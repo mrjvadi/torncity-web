@@ -17,8 +17,11 @@
   --text-dim: #a9b1d6;
   --text-faint: #7981a6;
 
-  --safe-t: env(safe-area-inset-top, 0px);
-  --safe-b: env(safe-area-inset-bottom, 0px);
+  /* Inside Telegram in full screen, its own close/menu buttons sit over the
+     top of the page: the content safe area (Bot API 8.0) keeps clear of
+     them, on top of the device's notch. */
+  --safe-t: max(env(safe-area-inset-top, 0px), calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px)));
+  --safe-b: max(env(safe-area-inset-bottom, 0px), calc(var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px)));
   --safe-l: env(safe-area-inset-left, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
 }
@@ -334,7 +337,7 @@ input {
 }
 .nx-chevron:disabled { opacity: 0.35; }
 .nx-ribbon {
-  flex: 1; text-align: center; font-size: 19px; padding: 10px 12px;
+  flex: 1; text-align: center; font-size: 17px; font-weight: 700; padding: 10px 12px;
   border-radius: 10px; border: 1px solid var(--gold-soft); color: #fff;
 }
 .nx-tone-gold { background: linear-gradient(180deg, #7a5a12, #4a3608); }
@@ -404,7 +407,7 @@ input {
   background: linear-gradient(180deg, var(--panel), var(--panel-2));
   border: 1px solid var(--gold-soft); border-radius: 16px; padding: 16px 10px;
 }
-.nx-tile-title { font-size: 15px; color: var(--text); }
+.nx-tile-title { font-size: 14.5px; font-weight: 700; color: var(--text); }
 .nx-tile-sub { font-size: 11.5px; color: var(--text-dim); }
 .nx-tile-badge {
   position: absolute; top: -6px; left: -6px; background: var(--anar); color: #fff;
