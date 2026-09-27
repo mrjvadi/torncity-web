@@ -14,6 +14,10 @@ interface TelegramWebApp {
   contentSafeAreaInset?: { top: number; bottom: number; left: number; right: number }
   openTelegramLink?(url: string): void
   openLink?(url: string): void
+  isVersionAtLeast?(version: string): boolean
+  requestFullscreen?(): void
+  lockOrientation?(): void
+  isFullscreen?: boolean
 }
 
 declare global {
@@ -32,6 +36,13 @@ export function initTelegram(): void {
   try {
     wa.ready()
     wa.expand()
+    // Full screen (Bot API 8.0): the game takes the whole display, without
+    // Telegram's header; --safe-t keeps the HUD clear of its buttons. On a
+    // phone only, and upright, as the game is laid out.
+    if (wa.isVersionAtLeast?.('8.0') && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      wa.requestFullscreen?.()
+      wa.lockOrientation?.()
+    }
     wa.disableVerticalSwipes?.()
     wa.setHeaderColor?.('#080b16')
     wa.setBackgroundColor?.('#080b16')
