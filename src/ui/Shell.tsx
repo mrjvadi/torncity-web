@@ -8,6 +8,7 @@ import BottomSheet from './BottomSheet'
 import { useSession } from '../state/SessionContext'
 import { useScreen } from '../state/useScreen'
 import type { Action } from '../api/types'
+import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 
 const TAB_COMMAND: Record<TabKey, string> = {
   profile: 'player.profile.get',
@@ -17,16 +18,35 @@ const TAB_COMMAND: Record<TabKey, string> = {
   society: 'faction.mine',
 }
 
+/** A tab opens its hub (a local screen) when one is registered. */
+const TAB_HUB: Partial<Record<TabKey, string>> = {
+  activity: 'activity_hub',
+  market: 'economy_hub',
+  society: 'society_hub',
+}
+
+type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
+
 export default function Shell() {
   const { profile, exec, signOut } = useSession()
   const [tab, setTab] = useState<TabKey>('city')
-  const [screenKey, setScreenKey] = useState<{ command: string; args?: Record<string, string> }>({ command: TAB_COMMAND.city })
+  const [screenKey, setScreenKey] = useState<ScreenKey>({ command: TAB_COMMAND.city })
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
 
   function selectTab(next: TabKey) {
     setTab(next)
-    setScreenKey({ command: TAB_COMMAND[next] })
+    const hub = TAB_HUB[next]
+    if (hub && LOCAL_SCREENS[hub]) setScreenKey({ command: '', local: hub })
+    else setScreenKey({ command: TAB_COMMAND[next] })
+  }
+
+  function run(command: string, args?: Record<string, string>) {
+    setScreenKey({ command, args })
+  }
+
+  function openLocal(name: string, args?: Record<string, string>) {
+    setScreenKey({ command: '', local: name, args })
   }
 
   async function onAction(a: Action) {
@@ -35,8 +55,12 @@ export default function Shell() {
     if (res) setScreenKey({ command: a.command, args: a.args })
   }
 
-  const isCity = screenKey.command === TAB_COMMAND.city
-  const { response, loading } = useScreen(isCity ? null : screenKey.command, screenKey.args)
+  const isLocal = !!screenKey.local
+  const isCity = !isLocal && screenKey.command === TAB_COMMAND.city
+  const { response, loading } = useScreen(isCity || isLocal ? null : screenKey.command, screenKey.args)
+  const Local = isLocal ? LOCAL_SCREENS[screenKey.local!] : undefined
+  const Native = !isLocal && response?.screen ? SERVER_SCREENS[response.screen] : undefined
+  const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: screenKey.args }
 
   return (
     <div className="shell">
@@ -49,7 +73,10 @@ export default function Shell() {
         onAvatar={() => selectTab('profile')}
       />
       <main className="shell-main">
-        {isCity ? <CityView /> : <GenericScreen response={response} loading={loading} onAction={onAction} />}
+        {isCity ? <CityView />
+          : Local ? <Local {...props} />
+            : Native ? <Native {...props} />
+              : <GenericScreen response={response} loading={loading} onAction={onAction} />}
       </main>
       <Dock active={tab} onSelect={selectTab} />
 
