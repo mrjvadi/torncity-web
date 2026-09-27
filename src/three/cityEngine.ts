@@ -1,7 +1,10 @@
 import * as THREE from 'three'
 import type { CityMap, CityPlot, ModelLibrary } from '../api/types'
-import { cloneMesh, loadModelLibrary } from './assetCache'
+import { cloneMesh, loadModelLibrary, starterGeometry, cloneStarter } from './assetCache'
+import { buildKind, classifyStrict, classifyGeneric, hashSeed } from './builders'
 import { report } from '../lib/reporter'
+
+const HOUSES = ['building-small-a', 'building-small-b', 'building-small-c', 'building-small-d', 'building-garage']
 
 export interface LabelPoint {
   id: string
@@ -11,9 +14,24 @@ export interface LabelPoint {
   visible: boolean
 }
 
+export interface BubbleAnchor {
+  id: string
+  x: number
+  y: number
+  z: number
+}
+
+export interface BubbleScreenPoint {
+  id: string
+  x: number
+  y: number
+  visible: boolean
+}
+
 export interface CityEngineOptions {
   onPlotTap: (plot: CityPlot) => void
   onLabels: (labels: LabelPoint[]) => void
+  onBubbles?: (points: BubbleScreenPoint[]) => void
 }
 
 const MIN_FRUSTUM = 4
@@ -25,12 +43,13 @@ export class CityEngine {
   private scene = new THREE.Scene()
   private camera: THREE.OrthographicCamera
   private target = new THREE.Vector3(0, 0, 0)
-  private frustum = 14
+  private frustum = 10
   private bounds = { minX: -4, maxX: 20, minZ: -4, maxZ: 20 }
   private raf = 0
   private opts: CityEngineOptions
   private plots: CityPlot[] = []
   private placeLabels: { plot: CityPlot; world: THREE.Vector3 }[] = []
+  private bubbleAnchors: BubbleAnchor[] = []
   private disposed = false
 
   // pan/zoom pointer state
@@ -48,17 +67,16 @@ export class CityEngine {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: dpr < 2,
-      alpha: false,
+      alpha: true,
       powerPreference: 'low-power',
     })
     this.renderer.setPixelRatio(dpr)
-    this.renderer.setClearColor(0x0b1330, 1)
+    this.renderer.setClearColor(0x000000, 0)
 
     const aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight)
     this.camera = new THREE.OrthographicCamera(-this.frustum * aspect, this.frustum * aspect, this.frustum, -this.frustum, 0.1, 200)
     this.placeCamera()
 
-    this.buildSky()
     this.buildLights()
 
     canvas.addEventListener('webglcontextlost', this.onContextLost, false)
@@ -77,20 +95,11 @@ export class CityEngine {
     report('webglcontextlost', 'city view lost its WebGL context')
   }
 
-  private buildSky() {
-    const top = new THREE.Color('#1b2a5c')
-    const bottom = new THREE.Color('#e9926a')
-    const geo = new THREE.SphereGeometry(150, 16, 16)
-    const mat = new THREE.ShaderMaterial({
-      uniforms: { top: { value: top }, bottom: { value: bottom } },
-      vertexShader: `varying vec3 vPos; void main() { vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-      fragmentShader: `varying vec3 vPos; uniform vec3 top; uniform vec3 bottom; void main() { float h = normalize(vPos).y * 0.5 + 0.5; gl_FragColor = vec4(mix(bottom, top, h), 1.0); }`,
-      side: THREE.BackSide,
-      depthWrite: false,
-    })
-    const sky = new THREE.Mesh(geo, mat)
-    this.scene.add(sky)
-  }
+  // The dusk sky is a plain CSS gradient behind the (alpha-transparent)
+  // canvas, not a 3D sphere: an orthographic camera's rays are all parallel,
+  // so a world-space sky sphere renders as a few flat, hard-edged bands
+  // instead of a smooth gradient. A screen-space gradient is also one less
+  // big mesh to draw every frame — better for an iPhone's battery too.
 
   private buildLights() {
     const sun = new THREE.DirectionalLight(0xffb27a, 2.0)
@@ -98,6 +107,8 @@ export class CityEngine {
     this.scene.add(sun)
     const ambient = new THREE.HemisphereLight(0x7f8fd0, 0x22263a, 1.1)
     this.scene.add(ambient)
+    // a soft dusk haze, as the prototype's fog_light_color/fog_density
+    this.scene.fog = new THREE.FogExp2(0x3b3f74, 0.012)
   }
 
   private placeCamera() {
@@ -137,9 +148,10 @@ export class CityEngine {
     this.placeCamera()
 
     this.buildGround(cityMap)
-    this.buildRoads(cityMap)
+    void this.buildRoads(cityMap)
     this.buildWater(cityMap)
     this.buildPlotBases(cityMap)
+    void this.buildGreenery(cityMap)
     void this.buildModels(cityMap)
     this.updateLabels()
   }
@@ -153,8 +165,52 @@ export class CityEngine {
     this.scene.add(mesh)
   }
 
-  private buildRoads(cityMap: CityMap) {
+  /** Road tiles from the owner's own Starter Kit (proto/art/models), the way
+   * the prototype lays them: a straight tile turned to face its neighbours,
+   * an intersection tile where two roads cross. Two InstancedMeshes (one
+   * geometry/material pair each, shared with every tile of that kind) keep
+   * a city full of roads to one draw call per kind. Falls back to a flat
+   * tinted plane if the kit fails to load (offline, a slow first paint). */
+  private async buildRoads(cityMap: CityMap) {
     if (cityMap.roads.length === 0) return
+    const cells = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
+    const has = (x: number, y: number) => cells.has(`${x},${y}`)
+    const straight = await starterGeometry('road-straight')
+    const cross = await starterGeometry('road-intersection')
+    if (this.disposed) return
+    if (!straight || !cross) {
+      this.buildFlatRoads(cityMap)
+      return
+    }
+    const straightMesh = new THREE.InstancedMesh(straight.geometry, straight.material, cityMap.roads.length)
+    const crossMesh = new THREE.InstancedMesh(cross.geometry, cross.material, cityMap.roads.length)
+    let ns = 0
+    let nc = 0
+    const m = new THREE.Matrix4()
+    const q = new THREE.Quaternion()
+    const up = new THREE.Vector3(0, 1, 0)
+    for (const [x, y] of cityMap.roads) {
+      const ew = has(x - 1, y) || has(x + 1, y)
+      const ns2 = has(x, y - 1) || has(x, y + 1)
+      const pos = new THREE.Vector3(x + 0.5, 0.005, y + 0.5)
+      if (ew && ns2) {
+        q.identity()
+        m.compose(pos, q, new THREE.Vector3(1, 1, 1))
+        crossMesh.setMatrixAt(nc++, m)
+      } else {
+        q.setFromAxisAngle(up, ew ? Math.PI / 2 : 0)
+        m.compose(pos, q, new THREE.Vector3(1, 1, 1))
+        straightMesh.setMatrixAt(ns++, m)
+      }
+    }
+    straightMesh.count = ns
+    crossMesh.count = nc
+    straightMesh.instanceMatrix.needsUpdate = true
+    crossMesh.instanceMatrix.needsUpdate = true
+    this.scene.add(straightMesh, crossMesh)
+  }
+
+  private buildFlatRoads(cityMap: CityMap) {
     const geo = new THREE.PlaneGeometry(1, 1)
     geo.rotateX(-Math.PI / 2)
     const mat = new THREE.MeshLambertMaterial({ color: 0x555a6e })
@@ -162,6 +218,39 @@ export class CityEngine {
     const m = new THREE.Matrix4()
     cityMap.roads.forEach(([x, y], i) => {
       m.makeTranslation(x + 0.5, 0.005, y + 0.5)
+      mesh.setMatrixAt(i, m)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+    this.scene.add(mesh)
+  }
+
+  /** Grass and trees from the Starter Kit, scattered over the ground cells a
+   * road or a plot does not cover — one InstancedMesh, so the greenery never
+   * costs more than a single draw call regardless of the city's size. */
+  private async buildGreenery(cityMap: CityMap) {
+    const taken = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
+    for (const p of cityMap.plots) {
+      for (let dx = 0; dx < p.w; dx++) {
+        for (let dy = 0; dy < p.h; dy++) taken.add(`${p.x + dx},${p.y + dy}`)
+      }
+    }
+    const spots: [number, number][] = []
+    for (let x = 0; x < cityMap.grid.w; x++) {
+      for (let y = 0; y < cityMap.grid.h; y++) {
+        if (taken.has(`${x},${y}`)) continue
+        if (((x * 131 + y * 977) % 5) === 0) spots.push([x, y])
+      }
+    }
+    if (spots.length === 0) return
+    const tree = await starterGeometry('grass-trees')
+    if (!tree || this.disposed) return
+    const mesh = new THREE.InstancedMesh(tree.geometry, tree.material, spots.length)
+    const m = new THREE.Matrix4()
+    const q = new THREE.Quaternion()
+    const up = new THREE.Vector3(0, 1, 0)
+    spots.forEach(([x, y], i) => {
+      q.setFromAxisAngle(up, ((x * 7 + y * 13) % 4) * (Math.PI / 2))
+      m.compose(new THREE.Vector3(x + 0.5, 0, y + 0.5), q, new THREE.Vector3(1, 1, 1))
       mesh.setMatrixAt(i, m)
     })
     mesh.instanceMatrix.needsUpdate = true
@@ -201,33 +290,36 @@ export class CityEngine {
     if (cityMap.plots.length === 0) return
     const geo = new THREE.PlaneGeometry(1, 1)
     geo.rotateX(-Math.PI / 2)
-    const mat = new THREE.MeshLambertMaterial({ color: 0x8a8f9e, vertexColors: true })
+    // a quiet kerb/pavement pad under every building, not a category colour:
+    // the building itself (procedural or modelled) now carries that read
+    const mat = new THREE.MeshLambertMaterial({ color: 0xc9c4b8 })
     const mesh = new THREE.InstancedMesh(geo, mat, cityMap.plots.length)
     const m = new THREE.Matrix4()
-    const color = new THREE.Color()
     cityMap.plots.forEach((p, i) => {
       m.compose(
-        new THREE.Vector3(p.x + p.w / 2, 0.01, p.y + p.h / 2),
+        new THREE.Vector3(p.x + p.w / 2, 0.008, p.y + p.h / 2),
         new THREE.Quaternion(),
-        new THREE.Vector3(p.w * 0.94, 1, p.h * 0.94),
+        new THREE.Vector3(p.w * 0.96, 1, p.h * 0.96),
       )
       mesh.setMatrixAt(i, m)
-      const c = p.kind === 'company' ? 0x2a4bc8 : p.kind === 'place' ? 0x2bc4b2 : 0x4cc47e
-      color.set(c)
-      mesh.setColorAt(i, color)
     })
     mesh.instanceMatrix.needsUpdate = true
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
     this.scene.add(mesh)
   }
 
+  /** One building per plot, in three tiers: the owner's own procedural kit
+   * when a plot's model key names something the kit knows how to draw (a
+   * bazaar, a bank, a factory, a shop, a villa...); the CDN's model library
+   * (the isometric Kenney set already served from webomm.ir404.site) when
+   * the key names something else the catalogue modelled; and, only then, a
+   * generic shape from the kit (a tower, a small civic front) so nothing
+   * plot is ever left bare. Buildings are coloured by a hash of the plot's
+   * id so a street of generic towers still reads as a street, not a repeat. */
   private async buildModels(cityMap: CityMap) {
-    const library = await loadModelLibrary()
-    if (!library || this.disposed) return
     this.placeLabels = []
+    const library = await loadModelLibrary().catch(() => null)
     for (const plot of cityMap.plots) {
       if (this.disposed) return
-      const entry = this.resolveModel(library, plot.model)
       const group = new THREE.Group()
       const plotScale = clamp(Math.min(plot.w, plot.h) / 2, 0.8, 1.35)
       group.position.set(plot.x + plot.w / 2, 0, plot.y + plot.h / 2)
@@ -238,14 +330,36 @@ export class CityEngine {
       if (plot.kind === 'place') {
         this.placeLabels.push({ plot, world: new THREE.Vector3(plot.x + plot.w / 2, 1.6 * plotScale, plot.y + plot.h / 2) })
       }
+      if (plot.kind === 'decor') continue
 
-      if (!entry) continue
-      for (const part of entry.parts) {
-        const instance = await cloneMesh(part.mesh)
-        if (!instance || this.disposed) continue
-        fitAndPlacePart(instance, part)
-        group.add(instance)
+      const kit = classifyStrict(plot.model)
+      if (kit) {
+        group.add(buildKind(kit, hashSeed(plot.id)))
+        continue
       }
+
+      const entry = library ? this.resolveModel(library, plot.model) : null
+      if (entry) {
+        for (const part of entry.parts) {
+          const instance = await cloneMesh(part.mesh)
+          if (!instance || this.disposed) continue
+          fitAndPlacePart(instance, part)
+          group.add(instance)
+        }
+        continue
+      }
+
+      // last resort: a generic shape from the kit, or (for a company) a
+      // Starter Kit house for a little of the owner's own art on the street
+      if (plot.kind === 'company') {
+        const house = await cloneStarter(HOUSES[hashSeed(plot.id) % HOUSES.length])
+        if (house && !this.disposed) {
+          house.scale.setScalar(0.62)
+          group.add(house)
+          continue
+        }
+      }
+      group.add(buildKind(classifyGeneric(plot.kind, hashSeed(plot.id)), hashSeed(plot.id)))
     }
     this.updateLabels()
   }
@@ -273,6 +387,27 @@ export class CityEngine {
       }
     })
     this.opts.onLabels(labels)
+    this.updateBubbles()
+  }
+
+  /** Screen-anchors the world bubbles (home_proto.gd `_world_bubbles`) hang
+   * over: the caller names the plots it cares about once (setBubbleAnchors),
+   * and every frame they get the same camera-projected x/y as a place's
+   * label, so they track a pan/zoom exactly like the buildings do. */
+  setBubbleAnchors(anchors: BubbleAnchor[]) {
+    this.bubbleAnchors = anchors
+    this.updateBubbles()
+  }
+
+  private updateBubbles() {
+    if (!this.opts.onBubbles) return
+    const w = this.canvas.clientWidth
+    const h = this.canvas.clientHeight
+    const points: BubbleScreenPoint[] = this.bubbleAnchors.map((a) => {
+      const p = new THREE.Vector3(a.x, a.y, a.z).project(this.camera)
+      return { id: a.id, x: (p.x * 0.5 + 0.5) * w, y: (-p.y * 0.5 + 0.5) * h, visible: p.z < 1 }
+    })
+    this.opts.onBubbles(points)
   }
 
   // -- input: pan with inertia, pinch/wheel zoom, tap to pick a plot --------
