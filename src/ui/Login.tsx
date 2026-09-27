@@ -42,9 +42,9 @@ export default function Login() {
     <div className="login-screen">
       <div className="login-card">
         <div className="login-badge"><Icon name="city" palette="gold" size={44} /></div>
-        <h1 className="display">شهر تورن</h1>
+        <h1 className="display">تورن‌سیتی</h1>
         <p className="login-hint">
-          در چت خصوصی با ربات دستور <b>اتصال</b> (/link) را بفرستید و کد ۸ رقمی را اینجا وارد کنید.
+          در چت خصوصی با ربات دستور <b>اتصال</b> (/link) را بفرستید و کد 8 حرفی را اینجا وارد کنید.
         </p>
         <form onSubmit={onSubmit} className="login-form">
           <input
