@@ -3,6 +3,8 @@
 // backend. Never enabled unless the query string asks for it.
 
 import { API_BASE } from './client'
+import { mockFeatureCommand } from './mock_features'
+import { mockNativeCommand } from './mock_views'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -24,9 +26,16 @@ const MOCK_AUTH = {
 const MOCK_PROFILE_VIEW = {
   name: 'سارا', code: 'K7Q2M9A', avatar: '🦊', city_code: 'calderis', city: 'کالدریس',
   place: { code: 'old_town', name: 'مرکز شهر' },
-  level: 7, xp: 5400, next_level_xp: 6500, energy: 72, max_energy: 100, energy_full_in_seconds: 2820,
+  level: 7, xp: 5400, next_level_xp: 6500, energy: 72, max_energy: 100, energy_full_in_seconds: 720,
   health: 88, max_health: 100, cash: 12450, bank: 86300, travelling: false,
   rank: { code: 'citizen', name: 'شهروند', emoji: '🎖' },
+  // matches job.status's mock below (business_district, no active shift):
+  // the home overlay's ready-toast and shift-ready world bubble read this
+  work: {
+    job: { job: { career_code: 'retail', career_name: 'تجارت', rank: 'senior', title: 'فروشنده‌ی ارشد' }, city_code: 'calderis', city: 'کالدریس', pay: 1850, shift_ends_in_seconds: 0 },
+    course: { course: { code: 'mgmt101', name: 'مدیریت پایه' }, remaining_seconds: 0, paused: false },
+    certificates: 2,
+  },
   jail: null, hospital: null,
 }
 
@@ -43,13 +52,24 @@ const MOCK_CITY_MAP = {
     { id: 'place:old_town', x: 4, y: 3, w: 2, h: 2, kind: 'place', model: 'place:old_town', rot: 0, ref: { table: 'place', code: 'old_town' }, name: { fa: 'مرکز شهر', en: 'Old Town' } },
     { id: 'company:Q7M2K9B', x: 8, y: 3, w: 2, h: 2, kind: 'company', model: 'company:factory', rot: 90, ref: { table: 'company_type', code: 'factory', company_id: 'Q7M2K9B', owner: 'سارا' }, name: { fa: 'استودیو دانا', en: 'Dana Studio' } },
     { id: 'place:harbour', x: 2, y: 8, w: 2, h: 2, kind: 'place', model: 'place:harbour', rot: 0, ref: { table: 'place', code: 'harbour' }, name: { fa: 'باغ آسمان', en: 'Harbour' } },
+    // matches job.status's mock workplace, so the shift-ready world bubble
+    // (CityView) has a real building to anchor itself over
+    { id: 'place:business_district', x: 6, y: 8, w: 2, h: 2, kind: 'place', model: 'place:bazaar', rot: 0, ref: { table: 'place', code: 'business_district' }, name: { fa: 'فروشگاه‌های البرز', en: 'Alborz Shops' } },
   ],
 }
 
-function mockCommand(command: string) {
+function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.profile.get') {
     return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view: MOCK_PROFILE_VIEW, actions: [] })
   }
+  // war/military (no structured view yet) and friends/search (structured):
+  // the features area's own mock data (src/api/mock_features.ts).
+  const feature = mockFeatureCommand(command, args)
+  if (feature) return json(feature)
+  // Native screens with a real view (src/screens/native/*): real shapes
+  // adapted from the golden view-snapshots (src/api/mock_views.ts).
+  const native = mockNativeCommand(command, args)
+  if (native) return json({ ok: true, ...native })
   return json({
     ok: true,
     screen: command.replace('.', '_'),
@@ -87,7 +107,7 @@ export function installMockApi(): void {
     }
     if (path === '/api/v1/command' && init?.body) {
       const body = JSON.parse(String(init.body))
-      return mockCommand(body.command)
+      return mockCommand(body.command, body.args)
     }
     if (path === '/api/v1/auth/logout') {
       return json({ ok: true })
