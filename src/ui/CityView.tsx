@@ -111,7 +111,7 @@ function PlotSheet({ plot, onClose, exec }: { plot: CityPlot | null; onClose: ()
         busy ? (
           <div className="skeleton" style={{ height: 60 }} />
         ) : company?.text ? (
-          <div dangerouslySetInnerHTML={{ __html: sanitizeTelegramHtml(company.text) }} style={{ lineHeight: 2, fontSize: 14 }} />
+          <div className="screen-text" dangerouslySetInnerHTML={{ __html: sanitizeTelegramHtml(company.text) }} />
         ) : (
           <p style={{ color: 'var(--text-dim)' }}>اطلاعاتی برای این کسب‌وکار یافت نشد.</p>
         )

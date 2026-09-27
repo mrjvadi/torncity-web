@@ -143,14 +143,6 @@ function GenericStyles() {
         border-radius: 18px;
         padding: 16px;
       }
-      .screen-text { font-size: 15px; line-height: 2; color: var(--text); white-space: normal; }
-      .screen-text b { color: var(--gold); }
-      .screen-text code { background: rgba(255,255,255,0.08); border-radius: 4px; padding: 1px 6px; direction: ltr; display: inline-block; }
-      .screen-text .tg-quote { border-inline-start: 3px solid var(--gold-soft); padding: 4px 10px; margin: 8px 0; background: rgba(255,255,255,0.03); border-radius: 8px; }
-      .screen-text .tg-quote summary { cursor: pointer; color: var(--gold); list-style: none; }
-      .screen-text .tg-quote summary::-webkit-details-marker { display: none; }
-      .screen-text .tg-quote summary::before { content: '▸ بیشتر'; }
-      .screen-text .tg-quote[open] summary::before { content: '▾ کمتر'; }
 
       .action-row { display: flex; flex-wrap: wrap; gap: 10px; }
       .action-primary {
