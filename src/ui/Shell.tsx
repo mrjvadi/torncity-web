@@ -73,7 +73,7 @@ export default function Shell() {
         onAvatar={() => selectTab('profile')}
       />
       <main className="shell-main">
-        {isCity ? <CityView />
+        {isCity ? <CityView onTab={selectTab} onInbox={() => setBellOpen(true)} />
           : Local ? <Local {...props} />
             : Native ? <Native {...props} />
               : <GenericScreen response={response} loading={loading} onAction={onAction} />}
