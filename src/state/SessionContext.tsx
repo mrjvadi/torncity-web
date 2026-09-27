@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import * as api from '../api/client'
 import type { Bootstrap, CommandResponse, ProfileView } from '../api/types'
 import { report } from '../lib/reporter'
+import { friendlyError } from '../lib/errors'
 import { initTelegram, telegramInitData } from '../lib/telegram'
 import { useToast } from './ToastContext'
 
@@ -48,7 +49,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       report('boot', 'signed in and bootstrapped')
     } catch (e) {
       report('boot', 'bootstrap failed: ' + String(e))
-      setError(e instanceof Error ? e.message : String(e))
+      setError(friendlyError(e))
       setStatus('signed_out')
     }
   }, [])
@@ -75,8 +76,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       await afterSignedIn()
     } catch (e) {
       setStatus('signed_out')
-      const message = e instanceof Error ? e.message : String(e)
-      setError(message)
+      setError(friendlyError(e))
       throw e
     }
   }, [afterSignedIn])
@@ -91,7 +91,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       await afterSignedIn()
     } catch (e) {
       setStatus('signed_out')
-      setError(e instanceof Error ? e.message : String(e))
+      setError(friendlyError(e))
     }
   }, [afterSignedIn])
 
@@ -122,7 +122,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       void refreshProfile()
       return res
     } catch (e) {
-      toast.push(e instanceof Error ? e.message : 'خطای شبکه')
+      toast.push(friendlyError(e))
       report('command', `${command} failed: ${String(e)}`)
       return null
     }

@@ -59,18 +59,18 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
       </div>
 
       <div className="hud-stat-row">
-        <button className="hud-corner" onClick={onMenu} aria-label="منو">
-          <Icon name="menu" palette="steel" size={26} />
-        </button>
+        <div className="hud-bars">
+          <StatBar icon="energy" palette="amber" color="#f5a623" value={profile?.energy ?? 0} max={profile?.max_energy ?? 100} frac={energyFrac} full={energyFull} fullIn={profile?.energy_full_in_seconds ?? 0} />
+          <StatBar icon="health" palette="emerald" color="#4cc47e" value={profile?.health ?? 0} max={profile?.max_health ?? 100} frac={healthFrac} full={healthFull} fullIn={0} />
+        </div>
+
         <button className="hud-corner" onClick={onBell} aria-label="اعلان‌ها">
           <Icon name="inbox" palette="sapphire" size={26} />
           {unread > 0 && <span className="hud-count">{unread < 100 ? unread : '99+'}</span>}
         </button>
-
-        <div className="hud-bars">
-          <StatBar icon="health" palette="emerald" color="#4cc47e" value={profile?.health ?? 0} max={profile?.max_health ?? 100} frac={healthFrac} full={healthFull} fullIn={0} />
-          <StatBar icon="energy" palette="amber" color="#f5a623" value={profile?.energy ?? 0} max={profile?.max_energy ?? 100} frac={energyFrac} full={energyFull} fullIn={profile?.energy_full_in_seconds ?? 0} />
-        </div>
+        <button className="hud-corner" onClick={onMenu} aria-label="منو">
+          <Icon name="menu" palette="steel" size={26} />
+        </button>
       </div>
       <HudStyles />
     </div>
@@ -119,12 +119,12 @@ function HudStyles() {
       .hud-stat-row { display: flex; align-items: center; gap: 8px; padding: 2px 12px 10px; }
       .hud-corner { position: relative; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
       .hud-count { position: absolute; top: -4px; left: -4px; background: var(--anar); color: #fff; font-size: 10px; border-radius: 8px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; border: 1px solid #2a0a0a; }
-      .hud-bars { flex: 1; display: flex; gap: 8px; justify-content: flex-end; }
-      .stat { position: relative; width: 128px; }
+      .hud-bars { flex: 1; display: flex; gap: 20px; justify-content: flex-end; padding-inline-start: 8px; }
+      .stat { position: relative; width: 122px; }
       .stat-bar { position: relative; height: 26px; border-radius: 13px; background: rgba(0,0,0,0.55); border: 2px solid; overflow: hidden; }
       .stat-fill { position: absolute; inset: 0; right: auto; border-radius: 13px; transition: width 0.4s; opacity: 0.85; }
       .stat-label { position: relative; z-index: 1; display: block; text-align: center; font-size: 14px; line-height: 22px; color: #fff; }
-      .stat-icon { position: absolute; top: -8px; left: -14px; }
+      .stat-icon { position: absolute; top: -7px; left: -6px; }
       .stat-chip { position: absolute; bottom: -16px; left: 8px; right: 8px; text-align: center; font-size: 10px; color: #ffd66b; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 1px 4px; }
     `}</style>
   )
