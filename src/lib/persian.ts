@@ -38,3 +38,13 @@ export function extractLinkCode(raw: string): string {
   const match = cleaned.match(/[A-Z0-9]{8}/)
   return match ? match[0] : cleaned.replace(/[^A-Z0-9]/g, '').slice(0, 8)
 }
+
+
+/** What a player is typing into the code field: Latin capitals and digits
+ * only (Persian digits read as digits, bidi marks and anything else dropped),
+ * at most 8. A whole pasted message goes through extractLinkCode instead. */
+export function typedLinkCode(raw: string): string {
+  const latin = raw.replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+  return latin.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)
+}

@@ -1,6 +1,6 @@
 import { useState, type ClipboardEvent, type FormEvent } from 'react'
 import { useSession } from '../state/SessionContext'
-import { extractLinkCode } from '../lib/persian'
+import { extractLinkCode, typedLinkCode } from '../lib/persian'
 import Icon from './Icon'
 
 export default function Login() {
@@ -50,7 +50,11 @@ export default function Login() {
           <input
             className="login-input display"
             value={code}
-            onChange={(e) => setCode(extractLinkCode(e.target.value))}
+            onChange={(e) => {
+              // a long value is a paste the browser did not report as one
+              const v = e.target.value
+              setCode(v.length > 12 ? extractLinkCode(v) || typedLinkCode(v) : typedLinkCode(v))
+            }}
             onPaste={onPaste}
             placeholder="XXXXXXXX"
             autoComplete="off"
@@ -58,7 +62,6 @@ export default function Login() {
             autoCorrect="off"
             spellCheck={false}
             inputMode="text"
-            maxLength={8}
             dir="ltr"
           />
           <button className="login-submit display" type="submit" disabled={code.length !== 8 || busy}>
