@@ -43,7 +43,7 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
               style={{ strokeDasharray: `${xpFrac * 276.5} 276.5` }}
             />
           </svg>
-          <span className="hud-avatar-plate"><Icon name="person" palette="teal" size={28} /></span>
+          <span className="hud-avatar-plate"><Icon name="person" palette="teal" size={24} /></span>
           <span className="hud-level display">{profile ? formatNumber(profile.level) : '–'}</span>
         </button>
 
@@ -66,11 +66,11 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
         </div>
 
         <button className="hud-corner" onClick={onBell} aria-label="اعلان‌ها">
-          <Icon name="inbox" palette="sapphire" size={19} />
+          <Icon name="inbox" palette="sapphire" size={16} />
           {unread > 0 && <span className="hud-count">{unread < 100 ? unread : '99+'}</span>}
         </button>
         <button className="hud-corner" onClick={onMenu} aria-label="منو">
-          <Icon name="menu" palette="steel" size={19} />
+          <Icon name="menu" palette="steel" size={16} />
         </button>
       </div>
 
@@ -94,7 +94,7 @@ function StatBar({ icon, palette, color, value, max, frac, full, fullIn }: {
 }) {
   return (
     <div className="stat">
-      <Icon name={icon} palette={palette} size={20} className="stat-icon" />
+      <Icon name={icon} palette={palette} size={17} className="stat-icon" />
       <div className="stat-bar" style={{ borderColor: color }}>
         <div className="stat-fill" style={{ width: `${frac * 100}%`, background: color }} />
         <span className="stat-label display">{formatNumber(value)}/{formatNumber(max)}</span>
@@ -112,7 +112,7 @@ function HudStyles() {
          where --safe-t already eats the top for its own button bar. */
       .hud { position: relative; z-index: 5; padding-top: var(--safe-t); background: linear-gradient(180deg, rgba(7,10,20,0.92), rgba(7,10,20,0.75) 70%, transparent); }
       .hud-top { display: flex; align-items: center; gap: 6px; padding: 6px 8px 2px; }
-      .hud-avatar { position: relative; width: 44px; height: 44px; flex: none; }
+      .hud-avatar { position: relative; width: 40px; height: 40px; flex: none; }
       .hud-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
       .ring-track { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 7; }
       .ring-value { fill: none; stroke: var(--firouzeh); stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray 0.4s; }
@@ -130,7 +130,7 @@ function HudStyles() {
       .hud-pill-value { font-size: 11.5px; color: var(--gold); min-width: 0; }
       .hud-bank .hud-pill-value { color: #8fb0ff; font-size: 10px; }
 
-      .hud-corner { position: relative; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
+      .hud-corner { position: relative; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
       .hud-count { position: absolute; top: -4px; left: -4px; background: var(--anar); color: #fff; font-size: 9px; border-radius: 7px; min-width: 13px; height: 13px; display: flex; align-items: center; justify-content: center; padding: 0 2px; border: 1px solid #2a0a0a; }
 
       /* each stat: its struck icon beside the bar, the value and the time it

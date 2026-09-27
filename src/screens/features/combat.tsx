@@ -23,7 +23,7 @@ const Gym: ScreenComponent = () => (
     <TileGrid>
       {BSTATS.map((b) => (
         <div className="ft-card" key={b.name} style={{ flex: '1 1 calc(50% - 5px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <Plate icon={b.icon} palette={b.palette} size={72} />
+          <Plate icon={b.icon} palette={b.palette} size={56} />
           <div className="display" style={{ fontSize: 16 }}>{b.name}</div>
           <div className="display" style={{ fontSize: 22, color: 'var(--gold)' }}>{b.value.toLocaleString('en-US')}</div>
           <div style={{ fontSize: 12, color: 'var(--leaf)' }}>+12 در هر تمرین</div>
@@ -119,7 +119,7 @@ const Bounty: ScreenComponent = () => (
       {WANTED.map((w) => (
         <div className="ft-poster" key={w.name} style={{ flex: '1 1 calc(50% - 5px)' }}>
           <div className="display" style={{ fontSize: 18 }}>تحت تعقیب</div>
-          <Plate icon={w.icon} palette={w.palette} size={80} />
+          <Plate icon={w.icon} palette={w.palette} size={60} />
           <div className="display" style={{ fontSize: 15 }}>{w.name}  ·  سطح {w.level}</div>
           <div className="display" style={{ fontSize: 20, color: '#b06a00' }}>{w.reward} نیل</div>
           <div style={{ fontSize: 12 }}>از طرف: {w.by}</div>

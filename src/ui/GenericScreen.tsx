@@ -64,6 +64,8 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
     setPendingInput(null)
   }
 
+  const lead = rows.flatMap(([, list]) => list).find((a) => a.kind === 'primary')
+
   return (
     <div className="screen-scroll">
       {response?.text && (
@@ -77,9 +79,7 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
 
       {rows.map(([row, actions]) => (
         <div className="action-row" key={row}>
-          {actions.map((a, i) => (
-            <ActionButton key={`${row}-${i}`} action={a} onClick={() => handleClick(a)} />
-          ))}
+          {actions.map((a, i) => <ActionButton key={`${row}-${i}`} action={a} lead={a === lead} onClick={() => handleClick(a)} />)}
         </div>
       ))}
 
@@ -108,11 +108,13 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
   )
 }
 
-function ActionButton({ action, onClick }: { action: Action; onClick: () => void }) {
+/** Only the lead primary is a gold slab; a second or third primary on the
+ * same screen steps down to an outlined button, so one choice leads. */
+function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean; onClick: () => void }) {
   if (action.kind === 'primary') {
     return (
-      <button className="action-primary display" onClick={onClick}>
-        <Icon name={action.icon ?? 'box'} palette="cream" size={22} />
+      <button className={`action-primary${lead ? '' : ' action-primary-alt'} display`} onClick={onClick}>
+        <Icon name={action.icon ?? 'box'} palette={lead ? 'cream' : 'gold'} size={18} />
         <span>{action.label}</span>
       </button>
     )
@@ -120,14 +122,22 @@ function ActionButton({ action, onClick }: { action: Action; onClick: () => void
   if (action.kind === 'danger' || action.kind === 'confirm') {
     return (
       <button className="action-danger display" onClick={onClick}>
-        <Icon name={action.icon ?? 'box'} palette="ruby" size={20} />
+        <Icon name={action.icon ?? 'box'} palette="ruby" size={18} />
         <span>{action.label}</span>
       </button>
     )
   }
+  if (action.kind === 'back') {
+    return (
+      <button className="action-tile action-back" onClick={onClick}>
+        <span className="action-back-arrow" aria-hidden>›</span>
+        <span className="action-tile-label">{action.label}</span>
+      </button>
+    )
+  }
   return (
-    <button className={`action-tile${action.kind === 'back' ? ' action-back' : ''}`} onClick={onClick}>
-      <Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={24} />
+    <button className="action-tile" onClick={onClick}>
+      <Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={20} />
       <span className="action-tile-label">{action.label}</span>
     </button>
   )
@@ -136,35 +146,39 @@ function ActionButton({ action, onClick }: { action: Action; onClick: () => void
 function GenericStyles() {
   return (
     <style>{`
-      .screen-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 14px calc(24px + var(--safe-b)); display: flex; flex-direction: column; gap: 12px; }
+      .screen-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 12px calc(20px + var(--safe-b)); display: flex; flex-direction: column; gap: 10px; }
       .screen-card {
         background: linear-gradient(180deg, var(--panel), var(--panel-2));
         border: 1px solid rgba(242,194,85,0.22);
-        border-radius: 18px;
-        padding: 16px;
+        border-radius: 14px;
+        padding: 12px;
       }
 
-      .action-row { display: flex; flex-wrap: wrap; gap: 10px; }
+      .action-row { display: flex; flex-wrap: wrap; gap: 8px; }
       .action-primary {
         flex: 1 1 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
         background: linear-gradient(180deg, #ffe680, #f5a11f); color: #4a2600;
-        font-size: 17px; padding: 14px; border-radius: 16px;
-        box-shadow: 0 6px 0 #9a4e06, 0 10px 20px rgba(0,0,0,0.3);
+        font-size: 15px; padding: 10px 12px; border-radius: 14px;
+        box-shadow: 0 4px 0 #9a4e06, 0 6px 14px rgba(0,0,0,0.3);
       }
-      .action-primary:active { transform: translateY(3px); box-shadow: 0 3px 0 #9a4e06; }
+      .action-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #9a4e06; }
+      .action-primary-alt { background: linear-gradient(180deg, rgba(242,194,85,0.16), rgba(242,194,85,0.05)); color: var(--gold); border: 1px solid var(--gold-soft); box-shadow: none; }
+      .action-primary-alt:active { box-shadow: none; }
       .action-danger {
         flex: 1 1 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
         background: linear-gradient(180deg, #4a1418, #2a0a0c); color: #ffd9db;
-        border: 1px solid var(--anar); font-size: 16px; padding: 13px; border-radius: 16px;
+        border: 1px solid var(--anar); font-size: 14px; padding: 10px; border-radius: 14px;
       }
       .action-tile {
-        flex: 1 1 calc(50% - 5px); min-width: 140px; display: flex; align-items: center; gap: 10px;
+        flex: 1 1 calc(50% - 4px); min-width: 130px; display: flex; align-items: center; gap: 8px;
         background: linear-gradient(180deg, var(--panel), var(--panel-2));
         border: 1px solid rgba(242,194,85,0.18);
-        border-radius: 14px; padding: 12px;
+        border-radius: 12px; padding: 9px 10px;
       }
-      .action-tile-label { font-size: 14px; color: var(--text); text-align: right; }
-      .action-back { border-color: rgba(255,255,255,0.15); }
+      .action-tile-label { font-size: 13px; color: var(--text); text-align: right; }
+      .action-back { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); justify-content: center; }
+      .action-back .action-tile-label { color: var(--text-dim); }
+      .action-back-arrow { font-size: 18px; line-height: 1; color: var(--text-dim); }
 
       .sheet-input {
         width: 100%; background: var(--panel-deep); border: 1px solid var(--gold-soft);

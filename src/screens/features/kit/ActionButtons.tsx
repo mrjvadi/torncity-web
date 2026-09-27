@@ -79,14 +79,14 @@ function OneButton({ action, onClick }: { action: Action; onClick: () => void })
   if (action.kind === 'primary') {
     return (
       <button className="ft-btn ft-btn-gold display" style={{ flex: '1 1 100%' }} onClick={onClick}>
-        <Icon name={icon} palette="cream" size={20} /><span>{action.label}</span>
+        <Icon name={icon} palette="cream" size={18} /><span>{action.label}</span>
       </button>
     )
   }
   if (action.kind === 'danger' || action.kind === 'confirm') {
     return (
       <button className="ft-btn ft-btn-red display" style={{ flex: '1 1 100%' }} onClick={onClick}>
-        <Icon name={icon} palette="cream" size={20} /><span>{action.label}</span>
+        <Icon name={icon} palette="cream" size={18} /><span>{action.label}</span>
       </button>
     )
   }
@@ -100,7 +100,7 @@ function OneButton({ action, onClick }: { action: Action; onClick: () => void })
       }}
       onClick={onClick}
     >
-      <Icon name={icon} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={20} />
+      <Icon name={icon} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={18} />
       <span>{action.label}</span>
     </button>
   )

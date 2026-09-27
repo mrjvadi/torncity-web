@@ -47,7 +47,7 @@ export function StatPair({ left, right }: { left: ReactNode; right: ReactNode })
 export function Stat({ icon, palette, label, value }: { icon: string; palette?: IconPalette; label: string; value: ReactNode }) {
   return (
     <div className="nx-stat">
-      <Icon name={icon} palette={palette ?? 'gold'} size={26} />
+      <Icon name={icon} palette={palette ?? 'gold'} size={22} />
       <div className="nx-stat-text">
         <div className="nx-stat-value display">{value}</div>
         <div className="nx-stat-label">{label}</div>
@@ -102,7 +102,7 @@ export function ListRow({ icon, palette, title, sub, right, tone, onClick }: {
   const Comp = onClick ? 'button' : 'div'
   return (
     <Comp className={`nx-row${tone ? ` nx-row-${tone}` : ''}${onClick ? ' nx-row-tap' : ''}`} onClick={onClick}>
-      <span className="nx-row-plate"><Icon name={icon} palette={palette ?? 'steel'} size={24} /></span>
+      <span className="nx-row-plate"><Icon name={icon} palette={palette ?? 'steel'} size={20} /></span>
       <span className="nx-row-text">
         <span className="nx-row-title">{title}</span>
         {sub && <span className="nx-row-sub">{sub}</span>}
@@ -126,7 +126,7 @@ export function Tile({ icon, palette, title, sub, badge, tone, onClick }: {
   return (
     <button className={`nx-tile${tone ? ` nx-tile-${tone}` : ''}`} onClick={onClick}>
       {!!badge && <span className="nx-tile-badge">{badge < 100 ? badge : '99+'}</span>}
-      <Icon name={icon} palette={palette ?? 'gold'} size={40} />
+      <Icon name={icon} palette={palette ?? 'gold'} size={30} />
       <span className="nx-tile-title">{title}</span>
       {sub && <span className="nx-tile-sub">{sub}</span>}
     </button>

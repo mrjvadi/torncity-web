@@ -26,7 +26,7 @@ export default function MenuSheet({ open, onClose, onPick, onSignOut }: MenuShee
       <div className="menu-grid">
         {USEFUL_COMMANDS.map((c) => (
           <button key={c.command} className="menu-item" onClick={() => { onPick(c.command); onClose() }}>
-            <Icon name={c.icon} palette="sapphire" size={26} />
+            <Icon name={c.icon} palette="sapphire" size={22} />
             <span>{c.label}</span>
           </button>
         ))}

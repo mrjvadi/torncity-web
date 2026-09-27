@@ -32,6 +32,8 @@ export default function Actions({ response, onAction, only }: {
     return [...byRow.entries()].sort((a, b) => a[0] - b[0])
   }, [response, only])
 
+  const lead = rows.flatMap(([, list]) => list).find((a) => a.kind === 'primary')
+
   if (rows.length === 0) return null
 
   function handleClick(a: Action) {
@@ -63,7 +65,7 @@ export default function Actions({ response, onAction, only }: {
     <div className="nx-actions">
       {rows.map(([row, actions]) => (
         <div className="nx-action-row" key={row}>
-          {actions.map((a, i) => <ActionButton key={`${row}-${i}`} action={a} onClick={() => handleClick(a)} />)}
+          {actions.map((a, i) => <ActionButton key={`${row}-${i}`} action={a} lead={a === lead} onClick={() => handleClick(a)} />)}
         </div>
       ))}
 
@@ -90,11 +92,13 @@ export default function Actions({ response, onAction, only }: {
   )
 }
 
-function ActionButton({ action, onClick }: { action: Action; onClick: () => void }) {
+/** Only the lead primary is a gold slab; a second or third primary on the
+ * same screen steps down to an outlined button, so one choice leads. */
+function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean; onClick: () => void }) {
   if (action.kind === 'primary') {
     return (
-      <button className="nx-primary display" onClick={onClick}>
-        <Icon name={action.icon ?? 'box'} palette="cream" size={22} />
+      <button className={`nx-primary${lead ? '' : ' nx-primary-alt'} display`} onClick={onClick}>
+        <Icon name={action.icon ?? 'box'} palette={lead ? 'cream' : 'gold'} size={18} />
         <span>{action.label}</span>
       </button>
     )
@@ -102,14 +106,22 @@ function ActionButton({ action, onClick }: { action: Action; onClick: () => void
   if (action.kind === 'danger' || action.kind === 'confirm') {
     return (
       <button className="nx-action-danger display" onClick={onClick}>
-        <Icon name={action.icon ?? 'box'} palette="ruby" size={20} />
+        <Icon name={action.icon ?? 'box'} palette="ruby" size={18} />
         <span>{action.label}</span>
       </button>
     )
   }
+  if (action.kind === 'back') {
+    return (
+      <button className="nx-action-tile nx-action-back" onClick={onClick}>
+        <span className="nx-action-back-arrow" aria-hidden>›</span>
+        <span className="nx-action-tile-label">{action.label}</span>
+      </button>
+    )
+  }
   return (
-    <button className={`nx-action-tile${action.kind === 'back' ? ' nx-action-back' : ''}`} onClick={onClick}>
-      <Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={24} />
+    <button className="nx-action-tile" onClick={onClick}>
+      <Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={20} />
       <span className="nx-action-tile-label">{action.label}</span>
     </button>
   )

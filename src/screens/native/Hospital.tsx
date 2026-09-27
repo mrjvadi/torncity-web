@@ -26,8 +26,8 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '8px 0' }}>
         {v.in_hospital && v.cause && <span className="nx-chip nx-chip-ruby">{CAUSE_FA[v.cause] ?? v.cause}</span>}
-        <Ring frac={frac} color={v.in_hospital ? 'var(--anar)' : 'var(--leaf)'} size={130}>
-          <Icon name="health" palette={v.in_hospital ? 'ruby' : 'emerald'} size={40} />
+        <Ring frac={frac} color={v.in_hospital ? 'var(--anar)' : 'var(--leaf)'} size={110}>
+          <Icon name="health" palette={v.in_hospital ? 'ruby' : 'emerald'} size={32} />
         </Ring>
         {v.in_hospital ? (
           <>

@@ -36,7 +36,7 @@ export function Hero({
 }) {
   return (
     <div className={`ft-hero ft-tint-${tint}`}>
-      <div className="ft-hero-icon"><Icon name={icon} palette={TINT_ICON_PALETTE[tint]} size={40} /></div>
+      <div className="ft-hero-icon"><Icon name={icon} palette={TINT_ICON_PALETTE[tint]} size={30} /></div>
       {stat && (
         <div style={{ marginBottom: 6 }}>
           <div className="ft-hero-stat-label">{stat.label}</div>
@@ -66,7 +66,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
 /** A list row: a plated icon, a title and a line under it, an optional value
  * at the end — the prototype's `_row`/`_person`. */
 export function Row({
-  icon, palette = 'steel', title, sub, right, rightColor, online, badge, size = 48,
+  icon, palette = 'steel', title, sub, right, rightColor, online, badge, size = 38,
 }: {
   icon: string
   palette?: IconPalette
@@ -91,7 +91,7 @@ export function Row({
 }
 
 export function Plate({
-  icon, palette = 'steel', size = 48, online, badge, bg,
+  icon, palette = 'steel', size = 38, online, badge, bg,
 }: { icon: string; palette?: IconPalette; size?: number; online?: boolean; badge?: number; bg?: string }) {
   return (
     <span className="ft-plate" style={{ width: size, height: size, background: bg ?? 'rgba(255,255,255,0.06)' }}>
@@ -111,7 +111,7 @@ export function Tile({
 }: { icon: string; palette?: IconPalette; title: string; sub?: string; glow?: boolean }) {
   return (
     <div className="ft-tile" style={glow ? { borderColor: 'rgba(242,194,85,0.6)' } : undefined}>
-      <Plate icon={icon} palette={palette} size={56} />
+      <Plate icon={icon} palette={palette} size={44} />
       <div className="ft-tile-title display">{title}</div>
       {sub && <div className="ft-tile-sub">{sub}</div>}
     </div>

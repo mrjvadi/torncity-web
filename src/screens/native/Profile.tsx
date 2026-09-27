@@ -49,7 +49,7 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
             </div>
           </div>
           <div style={{ width: 78, height: 78, borderRadius: '50%', background: 'radial-gradient(circle at 40% 30%, #14655f, #0a2a27)', border: '2px solid var(--gold-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-            <Icon name="person" palette="teal" size={44} />
+            <Icon name="person" palette="teal" size={36} />
           </div>
         </div>
       </Card>
@@ -99,7 +99,7 @@ function NeedsGrid({ needs }: { needs: NonNullable<ProfileView['needs']> }) {
               <span className="nx-bar-label display" style={{ lineHeight: '18px', fontSize: 12 }}>{formatNumber(needs[i.key] as number)}</span>
             </div>
           </div>
-          <Icon name={i.icon} palette="steel" size={20} />
+          <Icon name={i.icon} palette="steel" size={18} />
         </div>
       ))}
     </div>

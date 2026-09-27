@@ -35,7 +35,7 @@ export default function Inventory({ response, loading, onAction, run }: ScreenPr
             onClick={() => l.item?.code && run('inventory.item', { item: l.item.code })}
           >
             {!!(l.qty && l.qty > 1) && <span className="nx-tile-badge">{formatNumber(l.qty)}×</span>}
-            <Icon name="box" palette="gold" size={36} />
+            <Icon name="box" palette="gold" size={28} />
             <span className="nx-tile-title display">{l.item?.name ?? l.item?.code ?? '—'}</span>
             {(l.durability !== undefined || l.uses_left !== undefined) && (
               <span className="nx-tile-sub">
