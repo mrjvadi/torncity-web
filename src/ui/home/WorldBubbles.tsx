@@ -34,7 +34,7 @@ export default function WorldBubbles({ bubbles, points }: WorldBubblesProps) {
             style={{ left: p.x, top: p.y }}
             onClick={b.onTap}
           >
-            <span className="bubble-plate"><Icon name={b.icon} palette={b.palette} size={30} /></span>
+            <span className="bubble-plate"><Icon name={b.icon} palette={b.palette} size={22} /></span>
             <span className="bubble-chip display">{b.text}</span>
             <span className="bubble-pin" />
           </button>

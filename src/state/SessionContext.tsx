@@ -102,6 +102,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setStatus('signed_out')
   }, [])
 
+  // The HUD's numbers follow every answer that carries them (api.onView),
+  // and are re-read every minute and whenever the player comes back to the
+  // app, so they never disagree with the screen in front of them.
+  useEffect(() => {
+    const keys = ['name', 'level', 'xp', 'next_level_xp', 'energy', 'max_energy', 'energy_full_in_seconds',
+      'health', 'max_health', 'cash', 'bank', 'rank', 'nerve', 'max_nerve', 'nerve_full_in_seconds']
+    return api.onView((view) => {
+      const patch: Record<string, unknown> = {}
+      for (const k of keys) if (view[k] !== undefined && view[k] !== null) patch[k] = view[k]
+      if (Object.keys(patch).length > 0) {
+        setProfile((p) => (p ? ({ ...p, ...patch } as ProfileView) : p))
+      }
+    })
+  }, [])
+
   const refreshProfile = useCallback(async () => {
     try {
       const p = await api.runCommand('player.profile.get')
@@ -110,6 +125,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       // keep the last known profile
     }
   }, [])
+
+  useEffect(() => {
+    if (status !== 'signed_in') return
+    const tick = window.setInterval(() => { void refreshProfile() }, 60_000)
+    const back = () => { if (document.visibilityState === 'visible') void refreshProfile() }
+    document.addEventListener('visibilitychange', back)
+    window.addEventListener('focus', back)
+    return () => {
+      window.clearInterval(tick)
+      document.removeEventListener('visibilitychange', back)
+      window.removeEventListener('focus', back)
+    }
+  }, [status, refreshProfile])
 
   const exec = useCallback(async (command: string, args: Record<string, string> = {}) => {
     try {

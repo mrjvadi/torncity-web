@@ -42,19 +42,18 @@ export default function SidePlates({ onMissions, onGift, onRank, onInbox, onFact
   )
 }
 
-/** Even top offsets within the city view's own height, not the viewport's —
- * the column starts a little below the HUD and never crowds the dock. */
+/** Even centre offsets within the city view's own height: the first plate
+ * clears the HUD above it, the last stays above the ready card at the foot. */
 function topFor(i: number, count: number): string {
-  const start = 6
-  const span = 46
-  return `${start + (i * span) / Math.max(1, count - 1 || 1)}%`
+  const frac = count > 1 ? i / (count - 1) : 0
+  return `calc(44px + (100% - 44px - 160px) * ${frac.toFixed(3)})`
 }
 
 function Plate({ icon, palette, label, count, onTap, side, top }: PlateDef & { side: 'left' | 'right'; top: string }) {
   return (
     <button className="plate" style={{ top, [side]: '4%' } as CSSProperties} onClick={onTap}>
       <span className="plate-ring">
-        <Icon name={icon} palette={palette} size={34} />
+        <Icon name={icon} palette={palette} size={25} />
       </span>
       <span className="plate-cap display">{label}</span>
       {!!count && count > 0 && <span className="plate-count">{count < 100 ? count : '99+'}</span>}

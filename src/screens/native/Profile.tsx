@@ -39,7 +39,7 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
               <div className="nx-bar" style={{ borderColor: 'var(--firouzeh)', height: 22 }}>
                 <div className="nx-bar-fill" style={{ width: `${xpFrac * 100}%`, background: 'var(--firouzeh)' }} />
                 <span className="nx-bar-label display" style={{ lineHeight: '18px', fontSize: 13 }}>
-                  {formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}
+                  <span dir="ltr">{formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}</span>
                 </span>
               </div>
             </div>

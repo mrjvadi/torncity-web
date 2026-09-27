@@ -140,16 +140,30 @@ export async function getBootstrap(): Promise<Bootstrap> {
   return authed<Bootstrap>('/api/v1/bootstrap', { method: 'GET' })
 }
 
+/** Every command answer's view, for whoever keeps a live copy of the
+ * player's numbers (the HUD): any screen that carries cash, energy and the
+ * rest brings them up to date, whichever screen fetched it. */
+const viewListeners = new Set<(view: Record<string, unknown>) => void>()
+
+export function onView(fn: (view: Record<string, unknown>) => void): () => void {
+  viewListeners.add(fn)
+  return () => viewListeners.delete(fn)
+}
+
 export async function runCommand(
   command: string,
   args: Record<string, string> = {},
   idempotencyKey?: string,
 ): Promise<CommandResponse> {
-  return authed<CommandResponse>('/api/v1/command', {
+  const res = await authed<CommandResponse>('/api/v1/command', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ command, args, idempotency_key: idempotencyKey }),
   })
+  if (res && res.view && typeof res.view === 'object') {
+    for (const fn of viewListeners) fn(res.view as Record<string, unknown>)
+  }
+  return res
 }
 
 export async function getContent(sinceVersion?: string): Promise<unknown> {
