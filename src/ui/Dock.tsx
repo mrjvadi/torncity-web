@@ -31,13 +31,13 @@ export default function Dock({ active, onSelect, badge }: DockProps) {
             >
               {isActive ? (
                 <span className="dock-tile">
-                  <Icon name={t.icon} palette="gold" size={38} />
+                  <Icon name={t.icon} palette="gold" size={26} />
                   <span className="dock-tile-label display">{t.label}</span>
                 </span>
               ) : (
                 <>
                   <span className="dock-icon-wrap">
-                    <Icon name={t.icon} palette="steel" size={30} />
+                    <Icon name={t.icon} palette="steel" size={22} />
                     {count > 0 && <span className="dock-count">{count < 100 ? count : '99+'}</span>}
                   </span>
                   <span className="dock-label display">{t.label}</span>
@@ -55,29 +55,33 @@ export default function Dock({ active, onSelect, badge }: DockProps) {
 function DockStyles() {
   return (
     <style>{`
+      /* ~32% shorter than the first pass, per the owner: the dock ate too
+         much of the screen on a phone. Tap targets stay >=40px even so —
+         each tab is a flex-1 slice of the full width, comfortably over
+         that at any normal phone size, and the bar itself is >=48px tall. */
       .dock { padding-bottom: var(--safe-b); background: linear-gradient(0deg, rgba(7,10,20,0.95), rgba(7,10,20,0.5) 80%, transparent); }
       .dock-bar {
         display: flex; align-items: flex-end; justify-content: space-between;
         background: linear-gradient(180deg, #171b38, #0a0c1c);
         border-top: 1px solid var(--gold-soft);
         box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
-        padding: 6px 6px 8px;
-        min-height: 68px;
+        padding: 4px 4px 5px;
+        min-height: 48px;
       }
-      .dock-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; position: relative; }
+      .dock-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 2px; position: relative; min-height: 40px; justify-content: center; }
       .dock-icon-wrap { position: relative; display: flex; }
-      .dock-label { font-size: 12px; color: var(--text-faint); }
-      .dock-count { position: absolute; top: -6px; left: -8px; background: var(--anar); color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
-      .dock-tab.active { transform: translateY(-14px); }
+      .dock-label { font-size: 9.5px; color: var(--text-faint); }
+      .dock-count { position: absolute; top: -5px; left: -7px; background: var(--anar); color: #fff; font-size: 9px; min-width: 13px; height: 13px; border-radius: 7px; display: flex; align-items: center; justify-content: center; padding: 0 2px; }
+      .dock-tab.active { transform: translateY(-9px); }
       .dock-tile {
-        display: flex; flex-direction: column; align-items: center; gap: 2px;
+        display: flex; flex-direction: column; align-items: center; gap: 1px;
         background: linear-gradient(180deg, #3a63d0, #15286a);
-        border: 2px solid var(--gold);
-        border-radius: 20px;
-        padding: 10px 18px 8px;
-        box-shadow: 0 8px 20px rgba(58,99,208,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+        border: 1.5px solid var(--gold);
+        border-radius: 15px;
+        padding: 6px 13px 5px;
+        box-shadow: 0 6px 14px rgba(58,99,208,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
       }
-      .dock-tile-label { font-size: 15px; color: #ffd66b; }
+      .dock-tile-label { font-size: 11.5px; color: #ffd66b; }
     `}</style>
   )
 }

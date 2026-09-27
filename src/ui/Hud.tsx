@@ -24,6 +24,14 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
   const energyFull = !!profile && profile.energy >= profile.max_energy
   const healthFull = !!profile && profile.health >= profile.max_health
 
+  // nerve is not in every realm's profile view (client-api.md §3): only a
+  // number here means the server actually sent one
+  const nerve = typeof profile?.nerve === 'number' ? profile.nerve : null
+  const maxNerve = typeof profile?.max_nerve === 'number' ? profile.max_nerve : null
+  const nerveFullIn = typeof profile?.nerve_full_in_seconds === 'number' ? profile.nerve_full_in_seconds : 0
+  const nerveFrac = nerve !== null && maxNerve ? Math.min(1, nerve / maxNerve) : 0
+  const nerveFull = nerve !== null && maxNerve !== null && nerve >= maxNerve
+
   return (
     <div className="hud">
       <div className="hud-top">
@@ -35,7 +43,7 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
               style={{ strokeDasharray: `${xpFrac * 276.5} 276.5` }}
             />
           </svg>
-          <span className="hud-avatar-plate"><Icon name="person" palette="teal" size={40} /></span>
+          <span className="hud-avatar-plate"><Icon name="person" palette="teal" size={28} /></span>
           <span className="hud-level display">{profile ? formatNumber(profile.level) : '–'}</span>
         </button>
 
@@ -49,28 +57,31 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
           <button className="hud-pill hud-cash" onClick={onBank}>
             <span className="hud-pill-plus">+</span>
             <span className="hud-pill-value display">{profile ? formatNumber(profile.cash) : '–'}</span>
-            <Icon name="coins" palette="gold" size={26} />
+            <Icon name="coins" palette="gold" size={17} />
           </button>
           <button className="hud-pill hud-bank" onClick={onBank}>
             <span className="hud-pill-value display">{profile ? formatNumber(profile.bank) : '–'}</span>
-            <Icon name="bank" palette="sapphire" size={22} />
+            <Icon name="bank" palette="sapphire" size={14} />
           </button>
         </div>
+
+        <button className="hud-corner" onClick={onBell} aria-label="اعلان‌ها">
+          <Icon name="inbox" palette="sapphire" size={19} />
+          {unread > 0 && <span className="hud-count">{unread < 100 ? unread : '99+'}</span>}
+        </button>
+        <button className="hud-corner" onClick={onMenu} aria-label="منو">
+          <Icon name="menu" palette="steel" size={19} />
+        </button>
       </div>
 
       <div className="hud-stat-row">
         <div className="hud-bars">
           <StatBar icon="energy" palette="amber" color="#f5a623" value={profile?.energy ?? 0} max={profile?.max_energy ?? 100} frac={energyFrac} full={energyFull} fullIn={profile?.energy_full_in_seconds ?? 0} />
+          {nerve !== null && maxNerve !== null && (
+            <StatBar icon="nerve" palette="ruby" color="#e5484d" value={nerve} max={maxNerve} frac={nerveFrac} full={nerveFull} fullIn={nerveFullIn} />
+          )}
           <StatBar icon="health" palette="emerald" color="#4cc47e" value={profile?.health ?? 0} max={profile?.max_health ?? 100} frac={healthFrac} full={healthFull} fullIn={0} />
         </div>
-
-        <button className="hud-corner" onClick={onBell} aria-label="اعلان‌ها">
-          <Icon name="inbox" palette="sapphire" size={26} />
-          {unread > 0 && <span className="hud-count">{unread < 100 ? unread : '99+'}</span>}
-        </button>
-        <button className="hud-corner" onClick={onMenu} aria-label="منو">
-          <Icon name="menu" palette="steel" size={26} />
-        </button>
       </div>
       <HudStyles />
     </div>
@@ -78,7 +89,7 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
 }
 
 function StatBar({ icon, palette, color, value, max, frac, full, fullIn }: {
-  icon: string; palette: 'emerald' | 'amber'; color: string; value: number; max: number
+  icon: string; palette: 'emerald' | 'amber' | 'ruby'; color: string; value: number; max: number
   frac: number; full: boolean; fullIn: number
 }) {
   return (
@@ -87,7 +98,7 @@ function StatBar({ icon, palette, color, value, max, frac, full, fullIn }: {
         <div className="stat-fill" style={{ width: `${frac * 100}%`, background: color }} />
         <span className="stat-label display">{formatNumber(value)}/{formatNumber(max)}</span>
       </div>
-      <Icon name={icon} palette={palette} size={30} className="stat-icon" />
+      <Icon name={icon} palette={palette} size={20} className="stat-icon" />
       {!full && fullIn > 0 && <span className="stat-chip">پر {clockIn(fullIn)}</span>}
     </div>
   )
@@ -96,36 +107,40 @@ function StatBar({ icon, palette, color, value, max, frac, full, fullIn }: {
 function HudStyles() {
   return (
     <style>{`
+      /* ~32% shorter than the first pass: the owner flagged the HUD/dock as
+         too tall on a phone, especially inside Telegram's full-screen mode
+         where --safe-t already eats the top for its own button bar. */
       .hud { position: relative; padding-top: var(--safe-t); background: linear-gradient(180deg, rgba(7,10,20,0.92), rgba(7,10,20,0.75) 70%, transparent); }
-      .hud-top { display: flex; align-items: center; gap: 10px; padding: 10px 12px 4px; }
-      .hud-avatar { position: relative; width: 64px; height: 64px; flex: none; }
+      .hud-top { display: flex; align-items: center; gap: 6px; padding: 6px 8px 2px; }
+      .hud-avatar { position: relative; width: 44px; height: 44px; flex: none; }
       .hud-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-      .ring-track { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 6; }
-      .ring-value { fill: none; stroke: var(--firouzeh); stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 0.4s; }
-      .hud-avatar-plate { position: absolute; inset: 7px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #14655f, #0a2a27); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; }
-      .hud-level { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #3a2a8a, #1a1050); border: 1px solid var(--gold); border-radius: 8px; font-size: 15px; padding: 0 6px; color: #ffd66b; min-width: 22px; text-align: center; }
+      .ring-track { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 7; }
+      .ring-value { fill: none; stroke: var(--firouzeh); stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray 0.4s; }
+      .hud-avatar-plate { position: absolute; inset: 5px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #14655f, #0a2a27); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; }
+      .hud-level { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #3a2a8a, #1a1050); border: 1px solid var(--gold); border-radius: 6px; font-size: 11px; padding: 0 4px; color: #ffd66b; min-width: 16px; text-align: center; line-height: 14px; }
       .hud-id { flex: 1; min-width: 0; text-align: right; }
-      .hud-name { font-size: 20px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .hud-rank { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
-      .hud-xpbar { height: 7px; border-radius: 4px; background: rgba(0,0,0,0.5); margin-top: 6px; overflow: hidden; border: 1px solid rgba(43,196,178,0.4); }
+      .hud-name { font-size: 15px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+      .hud-rank { font-size: 10px; color: var(--text-dim); margin-top: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .hud-xpbar { height: 5px; border-radius: 3px; background: rgba(0,0,0,0.5); margin-top: 3px; overflow: hidden; border: 1px solid rgba(43,196,178,0.4); }
       .hud-xpbar-fill { height: 100%; background: var(--firouzeh); }
-      .hud-money { display: flex; flex-direction: column; gap: 6px; flex: none; }
-      .hud-pill { display: flex; align-items: center; gap: 6px; background: linear-gradient(180deg, #0d1024, #05070f); border: 1px solid var(--gold-soft); border-radius: 20px; padding: 6px 10px; }
+      .hud-money { display: flex; flex-direction: column; gap: 3px; flex: none; }
+      .hud-pill { display: flex; align-items: center; gap: 4px; background: linear-gradient(180deg, #0d1024, #05070f); border: 1px solid var(--gold-soft); border-radius: 13px; padding: 3px 7px; }
       .hud-cash { border-color: var(--gold); }
-      .hud-pill-plus { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(180deg, #7ee0a0, #2f9a55); color: #fff; font-size: 15px; line-height: 20px; text-align: center; }
-      .hud-pill-value { font-size: 16px; color: var(--gold); min-width: 0; }
-      .hud-bank .hud-pill-value { color: #8fb0ff; font-size: 14px; }
+      .hud-pill-plus { width: 13px; height: 13px; border-radius: 50%; background: linear-gradient(180deg, #7ee0a0, #2f9a55); color: #fff; font-size: 11px; line-height: 13px; text-align: center; flex: none; }
+      .hud-pill-value { font-size: 11.5px; color: var(--gold); min-width: 0; }
+      .hud-bank .hud-pill-value { color: #8fb0ff; font-size: 10px; }
 
-      .hud-stat-row { display: flex; align-items: center; gap: 8px; padding: 2px 12px 10px; }
-      .hud-corner { position: relative; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
-      .hud-count { position: absolute; top: -4px; left: -4px; background: var(--anar); color: #fff; font-size: 10px; border-radius: 8px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; border: 1px solid #2a0a0a; }
-      .hud-bars { flex: 1; display: flex; gap: 20px; justify-content: flex-end; padding-inline-start: 8px; }
-      .stat { position: relative; width: 122px; }
-      .stat-bar { position: relative; height: 26px; border-radius: 13px; background: rgba(0,0,0,0.55); border: 2px solid; overflow: hidden; }
-      .stat-fill { position: absolute; inset: 0; right: auto; border-radius: 13px; transition: width 0.4s; opacity: 0.85; }
-      .stat-label { position: relative; z-index: 1; display: block; text-align: center; font-size: 14px; line-height: 22px; color: #fff; }
-      .stat-icon { position: absolute; top: -7px; left: -6px; }
-      .stat-chip { position: absolute; bottom: -16px; left: 8px; right: 8px; text-align: center; font-size: 10px; color: #ffd66b; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 1px 4px; }
+      .hud-corner { position: relative; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
+      .hud-count { position: absolute; top: -4px; left: -4px; background: var(--anar); color: #fff; font-size: 9px; border-radius: 7px; min-width: 13px; height: 13px; display: flex; align-items: center; justify-content: center; padding: 0 2px; border: 1px solid #2a0a0a; }
+
+      .hud-stat-row { display: flex; align-items: center; padding: 1px 8px 5px; }
+      .hud-bars { flex: 1; display: flex; gap: 6px; justify-content: flex-end; min-width: 0; }
+      .stat { position: relative; width: 88px; flex: 1 1 88px; max-width: 108px; }
+      .stat-bar { position: relative; height: 18px; border-radius: 9px; background: rgba(0,0,0,0.55); border: 1.5px solid; overflow: hidden; }
+      .stat-fill { position: absolute; inset: 0; right: auto; border-radius: 9px; transition: width 0.4s; opacity: 0.85; }
+      .stat-label { position: relative; z-index: 1; display: block; text-align: center; font-size: 10.5px; line-height: 15px; color: #fff; }
+      .stat-icon { position: absolute; top: -6px; right: -5px; left: auto; }
+      .stat-chip { position: absolute; bottom: -12px; left: 6px; right: 6px; text-align: center; font-size: 8.5px; color: #ffd66b; background: rgba(0,0,0,0.6); border-radius: 5px; padding: 0px 3px; line-height: 13px; }
     `}</style>
   )
 }
