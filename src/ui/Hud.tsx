@@ -94,12 +94,12 @@ function StatBar({ icon, palette, color, value, max, frac, full, fullIn }: {
 }) {
   return (
     <div className="stat">
+      <Icon name={icon} palette={palette} size={20} className="stat-icon" />
       <div className="stat-bar" style={{ borderColor: color }}>
         <div className="stat-fill" style={{ width: `${frac * 100}%`, background: color }} />
         <span className="stat-label display">{formatNumber(value)}/{formatNumber(max)}</span>
+        {!full && fullIn > 0 && <span className="stat-chip">پر {clockIn(fullIn)}</span>}
       </div>
-      <Icon name={icon} palette={palette} size={20} className="stat-icon" />
-      {!full && fullIn > 0 && <span className="stat-chip">پر {clockIn(fullIn)}</span>}
     </div>
   )
 }
@@ -110,7 +110,7 @@ function HudStyles() {
       /* ~32% shorter than the first pass: the owner flagged the HUD/dock as
          too tall on a phone, especially inside Telegram's full-screen mode
          where --safe-t already eats the top for its own button bar. */
-      .hud { position: relative; padding-top: var(--safe-t); background: linear-gradient(180deg, rgba(7,10,20,0.92), rgba(7,10,20,0.75) 70%, transparent); }
+      .hud { position: relative; z-index: 5; padding-top: var(--safe-t); background: linear-gradient(180deg, rgba(7,10,20,0.92), rgba(7,10,20,0.75) 70%, transparent); }
       .hud-top { display: flex; align-items: center; gap: 6px; padding: 6px 8px 2px; }
       .hud-avatar { position: relative; width: 44px; height: 44px; flex: none; }
       .hud-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -133,14 +133,16 @@ function HudStyles() {
       .hud-corner { position: relative; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
       .hud-count { position: absolute; top: -4px; left: -4px; background: var(--anar); color: #fff; font-size: 9px; border-radius: 7px; min-width: 13px; height: 13px; display: flex; align-items: center; justify-content: center; padding: 0 2px; border: 1px solid #2a0a0a; }
 
-      .hud-stat-row { display: flex; align-items: center; padding: 1px 8px 5px; }
-      .hud-bars { flex: 1; display: flex; gap: 6px; justify-content: flex-end; min-width: 0; }
-      .stat { position: relative; width: 88px; flex: 1 1 88px; max-width: 108px; }
-      .stat-bar { position: relative; height: 18px; border-radius: 9px; background: rgba(0,0,0,0.55); border: 1.5px solid; overflow: hidden; }
-      .stat-fill { position: absolute; inset: 0; right: auto; border-radius: 9px; transition: width 0.4s; opacity: 0.85; }
-      .stat-label { position: relative; z-index: 1; display: block; text-align: center; font-size: 10.5px; line-height: 15px; color: #fff; }
-      .stat-icon { position: absolute; top: -6px; right: -5px; left: auto; }
-      .stat-chip { position: absolute; bottom: -12px; left: 6px; right: 6px; text-align: center; font-size: 8.5px; color: #ffd66b; background: rgba(0,0,0,0.6); border-radius: 5px; padding: 0px 3px; line-height: 13px; }
+      /* each stat: its struck icon beside the bar, the value and the time it
+         fills inside the bar — nothing hangs below the HUD to be clipped */
+      .hud-stat-row { display: flex; align-items: center; padding: 2px 8px 6px; }
+      .hud-bars { flex: 1; display: flex; gap: 8px; min-width: 0; }
+      .stat { display: flex; align-items: center; gap: 3px; flex: 1 1 0; min-width: 0; }
+      .stat-icon { flex: none; }
+      .stat-bar { position: relative; flex: 1; min-width: 0; height: 18px; border-radius: 9px; background: rgba(0,0,0,0.55); border: 1.5px solid; overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 0 7px; gap: 4px; }
+      .stat-fill { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 9px; transition: width 0.4s; opacity: 0.85; }
+      .stat-label { position: relative; z-index: 1; font-size: 10.5px; line-height: 15px; color: #fff; white-space: nowrap; }
+      .stat-chip { position: relative; z-index: 1; font-size: 9px; line-height: 15px; color: #fff4c2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
     `}</style>
   )
 }
