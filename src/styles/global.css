@@ -123,6 +123,11 @@ input {
   text-align: center;
 }
 
+.boot-blank {
+  flex: 1;
+  background: var(--ink);
+}
+
 .skeleton {
   background: linear-gradient(100deg, #12172f 30%, #1b2140 50%, #12172f 70%);
   background-size: 200% 100%;
