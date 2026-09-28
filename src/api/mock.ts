@@ -5,6 +5,7 @@
 import { API_BASE } from './client'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
+import { mockMoreCommand } from './mock_more'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -58,9 +59,32 @@ const MOCK_CITY_MAP = {
   ],
 }
 
+// The profile's own buttons (internal/telegram/screens/profile.go, an
+// established player's dashboard): hospital, current job, education, bank,
+// home, shops, friends, faction, missions, skills, life, achievements, the
+// leaderboard, settings. Filled in here (was empty) so every screen one tap
+// away from the profile — not just this area's own — can be reached in
+// ?mock=1 the way a player would reach it.
+const MOCK_PROFILE_ACTIONS = [
+  { label: 'بیمارستان', command: 'health.hospital', row: 0, kind: 'secondary', icon: 'hospital' },
+  { label: 'شغل من', command: 'job.status', row: 0, kind: 'secondary', icon: 'work' },
+  { label: 'تحصیل', command: 'education.list', row: 1, kind: 'secondary', icon: 'study' },
+  { label: 'بانک', command: 'bank.show', row: 1, kind: 'secondary', icon: 'bank' },
+  { label: 'ملک من', command: 'property.mine', row: 2, kind: 'secondary', icon: 'house' },
+  { label: 'مغازه‌ها', command: 'shop.list', row: 2, kind: 'secondary', icon: 'cart' },
+  { label: 'دوستان', command: 'social.friend.list', row: 3, kind: 'secondary', icon: 'society' },
+  { label: 'مأموریت‌ها', command: 'mission.board', row: 3, kind: 'secondary', icon: 'missions' },
+  { label: 'مهارت‌ها', command: 'skills.list', row: 4, kind: 'secondary', icon: 'chart' },
+  { label: 'زندگی', command: 'life.me', row: 4, kind: 'secondary', icon: 'moon' },
+  { label: 'دستاوردها', command: 'achievement.list', row: 5, kind: 'secondary', icon: 'trophy' },
+  { label: 'رتبه‌ها', command: 'life.top', row: 5, kind: 'secondary', icon: 'podium' },
+  { label: 'تنظیمات', command: 'player.settings', row: 6, kind: 'navigation', icon: 'gears' },
+  { label: 'تازه‌سازی', command: 'player.profile.get', row: 6, kind: 'navigation', icon: 'clock' },
+]
+
 function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.profile.get') {
-    return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view: MOCK_PROFILE_VIEW, actions: [] })
+    return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view: MOCK_PROFILE_VIEW, actions: MOCK_PROFILE_ACTIONS })
   }
   // war/military (no structured view yet) and friends/search (structured):
   // the features area's own mock data (src/api/mock_features.ts).
@@ -70,6 +94,10 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   // adapted from the golden view-snapshots (src/api/mock_views.ts).
   const native = mockNativeCommand(command, args)
   if (native) return json({ ok: true, ...native })
+  // Screens this worktree's own area adds (src/screens/more/*): real
+  // shapes adapted from the same goldens (src/api/mock_more.ts).
+  const more = mockMoreCommand(command, args)
+  if (more) return json({ ok: true, ...more })
   return json({
     ok: true,
     screen: command.replace('.', '_'),

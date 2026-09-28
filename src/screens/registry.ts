@@ -28,10 +28,12 @@ async function retry<T>(load: () => Promise<T>, tries = 4): Promise<T> {
   }
 }
 
-export const screensReady: Promise<void> = Promise.all([retry(() => import('./native')), retry(() => import('./features'))]).then(
-  ([native, features]) => {
-    Object.assign(SERVER_SCREENS, features.default.SERVER, native.default.SERVER)
-    Object.assign(LOCAL_SCREENS, features.default.LOCAL, native.default.LOCAL)
+export const screensReady: Promise<void> = Promise.all([
+  retry(() => import('./native')), retry(() => import('./features')), retry(() => import('./more')),
+]).then(
+  ([native, features, more]) => {
+    Object.assign(SERVER_SCREENS, features.default.SERVER, native.default.SERVER, more.default.SERVER)
+    Object.assign(LOCAL_SCREENS, features.default.LOCAL, native.default.LOCAL, more.default.LOCAL)
   },
   () => undefined,
 )

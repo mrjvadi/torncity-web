@@ -1,0 +1,10 @@
+/* Small additions for this area's screens (src/screens/more/*), on top of
+ * the shared nx- classes (src/screens/native/kit, src/styles/global.css).
+ * Prefixed mx- per the area's scope rules. */
+
+/* A card's own bio line (Card.tsx): wraps long free text without
+ * stretching the card past the screen. */
+.mx-bio {
+  line-height: 1.6;
+  word-break: break-word;
+}
