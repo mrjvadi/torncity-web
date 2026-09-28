@@ -40,7 +40,12 @@ function ReadyToastStyles() {
          overlaps the card's top-right corner at 104/720 across. */
       .ready-toast { position: absolute; left: calc(14 * var(--u)); right: calc(14 * var(--u)); bottom: calc(14 * var(--u)); z-index: 6; }
       .ready-toast-row { display: flex; align-items: center; gap: calc(10 * var(--u)); padding: calc(4 * var(--u)) calc(70 * var(--u)) calc(4 * var(--u)) calc(4 * var(--u)); }
-      .ready-toast-icon { position: absolute; top: calc(-14 * var(--u)); inset-inline-end: calc(4 * var(--u)); z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+      /* physical right, not inline-end: home_proto.gd _ready_toast embosses
+         the icon near the card's own right edge (x=598-702 of a 14-706
+         card) in fixed canvas coordinates, regardless of the page's RTL
+         flow — the row's own right padding above already reserves the
+         space for it. */
+      .ready-toast-icon { position: absolute; top: calc(-14 * var(--u)); right: calc(4 * var(--u)); z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
       .ready-toast-copy { flex: 1; min-width: 0; text-align: right; }
       .ready-toast-title { font-size: calc(24 * var(--u)); line-height: 1.3; }
       .ready-toast-sub { font-size: calc(15 * var(--u)); color: #bfe9e3; margin-top: calc(2 * var(--u)); line-height: 1.3; }

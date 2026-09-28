@@ -72,7 +72,10 @@ function SidePlateStyles() {
          button stays on the screen's right whether the page is RTL or not. */
       .side-plates { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
       .plate { position: absolute; display: flex; flex-direction: column; align-items: center; gap: calc(3 * var(--u)); pointer-events: auto; padding: 0; transform: translateY(-50%); }
-      .plate-count { position: absolute; top: calc(-8 * var(--u)); inset-inline-end: calc(-6 * var(--u)); }
+      /* physical right, not inline-end (see the comment above): _plate_icon
+         always counts from c.x + 14, the plate's own right side, whether
+         the plate sits in the left or right column. */
+      .plate-count { position: absolute; top: calc(-8 * var(--u)); right: calc(-6 * var(--u)); }
       .plate-cap {
         background: linear-gradient(180deg, #14183a, #05070f);
         border: 1.5px solid var(--gold-soft); border-radius: calc(10 * var(--u));

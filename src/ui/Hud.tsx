@@ -39,6 +39,7 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
 
   return (
     <div className="hud">
+      <div className="hud-panel">
       <div className="hud-top">
         <button className="hud-avatar" onClick={onAvatar} aria-label="پروفایل">
           <svg className="hud-ring" viewBox="0 0 100 100">
@@ -88,6 +89,7 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
           <StatBar icon="energy" palette="amber" color="#f5a623" value={profile?.energy ?? 0} max={profile?.max_energy ?? 100} frac={energyFrac} full={energyFull} fullIn={profile?.energy_full_in_seconds ?? 0} />
         </div>
       </div>
+      </div>
       <HudStyles />
     </div>
   )
@@ -118,8 +120,30 @@ function HudStyles() {
          the prototype's own 720-canvas Rect2 numbers, so this sits at the
          prototype's exact proportions on a phone (owner's "smaller" HUD ask
          already comes out true once it's built at 1/720 scale). */
-      .hud { position: relative; z-index: 5; padding-top: var(--safe-t); background: linear-gradient(180deg, rgba(7,10,20,0.94), rgba(7,10,20,0.8) 70%, transparent); }
-      .hud-top { display: flex; align-items: flex-start; gap: calc(6 * var(--u)); padding: calc(8 * var(--u)) calc(10 * var(--u)) calc(2 * var(--u)); }
+      .hud { position: relative; z-index: 5; padding-top: var(--safe-t); }
+      /* home_proto.gd _top_bar: one lit frame panel behind both rows
+         (Rect2(-24, -40, 768, 188), radius 44, gold trim, a lapis glow),
+         its top edge bled off past the canvas so only the bottom corners
+         round off. */
+      .hud-panel {
+        position: relative;
+        background: linear-gradient(180deg, rgba(26,31,71,0.97), rgba(10,13,31,0.97));
+        border: calc(2 * var(--u)) solid var(--gold);
+        border-top: none;
+        border-radius: 0 0 calc(44 * var(--u)) calc(44 * var(--u));
+        box-shadow:
+          inset 0 1.5px 0 rgba(255,255,255,0.18),
+          inset 0 calc(-16 * var(--u)) calc(20 * var(--u)) calc(-16 * var(--u)) rgba(0,0,0,0.6),
+          0 0 calc(22 * var(--u)) rgba(53,82,200,0.4),
+          0 calc(8 * var(--u)) calc(20 * var(--u)) rgba(0,0,0,0.5);
+        overflow: hidden;
+      }
+      .hud-panel::before {
+        content: ''; position: absolute; inset: 0; pointer-events: none;
+        background-image: var(--girih); background-size: calc(46 * var(--u)) calc(46 * var(--u));
+        opacity: 0.12; mix-blend-mode: overlay;
+      }
+      .hud-top { position: relative; display: flex; align-items: flex-start; gap: calc(6 * var(--u)); padding: calc(8 * var(--u)) calc(10 * var(--u)) calc(2 * var(--u)); }
 
       .hud-avatar { position: relative; width: calc(112 * var(--u)); height: calc(112 * var(--u)); flex: none; }
       .hud-ring { position: absolute; inset: calc(-6 * var(--u)); width: calc(100% + 12 * var(--u)); height: calc(100% + 12 * var(--u)); transform: rotate(-90deg); }
@@ -145,7 +169,11 @@ function HudStyles() {
       .hud-id { flex: 1; min-width: 0; text-align: right; padding-top: calc(6 * var(--u)); }
       .hud-name { font-size: calc(28 * var(--u)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
       .hud-rank { font-size: calc(15 * var(--u)); color: var(--text-dim); margin-top: calc(1 * var(--u)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .hud-xpbar { height: calc(11 * var(--u)); border-radius: calc(6 * var(--u)); background: rgba(0,0,0,0.6); margin-top: calc(5 * var(--u)); overflow: hidden; border: 1.5px solid rgba(43,196,178,0.55); }
+      /* home_proto.gd _top_bar: the xp bar is a fixed 170/720-wide strip
+         under the name, not a full-width one (Rect2(386, 100, 170, 14)) —
+         width is explicit and it hugs the name's own trailing (right)
+         edge instead of stretching across the id column. */
+      .hud-xpbar { width: calc(170 * var(--u)); margin-left: auto; height: calc(11 * var(--u)); border-radius: calc(6 * var(--u)); background: rgba(0,0,0,0.6); margin-top: calc(5 * var(--u)); overflow: hidden; border: 1.5px solid rgba(43,196,178,0.55); }
       .hud-xpbar-fill { height: 100%; background: linear-gradient(180deg, #7cf0e2, var(--firouzeh)); transition: width 0.4s; }
 
       .hud-money { display: flex; flex-direction: column; gap: calc(4 * var(--u)); flex: none; padding-top: calc(2 * var(--u)); }
@@ -156,12 +184,17 @@ function HudStyles() {
         padding: calc(4 * var(--u)) calc(8 * var(--u));
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 calc(3 * var(--u)) calc(8 * var(--u)) rgba(0,0,0,0.4);
       }
-      .hud-cash { border-color: var(--gold); padding-inline-start: calc(20 * var(--u)); }
+      /* physical left, not inline-start: room for the plus badge, which
+         sits at this pill's own left edge (see .hud-pill-plus below). */
+      .hud-cash { border-color: var(--gold); padding-left: calc(20 * var(--u)); }
       .hud-pill-coin { flex: none; }
       .hud-pill-value { font-size: calc(20 * var(--u)); min-width: 0; white-space: nowrap; }
       .hud-bank .hud-pill-value { font-size: calc(17 * var(--u)); }
       .hud-pill-plus {
-        position: absolute; inset-inline-start: calc(-6 * var(--u)); top: 50%; transform: translateY(-50%);
+        /* physical, not logical: home_proto.gd _top_bar puts this at the
+           cash frame's own left edge (x=30 vs frame x=22) in fixed canvas
+           coordinates, regardless of the page's RTL flow. */
+        position: absolute; left: calc(-6 * var(--u)); top: 50%; transform: translateY(-50%);
         width: calc(20 * var(--u)); height: calc(20 * var(--u)); border-radius: 50%;
         background: linear-gradient(180deg, #7ee0a0, #2f9a55); border: 1.5px solid #1a5a30;
         color: #fff; font-size: calc(15 * var(--u)); line-height: calc(18 * var(--u)); text-align: center; flex: none;
@@ -186,7 +219,7 @@ function HudStyles() {
       /* the stat row: value text and the "full at" chip sit outside the
          fill (never on top of it) so both stay readable at any fraction —
          the icon overlaps the bar's own end, as in the prototype. */
-      .hud-stat-row { display: flex; align-items: center; padding: calc(2 * var(--u)) calc(10 * var(--u)) calc(6 * var(--u)); }
+      .hud-stat-row { position: relative; display: flex; align-items: center; padding: calc(2 * var(--u)) calc(10 * var(--u)) calc(6 * var(--u)); }
       .hud-bars { flex: 1; display: flex; gap: calc(8 * var(--u)); min-width: 0; }
       .stat { display: flex; flex-direction: column; align-items: center; gap: calc(4 * var(--u)); flex: 1 1 0; min-width: 0; }
       .stat-bar {
@@ -197,7 +230,11 @@ function HudStyles() {
       .stat-fill { position: absolute; inset: 2px; right: 2px; border-radius: 999px; transition: width 0.4s; overflow: hidden; box-shadow: inset 0 2px 3px rgba(255,255,255,0.35); }
       .stat-value { position: relative; z-index: 1; font-size: calc(18 * var(--u)); line-height: 1; color: #fff; white-space: nowrap; text-shadow: 0 2px 2px rgba(0,0,0,0.6); }
       .stat-max { font-size: calc(15 * var(--u)); color: rgba(255,255,255,0.75); }
-      .stat-icon { position: absolute; inset-inline-end: calc(-10 * var(--u)); top: 50%; transform: translateY(-50%); z-index: 2; }
+      /* physical right, not inline-end: home_proto.gd _stat_row embosses
+         each bar's icon past its own right edge (x + 138 for a 176-wide
+         bar) in fixed canvas coordinates, regardless of the page's RTL
+         flow. */
+      .stat-icon { position: absolute; right: calc(-10 * var(--u)); top: 50%; transform: translateY(-50%); z-index: 2; }
       .stat-chip { font-size: calc(13 * var(--u)); }
     `}</style>
   )
