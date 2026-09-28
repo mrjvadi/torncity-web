@@ -14,9 +14,24 @@ export const SERVER_SCREENS: Record<string, ScreenComponent> = {}
  * built yet. */
 export const LOCAL_SCREENS: Record<string, ScreenComponent> = {}
 
-export const screensReady: Promise<void> = Promise.all([import('./native'), import('./features')]).then(
+/** A chunk that fails on a flaky link is fetched again a few times; if it
+ * still fails the shell opens anyway, with GenericScreen for every screen,
+ * rather than leaving the player on a blank page. */
+async function retry<T>(load: () => Promise<T>, tries = 4): Promise<T> {
+  for (let i = 1; ; i++) {
+    try {
+      return await load()
+    } catch (e) {
+      if (i >= tries) throw e
+      await new Promise((r) => setTimeout(r, 800 * i))
+    }
+  }
+}
+
+export const screensReady: Promise<void> = Promise.all([retry(() => import('./native')), retry(() => import('./features'))]).then(
   ([native, features]) => {
     Object.assign(SERVER_SCREENS, features.default.SERVER, native.default.SERVER)
     Object.assign(LOCAL_SCREENS, features.default.LOCAL, native.default.LOCAL)
   },
+  () => undefined,
 )
