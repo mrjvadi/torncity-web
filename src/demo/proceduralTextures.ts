@@ -349,6 +349,45 @@ export function makeFarmTexture(seed = 7): CanvasTexture {
   return finish(canvas)
 }
 
+/** A transparent-background cluster of a few blades + one small flower dot
+ * — alpha-tested billboard quads for the near-camera grass field
+ * (terrain.ts's buildGrassField). Drawn once, instanced many times. */
+export function makeGrassBladeTexture(seed = 8): CanvasTexture {
+  const size = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('2d context unavailable')
+  const rnd = mulberry32(seed)
+  ctx.clearRect(0, 0, size, size)
+  const blades = 6
+  for (let i = 0; i < blades; i++) {
+    const bx = size * 0.5 + (rnd() - 0.5) * size * 0.5
+    const bh = size * (0.55 + rnd() * 0.4)
+    const bw = size * (0.05 + rnd() * 0.05)
+    const lean = (rnd() - 0.5) * size * 0.18
+    const g = rnd() > 0.5 ? '#4f8c3a' : '#3c7a2c'
+    ctx.fillStyle = g
+    ctx.beginPath()
+    ctx.moveTo(bx - bw, size)
+    ctx.quadraticCurveTo(bx + lean * 0.5, size - bh * 0.6, bx + lean, size - bh)
+    ctx.quadraticCurveTo(bx + lean * 0.5 + bw, size - bh * 0.6, bx + bw, size)
+    ctx.closePath()
+    ctx.fill()
+  }
+  if (rnd() > 0.55) {
+    ctx.fillStyle = rnd() > 0.5 ? '#e8d24a' : '#e0e0e0'
+    ctx.beginPath()
+    ctx.arc(size * 0.5 + (rnd() - 0.5) * size * 0.3, size * 0.32, size * 0.06, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  const tex = new CanvasTexture(canvas)
+  tex.colorSpace = SRGBColorSpace
+  tex.needsUpdate = true
+  return tex
+}
+
 /** Disposes every texture handed to it — call from the scene's dispose(). */
 export function disposeTextures(...textures: (Texture | undefined | null)[]) {
   for (const t of textures) t?.dispose()

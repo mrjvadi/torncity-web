@@ -6,9 +6,9 @@
 // space, so they already agree on shape) — that hides the seam and avoids
 // z-fighting without needing to cut a hole in the coarse mesh.
 
-import { BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial, Object3D, Texture } from 'three'
+import { BufferAttribute, BufferGeometry, Color, DoubleSide, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, Vector3 } from 'three'
 import type { CityGrids } from './grids'
-import { makeGroundDetailTexture } from './proceduralTextures'
+import { makeGrassBladeTexture, makeGroundDetailTexture } from './proceduralTextures'
 
 // No vertical exaggeration by default — the task's own "no vertical
 // exaggeration; at most 1.2x if screenshots show the hills unreadable"
@@ -174,5 +174,132 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
       ;(fineMesh.material as MeshStandardMaterial).dispose()
       detailTexture.dispose()
     },
+  }
+}
+
+// -- near-camera grass tufts ------------------------------------------------
+
+const GRASS_RADIUS = 200
+const GRASS_FADE_BAND = 45
+const GRASS_MAX_INSTANCES = 1600
+const GRASS_MOVE_THRESHOLD = 10 // metres the camera must move before a re-scatter
+
+function crossedQuadGeometry(width: number, height: number): BufferGeometry {
+  const hw = width / 2
+  const positions = new Float32Array([
+    -hw, 0, 0, hw, 0, 0, hw, height, 0, -hw, height, 0,
+    0, 0, -hw, 0, 0, hw, 0, height, hw, 0, height, -hw,
+  ])
+  const uvs = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1])
+  const normals = new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0])
+  const indices = new Uint16Array([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7])
+  const geo = new BufferGeometry()
+  geo.setAttribute('position', new BufferAttribute(positions, 3))
+  geo.setAttribute('normal', new BufferAttribute(normals, 3))
+  geo.setAttribute('uv', new BufferAttribute(uvs, 2))
+  geo.setIndex(new BufferAttribute(indices, 1))
+  return geo
+}
+
+function hashG(x: number, y: number, salt: number): number {
+  const h = Math.imul(x * 374761393, 1) ^ Math.imul(y * 668265263, 1) ^ Math.imul(salt, 2246822519)
+  return (h >>> 0) / 4294967295
+}
+
+export class GrassField {
+  readonly object: InstancedMesh
+  private geo: BufferGeometry
+  private mat: MeshStandardMaterial
+  private tex: Texture
+  private grids: CityGrids
+  private candidates: { fx: number; fy: number }[] = []
+  private lastCamera = new Vector3(Infinity, Infinity, Infinity)
+  private tmpMatrix = new Matrix4()
+  private reducedMotion: boolean
+
+  constructor(grids: CityGrids) {
+    this.grids = grids
+    this.reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+
+    const forestOrGrass = new Set(
+      grids.doc.biomeLegend
+        .map((b, idx) => ({ idx, code: b.code }))
+        .filter((b) => !['ocean', 'lake', 'desert', 'polar_ice', 'tundra'].includes(b.code))
+        .map((b) => b.idx),
+    )
+    const { w, h } = grids.fine
+    for (let fy = 2; fy < h - 2; fy++) {
+      for (let fx = 2; fx < w - 2; fx++) {
+        const idx = fy * w + fx
+        if (!forestOrGrass.has(grids.fine.biome[idx])) continue
+        if (grids.fineIsWet(fx, fy)) continue
+        if (grids.fineSlopeAt(fx, fy) > 0.4) continue
+        this.candidates.push({ fx, fy })
+      }
+    }
+
+    this.tex = makeGrassBladeTexture(31)
+    this.geo = crossedQuadGeometry(0.6, 0.55)
+    this.mat = new MeshStandardMaterial({
+      map: this.tex,
+      alphaTest: 0.4,
+      side: DoubleSide,
+      roughness: 1,
+    })
+    this.object = new InstancedMesh(this.geo, this.mat, GRASS_MAX_INSTANCES)
+    this.object.count = 0
+    this.object.frustumCulled = false
+  }
+
+  /** Re-scatters tufts around `cameraPos` (scene metres) if the camera has
+   * moved far enough since the last scatter to matter. Cheap enough to call
+   * from the same throttle water.ts's ripple animation uses; grass itself
+   * never animates (prefers-reduced-motion has no bearing on a static
+   * scatter, but a reduced-motion viewer still gets one — only the WATER
+   * ripple/foam is motion). Returns true if it changed anything (caller
+   * should re-render). */
+  update(cameraPos: Vector3): boolean {
+    if (cameraPos.distanceTo(this.lastCamera) < GRASS_MOVE_THRESHOLD) return false
+    this.lastCamera.copy(cameraPos)
+
+    const scored: { fx: number; fy: number; d: number }[] = []
+    for (const c of this.candidates) {
+      const { x, z } = this.grids.fineScene(c.fx, c.fy)
+      const d = Math.hypot(x - cameraPos.x, z - cameraPos.z)
+      if (d > GRASS_RADIUS) continue
+      scored.push({ fx: c.fx, fy: c.fy, d })
+    }
+    scored.sort((a, b) => a.d - b.d)
+
+    let n = 0
+    const q = new Quaternion()
+    const up = new Vector3(0, 1, 0)
+    for (const s of scored) {
+      const perCell = 2
+      for (let k = 0; k < perCell && n < GRASS_MAX_INSTANCES; k++) {
+        const jx = (hashG(s.fx, s.fy, 5 + k) - 0.5) * this.grids.doc.lotMeters * 0.8
+        const jz = (hashG(s.fx, s.fy, 15 + k) - 0.5) * this.grids.doc.lotMeters * 0.8
+        const { x, z } = this.grids.fineScene(s.fx, s.fy)
+        const wx = x + jx
+        const wz = z + jz
+        const fade = 1 - Math.max(0, Math.min(1, (s.d - (GRASS_RADIUS - GRASS_FADE_BAND)) / GRASS_FADE_BAND))
+        if (fade <= 0.02) continue
+        const y = this.grids.fineElevAt(s.fx, s.fy) * ELEVATION_SCALE
+        const scale = fade * (0.75 + hashG(s.fx, s.fy, 25 + k) * 0.5)
+        q.setFromAxisAngle(up, hashG(s.fx, s.fy, 35 + k) * Math.PI * 2)
+        this.tmpMatrix.compose(new Vector3(wx, y, wz), q, new Vector3(scale, scale, scale))
+        this.object.setMatrixAt(n++, this.tmpMatrix)
+      }
+      if (n >= GRASS_MAX_INSTANCES) break
+    }
+    this.object.count = n
+    this.object.instanceMatrix.needsUpdate = true
+    return true
+  }
+
+  dispose() {
+    this.geo.dispose()
+    this.mat.dispose()
+    this.tex.dispose()
   }
 }
