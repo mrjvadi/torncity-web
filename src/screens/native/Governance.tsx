@@ -13,6 +13,12 @@ const OFFICE_FA: Record<string, string> = {
   mayor: 'شهردار', deputy_mayor: 'معاون شهردار', city_council: 'عضو شورای شهر', president: 'رئیس‌جمهور',
 }
 
+const LEVER_FA: Record<string, string> = {
+  'city.tax_rate': 'نرخ مالیات',
+  'city.minimum_wage': 'حداقل دستمزد',
+  'city.shift_window_hours': 'بازه‌ی ساعت شیفت',
+}
+
 function leverValue(l: Lever): string {
   if (l.value === undefined) return '—'
   if (l.type === 'bps') return pct(l.value / 10000)
@@ -47,7 +53,7 @@ export default function Governance({ response, loading, onAction, run }: ScreenP
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {s.levers!.map((l, li) => (
                 <div key={li} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.25)', borderRadius: 10, padding: '8px 10px' }}>
-                  <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{l.code}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{LEVER_FA[l.code ?? ''] ?? l.code}</span>
                   <span className="display" style={{ fontSize: 14, color: 'var(--gold)' }}>{leverValue(l)}</span>
                 </div>
               ))}
