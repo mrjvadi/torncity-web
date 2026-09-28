@@ -175,7 +175,10 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
         />
       )}
 
-      {loading && <div className="city-loading"><div className="skeleton" style={{ width: 160, height: 22 }} /></div>}
+      {/* text only — no blank shimmer placeholder: the proto has no loading
+          skeleton concept, and an unstyled shimmering pill over the city
+          reads as a rendering bug more than a loading state. */}
+      {loading && <div className="city-loading">در حال بارگذاری شهر…</div>}
       {loadError && <div className="city-error">نقشه‌ی شهر بارگذاری نشد.</div>}
 
       <PlotSheet plot={selected} onClose={() => setSelected(null)} exec={exec} />

@@ -21,9 +21,9 @@ interface SidePlatesProps {
 
 /** The two columns of plate buttons that float over the city, either side of
  * the world bubbles (home_proto.gd `_side_buttons`/`_plate_icon`): a dark
- * round plate with a gold rim (80/720 wide), an embossed glyph, a caption
- * ribbon under it, and — only when there is a real count to show — a red
- * badge. */
+ * round plate with a gold rim (~96/720 wide), a big embossed glyph, a wide
+ * caption pill under it, and — only when there is a real count to show — a
+ * red badge. */
 export default function SidePlates({ onMissions, onGift, onRank, onInbox, onFaction }: SidePlatesProps) {
   const right: PlateDef[] = [
     { id: 'missions', icon: 'missions', palette: 'violet', label: 'مأموریت', onTap: onMissions },
@@ -54,9 +54,9 @@ function topFor(i: number, count: number): string {
 function SidePlate({ icon, palette, label, count, onTap, side, top }: PlateDef & { side: 'left' | 'right'; top: string }) {
   return (
     <button className="plate" style={{ top, [side]: '4%' } as CSSProperties} onClick={onTap}>
-      <Plate size="calc(80 * var(--u))" rimWidth="calc(3 * var(--u))">
-        <Emboss name={icon} palette={palette} size="calc(50 * var(--u))" />
-        {!!count && count > 0 && <Count n={count} size="calc(26 * var(--u))" className="plate-count" />}
+      <Plate size="calc(96 * var(--u))" rimWidth="calc(3.5 * var(--u))">
+        <Emboss name={icon} palette={palette} size="calc(62 * var(--u))" />
+        {!!count && count > 0 && <Count n={count} size="calc(30 * var(--u))" className="plate-count" />}
       </Plate>
       <span className="plate-cap"><GLabel top="#ffffff" bottom="#e8ecff" stroke={0.8}>{label}</GLabel></span>
     </button>
@@ -75,11 +75,11 @@ function SidePlateStyles() {
       /* physical right, not inline-end (see the comment above): _plate_icon
          always counts from c.x + 14, the plate's own right side, whether
          the plate sits in the left or right column. */
-      .plate-count { position: absolute; top: calc(-8 * var(--u)); right: calc(-6 * var(--u)); }
+      .plate-count { position: absolute; top: calc(-9 * var(--u)); right: calc(-7 * var(--u)); }
       .plate-cap {
         background: linear-gradient(180deg, #14183a, #05070f);
-        border: 1.5px solid var(--gold-soft); border-radius: calc(10 * var(--u));
-        padding: calc(3 * var(--u)) calc(9 * var(--u)); font-size: calc(17 * var(--u)); white-space: nowrap;
+        border: 1.5px solid var(--gold-soft); border-radius: calc(12 * var(--u));
+        padding: calc(4 * var(--u)) calc(14 * var(--u)); font-size: calc(19 * var(--u)); white-space: nowrap;
         box-shadow: 0 calc(3 * var(--u)) calc(8 * var(--u)) rgba(0, 0, 0, 0.4);
       }
     `}</style>
