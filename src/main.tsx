@@ -8,15 +8,19 @@ installGlobalReporter()
 
 const params = new URLSearchParams(location.search)
 async function boot() {
-  if (params.get('mock') === '1') {
-    const { installMockApi } = await import('./api/mock')
-    installMockApi()
-  }
+  // The mock API chunk and the Telegram WebApp script are independent —
+  // fetch them together instead of one after the other, so a slow
+  // connection pays for the slower of the two, not both.
+  const mockReady = params.get('mock') === '1'
+    ? import('./api/mock').then(({ installMockApi }) => installMockApi())
+    : Promise.resolve()
 
   // Load the Telegram WebApp script same-origin, never from telegram.org —
   // it is filtered in Iran and a synchronous load from there would freeze
-  // the page. Safe to skip outside Telegram.
-  await new Promise<void>((resolve) => {
+  // the page. Safe to skip outside Telegram. index.html preloads this same
+  // URL as early as the HTML parser sees it, so by the time this script tag
+  // is created the fetch is often already done.
+  const telegramReady = new Promise<void>((resolve) => {
     const script = document.createElement('script')
     script.src = '/telegram-web-app.js'
     script.async = true
@@ -25,6 +29,8 @@ async function boot() {
     document.head.appendChild(script)
     setTimeout(resolve, 1200)
   })
+
+  await Promise.all([mockReady, telegramReady])
 
   report('boot', 'main mounted')
   createRoot(document.getElementById('root')!).render(
