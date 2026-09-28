@@ -1,0 +1,298 @@
+/* The design kit: a faithful CSS port of the Godot prototype's primitives
+   (proto/home_proto.gd _frame/_button/_badge/_bar/_ring/_emboss/_glabel and
+   proto/ui/*.gdshader). Class prefix `k-` throughout, kept separate from the
+   screens' own `nx-`/`ft-` classes so both can be restyled independently.
+   Sizes are plain CSS lengths (px, or calc(N * var(--u)) for anything that
+   must sit at the prototype's own 720-canvas proportions) — components take
+   them as props/CSS vars rather than hardcoding either unit, so the same
+   kit serves the chrome (proto scale) and the 54 feature screens (their own
+   layout) alike. */
+
+/* -- Frame: a lit panel — vertical gradient face, girih lattice, metallic
+   trim lit from the top, optional inner glow and drop shadow
+   (home_proto.gd _frame / ui/frame.gdshader). */
+.k-frame {
+  position: relative;
+  border-radius: var(--k-radius, 18px);
+  background: linear-gradient(180deg, var(--k-top, var(--panel)), var(--k-bottom, var(--panel-2)));
+  border-style: solid;
+  border-width: var(--k-trim-w, 2px);
+  border-color: var(--k-trim, var(--gold));
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -12px 18px -14px rgba(0, 0, 0, 0.6),
+    var(--k-glow, 0 0 0 transparent),
+    0 8px 18px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+.k-frame > .k-frame-body { position: relative; z-index: 1; }
+.k-frame.k-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--girih);
+  background-size: var(--k-pattern-size, 46px 46px);
+  opacity: var(--k-pattern-a, 0.35);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.k-frame.k-flush { border-radius: var(--k-radius, 18px); }
+.k-frame-pad { padding: var(--k-pad, 12px); }
+
+/* -- Slab: a chunky glossy button — face gradient, a darker "lip" that the
+   press sinks into, a gloss band on the upper half (ui/button.gdshader). */
+.k-slab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--k-radius, 16px);
+  background: linear-gradient(180deg, var(--k-top), var(--k-bottom));
+  color: var(--k-text, #fff);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -40% 40% -30% rgba(0, 0, 0, 0.25),
+    0 var(--k-lip, 5px) 0 var(--k-lip-c, rgba(0, 0, 0, 0.4)),
+    0 calc(var(--k-lip, 5px) + 5px) 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.k-slab:active {
+  transform: translateY(var(--k-lip, 5px));
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.2), 0 0 0 transparent;
+}
+.k-slab:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.35);
+  cursor: not-allowed;
+}
+.k-slab-gold { --k-top: #ffe680; --k-bottom: #f5a11f; --k-lip-c: #9a4e06; --k-text: #4a2600; }
+.k-slab-green { --k-top: #8be8a0; --k-bottom: #3fae63; --k-lip-c: #1a5a30; --k-text: #123018; }
+.k-slab-red { --k-top: #ff8a8e; --k-bottom: #d8343b; --k-lip-c: #6e1216; --k-text: #fff; }
+.k-slab-blue { --k-top: #6f8cf0; --k-bottom: #2a45b0; --k-lip-c: #101e60; --k-text: #fff; }
+.k-slab-steel { --k-top: #a7afc8; --k-bottom: #4a536e; --k-lip-c: #1e2436; --k-text: #fff; }
+.k-slab-ghost { --k-top: transparent; --k-bottom: transparent; --k-lip-c: transparent; --k-text: var(--gold); box-shadow: none; border: 1px solid var(--gold-soft); background: linear-gradient(180deg, rgba(242,194,85,0.16), rgba(242,194,85,0.05)); }
+.k-slab-ghost:active { box-shadow: none; }
+
+/* -- Plate: a round (or rounded-square) rimmed plate an icon sits on
+   (home_proto.gd _badge / ui/badge.gdshader). */
+.k-plate {
+  position: relative;
+  flex: none;
+  width: var(--k-size, 64px);
+  height: var(--k-size, 64px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, var(--k-plate-l, #232c58), var(--k-plate-d, #0d1024));
+  border-style: solid;
+  border-width: var(--k-rim-w, 3px);
+  border-color: var(--k-rim, var(--gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.45),
+    inset 0 2px 5px rgba(255, 255, 255, 0.14),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.4);
+}
+.k-plate-square { border-radius: 22%; }
+
+/* -- GLabel: the display font with a vertical gradient fill and a dark
+   outline (home_proto.gd _glabel / ui/grad_text.gdshader). */
+.k-glabel {
+  font-family: 'Lalezar', 'Vazirmatn', sans-serif;
+  font-weight: 400;
+  display: inline-block;
+  background: linear-gradient(180deg, var(--k-g-top, #fff6c8), var(--k-g-bottom, #ffb21f));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: var(--k-g-stroke, 1px) rgba(2, 3, 8, 0.92);
+  paint-order: stroke fill;
+  text-shadow: 0 2px 1px rgba(0, 0, 0, 0.4);
+  line-height: 1.15;
+}
+
+/* -- Bar: a resource bar — sunken track, lit fill from the reading edge
+   (right, RTL), value text centred inside (ui/bar.gdshader). */
+.k-bar-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.k-bar {
+  position: relative;
+  height: var(--k-h, 30px);
+  border-radius: 999px;
+  background: rgba(2, 3, 8, 0.85);
+  border: 2px solid var(--k-outline, var(--gold));
+  overflow: hidden;
+}
+.k-bar-fill {
+  position: absolute;
+  inset: 2px auto 2px 2px;
+  right: 2px;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--k-fill-l, #fff), var(--k-fill, #f5a623) 60%);
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+  transition: width 0.4s ease;
+}
+.k-bar.k-bar-full .k-bar-fill { animation: k-breathe 1.6s ease-in-out infinite; }
+.k-bar-label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: var(--k-fs, 15px);
+  color: #fff;
+}
+@keyframes k-breathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+
+/* -- Ring: a progress ring for timers, clockwise from the top
+   (ui/ring.gdshader). */
+.k-ring { position: relative; flex: none; }
+.k-ring svg { display: block; transform: rotate(-90deg); }
+.k-ring-track { fill: none; stroke: rgba(2, 3, 8, 0.75); }
+.k-ring-value { fill: none; stroke-linecap: round; transition: stroke-dasharray 0.4s ease; }
+.k-ring-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+
+/* -- Count: the small red notification badge. */
+.k-count {
+  position: absolute;
+  min-width: var(--k-size, 19px);
+  height: var(--k-size, 19px);
+  padding: 0 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff9a9e, var(--anar));
+  border: 1px solid #6e1216;
+  color: #fff;
+  font-size: var(--k-fs, 11px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+/* -- Ribbon: the screen title band with folded tails, and the two round
+   back/help buttons beside it (screens_proto.gd _hdr). */
+.k-hdr { display: flex; align-items: center; gap: var(--k-gap, 10px); }
+.k-hdr-btn {
+  flex: none;
+  width: var(--k-btn, 44px);
+  height: var(--k-btn, 44px);
+  border-radius: 50%;
+  border: 2px solid var(--gold-soft);
+  background: linear-gradient(180deg, #3f55a8, #1a2560);
+  color: #fff;
+  font-size: var(--k-btn-fs, 1.3em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 0 #0a1030, 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.k-hdr-btn:active { transform: translateY(3px); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.2); }
+.k-hdr-btn:disabled { visibility: hidden; }
+.k-ribbon {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: var(--k-h, 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--k-h, 48px);
+  background: linear-gradient(180deg, var(--k-top), var(--k-bottom));
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.3), 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+.k-ribbon::before, .k-ribbon::after {
+  content: '';
+  position: absolute;
+  top: 12%;
+  width: calc(var(--k-h, 48px) * 0.5);
+  height: 76%;
+  background: var(--k-bottom);
+  filter: brightness(0.6);
+  z-index: -1;
+}
+.k-ribbon::before { left: calc(var(--k-h, 48px) * -0.32); clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+.k-ribbon::after { right: calc(var(--k-h, 48px) * -0.32); clip-path: polygon(0 0, 0 100%, 100% 50%); }
+.k-ribbon-title { position: relative; z-index: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* -- Chip: a small lit pill (screens_proto.gd _chip). */
+.k-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--k-pad, 4px 12px);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--k-top, #3a4468), var(--k-bottom, #1c2340));
+  border: 1.5px solid var(--k-rim, var(--gold-soft));
+  color: #fff;
+  font-size: var(--k-fs, 13px);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.15);
+  white-space: nowrap;
+}
+
+/* -- Segmented: filter/tab chips (crime categories, leaderboard boards…). */
+.k-seg { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.k-seg-opt {
+  flex: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-size: 12.5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-dim);
+}
+.k-seg-opt.k-active {
+  background: linear-gradient(180deg, #ffe680, #f5a11f);
+  border-color: #9a4e06;
+  color: #4a2600;
+  box-shadow: 0 3px 0 #9a4e06;
+}
+
+/* -- Numpad: the bank screen's keypad (screens_proto.gd _s_bank keys). */
+.k-numpad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k-gap, 8px); }
+.k-numpad .k-slab { height: var(--k-key-h, 54px); font-size: 19px; }
+
+/* -- Screen: the shared background behind every non-city screen — the
+   city photo, the dark gradient, the vignette, and the girih pattern
+   (screens_proto.gd _build_ui). */
+.k-screen { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--ink); overflow: hidden; }
+.k-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--k-bg-url);
+  background-size: cover;
+  background-position: center 30%;
+  filter: saturate(0.85) brightness(0.8);
+}
+.k-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 75% at 50% 40%, transparent 40%, rgba(2, 2, 8, 0.55) 100%),
+    linear-gradient(180deg, rgba(7, 10, 20, 0.55) 0%, rgba(7, 10, 20, 0.72) 55%, rgba(7, 10, 20, 0.92) 100%);
+}
+.k-screen-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--girih);
+  background-size: 46px 46px;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
+}
+.k-screen-body { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; min-height: 0; }
