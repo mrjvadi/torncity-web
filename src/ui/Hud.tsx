@@ -88,17 +88,25 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
   )
 }
 
+/* the value/time text lives above the bar, never on top of the fill: at
+   low fractions the old inline layout put the "full at" time so close to
+   the value that they crowded each other, and a value pinned to the bar's
+   edge would straddle the fill/track boundary and lose contrast on
+   whichever half had no color under it. A plain bar underneath has no such
+   failure mode at any width or fraction. */
 function StatBar({ icon, palette, color, value, max, frac, full, fullIn }: {
   icon: string; palette: 'emerald' | 'amber' | 'ruby'; color: string; value: number; max: number
   frac: number; full: boolean; fullIn: number
 }) {
   return (
     <div className="stat">
-      <Icon name={icon} palette={palette} size={17} className="stat-icon" />
+      <div className="stat-head">
+        <Icon name={icon} palette={palette} size={13} className="stat-icon" />
+        <span className="stat-value display">{formatNumber(value)}<span className="stat-max">/{formatNumber(max)}</span></span>
+        {!full && fullIn > 0 && <span className="stat-chip">{clockIn(fullIn)}</span>}
+      </div>
       <div className="stat-bar" style={{ borderColor: color }}>
         <div className="stat-fill" style={{ width: `${frac * 100}%`, background: color }} />
-        <span className="stat-label display">{formatNumber(value)}/{formatNumber(max)}</span>
-        {!full && fullIn > 0 && <span className="stat-chip">پر {clockIn(fullIn)}</span>}
       </div>
     </div>
   )
@@ -111,8 +119,8 @@ function HudStyles() {
          too tall on a phone, especially inside Telegram's full-screen mode
          where --safe-t already eats the top for its own button bar. */
       .hud { position: relative; z-index: 5; padding-top: var(--safe-t); background: linear-gradient(180deg, rgba(7,10,20,0.92), rgba(7,10,20,0.75) 70%, transparent); }
-      .hud-top { display: flex; align-items: center; gap: 6px; padding: 6px 8px 2px; }
-      .hud-avatar { position: relative; width: 40px; height: 40px; flex: none; }
+      .hud-top { display: flex; align-items: center; gap: 6px; padding: 5px 8px 1px; }
+      .hud-avatar { position: relative; width: 38px; height: 38px; flex: none; }
       .hud-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
       .ring-track { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 7; }
       .ring-value { fill: none; stroke: var(--firouzeh); stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray 0.4s; }
@@ -133,16 +141,21 @@ function HudStyles() {
       .hud-corner { position: relative; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 40% 30%, #232c58, #10142b); border: 1px solid var(--gold-soft); display: flex; align-items: center; justify-content: center; flex: none; }
       .hud-count { position: absolute; top: -4px; left: -4px; background: var(--anar); color: #fff; font-size: 9px; border-radius: 7px; min-width: 13px; height: 13px; display: flex; align-items: center; justify-content: center; padding: 0 2px; border: 1px solid #2a0a0a; }
 
-      /* each stat: its struck icon beside the bar, the value and the time it
-         fills inside the bar — nothing hangs below the HUD to be clipped */
-      .hud-stat-row { display: flex; align-items: center; padding: 2px 8px 6px; }
-      .hud-bars { flex: 1; display: flex; gap: 8px; min-width: 0; }
-      .stat { display: flex; align-items: center; gap: 3px; flex: 1 1 0; min-width: 0; }
-      .stat-icon { flex: none; }
-      .stat-bar { position: relative; flex: 1; min-width: 0; height: 18px; border-radius: 9px; background: rgba(0,0,0,0.55); border: 1.5px solid; overflow: hidden; display: flex; align-items: center; justify-content: space-between; padding: 0 7px; gap: 4px; }
-      .stat-fill { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 9px; transition: width 0.4s; opacity: 0.85; }
-      .stat-label { position: relative; z-index: 1; font-size: 10.5px; line-height: 15px; color: #fff; white-space: nowrap; }
-      .stat-chip { position: relative; z-index: 1; font-size: 9px; line-height: 15px; color: #fff4c2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+      /* each stat: icon + value + "full at" time on one text line, then a
+         plain colored bar underneath. Text never sits on top of the fill,
+         so it stays fully readable at any fraction and any of the widths
+         we support (320-430px), even with three bars up when nerve is
+         sent by the realm. */
+      .hud-stat-row { display: flex; align-items: center; padding: 1px 8px 5px; }
+      .hud-bars { flex: 1; display: flex; gap: 6px; min-width: 0; }
+      .stat { display: flex; flex-direction: column; gap: 2px; flex: 1 1 0; min-width: 0; }
+      .stat-head { display: flex; align-items: baseline; gap: 3px; min-width: 0; }
+      .stat-icon { flex: none; align-self: center; }
+      .stat-value { font-size: 10.5px; line-height: 1; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .stat-max { font-size: 9px; color: rgba(255,255,255,0.6); }
+      .stat-chip { font-size: 9px; line-height: 1; color: #ffd66b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; margin-inline-start: auto; padding-inline-start: 3px; }
+      .stat-bar { position: relative; min-width: 0; height: 7px; border-radius: 4px; background: rgba(0,0,0,0.55); border: 1.5px solid; overflow: hidden; }
+      .stat-fill { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 4px; transition: width 0.4s; }
     `}</style>
   )
 }
