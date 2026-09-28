@@ -90,7 +90,8 @@ export class CityEngine {
   private raf = 0
   private active = true
   private contextLost = false
-  private clouds: Object3D[] = []
+  private cloudMesh: InstancedMesh | null = null
+  private cloudSpecs: [number, number, number][] = []
   private lastCloudTick = 0
 
   // pan/zoom pointer state
@@ -211,30 +212,41 @@ export class CityEngine {
     const geo = new PlaneGeometry(1, 1)
     geo.rotateX(-Math.PI / 2)
     const mat = new MeshBasicMaterial({ color: 0x0a1030, transparent: true, opacity: 0.1, depthWrite: false })
-    const specs: [number, number, number][] = [
+    // one InstancedMesh for all of them: three moving blobs still cost a
+    // single draw call, same as if there were only one
+    this.cloudSpecs = [
       [5, 3.2, 9],
       [14, 2.6, 15],
       [9, 3.6, 22],
     ]
-    for (const [x, size, z] of specs) {
-      const mesh = new Mesh(geo, mat)
-      mesh.position.set(x, 6, z)
-      mesh.scale.set(size, 1, size * 0.7)
-      this.scene.add(mesh)
-      this.clouds.push(mesh)
-    }
+    this.cloudMesh = new InstancedMesh(geo, mat, this.cloudSpecs.length)
+    this.cloudMesh.frustumCulled = false
+    this.scene.add(this.cloudMesh)
     this.lastCloudTick = performance.now()
+    this.writeCloudMatrices()
+  }
+
+  private writeCloudMatrices() {
+    if (!this.cloudMesh) return
+    const m = new Matrix4()
+    const q = new Quaternion()
+    this.cloudSpecs.forEach(([x, size, z], i) => {
+      m.compose(new Vector3(x, 6, z), q, new Vector3(size, 1, size * 0.7))
+      this.cloudMesh!.setMatrixAt(i, m)
+    })
+    this.cloudMesh.instanceMatrix.needsUpdate = true
   }
 
   private tickClouds(now: number) {
-    if (this.clouds.length === 0) return
+    if (this.cloudSpecs.length === 0) return
     const dt = (now - this.lastCloudTick) / 1000
     this.lastCloudTick = now
     const span = this.bounds.maxX - this.bounds.minX + 10
-    for (const c of this.clouds) {
-      c.position.x += dt * 0.15
-      if (c.position.x > this.bounds.maxX + 8) c.position.x -= span
+    for (const spec of this.cloudSpecs) {
+      spec[0] += dt * 0.15
+      if (spec[0] > this.bounds.maxX + 8) spec[0] -= span
     }
+    this.writeCloudMatrices()
   }
 
   private placeCamera() {
@@ -772,7 +784,7 @@ export class CityEngine {
     }
 
     if (moving || this.pointers.size > 0) this.requestRender()
-    else if (this.clouds.length > 0) {
+    else if (this.cloudSpecs.length > 0) {
       // keep the drift alive at a low cadence via a lightweight timer
       // rather than chaining requestAnimationFrame at 60fps for no reason
       window.setTimeout(() => this.requestRender(), 120)
