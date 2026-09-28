@@ -1,4 +1,5 @@
 import BottomSheet from './BottomSheet'
+import { BUILD_ID } from '../lib/freshness'
 import Icon from './Icon'
 
 const USEFUL_COMMANDS: { command: string; label: string; icon: string }[] = [
@@ -32,9 +33,11 @@ export default function MenuSheet({ open, onClose, onPick, onSignOut }: MenuShee
         ))}
       </div>
       <button className="menu-signout display" onClick={onSignOut}>خروج از حساب</button>
+      <div className="menu-build">نسخه <span dir="ltr">{BUILD_ID}</span></div>
       <style>{`
         .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
         .menu-item { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid rgba(242,194,85,0.18); border-radius: 14px; padding: 14px 6px; font-size: 12px; color: var(--text-dim); }
+        .menu-build { margin-top: 10px; text-align: center; font-size: 11px; color: var(--text-dim); opacity: 0.7; }
         .menu-signout { width: 100%; background: rgba(229,72,77,0.12); color: #ff9aa0; border: 1px solid rgba(229,72,77,0.4); padding: 12px; border-radius: 14px; font-size: 15px; }
       `}</style>
     </BottomSheet>

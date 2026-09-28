@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/v2/',
   plugins: [react()],
+  // The build's own stamp (UTC), shown in the menu so a player can say which
+  // version they are looking at.
+  define: { __BUILD_ID__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')) },
   build: {
     target: 'es2020',
     sourcemap: false,
