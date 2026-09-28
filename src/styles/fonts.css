@@ -1,3 +1,8 @@
+/* Vazirmatn and Lalezar, OFL-licensed (public/fonts/OFL.txt). Subset to
+   Persian/Arabic (U+0600-06FF), basic Latin, and the handful of extra
+   punctuation/arrow glyphs the app actually renders — not full Unicode,
+   so still safe for arbitrary player-typed Persian text, just not for
+   Cyrillic/Greek/CJK/emoji (those already fell back before subsetting). */
 @font-face {
   font-family: 'Vazirmatn';
   src: url('/v2/fonts/Vazirmatn-Regular.woff2') format('woff2');
@@ -24,7 +29,7 @@
 }
 @font-face {
   font-family: 'Lalezar';
-  src: url('/v2/fonts/Lalezar-Regular.ttf') format('truetype');
+  src: url('/v2/fonts/Lalezar-Regular.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
