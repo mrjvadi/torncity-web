@@ -1,6 +1,7 @@
 import {
   ACESFilmicToneMapping,
   Box3,
+  Color,
   DirectionalLight,
   FogExp2,
   Group,
@@ -13,6 +14,7 @@ import {
   MeshLambertMaterial,
   Object3D,
   OrthographicCamera,
+  PCFShadowMap,
   Plane,
   PlaneGeometry,
   Quaternion,
@@ -61,8 +63,16 @@ export interface CityEngineOptions {
   onBubbles?: (points: BubbleScreenPoint[]) => void
 }
 
-const MIN_FRUSTUM = 4
-const MAX_FRUSTUM = 26
+const MIN_FRUSTUM = 2.2
+const MAX_FRUSTUM = 16
+// how tight the prototype's own shot frames its 9x9 block: 2-3 lots fill
+// the screen width, so this is a fixed starting zoom, not one that grows
+// with the server's grid — a bigger city should still read as "the same
+// close-up street", the filler tiles just carry on past the edge of frame
+const INITIAL_FRUSTUM = 3.1
+// the light, soft daytime mood (home_proto.gd's WorldEnvironment/lights),
+// not the dusk-void one this screen used to have
+const SKY = 0xdde8da
 const DEV = import.meta.env.DEV
 
 type LibraryEntry = { parts: import('../api/types').ModelPart[] }
@@ -93,6 +103,7 @@ export class CityEngine {
   private cloudMesh: InstancedMesh | null = null
   private cloudSpecs: [number, number, number][] = []
   private lastCloudTick = 0
+  private sun!: DirectionalLight
 
   // pan/zoom pointer state
   private pointers = new Map<number, { x: number; y: number }>()
@@ -112,16 +123,30 @@ export class CityEngine {
     this.renderer = new WebGLRenderer({
       canvas,
       antialias: dpr < 1.75,
+      // WebKit's software GL path renders a blank canvas for alpha:false
+      // contexts (a real Safari/WebKit bug, not just a style choice), so
+      // this stays alpha:true — the light sky colour that replaces the old
+      // dark void is painted as a real scene.background below instead,
+      // which always draws regardless of that quirk.
       alpha: true,
       powerPreference: 'low-power',
     })
     this.renderer.setPixelRatio(dpr)
     this.renderer.setClearColor(0x000000, 0)
+    this.scene.background = new Color(SKY)
     // free, one-time colour grading (no extra draw calls): a filmic tone
-    // curve so the dusk lighting rolls off instead of clipping to white.
+    // curve so the bright daytime lighting rolls off instead of clipping.
     this.renderer.outputColorSpace = SRGBColorSpace
     this.renderer.toneMapping = ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.18
+    this.renderer.toneMappingExposure = 1.32
+    // one directional light casting soft shadows (proto's DirectionalLight3D
+    // has shadow_enabled=true) — a single 1k shadow map is cheap enough for
+    // an iPhone and is the one thing that reads as "grounded" the flat
+    // instanced tiles otherwise can't give the scene.
+    this.renderer.shadowMap.enabled = true
+    // three 0.186 folded the old "soft" variant into this one (percentage-
+    // closer filtering is always on for a directional light's shadow map)
+    this.renderer.shadowMap.type = PCFShadowMap
 
     const aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight)
     this.camera = new OrthographicCamera(-this.frustum * aspect, this.frustum * aspect, this.frustum, -this.frustum, 0.1, 200)
@@ -187,20 +212,52 @@ export class CityEngine {
     }
   }
 
-  // The dusk sky is a plain CSS gradient behind the (alpha-transparent)
-  // canvas, not a 3D sphere: an orthographic camera's rays are all parallel,
-  // so a world-space sky sphere renders as a few flat, hard-edged bands
-  // instead of a smooth gradient. A screen-space gradient is also one less
-  // big mesh to draw every frame — better for an iPhone's battery too.
+  // The sky is the renderer's own clear colour, not a 3D sphere: an
+  // orthographic camera's rays are all parallel, so a world-space sky sphere
+  // renders as a few flat, hard-edged bands instead of a smooth gradient.
+  // A flat clear colour is also one less mesh to draw every frame — better
+  // for an iPhone's battery too, and it makes the canvas fully opaque so no
+  // dark page background can ever show through at the grid's edge.
 
   private buildLights() {
-    const sun = new DirectionalLight(0xffb27a, 2.3)
-    sun.position.set(-8, 14, -10)
-    this.scene.add(sun)
-    const ambient = new HemisphereLight(0x8f9cdc, 0x2a2e46, 1.15)
+    // proto's DirectionalLight3D: light_color #FFB27A, tilted sun; here it
+    // also casts the scene's only shadows (soft, one 1k map)
+    this.sun = new DirectionalLight(0xffc98a, 2.1)
+    this.sun.castShadow = true
+    this.sun.shadow.mapSize.set(1024, 1024)
+    this.sun.shadow.bias = -0.0012
+    this.sun.shadow.normalBias = 0.025
+    this.sun.shadow.camera.near = 1
+    this.sun.shadow.camera.far = 50
+    this.scene.add(this.sun)
+    this.scene.add(this.sun.target)
+    // proto's Environment.ambient_light_color/energy (#7F8FD0 @ 0.55): a
+    // near-flat hemisphere (sky and ground close in both hue and value, not
+    // the old dark-navy ground) so every surface — including walls and
+    // undersides — reads bright and cool rather than half-lit
+    const ambient = new HemisphereLight(0xb9c3ee, 0xd9deef, 1.5)
     this.scene.add(ambient)
-    // a soft dusk haze, as the prototype's fog_light_color/fog_density
-    this.scene.fog = new FogExp2(0x3b3f74, 0.012)
+    // a light, barely-there haze (proto's fog_light_color/fog_density),
+    // toned to the sky colour instead of dusk navy so distant tiles fade
+    // into the same soft daytime mood rather than a dark void
+    this.scene.fog = new FogExp2(SKY, 0.01)
+  }
+
+  /** Re-aims the sun and its shadow camera at the city's own centre once the
+   * grid is known (loadCity): a directional light's shadow only depends on
+   * direction, but its shadow *camera* is a real frustum that has to be
+   * sized and centred on the ground it needs to cover. */
+  private positionSun(center: Vector3, gridW: number, gridH: number) {
+    this.sun.position.set(center.x - 10, center.y + 16, center.z - 8)
+    this.sun.target.position.copy(center)
+    this.sun.target.updateMatrixWorld()
+    const half = Math.max(gridW, gridH) / 2 + 5
+    const cam = this.sun.shadow.camera
+    cam.left = -half
+    cam.right = half
+    cam.top = half
+    cam.bottom = -half
+    cam.updateProjectionMatrix()
   }
 
   /** A handful of flat, cheap cloud-shadow blobs drifting slowly over the
@@ -211,7 +268,7 @@ export class CityEngine {
   private buildClouds() {
     const geo = new PlaneGeometry(1, 1)
     geo.rotateX(-Math.PI / 2)
-    const mat = new MeshBasicMaterial({ color: 0x0a1030, transparent: true, opacity: 0.1, depthWrite: false })
+    const mat = new MeshBasicMaterial({ color: 0x6a7098, transparent: true, opacity: 0.07, depthWrite: false })
     // one InstancedMesh for all of them: three moving blobs still cost a
     // single draw call, same as if there were only one
     this.cloudSpecs = [
@@ -249,9 +306,16 @@ export class CityEngine {
     this.writeCloudMatrices()
   }
 
+  // proto's own cam: position (10.5, 13, 10.5) looking at the origin — a
+  // (1, 1.238, 1) direction. The distance (its vector's own length) only
+  // has to clear the near/far planes for an orthographic camera, so it is
+  // copied as-is rather than re-derived, which keeps the shadow-casting
+  // sun (placed the same way) at a matching, familiar angle.
+  private static readonly CAM_DIR = new Vector3(1, 1.238, 1).normalize()
+  private static readonly CAM_DIST = 19.7
+
   private placeCamera() {
-    const dir = new Vector3(1, 1.25, 1).normalize()
-    const pos = this.target.clone().add(dir.multiplyScalar(40))
+    const pos = this.target.clone().addScaledVector(CityEngine.CAM_DIR, CityEngine.CAM_DIST)
     this.camera.position.copy(pos)
     this.camera.up.set(0, 1, 0)
     this.camera.lookAt(this.target)
@@ -262,7 +326,7 @@ export class CityEngine {
   // canvas's own centre (at ~54% down, not 50%); nudging the ortho frustum's
   // top/bottom by this fraction of its half-height pushes the framed city
   // down to sit in that band instead of half-hidden under the HUD
-  private static readonly VERTICAL_BIAS = 0.08
+  private static readonly VERTICAL_BIAS = 0.16
 
   private updateFrustumPlanes() {
     const aspect = this.canvas.clientWidth / Math.max(1, this.canvas.clientHeight)
@@ -292,12 +356,13 @@ export class CityEngine {
       maxZ: cityMap.grid.h + 3,
     }
     this.target.set(cityMap.grid.w / 2, 0, cityMap.grid.h / 2)
-    // a fixed frustum makes a small test city look like a toy stranded in a
-    // huge dark void; sizing the initial zoom off the grid itself keeps the
-    // composition close to the prototype's tight, filled-frame shot for any
-    // city size the server sends, before the player's own pinch takes over
-    this.setFrustum(Math.max(cityMap.grid.w, cityMap.grid.h) * 0.58)
+    // the prototype frames its block tight (2-3 lots fill the width) no
+    // matter how big the city behind it is — the dense filler tiles carry
+    // the composition past the edge of frame, so the initial zoom is a
+    // fixed close-up, not one that grows with the server's grid
+    this.setFrustum(INITIAL_FRUSTUM)
     this.placeCamera()
+    this.positionSun(this.target, cityMap.grid.w, cityMap.grid.h)
 
     this.buildGround(cityMap)
     void this.buildRoads(cityMap)
@@ -312,9 +377,13 @@ export class CityEngine {
   private buildGround(cityMap: CityMap) {
     const geo = new PlaneGeometry(cityMap.grid.w + 20, cityMap.grid.h + 20)
     geo.rotateX(-Math.PI / 2)
-    const mat = new MeshLambertMaterial({ color: 0x3e6b4a })
+    // a light mint base (the grass models' own bright green, not the old
+    // dark-forest tone) so any sliver that peeks between tiles still reads
+    // as the same soft daytime lawn
+    const mat = new MeshLambertMaterial({ color: 0xcdeec6 })
     const mesh = new Mesh(geo, mat)
     mesh.position.set(cityMap.grid.w / 2, -0.03, cityMap.grid.h / 2)
+    mesh.receiveShadow = true
     this.scene.add(mesh)
   }
 
@@ -368,10 +437,13 @@ export class CityEngine {
     crossMesh.count = nc
     straightMesh.instanceMatrix.needsUpdate = true
     crossMesh.instanceMatrix.needsUpdate = true
+    straightMesh.receiveShadow = true
+    crossMesh.receiveShadow = true
     this.scene.add(straightMesh, crossMesh)
     if (lampMesh) {
       lampMesh.count = nl
       lampMesh.instanceMatrix.needsUpdate = true
+      lampMesh.receiveShadow = true
       this.scene.add(lampMesh)
     }
     this.requestRender()
@@ -380,8 +452,11 @@ export class CityEngine {
   private buildFlatRoads(cityMap: CityMap) {
     const geo = new PlaneGeometry(1, 1)
     geo.rotateX(-Math.PI / 2)
-    const mat = new MeshLambertMaterial({ color: 0x555a6e })
+    // a light neutral grey (not the old dark slate) so an offline city
+    // without the Starter Kit loaded still reads as the same bright street
+    const mat = new MeshLambertMaterial({ color: 0xd7d6d0 })
     const mesh = new InstancedMesh(geo, mat, cityMap.roads.length)
+    mesh.receiveShadow = true
     const m = new Matrix4()
     cityMap.roads.forEach(([x, y], i) => {
       m.makeTranslation(x + 0.5, 0.005, y + 0.5)
@@ -455,6 +530,7 @@ export class CityEngine {
         mesh.setMatrixAt(i, m)
       })
       mesh.instanceMatrix.needsUpdate = true
+      mesh.receiveShadow = true
       this.scene.add(mesh)
       this.requestRender()
     }
@@ -462,6 +538,7 @@ export class CityEngine {
       const fountain = await cloneStarter('pavement-fountain')
       if (fountain && !this.disposed) {
         fountain.position.set(fountainAt[0] + 0.5, 0, fountainAt[1] + 0.5)
+        fountain.traverse((o) => { const mm = o as Mesh; if (mm.isMesh) { mm.receiveShadow = true; mm.castShadow = true } })
         this.scene.add(fountain)
         this.requestRender()
       }
@@ -483,6 +560,10 @@ export class CityEngine {
         mesh.setMatrixAt(i, m)
       })
       mesh.instanceMatrix.needsUpdate = true
+      mesh.receiveShadow = true
+      // the conifer canopies (grass-trees / grass-trees-tall) cast; bare
+      // grass has nothing tall enough to bother
+      mesh.castShadow = name !== 'grass'
       this.scene.add(mesh)
       this.requestRender()
     }
@@ -511,9 +592,11 @@ export class CityEngine {
       x = w + width / 2
     }
     geo.rotateX(-Math.PI / 2)
-    const mat = new MeshLambertMaterial({ color: 0x2a5f9e, transparent: true, opacity: 0.92 })
+    // a soft pastel turquoise, not the old dark navy sea
+    const mat = new MeshLambertMaterial({ color: 0x9fdfe3, transparent: true, opacity: 0.88 })
     const mesh = new Mesh(geo, mat)
     mesh.position.set(x, -0.015, z)
+    mesh.receiveShadow = true
     this.scene.add(mesh)
   }
 
@@ -523,7 +606,7 @@ export class CityEngine {
     geo.rotateX(-Math.PI / 2)
     // a quiet kerb/pavement pad under every building, not a category colour:
     // the building itself (procedural or modelled) now carries that read
-    const mat = new MeshLambertMaterial({ color: 0xc9c4b8 })
+    const mat = new MeshLambertMaterial({ color: 0xe4e0d6 })
     const mesh = new InstancedMesh(geo, mat, cityMap.plots.length)
     const m = new Matrix4()
     cityMap.plots.forEach((p, i) => {
@@ -535,6 +618,7 @@ export class CityEngine {
       mesh.setMatrixAt(i, m)
     })
     mesh.instanceMatrix.needsUpdate = true
+    mesh.receiveShadow = true
     this.scene.add(mesh)
   }
 
@@ -633,16 +717,19 @@ export class CityEngine {
       for (const g of batch.opaque) { g.applyMatrix4(m); cityOpaque.push(g) }
       for (const g of batch.glow) { g.applyMatrix4(m); cityGlow.push(g) }
     }
-    this.addMerged(cityOpaque, new MeshLambertMaterial({ vertexColors: true }))
-    this.addMerged(cityGlow, new MeshBasicMaterial({ vertexColors: true, toneMapped: false }))
+    this.addMerged(cityOpaque, new MeshLambertMaterial({ vertexColors: true }), true)
+    this.addMerged(cityGlow, new MeshBasicMaterial({ vertexColors: true, toneMapped: false }), false)
   }
 
-  private addMerged(geometries: BufferGeometry[], material: Material) {
+  private addMerged(geometries: BufferGeometry[], material: Material, shadowed: boolean) {
     if (geometries.length === 0) return
     const merged = mergeGeometries(geometries, false)
     geometries.forEach((g) => g.dispose())
     if (!merged) return
-    this.scene.add(new Mesh(merged, material))
+    const mesh = new Mesh(merged, material)
+    mesh.castShadow = shadowed
+    mesh.receiveShadow = shadowed
+    this.scene.add(mesh)
   }
 
   /** The last-resort Starter Kit house, grouped by which of the five house
@@ -669,6 +756,8 @@ export class CityEngine {
         mesh.setMatrixAt(i, m)
       })
       mesh.instanceMatrix.needsUpdate = true
+      mesh.castShadow = true
+      mesh.receiveShadow = true
       this.scene.add(mesh)
       this.requestRender()
     }
@@ -691,6 +780,7 @@ export class CityEngine {
         const instance = await cloneMesh(part.mesh)
         if (!instance || this.disposed) continue
         fitAndPlacePart(instance, part)
+        instance.traverse((o) => { const mm = o as Mesh; if (mm.isMesh) { mm.castShadow = true; mm.receiveShadow = true } })
         group.add(instance)
       }
       this.requestRender()

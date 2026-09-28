@@ -4,12 +4,23 @@
 // for every placement. This is what keeps an iPhone from running out of
 // memory on a city full of buildings.
 
-import { Group, Mesh, MeshStandardMaterial, type BufferGeometry, type Material, type Texture } from 'three'
+import { Color, Group, Mesh, MeshStandardMaterial, type BufferGeometry, type Material, type Texture } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { getAssetManifest, getModelLibrary, assetUrl } from '../api/client'
 import type { AssetManifest, ModelLibrary } from '../api/types'
 
 const loader = new GLTFLoader()
+
+// the Kenney kit's own colormap is baked fairly mid-tone (it was made for a
+// game that lights it however it likes); the prototype's own bright pastel
+// look leans on that kit plus a generous bloom pass three.js's renderer
+// doesn't have here, so every textured material is nudged toward white
+// once, at load time — cheaper than a post-process bloom and applies
+// equally whether a piece is drawn once or a thousand times via InstancedMesh.
+const TINT = new Color(0xffffff)
+function lighten(m: MeshStandardMaterial): void {
+  m.color.lerp(TINT, 0.32)
+}
 
 let manifestPromise: Promise<AssetManifest | null> | null = null
 let libraryPromise: Promise<ModelLibrary | null> | null = null
@@ -71,6 +82,7 @@ async function loadMeshTemplate(meshKey: string): Promise<Group | null> {
         } else if (m.map) {
           kitTextures.set(kit, m.map)
         }
+        lighten(m)
       }
     })
     return root
@@ -130,6 +142,7 @@ async function loadStarterTemplate(name: string): Promise<Group | null> {
         } else if (m.map) {
           starterTexture = m.map
         }
+        lighten(m)
       }
     })
     return root
