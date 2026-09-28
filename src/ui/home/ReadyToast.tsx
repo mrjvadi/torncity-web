@@ -14,7 +14,7 @@ interface ReadyToastProps {
 export default function ReadyToast({ title, subtitle, cta, onTap }: ReadyToastProps) {
   return (
     <div className="ready-toast">
-      <span className="ready-toast-icon"><Icon name="energy" palette="amber" size={32} /></span>
+      <span className="ready-toast-icon"><Icon name="energy" palette="amber" size={26} /></span>
       <div className="ready-toast-copy">
         <div className="ready-toast-title display">{title}</div>
         <div className="ready-toast-sub">{subtitle}</div>

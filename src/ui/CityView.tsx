@@ -159,9 +159,10 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
         onFaction={() => onTab?.('society')}
       />
       <WorldBubbles bubbles={bubbles} points={bubblePoints} />
+      {/* NBSP in the title keeps "پر می‌شه" together at narrow widths */}
       {showToast && (
         <ReadyToast
-          title={`انرژی ${formatNumber(Math.round(energyFullIn / 60))} دقیقه دیگه پر می‌شه`}
+          title={`انرژی ${formatNumber(Math.round(energyFullIn / 60))} دقیقه دیگه پر می‌شه`}
           subtitle={pay > 0 ? `یه شیفت برو که هدر نره  ·  +${formatNumber(pay)}` : 'یه شیفت برو که هدر نره'}
           cta="شروع شیفت"
           onTap={() => { void exec('job.work') }}
