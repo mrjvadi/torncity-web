@@ -8,12 +8,18 @@
 
 import {
   ACESFilmicToneMapping,
+  BackSide,
+  BufferAttribute,
+  BufferGeometry,
   Color,
   DirectionalLight,
   FogExp2,
   HemisphereLight,
+  Mesh,
+  MeshBasicMaterial,
   PerspectiveCamera,
   Scene,
+  SphereGeometry,
   SRGBColorSpace,
   Vector3,
   WebGLRenderer,
@@ -28,7 +34,12 @@ import { buildBuildings, type BuildingsResult } from './buildings'
 import { buildProps, type PropsResult } from './props'
 import { disposeKitAssets } from './kitAssets'
 
-const SKY = 0xdde8da
+// A light pastel daytime sky: pale blue overhead fading to a near-white
+// haze at the horizon — a real gradient (buildSky below), not a flat
+// fill, matching the reference images' bright, clear daylight look.
+const SKY_TOP = 0x8fc3ec
+const SKY_HORIZON = 0xe9f3f7
+const SKY = SKY_HORIZON // fog/background colour: matches the horizon band so distant geometry fades into the dome, not a visible seam
 const RECENTLY_MOVED_MS = 4000
 const WATER_TICK_MS = 1000 / 30
 
@@ -84,7 +95,7 @@ export class WorldCityScene {
     this.scene.background = new Color(SKY)
     this.renderer.outputColorSpace = SRGBColorSpace
     this.renderer.toneMapping = ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.0
+    this.renderer.toneMappingExposure = 1.35
     this.renderer.shadowMap.enabled = false
 
     // far=15000 covers the coarse backdrop from anywhere the camera can
@@ -110,17 +121,48 @@ export class WorldCityScene {
   }
 
   private buildLights() {
-    const sun = new DirectionalLight(0xfff1d8, 2.1)
+    const sun = new DirectionalLight(0xfff6e2, 2.6)
     sun.position.set(-420, 520, -260)
     this.scene.add(sun)
-    const ambient = new HemisphereLight(0xb9c9ee, 0xcdd6c2, 0.75)
+    // Sky-blue-from-above / warm-ground-from-below hemisphere fill — the
+    // main source of the bright pastel daytime look the reference images
+    // have, brighter than a single ambient light could give without
+    // blowing out the sun-facing walls.
+    const ambient = new HemisphereLight(SKY_TOP, 0xdcd3b8, 1.05)
     this.scene.add(ambient)
+    this.buildSky()
     // Tuned so the ~1.5km city core reads with clear contrast and the
     // coarse backdrop only fades to sky past a few km — a portrait phone's
     // narrow horizontal FOV needs several km of camera distance to fit the
     // whole city width-on, so fog this thin is what keeps that shot from
     // reading as fogged-out rather than merely distant.
-    this.scene.fog = new FogExp2(SKY, 0.00018)
+    this.scene.fog = new FogExp2(SKY, 0.00013)
+  }
+
+  /** A large inward-facing sphere, vertex-coloured from a pale blue
+   * overhead to a near-white horizon band — a real gradient sky instead of
+   * a flat fill. Excluded from fog (constant colour regardless of camera
+   * distance) since it always sits at the far clip anyway. */
+  private buildSky() {
+    const geo = new SphereGeometry(6500, 24, 16)
+    const pos = geo.attributes.position as BufferAttribute
+    const colors = new Float32Array(pos.count * 3)
+    const top = new Color(SKY_TOP)
+    const horizon = new Color(SKY_HORIZON)
+    const c = new Color()
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i) / 6500 // -1..1
+      const t = Math.pow(Math.max(0, y), 0.55)
+      c.copy(horizon).lerp(top, t)
+      colors[i * 3 + 0] = c.r
+      colors[i * 3 + 1] = c.g
+      colors[i * 3 + 2] = c.b
+    }
+    geo.setAttribute('color', new BufferAttribute(colors, 3))
+    const mat = new MeshBasicMaterial({ vertexColors: true, side: BackSide, fog: false, depthWrite: false })
+    const mesh = new Mesh(geo, mat)
+    mesh.renderOrder = -1000
+    this.scene.add(mesh)
   }
 
   private onContextLost = (e: Event) => {
@@ -263,7 +305,14 @@ export class WorldCityScene {
     if (import.meta.env.DEV || new URLSearchParams(location.search).has('stats')) {
       // A debug hook for the project's own Playwright screenshot/stats
       // scripts — never referenced by the page itself.
-      ;(window as unknown as { __wc?: unknown }).__wc = { scene: this.scene, camera: this.camera, renderer: this.renderer, grids, doc }
+      ;(window as unknown as { __wc?: unknown }).__wc = {
+        scene: this.scene,
+        camera: this.camera,
+        renderer: this.renderer,
+        controls: this.controls,
+        grids,
+        doc,
+      }
     }
 
     return this.labelsFor(grids)
@@ -287,24 +336,33 @@ export class WorldCityScene {
     }
     maxY += maxHeight
 
-    // CityGrids centres the scene on the city itself, so the target is
-    // simply the vertical midpoint at world X/Z = 0 (see grids.ts).
-    const cy = (minY + maxY) / 2
+    // CityGrids centres the scene on the city itself, so the target sits
+    // at world X/Z = 0 (see grids.ts). Its Y is deliberately just above
+    // GROUND, not the vertical midpoint up to the tallest tower: a handful
+    // of 40-floor towers pull that midpoint ~60-70m up, aiming the camera
+    // near the TOP of the skyline instead of into it — the look ray then
+    // clears most low/mid-rise buildings entirely and crosses empty air
+    // over them, which reads as a hole punched through the middle of the
+    // city (see the project report). Aiming just above the street reads
+    // as a real skyline shot instead.
+    const groundY = (minY + maxY - maxHeight) / 2
+    const cy = groundY + 12
     const target = new Vector3(0, cy, 0)
     this.controls.target.copy(target)
 
+    // Fitting the ENTIRE 48-lot grid edge to edge (a strict bounding-sphere
+    // fit against the camera's fov) pushes the camera kilometres back on a
+    // portrait phone screen (its horizontal fov is much narrower than
+    // vertical) — technically "fits", but reads as a tiny distant town,
+    // not the skyline shot the brief wants. Framing instead off a fixed
+    // fraction of the footprint's own half-diagonal, calibrated against a
+    // hand-placed shot that actually read well (multiple towers, readable
+    // windows, the block pattern legible — see the project report), gets a
+    // real skyline: the outer housing/farm ring crops out of frame, and
+    // the player can still zoom out to the full valley from here.
     const footprintMeters = (size * doc.lotMeters) / 2
-    const radius = Math.sqrt(footprintMeters * footprintMeters * 2 + ((maxY - minY) / 2) ** 2) * 1.12
-
-    // Fit by the VERTICAL fov only, not the narrower horizontal one a
-    // portrait phone screen has: fitting the full 45deg-wide city corner
-    // to corner into a ~22deg horizontal half-fov pushes the camera many
-    // kilometres back, which reads as a hazy, tiny distant town rather
-    // than the "skyline" shot the brief asks for. Letting the left/right
-    // edges crop (the player can still orbit/zoom) keeps the default shot
-    // close enough to actually read as a city.
-    const vFov = (this.camera.fov * Math.PI) / 180
-    const dist = Math.max(this.controls.minDistance, radius / Math.sin(vFov / 2))
+    const halfDiagonal = Math.sqrt(footprintMeters * footprintMeters * 2)
+    const dist = Math.max(this.controls.minDistance, halfDiagonal * 0.5)
 
     // A 3/4 view biased toward the city's own north edge (where the river
     // and its bridges sit in this export) so the default shot shows the

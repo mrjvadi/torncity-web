@@ -43,8 +43,16 @@ export interface TerrainResult {
   dispose(): void
 }
 
+// The exported biome legend's own colours are saturated map-style swatches
+// (meant to be told apart on a 2D preview map, not lit and shaded in 3D) —
+// lightened toward white here so a lit, textured lawn reads as a bright
+// pastel daytime park/field instead of a dark saturated blob, the same
+// "nudge the source palette toward white" trick kitAssets.ts already used
+// for the Kenney kit's own materials.
+const GRASS_LIGHTEN = 0.42
 function biomeColorLegend(grids: CityGrids): Color[] {
-  return grids.doc.biomeLegend.map((b) => new Color(`#${b.colorHex}`))
+  const white = new Color(0xffffff)
+  return grids.doc.biomeLegend.map((b) => new Color(`#${b.colorHex}`).lerp(white, GRASS_LIGHTEN))
 }
 
 function blendSlopeAndWetness(base: Color, slope: number, wet: boolean, sandy: boolean): Color {

@@ -40,6 +40,53 @@ export class CityGrids {
     const center = fineWorldMeters(doc, originX + size / 2, originY + size / 2)
     this.originX = center.x
     this.originZ = center.z
+
+    this.gradeCityFootprint()
+  }
+
+  /** Grades the fine grid's elevation to one smooth plateau under the
+   * city's own lot core, blended out to real terrain over a margin beyond
+   * it — real settlement grading (ADR 0028's spirit: a city site is
+   * levelled once, not per building), and the only thing that keeps every
+   * road/sidewalk/building base flush with the ground mesh under it. The
+   * fine grid's own relief is small in a city core by construction
+   * (findCitySite only accepts a flat window), but "small" is still
+   * enough (a metre or two between adjacent lots) to sink a flat-topped
+   * building corner half a floor into the terrain, or split a road ribbon
+   * into a jagged, partly-buried strip — see the project report. Mutates
+   * this.fine.elevation in place so every consumer (terrain, roads,
+   * buildings, props, water) reads the SAME graded ground with no extra
+   * plumbing. */
+  private gradeCityFootprint() {
+    const { originX, originY, size } = this.doc.city
+    const w = this.fine.w
+    const elev = this.fine.elevation
+    let sum = 0
+    let n = 0
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        sum += elev[(originY + y) * w + (originX + x)]
+        n++
+      }
+    }
+    const plateau = n > 0 ? sum / n : 0
+
+    const margin = 6 // lots of soft falloff beyond the city's own core
+    const minX = originX - margin
+    const maxX = originX + size - 1 + margin
+    const minY = originY - margin
+    const maxY = originY + size - 1 + margin
+    for (let y = Math.max(0, minY); y <= Math.min(this.fine.h - 1, maxY); y++) {
+      for (let x = Math.max(0, minX); x <= Math.min(w - 1, maxX); x++) {
+        const dx = x < originX ? originX - x : x > originX + size - 1 ? x - (originX + size - 1) : 0
+        const dy = y < originY ? originY - y : y > originY + size - 1 ? y - (originY + size - 1) : 0
+        const d = Math.max(dx, dy)
+        const t = 1 - Math.min(1, d / margin) // 1 at the core, 0 at margin's edge
+        const blend = t * t * (3 - 2 * t) // smoothstep
+        const i = y * w + x
+        elev[i] = Math.round(elev[i] * (1 - blend) + plateau * blend)
+      }
+    }
   }
 
   // -- scene-space placement ----------------------------------------------

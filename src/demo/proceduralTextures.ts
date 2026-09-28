@@ -223,16 +223,28 @@ export function makeFacadeTexture(kind: FacadeKind, seed = 4): FacadeTextureResu
   const rnd = mulberry32(seed + kind.length)
 
   if (kind === 'glass') {
-    const grad = ctx.createLinearGradient(0, 0, 0, h)
-    grad.addColorStop(0, '#8fb9d6')
-    grad.addColorStop(1, '#4d7fa3')
-    ctx.fillStyle = grad
+    // Dark frame border (the mullion) all around the tile, a deep-blue
+    // glass pane inset inside it, and a soft diagonal sky-reflection
+    // streak — reads as a real curtain-wall bay even minified at distance,
+    // since the dark frame stays a hard edge under mip-mapping longer
+    // than a soft gradient would.
+    ctx.fillStyle = '#1b2530'
     ctx.fillRect(0, 0, w, h)
-    ctx.fillStyle = 'rgba(255,255,255,0.10)'
-    ctx.fillRect(2, 2, w - 4, h * 0.42)
-    ctx.strokeStyle = 'rgba(20,30,40,0.55)'
-    ctx.lineWidth = 2.5
-    ctx.strokeRect(1.25, 1.25, w - 2.5, h - 2.5)
+    const inset = w * 0.09
+    const grad = ctx.createLinearGradient(0, 0, w, h)
+    grad.addColorStop(0, '#2f5578')
+    grad.addColorStop(0.5, '#3d6f96')
+    grad.addColorStop(1, '#254864')
+    ctx.fillStyle = grad
+    ctx.fillRect(inset, inset, w - inset * 2, h - inset * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.16)'
+    ctx.beginPath()
+    ctx.moveTo(inset, h * 0.55)
+    ctx.lineTo(w * 0.55, inset)
+    ctx.lineTo(w * 0.72, inset)
+    ctx.lineTo(inset, h * 0.75)
+    ctx.closePath()
+    ctx.fill()
   } else if (kind === 'midrise') {
     ctx.fillStyle = '#8a5340'
     ctx.fillRect(0, 0, w, h)
@@ -242,7 +254,7 @@ export function makeFacadeTexture(kind: FacadeKind, seed = 4): FacadeTextureResu
       ctx.fillStyle = rnd() > 0.5 ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.08)'
       ctx.fillRect(x, y, 2, 1)
     }
-    ctx.fillStyle = '#2b2f36'
+    ctx.fillStyle = '#14181d'
     ctx.fillRect(w * 0.14, h * 0.16, w * 0.72, h * 0.6)
     ctx.strokeStyle = 'rgba(0,0,0,0.4)'
     ctx.lineWidth = 2
@@ -256,7 +268,7 @@ export function makeFacadeTexture(kind: FacadeKind, seed = 4): FacadeTextureResu
       ctx.fillStyle = rnd() > 0.5 ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.10)'
       ctx.fillRect(x, y, 1.5, 1.5)
     }
-    ctx.fillStyle = '#39424a'
+    ctx.fillStyle = '#171b20'
     ctx.fillRect(w * 0.2, h * 0.22, w * 0.6, h * 0.42)
     ctx.strokeStyle = '#efe6d2'
     ctx.lineWidth = 2
@@ -278,7 +290,7 @@ export function makeFacadeTexture(kind: FacadeKind, seed = 4): FacadeTextureResu
       ctx.lineTo(w, y)
       ctx.stroke()
     }
-    ctx.fillStyle = '#2f3947'
+    ctx.fillStyle = '#161c22'
     ctx.fillRect(w * 0.22, h * 0.2, w * 0.56, h * 0.5)
     ctx.strokeStyle = '#efe6d2'
     ctx.lineWidth = 2
