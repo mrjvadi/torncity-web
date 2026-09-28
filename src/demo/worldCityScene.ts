@@ -347,25 +347,28 @@ export class WorldCityScene {
     const target = new Vector3(0, cy, 0)
     this.controls.target.copy(target)
 
-    // Fitting the ENTIRE 48-lot grid edge to edge (a strict bounding-sphere
-    // fit against the camera's fov) pushes the camera kilometres back on a
-    // portrait phone screen (its horizontal fov is much narrower than
-    // vertical) — technically "fits", but reads as a tiny distant town,
-    // not the skyline shot the brief wants. Framing instead off a fixed
-    // fraction of the footprint's own half-diagonal, calibrated against a
-    // hand-placed shot that actually read well (multiple towers, readable
-    // windows, the block pattern legible — see the project report), gets a
-    // real skyline: the outer housing/farm ring crops out of frame, and
-    // the player can still zoom out to the full valley from here.
+    // A true bounding-sphere fit (city half-diagonal + building height,
+    // by the camera's own vertical fov) puts the WHOLE dense city right at
+    // the frame's edge; dividing by FILL backs the camera off just enough
+    // that the city fills ~70% of the frame instead of exactly 100% (room
+    // to breathe, no tower clipped at the top edge) while still reading as
+    // "the whole city", not a cropped fragment — now that the city core is
+    // actually dense (block-fill, not scattered lots) this reads right at
+    // a real distance instead of needing the old artificial close-in crop.
     const footprintMeters = (size * doc.lotMeters) / 2
     const halfDiagonal = Math.sqrt(footprintMeters * footprintMeters * 2)
-    const dist = Math.max(this.controls.minDistance, halfDiagonal * 0.5)
+    const radius = Math.sqrt(halfDiagonal * halfDiagonal + ((maxY - groundY) / 2) ** 2) * 1.06
+    const vFov = (this.camera.fov * Math.PI) / 180
+    const FILL = 0.7
+    const fitDist = radius / Math.sin(vFov / 2)
+    const dist = Math.max(this.controls.minDistance, fitDist / FILL)
 
-    // A 3/4 view biased toward the city's own north edge (where the river
-    // and its bridges sit in this export) so the default shot shows the
-    // river, the bridges and the skyline together, as the brief asks.
+    // A 3/4 view, ~35deg above the horizon, biased toward the city's own
+    // north edge (where the river and its bridges sit in this export) so
+    // the default shot shows the river, the bridges and the skyline
+    // together, as the brief asks.
     const azimuth = -0.62
-    const polar = Math.PI / 3.1
+    const polar = (90 - 35) * (Math.PI / 180)
     const offset = new Vector3(dist * Math.sin(polar) * Math.sin(azimuth), dist * Math.cos(polar), dist * Math.sin(polar) * Math.cos(azimuth))
     this.camera.position.copy(target).add(offset)
     this.controls.update()

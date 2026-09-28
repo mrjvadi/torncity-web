@@ -64,6 +64,37 @@ interface Footprint {
   baseY: number
 }
 
+// The grading pass (CityGrids.gradeCityFootprint) is what makes this
+// assertion possible at all: every building's own footprint sits on a pad
+// graded to ONE height for the whole city core, so sampling terrain at a
+// lot's 4 corners and centre should always land within a hair of its
+// base — if a future change to the grading margin, the block-fill radius,
+// or the export's own city.originX/Y ever put a building outside the
+// graded plateau again, this catches it immediately in dev instead of
+// shipping a building sunk diagonally into a slope.
+const GRADING_TOLERANCE_M = 0.3
+
+function assertFlatFootprint(grids: CityGrids, lot: CityLotJSON, baseElev: number) {
+  if (!import.meta.env.DEV) return
+  const corners: [number, number][] = [
+    [lot.x, lot.y],
+    [lot.x + lot.w, lot.y],
+    [lot.x, lot.y + lot.h],
+    [lot.x + lot.w, lot.y + lot.h],
+    [lot.x + lot.w / 2, lot.y + lot.h / 2],
+  ]
+  for (const [lx, ly] of corners) {
+    const h = grids.cityElevAt(lx, ly)
+    if (Math.abs(h - baseElev) > GRADING_TOLERANCE_M) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[worldCity] grading assertion failed: ${lot.type} at (${lot.x},${lot.y}) samples ${h.toFixed(2)}m at corner (${lx},${ly}), ` +
+          `base is ${baseElev.toFixed(2)}m (>${GRADING_TOLERANCE_M}m off) — the city footprint is not flat under this building`,
+      )
+    }
+  }
+}
+
 function footprintOf(grids: CityGrids, lot: CityLotJSON): Footprint {
   const a = grids.cityScene(lot.x, lot.y)
   const b = grids.cityScene(lot.x + lot.w, lot.y + lot.h)
@@ -73,7 +104,9 @@ function footprintOf(grids: CityGrids, lot: CityLotJSON): Footprint {
   const z1 = Math.max(a.z, b.z) - SETBACK
   const cx = Math.round(lot.x + lot.w / 2)
   const cz = Math.round(lot.y + lot.h / 2)
-  const baseY = grids.cityElevAt(cx, cz) * ELEVATION_SCALE + FINE_GROUND_LIFT
+  const baseElev = grids.cityElevAt(cx, cz)
+  assertFlatFootprint(grids, lot, baseElev)
+  const baseY = baseElev * ELEVATION_SCALE + FINE_GROUND_LIFT
   return { x0, x1, z0, z1, baseY }
 }
 
