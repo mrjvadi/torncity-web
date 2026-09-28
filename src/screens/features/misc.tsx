@@ -96,7 +96,7 @@ const Event: ScreenComponent = () => (
           { icon: 'coins', reward: 'x_car', done: false },
           { icon: 'x_chest', reward: 'x_flower', done: false },
         ].map((t, i) => (
-          <div className="ft-card" key={i} style={{ flex: '1 1 calc(33% - 8px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <div className="ft-card" key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <Plate icon={t.icon} palette="gold" size={38} />
             <div style={{ fontSize: 12 }}>مرحله {i + 1}</div>
             <Plate icon={t.reward} palette={t.done ? 'gold' : 'steel'} size={38} />

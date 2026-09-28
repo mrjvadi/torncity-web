@@ -20,9 +20,9 @@ const Gym: ScreenComponent = () => (
     <ComingSoonBanner />
     <Hero tint="ruby" icon="x_lift" title="باشگاه آهنین" sub="رده 3 از 8  ·  هر تمرین 20% بیشتر" stat={{ label: 'قدرت نبرد', value: '4,185' }} />
     <Card><StatBar label="انرژی" value="85 از 100" fraction={0.85} color="var(--saffron)" /></Card>
-    <TileGrid>
+    <TileGrid cols={2}>
       {BSTATS.map((b) => (
-        <div className="ft-card" key={b.name} style={{ flex: '1 1 calc(50% - 5px)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        <div className="ft-card" key={b.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <Plate icon={b.icon} palette={b.palette} size={56} />
           <div className="display" style={{ fontSize: 16 }}>{b.name}</div>
           <div className="display" style={{ fontSize: 22, color: 'var(--gold)' }}>{b.value.toLocaleString('en-US')}</div>
@@ -115,9 +115,9 @@ const Bounty: ScreenComponent = () => (
     <ComingSoonBanner />
     <Hero tint="saffron" icon="x_wanted" title="تحت تعقیب" sub="هر کس هدف را به بیمارستان بفرستد جایزه را می‌برد" />
     <SoonBtn>+ گذاشتن جایزه</SoonBtn>
-    <TileGrid>
+    <TileGrid cols={2}>
       {WANTED.map((w) => (
-        <div className="ft-poster" key={w.name} style={{ flex: '1 1 calc(50% - 5px)' }}>
+        <div className="ft-poster" key={w.name}>
           <div className="display" style={{ fontSize: 18 }}>تحت تعقیب</div>
           <Plate icon={w.icon} palette={w.palette} size={60} />
           <div className="display" style={{ fontSize: 15 }}>{w.name}  ·  سطح {w.level}</div>
