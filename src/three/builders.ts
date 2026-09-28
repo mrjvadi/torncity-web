@@ -66,7 +66,10 @@ function cone(batch: BuildBatch, r: number, h: number, x: number, y: number, z: 
 const PAL = {
   stone: 0xefe6d2,
   trim: 0xd7cab0,
-  roof: 0x5b6478,
+  // a near-white roof (the prototype's Kenney kit caps every building with a
+  // pale flat roof, never the dark slate this used to be) so civic/bank
+  // silhouettes read as the same kit as the lilac towers around them
+  roof: 0xede9f5,
   gold: 0xf2c255,
   teal: 0x2bc4b2,
   lapis: 0x3552c8,
@@ -179,7 +182,12 @@ function tower(batch: BuildBatch, wall: number, seed: number): void {
 export type BuildKind = 'civic' | 'bazaar' | 'bank' | 'shop' | 'villa' | 'factory' | 'military' | 'airport' | 'tower'
 
 const ACCENTS = [0xe5484d, 0x2bc4b2, 0x8e6cf0, 0xf5a623, 0x4cc47e]
-const WALLS = [0xf4efe6, 0xeadbc4, 0xdde6ee, 0xf1e1d0, 0x8c95b8, 0xa7a0c8]
+// the prototype's Kenney kit is dominated by lilac/purple walls (its own
+// colormap.png: a violet strip is the single biggest swatch), so most towers
+// land on one of those; one warm cream variant keeps a street from reading
+// as a single flat colour, same as the two-or-three house tints in the
+// reference render
+const WALLS = [0xc9b6ea, 0xb79ee0, 0xe4d6ff, 0x9f87d6, 0xd8c7f2, 0xeadbc4]
 
 /** Build one of the kit's shapes for a plot, coloured by a small hash of its
  * id so neighbouring buildings vary without any server-side colour data.

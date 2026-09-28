@@ -121,7 +121,7 @@ export class CityEngine {
     // curve so the dusk lighting rolls off instead of clipping to white.
     this.renderer.outputColorSpace = SRGBColorSpace
     this.renderer.toneMapping = ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.08
+    this.renderer.toneMappingExposure = 1.18
 
     const aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight)
     this.camera = new OrthographicCamera(-this.frustum * aspect, this.frustum * aspect, this.frustum, -this.frustum, 0.1, 200)
@@ -194,10 +194,10 @@ export class CityEngine {
   // big mesh to draw every frame — better for an iPhone's battery too.
 
   private buildLights() {
-    const sun = new DirectionalLight(0xffb27a, 2.0)
+    const sun = new DirectionalLight(0xffb27a, 2.3)
     sun.position.set(-8, 14, -10)
     this.scene.add(sun)
-    const ambient = new HemisphereLight(0x7f8fd0, 0x22263a, 1.1)
+    const ambient = new HemisphereLight(0x8f9cdc, 0x2a2e46, 1.15)
     this.scene.add(ambient)
     // a soft dusk haze, as the prototype's fog_light_color/fog_density
     this.scene.fog = new FogExp2(0x3b3f74, 0.012)
@@ -257,12 +257,20 @@ export class CityEngine {
     this.camera.lookAt(this.target)
   }
 
+  // the HUD sits over the canvas's top ~20% and the dock over its bottom
+  // ~12%, so the safe band between them is centred a little below the
+  // canvas's own centre (at ~54% down, not 50%); nudging the ortho frustum's
+  // top/bottom by this fraction of its half-height pushes the framed city
+  // down to sit in that band instead of half-hidden under the HUD
+  private static readonly VERTICAL_BIAS = 0.08
+
   private updateFrustumPlanes() {
     const aspect = this.canvas.clientWidth / Math.max(1, this.canvas.clientHeight)
+    const bias = this.frustum * CityEngine.VERTICAL_BIAS
     this.camera.left = -this.frustum * aspect
     this.camera.right = this.frustum * aspect
-    this.camera.top = this.frustum
-    this.camera.bottom = -this.frustum
+    this.camera.top = this.frustum + bias
+    this.camera.bottom = -this.frustum + bias
     this.camera.updateProjectionMatrix()
   }
 
@@ -284,6 +292,11 @@ export class CityEngine {
       maxZ: cityMap.grid.h + 3,
     }
     this.target.set(cityMap.grid.w / 2, 0, cityMap.grid.h / 2)
+    // a fixed frustum makes a small test city look like a toy stranded in a
+    // huge dark void; sizing the initial zoom off the grid itself keeps the
+    // composition close to the prototype's tight, filled-frame shot for any
+    // city size the server sends, before the player's own pinch takes over
+    this.setFrustum(Math.max(cityMap.grid.w, cityMap.grid.h) * 0.58)
     this.placeCamera()
 
     this.buildGround(cityMap)
@@ -316,6 +329,7 @@ export class CityEngine {
     const cells = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
     const has = (x: number, y: number) => cells.has(`${x},${y}`)
     const straight = await starterGeometry('road-straight')
+    const lamp = await starterGeometry('road-straight-lightposts')
     const cross = await starterGeometry('road-intersection')
     if (this.disposed) return
     if (!straight || !cross) {
@@ -323,8 +337,14 @@ export class CityEngine {
       return
     }
     const straightMesh = new InstancedMesh(straight.geometry, straight.material, cityMap.roads.length)
+    // the prototype alternates a lit lamppost tile into every other straight
+    // stretch (home_proto.gd `_tile_at`'s (abs(x)+abs(z))%2==0); the model's
+    // own baked bulb reads as lit without a runtime light, so this costs one
+    // extra draw call, not a per-lamp light on a phone's budget
+    const lampMesh = lamp ? new InstancedMesh(lamp.geometry, lamp.material, cityMap.roads.length) : null
     const crossMesh = new InstancedMesh(cross.geometry, cross.material, cityMap.roads.length)
     let ns = 0
+    let nl = 0
     let nc = 0
     const m = new Matrix4()
     const q = new Quaternion()
@@ -340,7 +360,8 @@ export class CityEngine {
       } else {
         q.setFromAxisAngle(up, ew ? Math.PI / 2 : 0)
         m.compose(pos, q, new Vector3(1, 1, 1))
-        straightMesh.setMatrixAt(ns++, m)
+        if (lampMesh && (x + y) % 2 === 0) lampMesh.setMatrixAt(nl++, m)
+        else straightMesh.setMatrixAt(ns++, m)
       }
     }
     straightMesh.count = ns
@@ -348,6 +369,11 @@ export class CityEngine {
     straightMesh.instanceMatrix.needsUpdate = true
     crossMesh.instanceMatrix.needsUpdate = true
     this.scene.add(straightMesh, crossMesh)
+    if (lampMesh) {
+      lampMesh.count = nl
+      lampMesh.instanceMatrix.needsUpdate = true
+      this.scene.add(lampMesh)
+    }
     this.requestRender()
   }
 
@@ -366,9 +392,17 @@ export class CityEngine {
     this.requestRender()
   }
 
-  /** Grass and trees from the Starter Kit, scattered over the ground cells a
-   * road or a plot does not cover — one InstancedMesh, so the greenery never
-   * costs more than a single draw call regardless of the city's size. */
+  /** Every ground cell a road or a plot does not cover, filled the way the
+   * prototype's `_tile_at` fills its own 9x9 block: a sidewalk (pavement)
+   * where a cell touches a road, so the streets read as a real pedestrian
+   * city rather than roads dropped in a field, and a mix of tall trees /
+   * short trees / bare grass everywhere else, so nothing is left as bare
+   * dark ground. One InstancedMesh per variant (four total) — still a flat,
+   * small draw-call cost regardless of how big the city grid is, and far
+   * cheaper than the bare-dirt look of only covering one cell in five. A
+   * single un-instanced pavement-fountain plate lands on the sidewalk cell
+   * nearest the grid's centre, the same small plaza flourish the
+   * prototype's own plaza corner has. */
   private async buildGreenery(cityMap: CityMap) {
     const taken = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
     for (const p of cityMap.plots) {
@@ -376,28 +410,82 @@ export class CityEngine {
         for (let dy = 0; dy < p.h; dy++) taken.add(`${p.x + dx},${p.y + dy}`)
       }
     }
-    const spots: [number, number][] = []
+    const roadCells = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
+    const nearRoad = (x: number, y: number) =>
+      roadCells.has(`${x - 1},${y}`) || roadCells.has(`${x + 1},${y}`) || roadCells.has(`${x},${y - 1}`) || roadCells.has(`${x},${y + 1}`)
+
+    const pavementSpots: [number, number][] = []
+    const grassSpots: [number, number][] = []
     for (let x = 0; x < cityMap.grid.w; x++) {
       for (let y = 0; y < cityMap.grid.h; y++) {
         if (taken.has(`${x},${y}`)) continue
-        if (((x * 131 + y * 977) % 5) === 0) spots.push([x, y])
+        if (nearRoad(x, y)) pavementSpots.push([x, y])
+        else grassSpots.push([x, y])
       }
     }
-    if (spots.length === 0) return
-    const tree = await starterGeometry('grass-trees')
-    if (!tree || this.disposed) return
-    const mesh = new InstancedMesh(tree.geometry, tree.material, spots.length)
+    if (pavementSpots.length === 0 && grassSpots.length === 0) return
+
+    // the sidewalk cell whose centre sits closest to the grid's own centre
+    // gets the fountain plate instead of a plain pavement tile
+    let fountainAt: [number, number] | null = null
+    if (pavementSpots.length > 0) {
+      const cx = cityMap.grid.w / 2
+      const cz = cityMap.grid.h / 2
+      let best = Infinity
+      for (const [x, y] of pavementSpots) {
+        const d = (x + 0.5 - cx) ** 2 + (y + 0.5 - cz) ** 2
+        if (d < best) {
+          best = d
+          fountainAt = [x, y]
+        }
+      }
+    }
+
+    const up = new Vector3(0, 1, 0)
     const m = new Matrix4()
     const q = new Quaternion()
-    const up = new Vector3(0, 1, 0)
-    spots.forEach(([x, y], i) => {
-      q.setFromAxisAngle(up, ((x * 7 + y * 13) % 4) * (Math.PI / 2))
-      m.compose(new Vector3(x + 0.5, 0, y + 0.5), q, new Vector3(1, 1, 1))
-      mesh.setMatrixAt(i, m)
-    })
-    mesh.instanceMatrix.needsUpdate = true
-    this.scene.add(mesh)
-    this.requestRender()
+
+    const plain = pavementSpots.filter(([x, y]) => !fountainAt || x !== fountainAt[0] || y !== fountainAt[1])
+    const pavement = await starterGeometry('pavement')
+    if (pavement && !this.disposed && plain.length > 0) {
+      const mesh = new InstancedMesh(pavement.geometry, pavement.material, plain.length)
+      plain.forEach(([x, y], i) => {
+        q.setFromAxisAngle(up, ((x * 7 + y * 13) % 4) * (Math.PI / 2))
+        m.compose(new Vector3(x + 0.5, 0, y + 0.5), q, new Vector3(1, 1, 1))
+        mesh.setMatrixAt(i, m)
+      })
+      mesh.instanceMatrix.needsUpdate = true
+      this.scene.add(mesh)
+      this.requestRender()
+    }
+    if (fountainAt && !this.disposed) {
+      const fountain = await cloneStarter('pavement-fountain')
+      if (fountain && !this.disposed) {
+        fountain.position.set(fountainAt[0] + 0.5, 0, fountainAt[1] + 0.5)
+        this.scene.add(fountain)
+        this.requestRender()
+      }
+    }
+
+    const variants: [string, [number, number][]][] = [
+      ['grass-trees-tall', grassSpots.filter(([x, y]) => (x * 131 + y * 977) % 3 === 0)],
+      ['grass-trees', grassSpots.filter(([x, y]) => (x * 131 + y * 977) % 3 === 1)],
+      ['grass', grassSpots.filter(([x, y]) => (x * 131 + y * 977) % 3 === 2)],
+    ]
+    for (const [name, spots] of variants) {
+      if (spots.length === 0) continue
+      const tile = await starterGeometry(name)
+      if (!tile || this.disposed) continue
+      const mesh = new InstancedMesh(tile.geometry, tile.material, spots.length)
+      spots.forEach(([x, y], i) => {
+        q.setFromAxisAngle(up, ((x * 7 + y * 13) % 4) * (Math.PI / 2))
+        m.compose(new Vector3(x + 0.5, 0, y + 0.5), q, new Vector3(1, 1, 1))
+        mesh.setMatrixAt(i, m)
+      })
+      mesh.instanceMatrix.needsUpdate = true
+      this.scene.add(mesh)
+      this.requestRender()
+    }
   }
 
   private buildWater(cityMap: CityMap) {
