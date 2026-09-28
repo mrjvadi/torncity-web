@@ -17,9 +17,9 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
    * its own primary CTA from the view). */
   only?: (a: Action) => boolean
   /** The command the screen's own header ↻ button already sends (e.g.
-   * `bank.show`). The server also hands back a "تازه‌سازی" tile that sends
-   * this exact same command — drop it here so the action isn't offered
-   * twice. */
+   * `bank.show`). The server also hands back a "تازه‌سازی" tile that usually
+   * sends this exact same command — drop it here so the action isn't
+   * offered twice. Set on every screen that draws a header refresh. */
   refreshCommand?: string
 }) {
   const [pendingInput, setPendingInput] = useState<Action | null>(null)
@@ -28,7 +28,12 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
 
   const rows = useMemo(() => {
     const actions = (response?.actions ?? []).filter((a) => !only || only(a))
-      .filter((a) => !refreshCommand || a.command !== refreshCommand)
+      // A screen with its own header refresh never needs the server's
+      // "تازه‌سازی" tile too — it usually repeats this exact command, but a
+      // deeper view (e.g. a market order book) can send its list screen's
+      // command instead while still meaning "reload me", so a plain
+      // navigation action labelled exactly "تازه‌سازی" is dropped as well.
+      .filter((a) => !refreshCommand || (a.command !== refreshCommand && !(a.kind === 'navigation' && a.label === 'تازه‌سازی')))
     const byRow = new Map<number, Action[]>()
     for (const a of actions) {
       const list = byRow.get(a.row) ?? []
