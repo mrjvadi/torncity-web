@@ -37,7 +37,7 @@ export default function Leaderboard({ response, loading, onAction, run }: Screen
         ))}
       </div>
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="life.top" />
     </ScreenScroll>
   )
 }

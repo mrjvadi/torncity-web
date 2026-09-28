@@ -42,7 +42,7 @@ export function Market({ response, loading, onAction, run }: ScreenProps) {
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="market.list" />
     </ScreenScroll>
   )
 }
@@ -103,7 +103,7 @@ export function Book({ response, loading, onAction, run }: ScreenProps) {
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="market.book" />
     </ScreenScroll>
   )
 }

@@ -75,7 +75,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="life.me" />
     </ScreenScroll>
   )
 }

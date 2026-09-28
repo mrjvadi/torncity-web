@@ -56,7 +56,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
         </div>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="health.hospital" />
     </ScreenScroll>
   )
 }

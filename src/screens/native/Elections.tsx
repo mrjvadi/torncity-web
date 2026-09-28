@@ -32,7 +32,7 @@ export function Elections({ response, loading, onAction, run }: ScreenProps) {
           />
         ))}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="election.list" />
     </ScreenScroll>
   )
 }
@@ -72,7 +72,7 @@ export function Election({ response, loading, onAction, run }: ScreenProps) {
 
       {!!v.deposit && !v.standing && <div style={{ fontSize: 12, color: 'var(--text-dim)', textAlign: 'center' }}>سپرده‌ی نامزدی: {money(v.deposit)}</div>}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="election.view" />
     </ScreenScroll>
   )
 }

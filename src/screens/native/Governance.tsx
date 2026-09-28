@@ -56,7 +56,7 @@ export default function Governance({ response, loading, onAction, run }: ScreenP
         </Card>
       ))}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="gov.city" />
     </ScreenScroll>
   )
 }

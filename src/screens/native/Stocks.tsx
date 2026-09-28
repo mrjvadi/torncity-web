@@ -32,7 +32,7 @@ export function Exchange({ response, loading, onAction, run }: ScreenProps) {
           )
         })}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="stock.list" />
     </ScreenScroll>
   )
 }
@@ -90,7 +90,7 @@ export function Portfolio({ response, loading, onAction, run }: ScreenProps) {
         />
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="stock.mine" />
     </ScreenScroll>
   )
 }

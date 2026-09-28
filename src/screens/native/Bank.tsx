@@ -33,7 +33,7 @@ export default function Bank({ response, loading, onAction, run }: ScreenProps) 
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="bank.show" />
     </ScreenScroll>
   )
 }

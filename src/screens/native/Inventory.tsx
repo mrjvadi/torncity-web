@@ -46,7 +46,7 @@ export default function Inventory({ response, loading, onAction, run }: ScreenPr
         ))}
       </div>
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="inventory.show" />
     </ScreenScroll>
   )
 }
