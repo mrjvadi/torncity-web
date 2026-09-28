@@ -133,6 +133,12 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
     engineRef.current?.setBubbleAnchors(bubbleAnchors)
   }, [bubbleAnchors])
 
+  // the plot sheet fully covers the canvas while it's open — no reason to
+  // keep the city rendering underneath it
+  useEffect(() => {
+    engineRef.current?.setActive(!selected)
+  }, [selected])
+
   // the bottom ready-toast: only when there is a real reason for it —
   // energy not yet full, a job to work, and no shift already running
   const energyFullIn = profile?.energy_full_in_seconds ?? 0
