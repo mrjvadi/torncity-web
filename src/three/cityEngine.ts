@@ -13,8 +13,8 @@ import {
   MeshBasicMaterial,
   MeshLambertMaterial,
   Object3D,
-  OrthographicCamera,
   PCFShadowMap,
+  PerspectiveCamera,
   Plane,
   PlaneGeometry,
   Quaternion,
@@ -63,16 +63,46 @@ export interface CityEngineOptions {
   onBubbles?: (points: BubbleScreenPoint[]) => void
 }
 
-const MIN_FRUSTUM = 2.2
-const MAX_FRUSTUM = 16
-// how tight the prototype's own shot frames its 9x9 block: 2-3 lots fill
-// the screen width, so this is a fixed starting zoom, not one that grows
-// with the server's grid — a bigger city should still read as "the same
-// close-up street", the filler tiles just carry on past the edge of frame
-const INITIAL_FRUSTUM = 3.1
+// the prototype's own camera (home_proto.gd `_build_world`): a Camera3D at
+// (10.5, 13, 10.5) looking at the origin with a 27° (vertical) field of
+// view. Copied exactly — direction, distance and FOV — instead of guessed
+// at as an equivalent orthographic size, so the framing (how many lots fill
+// the width, how big a building reads) matches the reference without eyeballing.
+const CAM_FOV = 27
+const CAM_OFFSET = new Vector3(10.5, 13, 10.5)
+const CAM_DIR = CAM_OFFSET.clone().normalize()
+const CAM_DIST = CAM_OFFSET.length()
+// the prototype's home screen has no pinch-zoom of its own (a fixed shot);
+// this is this screen's own interactive range around that same default
+const MIN_DIST = 9
+const MAX_DIST = 38
+// home_proto.gd draws its own HUD as an overlay fading the city out behind
+// two gradients on top of its own full 720x1280 canvas (the top bar and
+// the dock/toast strip). Our canvas is already sized to just the space
+// between the HUD and the dock by the surrounding flex layout (they are
+// separate siblings, not an overlay drawn on top of a full-screen canvas),
+// so the two apps exclude their chrome by different mechanisms and the
+// prototype's own gradient extents (soft fades, not hard cutoffs) don't
+// translate into a crop fraction directly — this pair is tuned instead by
+// comparing renders against the reference screenshot, the same way the
+// prototype's own gradient sizes were themselves picked by eye.
+const SAFE_FRAC = 0.8
+const SAFE_TOP_FRAC = 0.12
+const HALF_FOV_TAN = Math.tan(MathUtils.degToRad(CAM_FOV / 2))
 // the light, soft daytime mood (home_proto.gd's WorldEnvironment/lights),
 // not the dusk-void one this screen used to have
 const SKY = 0xdde8da
+// shadows are the one part of this scene with a real GPU-memory cost (a
+// depth texture plus an extra draw per shadow-casting object); a phone the
+// OS already reports as memory-constrained skips them from the start, and
+// a context loss — the actual symptom low GPU memory produces on an iPhone —
+// turns them off for the rest of the session rather than risk losing the
+// context again on the next frame
+const LOW_MEMORY_GB = 4
+function isLowMemoryDevice(): boolean {
+  const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory
+  return typeof mem === 'number' && mem <= LOW_MEMORY_GB
+}
 const DEV = import.meta.env.DEV
 
 type LibraryEntry = { parts: import('../api/types').ModelPart[] }
@@ -81,10 +111,11 @@ export class CityEngine {
   private canvas: HTMLCanvasElement
   private renderer: WebGLRenderer
   private scene = new Scene()
-  private camera: OrthographicCamera
+  private camera: PerspectiveCamera
   private target = new Vector3(0, 0, 0)
-  private frustum = 10
+  private distance = CAM_DIST
   private bounds = { minX: -4, maxX: 20, minZ: -4, maxZ: 20 }
+  private shadowsEnabled = !isLowMemoryDevice()
   private opts: CityEngineOptions
   private plots: CityPlot[] = []
   private placeLabels: { plot: CityPlot; world: Vector3 }[] = []
@@ -110,7 +141,7 @@ export class CityEngine {
   private lastPan: { x: number; y: number } | null = null
   private velocity = { x: 0, z: 0 }
   private pinchStartDist = 0
-  private pinchStartFrustum = 14
+  private pinchStartDistance = CAM_DIST
   private downInfo: { x: number; y: number; t: number } | null = null
 
   constructor(canvas: HTMLCanvasElement, opts: CityEngineOptions) {
@@ -141,15 +172,15 @@ export class CityEngine {
     this.renderer.toneMappingExposure = 1.32
     // one directional light casting soft shadows (proto's DirectionalLight3D
     // has shadow_enabled=true) — a single 1k shadow map is cheap enough for
-    // an iPhone and is the one thing that reads as "grounded" the flat
-    // instanced tiles otherwise can't give the scene.
-    this.renderer.shadowMap.enabled = true
+    // most phones and is the one thing that reads as "grounded" the flat
+    // instanced tiles otherwise can't give the scene; skipped from the start
+    // on a phone that already reports itself as memory-constrained.
+    this.renderer.shadowMap.enabled = this.shadowsEnabled
     // three 0.186 folded the old "soft" variant into this one (percentage-
     // closer filtering is always on for a directional light's shadow map)
     this.renderer.shadowMap.type = PCFShadowMap
 
-    const aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight)
-    this.camera = new OrthographicCamera(-this.frustum * aspect, this.frustum * aspect, this.frustum, -this.frustum, 0.1, 200)
+    this.camera = new PerspectiveCamera(CAM_FOV, 1, 0.5, 200)
     this.placeCamera()
 
     this.buildLights()
@@ -173,6 +204,16 @@ export class CityEngine {
     this.contextLost = true
     cancelAnimationFrame(this.raf)
     this.raf = 0
+    // a context loss is itself the symptom low GPU memory produces on an
+    // iPhone; shadows are the one extra depth texture and per-object draw
+    // this scene asks for, so they go off for the rest of the session
+    // rather than risk losing the context again on the very next frame —
+    // renderer.shadowMap.enabled gates the whole feature at the shader
+    // level, so no per-mesh flag needs touching to make this take effect
+    if (this.shadowsEnabled) {
+      this.shadowsEnabled = false
+      this.renderer.shadowMap.enabled = false
+    }
     report('webglcontextlost', 'city view lost its WebGL context')
   }
 
@@ -223,7 +264,10 @@ export class CityEngine {
     // proto's DirectionalLight3D: light_color #FFB27A, tilted sun; here it
     // also casts the scene's only shadows (soft, one 1k map)
     this.sun = new DirectionalLight(0xffc98a, 2.1)
-    this.sun.castShadow = true
+    this.sun.castShadow = this.shadowsEnabled
+    // at most 1024: a bigger shadow map is the single biggest extra chunk of
+    // GPU memory this scene could ask for, and that budget is exactly what
+    // caused WebGL context loss on iPhones before
     this.sun.shadow.mapSize.set(1024, 1024)
     this.sun.shadow.bias = -0.0012
     this.sun.shadow.normalBias = 0.025
@@ -306,35 +350,32 @@ export class CityEngine {
     this.writeCloudMatrices()
   }
 
-  // proto's own cam: position (10.5, 13, 10.5) looking at the origin — a
-  // (1, 1.238, 1) direction. The distance (its vector's own length) only
-  // has to clear the near/far planes for an orthographic camera, so it is
-  // copied as-is rather than re-derived, which keeps the shadow-casting
-  // sun (placed the same way) at a matching, familiar angle.
-  private static readonly CAM_DIR = new Vector3(1, 1.238, 1).normalize()
-  private static readonly CAM_DIST = 19.7
-
   private placeCamera() {
-    const pos = this.target.clone().addScaledVector(CityEngine.CAM_DIR, CityEngine.CAM_DIST)
+    const pos = this.target.clone().addScaledVector(CAM_DIR, this.distance)
     this.camera.position.copy(pos)
     this.camera.up.set(0, 1, 0)
     this.camera.lookAt(this.target)
   }
 
-  // the HUD sits over the canvas's top ~20% and the dock over its bottom
-  // ~12%, so the safe band between them is centred a little below the
-  // canvas's own centre (at ~54% down, not 50%); nudging the ortho frustum's
-  // top/bottom by this fraction of its half-height pushes the framed city
-  // down to sit in that band instead of half-hidden under the HUD
-  private static readonly VERTICAL_BIAS = 0.16
-
-  private updateFrustumPlanes() {
-    const aspect = this.canvas.clientWidth / Math.max(1, this.canvas.clientHeight)
-    const bias = this.frustum * CityEngine.VERTICAL_BIAS
-    this.camera.left = -this.frustum * aspect
-    this.camera.right = this.frustum * aspect
-    this.camera.top = this.frustum + bias
-    this.camera.bottom = -this.frustum + bias
+  /** Aspect and the HUD/dock lens-shift only change on a resize — zooming
+   * (setDistance) only ever moves the camera along CAM_DIR, via placeCamera. */
+  private updateProjection() {
+    const w = this.canvas.clientWidth
+    const h = Math.max(1, this.canvas.clientHeight)
+    this.camera.aspect = w / h
+    this.camera.fov = CAM_FOV
+    // crop the full 27° cone down to the proto's own safe band (see
+    // PROTO_CANVAS_H/SAFE_* above): a virtual frame SAFE_FRAC taller than
+    // our actual canvas, of which our canvas shows the slice starting
+    // SAFE_TOP_FRAC down — a real lens-shift (setViewOffset forces
+    // camera.aspect to fullWidth/fullHeight as a side effect, but the
+    // *rendered* image's angular aspect still works out to fullWidth/h
+    // divided by the same crop fraction applied to both axes, i.e. back to
+    // w/h — fullWidth is kept equal to w precisely so nothing crops
+    // horizontally, only vertically), so the ground plane itself is never
+    // stretched or skewed to fake this, only cropped
+    const fullH = h / SAFE_FRAC
+    this.camera.setViewOffset(w, fullH, 0, fullH * SAFE_TOP_FRAC, w, h)
     this.camera.updateProjectionMatrix()
   }
 
@@ -343,7 +384,7 @@ export class CityEngine {
     const h = this.canvas.clientHeight
     if (w === 0 || h === 0) return
     this.renderer.setSize(w, h, false)
-    this.updateFrustumPlanes()
+    this.updateProjection()
     this.requestRender()
   }
 
@@ -356,11 +397,10 @@ export class CityEngine {
       maxZ: cityMap.grid.h + 3,
     }
     this.target.set(cityMap.grid.w / 2, 0, cityMap.grid.h / 2)
-    // the prototype frames its block tight (2-3 lots fill the width) no
-    // matter how big the city behind it is — the dense filler tiles carry
-    // the composition past the edge of frame, so the initial zoom is a
-    // fixed close-up, not one that grows with the server's grid
-    this.setFrustum(INITIAL_FRUSTUM)
+    // the prototype's own default zoom (CAM_DIST), no matter how big the
+    // city behind it is — the dense filler tiles carry the composition past
+    // the edge of frame, so this never grows with the server's grid
+    this.setDistance(CAM_DIST)
     this.placeCamera()
     this.positionSun(this.target, cityMap.grid.w, cityMap.grid.h)
 
@@ -467,17 +507,29 @@ export class CityEngine {
     this.requestRender()
   }
 
-  /** Every ground cell a road or a plot does not cover, filled the way the
-   * prototype's `_tile_at` fills its own 9x9 block: a sidewalk (pavement)
-   * where a cell touches a road, so the streets read as a real pedestrian
-   * city rather than roads dropped in a field, and a mix of tall trees /
-   * short trees / bare grass everywhere else, so nothing is left as bare
-   * dark ground. One InstancedMesh per variant (four total) — still a flat,
-   * small draw-call cost regardless of how big the city grid is, and far
-   * cheaper than the bare-dirt look of only covering one cell in five. A
-   * single un-instanced pavement-fountain plate lands on the sidewalk cell
-   * nearest the grid's centre, the same small plaza flourish the
-   * prototype's own plaza corner has. */
+  // the prototype's own `_tile_at` weighting for a cell that is not on a
+  // road, not a real plot and not the plaza: eight of ten hash slots a
+  // lilac Kenney house, two a conifer cluster — copied verbatim (down to
+  // the repeated a/b/c entries) rather than re-balanced, since that 80/20
+  // split between building and tree is what makes the reference read as a
+  // packed town instead of a park with buildings in it
+  private static readonly TILE_TABLE = [
+    'building-small-a', 'building-small-b', 'building-small-c', 'building-small-d',
+    'building-garage', 'grass-trees', 'building-small-a', 'building-small-c',
+    'grass-trees-tall', 'building-small-b',
+  ]
+
+  /** Every ground cell a road or a real plot does not cover, filled exactly
+   * the way the prototype's own `_tile_at` fills its 9x9 block: a small
+   * paved plaza (with a fountain) at the two cells diagonally off the road
+   * hub nearest the grid's centre — `_tile_at`'s own (1,1)/(1,-1)/(-1,1)/
+   * (-1,-1) cells around its origin intersection, generalised to whichever
+   * intersection sits closest to the middle of the server's own grid — and
+   * everywhere else the TILE_TABLE hash above. This is the single thing
+   * that makes even a city with a handful of real plots read as dozens of
+   * buildings packed along the roads: one InstancedMesh per model kind
+   * (six or seven total, buildings and trees alike), so the draw-call count
+   * stays flat no matter how many cells the hash fills. */
   private async buildGreenery(cityMap: CityMap) {
     const taken = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
     for (const p of cityMap.plots) {
@@ -486,47 +538,49 @@ export class CityEngine {
       }
     }
     const roadCells = new Set(cityMap.roads.map(([x, y]) => `${x},${y}`))
-    const nearRoad = (x: number, y: number) =>
-      roadCells.has(`${x - 1},${y}`) || roadCells.has(`${x + 1},${y}`) || roadCells.has(`${x},${y - 1}`) || roadCells.has(`${x},${y + 1}`)
 
-    const pavementSpots: [number, number][] = []
-    const grassSpots: [number, number][] = []
+    // the road cell nearest the grid's centre stands in for `_tile_at`'s
+    // own origin intersection; its diagonal neighbours (off the road, off
+    // any real plot) become the plaza, one of them the fountain
+    const cx = cityMap.grid.w / 2
+    const cz = cityMap.grid.h / 2
+    let hub: [number, number] | null = null
+    let hubBest = Infinity
+    for (const [x, y] of cityMap.roads) {
+      const d = (x + 0.5 - cx) ** 2 + (y + 0.5 - cz) ** 2
+      if (d < hubBest) { hubBest = d; hub = [x, y] }
+    }
+    const plazaSpots: [number, number][] = []
+    let fountainAt: [number, number] | null = null
+    if (hub) {
+      const [hx, hy] = hub
+      for (const [x, y] of [[hx + 1, hy + 1], [hx + 1, hy - 1], [hx - 1, hy + 1], [hx - 1, hy - 1]] as const) {
+        if (x < 0 || y < 0 || x >= cityMap.grid.w || y >= cityMap.grid.h) continue
+        const key = `${x},${y}`
+        if (taken.has(key) || roadCells.has(key)) continue
+        if (!fountainAt) fountainAt = [x, y]
+        else plazaSpots.push([x, y])
+        taken.add(key)
+      }
+    }
+
+    const fillSpots: [number, number][] = []
     for (let x = 0; x < cityMap.grid.w; x++) {
       for (let y = 0; y < cityMap.grid.h; y++) {
         if (taken.has(`${x},${y}`)) continue
-        if (nearRoad(x, y)) pavementSpots.push([x, y])
-        else grassSpots.push([x, y])
+        fillSpots.push([x, y])
       }
     }
-    if (pavementSpots.length === 0 && grassSpots.length === 0) return
+    if (fillSpots.length === 0 && plazaSpots.length === 0 && !fountainAt) return
 
-    // the sidewalk cell whose centre sits closest to the grid's own centre
-    // gets the fountain plate instead of a plain pavement tile
-    let fountainAt: [number, number] | null = null
-    if (pavementSpots.length > 0) {
-      const cx = cityMap.grid.w / 2
-      const cz = cityMap.grid.h / 2
-      let best = Infinity
-      for (const [x, y] of pavementSpots) {
-        const d = (x + 0.5 - cx) ** 2 + (y + 0.5 - cz) ** 2
-        if (d < best) {
-          best = d
-          fountainAt = [x, y]
-        }
-      }
-    }
-
-    const up = new Vector3(0, 1, 0)
+    const identity = new Quaternion()
     const m = new Matrix4()
-    const q = new Quaternion()
 
-    const plain = pavementSpots.filter(([x, y]) => !fountainAt || x !== fountainAt[0] || y !== fountainAt[1])
     const pavement = await starterGeometry('pavement')
-    if (pavement && !this.disposed && plain.length > 0) {
-      const mesh = new InstancedMesh(pavement.geometry, pavement.material, plain.length)
-      plain.forEach(([x, y], i) => {
-        q.setFromAxisAngle(up, ((x * 7 + y * 13) % 4) * (Math.PI / 2))
-        m.compose(new Vector3(x + 0.5, 0, y + 0.5), q, new Vector3(1, 1, 1))
+    if (pavement && !this.disposed && plazaSpots.length > 0) {
+      const mesh = new InstancedMesh(pavement.geometry, pavement.material, plazaSpots.length)
+      plazaSpots.forEach(([x, y], i) => {
+        m.compose(new Vector3(x + 0.5, 0, y + 0.5), identity, new Vector3(1, 1, 1))
         mesh.setMatrixAt(i, m)
       })
       mesh.instanceMatrix.needsUpdate = true
@@ -538,32 +592,33 @@ export class CityEngine {
       const fountain = await cloneStarter('pavement-fountain')
       if (fountain && !this.disposed) {
         fountain.position.set(fountainAt[0] + 0.5, 0, fountainAt[1] + 0.5)
-        fountain.traverse((o) => { const mm = o as Mesh; if (mm.isMesh) { mm.receiveShadow = true; mm.castShadow = true } })
+        fountain.traverse((o) => { const mm = o as Mesh; if (mm.isMesh) { mm.receiveShadow = true; mm.castShadow = this.shadowsEnabled } })
         this.scene.add(fountain)
         this.requestRender()
       }
     }
 
-    const variants: [string, [number, number][]][] = [
-      ['grass-trees-tall', grassSpots.filter(([x, y]) => (x * 131 + y * 977) % 3 === 0)],
-      ['grass-trees', grassSpots.filter(([x, y]) => (x * 131 + y * 977) % 3 === 1)],
-      ['grass', grassSpots.filter(([x, y]) => (x * 131 + y * 977) % 3 === 2)],
-    ]
-    for (const [name, spots] of variants) {
-      if (spots.length === 0) continue
+    // `_place` always drops a non-road tile at rot=0 — the kit's own models
+    // already face the street — so every filler tile here does too
+    const byName = new Map<string, [number, number][]>()
+    for (const [x, y] of fillSpots) {
+      const h = Math.abs((x * 73856093) ^ (y * 19349663)) % 10
+      const name = CityEngine.TILE_TABLE[h]
+      const arr = byName.get(name)
+      if (arr) arr.push([x, y])
+      else byName.set(name, [[x, y]])
+    }
+    for (const [name, spots] of byName) {
       const tile = await starterGeometry(name)
       if (!tile || this.disposed) continue
       const mesh = new InstancedMesh(tile.geometry, tile.material, spots.length)
       spots.forEach(([x, y], i) => {
-        q.setFromAxisAngle(up, ((x * 7 + y * 13) % 4) * (Math.PI / 2))
-        m.compose(new Vector3(x + 0.5, 0, y + 0.5), q, new Vector3(1, 1, 1))
+        m.compose(new Vector3(x + 0.5, 0, y + 0.5), identity, new Vector3(1, 1, 1))
         mesh.setMatrixAt(i, m)
       })
       mesh.instanceMatrix.needsUpdate = true
       mesh.receiveShadow = true
-      // the conifer canopies (grass-trees / grass-trees-tall) cast; bare
-      // grass has nothing tall enough to bother
-      mesh.castShadow = name !== 'grass'
+      mesh.castShadow = this.shadowsEnabled
       this.scene.add(mesh)
       this.requestRender()
     }
@@ -727,7 +782,7 @@ export class CityEngine {
     geometries.forEach((g) => g.dispose())
     if (!merged) return
     const mesh = new Mesh(merged, material)
-    mesh.castShadow = shadowed
+    mesh.castShadow = shadowed && this.shadowsEnabled
     mesh.receiveShadow = shadowed
     this.scene.add(mesh)
   }
@@ -756,7 +811,7 @@ export class CityEngine {
         mesh.setMatrixAt(i, m)
       })
       mesh.instanceMatrix.needsUpdate = true
-      mesh.castShadow = true
+      mesh.castShadow = this.shadowsEnabled
       mesh.receiveShadow = true
       this.scene.add(mesh)
       this.requestRender()
@@ -780,7 +835,7 @@ export class CityEngine {
         const instance = await cloneMesh(part.mesh)
         if (!instance || this.disposed) continue
         fitAndPlacePart(instance, part)
-        instance.traverse((o) => { const mm = o as Mesh; if (mm.isMesh) { mm.castShadow = true; mm.receiveShadow = true } })
+        instance.traverse((o) => { const mm = o as Mesh; if (mm.isMesh) { mm.castShadow = this.shadowsEnabled; mm.receiveShadow = true } })
         group.add(instance)
       }
       this.requestRender()
@@ -798,9 +853,15 @@ export class CityEngine {
   private updateLabels() {
     const w = this.canvas.clientWidth
     const h = this.canvas.clientHeight
+    // a world bubble (shift-ready, course-done...) already names and marks
+    // its own plot; a name label on the same spot only doubles it up, so a
+    // plot with a bubble on it skips its label entirely rather than the two
+    // fighting for the same few pixels
+    const bubbledPlots = new Set(this.bubbleAnchors.map((a) => `${a.x.toFixed(2)},${a.z.toFixed(2)}`))
     const labels: LabelPoint[] = this.placeLabels.map(({ plot, world }) => {
       const p = world.clone().project(this.camera)
-      const visible = p.z < 1
+      const onBubble = bubbledPlots.has(`${world.x.toFixed(2)},${world.z.toFixed(2)}`)
+      const visible = p.z < 1 && !onBubble
       return {
         id: plot.id,
         text: plot.name?.fa || plot.name?.en || '',
@@ -848,7 +909,7 @@ export class CityEngine {
       this.downInfo = null
       const pts = [...this.pointers.values()]
       this.pinchStartDist = dist(pts[0], pts[1])
-      this.pinchStartFrustum = this.frustum
+      this.pinchStartDistance = this.distance
     }
   }
 
@@ -867,7 +928,7 @@ export class CityEngine {
       const d = dist(pts[0], pts[1])
       if (this.pinchStartDist > 0) {
         const factor = this.pinchStartDist / Math.max(1, d)
-        this.setFrustum(this.pinchStartFrustum * factor)
+        this.setDistance(this.pinchStartDistance * factor)
         this.requestRender()
       }
     }
@@ -892,12 +953,15 @@ export class CityEngine {
 
   private onWheel = (e: WheelEvent) => {
     e.preventDefault()
-    this.setFrustum(this.frustum * (1 + e.deltaY * 0.001))
+    this.setDistance(this.distance * (1 + e.deltaY * 0.001))
     this.requestRender()
   }
 
   private pan(dxPx: number, dyPx: number) {
-    const worldPerPx = (this.frustum * 2) / Math.max(1, this.canvas.clientHeight)
+    // a perspective camera's world-per-pixel varies with depth; the target's
+    // own distance is the right approximation for how a drag near the
+    // camera's look-at point should feel, same as most map/city UIs do
+    const worldPerPx = (2 * this.distance * HALF_FOV_TAN) / Math.max(1, this.canvas.clientHeight)
     // screen right/down -> move target opposite, along camera's local right/forward on the ground plane
     const right = new Vector3(1, 0, -1).normalize()
     const fwd = new Vector3(-1, 0, -1).normalize()
@@ -908,9 +972,9 @@ export class CityEngine {
     this.placeCamera()
   }
 
-  private setFrustum(v: number) {
-    this.frustum = clamp(v, MIN_FRUSTUM, MAX_FRUSTUM)
-    this.updateFrustumPlanes()
+  private setDistance(v: number) {
+    this.distance = clamp(v, MIN_DIST, MAX_DIST)
+    this.placeCamera()
   }
 
   private pickPlot(clientX: number, clientY: number) {
