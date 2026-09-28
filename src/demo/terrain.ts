@@ -16,6 +16,16 @@ import { makeGrassBladeTexture, makeGroundDetailTexture } from './proceduralText
 // happened).
 export const ELEVATION_SCALE = 1.0
 
+// The fine terrain mesh is rendered this far above its own raw elevation
+// (see buildGridMesh's yLift param, used below) so it always wins the
+// z-fight against the coarse mesh underneath it. EVERYTHING else that
+// sits "on the ground" — roads, sidewalks, buildings, props, the grass
+// field — must add this same lift to grids.cityElevAt/fineElevAt, or it
+// renders a couple of centimetres UNDER the visible ground and disappears
+// entirely (this bit the first pass at this file: roads existed, had the
+// right footprint, and were simply invisible, buried under the terrain).
+export const FINE_GROUND_LIFT = 0.25
+
 // How many metres one ground-detail-texture repeat spans — a small tile
 // repeated often reads as fine mottling underfoot without needing a huge
 // texture.
@@ -159,8 +169,8 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
     detailTexture,
     GROUND_DETAIL_METERS,
     // Lift the fine mesh a touch above the coarse one so it always wins
-    // the z-fight in their shared footprint — see this file's top comment.
-    0.25,
+    // the z-fight in their shared footprint — see FINE_GROUND_LIFT's doc.
+    FINE_GROUND_LIFT,
   )
   fineMesh.name = 'terrain-fine'
 
@@ -284,7 +294,7 @@ export class GrassField {
         const wz = z + jz
         const fade = 1 - Math.max(0, Math.min(1, (s.d - (GRASS_RADIUS - GRASS_FADE_BAND)) / GRASS_FADE_BAND))
         if (fade <= 0.02) continue
-        const y = this.grids.fineElevAt(s.fx, s.fy) * ELEVATION_SCALE
+        const y = this.grids.fineElevAt(s.fx, s.fy) * ELEVATION_SCALE + FINE_GROUND_LIFT
         const scale = fade * (0.75 + hashG(s.fx, s.fy, 25 + k) * 0.5)
         q.setFromAxisAngle(up, hashG(s.fx, s.fy, 35 + k) * Math.PI * 2)
         this.tmpMatrix.compose(new Vector3(wx, y, wz), q, new Vector3(scale, scale, scale))

@@ -12,7 +12,7 @@ import { DoubleSide, Mesh, MeshStandardMaterial, Object3D, Vector3 } from 'three
 import type { CityGrids } from './grids'
 import { ROAD_CLASS_ARTERIAL, ROAD_CLASS_HIGHWAY } from './cityExportTypes'
 import { GeomAccum } from './meshBuilder'
-import { ELEVATION_SCALE } from './terrain'
+import { ELEVATION_SCALE, FINE_GROUND_LIFT } from './terrain'
 import { makeRoadTexture, makeSidewalkTexture } from './proceduralTextures'
 
 const ROAD_THICKNESS = 0.1
@@ -62,7 +62,7 @@ export function buildRoads(grids: CityGrids): RoadsResult {
   const guardrail = new GeomAccum()
   const pillars = new GeomAccum()
 
-  const cellY = (lx: number, ly: number): number => grids.cityElevAt(lx, ly) * ELEVATION_SCALE
+  const cellY = (lx: number, ly: number): number => grids.cityElevAt(lx, ly) * ELEVATION_SCALE + FINE_GROUND_LIFT
 
   // -- bridges: connected components of the bridge set, each a flat deck --
   const bridgeGroupId = new Map<string, number>()

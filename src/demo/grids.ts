@@ -10,7 +10,6 @@
 import {
   type CityExportJSON,
   type DecodedGrid,
-  cityWorldMeters,
   coarseWorldMeters,
   decodeCoarseGrid,
   decodeFineGrid,
@@ -32,8 +31,13 @@ export class CityGrids {
     this.doc = doc
     this.coarse = decodeCoarseGrid(doc)
     this.fine = decodeFineGrid(doc)
+    // NOTE: fineWorldMeters, not cityWorldMeters — cityWorldMeters already
+    // adds doc.city.originX/Y itself (it takes CITY-LOCAL coordinates), and
+    // originX/size/2 below is already a FINE-GRID index, so going through
+    // cityWorldMeters here would add the city offset twice and shift the
+    // whole scene by ~city.originX lots off the real centre.
     const { originX, originY, size } = doc.city
-    const center = cityWorldMeters(doc, originX + size / 2, originY + size / 2)
+    const center = fineWorldMeters(doc, originX + size / 2, originY + size / 2)
     this.originX = center.x
     this.originZ = center.z
   }

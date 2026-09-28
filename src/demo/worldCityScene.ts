@@ -84,15 +84,18 @@ export class WorldCityScene {
     this.scene.background = new Color(SKY)
     this.renderer.outputColorSpace = SRGBColorSpace
     this.renderer.toneMapping = ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.05
+    this.renderer.toneMappingExposure = 1.0
     this.renderer.shadowMap.enabled = false
 
-    this.camera = new PerspectiveCamera(45, 1, 0.4, 7000)
+    // far=15000 covers the coarse backdrop from anywhere the camera can
+    // reach (maxDistance below); fog (see buildLights) fades it to the
+    // sky colour well before that so there is never a hard clip edge.
+    this.camera = new PerspectiveCamera(45, 1, 0.4, 15000)
     this.controls = new OrbitControls(this.camera, canvas)
     this.controls.enableDamping = false
     this.controls.screenSpacePanning = false
-    this.controls.minDistance = 12
-    this.controls.maxDistance = 3200
+    this.controls.minDistance = 11 // street level
+    this.controls.maxDistance = 6000 // out to the valley
     this.controls.minPolarAngle = 0.12
     this.controls.maxPolarAngle = Math.PI / 2 - 0.03
     this.controls.addEventListener('change', this.onControlsChange)
@@ -107,12 +110,17 @@ export class WorldCityScene {
   }
 
   private buildLights() {
-    const sun = new DirectionalLight(0xfff1d8, 3.1)
+    const sun = new DirectionalLight(0xfff1d8, 2.1)
     sun.position.set(-420, 520, -260)
     this.scene.add(sun)
-    const ambient = new HemisphereLight(0xb9c9ee, 0xcdd6c2, 0.95)
+    const ambient = new HemisphereLight(0xb9c9ee, 0xcdd6c2, 0.75)
     this.scene.add(ambient)
-    this.scene.fog = new FogExp2(SKY, 0.00042)
+    // Tuned so the ~1.5km city core reads with clear contrast and the
+    // coarse backdrop only fades to sky past a few km — a portrait phone's
+    // narrow horizontal FOV needs several km of camera distance to fit the
+    // whole city width-on, so fog this thin is what keeps that shot from
+    // reading as fogged-out rather than merely distant.
+    this.scene.fog = new FogExp2(SKY, 0.00018)
   }
 
   private onContextLost = (e: Event) => {
@@ -197,30 +205,66 @@ export class WorldCityScene {
   async load(doc: CityExportJSON): Promise<WorldCityLabels> {
     const grids = new CityGrids(doc)
 
-    this.terrain = buildTerrain(grids)
-    this.scene.add(...this.terrain.objects)
+    // Each layer is independent — a bug in one (or a slow/missing kit GLB)
+    // should never blank the whole scene, so every stage is wrapped and
+    // logged rather than left to reject the whole load() promise.
+    const stage = (name: string, fn: () => void) => {
+      try {
+        fn()
+      } catch (e) {
+        console.error(`[worldCity] ${name} failed`, e)
+      }
+    }
+    const stageAsync = async (name: string, fn: () => Promise<void>) => {
+      try {
+        await fn()
+      } catch (e) {
+        console.error(`[worldCity] ${name} failed`, e)
+      }
+    }
 
-    this.water = buildWater(grids)
-    if (this.water.mesh) this.scene.add(this.water.mesh)
+    stage('terrain', () => {
+      this.terrain = buildTerrain(grids)
+      this.scene.add(...this.terrain.objects)
+    })
 
-    this.roads = buildRoads(grids)
-    this.scene.add(...this.roads.objects)
+    stage('water', () => {
+      this.water = buildWater(grids)
+      if (this.water.mesh) this.scene.add(this.water.mesh)
+    })
 
-    this.buildings = await buildBuildings(grids)
-    this.scene.add(...this.buildings.objects)
+    stage('roads', () => {
+      this.roads = buildRoads(grids)
+      this.scene.add(...this.roads.objects)
+    })
 
-    this.props = await buildProps(grids)
-    this.scene.add(...this.props.objects)
+    await stageAsync('buildings', async () => {
+      this.buildings = await buildBuildings(grids)
+      this.scene.add(...this.buildings.objects)
+    })
 
-    this.grass = new GrassField(grids)
-    this.scene.add(this.grass.object)
+    await stageAsync('props', async () => {
+      this.props = await buildProps(grids)
+      this.scene.add(...this.props.objects)
+    })
+
+    stage('grass', () => {
+      this.grass = new GrassField(grids)
+      this.scene.add(this.grass.object)
+    })
 
     this.frameCamera(grids)
-    this.grass.update(this.camera.position)
+    this.grass?.update(this.camera.position)
     this.startWaterTicking()
 
     this.sceneBuilt = true
     this.requestRender()
+
+    if (import.meta.env.DEV || new URLSearchParams(location.search).has('stats')) {
+      // A debug hook for the project's own Playwright screenshot/stats
+      // scripts — never referenced by the page itself.
+      ;(window as unknown as { __wc?: unknown }).__wc = { scene: this.scene, camera: this.camera, renderer: this.renderer, grids, doc }
+    }
 
     return this.labelsFor(grids)
   }
@@ -250,12 +294,17 @@ export class WorldCityScene {
     this.controls.target.copy(target)
 
     const footprintMeters = (size * doc.lotMeters) / 2
-    const radius = Math.sqrt(footprintMeters * footprintMeters * 2 + ((maxY - minY) / 2) ** 2) * 1.35
+    const radius = Math.sqrt(footprintMeters * footprintMeters * 2 + ((maxY - minY) / 2) ** 2) * 1.12
 
+    // Fit by the VERTICAL fov only, not the narrower horizontal one a
+    // portrait phone screen has: fitting the full 45deg-wide city corner
+    // to corner into a ~22deg horizontal half-fov pushes the camera many
+    // kilometres back, which reads as a hazy, tiny distant town rather
+    // than the "skyline" shot the brief asks for. Letting the left/right
+    // edges crop (the player can still orbit/zoom) keeps the default shot
+    // close enough to actually read as a city.
     const vFov = (this.camera.fov * Math.PI) / 180
-    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect)
-    const limitingFov = Math.min(vFov, hFov)
-    const dist = Math.max(this.controls.minDistance, radius / Math.sin(limitingFov / 2))
+    const dist = Math.max(this.controls.minDistance, radius / Math.sin(vFov / 2))
 
     // A 3/4 view biased toward the city's own north edge (where the river
     // and its bridges sit in this export) so the default shot shows the

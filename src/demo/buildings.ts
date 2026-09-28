@@ -11,7 +11,7 @@ import { Color, DoubleSide, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, 
 import type { CityGrids } from './grids'
 import type { CityLotJSON } from './cityExportTypes'
 import { GeomAccum } from './meshBuilder'
-import { ELEVATION_SCALE } from './terrain'
+import { ELEVATION_SCALE, FINE_GROUND_LIFT } from './terrain'
 import { makeFacadeTexture, makeFarmTexture, makeRoofTexture, makeShopfrontTexture, type FacadeKind } from './proceduralTextures'
 import { kitGeometry } from './kitAssets'
 
@@ -73,7 +73,7 @@ function footprintOf(grids: CityGrids, lot: CityLotJSON): Footprint {
   const z1 = Math.max(a.z, b.z) - SETBACK
   const cx = Math.round(lot.x + lot.w / 2)
   const cz = Math.round(lot.y + lot.h / 2)
-  const baseY = grids.cityElevAt(cx, cz) * ELEVATION_SCALE
+  const baseY = grids.cityElevAt(cx, cz) * ELEVATION_SCALE + FINE_GROUND_LIFT
   return { x0, x1, z0, z1, baseY }
 }
 
@@ -259,7 +259,7 @@ async function addParkTrees(grids: CityGrids, parkLots: CityLotJSON[], objects: 
       const local = grids.cityScene(lot.x + hx * lot.w, lot.y + hz * lot.h)
       const cx = Math.round(lot.x + hx * lot.w)
       const cz = Math.round(lot.y + hz * lot.h)
-      const y = grids.cityElevAt(cx, cz) * ELEVATION_SCALE
+      const y = grids.cityElevAt(cx, cz) * ELEVATION_SCALE + FINE_GROUND_LIFT
       spots.push({ pos: new Vector3(local.x, y, local.z), scale: 2.2 + hash2(lot.x, lot.y, 160 + i) * 1.4 })
     }
   }

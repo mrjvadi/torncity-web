@@ -8,7 +8,7 @@ import { Color, DoubleSide, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, 
 import type { CityGrids } from './grids'
 import { ROAD_CLASS_HIGHWAY } from './cityExportTypes'
 import { GeomAccum } from './meshBuilder'
-import { ELEVATION_SCALE } from './terrain'
+import { ELEVATION_SCALE, FINE_GROUND_LIFT } from './terrain'
 import { kitGeometry } from './kitAssets'
 
 const LAMP_SPACING_CELLS = 3
@@ -57,7 +57,7 @@ export async function buildProps(grids: CityGrids): Promise<PropsResult> {
     if (!horizontal && !vertical) continue
 
     const { x: cx, z: cz } = grids.cityScene(x, y)
-    const ey = grids.cityElevAt(x, y) * ELEVATION_SCALE
+    const ey = grids.cityElevAt(x, y) * ELEVATION_SCALE + FINE_GROUND_LIFT
 
     // Pick the side that is actually a free sidewalk edge (no road
     // continuing that direction) so props never spawn on top of asphalt.

@@ -15,7 +15,7 @@
 import { BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, ShaderMaterial, Vector3 } from 'three'
 import type { CityGrids } from './grids'
 import { WATER_KIND_LAKE, WATER_KIND_OCEAN, WATER_KIND_RIVER, WATER_KIND_STREAM } from './cityExportTypes'
-import { ELEVATION_SCALE } from './terrain'
+import { ELEVATION_SCALE, FINE_GROUND_LIFT } from './terrain'
 
 const VERT = /* glsl */ `
   attribute float shoreDist;
@@ -174,7 +174,7 @@ export function buildWater(grids: CityGrids): WaterResult {
     const e = grids.fineElevAt(fx, fy) * ELEVATION_SCALE
     const kind = grids.fine.water[grids.fineIndex(fx, fy)]
     const y = kind === WATER_KIND_OCEAN ? Math.min(0, e) : e
-    return y + 0.06
+    return y + FINE_GROUND_LIFT + 0.06
   }
 
   for (let y = 0; y < h; y++) {
