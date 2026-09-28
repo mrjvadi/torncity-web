@@ -35,7 +35,7 @@ export function InboxHub({ response, loading, onAction, run }: ScreenProps) {
           )
         })}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="inbox.show" />
     </ScreenScroll>
   )
 }
@@ -61,7 +61,7 @@ export function InboxCategory({ response, loading, onAction, run }: ScreenProps)
         ))}
         {!(v.items && v.items.length) && <Notice>پیامی در این دسته نیست.</Notice>}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="inbox.category" />
     </ScreenScroll>
   )
 }

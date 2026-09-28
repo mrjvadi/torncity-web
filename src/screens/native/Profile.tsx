@@ -77,7 +77,7 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="player.profile.get" />
     </ScreenScroll>
   )
 }

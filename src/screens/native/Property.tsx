@@ -42,7 +42,7 @@ export function PropertyMarket({ response, loading, onAction, run }: ScreenProps
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="property.list" />
     </ScreenScroll>
   )
 }
@@ -94,7 +94,7 @@ export function PropertyMine({ response, loading, onAction, run }: ScreenProps) 
         ))}
       </div>
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="property.mine" />
     </ScreenScroll>
   )
 }

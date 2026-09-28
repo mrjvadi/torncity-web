@@ -10,12 +10,17 @@ import { toWesternDigits } from '../../../lib/persian'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
 
-export default function Actions({ response, onAction, only }: {
+export default function Actions({ response, onAction, only, refreshCommand }: {
   response: CommandResponse | null
   onAction: (a: Action) => void
   /** Render only these rows (e.g. skip row 0 when a screen already drew
    * its own primary CTA from the view). */
   only?: (a: Action) => boolean
+  /** The command the screen's own header ↻ button already sends (e.g.
+   * `bank.show`). The server also hands back a "تازه‌سازی" tile that usually
+   * sends this exact same command — drop it here so the action isn't
+   * offered twice. Set on every screen that draws a header refresh. */
+  refreshCommand?: string
 }) {
   const [pendingInput, setPendingInput] = useState<Action | null>(null)
   const [pendingConfirm, setPendingConfirm] = useState<Action | null>(null)
@@ -23,6 +28,12 @@ export default function Actions({ response, onAction, only }: {
 
   const rows = useMemo(() => {
     const actions = (response?.actions ?? []).filter((a) => !only || only(a))
+      // A screen with its own header refresh never needs the server's
+      // "تازه‌سازی" tile too — it usually repeats this exact command, but a
+      // deeper view (e.g. a market order book) can send its list screen's
+      // command instead while still meaning "reload me", so a plain
+      // navigation action labelled exactly "تازه‌سازی" is dropped as well.
+      .filter((a) => !refreshCommand || (a.command !== refreshCommand && !(a.kind === 'navigation' && a.label === 'تازه‌سازی')))
     const byRow = new Map<number, Action[]>()
     for (const a of actions) {
       const list = byRow.get(a.row) ?? []
@@ -30,7 +41,7 @@ export default function Actions({ response, onAction, only }: {
       byRow.set(a.row, list)
     }
     return [...byRow.entries()].sort((a, b) => a[0] - b[0])
-  }, [response, only])
+  }, [response, only, refreshCommand])
 
   const lead = rows.flatMap(([, list]) => list).find((a) => a.kind === 'primary')
 

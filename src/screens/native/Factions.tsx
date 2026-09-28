@@ -37,7 +37,7 @@ export function FactionHome({ response, loading, onAction, run }: ScreenProps) {
         </Notice>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="faction.mine" />
     </ScreenScroll>
   )
 }
@@ -60,7 +60,7 @@ export function FactionList({ response, loading, onAction, run }: ScreenProps) {
             onClick={() => f.ref?.code && run('faction.view', { code: f.ref.code })} />
         ))}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="faction.list" />
     </ScreenScroll>
   )
 }

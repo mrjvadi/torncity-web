@@ -45,7 +45,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
         ))}
       </div>
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="mission.board" />
     </ScreenScroll>
   )
 }

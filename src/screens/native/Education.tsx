@@ -51,7 +51,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="education.list" />
     </ScreenScroll>
   )
 }

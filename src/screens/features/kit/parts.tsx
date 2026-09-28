@@ -102,8 +102,13 @@ export function Plate({
   )
 }
 
-export function TileGrid({ children }: { children: ReactNode }) {
-  return <div className="ft-tile-grid">{children}</div>
+/** A grid of Tile (or custom card) children. It's a CSS grid, not a flex
+ * row, so a child can no longer claim "half width" with its own inline
+ * flex-basis (that only worked back when this was flexbox) — pass `cols`
+ * instead when a card needs more room than the default three-across (a
+ * stat card with a button, a wanted poster). */
+export function TileGrid({ children, cols = 3 }: { children: ReactNode; cols?: 2 | 3 }) {
+  return <div className={`ft-tile-grid${cols === 2 ? ' ft-tile-grid-2' : ''}`}>{children}</div>
 }
 
 export function Tile({

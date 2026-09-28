@@ -26,7 +26,7 @@ export default function JobStatus({ response, loading, onAction, run }: ScreenPr
       <ScreenScroll>
         <Header title="کار" tone="gold" onRefresh={() => run('job.status')} />
         <Notice>هنوز شغلی نداری.</Notice>
-        <Actions response={response} onAction={onAction} />
+        <Actions response={response} onAction={onAction} refreshCommand="job.status" />
       </ScreenScroll>
     )
   }
@@ -70,7 +70,7 @@ export default function JobStatus({ response, loading, onAction, run }: ScreenPr
         )}
       </div>
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="job.status" />
     </ScreenScroll>
   )
 }

@@ -28,7 +28,7 @@ export function TravelOptions({ response, loading, onAction, run }: ScreenProps)
           />
         ))}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="travel.options" />
     </ScreenScroll>
   )
 }
@@ -47,7 +47,7 @@ export function TravelStatus({ response, loading, onAction, run }: ScreenProps) 
         <div className="display" style={{ fontSize: 36, color: 'var(--firouzeh)' }}>{hms(v.remaining_seconds)}</div>
         <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>تا رسیدن</div>
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="travel.status" />
     </ScreenScroll>
   )
 }

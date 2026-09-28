@@ -25,14 +25,14 @@ export function Exchange({ response, loading, onAction, run }: ScreenProps) {
           return (
             <ListRow key={i} icon="chart" palette="emerald" title={l.company?.name ?? '—'}
               sub={l.type?.name}
-              right={<span style={{ color: chg === null ? undefined : chg >= 0 ? 'var(--leaf)' : 'var(--anar)' }}>
+              right={<span dir="ltr" style={{ color: chg === null ? undefined : chg >= 0 ? 'var(--leaf)' : 'var(--anar)' }}>
                 {formatNumber(l.price ?? 0)}{chg !== null ? ` (${chg >= 0 ? '+' : ''}${pct(chg)})` : ''}
               </span>}
               onClick={() => l.company?.code && run('stock.view', { code: l.company.code })} />
           )
         })}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="stock.list" />
     </ScreenScroll>
   )
 }
@@ -90,7 +90,7 @@ export function Portfolio({ response, loading, onAction, run }: ScreenProps) {
         />
       )}
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="stock.mine" />
     </ScreenScroll>
   )
 }

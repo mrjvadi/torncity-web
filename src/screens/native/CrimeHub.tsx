@@ -55,7 +55,7 @@ export default function CrimeHub({ response, loading, onAction, run }: ScreenPro
         ))}
       </div>
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="crime.hub" />
     </ScreenScroll>
   )
 }
@@ -82,7 +82,7 @@ export function CrimeList({ response, loading, onAction, run }: ScreenProps) {
           />
         ))}
       </div>
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="crime.list" />
     </ScreenScroll>
   )
 }

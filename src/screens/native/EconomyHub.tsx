@@ -6,7 +6,8 @@ export default function EconomyHub({ run, openLocal }: ScreenProps) {
   return (
     <ScreenScroll>
       <Header title="اقتصاد" tone="emerald" />
-      <TileGrid>
+      <div className="nx-hub-body">
+        <TileGrid>
         {ECONOMY_TILES.map((t) => (
           <Tile
             key={t.key}
@@ -17,7 +18,8 @@ export default function EconomyHub({ run, openLocal }: ScreenProps) {
             onClick={() => (t.command ? run(t.command) : openLocal(t.local!))}
           />
         ))}
-      </TileGrid>
+        </TileGrid>
+      </div>
     </ScreenScroll>
   )
 }

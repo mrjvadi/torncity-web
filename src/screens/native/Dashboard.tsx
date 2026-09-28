@@ -33,7 +33,7 @@ export default function Dashboard({ response, loading, onAction, run }: ScreenPr
         right={<Stat icon="bank" palette="sapphire" label="بانک" value={money(v.bank)} />}
       />
 
-      <Actions response={response} onAction={onAction} />
+      <Actions response={response} onAction={onAction} refreshCommand="player.profile.get" />
     </ScreenScroll>
   )
 }

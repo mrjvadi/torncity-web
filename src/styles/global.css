@@ -244,6 +244,10 @@ input {
 }
 
 .ft-tile-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+/* A card that needs more room than the default three-across grid gives it
+ * (a stat card with a training button, a wanted poster) — TileGrid's
+ * `cols={2}`. */
+.ft-tile-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .ft-tile {
   min-width: 0;
   display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -277,6 +281,27 @@ input {
 .ft-btn-red { background: linear-gradient(180deg, #ff8a8e, #d8343b); color: #fff; box-shadow: 0 4px 0 #6e1216; }
 .ft-btn-blue { background: linear-gradient(180deg, #6f8cf0, #2a45b0); color: #fff; box-shadow: 0 4px 0 #101e60; }
 .ft-btn-steel { background: linear-gradient(180deg, #a7afc8, #4a536e); color: #fff; box-shadow: 0 4px 0 #1e2436; }
+/* A second (or third) primary on the same screen: outlined, not gold —
+   only the lead primary gets the full slab (ActionButtons.tsx). */
+.ft-btn-outline {
+  background: linear-gradient(180deg, rgba(242,194,85,0.16), rgba(242,194,85,0.05));
+  color: var(--gold); border: 1px solid rgba(242,194,85,0.35); box-shadow: none;
+}
+.ft-btn-outline:active { box-shadow: none; }
+/* A server "back" action: a plain arrow and its label, no icon, no slab —
+   matches the native screens' nx-action-back. */
+.ft-btn-back {
+  background: rgba(255,255,255,0.03); color: var(--text-dim);
+  border: 1px solid rgba(255,255,255,0.12); box-shadow: none;
+}
+.ft-btn-back:active { box-shadow: none; }
+.ft-btn-back-arrow { font-size: 17px; line-height: 1; color: var(--text-dim); }
+/* A navigation/secondary tile among the actions: the gold-trimmed panel
+   look, half-width so two sit side by side. */
+.ft-btn-tile {
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid rgba(242,194,85,0.22); box-shadow: none; color: var(--text);
+}
 .ft-btn:active { transform: translateY(3px); box-shadow: none; }
 .ft-btn:disabled, .ft-btn.ft-disabled {
   opacity: 0.42; box-shadow: none; filter: grayscale(0.4);
@@ -330,7 +355,7 @@ input {
 
 .nx-header { display: flex; align-items: center; gap: 8px; }
 .nx-chevron {
-  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  flex: none; width: 36px; height: 36px; border-radius: 50%;
   background: radial-gradient(circle at 40% 30%, #232c58, #10142b);
   border: 1px solid var(--gold-soft); color: var(--text-dim); font-size: 17px;
   display: flex; align-items: center; justify-content: center;
@@ -400,6 +425,10 @@ input {
 .nx-row-sapphire { border-color: rgba(53,82,200,0.45); }
 .nx-row-teal { border-color: rgba(43,196,178,0.4); }
 
+/* The three dock hubs: a short tile grid on a tall screen, so it's
+   centred in the space under the header instead of stranding a slab of
+   emptiness below it. */
+.nx-hub-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .nx-tilegrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .nx-tile {
   position: relative; min-width: 0;
@@ -421,7 +450,7 @@ input {
 
 .nx-seg { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
 .nx-seg-opt {
-  flex: none; padding: 6px 12px; border-radius: 18px; font-size: 12.5px;
+  flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border-radius: 18px; font-size: 12.5px;
   background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim);
 }
 .nx-seg-opt.active { background: linear-gradient(180deg, #1c6b4a, #0e3d2a); border-color: var(--leaf); color: #fff; }
