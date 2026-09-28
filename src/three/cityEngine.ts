@@ -817,9 +817,22 @@ export class CityEngine {
     window.removeEventListener('pointercancel', this.onPointerUp)
     this.canvas.removeEventListener('wheel', this.onWheel)
     document.removeEventListener('visibilitychange', this.onVisibility)
+    // geometries and materials are safe to dispose here even where they
+    // are shared with assetCache's module-level template cache: dispose()
+    // only drops the GPU-side buffers/programs a *renderer* tracked (this
+    // renderer, which is being torn down anyway), not the JS-side
+    // descriptors those caches hold — the next CityEngine's new renderer
+    // re-uploads them the first time they are drawn again.
     this.scene.traverse((obj) => {
       const mesh = obj as Mesh
       if (mesh.geometry) mesh.geometry.dispose()
+      const mat = mesh.material as Material | Material[] | undefined
+      if (!mat) return
+      for (const m of Array.isArray(mat) ? mat : [mat]) {
+        const withMap = m as Material & { map?: { dispose(): void } | null }
+        withMap.map?.dispose()
+        m.dispose()
+      }
     })
     this.renderer.dispose()
   }
