@@ -27,7 +27,7 @@ export default function Dock({ active, onSelect, badge }: DockProps) {
   const activeIndex = TABS.findIndex((t) => t.key === active)
   return (
     <nav className="dock">
-      <div className="dock-canvas">
+      <div className="dock-canvas dock-bar">
         <div className="dock-bg" />
         <div className="dock-row">
           {TABS.map((t, i) => {
