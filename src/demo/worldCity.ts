@@ -88,7 +88,7 @@ function renderOverlay(root: HTMLElement, labels: Awaited<ReturnType<WorldCitySc
 
   const hint = document.createElement('div')
   hint.className = 'wc-hint'
-  hint.textContent = `seed ${doc.seed} · ${doc.grid.w}×${doc.grid.h} کاشی`
+  hint.textContent = `seed ${doc.seed} · ${doc.city.size}×${doc.city.size} قطعه · ${doc.fineGrid.w}×${doc.fineGrid.h} ریزنقشه`
   overlay.appendChild(hint)
 
   root.appendChild(overlay)
