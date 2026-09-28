@@ -97,12 +97,27 @@ export class WorldCityScene {
     // far=15000 covers the coarse backdrop from anywhere the camera can
     // reach (maxDistance below); fog (see buildLights) fades it to the
     // sky colour well before that so there is never a hard clip edge.
-    this.camera = new PerspectiveCamera(45, 1, 0.4, 15000)
+    // near=0.4 (street-level detail) and a far plane kept as small as the
+    // scene allows is what a STANDARD depth buffer needs here: a 0.4..15000
+    // near/far ratio (37500:1) spends almost all of its precision in the
+    // first few hundred metres and z-fights badly beyond that — real
+    // buildings/roads a few hundred to low thousands of metres out were
+    // silently losing the depth test against the terrain and vanishing in
+    // wide shots even though their geometry was correct (see the project
+    // report's debugging trail). A logarithmic depth buffer is the textbook
+    // fix for this ratio, but this renderer targets an iPhone WebView on
+    // WebGL1-class hardware where logarithmicDepthBuffer's extension
+    // support is unreliable (it silently produced a fully blank scene when
+    // tried here) — so the fix instead is keeping far close enough that the
+    // ratio itself stays sane. 9000 comfortably covers maxDistance (the
+    // valley zoom-out) while cutting the near/far ratio to a fifth of what
+    // it was.
+    this.camera = new PerspectiveCamera(45, 1, 1, 11000)
     this.controls = new OrbitControls(this.camera, canvas)
     this.controls.enableDamping = false
     this.controls.screenSpacePanning = false
     this.controls.minDistance = 11 // street level
-    this.controls.maxDistance = 6000 // out to the valley
+    this.controls.maxDistance = 10000 // out to the valley
     this.controls.minPolarAngle = 0.12
     this.controls.maxPolarAngle = Math.PI / 2 - 0.03
     this.controls.addEventListener('change', this.onControlsChange)
@@ -133,7 +148,7 @@ export class WorldCityScene {
     // narrow horizontal FOV needs several km of camera distance to fit the
     // whole city width-on, so fog this thin is what keeps that shot from
     // reading as fogged-out rather than merely distant.
-    this.scene.fog = new FogExp2(SKY, 0.00013)
+    this.scene.fog = new FogExp2(SKY, 0.00007)
   }
 
   /** A vertical-gradient canvas, pale blue overhead fading to a near-white
@@ -347,20 +362,25 @@ export class WorldCityScene {
     const target = new Vector3(0, cy, 0)
     this.controls.target.copy(target)
 
-    // A true bounding-sphere fit (city half-diagonal + building height,
-    // by the camera's own vertical fov) puts the WHOLE dense city right at
-    // the frame's edge; dividing by FILL backs the camera off just enough
-    // that the city fills ~70% of the frame instead of exactly 100% (room
-    // to breathe, no tower clipped at the top edge) while still reading as
-    // "the whole city", not a cropped fragment — now that the city core is
-    // actually dense (block-fill, not scattered lots) this reads right at
-    // a real distance instead of needing the old artificial close-in crop.
+    // A true bounding-sphere fit (city half-diagonal + building height) by
+    // the camera's own LIMITING fov puts the whole dense city right at the
+    // frame's edge; dividing by FILL backs the camera off just enough that
+    // it fills ~70% of the frame instead of exactly 100%. "Limiting" fov
+    // matters a lot here: a portrait phone's HORIZONTAL fov is much
+    // narrower than its 45deg vertical one (aspect < 1), so a sphere sized
+    // to the city's own X/Z footprint needs the narrower horizontal angle
+    // to fit by width, not the vertical one — using vFov alone here once
+    // silently cropped roughly the western/eastern half of the city out of
+    // frame (see the project report): it fit vertically at a distance that
+    // was nowhere near far enough horizontally.
     const footprintMeters = (size * doc.lotMeters) / 2
     const halfDiagonal = Math.sqrt(footprintMeters * footprintMeters * 2)
     const radius = Math.sqrt(halfDiagonal * halfDiagonal + ((maxY - groundY) / 2) ** 2) * 1.06
     const vFov = (this.camera.fov * Math.PI) / 180
-    const FILL = 0.7
-    const fitDist = radius / Math.sin(vFov / 2)
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect)
+    const limitingFov = Math.min(vFov, hFov)
+    const FILL = 0.92
+    const fitDist = radius / Math.sin(limitingFov / 2)
     const dist = Math.max(this.controls.minDistance, fitDist / FILL)
 
     // A 3/4 view, ~35deg above the horizon, biased toward the city's own
