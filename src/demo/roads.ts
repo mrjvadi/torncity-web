@@ -26,8 +26,8 @@ const PILLAR_SIZE = 1.4
 
 function widthForClass(cls: number): number {
   if (cls === ROAD_CLASS_HIGHWAY) return 19
-  if (cls === ROAD_CLASS_ARTERIAL) return 15
-  return 8
+  if (cls === ROAD_CLASS_ARTERIAL) return 17
+  return 11
 }
 
 const DIRS: [number, number][] = [

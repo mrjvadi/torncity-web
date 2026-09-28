@@ -49,7 +49,7 @@ export interface TerrainResult {
 // pastel daytime park/field instead of a dark saturated blob, the same
 // "nudge the source palette toward white" trick kitAssets.ts already used
 // for the Kenney kit's own materials.
-const GRASS_LIGHTEN = 0.42
+const GRASS_LIGHTEN = 0.3
 function biomeColorLegend(grids: CityGrids): Color[] {
   const white = new Color(0xffffff)
   return grids.doc.biomeLegend.map((b) => new Color(`#${b.colorHex}`).lerp(white, GRASS_LIGHTEN))

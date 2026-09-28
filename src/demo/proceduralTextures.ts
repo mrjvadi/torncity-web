@@ -109,7 +109,11 @@ export function makeRoadTexture(kind: 'local' | 'arterial' | 'highway', seed = 2
   canvas.height = texH
   const rnd = mulberry32(seed + (kind === 'local' ? 1 : kind === 'arterial' ? 2 : 3))
 
-  ctx.fillStyle = kind === 'highway' ? '#3a3c40' : '#45464a'
+  // Deliberately dark (darker than a real photo's asphalt) — this scene's
+  // bright pastel exposure (see worldCityScene.ts) lifts every mid-tone a
+  // lot; a lighter grey here reads as barely darker than the lightened
+  // grass next to it and the road all but disappears at a distance.
+  ctx.fillStyle = kind === 'highway' ? '#26282c' : '#2e3034'
   ctx.fillRect(0, 0, texW, texH)
   // Noise / grime patches.
   for (let i = 0; i < 260; i++) {
