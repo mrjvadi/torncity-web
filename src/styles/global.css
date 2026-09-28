@@ -133,6 +133,19 @@ input {
 .icon.pal-teal { background: linear-gradient(165deg, var(--pal-teal-l) 0%, var(--pal-teal-l) 18%, var(--pal-teal-m) 100%); --icon-o: var(--pal-teal-o); }
 .icon.pal-cream { background: linear-gradient(165deg, var(--pal-cream-l) 0%, var(--pal-cream-l) 18%, var(--pal-cream-m) 100%); --icon-o: var(--pal-cream-o); }
 
+/* -- the baked icon: a PNG->WebP render of emboss.gdshader itself (see
+   public/icons3d and tools/bake_icons.gd in the client repo), so the
+   outline and drop shadow are already in the pixels — no CSS filter
+   needed, just keep it crisp. */
+.icon-img {
+  display: inline-block;
+  flex: none;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 .toast-layer {
   position: fixed;
   top: calc(var(--safe-t) + 12px);
