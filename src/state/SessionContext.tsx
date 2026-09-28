@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import * as api from '../api/client'
-import type { Bootstrap, CommandResponse, ProfileView } from '../api/types'
+import type { Bootstrap, CommandResponse, ProfileView, RealtimeVitals } from '../api/types'
+import type { RealtimeHandle } from '../api/realtime'
 import { report } from '../lib/reporter'
 import { friendlyError } from '../lib/errors'
 import { initTelegram, telegramInitData } from '../lib/telegram'
@@ -8,10 +9,23 @@ import { useToast } from './ToastContext'
 
 type Status = 'checking' | 'signed_out' | 'signing_in' | 'signed_in'
 
+// The fields a "vitals" publication and a command's own view agree on
+// naming exactly the same way (client-api.md §3 and §5.3), so one patch
+// function serves both sources.
+const VITALS_KEYS = [
+  'name', 'level', 'xp', 'next_level_xp', 'energy', 'max_energy', 'energy_full_in_seconds',
+  'health', 'max_health', 'cash', 'bank', 'rank', 'nerve', 'max_nerve', 'nerve_full_in_seconds',
+] as const
+
 interface SessionApi {
   status: Status
   bootstrap: Bootstrap | null
   profile: ProfileView | null
+  /** Unread notices (client-api.md §5.3's "inbox", and every "vitals"
+   * snapshot): kept here so whoever wires the bell badge has one source,
+   * live over the socket when it is up and no staler than the last poll
+   * otherwise. */
+  unread: number
   error: string | null
   inTelegram: boolean
   loginWithCode: (code: string) => Promise<void>
@@ -33,7 +47,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<Status>('checking')
   const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null)
   const [profile, setProfile] = useState<ProfileView | null>(null)
+  const [unread, setUnread] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  // Whether the realtime socket is actually connected right now: only used
+  // to lengthen the HTTP poll below, never to gate anything correctness
+  // depends on (a client without it must work exactly as before this
+  // feature).
+  const [live, setLive] = useState(false)
+  const realtimeRef = useRef<RealtimeHandle | null>(null)
   const toast = useToast()
   const inTelegram = useRef(!!telegramInitData()).current
 
@@ -97,8 +118,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     void api.logout()
+    realtimeRef.current?.disconnect()
+    realtimeRef.current = null
+    setLive(false)
     setBootstrap(null)
     setProfile(null)
+    setUnread(0)
     setStatus('signed_out')
   }, [])
 
@@ -106,16 +131,52 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   // and are re-read every minute and whenever the player comes back to the
   // app, so they never disagree with the screen in front of them.
   useEffect(() => {
-    const keys = ['name', 'level', 'xp', 'next_level_xp', 'energy', 'max_energy', 'energy_full_in_seconds',
-      'health', 'max_health', 'cash', 'bank', 'rank', 'nerve', 'max_nerve', 'nerve_full_in_seconds']
     return api.onView((view) => {
       const patch: Record<string, unknown> = {}
-      for (const k of keys) if (view[k] !== undefined && view[k] !== null) patch[k] = view[k]
+      for (const k of VITALS_KEYS) if (view[k] !== undefined && view[k] !== null) patch[k] = view[k]
       if (Object.keys(patch).length > 0) {
         setProfile((p) => (p ? ({ ...p, ...patch } as ProfileView) : p))
       }
     })
   }, [])
+
+  // The same numbers also follow the realtime channel (client-api.md §5.3),
+  // when the server says it is available and the socket manages to connect
+  // — from ANY source, not only this tab's own commands: a Telegram action,
+  // another device, energy regen. Connected lazily (api/realtime.ts is a
+  // dynamic import) only once signed in, and torn down on sign-out or
+  // unmount. A failure anywhere in this path is silent: the poll below
+  // never stops being the fallback.
+  useEffect(() => {
+    if (status !== 'signed_in' || !bootstrap?.realtime) return
+    let cancelled = false
+    void (async () => {
+      const { connectRealtime } = await import('../api/realtime')
+      const handle = await connectRealtime(
+        (v: RealtimeVitals) => {
+          setProfile((p) => (p ? {
+            ...p,
+            cash: v.cash, bank: v.bank, energy: v.energy, max_energy: v.max_energy,
+            health: v.health, max_health: v.max_health, xp: v.xp, level: v.level,
+          } : p))
+          setUnread(v.unread)
+        },
+        (u: number) => setUnread(u),
+        (isLive: boolean) => setLive(isLive),
+      )
+      if (cancelled) {
+        handle?.disconnect()
+        return
+      }
+      realtimeRef.current = handle
+    })()
+    return () => {
+      cancelled = true
+      realtimeRef.current?.disconnect()
+      realtimeRef.current = null
+      setLive(false)
+    }
+  }, [status, bootstrap?.realtime])
 
   const refreshProfile = useCallback(async () => {
     try {
@@ -126,9 +187,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // The poll: every 60s normally, the fallback and the only source when the
+  // socket cannot connect at all; stretched to 3 minutes while the socket
+  // is actually live, since it is then telling us the same numbers sooner.
   useEffect(() => {
     if (status !== 'signed_in') return
-    const tick = window.setInterval(() => { void refreshProfile() }, 60_000)
+    const interval = live ? 180_000 : 60_000
+    const tick = window.setInterval(() => { void refreshProfile() }, interval)
     const back = () => { if (document.visibilityState === 'visible') void refreshProfile() }
     document.addEventListener('visibilitychange', back)
     window.addEventListener('focus', back)
@@ -137,7 +202,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       document.removeEventListener('visibilitychange', back)
       window.removeEventListener('focus', back)
     }
-  }, [status, refreshProfile])
+  }, [status, refreshProfile, live])
 
   const exec = useCallback(async (command: string, args: Record<string, string> = {}) => {
     try {
@@ -157,7 +222,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [refreshProfile, toast])
 
   return (
-    <Ctx.Provider value={{ status, bootstrap, profile, error, inTelegram, loginWithCode, loginWithTelegram, signOut, refreshProfile, exec }}>
+    <Ctx.Provider value={{ status, bootstrap, profile, unread, error, inTelegram, loginWithCode, loginWithTelegram, signOut, refreshProfile, exec }}>
       {children}
     </Ctx.Provider>
   )

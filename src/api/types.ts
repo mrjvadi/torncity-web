@@ -51,6 +51,30 @@ export interface CommandResponse {
   error?: { code: string; message: string }
 }
 
+export interface RealtimeToken {
+  token: string
+  expires_at: string
+  user?: string
+  channels?: string[]
+  channel?: string
+}
+
+/** What a player's Centrifugo channel carries for a "vitals" publication
+ * (client-api.md §5.3): a full snapshot, not a diff, of the numbers the HUD
+ * shows. */
+export interface RealtimeVitals {
+  type: 'vitals'
+  cash: number
+  bank: number
+  energy: number
+  max_energy: number
+  health: number
+  max_health: number
+  xp: number
+  level: number
+  unread: number
+}
+
 export interface RankInfo {
   code: string
   name: string

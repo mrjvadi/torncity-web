@@ -1,8 +1,12 @@
-import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary } from './types'
+import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary, RealtimeToken } from './types'
 import { report } from '../lib/reporter'
 
 const API_BASE = 'https://apimmo.ir404.site'
 const ASSET_BASE = 'https://webomm.ir404.site'
+// Centrifugo's WebSocket endpoint (src/api/realtime.ts); same host pattern
+// as API_BASE, defined the same way — a plain constant, no CDN, no
+// telegram.org/Google dependency (players are in Iran).
+const WS_BASE = 'wss://wsmmo.ir404.site'
 
 const LS_ACCESS = 'tc.access_token'
 const LS_REFRESH = 'tc.refresh_token'
@@ -166,6 +170,14 @@ export async function runCommand(
   return res
 }
 
+/** A Centrifugo connection token: the player's own channel is subscribed
+ * server-side (the token's "channels" claim), never asked for by the
+ * client (client-api.md §5.1). Fetched again whenever the SDK's own
+ * getToken callback asks for one. */
+export async function getRealtimeToken(): Promise<RealtimeToken> {
+  return authed<RealtimeToken>('/api/v1/realtime/token', { method: 'GET' })
+}
+
 export async function getContent(sinceVersion?: string): Promise<unknown> {
   const q = sinceVersion ? `?since=${encodeURIComponent(sinceVersion)}` : ''
   return authed(`/api/v1/content${q}`, { method: 'GET' })
@@ -193,4 +205,4 @@ export function assetUrl(path: string): string {
   return `${ASSET_BASE}/assets/${path}`
 }
 
-export { ApiError, API_BASE, ASSET_BASE }
+export { ApiError, API_BASE, ASSET_BASE, WS_BASE }
