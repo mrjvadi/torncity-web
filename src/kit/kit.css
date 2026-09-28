@@ -109,9 +109,15 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-stroke: var(--k-g-stroke, 1px) rgba(2, 3, 8, 0.92);
-  paint-order: stroke fill;
-  text-shadow: 0 2px 1px rgba(0, 0, 0, 0.4);
+  /* The outline is a stack of drop shadows around the finished word, not
+     -webkit-text-stroke: WebKit strokes each Arabic glyph separately, so the
+     stroke is drawn across every join and the letters look disconnected. */
+  filter:
+    drop-shadow(var(--k-g-stroke, 1px) 0 0 rgba(2, 3, 8, 0.92))
+    drop-shadow(calc(-1 * var(--k-g-stroke, 1px)) 0 0 rgba(2, 3, 8, 0.92))
+    drop-shadow(0 var(--k-g-stroke, 1px) 0 rgba(2, 3, 8, 0.92))
+    drop-shadow(0 calc(-1 * var(--k-g-stroke, 1px)) 0 rgba(2, 3, 8, 0.92))
+    drop-shadow(0 2px 1px rgba(0, 0, 0, 0.4));
   line-height: 1.15;
 }
 
