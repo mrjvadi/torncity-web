@@ -62,7 +62,7 @@ export default function Icon({ name, palette = 'steel', size = 24, className }: 
       draggable={false}
       decoding="async"
       className={`icon-img${className ? ` ${className}` : ''}`}
-      style={{ width: size, height: size, transform: `scale(${GLYPH_SCALE})` }}
+      style={{ width: size, height: size, scale: String(GLYPH_SCALE) }}
       onError={() => setErroredSrc(src)}
       aria-hidden
     />

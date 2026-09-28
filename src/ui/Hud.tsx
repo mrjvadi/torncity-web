@@ -221,7 +221,7 @@ function HudStyles() {
          centred on it — coins (198,4,90,90) against the cash pill
          (22,22,236,56), bank glyph (206,76,68,68) against the bank pill
          (22,88,236,44). */
-      .hud-pill-coin { position: absolute; top: 50%; right: calc(-30 * var(--u)); transform: translateY(-50%); }
+      .hud-pill-coin { position: absolute; top: 50%; right: calc(-30 * var(--u)); transform: translateY(-50%); z-index: 2; }
       .hud-pill-coin-bank { right: calc(-16 * var(--u)); }
       .hud-pill-value { font-size: calc(30 * var(--u)); min-width: 0; white-space: nowrap; }
       .hud-bank .hud-pill-value { font-size: calc(24 * var(--u)); }
