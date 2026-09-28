@@ -147,9 +147,9 @@ export async function getBootstrap(): Promise<Bootstrap> {
 /** Every command answer's view, for whoever keeps a live copy of the
  * player's numbers (the HUD): any screen that carries cash, energy and the
  * rest brings them up to date, whichever screen fetched it. */
-const viewListeners = new Set<(view: Record<string, unknown>) => void>()
+const viewListeners = new Set<(view: Record<string, unknown>, screen: string) => void>()
 
-export function onView(fn: (view: Record<string, unknown>) => void): () => void {
+export function onView(fn: (view: Record<string, unknown>, screen: string) => void): () => void {
   viewListeners.add(fn)
   return () => viewListeners.delete(fn)
 }
@@ -165,7 +165,7 @@ export async function runCommand(
     body: JSON.stringify({ command, args, idempotency_key: idempotencyKey }),
   })
   if (res && res.view && typeof res.view === 'object') {
-    for (const fn of viewListeners) fn(res.view as Record<string, unknown>)
+    for (const fn of viewListeners) fn(res.view as Record<string, unknown>, res.screen ?? '')
   }
   return res
 }

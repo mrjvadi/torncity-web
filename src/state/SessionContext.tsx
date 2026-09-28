@@ -17,6 +17,19 @@ const VITALS_KEYS = [
   'health', 'max_health', 'cash', 'bank', 'rank', 'nerve', 'max_nerve', 'nerve_full_in_seconds',
 ] as const
 
+// Which of those a command's view may set, by the screen it answers with.
+// Only screens whose view is the player's OWN numbers qualify: the same key
+// names mean something else elsewhere (a crime result's `level` is the
+// level reached, 0 if none; a faction's `bank` is the faction's treasury; a
+// card's `name` is another player's).
+const VIEW_VITALS: Record<string, readonly string[]> = {
+  profile: VITALS_KEYS,
+  dashboard: VITALS_KEYS,
+  bank: ['cash', 'bank'],
+  job_status: ['energy', 'max_energy', 'energy_full_in_seconds'],
+  hospital: ['health', 'max_health'],
+}
+
 interface SessionApi {
   status: Status
   bootstrap: Bootstrap | null
@@ -131,9 +144,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   // and are re-read every minute and whenever the player comes back to the
   // app, so they never disagree with the screen in front of them.
   useEffect(() => {
-    return api.onView((view) => {
+    return api.onView((view, screen) => {
+      const keys = VIEW_VITALS[screen]
+      if (!keys) return
       const patch: Record<string, unknown> = {}
-      for (const k of VITALS_KEYS) if (view[k] !== undefined && view[k] !== null) patch[k] = view[k]
+      for (const k of keys) if (view[k] !== undefined && view[k] !== null) patch[k] = view[k]
       if (Object.keys(patch).length > 0) {
         setProfile((p) => (p ? ({ ...p, ...patch } as ProfileView) : p))
       }

@@ -28,7 +28,7 @@ const TAB_HUB: Partial<Record<TabKey, string>> = {
 type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
 
 export default function Shell() {
-  const { profile, exec, signOut } = useSession()
+  const { profile, unread, exec, signOut } = useSession()
   const [tab, setTab] = useState<TabKey>('city')
   const [screenKey, setScreenKey] = useState<ScreenKey>({ command: TAB_COMMAND.city })
   const [menuOpen, setMenuOpen] = useState(false)
@@ -66,7 +66,7 @@ export default function Shell() {
     <div className="shell">
       <Hud
         profile={profile}
-        unread={0}
+        unread={unread}
         onBank={() => onAction({ label: '', command: 'bank.show', row: 0, kind: 'navigation' })}
         onBell={() => setBellOpen(true)}
         onMenu={() => setMenuOpen(true)}
