@@ -428,7 +428,7 @@ input {
 /* The three dock hubs: a short tile grid on a tall screen, so it's
    centred in the space under the header instead of stranding a slab of
    emptiness below it. */
-.nx-hub-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.nx-hub-body { display: flex; flex-direction: column; padding-top: 4px; }
 .nx-tilegrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .nx-tile {
   position: relative; min-width: 0;
