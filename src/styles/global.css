@@ -24,6 +24,33 @@
   --safe-b: max(env(safe-area-inset-bottom, 0px), calc(var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px)));
   --safe-l: env(safe-area-inset-left, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
+
+  /* The prototype's canvas is 720x1280 (proto/home_proto.gd `W`/`H`): one
+     design unit is 1/720 of the app's own width, so every size copied from
+     the prototype's Rect2 numbers (calc(N * var(--u))) lands at exactly the
+     prototype's proportions on a phone, and the app becomes a centred
+     480px column on anything wider. */
+  --u: calc(min(100vw, 480px) / 720);
+
+  /* Each palette as the prototype's PAL dict (home_proto.gd): light, mid
+     (the dark stop of the icon's own gradient) and outline (the emboss
+     shader's dark rim/shadow colour) — used by both .icon (mask+gradient)
+     and the kit's Emboss/Frame/trim pieces. */
+  --pal-gold-l: #fff3b0;   --pal-gold-m: #d97c00;   --pal-gold-o: #3a1c00;
+  --pal-amber-l: #fff08a;  --pal-amber-m: #e07000;  --pal-amber-o: #3a1600;
+  --pal-ruby-l: #ffb0b4;   --pal-ruby-m: #b3121e;   --pal-ruby-o: #3a0006;
+  --pal-emerald-l: #c4ffd2; --pal-emerald-m: #1e8f4a; --pal-emerald-o: #03250f;
+  --pal-sapphire-l: #cfe0ff; --pal-sapphire-m: #2a4bc8; --pal-sapphire-o: #050c33;
+  --pal-violet-l: #e6daff; --pal-violet-m: #6a3fd0; --pal-violet-o: #1a0a3d;
+  --pal-steel-l: #f4f7ff;  --pal-steel-m: #7c86a6;  --pal-steel-o: #12161f;
+  --pal-fox-l: #ffd9ae;    --pal-fox-m: #e0561b;    --pal-fox-o: #3a1200;
+  --pal-teal-l: #e6fffb;   --pal-teal-m: #2bc4b2;   --pal-teal-o: #042a26;
+  --pal-cream-l: #ffffff;  --pal-cream-m: #ffefcf;  --pal-cream-o: #5a2e00;
+
+  /* The girih (eight-point star) lattice frame.gdshader draws faintly across
+     every panel's face, as a tiled inline pattern: two overlapping squares
+     (one turned 45°), gold, at very low opacity. */
+  --girih: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46'%3E%3Cg fill='none' stroke='%23f2c255' stroke-opacity='0.5' stroke-width='1'%3E%3Crect x='11' y='11' width='24' height='24'/%3E%3Crect x='11' y='11' width='24' height='24' transform='rotate(45 23 23)'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 * {
@@ -77,7 +104,10 @@ input {
 }
 
 /* -- the embossed icon: a CSS mask of a white SVG glyph, filled with a
-   gradient, plus a soft drop shadow so it reads as carved into the plate. */
+   lit-to-dark gradient in the palette's own colour, a top gloss band, and a
+   drop shadow tinted with the palette's own (not plain black) outline
+   colour — the closest a mask+gradient can get to emboss.gdshader's
+   bevelled, lit, outlined glyph without a real height-field shader. */
 .icon {
   display: inline-block;
   -webkit-mask-repeat: no-repeat;
@@ -86,19 +116,22 @@ input {
   mask-position: center;
   -webkit-mask-size: contain;
   mask-size: contain;
-  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.55));
+  filter:
+    drop-shadow(0 1px 0 var(--icon-o)) drop-shadow(0 -1px 0 var(--icon-o))
+    drop-shadow(1px 0 0 var(--icon-o)) drop-shadow(-1px 0 0 var(--icon-o))
+    drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
   flex: none;
 }
-.icon.pal-gold { background: linear-gradient(180deg, #fff3b0, #d97c00); }
-.icon.pal-amber { background: linear-gradient(180deg, #fff08a, #e07000); }
-.icon.pal-ruby { background: linear-gradient(180deg, #ffb0b4, #b3121e); }
-.icon.pal-emerald { background: linear-gradient(180deg, #c4ffd2, #1e8f4a); }
-.icon.pal-sapphire { background: linear-gradient(180deg, #cfe0ff, #2a4bc8); }
-.icon.pal-violet { background: linear-gradient(180deg, #e6daff, #6a3fd0); }
-.icon.pal-steel { background: linear-gradient(180deg, #f4f7ff, #7c86a6); }
-.icon.pal-fox { background: linear-gradient(180deg, #ffd9ae, #e0561b); }
-.icon.pal-teal { background: linear-gradient(180deg, #e6fffb, #2bc4b2); }
-.icon.pal-cream { background: linear-gradient(180deg, #ffffff, #ffefcf); }
+.icon.pal-gold { background: linear-gradient(165deg, var(--pal-gold-l) 0%, var(--pal-gold-l) 18%, var(--pal-gold-m) 100%); --icon-o: var(--pal-gold-o); }
+.icon.pal-amber { background: linear-gradient(165deg, var(--pal-amber-l) 0%, var(--pal-amber-l) 18%, var(--pal-amber-m) 100%); --icon-o: var(--pal-amber-o); }
+.icon.pal-ruby { background: linear-gradient(165deg, var(--pal-ruby-l) 0%, var(--pal-ruby-l) 18%, var(--pal-ruby-m) 100%); --icon-o: var(--pal-ruby-o); }
+.icon.pal-emerald { background: linear-gradient(165deg, var(--pal-emerald-l) 0%, var(--pal-emerald-l) 18%, var(--pal-emerald-m) 100%); --icon-o: var(--pal-emerald-o); }
+.icon.pal-sapphire { background: linear-gradient(165deg, var(--pal-sapphire-l) 0%, var(--pal-sapphire-l) 18%, var(--pal-sapphire-m) 100%); --icon-o: var(--pal-sapphire-o); }
+.icon.pal-violet { background: linear-gradient(165deg, var(--pal-violet-l) 0%, var(--pal-violet-l) 18%, var(--pal-violet-m) 100%); --icon-o: var(--pal-violet-o); }
+.icon.pal-steel { background: linear-gradient(165deg, var(--pal-steel-l) 0%, var(--pal-steel-l) 18%, var(--pal-steel-m) 100%); --icon-o: var(--pal-steel-o); }
+.icon.pal-fox { background: linear-gradient(165deg, var(--pal-fox-l) 0%, var(--pal-fox-l) 18%, var(--pal-fox-m) 100%); --icon-o: var(--pal-fox-o); }
+.icon.pal-teal { background: linear-gradient(165deg, var(--pal-teal-l) 0%, var(--pal-teal-l) 18%, var(--pal-teal-m) 100%); --icon-o: var(--pal-teal-o); }
+.icon.pal-cream { background: linear-gradient(165deg, var(--pal-cream-l) 0%, var(--pal-cream-l) 18%, var(--pal-cream-m) 100%); --icon-o: var(--pal-cream-o); }
 
 .toast-layer {
   position: fixed;
@@ -353,30 +386,22 @@ input {
   display: flex; flex-direction: column; gap: 10px;
 }
 
-.nx-header { display: flex; align-items: center; gap: 8px; }
-.nx-chevron {
-  flex: none; width: 36px; height: 36px; border-radius: 50%;
-  background: radial-gradient(circle at 40% 30%, #232c58, #10142b);
-  border: 1px solid var(--gold-soft); color: var(--text-dim); font-size: 17px;
-  display: flex; align-items: center; justify-content: center;
-}
-.nx-chevron:disabled { visibility: hidden; }
-.nx-ribbon {
-  flex: 1; text-align: center; font-size: 15px; font-weight: 700; padding: 6px 10px;
-  border-radius: 10px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 3px 10px rgba(0,0,0,0.3); border: 1px solid var(--gold-soft); color: #fff;
-}
-.nx-tone-gold { background: linear-gradient(180deg, #7a5a12, #4a3608); }
-.nx-tone-ruby { background: linear-gradient(180deg, #7a1f26, #430e12); }
-.nx-tone-violet { background: linear-gradient(180deg, #4d3a8a, #2a1e57); }
-.nx-tone-emerald { background: linear-gradient(180deg, #1c6b4a, #0e3d2a); }
-.nx-tone-sapphire { background: linear-gradient(180deg, #1f3f8a, #101f4a); }
-.nx-tone-teal { background: linear-gradient(180deg, #147a72, #0a423d); }
+/* the screen header (kit/Parts.tsx Header) now renders straight on the
+   kit's own `.k-hdr`/`.k-hdr-btn`/`.k-ribbon` (see src/kit/kit.css) — no
+   nx-prefixed override left to keep here. */
 
+/* the lit card: a girih lattice across the face and a trim that reads as
+   metal, not just a flat border (home_proto.gd `_frame`/`_card`). */
 .nx-card {
+  position: relative;
   background: linear-gradient(180deg, var(--panel), var(--panel-2));
-  border: 1px solid var(--gold-soft);
-  border-radius: 14px;
+  background-image: var(--girih), linear-gradient(180deg, var(--panel), var(--panel-2));
+  background-size: 46px 46px, auto;
+  background-blend-mode: overlay, normal;
+  border: 2px solid var(--gold-soft);
+  border-radius: 16px;
   padding: 12px;
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.16), inset 0 -10px 16px -12px rgba(0,0,0,0.55);
 }
 .nx-card-ruby { border-color: rgba(229,72,77,0.5); }
 .nx-card-violet { border-color: rgba(142,108,240,0.45); }
@@ -395,9 +420,24 @@ input {
 .nx-stat-label { font-size: 11px; color: var(--text-dim); }
 
 .nx-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
-.nx-bar { position: relative; height: 24px; border-radius: 12px; background: rgba(0,0,0,0.55); border: 2px solid; overflow: hidden; }
-.nx-bar-fill { position: absolute; inset: 0; right: auto; opacity: 0.85; border-radius: 12px; transition: width 0.4s; }
-.nx-bar-label { position: relative; z-index: 1; display: block; text-align: center; line-height: 20px; font-size: 13px; color: #fff; }
+/* a sunken track with a lit fill from the reading edge (right, RTL) —
+   ui/bar.gdshader; the thin gold ring rides just outside whatever tint the
+   caller gave the border, echoing the prototype's always-gold outline. */
+.nx-bar {
+  position: relative; height: 26px; border-radius: 13px; background: rgba(2,3,8,0.85); border: 2px solid; overflow: hidden;
+  box-shadow: 0 0 0 1.5px rgba(242,194,85,0.5), inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.nx-bar-fill {
+  position: absolute; inset: 2px; left: auto; opacity: 0.95; border-radius: 12px; transition: width 0.4s;
+  box-shadow: inset 0 2px 3px rgba(255,255,255,0.35);
+}
+/* a pseudo-element, not the inline-styled fill itself, so the caller's own
+   `background: color` (Parts.tsx Bar) never clips the shine off. */
+.nx-bar-fill::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.5), transparent 55%);
+}
+.nx-bar-label { position: relative; z-index: 1; display: block; text-align: center; line-height: 22px; font-size: 13px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.6); font-family: 'Lalezar','Vazirmatn',sans-serif; }
 .nx-bar-sub { font-size: 12px; color: var(--text-dim); text-align: center; }
 
 .nx-ring { position: relative; margin: 0 auto; }
@@ -433,9 +473,11 @@ input {
 .nx-tile {
   position: relative; min-width: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
-  border: 1px solid var(--gold-soft); border-radius: 14px; padding: 12px 4px 10px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  background-image: var(--girih), linear-gradient(180deg, var(--panel), var(--panel-2));
+  background-size: 46px 46px, auto;
+  background-blend-mode: overlay, normal;
+  border: 1.5px solid var(--gold-soft); border-radius: 14px; padding: 12px 4px 10px;
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.14), inset 0 -8px 12px -10px rgba(0,0,0,0.5);
 }
 .nx-tile:active { transform: scale(0.97); }
 .nx-tile-title { font-size: 13px; font-weight: 700; text-align: center; color: var(--text); }
@@ -456,12 +498,14 @@ input {
 .nx-seg-opt.active { background: linear-gradient(180deg, #1c6b4a, #0e3d2a); border-color: var(--leaf); color: #fff; }
 
 .nx-primary {
+  position: relative; overflow: hidden;
   width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
   background: linear-gradient(180deg, #ffe680, #f5a11f); color: #4a2600;
-  font-size: 15px; padding: 10px 12px; border-radius: 14px;
-  box-shadow: 0 4px 0 #9a4e06, 0 6px 14px rgba(0,0,0,0.3);
+  font-size: 16px; font-family: 'Lalezar','Vazirmatn',sans-serif; padding: 11px 12px; border-radius: 14px;
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.4), 0 4px 0 #9a4e06, 0 6px 14px rgba(0,0,0,0.3);
 }
-.nx-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #9a4e06; }
+.nx-primary::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.35), transparent 55%); pointer-events: none; }
+.nx-primary:active { transform: translateY(4px); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.3); }
 .nx-primary:disabled { opacity: 0.5; }
 .nx-primary-alt { background: linear-gradient(180deg, rgba(242,194,85,0.16), rgba(242,194,85,0.05)); color: var(--gold); border: 1px solid var(--gold-soft); box-shadow: none; }
 .nx-primary-alt:active { box-shadow: none; }
@@ -510,97 +554,7 @@ input {
 .nx-confirm-yes { flex: 1; background: var(--anar); color: #fff; padding: 13px; border-radius: 14px; font-size: 16px; }
 .nx-confirm-no { flex: 1; background: rgba(255,255,255,0.08); color: var(--text); padding: 13px; border-radius: 14px; font-size: 16px; }
 
-/* home */
-
-/* the side plate buttons over the city (home_proto.gd _side_buttons):
-   positions are physical (left/right), not logical, on purpose — the
-   prototype itself lays this HUD out unmirrored, so a right-hand button
-   stays on the screen's right whether the surrounding page is RTL or not. */
-.side-plates { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
-.plate {
-  position: absolute; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  pointer-events: auto; padding: 0; transform: translateY(-50%);
-}
-.plate-ring {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #232c58, #10142b);
-  border: 2px solid var(--gold);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-.plate-cap {
-  background: linear-gradient(180deg, #14183a, #05070f);
-  border: 1px solid var(--gold-soft); border-radius: 10px;
-  padding: 2px 7px; font-size: 10.5px; color: #fff; white-space: nowrap;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
-}
-.plate-count {
-  position: absolute; top: -4px; right: -4px;
-  background: var(--anar); color: #fff; font-size: 10px; min-width: 17px; height: 17px;
-  border-radius: 9px; display: flex; align-items: center; justify-content: center;
-  padding: 0 3px; border: 1px solid #2a0a0a;
-}
-
-/* world bubbles: a ready-state pinned over the building it belongs to
-   (home_proto.gd _bubble), anchored by the city engine's own projection so
-   it tracks a pan/zoom exactly like the buildings under it. */
-.world-bubbles { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
-.bubble {
-  position: absolute; transform: translate(-50%, -100%);
-  display: flex; flex-direction: column; align-items: center;
-  pointer-events: auto; padding: 0; background: none; border: none;
-  animation: bubble-float 2.6s ease-in-out infinite;
-}
-.bubble-plate {
-  width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-}
-.bubble-teal .bubble-plate { background: radial-gradient(circle at 35% 30%, #123f3a, #042a26); }
-.bubble-sapphire .bubble-plate { background: radial-gradient(circle at 35% 30%, #17224f, #050c33); }
-.bubble-violet .bubble-plate { background: radial-gradient(circle at 35% 30%, #2c2060, #1a0a3d); }
-.bubble-amber .bubble-plate { background: radial-gradient(circle at 35% 30%, #4a2f08, #3a1600); }
-.bubble-chip {
-  margin-top: 2px; padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #fff;
-  border: 1.5px solid var(--gold); white-space: nowrap; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
-}
-.bubble-teal .bubble-chip { background: linear-gradient(180deg, #0e5e58, #063a35); }
-.bubble-sapphire .bubble-chip { background: linear-gradient(180deg, #1c2f78, #0c1440); }
-.bubble-violet .bubble-chip { background: linear-gradient(180deg, #4a2f9e, #241356); }
-.bubble-amber .bubble-chip { background: linear-gradient(180deg, #7a4a10, #3a1600); }
-.bubble-pin {
-  width: 0; height: 0; margin-top: -1px;
-  border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--gold);
-}
-@keyframes bubble-float {
-  0%, 100% { margin-top: 0; }
-  50% { margin-top: -6px; }
-}
-
-/* the bottom ready-toast CTA card over the dock (home_proto.gd _ready_toast) */
-.ready-toast {
-  position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 6;
-  display: flex; align-items: center; gap: 10px;
-  background: linear-gradient(180deg, rgba(16, 58, 62, 0.96), rgba(4, 18, 20, 0.97));
-  border: 1.5px solid var(--gold); border-radius: 16px; padding: 7px 10px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 0 22px rgba(43, 196, 178, 0.25);
-}
-.ready-toast-icon {
-  flex: none; width: 34px; height: 34px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #3a2606, #1c1000);
-  border: 1px solid var(--gold-soft);
-  display: flex; align-items: center; justify-content: center;
-}
-.ready-toast-copy { flex: 1; min-width: 0; text-align: right; }
-.ready-toast-title { font-size: 13px; color: #fff; line-height: 1.3; }
-.ready-toast-sub { font-size: 10.5px; color: #bfe9e3; margin-top: 2px; line-height: 1.3; }
-.ready-toast-cta {
-  flex: none; background: linear-gradient(180deg, #ffe680, #f5a11f); color: #5a2a00;
-  font-size: 12px; padding: 7px 12px; border-radius: 13px;
-  box-shadow: 0 4px 0 #9a4e06, 0 6px 14px rgba(0, 0, 0, 0.35);
-}
-
-/* the dock's raised active tile widens instead of just lifting, closer to
-   the prototype's proportions (home_proto.gd _dock: 208px active vs 128px) */
-.dock-tab.active { flex: 1.5; }
+/* home: the side plates, world bubbles, ready toast and dock now ship their
+   own scoped styles (src/ui/home/*.tsx, src/ui/Dock.tsx) built on the kit —
+   nothing left to override here. */
 

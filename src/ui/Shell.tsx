@@ -3,6 +3,7 @@ import Hud from './Hud'
 import Dock, { type TabKey } from './Dock'
 import GenericScreen from './GenericScreen'
 import CityView from './CityView'
+import { Screen } from '../kit'
 import MenuSheet from './MenuSheet'
 import BottomSheet from './BottomSheet'
 import { useSession } from '../state/SessionContext'
@@ -74,9 +75,13 @@ export default function Shell() {
       />
       <main className="shell-main">
         {isCity ? <CityView onTab={selectTab} onInbox={() => setBellOpen(true)} />
-          : Local ? <Local {...props} />
-            : Native ? <Native {...props} />
-              : <GenericScreen response={response} loading={loading} onAction={onAction} />}
+          : (
+            <Screen>
+              {Local ? <Local {...props} />
+                : Native ? <Native {...props} />
+                  : <GenericScreen response={response} loading={loading} onAction={onAction} />}
+            </Screen>
+          )}
       </main>
       <Dock active={tab} onSelect={selectTab} />
 

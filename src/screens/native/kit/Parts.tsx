@@ -3,10 +3,25 @@
 // cards, pill progress bars, a percent ring, list rows and hub tiles.
 // CSS lives in src/styles/global.css under the `/* screens */` block.
 
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import Icon, { type IconPalette } from '../../../ui/Icon'
+import { GLabel } from '../../../kit'
 
 export type Tone = 'gold' | 'ruby' | 'violet' | 'emerald' | 'sapphire' | 'teal'
+
+/** Ribbon top/bottom per tone — each screen's own stand-in for the
+ * prototype's bespoke per-screen tint (screens_proto.gd passes `_hdr` a
+ * one-off `Color(...)`; the web app buckets those into six reusable
+ * tones), shaded the same way as the kit's own `Ribbon` (`shade(tint,
+ * 0.25)` / `shade(tint, -0.3)`). */
+const TONE: Record<Tone, [top: string, bottom: string]> = {
+  gold: ['#b8860b', '#4a3608'],
+  ruby: ['#c8242c', '#430e12'],
+  violet: ['#7a5adf', '#2a1e57'],
+  emerald: ['#2fae6c', '#0e3d2a'],
+  sapphire: ['#3f6adf', '#101f4a'],
+  teal: ['#2bc4b2', '#0a423d'],
+}
 
 /** The whole screen's scroll area: every native screen renders one of
  * these at its root. */
@@ -14,19 +29,27 @@ export function ScreenScroll({ children }: { children: ReactNode }) {
   return <div className="nx-scroll">{children}</div>
 }
 
-/** The ribbon-shaped screen title, tinted per section, with the chevrons
- * the prototype draws either side of it. */
+/** The ribbon-shaped screen title, tinted per section, with the round
+ * back/refresh buttons either side — built on the kit's own `.k-hdr`/
+ * `.k-ribbon` (screens_proto.gd `_hdr`), just with a refresh (↻) button
+ * standing in for the prototype's help (؟) one, since every native screen
+ * needs "reload me", not a help sheet. DOM order is back-first,
+ * refresh-last so the app's RTL flex row lands back on the right — see
+ * kit/index.tsx `Ribbon` for the same convention. */
 export function Header({ title, tone = 'gold', onBack, onRefresh }: {
   title: string
   tone?: Tone
   onBack?: () => void
   onRefresh?: () => void
 }) {
+  const [top, bottom] = TONE[tone]
   return (
-    <div className="nx-header">
-      <button className="nx-chevron" disabled={!onBack} onClick={onBack} aria-label="بازگشت">‹</button>
-      <div className={`nx-ribbon nx-tone-${tone}`}>{title}</div>
-      <button className="nx-chevron" disabled={!onRefresh} onClick={onRefresh} aria-label="تازه‌سازی">↻</button>
+    <div className="k-hdr">
+      <button className="k-hdr-btn" disabled={!onBack} onClick={onBack} aria-label="بازگشت">‹</button>
+      <div className="k-ribbon" style={{ '--k-top': top, '--k-bottom': bottom } as CSSProperties}>
+        <GLabel className="k-ribbon-title" top="#ffffff" bottom="#ffe6b8" stroke={1.2}>{title}</GLabel>
+      </div>
+      <button className="k-hdr-btn" disabled={!onRefresh} onClick={onRefresh} aria-label="تازه‌سازی">↻</button>
     </div>
   )
 }
