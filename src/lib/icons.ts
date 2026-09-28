@@ -27,23 +27,156 @@ export const ICON_NAMES = new Set([
   'x_star', 'x_stopwatch', 'x_ticket', 'x_vest', 'x_wanted',
 ])
 
-// Known server icon keys (`configs/actions.yml`) mapped to a local glyph
-// when the bare name after the ':' is not itself a file.
+// Every `action:<key>` the server hands out (configs/actions.yml, kept in
+// sync by hand from that read-only server repo) mapped to a local glyph
+// when the bare name after the ':' is not itself a file. Grouped roughly
+// the way actions.yml is, so a new server key is easy to place.
 const KEY_MAP: Record<string, string> = {
   'action:default': 'box',
+
+  // money (bank/company/save/loan all reuse these)
   'action:deposit': 'money',
   'action:withdraw': 'cart',
   'action:pay': 'coins',
   'action:loan': 'bank',
-  'action:bank': 'bank',
+  'action:offer': 'gift',
+  'action:take': 'cart',
+  'action:repay': 'coins',
+  'action:rent': 'coins',
+  'action:price': 'x_cash',
+  'action:dividend': 'coins',
+  'action:allocate': 'chart',
+
+  // people / player / social
   'action:player': 'person',
+  'action:avatar': 'person',
+  'action:social': 'person',
+  'action:npc': 'person',
+  'action:accept': 'check',
+  'action:mark_read': 'check',
+  'action:language': 'world',
+  'action:invite': 'f_letter',
+  'action:join': 'f_hands',
+  'action:recruit': 'f_hands',
+  'action:link': 'x_share',
+  'action:device': 'phone',
+
+  // travel / map
+  'action:travel': 'plane',
+  'action:map': 'x_map',
+
+  // government / law / elections
+  'action:gov': 'gavel',
+  'action:lever': 'x_lift',
+  'action:set': 'gears',
+  'action:appoint': 'ribbon',
+  'action:seat': 'medal',
+  'action:dismiss': 'x_cross',
+  'action:law': 'f_scales',
+  'action:election': 'podium',
+  'action:stand': 'flagobj',
+  'action:city': 'city',
+
+  // job / education
+  'action:job': 'm_brief',
+  'action:apply': 'quill',
+  'action:promote': 'medal',
+  'action:quit': 'walk',
+  'action:education': 'study',
+  'action:enroll': 'f_grad',
+
+  // crime
+  'action:crime': 'crime',
+  'action:commit': 'pistol',
+  'action:bail': 'keys',
+  'action:report': 'x_wanted',
+
+  // inventory / shop / market / auction
+  'action:inventory': 'box',
+  'action:use': 'checklist',
+  'action:give': 'gift',
+  'action:drop': 'x_cross',
+  'action:shop': 'trade',
+  'action:buy': 'cart',
+  'action:sell': 'tag',
+  'action:market': 'market',
+  'action:cancel': 'close',
+  'action:auction': 'trade',
+
+  // company
+  'action:company': 'factory',
+  'action:register': 'checklist',
+  'action:manage': 'checklist',
+  'action:close': 'close',
+  'action:post': 'checklist',
+  'action:staff': 'f_hands',
+  'action:decide': 'checklist',
+  'action:fire': 'x_cross',
+  'action:supply': 'trade',
+  'action:research': 'book',
+  'action:license': 'tag',
+  'action:studio': 'x_mega',
+  'action:design': 'quill',
+  'action:revise': 'book',
+  'action:retire': 'x_cross',
+  'action:improve': 'chart',
+  'action:upgrade_kit': 'gears',
+  'action:retrofit': 'arm',
+  'action:produce': 'gears',
+  'action:reverse': 'gears',
+  'action:goods': 'box',
+  'action:stockup': 'x_chest',
+  'action:auto': 'gears',
+
+  // military / diplomacy / war
+  'action:military': 'helmet',
+  'action:station': 'tent',
+  'action:procure': 'trade',
+  'action:diplomacy': 'flagobj',
+  'action:impose': 'handcuffs',
+  'action:lift': 'x_lift',
+  'action:propose': 'f_letter',
+  'action:end': 'close',
+  'action:war': 'swords',
+  'action:declare': 'flagobj',
+  'action:target': 'radar',
+  'action:launch': 'missile',
+
+  // health / faction / missions
+  'action:health': 'health',
+  'action:treat': 'stetho',
+  'action:faction': 'shield',
+  'action:kick': 'x_cross',
+  'action:mission': 'missions',
+
+  // property
+  'action:property': 'house',
+  'action:let': 'keys',
+
+  // life / achievements
+  'action:life': 'mood',
+  'action:card': 'tag',
+  'action:bio': 'book',
+  'action:sleep': 'bed',
+  'action:top': 'trophy',
+  'action:achievement': 'trophy',
+
+  // stocks / savings / insurance / gold
+  'action:save': 'bank',
+  'action:insure': 'shield',
+  'action:stock': 'chart',
+  'action:ipo': 'x_star',
+  'action:gold': 'crowncoin',
+
+  // skills / inbox
+  'action:skills': 'study',
+  'action:inbox': 'inbox',
+
   'nav:profile': 'person',
   'nav:city': 'city',
   'nav:market': 'market',
   'nav:society': 'society',
   'nav:activity': 'activity',
-  'nav:back': 'close',
-  'crime_hub': 'crime',
 }
 
 const FALLBACK = 'box'

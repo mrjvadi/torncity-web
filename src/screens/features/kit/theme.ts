@@ -12,31 +12,11 @@ export const TINT_ICON_PALETTE: Record<Tint, IconPalette> = {
   emerald: 'emerald', violet: 'violet', steel: 'steel', teal: 'teal',
 }
 
-/** A server action icon key (configs/actions.yml) the shared Icon resolver
- * has no 1:1 file for, mapped to a real glyph in public/icons. Only the
- * military/war keys this area renders; everything else still falls back to
- * Icon's own resolver. */
-export const ACTION_ICON_OVERRIDES: Record<string, string> = {
-  'action:military': 'shield',
-  'action:war': 'swords',
-  'action:station': 'flagobj',
-  'action:procure': 'cart',
-  'action:buy': 'coins',
-  'action:upgrade_kit': 'gears',
-  'action:retrofit': 'gears',
-  'action:license': 'quill',
-  'action:declare': 'x_flag',
-  'action:join': 'handcuffs',
-  'action:propose': 'f_letter',
-  'action:target': 'radar',
-  'action:launch': 'missile',
-  'action:end': 'x_flag',
-}
-
-export function resolveActionIcon(icon: string | undefined): string | undefined {
-  if (!icon) return icon
-  return ACTION_ICON_OVERRIDES[icon] ?? icon
-}
+// Action icons used to get a second, separate map here (out of sync with
+// src/lib/icons.ts — e.g. "join" drawn as handcuffs, "buy" as coins here but
+// cart on the native screens). That one map is now the single source of
+// truth for every `action:*` key, so both areas render the same glyph for
+// the same action; the shared Icon component already resolves through it.
 
 /** One preview/native screen's hero: title fallback, icon and tint — the
  * ribbon colour the prototype opens each screen with. */
