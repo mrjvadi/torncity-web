@@ -3,7 +3,6 @@ import type { Action } from '../../../api/types'
 import { toWesternDigits } from '../../../lib/persian'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
-import { resolveActionIcon } from './theme'
 
 /**
  * Renders a server answer's `actions` in the feature card language (shared
@@ -26,6 +25,8 @@ export default function ActionButtons({ actions, onAction }: { actions: Action[]
     return [...byRow.entries()].sort((a, b) => a[0] - b[0])
   }, [actions])
 
+  const lead = rows.flatMap(([, list]) => list).find((a) => a.kind === 'primary')
+
   if (rows.length === 0) return null
 
   function handleClick(a: Action) {
@@ -47,7 +48,7 @@ export default function ActionButtons({ actions, onAction }: { actions: Action[]
     <>
       {rows.map(([row, rowActions]) => (
         <div className="ft-btn-row" key={row} style={{ flexWrap: 'wrap' }}>
-          {rowActions.map((a, i) => <OneButton key={`${row}-${i}`} action={a} onClick={() => handleClick(a)} />)}
+          {rowActions.map((a, i) => <OneButton key={`${row}-${i}`} action={a} lead={a === lead} onClick={() => handleClick(a)} />)}
         </div>
       ))}
 
@@ -74,12 +75,17 @@ export default function ActionButtons({ actions, onAction }: { actions: Action[]
   )
 }
 
-function OneButton({ action, onClick }: { action: Action; onClick: () => void }) {
-  const icon = resolveActionIcon(action.icon) ?? 'box'
+/** Only the lead primary is a gold slab; a second or third primary on the
+ * same screen steps down to an outlined button — the same rule the native
+ * screens use (src/screens/native/kit/Actions.tsx). Back is a plain arrow
+ * and label, never an icon (a server "back" action carries no icon key of
+ * its own — configs/actions.yml has no dedicated back entry). */
+function OneButton({ action, lead, onClick }: { action: Action; lead: boolean; onClick: () => void }) {
+  const icon = action.icon ?? 'box'
   if (action.kind === 'primary') {
     return (
-      <button className="ft-btn ft-btn-gold display" style={{ flex: '1 1 100%' }} onClick={onClick}>
-        <Icon name={icon} palette="cream" size={18} /><span>{action.label}</span>
+      <button className={`ft-btn ${lead ? 'ft-btn-gold' : 'ft-btn-outline'} display`} style={{ flex: '1 1 100%' }} onClick={onClick}>
+        <Icon name={icon} palette={lead ? 'cream' : 'gold'} size={18} /><span>{action.label}</span>
       </button>
     )
   }
@@ -90,16 +96,16 @@ function OneButton({ action, onClick }: { action: Action; onClick: () => void })
       </button>
     )
   }
+  if (action.kind === 'back') {
+    return (
+      <button className="ft-btn ft-btn-back display" style={{ flex: '1 1 100%' }} onClick={onClick}>
+        <span className="ft-btn-back-arrow" aria-hidden>›</span>
+        <span>{action.label}</span>
+      </button>
+    )
+  }
   return (
-    <button
-      className="ft-btn display"
-      style={{
-        flex: '1 1 calc(50% - 5px)',
-        background: action.kind === 'back' ? 'rgba(255,255,255,0.06)' : 'linear-gradient(180deg, var(--panel), var(--panel-2))',
-        border: '1px solid rgba(242,194,85,0.22)', boxShadow: 'none', color: 'var(--text)',
-      }}
-      onClick={onClick}
-    >
+    <button className="ft-btn ft-btn-tile display" style={{ flex: '1 1 calc(50% - 5px)' }} onClick={onClick}>
       <Icon name={icon} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={18} />
       <span>{action.label}</span>
     </button>
