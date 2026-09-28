@@ -17,11 +17,11 @@
 
     <style>
       html, body { margin: 0; padding: 0; background: #080b16; height: 100%; }
-      #root { height: 100%; display: flex; align-items: center; justify-content: center; }
+      #root { height: 100%; }
       /* Boot splash: shown the instant HTML paints, gone the instant React
          mounts and replaces #root's children — no custom font needed here,
          so it never waits on one. */
-      .boot-splash { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+      .boot-splash { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
       .boot-splash-mark {
         font: 700 28px/1 system-ui, sans-serif; color: #f2c255; letter-spacing: 0.5px;
       }
