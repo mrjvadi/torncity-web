@@ -5,6 +5,7 @@
 import { API_BASE } from './client'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
+import { mockMoreCommand } from './mock_more'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -70,6 +71,10 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   // adapted from the golden view-snapshots (src/api/mock_views.ts).
   const native = mockNativeCommand(command, args)
   if (native) return json({ ok: true, ...native })
+  // Screens this worktree's own area adds (src/screens/more/*): real
+  // shapes adapted from the same goldens (src/api/mock_more.ts).
+  const more = mockMoreCommand(command, args)
+  if (more) return json({ ok: true, ...more })
   return json({
     ok: true,
     screen: command.replace('.', '_'),
