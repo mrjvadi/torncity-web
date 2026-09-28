@@ -7,13 +7,41 @@
     <meta name="theme-color" content="#080b16" />
     <title>تورن‌سیتی</title>
     <link rel="icon" href="data:," />
+
+    <!-- Same-origin only: the Telegram WebApp script and the first font
+         weight the login screen needs, started at HTML-parse time so main.tsx
+         does not pay for their round trip later. Nothing here ever points at
+         telegram.org or a CDN — both are filtered on Iranian mobile networks. -->
+    <link rel="preload" href="/telegram-web-app.js" as="script" />
+    <link rel="preload" href="/v2/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin />
+
     <style>
       html, body { margin: 0; padding: 0; background: #080b16; height: 100%; }
-      #root { height: 100%; }
+      #root { height: 100%; display: flex; align-items: center; justify-content: center; }
+      /* Boot splash: shown the instant HTML paints, gone the instant React
+         mounts and replaces #root's children — no custom font needed here,
+         so it never waits on one. */
+      .boot-splash { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+      .boot-splash-mark {
+        font: 700 28px/1 system-ui, sans-serif; color: #f2c255; letter-spacing: 0.5px;
+      }
+      .boot-splash-dot {
+        width: 8px; height: 8px; border-radius: 50%; background: #f2c255;
+        animation: boot-splash-pulse 1.1s ease-in-out infinite;
+      }
+      @keyframes boot-splash-pulse {
+        0%, 100% { opacity: 0.25; transform: scale(0.85); }
+        50% { opacity: 1; transform: scale(1); }
+      }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-splash" aria-hidden="true">
+        <span class="boot-splash-mark">تورن‌سیتی</span>
+        <span class="boot-splash-dot"></span>
+      </div>
+    </div>
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
