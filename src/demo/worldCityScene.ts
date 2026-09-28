@@ -8,18 +8,13 @@
 
 import {
   ACESFilmicToneMapping,
-  BackSide,
-  BufferAttribute,
-  BufferGeometry,
+  CanvasTexture,
   Color,
   DirectionalLight,
   FogExp2,
   HemisphereLight,
-  Mesh,
-  MeshBasicMaterial,
   PerspectiveCamera,
   Scene,
-  SphereGeometry,
   SRGBColorSpace,
   Vector3,
   WebGLRenderer,
@@ -61,6 +56,7 @@ export class WorldCityScene {
   private active = true
   private raf = 0
 
+  private skyTexture: CanvasTexture | null = null
   private terrain: TerrainResult | null = null
   private water: WaterResult | null = null
   private roads: RoadsResult | null = null
@@ -111,6 +107,8 @@ export class WorldCityScene {
     this.controls.maxPolarAngle = Math.PI / 2 - 0.03
     this.controls.addEventListener('change', this.onControlsChange)
 
+    this.skyTexture = this.buildSkyTexture()
+    this.scene.background = this.skyTexture
     this.buildLights()
 
     canvas.addEventListener('webglcontextlost', this.onContextLost, false)
@@ -130,7 +128,6 @@ export class WorldCityScene {
     // blowing out the sun-facing walls.
     const ambient = new HemisphereLight(SKY_TOP, 0xdcd3b8, 1.05)
     this.scene.add(ambient)
-    this.buildSky()
     // Tuned so the ~1.5km city core reads with clear contrast and the
     // coarse backdrop only fades to sky past a few km — a portrait phone's
     // narrow horizontal FOV needs several km of camera distance to fit the
@@ -139,30 +136,30 @@ export class WorldCityScene {
     this.scene.fog = new FogExp2(SKY, 0.00013)
   }
 
-  /** A large inward-facing sphere, vertex-coloured from a pale blue
-   * overhead to a near-white horizon band — a real gradient sky instead of
-   * a flat fill. Excluded from fog (constant colour regardless of camera
-   * distance) since it always sits at the far clip anyway. */
-  private buildSky() {
-    const geo = new SphereGeometry(6500, 24, 16)
-    const pos = geo.attributes.position as BufferAttribute
-    const colors = new Float32Array(pos.count * 3)
-    const top = new Color(SKY_TOP)
-    const horizon = new Color(SKY_HORIZON)
-    const c = new Color()
-    for (let i = 0; i < pos.count; i++) {
-      const y = pos.getY(i) / 6500 // -1..1
-      const t = Math.pow(Math.max(0, y), 0.55)
-      c.copy(horizon).lerp(top, t)
-      colors[i * 3 + 0] = c.r
-      colors[i * 3 + 1] = c.g
-      colors[i * 3 + 2] = c.b
-    }
-    geo.setAttribute('color', new BufferAttribute(colors, 3))
-    const mat = new MeshBasicMaterial({ vertexColors: true, side: BackSide, fog: false, depthWrite: false })
-    const mesh = new Mesh(geo, mat)
-    mesh.renderOrder = -1000
-    this.scene.add(mesh)
+  /** A vertical-gradient canvas, pale blue overhead fading to a near-white
+   * horizon band, set directly as scene.background — a real gradient sky
+   * instead of a flat fill. Simpler and more robust than a 3D sky-dome
+   * mesh (no camera-relative geometry, no depth/render-order interaction
+   * to get wrong at street level), at the cost of not itself rotating
+   * with the camera's pitch — acceptable since the fog/hemisphere light
+   * already carry the "bright pastel daytime" read at any angle. */
+  private buildSkyTexture(): CanvasTexture {
+    const w = 8
+    const h = 256
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+    const grad = ctx.createLinearGradient(0, 0, 0, h)
+    grad.addColorStop(0, `#${new Color(SKY_TOP).getHexString()}`)
+    grad.addColorStop(0.62, `#${new Color(SKY_TOP).lerp(new Color(SKY_HORIZON), 0.6).getHexString()}`)
+    grad.addColorStop(1, `#${new Color(SKY_HORIZON).getHexString()}`)
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, w, h)
+    const tex = new CanvasTexture(canvas)
+    tex.colorSpace = SRGBColorSpace
+    tex.needsUpdate = true
+    return tex
   }
 
   private onContextLost = (e: Event) => {
@@ -412,6 +409,7 @@ export class WorldCityScene {
     document.removeEventListener('visibilitychange', this.onVisibility)
     this.controls.removeEventListener('change', this.onControlsChange)
     this.controls.dispose()
+    this.skyTexture?.dispose()
     this.terrain?.dispose()
     this.water?.dispose()
     this.roads?.dispose()
