@@ -14,37 +14,63 @@ function refresh(command: string): Record<string, unknown> {
 type Ctx = { args?: Record<string, unknown> }
 
 const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?: unknown; actions?: unknown[] }> = {
-  'crime.view': () => ({
-    screen: 'crime_detail', text: 'جرم',
-    view: {
-      crime: { code: 'pickpocketing', name: 'جیب‌بری' }, category: { code: 'petty_theft', name: 'جیب‌بری' },
-      nerve: 2, duration_seconds: 0, chance_bps: 5160,
-      hits_players: true, hits_np_cs: true, min_take: 15, max_take: 90,
-      jail_min_seconds: 120, jail_max_seconds: 360, fine_min: 100, fine_max: 400,
-      blocked: '', need: 0, have: 0, can_commit: true, nonce: 'a1b2c3d4e5f6',
-      odds: { base: 4000, skill: 800, awareness: 200, heat: -100, gear: 0 },
-      requirements: [
-        { kind: 'venue', met: true, here: { code: 'train_station', name: 'ایستگاه قطار' },
-          venues: [{ code: 'city_centre', name: 'مرکز شهر' }, { code: 'train_station', name: 'ایستگاه قطار' }] },
+  'crime.view': (ctx) => {
+    const timed = ctx.args?.crime === 'car_theft'
+    return {
+      screen: 'crime_detail', text: 'جرم',
+      view: timed ? {
+        crime: { code: 'car_theft', name: 'سرقت خودرو' }, category: { code: 'petty_theft', name: 'جیب‌بری' },
+        nerve: 8, duration_seconds: 1800, chance_bps: 4200,
+        hits_players: false, hits_np_cs: true, min_take: 800, max_take: 4200,
+        jail_min_seconds: 900, jail_max_seconds: 3600, fine_min: 1000, fine_max: 6000,
+        blocked: '', need: 0, have: 0, can_commit: true, nonce: 'f6e5d4c3b2a1',
+        odds: { base: 3200, skill: 600, awareness: 400, heat: 0, gear: 0 },
+        requirements: [{ kind: 'tool', met: true, tool: { code: 'slim_jim', name: 'ابزار قفل‌بازکنی' } }],
+      } : {
+        crime: { code: 'pickpocketing', name: 'جیب‌بری' }, category: { code: 'petty_theft', name: 'جیب‌بری' },
+        nerve: 2, duration_seconds: 0, chance_bps: 5160,
+        hits_players: true, hits_np_cs: true, min_take: 15, max_take: 90,
+        jail_min_seconds: 120, jail_max_seconds: 360, fine_min: 100, fine_max: 400,
+        blocked: '', need: 0, have: 0, can_commit: true, nonce: 'a1b2c3d4e5f6',
+        odds: { base: 4000, skill: 800, awareness: 200, heat: -100, gear: 0 },
+        requirements: [
+          { kind: 'venue', met: true, here: { code: 'train_station', name: 'ایستگاه قطار' },
+            venues: [{ code: 'city_centre', name: 'مرکز شهر' }, { code: 'train_station', name: 'ایستگاه قطار' }] },
+        ],
+      },
+      actions: [
+        timed
+          ? { label: 'انجام جرم', command: 'crime.commit', args: { crime: 'car_theft', nonce: 'f6e5d4c3b2a1' }, row: 0, kind: 'primary', icon: 'crime' }
+          : { label: 'انجام جرم', command: 'crime.commit', args: { crime: 'pickpocketing', nonce: 'a1b2c3d4e5f6' }, row: 0, kind: 'primary', icon: 'crime' },
+        back('crime.list'),
       ],
-    },
-    actions: [
-      { label: 'انجام جرم', command: 'crime.commit', args: { crime: 'pickpocketing', nonce: 'a1b2c3d4e5f6' }, row: 0, kind: 'primary', icon: 'crime' },
-      back('crime.list'),
-    ],
-  }),
-  'crime.commit': () => ({
-    screen: 'crime_result', text: 'نتیجه',
-    view: {
-      player: 'سارا', crime: { code: 'pickpocketing', name: 'جیب‌بری' }, venue: { code: 'train_station', name: 'ایستگاه قطار' },
-      city: 'کالدریس', city_code: 'calderis', result: 'succeeded', victim_player: true,
-      take: 1500, dry_spell: false, xp: 5, criminal_xp: 8, level: 0,
-      skills: [{ skill: 'stealth', xp: 12, level: 2 }],
-      heat: { heat: 23, max: 100, wanted: 2, stars: 5 }, nerve: { nerve: 14, max: 20, full_in_seconds: 1800 },
-      jail: null, fine: 0, fine_paid: 0, loot: null, notice: false,
-    },
-    actions: [refresh('crime.hub'), back('crime.hub')],
-  }),
+    }
+  },
+  'crime.commit': (ctx) => {
+    if (ctx.args?.crime === 'car_theft') {
+      return {
+        screen: 'crime_started', text: 'جرم آغاز شد',
+        view: {
+          crime: { code: 'car_theft', name: 'سرقت خودرو' }, venue: { code: 'harbour', name: 'بندر' },
+          duration_seconds: 1800, ends_at: new Date(Date.now() + 1800000).toISOString(),
+          nerve: { nerve: 6, max: 20 },
+        },
+        actions: [refresh('crime.hub'), back('crime.hub')],
+      }
+    }
+    return {
+      screen: 'crime_result', text: 'نتیجه',
+      view: {
+        player: 'سارا', crime: { code: 'pickpocketing', name: 'جیب‌بری' }, venue: { code: 'train_station', name: 'ایستگاه قطار' },
+        city: 'کالدریس', city_code: 'calderis', result: 'succeeded', victim_player: true,
+        take: 1500, dry_spell: false, xp: 5, criminal_xp: 8, level: 0,
+        skills: [{ skill: 'stealth', xp: 12, level: 2 }],
+        heat: { heat: 23, max: 100, wanted: 2, stars: 5 }, nerve: { nerve: 14, max: 20, full_in_seconds: 1800 },
+        jail: null, fine: 0, fine_paid: 0, loot: null, notice: false,
+      },
+      actions: [refresh('crime.hub'), back('crime.hub')],
+    }
+  },
 
   'job.list': (ctx) => ({
     screen: 'job_openings', text: 'فرصت‌های شغلی',

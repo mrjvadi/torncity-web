@@ -57,6 +57,7 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
     },
     actions: [
       { label: 'شروع شیفت', command: 'job.work', row: 0, kind: 'primary', icon: 'action:default' },
+      { label: 'فرصت‌های شغلی دیگر', command: 'job.list', row: 1, kind: 'secondary', icon: 'work' },
       refresh('job.status'), back('player.profile.get'),
     ],
   }),
@@ -165,6 +166,7 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
       { label: 'واریز مبلغ دلخواه', command: 'bank.deposit', input: { field: 'amount' }, row: 1, kind: 'primary', icon: 'action:deposit' },
       { label: 'برداشت مبلغ دلخواه', command: 'bank.withdraw', input: { field: 'amount' }, row: 2, kind: 'primary', icon: 'action:withdraw' },
       { label: 'پرداخت به بازیکن', command: 'bank.pay', row: 3, kind: 'navigation', icon: 'action:pay' },
+      { label: 'بانک ملی', command: 'loan.hub', row: 4, kind: 'navigation', icon: 'bank' },
       back('player.profile.get'), refresh('bank.show'),
     ],
   }),
@@ -334,7 +336,10 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
       spots: [{ spot: { name: 'تخت هاستل' }, place: { name: 'محله‌ی مسکونی' }, price: 150, rest: 55, relief: 8 }],
       sleep_in_seconds: 0, home: false, notice: '',
     },
-    actions: [refresh('life.me'), back('player.profile.get')],
+    actions: [
+      { label: 'کارت من', command: 'life.card', row: 0, kind: 'secondary', icon: 'person' },
+      refresh('life.me'), back('player.profile.get'),
+    ],
   }),
 }
 
