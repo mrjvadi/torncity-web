@@ -31,7 +31,7 @@ export default function Dock({ active, onSelect, badge }: DockProps) {
             >
               {isActive ? (
                 <span className="dock-tile">
-                  <Icon name={t.icon} palette="gold" size={26} />
+                  <Icon name={t.icon} palette="gold" size={21} />
                   <span className="dock-tile-label display">{t.label}</span>
                 </span>
               ) : (
@@ -58,7 +58,10 @@ function DockStyles() {
       /* ~32% shorter than the first pass, per the owner: the dock ate too
          much of the screen on a phone. Tap targets stay >=40px even so —
          each tab is a flex-1 slice of the full width, comfortably over
-         that at any normal phone size, and the bar itself is >=48px tall. */
+         that at any normal phone size, and the bar itself is >=48px tall.
+         The raised active tile used to be visibly taller than the other
+         four tabs (its own box forced the whole bar taller to fit it) —
+         it is now sized close to the others, just lifted and tinted. */
       .dock { padding-bottom: var(--safe-b); background: linear-gradient(0deg, rgba(7,10,20,0.95), rgba(7,10,20,0.5) 80%, transparent); }
       .dock-bar {
         display: flex; align-items: flex-end; justify-content: space-between;
@@ -72,16 +75,16 @@ function DockStyles() {
       .dock-icon-wrap { position: relative; display: flex; }
       .dock-label { font-size: 9.5px; color: var(--text-faint); }
       .dock-count { position: absolute; top: -5px; left: -7px; background: var(--anar); color: #fff; font-size: 9px; min-width: 13px; height: 13px; border-radius: 7px; display: flex; align-items: center; justify-content: center; padding: 0 2px; }
-      .dock-tab.active { transform: translateY(-9px); }
+      .dock-tab.active { transform: translateY(-6px); }
       .dock-tile {
         display: flex; flex-direction: column; align-items: center; gap: 1px;
         background: linear-gradient(180deg, #3a63d0, #15286a);
         border: 1.5px solid var(--gold);
-        border-radius: 15px;
-        padding: 6px 13px 5px;
+        border-radius: 13px;
+        padding: 5px 11px 4px;
         box-shadow: 0 6px 14px rgba(58,99,208,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
       }
-      .dock-tile-label { font-size: 11.5px; color: #ffd66b; }
+      .dock-tile-label { font-size: 10.5px; color: #ffd66b; }
     `}</style>
   )
 }
