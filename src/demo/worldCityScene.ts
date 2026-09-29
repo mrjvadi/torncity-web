@@ -22,12 +22,13 @@ import {
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { CityExportJSON } from './cityExportTypes'
 import { CityGrids } from './grids'
-import { buildTerrain, GrassField, type TerrainResult } from './terrain'
+import { buildBoulders, buildTerrain, buildTreeClusters, GrassField, type FieldResult, type TerrainResult } from './terrain'
 import { buildWater, type WaterResult } from './water'
 import { buildRoads, type RoadsResult } from './roads'
 import { buildBuildings, type BuildingsResult } from './buildings'
 import { buildProps, type PropsResult } from './props'
 import { disposeKitAssets } from './kitAssets'
+import { upgradeToPhotoTextures } from './photoUpgrade'
 
 // A light pastel daytime sky: pale blue overhead fading to a near-white
 // haze at the horizon — a real gradient (buildSky below), not a flat
@@ -63,6 +64,8 @@ export class WorldCityScene {
   private buildings: BuildingsResult | null = null
   private props: PropsResult | null = null
   private grass: GrassField | null = null
+  private trees: FieldResult | null = null
+  private boulders: FieldResult | null = null
 
   private lastMovedAt = performance.now()
   private waterClock = 0
@@ -307,12 +310,30 @@ export class WorldCityScene {
       this.scene.add(this.grass.object)
     })
 
+    await stageAsync('trees', async () => {
+      this.trees = await buildTreeClusters(grids)
+      this.scene.add(...this.trees.objects)
+    })
+
+    stage('boulders', () => {
+      this.boulders = buildBoulders(grids)
+      this.scene.add(...this.boulders.objects)
+    })
+
     this.frameCamera(grids)
     this.grass?.update(this.camera.position)
     this.startWaterTicking()
 
     this.sceneBuilt = true
     this.requestRender()
+
+    // Real photo textures load AFTER this first frame (fire-and-forget: a
+    // slow/offline fetch just leaves the canvas-noise materials on screen,
+    // never blocks or fails the scene) — see photoUpgrade.ts's own doc for
+    // exactly what swaps in.
+    if (this.terrain && this.roads && this.buildings) {
+      upgradeToPhotoTextures(this.terrain, this.roads, this.buildings, () => this.requestRender())
+    }
 
     if (import.meta.env.DEV || new URLSearchParams(location.search).has('stats')) {
       // A debug hook for the project's own Playwright screenshot/stats
@@ -439,6 +460,8 @@ export class WorldCityScene {
     this.buildings?.dispose()
     this.props?.dispose()
     this.grass?.dispose()
+    this.trees?.dispose()
+    this.boulders?.dispose()
     this.renderer.dispose()
     disposeKitAssets()
   }

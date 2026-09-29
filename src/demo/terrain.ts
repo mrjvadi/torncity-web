@@ -6,9 +6,10 @@
 // space, so they already agree on shape) — that hides the seam and avoids
 // z-fighting without needing to cut a hole in the coarse mesh.
 
-import { BufferAttribute, BufferGeometry, Color, DoubleSide, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, Vector3 } from 'three'
+import { BufferAttribute, BufferGeometry, Color, DoubleSide, IcosahedronGeometry, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, Vector3 } from 'three'
 import type { CityGrids } from './grids'
 import { makeGrassBladeTexture, makeGroundDetailTexture } from './proceduralTextures'
+import { kitGeometry } from './kitAssets'
 
 // No vertical exaggeration by default — the task's own "no vertical
 // exaggeration; at most 1.2x if screenshots show the hills unreadable"
@@ -33,13 +34,18 @@ const GROUND_DETAIL_METERS = 8
 
 const ROCK_COLOR = new Color(0x8a8378)
 const WET_SOIL_COLOR = new Color(0x3d3324)
-const SAND_COLOR = new Color(0xd8c48a)
+// A pale, rocky grey-tan rather than a beach-sand yellow — the reference
+// alpine stream (refs/alp.jpg) has a rocky pale-grey bed and banks, not
+// sand.
+const SAND_COLOR = new Color(0xb8ae9c)
 const STEEP_SLOPE = 0.55 // rise/run past which ground reads as bare rock
 const WATER_NEAR_LOTS = 2.2
 
 export interface TerrainResult {
   objects: Object3D[]
   detailTexture: Texture
+  fineMaterial: MeshStandardMaterial
+  coarseMaterial: MeshStandardMaterial
   dispose(): void
 }
 
@@ -185,6 +191,8 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
   return {
     objects: [coarseMesh, fineMesh],
     detailTexture,
+    fineMaterial: fineMesh.material as MeshStandardMaterial,
+    coarseMaterial: coarseMesh.material as MeshStandardMaterial,
     dispose() {
       coarseMesh.geometry.dispose()
       fineMesh.geometry.dispose()
@@ -319,5 +327,148 @@ export class GrassField {
     this.geo.dispose()
     this.mat.dispose()
     this.tex.dispose()
+  }
+}
+
+// -- countryside trees and boulders (refs/alp.jpg: dense conifer clusters,
+// small boulders scattered on open grass) ------------------------------
+
+export interface FieldResult {
+  objects: Object3D[]
+  dispose(): void
+}
+
+/** Tall conifers clustered into groups (a handful of cluster centres, each
+ * with several trees scattered close together) rather than evenly spread
+ * one-per-cell — matches the alpine reference's dense stands of trees with
+ * open grass between them, not a uniform forest. Reuses the same Kenney
+ * tree GLB the park/street trees already share (one shared geometry/
+ * material, so this costs one extra draw call regardless of tree count). */
+export async function buildTreeClusters(grids: CityGrids): Promise<FieldResult> {
+  const forestCodes = new Set(
+    grids.doc.biomeLegend
+      .map((b, idx) => ({ idx, code: b.code }))
+      .filter((b) => !['ocean', 'lake', 'desert', 'polar_ice'].includes(b.code))
+      .map((b) => b.idx),
+  )
+  const { w, h } = grids.fine
+  const { originX, originY, size } = grids.doc.city
+  const inCity = (x: number, y: number) => x >= originX - 2 && x < originX + size + 2 && y >= originY - 2 && y < originY + size + 2
+
+  // Candidate cluster centres: fine cells outside the city, on a buildable
+  // (non-water, non-steep) grass/forest tile, thinned to roughly one
+  // candidate per ~9 lots so clusters don't crowd each other.
+  const centres: { x: number; y: number }[] = []
+  for (let y = 3; y < h - 3; y += 3) {
+    for (let x = 3; x < w - 3; x += 3) {
+      const idx = y * w + x
+      if (!forestCodes.has(grids.fine.biome[idx])) continue
+      if (grids.fineIsWet(x, y)) continue
+      if (grids.fineSlopeAt(x, y) > 0.45) continue
+      if (inCity(x, y)) continue
+      if (hashG(x, y, 201) > 0.4) continue // most candidates skipped: real stands are sparse across the map
+      centres.push({ x, y })
+    }
+  }
+
+  const tall = await kitGeometry('grass-trees-tall')
+  const short = await kitGeometry('grass-trees')
+  const objects: Object3D[] = []
+  if (!tall && !short) return { objects, dispose() {} }
+
+  type Spot = { x: number; y: number; scale: number; rot: number; tall: boolean }
+  const spots: Spot[] = []
+  for (const c of centres) {
+    const count = 4 + Math.floor(hashG(c.x, c.y, 211) * 7) // 4..10 trees per stand
+    for (let i = 0; i < count; i++) {
+      const jr = 1 + hashG(c.x, c.y, 220 + i) * 3.2 // spread within the stand, in lots
+      const ang = hashG(c.x, c.y, 240 + i) * Math.PI * 2
+      const fx = c.x + Math.cos(ang) * jr
+      const fy = c.y + Math.sin(ang) * jr
+      if (grids.fineIsWet(Math.round(fx), Math.round(fy))) continue
+      spots.push({
+        x: fx,
+        y: fy,
+        scale: 2.4 + hashG(c.x + i, c.y, 250) * 2.6,
+        rot: hashG(c.x, c.y + i, 260) * Math.PI * 2,
+        tall: hashG(c.x, c.y, 270 + i) > 0.35,
+      })
+    }
+  }
+
+  const place = (geoMat: { geometry: BufferGeometry; material: import('three').Material } | null, list: Spot[]) => {
+    if (!geoMat || list.length === 0) return
+    const mesh = new InstancedMesh(geoMat.geometry, geoMat.material, list.length)
+    const m = new Matrix4()
+    const q = new Quaternion()
+    const up = new Vector3(0, 1, 0)
+    list.forEach((s, idx) => {
+      const y = grids.fineElevAt(s.x, s.y) * ELEVATION_SCALE + FINE_GROUND_LIFT
+      const { x: sx, z: sz } = grids.fineScene(s.x, s.y)
+      q.setFromAxisAngle(up, s.rot)
+      m.compose(new Vector3(sx, y, sz), q, new Vector3(s.scale, s.scale, s.scale))
+      mesh.setMatrixAt(idx, m)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+    objects.push(mesh)
+  }
+  place(tall, spots.filter((s) => s.tall))
+  place(short, spots.filter((s) => !s.tall))
+
+  return {
+    objects,
+    dispose() {
+      // Geometry/material are owned by kitAssets' own cache — disposed via
+      // disposeKitAssets() at scene teardown, not here.
+    },
+  }
+}
+
+const BOULDER_COLOR_A = new Color(0x8d897c)
+const BOULDER_COLOR_B = new Color(0x716c60)
+
+/** Small boulders scattered thinly across open grass — cheap low-poly
+ * instances (one shared icosahedron), never inside the city or on water. */
+export function buildBoulders(grids: CityGrids): FieldResult {
+  const { w, h } = grids.fine
+  const { originX, originY, size } = grids.doc.city
+  const inCity = (x: number, y: number) => x >= originX - 2 && x < originX + size + 2 && y >= originY - 2 && y < originY + size + 2
+
+  const spots: { x: number; y: number; scale: number }[] = []
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      if (inCity(x, y)) continue
+      if (grids.fineIsWet(x, y)) continue
+      if (grids.fineSlopeAt(x, y) > 0.5) continue
+      if (hashG(x, y, 301) > 0.012) continue // thin scatter, not a carpet
+      spots.push({ x, y, scale: 0.35 + hashG(x, y, 311) * 0.9 })
+    }
+  }
+  if (spots.length === 0) return { objects: [], dispose() {} }
+
+  const geo = new IcosahedronGeometry(0.5, 0)
+  const mat = new MeshStandardMaterial({ color: BOULDER_COLOR_A, roughness: 1, flatShading: true })
+  const mesh = new InstancedMesh(geo, mat, spots.length)
+  const m = new Matrix4()
+  const q = new Quaternion()
+  const color = new Color()
+  spots.forEach((s, idx) => {
+    const y = grids.fineElevAt(s.x, s.y) * ELEVATION_SCALE + FINE_GROUND_LIFT
+    const { x: sx, z: sz } = grids.fineScene(s.x, s.y)
+    q.setFromAxisAngle(new Vector3(hashG(s.x, s.y, 320), 1, hashG(s.x, s.y, 330)).normalize(), hashG(s.x, s.y, 340) * Math.PI * 2)
+    m.compose(new Vector3(sx, y + s.scale * 0.25, sz), q, new Vector3(s.scale, s.scale * 0.72, s.scale))
+    mesh.setMatrixAt(idx, m)
+    color.copy(BOULDER_COLOR_A).lerp(BOULDER_COLOR_B, hashG(s.x, s.y, 350))
+    mesh.setColorAt(idx, color)
+  })
+  mesh.instanceMatrix.needsUpdate = true
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+
+  return {
+    objects: [mesh],
+    dispose() {
+      geo.dispose()
+      mat.dispose()
+    },
   }
 }

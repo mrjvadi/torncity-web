@@ -39,6 +39,9 @@ const DIRS: [number, number][] = [
 
 export interface RoadsResult {
   objects: Object3D[]
+  matLocal: MeshStandardMaterial
+  matArterial: MeshStandardMaterial
+  matSidewalk: MeshStandardMaterial
   dispose(): void
 }
 
@@ -258,6 +261,9 @@ export function buildRoads(grids: CityGrids): RoadsResult {
 
   return {
     objects,
+    matLocal,
+    matArterial,
+    matSidewalk,
     dispose() {
       for (const o of objects) {
         const m = o as Mesh

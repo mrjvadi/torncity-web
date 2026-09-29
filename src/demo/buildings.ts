@@ -161,6 +161,8 @@ function addRoofClutter(accum: GeomAccum, x0: number, x1: number, z0: number, z1
 
 export interface BuildingsResult {
   objects: Object3D[]
+  wallMaterials: Record<Category, MeshStandardMaterial>
+  roofMaterial: MeshStandardMaterial
   dispose(): void
 }
 
@@ -252,12 +254,15 @@ export async function buildBuildings(grids: CityGrids): Promise<BuildingsResult>
     disposables.push({ geometry: geo, material })
   }
 
+  const wallMaterials = {} as Record<Category, MeshStandardMaterial>
   ;(Object.keys(walls) as Category[]).forEach((cat) => {
     const mat = new MeshStandardMaterial({ map: facades[cat].texture, roughness: cat === 'glass' ? 0.25 : 0.92, metalness: cat === 'glass' ? 0.15 : 0, side: DoubleSide })
+    wallMaterials[cat] = mat
     addMesh(walls[cat], mat)
   })
+  const roofMaterial = new MeshStandardMaterial({ map: roofTex, roughness: 1, side: DoubleSide })
   addMesh(shopfront, new MeshStandardMaterial({ map: shopfrontTex, roughness: 0.4, side: DoubleSide }))
-  addMesh(roof, new MeshStandardMaterial({ map: roofTex, roughness: 1, side: DoubleSide }))
+  addMesh(roof, roofMaterial)
   addMesh(roofClutter, new MeshStandardMaterial({ color: 0x6d716c, roughness: 0.85, side: DoubleSide }))
   addMesh(farmField, new MeshStandardMaterial({ map: farmTex, roughness: 1, side: DoubleSide }))
   addMesh(parkGround, new MeshStandardMaterial({ color: new Color(0x4d8a4a), roughness: 1, side: DoubleSide }))
@@ -266,6 +271,8 @@ export async function buildBuildings(grids: CityGrids): Promise<BuildingsResult>
 
   return {
     objects,
+    wallMaterials,
+    roofMaterial,
     dispose() {
       for (const d of disposables) {
         d.geometry.dispose()
