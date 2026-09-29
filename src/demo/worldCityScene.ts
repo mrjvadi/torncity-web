@@ -15,6 +15,7 @@ import {
   Fog,
   HemisphereLight,
   PerspectiveCamera,
+  Raycaster,
   Scene,
   SRGBColorSpace,
   Vector3,
@@ -340,6 +341,8 @@ export class WorldCityScene {
     this.grass?.update(this.camera.position)
     this.startWaterTicking()
 
+    if (import.meta.env.DEV || new URLSearchParams(location.search).has('stats')) this.verifyNoCoarseUnderFineGrid(grids)
+
     this.sceneBuilt = true
     this.requestRender()
 
@@ -361,10 +364,62 @@ export class WorldCityScene {
         controls: this.controls,
         grids,
         doc,
+        coarseUnderFineCheck: this.lastCoarseUnderFineCheck,
       }
     }
 
     return this.labelsFor(grids)
+  }
+
+  /** Dev-only structural check for the coarse-mesh-hole fix: raycasts
+   * straight down at 200 random points inside the fine grid's own world
+   * footprint and requires the FIRST hit to be the fine terrain, a road, a
+   * building or water — never `terrain-coarse`. A single coarse hit means
+   * the hole (buildTerrain's coarseSkip) or its 1-tile overlap margin is
+   * wrong for this export's own fine-grid size, and logs loudly so it is
+   * never silently shipped again (see the project report's own history
+   * with this bug). */
+  lastCoarseUnderFineCheck: { failures: number; total: number; failedAt: string[] } | null = null
+
+  private verifyNoCoarseUnderFineGrid(grids: CityGrids) {
+    const raycaster = new Raycaster()
+    const { fine } = grids
+    const allowedNames = new Set(['terrain-fine', 'terrain-fine-skirt', 'water'])
+    // Only the non-instanced "ground-ish" meshes matter for this check
+    // (terrain/roads/buildings/water) — InstancedMesh props (grass, trees,
+    // boulders, cars, street lamps) can carry thousands of instances each,
+    // and raycasting all of them 200 times over is the difference between
+    // this check finishing in milliseconds and taking long enough to look
+    // like the scene never loaded at all.
+    const targets = this.scene.children.filter((o) => (o as { isMesh?: boolean }).isMesh && !(o as { isInstancedMesh?: boolean }).isInstancedMesh)
+    let failures = 0
+    const failedAt: string[] = []
+    for (let n = 0; n < 200; n++) {
+      const fx = 4 + Math.random() * (fine.w - 8)
+      const fy = 4 + Math.random() * (fine.h - 8)
+      const { x, z } = grids.fineScene(fx, fy)
+      const topY = grids.fineElevAt(Math.round(fx), Math.round(fy)) + 400
+      raycaster.set(new Vector3(x, topY, z), new Vector3(0, -1, 0))
+      raycaster.far = 800
+      const hits = raycaster.intersectObjects(targets, false)
+      const first = hits[0]
+      if (!first) continue // no geometry under this exact point is fine (a gap between instanced props etc.)
+      const obj = first.object
+      const name = obj.name
+      const ok = allowedNames.has(name) || name === '' /* roads/buildings/props merged meshes are unnamed */
+      if (!ok) {
+        failures++
+        failedAt.push(`${name || obj.type}@(${x.toFixed(0)},${z.toFixed(0)})`)
+      }
+    }
+    this.lastCoarseUnderFineCheck = { failures, total: 200, failedAt }
+    if (failures > 0) {
+      // eslint-disable-next-line no-console
+      console.error(`[worldCity] verifyNoCoarseUnderFineGrid: ${failures}/200 rays hit the wrong surface first: ${failedAt.slice(0, 8).join(', ')}${failures > 8 ? ', ...' : ''}`)
+    } else if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('[worldCity] verifyNoCoarseUnderFineGrid: 200/200 rays OK')
+    }
   }
 
   private frameCamera(grids: CityGrids) {

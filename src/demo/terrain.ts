@@ -1,15 +1,20 @@
 // Terrain at real metres, two LODs: the coarse 96x96 TILE grid (~305m/cell)
 // as the far backdrop, and the fine 128x128 LOT grid (~30.5m/cell) as the
-// near mesh the city itself sits on. The fine mesh is rendered a hair above
-// the coarse one everywhere it covers (both meshes are sampled from the
-// same underlying terrain, via cityExportTypes.ts's shared coordinate
-// space, so they already agree on shape) — that hides the seam and avoids
-// z-fighting without needing to cut a hole in the coarse mesh.
+// near mesh the city itself sits on. The coarse mesh has a real HOLE cut
+// under the fine grid's own footprint (buildTerrain's coarseSkip) — the two
+// are independently sampled (tile vs lot resolution) and the coarse
+// terrain is never flattened, so "trust the fine mesh's small lift to
+// always win the z-fight" breaks the moment a real hill near the city sits
+// above the fine grid's own graded-flat plateau (see the project report:
+// this is what the "tan surface cutting through buildings" bug was). A
+// vertical skirt around the fine mesh's own edge (buildFineSkirt) hides
+// any crack between the two independently-generated boundaries.
 
 import { BufferAttribute, BufferGeometry, Color, DoubleSide, IcosahedronGeometry, InstancedMesh, Matrix4, Mesh, MeshStandardMaterial, Object3D, Quaternion, Texture, Vector3 } from 'three'
 import type { CityGrids } from './grids'
 import { makeGrassBladeTexture, makeGroundDetailTexture } from './proceduralTextures'
 import { kitGeometry } from './kitAssets'
+import { GeomAccum } from './meshBuilder'
 
 // No vertical exaggeration by default — the task's own "no vertical
 // exaggeration; at most 1.2x if screenshots show the hills unreadable"
@@ -95,6 +100,15 @@ function buildGridMesh(
   detailTexture: Texture,
   detailMeters: number,
   yLift: number,
+  // When given, a quad whose centre (i+0.5, j+0.5) this returns true for
+  // is left OUT of the index buffer entirely — a real hole (no triangles
+  // drawn there at all), not just an occluded/lower surface. Used to cut
+  // the coarse mesh out from under the fine mesh's own footprint (see
+  // buildTerrain): drawing both surfaces and hoping the fine one always
+  // wins the z-fight breaks the moment the (independently sampled, never
+  // flattened) coarse terrain happens to sit ABOVE the fine grid's own
+  // graded-flat city plateau — which real hills near the city do.
+  skipQuad?: (i: number, j: number) => boolean,
 ): Mesh {
   const positions = new Float32Array(w * h * 3)
   const colors = new Float32Array(w * h * 3)
@@ -118,23 +132,19 @@ function buildGridMesh(
 
   const quadsX = w - 1
   const quadsY = h - 1
-  const useUint32 = w * h > 65535
-  const indices = useUint32 ? new Uint32Array(quadsX * quadsY * 6) : new Uint16Array(quadsX * quadsY * 6)
-  let ii = 0
+  const indexList: number[] = []
   for (let j = 0; j < quadsY; j++) {
     for (let i = 0; i < quadsX; i++) {
+      if (skipQuad?.(i, j)) continue
       const a = j * w + i
       const b = a + 1
       const c = a + w
       const d = c + 1
-      indices[ii++] = a
-      indices[ii++] = c
-      indices[ii++] = b
-      indices[ii++] = b
-      indices[ii++] = c
-      indices[ii++] = d
+      indexList.push(a, c, b, b, c, d)
     }
   }
+  const useUint32 = w * h > 65535
+  const indices = useUint32 ? new Uint32Array(indexList) : new Uint16Array(indexList)
 
   const geo = new BufferGeometry()
   geo.setAttribute('position', new BufferAttribute(positions, 3))
@@ -180,6 +190,25 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
   const legend = biomeColorLegend(grids)
   const detailTexture = makeGroundDetailTexture(256, 101)
 
+  // The coarse mesh's own hole under the fine grid: matched to the fine
+  // grid's true extent exactly — no overlap ring (an earlier version left
+  // one on purpose, meaning to share ground at the seam, but the two
+  // surfaces are independently sampled — tile vs lot resolution, coarse
+  // never flattened — and routinely disagreed by tens of metres right at
+  // that border, which is real hillside terrain, not a rounding error; no
+  // fixed bias reliably kept fine on top there without either failing
+  // verifyNoCoarseUnderFineGrid or visibly lifting the fine mesh), and no
+  // extra gap either (a hole bigger than the fine grid leaves a bare ring
+  // with nothing drawn in it at all — worse than the seam it was meant to
+  // fix). Coarse resumes exactly where fine's own geometry ends; the skirt
+  // below hides the small residual mismatch (interpolation error within a
+  // single tile, not a whole tile's worth) that's left at that shared
+  // boundary.
+  const fineHalfSpanTiles = grids.fine.w / grids.doc.lotsPerTile / 2
+  const holeHalf = fineHalfSpanTiles
+  const { i: fineCentreI, j: fineCentreJ } = grids.fineToCoarseTile(grids.fine.w / 2, grids.fine.h / 2)
+  const coarseSkip = (i: number, j: number) => Math.abs(i + 0.5 - fineCentreI) < holeHalf && Math.abs(j + 0.5 - fineCentreJ) < holeHalf
+
   const coarseMesh = buildGridMesh(
     grids,
     grids.coarse.w,
@@ -190,70 +219,149 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
     detailTexture,
     GROUND_DETAIL_METERS * 3,
     0,
+    coarseSkip,
   )
   coarseMesh.name = 'terrain-coarse'
 
   const fw = grids.fine.w
   const fh = grids.fine.h
+
+  const fineElevAt = (fx: number, fy: number): number => {
+    const raw = grids.fineElevAt(fx, fy)
+    const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
+    let out = raw
+    if (edgeDist < FINE_EDGE_BLEND_LOTS) {
+      const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
+      const blend = t * t * (3 - 2 * t)
+      const { i, j } = grids.fineToCoarseTile(fx, fy)
+      out = raw * (1 - blend) + grids.coarseElevAt(i, j) * blend
+    }
+    // The coarse hole is matched to the fine grid's extent exactly (see
+    // coarseSkip above), so coarse resumes right at this mesh's own edge —
+    // a small safety margin (interpolation error within one tile, not a
+    // whole tile's worth of mismatch) keeps fine reliably on top exactly
+    // at that boundary, verified by verifyNoCoarseUnderFineGrid.
+    const EDGE_SAFETY_LOTS = 3
+    if (edgeDist < EDGE_SAFETY_LOTS) {
+      out += (1 - edgeDist / EDGE_SAFETY_LOTS) * 15
+    }
+    return out
+  }
+  const fineColorAt = (fx: number, fy: number): Color => {
+    const idx = fy * fw + fx
+    const biome = grids.fine.biome[idx]
+    const base = legend[biome] ?? new Color(0x8fae6d)
+    const slope = grids.fineSlopeAt(fx, fy)
+    const wet = grids.fineIsWet(fx, fy)
+    const sandy = !wet && grids.fineNearWater(fx, fy, WATER_NEAR_LOTS)
+    const fineColor = blendSlopeAndWetness(base, slope, wet, sandy)
+    if (!wet && !sandy) {
+      const { x, z } = grids.fineScene(fx, fy)
+      const t = macroTint(x, z)
+      if (t >= 0) fineColor.lerp(new Color(0xffffff), t)
+      else fineColor.lerp(new Color(0x000000), -t * 0.7)
+    }
+    const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
+    if (edgeDist >= FINE_EDGE_BLEND_LOTS) return fineColor
+    const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
+    const blend = t * t * (3 - 2 * t)
+    const { i, j } = grids.fineToCoarseTile(fx, fy)
+    return fineColor.clone().lerp(coarseColorAt(grids, legend, i, j), blend)
+  }
+
   const fineMesh = buildGridMesh(
     grids,
     fw,
     fh,
     (fx, fy) => grids.fineScene(fx, fy),
-    (fx, fy) => {
-      const raw = grids.fineElevAt(fx, fy)
-      const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
-      if (edgeDist >= FINE_EDGE_BLEND_LOTS) return raw
-      const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
-      const blend = t * t * (3 - 2 * t)
-      const { i, j } = grids.fineToCoarseTile(fx, fy)
-      return raw * (1 - blend) + grids.coarseElevAt(i, j) * blend
-    },
-    (fx, fy) => {
-      const idx = fy * fw + fx
-      const biome = grids.fine.biome[idx]
-      const base = legend[biome] ?? new Color(0x8fae6d)
-      const slope = grids.fineSlopeAt(fx, fy)
-      const wet = grids.fineIsWet(fx, fy)
-      const sandy = !wet && grids.fineNearWater(fx, fy, WATER_NEAR_LOTS)
-      const fineColor = blendSlopeAndWetness(base, slope, wet, sandy)
-      if (!wet && !sandy) {
-        const { x, z } = grids.fineScene(fx, fy)
-        const t = macroTint(x, z)
-        if (t >= 0) fineColor.lerp(new Color(0xffffff), t)
-        else fineColor.lerp(new Color(0x000000), -t * 0.7)
-      }
-      const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
-      if (edgeDist >= FINE_EDGE_BLEND_LOTS) return fineColor
-      const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
-      const blend = t * t * (3 - 2 * t)
-      const { i, j } = grids.fineToCoarseTile(fx, fy)
-      return fineColor.clone().lerp(coarseColorAt(grids, legend, i, j), blend)
-    },
+    fineElevAt,
+    fineColorAt,
     detailTexture,
     GROUND_DETAIL_METERS,
     // Lift the fine mesh a touch above the coarse one so it always wins
-    // the z-fight in their shared footprint — see FINE_GROUND_LIFT's doc.
-    // The blend above (both height and colour) already fades this lift's
-    // own visible step out well before the fine grid's own edge, so the
-    // lift itself never shows as a seam either.
+    // the z-fight in the 1-tile overlap ring the coarse hole leaves — see
+    // FINE_GROUND_LIFT's doc.
     FINE_GROUND_LIFT,
   )
   fineMesh.name = 'terrain-fine'
 
+  const skirt = buildFineSkirt(grids, fw, fh, fineElevAt, fineColorAt, detailTexture)
+  skirt.name = 'terrain-fine-skirt'
+
   return {
-    objects: [coarseMesh, fineMesh],
+    objects: [coarseMesh, fineMesh, skirt],
     detailTexture,
     fineMaterial: fineMesh.material as MeshStandardMaterial,
     coarseMaterial: coarseMesh.material as MeshStandardMaterial,
     dispose() {
       coarseMesh.geometry.dispose()
       fineMesh.geometry.dispose()
+      skirt.geometry.dispose()
       ;(coarseMesh.material as MeshStandardMaterial).dispose()
       ;(fineMesh.material as MeshStandardMaterial).dispose()
+      ;(skirt.material as MeshStandardMaterial).dispose()
       detailTexture.dispose()
     },
   }
+}
+
+// A vertical wall around the fine mesh's own outer edge, from its real
+// surface straight down by SKIRT_DEPTH_M — the standard "hide the crack"
+// trick for a mesh with a deliberate hole cut under it (see the coarse
+// mesh's own coarseSkip above): the coarse hole's edge and the fine mesh's
+// edge are two independently-generated boundaries that are never
+// pixel-exact matches, so without a skirt a grazing view could see a sliver
+// of empty space (or the sky) through the seam between them. The skirt
+// shares the fine mesh's own edge vertices (same position/colour), so it
+// reads as a natural drop-off, not a visible seam of its own.
+const SKIRT_DEPTH_M = 50
+
+function buildFineSkirt(
+  grids: CityGrids,
+  fw: number,
+  fh: number,
+  elevAt: (fx: number, fy: number) => number,
+  colorAt: (fx: number, fy: number) => Color,
+  detailTexture: Texture,
+): Mesh {
+  const acc = new GeomAccum()
+  const topAt = (fx: number, fy: number): Vector3 => {
+    const { x, z } = grids.fineScene(fx, fy)
+    return new Vector3(x, elevAt(fx, fy) * ELEVATION_SCALE + FINE_GROUND_LIFT, z)
+  }
+  const addEdgeStrip = (points: [number, number][]) => {
+    for (let k = 0; k < points.length - 1; k++) {
+      const [ax, ay] = points[k]
+      const [bx, by] = points[k + 1]
+      const topA = topAt(ax, ay)
+      const topB = topAt(bx, by)
+      const botA = new Vector3(topA.x, topA.y - SKIRT_DEPTH_M, topA.z)
+      const botB = new Vector3(topB.x, topB.y - SKIRT_DEPTH_M, topB.z)
+      const normal = new Vector3(bx - ax, 0, -(by - ay)).normalize()
+      acc.addRect(topA, topB, botB, botA, normal.lengthSq() > 0 ? normal : new Vector3(1, 0, 0), GROUND_DETAIL_METERS, GROUND_DETAIL_METERS)
+    }
+  }
+
+  const north: [number, number][] = []
+  for (let fx = 0; fx < fw; fx++) north.push([fx, 0])
+  const south: [number, number][] = []
+  for (let fx = fw - 1; fx >= 0; fx--) south.push([fx, fh - 1])
+  const east: [number, number][] = []
+  for (let fy = 0; fy < fh; fy++) east.push([fw - 1, fy])
+  const west: [number, number][] = []
+  for (let fy = fh - 1; fy >= 0; fy--) west.push([0, fy])
+  addEdgeStrip(north)
+  addEdgeStrip(south)
+  addEdgeStrip(east)
+  addEdgeStrip(west)
+
+  const geo = acc.toGeometry() ?? new BufferGeometry()
+  const mat = new MeshStandardMaterial({ vertexColors: false, color: 0x6b6154, map: detailTexture, roughness: 1, side: DoubleSide })
+  // The skirt has no per-vertex colour data (GeomAccum doesn't carry one) —
+  // a flat soil tone reads fine for a strip that, by design, is only ever
+  // glimpsed edge-on at a steep grazing angle.
+  void colorAt
+  return new Mesh(geo, mat)
 }
 
 // -- near-camera grass tufts ------------------------------------------------

@@ -42,7 +42,17 @@ async function boot() {
     return
   }
 
-  const labels = await scene.load(doc)
+  let labels
+  try {
+    labels = await scene.load(doc)
+  } catch (e) {
+    // WebKit does not reliably surface an unhandled rejection here as a
+    // visible page error (bit this project's own debugging more than
+    // once) — log explicitly so a scene.load() failure is never silent.
+    if (loading) loading.textContent = 'ساخت صحنه ناموفق بود'
+    console.error('[worldCity] scene.load failed', e)
+    return
+  }
   loading?.remove()
   renderOverlay(root, labels, doc)
 }

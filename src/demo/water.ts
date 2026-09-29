@@ -130,6 +130,50 @@ const WET_THRESHOLD = 0.42
 const WET_ALPHA_IN = 0.62 // fully opaque past this interpolated wetness
 const WET_ALPHA_OUT = WET_THRESHOLD // fully transparent at the mesh's own cutoff
 
+// A separable box blur (radius in LOTS) over the binary wet mask, run
+// before the bilinear supersample + threshold below — without it, the
+// supersampled shoreline is still a diagonal-faceted staircase (bilinear
+// interpolation only smooths WITHIN one lot's own 4 neighbours; the mask's
+// own hard lot-grid edges are still the only source of curvature). Blurring
+// the mask first widens the wet/dry transition over several lots, so the
+// same threshold cut now follows a genuinely rounded contour instead of
+// tracing the lot grid's own diagonals.
+const WATER_BLUR_RADIUS_LOTS = 2
+
+function boxBlur(field: Float32Array, w: number, h: number, radius: number): Float32Array {
+  const tmp = new Float32Array(w * h)
+  const out = new Float32Array(w * h)
+  // horizontal pass
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let sum = 0
+      let n = 0
+      for (let dx = -radius; dx <= radius; dx++) {
+        const xx = x + dx
+        if (xx < 0 || xx >= w) continue
+        sum += field[y * w + xx]
+        n++
+      }
+      tmp[y * w + x] = sum / n
+    }
+  }
+  // vertical pass
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let sum = 0
+      let n = 0
+      for (let dy = -radius; dy <= radius; dy++) {
+        const yy = y + dy
+        if (yy < 0 || yy >= h) continue
+        sum += tmp[yy * w + x]
+        n++
+      }
+      out[y * w + x] = sum / n
+    }
+  }
+  return out
+}
+
 function bilinear(field: Float32Array | Int16Array, w: number, h: number, fx: number, fy: number): number {
   const x0 = Math.max(0, Math.min(w - 1, Math.floor(fx)))
   const y0 = Math.max(0, Math.min(h - 1, Math.floor(fy)))
@@ -155,6 +199,7 @@ export function buildWater(grids: CityGrids): WaterResult {
   if (!anyWet) {
     return { mesh: null, material: null, tick() {}, setCamera() {}, dispose() {} }
   }
+  const wetBlurred = boxBlur(wet, w, h, WATER_BLUR_RADIUS_LOTS)
 
   const sw = (w - 1) * SS + 1
   const sh = (h - 1) * SS + 1
@@ -164,7 +209,7 @@ export function buildWater(grids: CityGrids): WaterResult {
     for (let sx = 0; sx < sw; sx++) {
       const fx = sx / SS
       const fy = sy / SS
-      const wv = bilinear(wet, w, h, fx, fy)
+      const wv = bilinear(wetBlurred, w, h, fx, fy)
       const si = sy * sw + sx
       wetness[si] = wv
       wetMask[si] = wv >= WET_THRESHOLD ? 1 : 0
