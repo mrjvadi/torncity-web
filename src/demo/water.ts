@@ -12,9 +12,9 @@
 // moved; honouring prefers-reduced-motion) and calls tick() itself. See
 // worldCityScene.ts's own water-ticking code.
 
-import { BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, ShaderMaterial, Vector3 } from 'three'
+import { BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial, ShaderMaterial, Vector3 } from 'three'
 import type { CityGrids } from './grids'
-import { WATER_KIND_LAKE, WATER_KIND_OCEAN, WATER_KIND_RIVER, WATER_KIND_STREAM } from './cityExportTypes'
+import { isWetCoarse, WATER_KIND_LAKE, WATER_KIND_OCEAN, WATER_KIND_RIVER, WATER_KIND_STREAM } from './cityExportTypes'
 import { ELEVATION_SCALE, FINE_GROUND_LIFT } from './terrain'
 
 const VERT = /* glsl */ `
@@ -324,6 +324,74 @@ export function buildWater(grids: CityGrids): WaterResult {
     setCamera(pos) {
       ;(material.uniforms.uCameraPos.value as Vector3).copy(pos)
     },
+    dispose() {
+      geo.dispose()
+      material.dispose()
+    },
+  }
+}
+
+// The fine river mesh above only covers the fine grid's own ~3.9km
+// footprint; a river/lake/ocean that continues past that edge into the
+// coarse backdrop (this seed's does) used to just stop dead at the fine
+// grid's boundary. This is a second, much simpler flat-quad water patch —
+// no ripple shader, no shore fade, it is background scenery several
+// kilometres out — for every coarse cell the coarse grid's own flags mark
+// wet, skipping any cell already inside the fine grid's footprint (the
+// detailed mesh above owns that area) so the two never overlap/z-fight.
+export interface CoarseWaterResult {
+  mesh: Mesh | null
+  dispose(): void
+}
+
+export function buildCoarseWaterPatch(grids: CityGrids): CoarseWaterResult {
+  const { w, h } = grids.coarse
+  const fineHalfSpanTiles = grids.fine.w / grids.doc.lotsPerTile / 2
+  const { i: centreI, j: centreJ } = grids.fineToCoarseTile(grids.fine.w / 2, grids.fine.h / 2)
+
+  const positions: number[] = []
+  const normals: number[] = []
+  const uvs: number[] = []
+  const indices: number[] = []
+  let vcount = 0
+
+  for (let j = 0; j < h; j++) {
+    for (let i = 0; i < w; i++) {
+      const idx = j * w + i
+      if (!isWetCoarse(grids.coarse.water[idx])) continue
+      // Skip anything comfortably inside the fine grid's own footprint —
+      // padded a couple of tiles short of its true edge so this patch's
+      // flat quads never poke through the fine mesh's own (shored,
+      // rippled) water surface.
+      if (Math.abs(i - centreI) < fineHalfSpanTiles - 2 && Math.abs(j - centreJ) < fineHalfSpanTiles - 2) continue
+
+      const { x, z } = grids.coarseScene(i, j)
+      const y = grids.coarseElevAt(i, j) * ELEVATION_SCALE + 0.08
+      const half = grids.doc.tileMeters / 2
+      const base = vcount
+      positions.push(x - half, y, z - half, x + half, y, z - half, x + half, y, z + half, x - half, y, z + half)
+      for (let k = 0; k < 4; k++) normals.push(0, 1, 0)
+      uvs.push(0, 0, 1, 0, 1, 1, 0, 1)
+      indices.push(base, base + 2, base + 1, base, base + 3, base + 2)
+      vcount += 4
+    }
+  }
+
+  if (vcount === 0) return { mesh: null, dispose() {} }
+
+  const geo = new BufferGeometry()
+  geo.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3))
+  geo.setAttribute('normal', new BufferAttribute(new Float32Array(normals), 3))
+  geo.setAttribute('uv', new BufferAttribute(new Float32Array(uvs), 2))
+  const useUint32 = vcount > 65535
+  geo.setIndex(new BufferAttribute(useUint32 ? new Uint32Array(indices) : new Uint16Array(indices), 1))
+
+  const material = new MeshStandardMaterial({ color: 0x1c5f77, roughness: 0.35, metalness: 0.05, transparent: true, opacity: 0.92 })
+  const mesh = new Mesh(geo, material)
+  mesh.name = 'water-coarse'
+
+  return {
+    mesh,
     dispose() {
       geo.dispose()
       material.dispose()

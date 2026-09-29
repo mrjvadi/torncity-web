@@ -105,6 +105,17 @@ export class CityGrids {
     return this.fineScene(this.doc.city.originX + lx, this.doc.city.originY + ly)
   }
 
+  /** The coarse-grid TILE index a fine-grid LOT sits inside — the shared
+   * coordinate space both grids already agree on (fineGrid.originTileX/Y),
+   * rounded to the nearest whole tile. Used to sample the coarse grid's own
+   * elevation/biome at a fine cell's position, for blending the two
+   * meshes together at the fine grid's own outer edge (see terrain.ts). */
+  fineToCoarseTile(fx: number, fy: number): { i: number; j: number } {
+    const i = Math.round(this.doc.fineGrid.originTileX + fx / this.doc.lotsPerTile)
+    const j = Math.round(this.doc.fineGrid.originTileY + fy / this.doc.lotsPerTile)
+    return { i, j }
+  }
+
   // -- sampling -------------------------------------------------------------
 
   coarseIndex(i: number, j: number): number {

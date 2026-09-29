@@ -169,6 +169,11 @@ export function buildRoads(grids: CityGrids): RoadsResult {
     const ns = classAt(x, y + 1) !== undefined || classAt(x, y - 1) !== undefined
     if (ew && ns && !isBridge) {
       addCrosswalks(crosswalk, cx, cz, selfY + 0.01, hw)
+      // Fill the 4 corner gaps the road cross leaves inside this cell with
+      // a chamfered sidewalk patch, so the sidewalks arriving from the two
+      // cross streets read as one continuous wraparound around the corner
+      // instead of stopping as separate slabs short of the intersection.
+      addJunctionCorners(sidewalk, cx, cz, selfY, hw, half)
     }
     void connections
   }
@@ -339,6 +344,44 @@ function sidewalkSide(accum: GeomAccum, cx: number, cz: number, y: number, roadH
   z1 = Math.min(z1, cz + cellHalf)
   if (x1 <= x0 || z1 <= z0) return
   accum.addBox(new Vector3(x0, bottom, z0), new Vector3(x1, top, z1), 1.5, 1.5)
+}
+
+/** Fills the 4 corner gaps a road cross leaves inside a junction cell
+ * (between the road's own half-width and the cell's outer edge) with a
+ * chamfered sidewalk patch — a 45deg-cut corner rather than a true curve
+ * (cheap: 5 extra vertices per corner instead of an arc's many segments),
+ * but it reads as a rounded-ish corner and, more importantly, closes the
+ * gap the approach streets' own sidewalks used to stop short of, which is
+ * what actually made them read as disconnected slabs. */
+function addJunctionCorners(accum: GeomAccum, cx: number, cz: number, y: number, roadHalf: number, cellHalf: number) {
+  const top = y + ROAD_THICKNESS / 2 + SIDEWALK_THICKNESS
+  const bottom = y - ROAD_THICKNESS / 2
+  const outer = cellHalf - 0.15 // stay a hair inside the cell so neighbours never overlap
+  const chamfer = Math.min(SIDEWALK_WIDTH, (outer - roadHalf) * 0.55)
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const rx = cx + sx * roadHalf
+      const rz = cz + sz * roadHalf
+      const ox = cx + sx * outer
+      const oz = cz + sz * outer
+      // A chamfered quad (really a pentagon, built as two triangles' worth
+      // of quad + a corner cut) spanning from the road's own corner out to
+      // the cell's outer corner, clipped diagonally.
+      const p0 = new Vector3(rx, bottom, rz)
+      const p1 = new Vector3(ox, bottom, rz)
+      const p2 = new Vector3(ox, bottom, oz - sz * chamfer)
+      const p3 = new Vector3(ox - sx * chamfer, bottom, oz)
+      const p4 = new Vector3(rx, bottom, oz)
+      const top0 = new Vector3(p0.x, top, p0.z)
+      const top1 = new Vector3(p1.x, top, p1.z)
+      const top2 = new Vector3(p2.x, top, p2.z)
+      const top3 = new Vector3(p3.x, top, p3.z)
+      const top4 = new Vector3(p4.x, top, p4.z)
+      const n = new Vector3(0, 1, 0)
+      accum.addQuad(top0, top1, top2, top4, n, [0, 0], [1, 0], [1, 1], [0, 1])
+      accum.addTri(top2, top3, top4, n, [1, 1], [0.5, 1.3], [0, 1])
+    }
+  }
 }
 
 function addCrosswalks(accum: GeomAccum, cx: number, cz: number, y: number, roadHalf: number) {

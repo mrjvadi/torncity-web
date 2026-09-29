@@ -55,10 +55,21 @@ export interface TerrainResult {
 // pastel daytime park/field instead of a dark saturated blob, the same
 // "nudge the source palette toward white" trick kitAssets.ts already used
 // for the Kenney kit's own materials.
-const GRASS_LIGHTEN = 0.3
+const GRASS_LIGHTEN = 0.4
 function biomeColorLegend(grids: CityGrids): Color[] {
   const white = new Color(0xffffff)
   return grids.doc.biomeLegend.map((b) => new Color(`#${b.colorHex}`).lerp(white, GRASS_LIGHTEN))
+}
+
+// A large-scale (hundreds-of-metres) lightness wobble layered on top of the
+// flat per-biome tint — without it, a whole zone of one biome is a single
+// uniform colour over a huge area (a real field/lawn reads as patchy at
+// that scale even where the grass itself is one species). Two sine waves
+// at different periods/angles avoid an obviously-repeating grid pattern.
+function macroTint(x: number, z: number): number {
+  const a = Math.sin(x * 0.0021 + z * 0.0009)
+  const b = Math.sin(x * -0.0013 + z * 0.0027 + 1.7)
+  return (a * 0.6 + b * 0.4) * 0.09 // +/-9% lightness
 }
 
 function blendSlopeAndWetness(base: Color, slope: number, wet: boolean, sandy: boolean): Color {
@@ -142,6 +153,29 @@ function buildGridMesh(
   return new Mesh(geo, mat)
 }
 
+// How many LOTS in from the fine grid's own outer edge the blend toward
+// the coarse mesh's height/colour runs — a real transition zone instead of
+// the hard-edged square the fine grid's own boundary used to draw (two
+// independent samplings of "the same underlying terrain", at tile vs lot
+// resolution, agree in the general shape but not pixel-for-pixel, so an
+// unblended edge always drew a visible seam).
+const FINE_EDGE_BLEND_LOTS = 22
+
+function coarseColorAt(grids: CityGrids, legend: Color[], i: number, j: number): Color {
+  const idx = grids.coarseIndex(i, j)
+  const biome = grids.coarse.biome[idx]
+  const base = legend[biome] ?? new Color(0x8fae6d)
+  const wet = grids.coarseIsWet(i, j)
+  const c = (wet ? base.clone().lerp(new Color(0x3f7fa6), 0.35) : base.clone()) as Color
+  if (!wet) {
+    const { x, z } = grids.coarseScene(i, j)
+    const t = macroTint(x, z)
+    if (t >= 0) c.lerp(new Color(0xffffff), t)
+    else c.lerp(new Color(0x000000), -t * 0.7)
+  }
+  return c
+}
+
 export function buildTerrain(grids: CityGrids): TerrainResult {
   const legend = biomeColorLegend(grids)
   const detailTexture = makeGroundDetailTexture(256, 101)
@@ -152,38 +186,57 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
     grids.coarse.h,
     (i, j) => grids.coarseScene(i, j),
     (i, j) => grids.coarseElevAt(i, j),
-    (i, j) => {
-      const idx = j * grids.coarse.w + i
-      const biome = grids.coarse.biome[idx]
-      const base = legend[biome] ?? new Color(0x8fae6d)
-      const wet = grids.coarseIsWet(i, j)
-      return wet ? base.clone().lerp(new Color(0x3f7fa6), 0.35) : base
-    },
+    (i, j) => coarseColorAt(grids, legend, i, j),
     detailTexture,
     GROUND_DETAIL_METERS * 3,
     0,
   )
   coarseMesh.name = 'terrain-coarse'
 
+  const fw = grids.fine.w
+  const fh = grids.fine.h
   const fineMesh = buildGridMesh(
     grids,
-    grids.fine.w,
-    grids.fine.h,
+    fw,
+    fh,
     (fx, fy) => grids.fineScene(fx, fy),
-    (fx, fy) => grids.fineElevAt(fx, fy),
     (fx, fy) => {
-      const idx = fy * grids.fine.w + fx
+      const raw = grids.fineElevAt(fx, fy)
+      const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
+      if (edgeDist >= FINE_EDGE_BLEND_LOTS) return raw
+      const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
+      const blend = t * t * (3 - 2 * t)
+      const { i, j } = grids.fineToCoarseTile(fx, fy)
+      return raw * (1 - blend) + grids.coarseElevAt(i, j) * blend
+    },
+    (fx, fy) => {
+      const idx = fy * fw + fx
       const biome = grids.fine.biome[idx]
       const base = legend[biome] ?? new Color(0x8fae6d)
       const slope = grids.fineSlopeAt(fx, fy)
       const wet = grids.fineIsWet(fx, fy)
       const sandy = !wet && grids.fineNearWater(fx, fy, WATER_NEAR_LOTS)
-      return blendSlopeAndWetness(base, slope, wet, sandy)
+      const fineColor = blendSlopeAndWetness(base, slope, wet, sandy)
+      if (!wet && !sandy) {
+        const { x, z } = grids.fineScene(fx, fy)
+        const t = macroTint(x, z)
+        if (t >= 0) fineColor.lerp(new Color(0xffffff), t)
+        else fineColor.lerp(new Color(0x000000), -t * 0.7)
+      }
+      const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
+      if (edgeDist >= FINE_EDGE_BLEND_LOTS) return fineColor
+      const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
+      const blend = t * t * (3 - 2 * t)
+      const { i, j } = grids.fineToCoarseTile(fx, fy)
+      return fineColor.clone().lerp(coarseColorAt(grids, legend, i, j), blend)
     },
     detailTexture,
     GROUND_DETAIL_METERS,
     // Lift the fine mesh a touch above the coarse one so it always wins
     // the z-fight in their shared footprint — see FINE_GROUND_LIFT's doc.
+    // The blend above (both height and colour) already fades this lift's
+    // own visible step out well before the fine grid's own edge, so the
+    // lift itself never shows as a seam either.
     FINE_GROUND_LIFT,
   )
   fineMesh.name = 'terrain-fine'

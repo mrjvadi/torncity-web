@@ -8,6 +8,7 @@
 
 import {
   ACESFilmicToneMapping,
+  AmbientLight,
   CanvasTexture,
   Color,
   DirectionalLight,
@@ -23,7 +24,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { CityExportJSON } from './cityExportTypes'
 import { CityGrids } from './grids'
 import { buildBoulders, buildTerrain, buildTreeClusters, GrassField, type FieldResult, type TerrainResult } from './terrain'
-import { buildWater, type WaterResult } from './water'
+import { buildWater, buildCoarseWaterPatch, type WaterResult, type CoarseWaterResult } from './water'
 import { buildRoads, type RoadsResult } from './roads'
 import { buildBuildings, type BuildingsResult } from './buildings'
 import { buildProps, type PropsResult } from './props'
@@ -60,6 +61,7 @@ export class WorldCityScene {
   private skyTexture: CanvasTexture | null = null
   private terrain: TerrainResult | null = null
   private water: WaterResult | null = null
+  private coarseWater: CoarseWaterResult | null = null
   private roads: RoadsResult | null = null
   private buildings: BuildingsResult | null = null
   private props: PropsResult | null = null
@@ -146,6 +148,14 @@ export class WorldCityScene {
     // blowing out the sun-facing walls.
     const ambient = new HemisphereLight(SKY_TOP, 0xdcd3b8, 1.05)
     this.scene.add(ambient)
+    // A small direction-independent floor: the coarse backdrop's real
+    // elevation swings (hundreds of metres over a few km) put genuinely
+    // steep slopes in the terrain, and hemisphere light alone lets a slope
+    // facing away from both the sun and "up" go almost black — a real
+    // steep hillside should read as dim, not as a hole where the sky
+    // should be. This keeps every surface, front- or back-facing, above a
+    // dim ambient floor.
+    this.scene.add(new AmbientLight(0xffffff, 0.55))
     // Tuned so the ~1.5km city core reads with clear contrast and the
     // coarse backdrop only fades to sky past a few km — a portrait phone's
     // narrow horizontal FOV needs several km of camera distance to fit the
@@ -288,6 +298,8 @@ export class WorldCityScene {
     stage('water', () => {
       this.water = buildWater(grids)
       if (this.water.mesh) this.scene.add(this.water.mesh)
+      this.coarseWater = buildCoarseWaterPatch(grids)
+      if (this.coarseWater.mesh) this.scene.add(this.coarseWater.mesh)
     })
 
     stage('roads', () => {
@@ -456,6 +468,7 @@ export class WorldCityScene {
     this.skyTexture?.dispose()
     this.terrain?.dispose()
     this.water?.dispose()
+    this.coarseWater?.dispose()
     this.roads?.dispose()
     this.buildings?.dispose()
     this.props?.dispose()
