@@ -359,14 +359,14 @@ export async function buildTreeClusters(grids: CityGrids): Promise<FieldResult> 
   // (non-water, non-steep) grass/forest tile, thinned to roughly one
   // candidate per ~9 lots so clusters don't crowd each other.
   const centres: { x: number; y: number }[] = []
-  for (let y = 3; y < h - 3; y += 3) {
-    for (let x = 3; x < w - 3; x += 3) {
+  for (let y = 4; y < h - 4; y += 9) {
+    for (let x = 4; x < w - 4; x += 9) {
       const idx = y * w + x
       if (!forestCodes.has(grids.fine.biome[idx])) continue
       if (grids.fineIsWet(x, y)) continue
       if (grids.fineSlopeAt(x, y) > 0.45) continue
       if (inCity(x, y)) continue
-      if (hashG(x, y, 201) > 0.4) continue // most candidates skipped: real stands are sparse across the map
+      if (hashG(x, y, 201) > 0.22) continue // most candidates skipped: real stands are sparse across the map
       centres.push({ x, y })
     }
   }
@@ -376,10 +376,12 @@ export async function buildTreeClusters(grids: CityGrids): Promise<FieldResult> 
   const objects: Object3D[] = []
   if (!tall && !short) return { objects, dispose() {} }
 
+  const TREE_CAP = 900 // keep instance/triangle counts cheap on a phone GPU
   type Spot = { x: number; y: number; scale: number; rot: number; tall: boolean }
   const spots: Spot[] = []
   for (const c of centres) {
-    const count = 4 + Math.floor(hashG(c.x, c.y, 211) * 7) // 4..10 trees per stand
+    if (spots.length >= TREE_CAP) break
+    const count = 4 + Math.floor(hashG(c.x, c.y, 211) * 5) // 4..8 trees per stand
     for (let i = 0; i < count; i++) {
       const jr = 1 + hashG(c.x, c.y, 220 + i) * 3.2 // spread within the stand, in lots
       const ang = hashG(c.x, c.y, 240 + i) * Math.PI * 2
