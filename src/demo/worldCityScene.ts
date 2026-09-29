@@ -12,7 +12,7 @@ import {
   CanvasTexture,
   Color,
   DirectionalLight,
-  FogExp2,
+  Fog,
   HemisphereLight,
   PerspectiveCamera,
   Scene,
@@ -37,6 +37,11 @@ import { upgradeToPhotoTextures } from './photoUpgrade'
 const SKY_TOP = 0x8fc3ec
 const SKY_HORIZON = 0xe9f3f7
 const SKY = SKY_HORIZON // fog/background colour: matches the horizon band so distant geometry fades into the dome, not a visible seam
+// Linear fog starts past the city and its near surroundings (never hazes
+// the city itself) and fully hides the coarse backdrop by FOG_FAR, well
+// inside the valley zoom-out's own maxDistance.
+const FOG_NEAR = 1800
+const FOG_FAR = 8000
 const RECENTLY_MOVED_MS = 4000
 const WATER_TICK_MS = 1000 / 30
 
@@ -148,20 +153,19 @@ export class WorldCityScene {
     // blowing out the sun-facing walls.
     const ambient = new HemisphereLight(SKY_TOP, 0xdcd3b8, 1.05)
     this.scene.add(ambient)
-    // A small direction-independent floor: the coarse backdrop's real
-    // elevation swings (hundreds of metres over a few km) put genuinely
-    // steep slopes in the terrain, and hemisphere light alone lets a slope
-    // facing away from both the sun and "up" go almost black — a real
-    // steep hillside should read as dim, not as a hole where the sky
-    // should be. This keeps every surface, front- or back-facing, above a
-    // dim ambient floor.
-    this.scene.add(new AmbientLight(0xffffff, 0.55))
-    // Tuned so the ~1.5km city core reads with clear contrast and the
-    // coarse backdrop only fades to sky past a few km — a portrait phone's
-    // narrow horizontal FOV needs several km of camera distance to fit the
-    // whole city width-on, so fog this thin is what keeps that shot from
-    // reading as fogged-out rather than merely distant.
-    this.scene.fog = new FogExp2(SKY, 0.00007)
+    // A small direction-independent floor — just enough that a steep,
+    // backlit coarse hillside reads as dim rather than a black hole where
+    // the sky should be (see the project report), without flattening the
+    // sun/hemisphere's own contrast. 0.55 washed the whole scene into a
+    // grey-green haze; 0.25 is the smallest value that still keeps a
+    // worst-case backlit slope legible.
+    this.scene.add(new AmbientLight(0xffffff, 0.25))
+    // Linear fog, not exponential: starts only beyond FOG_NEAR (past the
+    // city and its immediate surroundings, so the city itself is never
+    // hazed), fully hides distant terrain by FOG_FAR. FogExp2 has no
+    // "start" — even a thin density still visibly greyed out the city at
+    // typical viewing distances.
+    this.scene.fog = new Fog(SKY, FOG_NEAR, FOG_FAR)
   }
 
   /** A vertical-gradient canvas, pale blue overhead fading to a near-white
@@ -395,33 +399,55 @@ export class WorldCityScene {
     const target = new Vector3(0, cy, 0)
     this.controls.target.copy(target)
 
-    // A true bounding-sphere fit (city half-diagonal + building height) by
-    // the camera's own LIMITING fov puts the whole dense city right at the
-    // frame's edge; dividing by FILL backs the camera off just enough that
-    // it fills ~70% of the frame instead of exactly 100%. "Limiting" fov
-    // matters a lot here: a portrait phone's HORIZONTAL fov is much
-    // narrower than its 45deg vertical one (aspect < 1), so a sphere sized
-    // to the city's own X/Z footprint needs the narrower horizontal angle
-    // to fit by width, not the vertical one — using vFov alone here once
-    // silently cropped roughly the western/eastern half of the city out of
-    // frame (see the project report): it fit vertically at a distance that
-    // was nowhere near far enough horizontally.
-    const footprintMeters = (size * doc.lotMeters) / 2
-    const halfDiagonal = Math.sqrt(footprintMeters * footprintMeters * 2)
-    const radius = Math.sqrt(halfDiagonal * halfDiagonal + ((maxY - groundY) / 2) ** 2) * 1.06
+    // A 3/4 view, 55-60deg above the horizon, biased toward a near-axis
+    // azimuth (not a full 45deg diagonal — see below) and toward the
+    // city's own north edge (where the river and its bridges sit in this
+    // export) so the default shot shows the river, the bridges and the
+    // skyline together, as the brief asks.
+    const azimuth = -0.3
+    const polar = (90 - 57.5) * (Math.PI / 180)
+
+    // Framing off the city's FULL 48-lot half-diagonal (~1040m) needs
+    // several km of distance on a portrait phone's ~22deg horizontal fov
+    // regardless of viewing angle — a camera's screen-horizontal axis is
+    // always level (perpendicular to world-up) no matter how steep the
+    // polar angle is, so steepening it does not shrink the footprint's own
+    // horizontal projection at all; only the AZIMUTH does (aligning it
+    // toward one of the footprint's own edges instead of its corner cuts
+    // the horizontal extent by ~30%, hence -0.3rad here rather than a full
+    // -45deg diagonal). Framing off the DENSE CORE (downtown, where the
+    // skyline actually reads as a city) rather than the full grid's
+    // outer, sparser housing/farm ring is what gets this into a genuinely
+    // "much shorter distance" range: the outer ring crops out of frame,
+    // same trade-off a real skyline establishing shot makes.
+    const viewDir = new Vector3(-Math.sin(polar) * Math.sin(azimuth), -Math.cos(polar), -Math.sin(polar) * Math.cos(azimuth)).normalize()
+    const worldUp = new Vector3(0, 1, 0)
+    const right = new Vector3().crossVectors(viewDir, worldUp).normalize()
+    const camUp = new Vector3().crossVectors(right, viewDir).normalize()
+
+    const footprintMeters = ((size * doc.lotMeters) / 2) * 0.42
+    let halfW = 0
+    let halfH = 0
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        for (const sy of [0, 1]) {
+          const corner = new Vector3(sx * footprintMeters, sy * (maxY - groundY), sz * footprintMeters)
+          halfW = Math.max(halfW, Math.abs(corner.dot(right)))
+          halfH = Math.max(halfH, Math.abs(corner.dot(camUp)))
+        }
+      }
+    }
+    const PAD = 1.12 // a little breathing room past the tightest exact fit
+    halfW *= PAD
+    halfH *= PAD
+
     const vFov = (this.camera.fov * Math.PI) / 180
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect)
-    const limitingFov = Math.min(vFov, hFov)
-    const FILL = 0.92
-    const fitDist = radius / Math.sin(limitingFov / 2)
-    const dist = Math.max(this.controls.minDistance, fitDist / FILL)
+    const FILL = 0.72 // the city should fill ~70% of the frame width, not edge-to-edge
+    const distForWidth = halfW / Math.sin(hFov / 2) / FILL
+    const distForHeight = halfH / Math.sin(vFov / 2) / FILL
+    const dist = Math.max(this.controls.minDistance, distForWidth, distForHeight)
 
-    // A 3/4 view, ~35deg above the horizon, biased toward the city's own
-    // north edge (where the river and its bridges sit in this export) so
-    // the default shot shows the river, the bridges and the skyline
-    // together, as the brief asks.
-    const azimuth = -0.62
-    const polar = (90 - 35) * (Math.PI / 180)
     const offset = new Vector3(dist * Math.sin(polar) * Math.sin(azimuth), dist * Math.cos(polar), dist * Math.sin(polar) * Math.cos(azimuth))
     this.camera.position.copy(target).add(offset)
     this.controls.update()

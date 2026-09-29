@@ -14,7 +14,7 @@
 
 import { BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial, ShaderMaterial, Vector3 } from 'three'
 import type { CityGrids } from './grids'
-import { isWetCoarse, WATER_KIND_LAKE, WATER_KIND_OCEAN, WATER_KIND_RIVER, WATER_KIND_STREAM } from './cityExportTypes'
+import { WATER_KIND_LAKE, WATER_KIND_OCEAN, WATER_KIND_RIVER, WATER_KIND_STREAM } from './cityExportTypes'
 import { ELEVATION_SCALE, FINE_GROUND_LIFT } from './terrain'
 
 const VERT = /* glsl */ `
@@ -344,10 +344,23 @@ export interface CoarseWaterResult {
   dispose(): void
 }
 
+const COARSE_OCEAN_BIT = 1
+const COARSE_LAKE_BIT = 4
+// Above this, a cell flagged ocean is almost certainly a misflagged
+// hilltop/coastal-noise cell, not open water — real sea level is ~0.
+const OCEAN_ELEV_TOLERANCE_M = 40
+// A lake is a flat body of standing water; if a connected group of
+// lake-flagged cells actually spans more than this much elevation, that
+// is sloped terrain wrongly carrying the flag (or two separate water
+// bodies at different levels touching), not a real lake — the whole group
+// is dropped rather than drawn as a tilted "floating" patch.
+const LAKE_FLATNESS_TOLERANCE_M = 15
+
 export function buildCoarseWaterPatch(grids: CityGrids): CoarseWaterResult {
   const { w, h } = grids.coarse
   const fineHalfSpanTiles = grids.fine.w / grids.doc.lotsPerTile / 2
   const { i: centreI, j: centreJ } = grids.fineToCoarseTile(grids.fine.w / 2, grids.fine.h / 2)
+  const insideFine = (i: number, j: number) => Math.abs(i - centreI) < fineHalfSpanTiles - 2 && Math.abs(j - centreJ) < fineHalfSpanTiles - 2
 
   const positions: number[] = []
   const normals: number[] = []
@@ -355,25 +368,74 @@ export function buildCoarseWaterPatch(grids: CityGrids): CoarseWaterResult {
   const indices: number[] = []
   let vcount = 0
 
+  const addQuad = (i: number, j: number, y: number) => {
+    const { x, z } = grids.coarseScene(i, j)
+    const half = grids.doc.tileMeters / 2
+    const base = vcount
+    positions.push(x - half, y, z - half, x + half, y, z - half, x + half, y, z + half, x - half, y, z + half)
+    for (let k = 0; k < 4; k++) normals.push(0, 1, 0)
+    uvs.push(0, 0, 1, 0, 1, 1, 0, 1)
+    indices.push(base, base + 2, base + 1, base, base + 3, base + 2)
+    vcount += 4
+  }
+
+  // Ocean: one flat plane at sea level (0) — never the per-cell terrain
+  // elevation, which is what made ocean cells on a sloped coast read as
+  // floating rectangles. Cells whose OWN elevation is well above sea level
+  // are dropped as misflagged rather than drawn tilted-looking-flat.
   for (let j = 0; j < h; j++) {
     for (let i = 0; i < w; i++) {
       const idx = j * w + i
-      if (!isWetCoarse(grids.coarse.water[idx])) continue
-      // Skip anything comfortably inside the fine grid's own footprint —
-      // padded a couple of tiles short of its true edge so this patch's
-      // flat quads never poke through the fine mesh's own (shored,
-      // rippled) water surface.
-      if (Math.abs(i - centreI) < fineHalfSpanTiles - 2 && Math.abs(j - centreJ) < fineHalfSpanTiles - 2) continue
+      if (!(grids.coarse.water[idx] & COARSE_OCEAN_BIT)) continue
+      if (insideFine(i, j)) continue
+      if (grids.coarseElevAt(i, j) > OCEAN_ELEV_TOLERANCE_M) continue
+      addQuad(i, j, 0.08)
+    }
+  }
 
-      const { x, z } = grids.coarseScene(i, j)
-      const y = grids.coarseElevAt(i, j) * ELEVATION_SCALE + 0.08
-      const half = grids.doc.tileMeters / 2
-      const base = vcount
-      positions.push(x - half, y, z - half, x + half, y, z - half, x + half, y, z + half, x - half, y, z + half)
-      for (let k = 0; k < 4; k++) normals.push(0, 1, 0)
-      uvs.push(0, 0, 1, 0, 1, 1, 0, 1)
-      indices.push(base, base + 2, base + 1, base, base + 3, base + 2)
-      vcount += 4
+  // Lakes: flood-fill each connected group of lake-flagged cells, draw the
+  // whole group at its OWN average elevation (one real flat surface) only
+  // if it is genuinely flat; a group that spans more than the tolerance is
+  // dropped entirely rather than drawn as a tilted patch.
+  const visited = new Uint8Array(w * h)
+  for (let j = 0; j < h; j++) {
+    for (let i = 0; i < w; i++) {
+      const idx = j * w + i
+      if (visited[idx] || !(grids.coarse.water[idx] & COARSE_LAKE_BIT)) continue
+      const cells: [number, number][] = []
+      const queue: [number, number][] = [[i, j]]
+      visited[idx] = 1
+      let sum = 0
+      let min = Infinity
+      let max = -Infinity
+      while (queue.length) {
+        const [ci, cj] = queue.pop() as [number, number]
+        const e = grids.coarseElevAt(ci, cj)
+        sum += e
+        if (e < min) min = e
+        if (e > max) max = e
+        cells.push([ci, cj])
+        for (const [dx, dy] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
+          const ni = ci + dx
+          const nj = cj + dy
+          if (ni < 0 || nj < 0 || ni >= w || nj >= h) continue
+          const nidx = nj * w + ni
+          if (visited[nidx] || !(grids.coarse.water[nidx] & COARSE_LAKE_BIT)) continue
+          visited[nidx] = 1
+          queue.push([ni, nj])
+        }
+      }
+      if (max - min > LAKE_FLATNESS_TOLERANCE_M) continue
+      const avgY = (sum / cells.length) * ELEVATION_SCALE + 0.08
+      for (const [ci, cj] of cells) {
+        if (insideFine(ci, cj)) continue
+        addQuad(ci, cj, avgY)
+      }
     }
   }
 
