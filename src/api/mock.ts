@@ -8,6 +8,7 @@ import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
 import { mockFoundingCommand } from './mock_founding'
 import { mockBasicCommand } from './mock_basic'
+import { mockLocation, mockSupportCommand } from '../support/mock'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 
 function json(body: unknown, status = 200): Response {
@@ -98,6 +99,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
       : { ...MOCK_PROFILE_VIEW, stage: { code: 'adult', name: 'بزرگسال' }, age: 27, needs: { hunger: 34, sleep: 52, stress: 22, happiness: 71 }, achievements: 4 }
     return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view, actions: MOCK_PROFILE_ACTIONS })
   }
+  const support = mockSupportCommand(command, args)
+  if (support) return json(support)
   const basic = mockBasicCommand(command, args)
   if (basic) return json({ ok: true, ...basic })
   // war/military (no structured view yet) and friends/search (structured):
@@ -148,6 +151,7 @@ export function installMockApi(): void {
         server_time: new Date().toISOString(),
         realtime: false,
         settlement: mockBootstrapSettlement(),
+        location: mockLocation(),
       })
     }
     const villageRes = mockVillageRoute(path, (init?.method ?? 'GET').toUpperCase(), new Headers(init?.headers))

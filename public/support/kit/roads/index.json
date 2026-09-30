@@ -1,0 +1,145 @@
+{
+ "module": 2.7,
+ "atlas": "atlas.jpg",
+ "atlas_bytes": 156221,
+ "sides_note": "N = -Z, S = +Z, E = +X, W = -X in three.js coordinates; a piece at rotation 0 connects on the listed sides; rotate about Y by k*90deg (counter-clockwise seen from above) to turn it.",
+ "pieces": {
+  "straight": {
+   "file": "straight.glb",
+   "type": "tile",
+   "size": [
+    2.7,
+    0.053,
+    2.7
+   ],
+   "module": 2.7,
+   "connections": [
+    "N",
+    "S"
+   ],
+   "triangles": 56,
+   "bytes": 2648
+  },
+  "curve": {
+   "file": "curve.glb",
+   "type": "tile",
+   "size": [
+    2.7,
+    0.053,
+    2.7
+   ],
+   "module": 2.7,
+   "connections": [
+    "E",
+    "S"
+   ],
+   "triangles": 480,
+   "bytes": 12552
+  },
+  "tjunction": {
+   "file": "tjunction.glb",
+   "type": "tile",
+   "size": [
+    2.7,
+    0.053,
+    2.7
+   ],
+   "module": 2.7,
+   "connections": [
+    "W",
+    "E",
+    "S"
+   ],
+   "triangles": 324,
+   "bytes": 9300
+  },
+  "crossing": {
+   "file": "crossing.glb",
+   "type": "tile",
+   "size": [
+    2.7,
+    0.053,
+    2.7
+   ],
+   "module": 2.7,
+   "connections": [
+    "N",
+    "E",
+    "S",
+    "W"
+   ],
+   "triangles": 344,
+   "bytes": 9540
+  },
+  "crosswalk": {
+   "file": "crosswalk.glb",
+   "type": "tile",
+   "size": [
+    2.7,
+    0.053,
+    2.7
+   ],
+   "module": 2.7,
+   "connections": [
+    "E",
+    "W"
+   ],
+   "triangles": 84,
+   "bytes": 3456
+  },
+  "endcap": {
+   "file": "endcap.glb",
+   "type": "tile",
+   "size": [
+    2.7,
+    0.053,
+    2.7
+   ],
+   "module": 2.7,
+   "connections": [
+    "S"
+   ],
+   "triangles": 58,
+   "bytes": 2736
+  },
+  "sidewalk": {
+   "file": "sidewalk.glb",
+   "type": "prop",
+   "size": [
+    2.7,
+    0.046,
+    0.405
+   ],
+   "module": null,
+   "connections": [],
+   "triangles": 68,
+   "bytes": 3628
+  },
+  "lamp": {
+   "file": "lamp.glb",
+   "type": "prop",
+   "size": [
+    0.911,
+    2.587,
+    0.16
+   ],
+   "module": null,
+   "connections": [],
+   "triangles": 472,
+   "bytes": 9464
+  },
+  "sign": {
+   "file": "sign.glb",
+   "type": "prop",
+   "size": [
+    0.139,
+    0.492,
+    0.023
+   ],
+   "module": null,
+   "connections": [],
+   "triangles": 368,
+   "bytes": 9084
+  }
+ }
+}

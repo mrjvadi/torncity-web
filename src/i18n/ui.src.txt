@@ -965,3 +965,64 @@ bank.submit_withdraw | برداشت {n} | Withdraw {n}
 bank.enter_amount | مبلغ را وارد کن | Enter an amount
 bank.too_much | بیشتر از موجودی است | More than you have
 bank.jailed | در زندان هستی؛ به بانک دسترسی نداری. | You are in jail; the bank is out of reach.
+# -- support city ------------------------------------------------------------
+sc.title | ساپورت | Support
+sc.loading | در حال ساختن شهر… | Building the city…
+sc.failed | نمایش سه‌بعدی شهر روی این دستگاه ممکن نیست. | The 3D city cannot be shown on this device.
+sc.view.aerial | نمای هوایی | Aerial view
+sc.view.street | نمای خیابان | Street view
+sc.travel | سفر | Travel
+sc.svc.reserve | بانک مرکزی | Reserve Bank
+sc.svc.bank | بانک | Bank
+sc.svc.exchange | بورس | Exchange
+sc.svc.auction | حراجی | Auction house
+sc.svc.loan | صندوق وام | Loan office
+sc.svc.cityhall | شهرداری | City hall
+sc.svc.jobs | اداره کار | Employment office
+sc.svc.companies | ثبت شرکت‌ها | Company registry
+sc.svc.market | بازار | Market
+sc.svc.shops | فروشگاه‌ها | Shops
+sc.svc.university | دانشگاه | University
+sc.svc.training | آموزشگاه مهارت | Skills school
+sc.svc.knowledge | دانش‌فروشی | Knowledge shop
+sc.svc.hospital | بیمارستان | Hospital
+sc.svc.police | پلیس | Police
+sc.svc.jail | زندان | Jail
+sc.svc.property | املاک | Property office
+sc.svc.housing | محله‌ی مسکونی | Housing district
+sc.svc.missions | تابلوی مأموریت | Mission board
+sc.svc.bus | ترمینال اتوبوس | Bus terminal
+sc.svc.train | ایستگاه قطار | Train station
+sc.svc.airport | فرودگاه | Airport
+sc.svc.barracks | پادگان | Barracks
+sc.soon.title | به‌زودی | Coming soon
+sc.soon.reserve | بانک مرکزی ساپورت به‌زودی باز می‌شود؛ ساپ را همین‌جا منتشر و نگهداری خواهد کرد. | The Reserve Bank of Support opens soon; it will issue and hold the SUP here.
+sc.dest.title | مقصد سفر | Where to
+sc.dest.here | اینجا هستید | You are here
+sc.dest.km | {n} کیلومتر | {n} km
+sc.dest.city | شهر خدمات | Service city
+sc.dest.village | روستا | Village
+sc.dest.empty | مقصدی برای سفر نیست. | No destination to travel to.
+sc.dest.mock | داده‌ی آزمایشی: فهرست مقصدها هنوز از سرور نمی‌آید. | Sample data: the server does not send destinations yet.
+sc.dest.hint_mode | پیشنهاد: {mode} | Suggested: {mode}
+sc.mode.bus | اتوبوس | Bus
+sc.mode.train | قطار | Train
+sc.mode.flight | هواپیما | Plane
+sc.confirm.title | سفر به {name} | Travel to {name}
+sc.confirm.distance | فاصله | Distance
+sc.confirm.time | زمان | Time
+sc.confirm.fare | کرایه | Fare
+sc.confirm.mode | وسیله | Vehicle
+sc.confirm.go | تأیید و حرکت | Confirm and go
+sc.confirm.no_mode | وسیله‌ای در دسترس نیست. | No vehicle is available.
+sc.confirm.loading | در حال گرفتن وسیله‌ها… | Fetching vehicles…
+sc.confirm.busy | مشغول | Busy
+sc.travel.failed | سفر آغاز نشد. | The journey did not start.
+sc.journey.title | در راه | On the road
+sc.journey.to | به {name} | To {name}
+sc.journey.by | با {mode} | By {mode}
+sc.journey.left | مانده تا رسیدن | until arrival
+sc.journey.arrived | رسیدی! | You have arrived!
+sc.journey.enter | ورود | Enter
+sc.journey.from | از {name} | From {name}
+sc.visit.travel | سفر | Travel
