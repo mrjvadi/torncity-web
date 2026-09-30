@@ -449,7 +449,7 @@ export const uiEn: Record<UiKey, string> = {
   'err.network': 'Could not reach the server. Check your connection.',
   'shell.tab.profile': 'Me',
   'shell.tab.activity': 'Activity',
-  'shell.tab.city': 'City',
+  'shell.tab.city': 'Village',
   'shell.tab.market': 'Economy',
   'shell.tab.society': 'Society',
   'shell.menu': 'Menu',

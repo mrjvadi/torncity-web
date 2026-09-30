@@ -195,6 +195,7 @@ export function renderedFineElev(grids: CityGrids, fx: number, fy: number): numb
   const fw = grids.fine.w
   const fh = grids.fine.h
   const raw = grids.fineElevAt(fx, fy)
+  if (grids.finalFine) return raw
   const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
   let out = raw
   if (edgeDist < FINE_EDGE_BLEND_LOTS) {
@@ -226,7 +227,15 @@ export function renderedGroundAt(grids: CityGrids, fx: number, fy: number): numb
   return (u + v <= 1 ? a + (b - a) * u + (c - a) * v : d + (b - d) * (1 - v) + (c - d) * (1 - u)) + FINE_GROUND_LIFT
 }
 
-export function buildTerrain(grids: CityGrids): TerrainResult {
+export interface TerrainOptions {
+  /** Coarse cells (quads) i0..i0+n-1 by j0..j0+n-1 are cut out: the fine mesh
+   * covers exactly that square, vertex line to vertex line. */
+  hole?: { i0: number; j0: number; n: number }
+  /** Only the coarse backdrop is built (no demo fine mesh, no skirt). */
+  coarseOnly?: boolean
+}
+
+export function buildTerrain(grids: CityGrids, opts: TerrainOptions = {}): TerrainResult {
   const legend = biomeColorLegend(grids)
   const detailTexture = makeGroundDetailTexture(256, 101)
 
@@ -247,7 +256,10 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
   const fineHalfSpanTiles = grids.fine.w / grids.doc.lotsPerTile / 2
   const holeHalf = fineHalfSpanTiles
   const { i: fineCentreI, j: fineCentreJ } = grids.fineToCoarseTile(grids.fine.w / 2, grids.fine.h / 2)
-  const coarseSkip = (i: number, j: number) => Math.abs(i + 0.5 - fineCentreI) < holeHalf && Math.abs(j + 0.5 - fineCentreJ) < holeHalf
+  const hole = opts.hole
+  const coarseSkip = hole
+    ? (i: number, j: number) => i >= hole.i0 && i < hole.i0 + hole.n && j >= hole.j0 && j < hole.j0 + hole.n
+    : (i: number, j: number) => Math.abs(i + 0.5 - fineCentreI) < holeHalf && Math.abs(j + 0.5 - fineCentreJ) < holeHalf
 
   const coarseMesh = buildGridMesh(
     grids,
@@ -262,6 +274,20 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
     coarseSkip,
   )
   coarseMesh.name = 'terrain-coarse'
+
+  if (opts.coarseOnly) {
+    return {
+      objects: [coarseMesh],
+      detailTexture,
+      fineMaterial: coarseMesh.material as MeshStandardMaterial,
+      coarseMaterial: coarseMesh.material as MeshStandardMaterial,
+      dispose() {
+        coarseMesh.geometry.dispose()
+        ;(coarseMesh.material as MeshStandardMaterial).dispose()
+        detailTexture.dispose()
+      },
+    }
+  }
 
   const fw = grids.fine.w
   const fh = grids.fine.h

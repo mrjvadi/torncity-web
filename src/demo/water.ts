@@ -190,16 +190,21 @@ function bilinear(field: Float32Array | Int16Array, w: number, h: number, fx: nu
   return top + (bot - top) * ty
 }
 
-export function buildWater(grids: CityGrids): WaterResult {
+export function buildWater(grids: CityGrids, opts: { skipLakes?: boolean; thinStreams?: boolean } = {}): WaterResult {
   const { w, h } = grids.fine
   const wet = new Float32Array(w * h)
-  for (let i = 0; i < w * h; i++) wet[i] = grids.fine.water[i] !== 0 ? 1 : 0
+  for (let i = 0; i < w * h; i++) wet[i] = grids.fine.water[i] !== 0 && !(opts.skipLakes && grids.fine.water[i] === WATER_KIND_LAKE) ? 1 : 0
   let anyWet = false
   for (const v of wet) if (v) { anyWet = true; break }
   if (!anyWet) {
     return { mesh: null, material: null, tick() {}, setCamera() {}, dispose() {} }
   }
-  const wetBlurred = boxBlur(wet, w, h, WATER_BLUR_RADIUS_LOTS)
+  let wetBlurred = boxBlur(wet, w, h, WATER_BLUR_RADIUS_LOTS)
+  if (opts.thinStreams) {
+    // a stream is one lot wide: blurred over five lots it would fall under the cutoff and vanish, so
+    // it keeps its own tent-shaped mask (about a lot and a bit wide once cut at the threshold)
+    wetBlurred = wetBlurred.map((v, i) => (grids.fine.water[i] === WATER_KIND_STREAM ? Math.max(v, 1) : v))
+  }
 
   const sw = (w - 1) * SS + 1
   const sh = (h - 1) * SS + 1
@@ -401,11 +406,14 @@ const OCEAN_ELEV_TOLERANCE_M = 40
 // is dropped rather than drawn as a tilted "floating" patch.
 const LAKE_FLATNESS_TOLERANCE_M = 15
 
-export function buildCoarseWaterPatch(grids: CityGrids): CoarseWaterResult {
+export function buildCoarseWaterPatch(grids: CityGrids, opts: { hole?: { i0: number; j0: number; n: number } } = {}): CoarseWaterResult {
   const { w, h } = grids.coarse
   const fineHalfSpanTiles = grids.fine.w / grids.doc.lotsPerTile / 2
   const { i: centreI, j: centreJ } = grids.fineToCoarseTile(grids.fine.w / 2, grids.fine.h / 2)
-  const insideFine = (i: number, j: number) => Math.abs(i - centreI) < fineHalfSpanTiles - 2 && Math.abs(j - centreJ) < fineHalfSpanTiles - 2
+  const hole = opts.hole
+  const insideFine = hole
+    ? (i: number, j: number) => i >= hole.i0 - 1 && i <= hole.i0 + hole.n && j >= hole.j0 - 1 && j <= hole.j0 + hole.n
+    : (i: number, j: number) => Math.abs(i - centreI) < fineHalfSpanTiles - 2 && Math.abs(j - centreJ) < fineHalfSpanTiles - 2
 
   const positions: number[] = []
   const normals: number[] = []

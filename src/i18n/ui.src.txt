@@ -470,7 +470,7 @@ err.internal | مشکلی پیش آمد. کمی بعد دوباره امتحان
 err.network | ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید. | Could not reach the server. Check your connection.
 shell.tab.profile | من | Me
 shell.tab.activity | فعالیت | Activity
-shell.tab.city | شهر | City
+shell.tab.city | روستا | Village
 shell.tab.market | اقتصاد | Economy
 shell.tab.society | جامعه | Society
 shell.menu | منو | Menu

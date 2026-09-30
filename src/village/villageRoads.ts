@@ -7,9 +7,9 @@
 import { BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial } from 'three'
 import type { VillageGround } from './terrainModel'
 
-const ROAD_HALF = 3.6
+const ROAD_HALF = 4.2
 const STEP_M = 3
-const LIFT = 0.14
+const LIFT = 0.18
 
 export interface RoadsMesh { mesh: Mesh | null; dispose(): void }
 
@@ -19,8 +19,8 @@ export function buildVillageRoads(ground: VillageGround, roadLots: { x: number; 
   const pos: number[] = []
   const col: number[] = []
   const idx: number[] = []
-  const base = new Color(0x6c6a66)
-  const edge = new Color(0x8b8578)
+  const base = new Color(0x6a6863)
+  const edge = new Color(0x8d8779)
 
   const strip = (ax: number, az: number, bx: number, bz: number) => {
     const len = Math.hypot(bx - ax, bz - az)
@@ -40,7 +40,7 @@ export function buildVillageRoads(ground: VillageGround, roadLots: { x: number; 
     for (let i = 0; i < n; i++) {
       const a = start + i * 3
       for (let s = 0; s < 2; s++) {
-        idx.push(a + s, a + s + 3, a + s + 1, a + s + 1, a + s + 3, a + s + 4)
+        idx.push(a + s, a + s + 1, a + s + 3, a + s + 1, a + s + 4, a + s + 3)
       }
     }
   }
@@ -56,18 +56,21 @@ export function buildVillageRoads(ground: VillageGround, roadLots: { x: number; 
       }
     }
     for (const [dx, dy] of [[-1, 0], [0, -1]] as const) if (has.has(`${r.x + dx},${r.y + dy}`)) arms++
-    if (arms === 0) strip(c.x - 8, c.z, c.x + 8, c.z)
+    // a road with no neighbour yet still spans its whole lot, edge to edge, so it reads as a road
+    if (arms === 0) strip(c.x - ground.lot / 2, c.z, c.x + ground.lot / 2, c.z)
     // a square where roads meet
-    const sq = 5
-    strip(c.x - sq, c.z - sq * 0.5, c.x + sq, c.z - sq * 0.5)
-    strip(c.x - sq, c.z + sq * 0.5, c.x + sq, c.z + sq * 0.5)
+    if (arms > 1) {
+      const sq = 6
+      strip(c.x - sq, c.z - sq * 0.5, c.x + sq, c.z - sq * 0.5)
+      strip(c.x - sq, c.z + sq * 0.5, c.x + sq, c.z + sq * 0.5)
+    }
   }
   const geo = new BufferGeometry()
   geo.setAttribute('position', new BufferAttribute(new Float32Array(pos), 3))
   geo.setAttribute('color', new BufferAttribute(new Float32Array(col), 3))
   geo.setIndex(new BufferAttribute(pos.length / 3 > 65000 ? new Uint32Array(idx) : new Uint16Array(idx), 1))
   geo.computeVertexNormals()
-  // strips wind either way: light them from above regardless
+  // (the winding above faces up: a road wound downward is culled away entirely) lit from above regardless
   const nrm = geo.attributes.normal
   for (let i = 0; i < nrm.count; i++) if (nrm.getY(i) < 0) nrm.setXYZ(i, -nrm.getX(i), -nrm.getY(i), -nrm.getZ(i))
   const mat = new MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })

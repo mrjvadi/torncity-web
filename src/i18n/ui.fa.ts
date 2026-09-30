@@ -447,7 +447,7 @@ export const uiFa = {
   'err.network': 'ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید.',
   'shell.tab.profile': 'من',
   'shell.tab.activity': 'فعالیت',
-  'shell.tab.city': 'شهر',
+  'shell.tab.city': 'روستا',
   'shell.tab.market': 'اقتصاد',
   'shell.tab.society': 'جامعه',
   'shell.menu': 'منو',

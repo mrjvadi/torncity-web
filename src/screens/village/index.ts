@@ -1,5 +1,6 @@
 import type { ScreenSet } from '../types'
 import VillageHome from './VillageHome'
+import VillageCall from './VillageCall'
 import { Knowledge, Overview, Progress, Who } from './Status'
 
 // The village: a local home screen (the 3D view) and the status screens,
@@ -13,6 +14,7 @@ const screens: ScreenSet = {
   },
   LOCAL: {
     village_home: VillageHome,
+    village_call: VillageCall,
     village_overview: Overview,
     village_progress: Progress,
     village_knowledge: Knowledge,

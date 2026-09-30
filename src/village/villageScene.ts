@@ -20,6 +20,7 @@ import { biomeTints, buildFineGroundMesh } from './groundMesh'
 import { buildFields, type Fields } from './groundFields'
 import { GrassTufts } from './grassTufts'
 import { createWaterMaterial } from './waterMaterial'
+import { buildLakeWater, type LakeWaterMesh } from './lakeWater'
 import type { VillageGround } from './terrainModel'
 import { buildModel, buildScaffold } from './buildingModels'
 import { ColorGeom } from './colorGeom'
@@ -68,6 +69,7 @@ export class VillageScene {
   private terrain!: TerrainResult
   private water: WaterResult | null = null
   private coarseWater: CoarseWaterResult | null = null
+  private lakes: LakeWaterMesh | null = null
   private grass: GrassTufts | null = null
   private groundMats: GroundMaterial[] = []
   private ctlMat!: GroundMaterial
@@ -171,11 +173,9 @@ export class VillageScene {
     }
     this.fields = buildFields(this.ground, grids.doc.biomeLegend)
     stage('terrain', () => {
-      const t = buildTerrain(grids)
-      // the demo's coarse backdrop and skirt stay; its fine mesh is replaced by the subdivided one
-      const fine = t.objects.find((o) => o.name === 'terrain-fine') as ThreeMesh
-      fine.geometry.dispose()
-      t.objects.splice(t.objects.indexOf(fine), 1)
+      // the demo's coarse backdrop only, with a hole exactly the size of the fine window: the
+      // subdivided fine mesh below fills it and meets it vertex to vertex (no skirt, no gap)
+      const t = buildTerrain(grids, { hole: this.holeTiles(), coarseOnly: true })
       this.terrain = t
       const tint = biomeTints(this.ground, grids.doc.biomeLegend)
       this.macro = makeMacroNoise(128)
@@ -193,7 +193,7 @@ export class VillageScene {
       this.scene.add(fineMesh, ...t.objects)
     })
     stage('water', () => {
-      this.water = buildWater(grids)
+      this.water = buildWater(grids, { skipLakes: true, thinStreams: true })
       this.waterNormals = makeWaterNormals(128)
       this.waterMat = createWaterMaterial({ normals: this.waterNormals, sunDir: SUN, horizon: SKY_HORIZON, top: SKY_TOP })
       if (this.water.mesh) {
@@ -201,7 +201,9 @@ export class VillageScene {
         this.water.mesh.renderOrder = 2
         this.scene.add(this.water.mesh)
       }
-      this.coarseWater = buildCoarseWaterPatch(grids)
+      this.lakes = buildLakeWater(this.ground, this.waterMat)
+      if (this.lakes.mesh) this.scene.add(this.lakes.mesh)
+      this.coarseWater = buildCoarseWaterPatch(grids, { hole: this.holeTiles() })
       if (this.coarseWater.mesh) this.scene.add(this.coarseWater.mesh)
     })
     stage('roads', () => this.rebuildRoads())
@@ -243,9 +245,17 @@ export class VillageScene {
 
   private terrainFine: ThreeMesh | null = null
 
+  /** The coarse cells the fine window covers: its edges lie on coarse vertex lines. */
+  private holeTiles() {
+    const d = this.ground.grids.doc
+    return { i0: d.fineGrid.originTileX, j0: d.fineGrid.originTileY, n: (d.fineGrid.w - 1) / d.lotsPerTile }
+  }
+
   /** True where nothing should grow: water and its banks, roads, building pads. */
   private blockedForGrowth(x: number, z: number): boolean {
     if (this.fields.at(this.fields.wet, x, z) > 0.25) return true
+    const lv = this.ground.lakeLevelAt(x, z)
+    if (lv !== null && this.ground.groundY(x, z) < lv + 0.7) return true
     for (const r of this.padRects) if (x > r.x0 - 2 && x < r.x1 + 2 && z > r.z0 - 2 && z < r.z1 + 2) return true
     for (const s of this.roadSegs) {
       const dx = s.bx - s.ax, dz = s.bz - s.az
@@ -276,18 +286,24 @@ export class VillageScene {
       for (const [dx, dy] of [[1, 0], [0, 1]] as const) {
         if (has.has(`${r.x + dx},${r.y + dy}`)) {
           const o = g.lotCentre(r.x + dx, r.y + dy)
-          this.roadSegs.push({ ax: c.x, az: c.z, bx: o.x, bz: o.z, half: 3.6 })
+          this.roadSegs.push({ ax: c.x, az: c.z, bx: o.x, bz: o.z, half: 4.2 })
           arms++
         }
       }
-      if (arms === 0) this.roadSegs.push({ ax: c.x - 5, az: c.z, bx: c.x + 5, bz: c.z, half: 3.6 })
+      if (arms === 0) this.roadSegs.push({ ax: c.x - g.lot / 2, az: c.z, bx: c.x + g.lot / 2, bz: c.z, half: 4.2 })
     }
     const { sub, lot } = g
     const size = (sub.N - 1) * sub.stepX
     const f = this.fields
     return {
       x0: sub.x0, z0: sub.z0, size,
-      wet: (x: number, z: number) => Math.min(1, f.at(f.wet, x, z)),
+      // wet ground: river banks by their lot-wide field; lake shores by how far the ground stands above the
+      // lake's own level, so the mud is a bank of some metres, not a lot-sized smear
+      wet: (x: number, z: number) => {
+        const lv = g.lakeLevelAt(x, z)
+        if (lv !== null) return 1 - smoothstep(0.05, 1.5, g.groundY(x, z) - lv)
+        return Math.min(1, f.at(f.wetRiver, x, z))
+      },
       forest: (x: number, z: number) => Math.min(1, f.at(f.forest, x, z)) * (0.15 + 0.85 * smoothstep(lot * 0.6, lot * 4, f.blockDist(x, z))),
       lawn: (x: number, z: number) => 1 - smoothstep(lot * 0.3, lot * 2.6, f.blockDist(x, z)),
       verges: this.roadSegs,
@@ -348,6 +364,8 @@ export class VillageScene {
         for (let k = 0; k < count; k++) {
           const c = grids.fineScene(fx + (r() - 0.5) * 0.9, fy + (r() - 0.5) * 0.9)
           if (inBlock && this.ground.lotAt(c.x, c.z) === null) continue
+          const lv = this.ground.lakeLevelAt(c.x, c.z)
+          if (lv !== null && groundY(c.x, c.z) < lv + 0.9) continue
           spots.push({ x: c.x, z: c.z, y: groundY(c.x, c.z), s: 0.8 + r() * 0.8, rot: r() * Math.PI * 2, species: /boreal|taiga/.test(code) || r() < 0.22 ? 1 : 0 })
         }
       }
@@ -541,7 +559,7 @@ export class VillageScene {
       const c = g.lotCentre(lot.x, lot.y)
       tx = c.x; tz = c.z
     }
-    const ty = g.groundY(tx, tz) + 4
+    const ty = Math.max(g.groundY(tx, tz), g.lakeLevelAt(tx, tz) ?? -Infinity) + 4
     this.center.set(mid.x, ty, mid.z)
     this.controls.target.set(tx, ty, tz)
     const aspect = this.camera.aspect || 0.5
@@ -551,7 +569,7 @@ export class VillageScene {
     const vFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * free)
     const hFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * aspect)
     const polar = mode === 'aerial' ? 0.95 : 1.1
-    const span = mode === 'aerial' ? n * g.lot * 1.12 : mode === 'close' ? 70 : 50
+    const span = mode === 'aerial' ? Math.max(n + 2, 7) * g.lot : mode === 'close' ? 70 : 50
     const dist = Math.max(this.controls.minDistance, (span / 2 / Math.tan(Math.min(hFov, vFov) / 2)) * (mode === 'aerial' ? 1.12 : 1))
     const az = -0.5
     this.camera.position.set(tx + dist * Math.sin(polar) * Math.sin(az), ty + dist * Math.cos(polar), tz + dist * Math.sin(polar) * Math.cos(az))
@@ -861,6 +879,7 @@ export class VillageScene {
     this.waterMat?.dispose()
     this.water?.dispose()
     this.coarseWater?.dispose()
+    this.lakes?.dispose()
     this.grass?.dispose()
     this.boulders?.dispose()
     this.trees?.dispose()

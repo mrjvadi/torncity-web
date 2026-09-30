@@ -29,6 +29,10 @@ export class CityGrids {
   /** How far the fine terrain is cut below a river/stream/lake surface (the
    * village view carves beds so water sits in them); 0 for the export demo. */
   riverCarveM = 0
+  /** The village view hands over fine heights that already meet the coarse
+   * backdrop exactly at the window's edge: the demo's edge blend, lift and
+   * skirt are then not applied. */
+  finalFine = false
 
   /** `pre` supplies grids that are already decoded (the village view builds
    * them from live chunks, not from an export file) and already graded to

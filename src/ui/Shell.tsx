@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import Hud from './Hud'
 import Dock, { type TabKey } from './Dock'
 import GenericScreen from './GenericScreen'
-import CityView from './CityView'
 import { Screen } from '../kit'
 import MenuSheet from './MenuSheet'
 import BottomSheet from './BottomSheet'
@@ -14,10 +13,14 @@ import { foundingDraftFromLaunch } from '../lib/telegram'
 import * as api from '../api/client'
 import { t } from '../i18n'
 
+/** The village tab: the player's village, or the call to found one. Support
+ * is a journey away, never a tab. */
+const VILLAGE_TAB = 'village'
+
 const TAB_COMMAND: Record<TabKey, string> = {
   profile: 'player.profile.get',
   activity: 'job.status',
-  city: '',
+  city: VILLAGE_TAB,
   market: 'market.list',
   society: 'faction.mine',
 }
@@ -29,6 +32,12 @@ const TAB_HUB: Partial<Record<TabKey, string>> = {
   society: 'society_hub',
 }
 
+/** The starter city, whose services are a journey from a village. */
+function supportCity(b: { cities: { code: string; name: string }[] } | null | undefined) {
+  const c = b?.cities.find((x) => x.code === 'support')
+  return { code: c?.code ?? 'support', name: c?.name ?? 'Support' }
+}
+
 type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
 
 export default function Shell() {
@@ -38,7 +47,8 @@ export default function Shell() {
   // as the start parameter: land on the founding form.
   const [screenKey, setScreenKey] = useState<ScreenKey>(() => {
     const draft = foundingDraftFromLaunch()
-    return draft ? { command: '', local: 'founding_form', args: { draft } } : { command: TAB_COMMAND.city }
+    if (draft) return { command: '', local: 'founding_form', args: { draft } }
+    return { command: '', local: bootstrap?.settlement ? 'village_home' : 'village_call' }
   })
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
@@ -62,7 +72,8 @@ export default function Shell() {
   function selectTab(next: TabKey) {
     setTab(next)
     const hub = TAB_HUB[next]
-    if (hub && LOCAL_SCREENS[hub]) setScreenKey({ command: '', local: hub })
+    if (next === 'city') setScreenKey({ command: '', local: hasVillage ? 'village_home' : 'village_call' })
+    else if (hub && LOCAL_SCREENS[hub]) setScreenKey({ command: '', local: hub })
     else setScreenKey({ command: TAB_COMMAND[next] })
   }
 
@@ -81,8 +92,7 @@ export default function Shell() {
   }
 
   const isLocal = !!screenKey.local
-  const isCity = !isLocal && screenKey.command === TAB_COMMAND.city
-  const { response, loading } = useScreen(isCity || isLocal ? null : screenKey.command, screenKey.args)
+  const { response, loading } = useScreen(isLocal ? null : screenKey.command, screenKey.args)
   const Local = isLocal ? LOCAL_SCREENS[screenKey.local!] : undefined
   const Native = !isLocal && response?.screen ? SERVER_SCREENS[response.screen] : undefined
   const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: screenKey.args }
@@ -98,8 +108,7 @@ export default function Shell() {
         onAvatar={() => selectTab('profile')}
       />
       <main className="shell-main">
-        {isCity ? <CityView onTab={selectTab} onInbox={() => setBellOpen(true)} />
-          : screenKey.local === 'village_home' && Local ? <Local {...props} />
+        {screenKey.local === 'village_home' && Local ? <Local {...props} />
           : (
             <Screen>
               {Local ? <Local {...props} />
@@ -114,6 +123,9 @@ export default function Shell() {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         onPick={(command) => { setTab('profile'); setScreenKey({ command }) }}
+        village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, support: supportCity(bootstrap) } : undefined}
+        onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
+        onTravel={(city) => { setTab('profile'); run('travel.options', { city }) }}
         onSignOut={signOut}
       />
       <BottomSheet open={bellOpen} onClose={() => setBellOpen(false)} title={t('shell.bell')}>
