@@ -12,6 +12,7 @@ import type { Action } from '../api/types'
 import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 import { foundingDraftFromLaunch } from '../lib/telegram'
 import * as api from '../api/client'
+import { t } from '../i18n'
 
 const TAB_COMMAND: Record<TabKey, string> = {
   profile: 'player.profile.get',
@@ -115,8 +116,8 @@ export default function Shell() {
         onPick={(command) => { setTab('profile'); setScreenKey({ command }) }}
         onSignOut={signOut}
       />
-      <BottomSheet open={bellOpen} onClose={() => setBellOpen(false)} title="اعلان‌ها">
-        <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '12px 0' }}>اعلانی وجود ندارد.</p>
+      <BottomSheet open={bellOpen} onClose={() => setBellOpen(false)} title={t('shell.bell')}>
+        <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '12px 0' }}>{t('shell.bell_empty')}</p>
       </BottomSheet>
 
       <style>{`

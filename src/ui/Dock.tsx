@@ -1,14 +1,15 @@
 import Icon from './Icon'
 import { GLabel, Count } from '../kit'
+import { t as tr, type Key } from '../i18n'
 
 export type TabKey = 'profile' | 'activity' | 'city' | 'market' | 'society'
 
-const TABS: { key: TabKey; icon: string; label: string }[] = [
-  { key: 'profile', icon: 'person', label: 'من' },
-  { key: 'activity', icon: 'activity', label: 'فعالیت' },
-  { key: 'city', icon: 'city', label: 'شهر' },
-  { key: 'market', icon: 'market', label: 'اقتصاد' },
-  { key: 'society', icon: 'society', label: 'جامعه' },
+const TABS: { key: TabKey; icon: string; label: Key }[] = [
+  { key: 'profile', icon: 'person', label: 'shell.tab.profile' },
+  { key: 'activity', icon: 'activity', label: 'shell.tab.activity' },
+  { key: 'city', icon: 'city', label: 'shell.tab.city' },
+  { key: 'market', icon: 'market', label: 'shell.tab.market' },
+  { key: 'society', icon: 'society', label: 'shell.tab.society' },
 ]
 
 interface DockProps {
@@ -45,7 +46,7 @@ export default function Dock({ active, onSelect, badge }: DockProps) {
                 {isActive ? (
                   <span className="dock-tile">
                     <Icon name={t.icon} palette="gold" size="calc(108 * var(--u))" />
-                    <span className="dock-tile-label"><GLabel top="#ffffff" bottom="#ffd66b" stroke={1}>{t.label}</GLabel></span>
+                    <span className="dock-tile-label"><GLabel top="#ffffff" bottom="#ffd66b" stroke={1}>{tr(t.label)}</GLabel></span>
                   </span>
                 ) : (
                   <>
@@ -53,7 +54,7 @@ export default function Dock({ active, onSelect, badge }: DockProps) {
                       <Icon name={t.icon} palette="steel" size="calc(80 * var(--u))" />
                       {count > 0 && <Count n={count} size="calc(32 * var(--u))" className="dock-count" />}
                     </span>
-                    <span className="dock-label">{t.label}</span>
+                    <span className="dock-label">{tr(t.label)}</span>
                   </>
                 )}
               </button>

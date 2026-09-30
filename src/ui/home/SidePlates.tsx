@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Plate, Emboss, Count, GLabel } from '../../kit'
 import type { IconPalette } from '../../kit'
+import { t } from '../../i18n'
 
 interface PlateDef {
   id: string
@@ -26,13 +27,13 @@ interface SidePlatesProps {
  * red badge. */
 export default function SidePlates({ onMissions, onGift, onRank, onInbox, onFaction }: SidePlatesProps) {
   const right: PlateDef[] = [
-    { id: 'missions', icon: 'missions', palette: 'violet', label: 'مأموریت', onTap: onMissions },
-    { id: 'gift', icon: 'gift', palette: 'ruby', label: 'جایزه‌ی روز', onTap: onGift },
-    { id: 'rank', icon: 'trophy', palette: 'gold', label: 'رتبه', onTap: onRank },
+    { id: 'missions', icon: 'missions', palette: 'violet', label: t('plate.missions'), onTap: onMissions },
+    { id: 'gift', icon: 'gift', palette: 'ruby', label: t('plate.gift'), onTap: onGift },
+    { id: 'rank', icon: 'trophy', palette: 'gold', label: t('plate.rank'), onTap: onRank },
   ]
   const left: PlateDef[] = [
-    { id: 'inbox', icon: 'inbox', palette: 'sapphire', label: 'پیام‌ها', onTap: onInbox },
-    { id: 'faction', icon: 'society', palette: 'teal', label: 'جناح', onTap: onFaction },
+    { id: 'inbox', icon: 'inbox', palette: 'sapphire', label: t('plate.inbox'), onTap: onInbox },
+    { id: 'faction', icon: 'society', palette: 'teal', label: t('plate.faction'), onTap: onFaction },
   ]
 
   return (

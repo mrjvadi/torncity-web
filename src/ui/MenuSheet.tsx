@@ -1,17 +1,18 @@
 import BottomSheet from './BottomSheet'
 import { BUILD_ID } from '../lib/freshness'
 import Icon from './Icon'
+import { t, type Key } from '../i18n'
 
-const USEFUL_COMMANDS: { command: string; label: string; icon: string }[] = [
-  { command: 'player.profile.get', label: 'پروفایل', icon: 'person' },
-  { command: 'bank.show', label: 'بانک', icon: 'bank' },
-  { command: 'inventory.show', label: 'کوله‌پشتی', icon: 'box' },
-  { command: 'job.status', label: 'وضعیت شغل', icon: 'work' },
-  { command: 'life.me', label: 'زندگی', icon: 'f_house' },
-  { command: 'map.list', label: 'نقشه‌ی شهر', icon: 'x_map' },
-  { command: 'map.cities', label: 'سفر بین‌شهری', icon: 'plane' },
-  { command: 'player.settings', label: 'تنظیمات', icon: 'gears' },
-  { command: 'device.list', label: 'دستگاه‌های متصل', icon: 'phone' },
+const USEFUL_COMMANDS: { command: string; label: Key; icon: string }[] = [
+  { command: 'player.profile.get', label: 'shell.menu.profile', icon: 'person' },
+  { command: 'bank.show', label: 'shell.menu.bank', icon: 'bank' },
+  { command: 'inventory.show', label: 'shell.menu.inventory', icon: 'box' },
+  { command: 'job.status', label: 'shell.menu.job', icon: 'work' },
+  { command: 'life.me', label: 'shell.menu.life', icon: 'f_house' },
+  { command: 'map.list', label: 'shell.menu.map', icon: 'x_map' },
+  { command: 'map.cities', label: 'shell.menu.cities', icon: 'plane' },
+  { command: 'player.settings', label: 'shell.menu.settings', icon: 'gears' },
+  { command: 'device.list', label: 'shell.menu.devices', icon: 'phone' },
 ]
 
 interface MenuSheetProps {
@@ -23,17 +24,17 @@ interface MenuSheetProps {
 
 export default function MenuSheet({ open, onClose, onPick, onSignOut }: MenuSheetProps) {
   return (
-    <BottomSheet open={open} onClose={onClose} title="منو">
+    <BottomSheet open={open} onClose={onClose} title={t('shell.menu')}>
       <div className="menu-grid">
         {USEFUL_COMMANDS.map((c) => (
           <button key={c.command} className="menu-item" onClick={() => { onPick(c.command); onClose() }}>
             <Icon name={c.icon} palette="sapphire" size={22} />
-            <span>{c.label}</span>
+            <span>{t(c.label)}</span>
           </button>
         ))}
       </div>
-      <button className="menu-signout display" onClick={onSignOut}>خروج از حساب</button>
-      <div className="menu-build">نسخه <span dir="ltr">{BUILD_ID}</span></div>
+      <button className="menu-signout display" onClick={onSignOut}>{t('shell.menu.sign_out')}</button>
+      <div className="menu-build">{t('shell.menu.version')} <span dir="ltr">{BUILD_ID}</span></div>
       <style>{`
         .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
         .menu-item { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid rgba(242,194,85,0.18); border-radius: 14px; padding: 14px 6px; font-size: 12px; color: var(--text-dim); }

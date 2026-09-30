@@ -12,6 +12,7 @@ import { sanitizeTelegramHtml } from '../lib/sanitizeHtml'
 import { report } from '../lib/reporter'
 import { formatNumber } from '../lib/persian'
 import type { TabKey } from './Dock'
+import { t } from '../i18n'
 
 interface CityViewProps {
   /** Switches the shell's own tab (missions -> activity, rank -> profile,
@@ -103,11 +104,11 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
   const bubbles = useMemo<WorldBubbleDef[]>(() => {
     const list: WorldBubbleDef[] = []
     if (jobStatus?.employed && !(jobStatus.shift && (jobStatus.shift.remaining_seconds ?? 0) > 0)) {
-      list.push({ id: 'bubble:work', text: 'شیفت آماده', icon: 'check', palette: 'teal', tint: 'teal', onTap: () => { void exec('job.work') } })
+      list.push({ id: 'bubble:work', text: t('city.shift_ready'), icon: 'check', palette: 'teal', tint: 'teal', onTap: () => { void exec('job.work') } })
     }
     const course = work?.course
     if (course?.course?.code && !course.paused && (course.remaining_seconds ?? 1) <= 0) {
-      list.push({ id: 'bubble:study', text: 'مدرک آماده', icon: 'study', palette: 'violet', tint: 'violet' })
+      list.push({ id: 'bubble:study', text: t('city.course_ready'), icon: 'study', palette: 'violet', tint: 'violet' })
     }
     return list
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,7 +160,7 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
 
       <SidePlates
         onMissions={() => onTab?.('activity')}
-        onGift={() => toast.push('جایزه‌ی روز به‌زودی اضافه می‌شود')}
+        onGift={() => toast.push(t('city.gift_soon'))}
         onRank={() => onTab?.('profile')}
         onInbox={() => onInbox?.()}
         onFaction={() => onTab?.('society')}
@@ -168,9 +169,9 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
       {/* NBSP in the title keeps "پر می‌شه" together at narrow widths */}
       {showToast && (
         <ReadyToast
-          title={`انرژی ${formatNumber(Math.round(energyFullIn / 60))} دقیقه دیگه پر می‌شه`}
-          subtitle={pay > 0 ? `یه شیفت برو که هدر نره  ·  +${formatNumber(pay)}` : 'یه شیفت برو که هدر نره'}
-          cta="شروع شیفت"
+          title={t('city.energy_full', { n: formatNumber(Math.round(energyFullIn / 60)) })}
+          subtitle={pay > 0 ? t('city.shift_pay', { pay: formatNumber(pay) }) : t('city.shift_go')}
+          cta={t('city.start_shift')}
           onTap={() => { void exec('job.work') }}
         />
       )}
@@ -178,8 +179,8 @@ export default function CityView({ onTab, onInbox }: CityViewProps) {
       {/* text only — no blank shimmer placeholder: the proto has no loading
           skeleton concept, and an unstyled shimmering pill over the city
           reads as a rendering bug more than a loading state. */}
-      {loading && <div className="city-loading">در حال بارگذاری شهر…</div>}
-      {loadError && <div className="city-error">نقشه‌ی شهر بارگذاری نشد.</div>}
+      {loading && <div className="city-loading">{t('city.loading')}</div>}
+      {loadError && <div className="city-error">{t('city.load_failed')}</div>}
 
       <PlotSheet plot={selected} onClose={() => setSelected(null)} exec={exec} />
 
@@ -234,7 +235,7 @@ function PlotSheet({ plot, onClose, exec }: { plot: CityPlot | null; onClose: ()
         ) : company?.text ? (
           <div className="screen-text" dangerouslySetInnerHTML={{ __html: sanitizeTelegramHtml(company.text) }} />
         ) : (
-          <p style={{ color: 'var(--text-dim)' }}>اطلاعاتی برای این کسب‌وکار یافت نشد.</p>
+          <p style={{ color: 'var(--text-dim)' }}>{t('city.no_info')}</p>
         )
       )}
       {plot.kind === 'place' && plot.ref?.code && (
@@ -243,7 +244,7 @@ function PlotSheet({ plot, onClose, exec }: { plot: CityPlot | null; onClose: ()
           style={{ width: '100%' }}
           onClick={() => { void exec('place.go', { place: plot.ref!.code! }); onClose() }}
         >
-          برو به {name}
+          {t('city.go_to', { name })}
         </button>
       )}
       {plot.kind === 'decor' && <p style={{ color: 'var(--text-dim)' }}>{name}</p>}

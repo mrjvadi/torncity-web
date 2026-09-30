@@ -4,6 +4,7 @@ import { formatNumber } from '../lib/persian'
 import { clockIn } from '../lib/time'
 import { GLabel, Chip, Emboss, Plate, Count } from '../kit'
 import type { IconPalette } from '../kit'
+import { t } from '../i18n'
 
 interface HudProps {
   profile: ProfileView | null
@@ -52,7 +53,7 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
     <div className="hud">
       <div className="hud-panel">
         <div className="hud-top">
-          <button className="hud-avatar" onClick={onAvatar} aria-label="پروفایل">
+          <button className="hud-avatar" onClick={onAvatar} aria-label={t('shell.profile')}>
             <svg className="hud-ring" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="44" className="ring-track" />
               <circle
@@ -96,13 +97,13 @@ export default function Hud({ profile, unread, onBank, onBell, onMenu, onAvatar 
           <StatBar icon="health" palette="emerald" color="#4cc47e" value={profile?.health ?? 0} max={profile?.max_health ?? 100} frac={healthFrac} full={healthFull} fullIn={0} />
         </div>
         <div className="hud-corner-plates">
-          <button className="hud-corner-plate" onClick={onBell} aria-label="اعلان‌ها">
+          <button className="hud-corner-plate" onClick={onBell} aria-label={t('shell.bell')}>
             <Plate size="calc(76 * var(--u))" rimWidth="calc(2.5 * var(--u))" light="#232c58" dark="#10142b">
               <Emboss name="inbox" palette="sapphire" size="calc(52 * var(--u))" />
             </Plate>
             {unread > 0 && <Count n={unread} size="calc(30 * var(--u))" className="hud-corner-count" />}
           </button>
-          <button className="hud-corner-plate" onClick={onMenu} aria-label="منو">
+          <button className="hud-corner-plate" onClick={onMenu} aria-label={t('shell.menu')}>
             <Plate size="calc(76 * var(--u))" rimWidth="calc(2.5 * var(--u))" light="#232c58" dark="#10142b">
               <Emboss name="menu" palette="steel" size="calc(52 * var(--u))" />
             </Plate>
