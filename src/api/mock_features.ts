@@ -21,8 +21,8 @@ const MILITARY: Record<string, () => CommandResponse> = {
       '<b>وزارت دفاع فنویک</b>',
       'وزیر دفاع: کیارش  ·  فرمانده کل: سارا',
       '',
-      'خزانه: 4,820,000 نیل',
-      'صندوق دفاع: 1,240,000 نیل',
+      'خزانه: 4,820,000 ساپ',
+      'صندوق دفاع: 1,240,000 ساپ',
       'سهم دفاع از بودجه: 18%',
       '',
       'نیروها: زمینی — یک لشکر  ·  هوایی — یک گردان  ·  پدافند — چند سامانه',
@@ -43,7 +43,7 @@ const MILITARY: Record<string, () => CommandResponse> = {
       'هوایی: جنگنده — یک گردان  ·  بمب‌افکن — چند فروند',
       'پدافند: سامانه‌ی راداری — چند سامانه',
       '',
-      'آمادگی: 82%  ·  هزینه‌ی نگه‌داری: 62,000 نیل',
+      'آمادگی: 82%  ·  هزینه‌ی نگه‌داری: 62,000 ساپ',
     ),
     actions: [
       { label: 'یگان زمینی', command: 'military.branch', args: { branch: 'ground' }, row: 0, kind: 'navigation', icon: 'action:military' },
@@ -77,7 +77,7 @@ const MILITARY: Record<string, () => CommandResponse> = {
   }),
   'military.procure': () => ({
     ok: true, screen: 'military.procure',
-    text: html('<b>تدارکات — فنویک</b>', 'صندوق دفاع: 1,240,000 نیل', '', '1) تانک «سیمرغ»  ·  صنایع آراز  ·  کالدریس  ·  موجودی 40  ·  قیمت 8,200'),
+    text: html('<b>تدارکات — فنویک</b>', 'صندوق دفاع: 1,240,000 ساپ', '', '1) تانک «سیمرغ»  ·  صنایع آراز  ·  کالدریس  ·  موجودی 40  ·  قیمت 8,200'),
     actions: [
       { label: 'خرید تانک «سیمرغ»  ·  8,200', command: 'military.buy', args: { no: '1' }, row: 0, kind: 'primary', icon: 'action:buy' },
       NAV_BACK('military.ministry'),

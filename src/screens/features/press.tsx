@@ -33,7 +33,7 @@ const News: ScreenComponent = () => (
 )
 
 const STEPS = [
-  { n: 1, icon: 'coins', reward: '1,000 نیل', done: true },
+  { n: 1, icon: 'coins', reward: '1,000 ساپ', done: true },
   { n: 3, icon: 'x_chest', reward: 'صندوق طلایی', done: true },
   { n: 5, icon: 'x_crown', reward: 'قاب ویژه', done: false },
   { n: 10, icon: 'x_car', reward: 'ماشین مسابقه', done: false },

@@ -185,7 +185,8 @@ export const fa = {
   'time.m': '{n} دقیقه',
   'time.s': '{n} ثانیه',
   'time.d': '{n} روز',
-  'unit.money': 'نیل',
+  'unit.money': 'ساپ',
+  'unit.gem': 'نیل',
 } as const
 
 export type Key = keyof typeof fa

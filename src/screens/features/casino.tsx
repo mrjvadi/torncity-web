@@ -21,7 +21,7 @@ const Casino: ScreenComponent = () => (
       <Tile icon="x_ticket" palette="violet" title="بخت‌آزمایی" sub="قرعه‌کشی جمعه" glow />
     </TileGrid>
     <Card>
-      <Row icon="x_ticket" palette="violet" title="جایزه‌ی بزرگ جمعه" sub="بلیت: 100 نیل  ·  2 روز و 4 ساعت" right="1,240,000" rightColor="var(--gold)" />
+      <Row icon="x_ticket" palette="violet" title="جایزه‌ی بزرگ جمعه" sub="بلیت: 100 ساپ  ·  2 روز و 4 ساعت" right="1,240,000" rightColor="var(--gold)" />
     </Card>
     <div style={{ fontSize: 13, color: 'var(--text-dim)', textAlign: 'center' }}>
       بازی مسئولانه: سقف روزانه را خودت تعیین می‌کنی و از آن بیشتر نمی‌شود.
@@ -72,7 +72,7 @@ const Race: ScreenComponent = () => (
       ))}
     </Section>
     <Card>
-      <Row icon="x_car" palette="ruby" title="شاهین R" sub="سرعت 220  ·  شتاب 7.1  ·  کنترل 68" right="جایزه‌ی نفر اول: 12,000 نیل" />
+      <Row icon="x_car" palette="ruby" title="شاهین R" sub="سرعت 220  ·  شتاب 7.1  ·  کنترل 68" right="جایزه‌ی نفر اول: 12,000 ساپ" />
     </Card>
     <BtnRow>
       <SoonBtn kind="red" icon="x_flame">نیترو x2</SoonBtn>

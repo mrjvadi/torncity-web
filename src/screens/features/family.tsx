@@ -62,18 +62,18 @@ const Proposal: ScreenComponent = () => (
     <Card><div className="screen-text">آشنایی: 12 روز  ·  34 پیام  ·  2 قرار</div></Card>
     <Section title="انگشتر">
       <TileGrid>
-        <Tile icon="f_diamond" palette="steel" title="نقره" sub="500 نیل  ·  +5 صمیمیت" />
-        <Tile icon="f_diamond" palette="gold" title="طلا" sub="2,500 نیل  ·  +15 صمیمیت" glow />
-        <Tile icon="f_diamond" palette="sapphire" title="الماس" sub="12,000 نیل  ·  +40 صمیمیت" />
+        <Tile icon="f_diamond" palette="steel" title="نقره" sub="500 ساپ  ·  +5 صمیمیت" />
+        <Tile icon="f_diamond" palette="gold" title="طلا" sub="2,500 ساپ  ·  +15 صمیمیت" glow />
+        <Tile icon="f_diamond" palette="sapphire" title="الماس" sub="12,000 ساپ  ·  +40 صمیمیت" />
       </TileGrid>
     </Section>
     <Section title="مهریه">
-      <Row icon="coins" palette="gold" title="1,000 نیل" sub="اگر همسر در طلاق بخواهد، پرداخت می‌شود" />
+      <Row icon="coins" palette="gold" title="1,000 ساپ" sub="اگر همسر در طلاق بخواهد، پرداخت می‌شود" />
     </Section>
     <Card>
       <div className="screen-text">«از روزی که در بازار آزور دیدمت، هر روزم بهتر شده. با من ازدواج می‌کنی؟»</div>
     </Card>
-    <SoonBtn>خواستگاری  ·  2,500 نیل</SoonBtn>
+    <SoonBtn>خواستگاری  ·  2,500 ساپ</SoonBtn>
   </Scroll>
 )
 
@@ -93,9 +93,9 @@ const Child: ScreenComponent = () => (
       <StatBar label="تحصیل" value="71%" fraction={0.71} color="var(--lapis)" />
     </Section>
     <Section title="کارها">
-      <Row icon="f_school" palette="sapphire" title="مدرسه" sub="هر روز  ·  120 نیل  ·  تحصیل +" right={<Chip text="ثبت‌نام شده" color="var(--steel)" />} />
+      <Row icon="f_school" palette="sapphire" title="مدرسه" sub="هر روز  ·  120 ساپ  ·  تحصیل +" right={<Chip text="ثبت‌نام شده" color="var(--steel)" />} />
       <Row icon="f_slide" palette="emerald" title="بازی در پارک" sub="شادی +15  ·  1 انرژی" />
-      <Row icon="f_grad" palette="violet" title="کلاس زبان" sub="تحصیل +10  ·  300 نیل" />
+      <Row icon="f_grad" palette="violet" title="کلاس زبان" sub="تحصیل +10  ·  300 ساپ" />
     </Section>
   </Scroll>
 )
@@ -106,8 +106,8 @@ const Divorce: ScreenComponent = () => (
     <Hero tint="ruby" icon="f_broken" title="جدایی از آرش" sub="42 روز ازدواج  ·  صمیمیت 18%" />
     <Card><div className="screen-text">پس از درخواست، 3 روز مهلت آشتی هست. اگر هیچ‌کدام پس نگیرید، طلاق ثبت می‌شود.</div></Card>
     <Section title="تقسیم دارایی">
-      <Row icon="bank" palette="sapphire" title="حساب مشترک" sub="24,000 نیل  ·  نصف به نصف" right="12,000" rightColor="#8fb0ff" />
-      <Row icon="f_house" palette="amber" title="خانه‌ی خانوادگی" sub="ارزش 180,000 نیل" />
+      <Row icon="bank" palette="sapphire" title="حساب مشترک" sub="24,000 ساپ  ·  نصف به نصف" right="12,000" rightColor="#8fb0ff" />
+      <Row icon="f_house" palette="amber" title="خانه‌ی خانوادگی" sub="ارزش 180,000 ساپ" />
       <ChipRow>
         <Chip text="به سارا" color="var(--steel)" />
         <Chip text="به آرش" color="var(--steel)" />

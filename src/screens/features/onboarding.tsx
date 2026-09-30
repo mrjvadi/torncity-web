@@ -14,25 +14,25 @@ const Tutorial: ScreenComponent = () => (
     <div className="ft-chip-row" style={{ justifyContent: 'center' }}>
       {[0, 1, 2, 3, 4, 5].map((i) => <span key={i} className="ft-dot" style={{ position: 'static', width: 10, height: 10, background: i <= 1 ? 'var(--gold)' : 'rgba(255,255,255,0.15)' }} />)}
     </div>
-    <Chip text="جایزه‌ی پایان: 1,000 نیل" color="var(--saffron)" />
+    <Chip text="جایزه‌ی پایان: 1,000 ساپ" color="var(--saffron)" />
     <SoonBtn kind="steel">رد کردن</SoonBtn>
   </Scroll>
 )
 
 const DAYS = [
-  { icon: 'coins', palette: 'gold' as const, reward: '500 نیل', claimed: true },
+  { icon: 'coins', palette: 'gold' as const, reward: '500 ساپ', claimed: true },
   { icon: 'energy', palette: 'amber' as const, reward: 'انرژی +10', claimed: true },
-  { icon: 'coins', palette: 'gold' as const, reward: '800 نیل', claimed: true },
+  { icon: 'coins', palette: 'gold' as const, reward: '800 ساپ', claimed: true },
   { icon: 'pill', palette: 'ruby' as const, reward: 'دارو ×2', claimed: true },
   { icon: 'x_gem', palette: 'sapphire' as const, reward: '5 طلا', claimed: false, today: true },
-  { icon: 'coins', palette: 'gold' as const, reward: '1,500 نیل', claimed: false },
+  { icon: 'coins', palette: 'gold' as const, reward: '1,500 ساپ', claimed: false },
   { icon: 'x_chest', palette: 'gold' as const, reward: 'صندوق هفته', claimed: false },
 ]
 
 const TASKS = [
-  { icon: 'crime', palette: 'steel' as const, label: '3 جرم انجام بده', have: 2, need: 3, reward: '300 نیل' },
+  { icon: 'crime', palette: 'steel' as const, label: '3 جرم انجام بده', have: 2, need: 3, reward: '300 ساپ' },
   { icon: 'x_lift', palette: 'amber' as const, label: 'در باشگاه تمرین کن', have: 1, need: 1, reward: 'انرژی +5' },
-  { icon: 'm_chat', palette: 'sapphire' as const, label: 'به یک دوست پیام بده', have: 0, need: 1, reward: '100 نیل' },
+  { icon: 'm_chat', palette: 'sapphire' as const, label: 'به یک دوست پیام بده', have: 0, need: 1, reward: '100 ساپ' },
   { icon: 'work', palette: 'teal' as const, label: 'یک شیفت کار کن', have: 1, need: 1, reward: 'تجربه +20' },
 ]
 

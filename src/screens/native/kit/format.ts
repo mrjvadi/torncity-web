@@ -2,14 +2,15 @@
 // Western digits (repo rule): no locale that would print Persian glyphs.
 
 import { formatNumber } from '../../../lib/persian'
+import { t } from '../../../i18n'
 
 export { formatNumber }
 
-/** Money in minor units, with the currency word after it (نیل, matching
+/** Money in minor units, with the currency word after it (ساپ, matching
  * the bot's own rendering). Negative values keep their sign. */
 export function money(n: number | undefined | null): string {
   if (n === undefined || n === null) return '۰'.replace('۰', '0')
-  return `${formatNumber(n)} نیل`
+  return `${formatNumber(n)} ${t('unit.money')}`
 }
 
 /** A whole-second duration as "H:MM" (an hour or more) or "MM:SS" (under

@@ -58,7 +58,7 @@ const Attack: ScreenComponent = () => (
           </div>
         )
       })}
-      <ChipRow><Chip text="جایزه روی سرش: 5,000 نیل" color="var(--saffron)" /></ChipRow>
+      <ChipRow><Chip text="جایزه روی سرش: 5,000 ساپ" color="var(--saffron)" /></ChipRow>
     </Card>
     <Section title="تجهیزات">
       <TileGrid>
@@ -94,12 +94,12 @@ const Fight: ScreenComponent = () => (
     </Section>
     <Section title="با بردیا چه کنی؟">
       <TileGrid>
-        <Tile icon="x_cash" palette="gold" title="جیبش را بزن" sub="3,200 نیل" />
+        <Tile icon="x_cash" palette="gold" title="جیبش را بزن" sub="3,200 ساپ" />
         <Tile icon="x_hosp" palette="ruby" title="بیمارستان" sub="2 ساعت" />
         <Tile icon="f_dove" palette="steel" title="رهایش کن" sub="تجربه +50" />
       </TileGrid>
     </Section>
-    <ChipRow><Chip text="جایزه‌ی سر: 5,000 نیل به حسابت آمد" color="var(--leaf)" /></ChipRow>
+    <ChipRow><Chip text="جایزه‌ی سر: 5,000 ساپ به حسابت آمد" color="var(--leaf)" /></ChipRow>
   </Scroll>
 )
 
@@ -121,7 +121,7 @@ const Bounty: ScreenComponent = () => (
           <div className="display" style={{ fontSize: 18 }}>تحت تعقیب</div>
           <Plate icon={w.icon} palette={w.palette} size={60} />
           <div className="display" style={{ fontSize: 15 }}>{w.name}  ·  سطح {w.level}</div>
-          <div className="display" style={{ fontSize: 20, color: '#b06a00' }}>{w.reward} نیل</div>
+          <div className="display" style={{ fontSize: 20, color: '#b06a00' }}>{w.reward} ساپ</div>
           <div style={{ fontSize: 12 }}>از طرف: {w.by}</div>
           {w.state ? <Chip text={w.state} color="var(--steel)" /> : <SoonBtn kind="red">حمله</SoonBtn>}
         </div>

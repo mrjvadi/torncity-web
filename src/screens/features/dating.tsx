@@ -72,9 +72,9 @@ const Date_: ScreenComponent = () => (
     <Hero tint="rose" icon="m_meal" title="دعوت از آرش" sub="هر دو در فنویک هستید" stat={{ label: 'وضعیت رابطه', value: 'صمیمی' }} />
     <Section title="کجا؟">
       <TileGrid>
-        <Tile icon="m_coffee" palette="amber" title="کافه" sub="200 نیل  ·  1 انرژی  ·  صمیمیت +6" />
-        <Tile icon="m_meal" palette="gold" title="رستوران" sub="800 نیل  ·  1 انرژی  ·  صمیمیت +12" glow />
-        <Tile icon="m_popcorn" palette="ruby" title="سینما" sub="400 نیل  ·  2 انرژی  ·  صمیمیت +9" />
+        <Tile icon="m_coffee" palette="amber" title="کافه" sub="200 ساپ  ·  1 انرژی  ·  صمیمیت +6" />
+        <Tile icon="m_meal" palette="gold" title="رستوران" sub="800 ساپ  ·  1 انرژی  ·  صمیمیت +12" glow />
+        <Tile icon="m_popcorn" palette="ruby" title="سینما" sub="400 ساپ  ·  2 انرژی  ·  صمیمیت +9" />
         <Tile icon="m_bench" palette="emerald" title="پارک" sub="رایگان  ·  2 انرژی  ·  صمیمیت +4" />
       </TileGrid>
     </Section>
@@ -86,7 +86,7 @@ const Date_: ScreenComponent = () => (
       </ChipRow>
     </Section>
     <Card><div className="screen-text">آرش باید دعوت را بپذیرد  ·  هزینه با دعوت‌کننده  ·  روزی یک قرار</div></Card>
-    <SoonBtn>فرستادن دعوت  ·  800 نیل</SoonBtn>
+    <SoonBtn>فرستادن دعوت  ·  800 ساپ</SoonBtn>
   </Scroll>
 )
 

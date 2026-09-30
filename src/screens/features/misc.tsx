@@ -43,7 +43,7 @@ const Will: ScreenComponent = () => (
       <div className="display" style={{ fontSize: 22 }}>وصیت‌نامه‌ی سارا</div>
       <div style={{ fontSize: 13, marginTop: 6 }}>ثبت‌شده در محضر فنویک  ·  آخرین تغییر: 3 روز پیش  ·  وصی: آرش</div>
     </div>
-    <Section title="دارایی‌ها  ·  حدود 412,000 نیل">
+    <Section title="دارایی‌ها  ·  حدود 412,000 ساپ">
       <TileGrid>
         <Tile icon="bank" palette="sapphire" title="نقد و بانک" sub="98,750" />
         <Tile icon="f_house" palette="amber" title="نیمی از خانه‌ی خانوادگی" sub="90,000" />
@@ -57,7 +57,7 @@ const Will: ScreenComponent = () => (
       <Row icon="a_rabbit" palette="cream" title="کیان" sub="3 سال  ·  تا 18 سالگی نزد قیم" right="25%" />
       <Row icon="f_baby" palette="amber" title="نوزاد" sub="12 روزه  ·  تا 18 سالگی نزد قیم" right="15%" />
     </Section>
-    <SoonBtn>ثبت در محضر  ·  500 نیل</SoonBtn>
+    <SoonBtn>ثبت در محضر  ·  500 ساپ</SoonBtn>
   </Scroll>
 )
 
