@@ -1145,6 +1145,7 @@ export const uiEn: Record<UiKey, string> = {
   'labor.wage_set': 'Wage for players',
   'labor.close': 'Close the job',
   'labor.not_resident': 'You do not live here, but you can work by the day while you are in the village.',
+  'labor.by_work_hint': 'Workers raise this building. At its site, work a shift yourself or hire labourers.',
   'labor.btn.site': 'Site',
   'labor.btn.mine': 'My work',
   'labor.btn.board': 'Hiring board',

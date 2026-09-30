@@ -106,11 +106,15 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
       {panel?.description && <p className="vh-desc">{panel.description}</p>}
 
       {going ? (
-        b.finish_at && <Bar frac={p} color="#f5a11f" label={`${countdown(b.finish_at, now)}  ·  ${t('progress.percent', { p: Math.round(p * 100) })}`} />
+        b.finish_at
+          ? <Bar frac={p} color="#f5a11f" label={`${countdown(b.finish_at, now)}  ·  ${t('progress.percent', { p: Math.round(p * 100) })}`} />
+          : <p className="vh-desc">{t('labor.by_work_hint')}</p>
       ) : (
         <TypePanel kind={kind} panel={panel} onOpen={onOpen} onClose={onClose} />
       )}
-      {going && b.id && !b.private && (
+      {/* A building raised by work, a citizen's private one too, is worked
+          and hired for at its site. */}
+      {going && b.id && (
         <div className="vh-sheet-actions">
           <Slab tone="gold" radius={14} lip={4} onClick={() => setSite(true)}>{t('labor.btn.site')}</Slab>
         </div>
