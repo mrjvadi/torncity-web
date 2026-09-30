@@ -175,3 +175,54 @@ property.commercial | تجاری | Commercial
 property.rented_to | اجاره داده به {name} | Rented to {name}
 property.rent_amount | اجاره {n} | Rent {n}
 property.overdue | {n} دوره معوق | {n} overdue periods
+# -- elections / government / factions / crime ------------------------------------
+office.mayor | شهردار | Mayor
+office.deputy_mayor | معاون شهردار | Deputy mayor
+office.city_council | عضو شورای شهر | City council member
+office.city_council_short | شورای شهر | City council
+office.president | رئیس‌جمهور | President
+phase.candidacy | نامزدی | Candidacy
+phase.voting | رأی‌گیری | Voting
+phase.counting | در حال شمارش | Counting
+phase.counted | پایان‌یافته | Finished
+elections.title | انتخابات | Elections
+elections.winner | برنده: {names} | Winner: {names}
+elections.counted | شمارش پایان یافت | Counting finished
+elections.candidates | {n} نامزد | {n} candidates
+elections.you | (تو) | (you)
+elections.elected | برنده | Elected
+elections.votes | {n} رأی | {n} votes
+elections.deposit | سپرده‌ی نامزدی: {n} | Candidacy deposit: {n}
+gov.title | دولت شهر | City government
+gov.holds | تو در یکی از این مقام‌ها هستی. | You hold one of these offices.
+gov.empty_seat | خالی | Vacant
+gov.lever.city.tax_rate | نرخ مالیات | Tax rate
+gov.lever.city.minimum_wage | حداقل دستمزد | Minimum wage
+gov.lever.city.shift_window_hours | بازه‌ی ساعت شیفت | Shift window (hours)
+faction.title | جناح | Faction
+faction.list_title | جناح‌های شهر | City factions
+faction.members | اعضا | Members
+faction.members_of | {a} از {b} | {a} of {b}
+faction.bank | صندوق | Treasury
+faction.your_rank | رتبه‌ی تو: {r} | Your rank: {r}
+faction.applications | {n} درخواست عضویت | {n} membership requests
+faction.rank.leader | رهبر | Leader
+faction.rank.officer | مسئول | Officer
+faction.rank.member | عضو | Member
+faction.operation | عملیات | Operation
+faction.gathering | در حال جمع شدن | Gathering
+faction.you_are_in | عضو {name} هستی. | You are a member of {name}.
+faction.member_count | {n} عضو | {n} members
+crime.title | جرم | Crime
+crime.in_jail | در زندان · {t} مانده | In jail · {t} left
+crime.busy | جرم در حال انجام · {t} مانده | Crime in progress · {t} left
+crime.travelling | در سفر هستی؛ نمی‌توانی جرم انجام بدهی. | You are travelling; you cannot commit crimes.
+crime.heat | داغی {n} | Heat {n}
+crime.wanted | {n} تحت تعقیب | {n} wanted
+crime.nerve | عصب {a}/{b} | Nerve {a}/{b}
+crime.full_in | پر در {t} | Full in {t}
+crime.venue | مکان: {name} | Place: {name}
+crime.tier | رتبه: {name} | Tier: {name}
+crime.tier_next | بعدی: {name} ({a}/{b}) | next: {name} ({a}/{b})
+crime.nerve_cost | {n} عصب | {n} nerve
+common.sep | ، | ,
