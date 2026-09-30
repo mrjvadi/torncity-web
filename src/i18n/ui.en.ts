@@ -945,4 +945,6 @@ export const uiEn: Record<UiKey, string> = {
   'bank.jailed': 'You are in jail; the bank is out of reach.',
   'profile.map': 'City map',
   'profile.travel': 'Intercity travel',
+  'common.prev': 'Previous',
+  'common.next': 'Next',
 }

@@ -14,6 +14,7 @@ import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 import { foundingDraftFromLaunch } from '../lib/telegram'
 import * as api from '../api/client'
 import { t } from '../i18n'
+import { NavCtx } from '../state/NavContext'
 
 /** The village tab: the player's village, or the call to found one. Support
  * is a journey away, never a tab. */
@@ -74,7 +75,32 @@ export default function Shell() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // the screens opened on the way, so the header's back returns to the previous one
+  const [hist, setHist] = useState<ScreenKey[]>([])
+
+  /** The screen a tab opens on. */
+  function rootOf(k: TabKey): ScreenKey {
+    const hub = TAB_HUB[k]
+    if (k === 'city') return { command: '', local: hasVillage ? 'village_home' : 'village_call' }
+    if (hub && LOCAL_SCREENS[hub]) return { command: '', local: hub }
+    return { command: TAB_COMMAND[k] }
+  }
+  const sameKey = (a: ScreenKey, b: ScreenKey) => a.command === b.command && (a.local ?? '') === (b.local ?? '') && JSON.stringify(a.args ?? {}) === JSON.stringify(b.args ?? {})
+  const atRoot = sameKey(screenKey, rootOf(tab))
+
+  function navigate(next: ScreenKey) {
+    if (sameKey(next, screenKey)) { setScreenKey(next); return }
+    setHist(sameKey(next, rootOf(tab)) ? [] : (h) => [...h.slice(-19), screenKey])
+    setScreenKey(next)
+  }
+
+  function goBack() {
+    if (hist.length) { setScreenKey(hist[hist.length - 1]); setHist(hist.slice(0, -1)) }
+    else selectTab(tab)
+  }
+
   function selectTab(next: TabKey) {
+    setHist([])
     setTab(next)
     const hub = TAB_HUB[next]
     if (next === 'city') setScreenKey({ command: '', local: hasVillage ? 'village_home' : 'village_call' })
@@ -83,17 +109,17 @@ export default function Shell() {
   }
 
   function run(command: string, args?: Record<string, string>) {
-    setScreenKey({ command, args })
+    navigate({ command, args })
   }
 
   function openLocal(name: string, args?: Record<string, string>) {
-    setScreenKey({ command: '', local: name, args })
+    navigate({ command: '', local: name, args })
   }
 
   async function onAction(a: Action) {
     if (!a.command) return
     const res = await exec(a.command, a.args ?? {})
-    if (res) setScreenKey({ command: a.command, args: a.args })
+    if (res) navigate({ command: a.command, args: a.args })
   }
 
   const isLocal = !!screenKey.local
@@ -103,6 +129,7 @@ export default function Shell() {
   const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: screenKey.args }
 
   return (
+    <NavCtx.Provider value={{ back: atRoot ? null : goBack }}>
     <div className="shell">
       <Hud
         profile={profile}
@@ -141,5 +168,6 @@ export default function Shell() {
         .vm-btn:active { transform: translateY(1px); }
       `}</style>
     </div>
+    </NavCtx.Provider>
   )
 }

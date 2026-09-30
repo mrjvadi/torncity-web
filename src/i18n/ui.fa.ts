@@ -943,6 +943,8 @@ export const uiFa = {
   'bank.jailed': 'در زندان هستی؛ به بانک دسترسی نداری.',
   'profile.map': 'نقشه‌ی شهر',
   'profile.travel': 'سفر بین‌شهری',
+  'common.prev': 'قبلی',
+  'common.next': 'بعدی',
 } as const
 
 export type UiKey = keyof typeof uiFa

@@ -1,0 +1,12 @@
+/* native controls for the server's action keyboard (Actions.tsx) */
+.ax-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 12px; text-align: start; color: var(--text); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); }
+.ax-row:active { background: rgba(255,255,255,0.1); }
+.ax-row-plate { flex: none; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+.ax-row-label { flex: 1; min-width: 0; font-size: 14px; }
+.ax-row-chev { flex: none; color: var(--text-dim); font-size: 20px; line-height: 1; }
+.ax-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ax-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 16px; font-size: 13px; color: var(--text); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+.ax-chip-primary { color: var(--gold); border-color: var(--gold-soft); background: rgba(242,194,85,0.1); }
+.ax-chip:active { transform: translateY(1px); }
+.ax-pager { display: flex; justify-content: space-between; gap: 10px; }
+.ax-page { padding: 7px 16px; border-radius: 16px; font-size: 13px; color: var(--text-dim); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
