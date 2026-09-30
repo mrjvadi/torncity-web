@@ -46,6 +46,8 @@ interface SessionApi {
   loginWithTelegram: () => Promise<void>
   signOut: () => void
   refreshProfile: () => Promise<void>
+  /** Reads the bootstrap again (the player's settlement appears after founding). */
+  refreshBootstrap: () => Promise<void>
   exec: (command: string, args?: Record<string, string>) => Promise<CommandResponse | null>
 }
 
@@ -225,6 +227,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }, [status])
 
+  const refreshBootstrap = useCallback(async () => {
+    try {
+      setBootstrap(await api.getBootstrap())
+    } catch {
+      // keep the last bootstrap
+    }
+  }, [])
+
   const refreshProfile = useCallback(async () => {
     try {
       const p = await api.runCommand('player.profile.get')
@@ -269,7 +279,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [refreshProfile, toast])
 
   return (
-    <Ctx.Provider value={{ status, bootstrap, profile, unread, error, inTelegram, loginWithCode, loginWithTelegram, signOut, refreshProfile, exec }}>
+    <Ctx.Provider value={{ status, bootstrap, profile, unread, error, inTelegram, loginWithCode, loginWithTelegram, signOut, refreshProfile, refreshBootstrap, exec }}>
       {children}
     </Ctx.Provider>
   )
