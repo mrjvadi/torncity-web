@@ -179,7 +179,14 @@ export class VillageStore {
           this.counters.layoutFetches++
           const next = await api.getLayout(this.id, this.snap.layout)
           if (next === null) this.counters.layout304++
-          else this.set({ layout: next, tick: this.snap.tick + 1 })
+          else {
+            const old = this.snap.layout
+            // bought land: the grid is bigger, so the ground (and the scene made
+            // from it) is made again; the chunks stay cached in the sampler
+            const grown = !!old && (old.grid.lots !== next.grid.lots || old.grid.origin.lat !== next.grid.origin.lat || old.grid.origin.lon !== next.grid.origin.lon)
+            if (grown) this.groundPromise = null
+            this.set(grown ? { layout: next, ground: null, tick: this.snap.tick + 1 } : { layout: next, tick: this.snap.tick + 1 })
+          }
           this.scheduleFinishFetch()
         } catch (e) {
           report('village', 'layout refetch failed: ' + String(e))

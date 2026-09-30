@@ -344,7 +344,7 @@ export interface LayoutVersions { head: string; member: string; public: string }
 /** What arrives on settlement:<id> (section 5.4). */
 export interface SettlementEvent {
   type:
-    | 'build_started' | 'build_finished' | 'build_cancelled' | 'build_salvaged'
+    | 'build_started' | 'build_finished' | 'build_cancelled' | 'build_salvaged' | 'build_batch_started' | 'grid_grown'
     | 'research_started' | 'research_finished' | 'knowledge_bought' | 'literacy_changed'
     | 'head_changed' | 'member_joined' | 'member_left'
   settlement_id: string
@@ -356,6 +356,12 @@ export interface SettlementEvent {
   lot_y?: number
   rotated?: boolean
   finish_at?: string
+  /** build_batch_started: how many, and which; grid_grown: the new side. */
+  count?: number
+  buildings?: { building_id: string; lot_x: number; lot_y: number }[]
+  grid_lots?: number
+  /** build_started: the roads the game laid with the building, finished at once. */
+  auto_roads?: { building_id: string; lot_x: number; lot_y: number }[]
   layout_version?: LayoutVersions
   research_id?: string
   code?: string
@@ -439,6 +445,63 @@ export interface LotConfirmView {
   cost_money: number
   materials: { component: Named; quantity: number }[] | null
   build_time_seconds: number
+  /** Lots of road the game lays with it (contract 1.4). */
+  auto_roads?: number
+}
+
+/** The panel of one placed building (settlement.building.view, contract 1.4). */
+export interface BuildingPanelView {
+  id: string
+  building: Named
+  role?: string
+  tier?: number
+  /** Which panel to draw; an unknown kind is drawn as 'generic'. */
+  kind: 'road' | 'civic_hall' | 'storage' | 'school' | 'security' | 'generic' | string
+  state: 'complete' | 'building'
+  mode?: '' | 'up' | 'dm' | 'cx'
+  x: number
+  y: number
+  w: number
+  h: number
+  rotated: boolean
+  upkeep?: number
+  description?: string
+  effects?: { target: string; value: number }[] | null
+  can_manage: boolean
+  started_at?: string
+  finish_at?: string
+  left_seconds?: number
+  progress_percent?: number
+  stock?: { item: Named; kind: string; qty: number }[] | null
+  literacy_percent?: number
+  teaching?: boolean
+  treasury?: number
+  population?: number
+  research?: { knowledge: Named; finish_at: string; left_seconds: number } | null
+  has_upgrade?: boolean
+  upgrades?: { building: Named; tier: number; cost_money: number; build_time_seconds: number; available: boolean; missing?: Named[] | null }[] | null
+}
+
+/** The total of a batch (settlement.build.place_many without confirm). */
+export interface BatchConfirmView {
+  settlement_name: string
+  building: Named
+  lots: { x: number; y: number }[] | null
+  count: number
+  cost_money: number
+  materials: { component: Named; quantity: number }[] | null
+  build_time_seconds: number
+}
+
+/** The price of the next expansion of the land (settlement.grid.grow). */
+export interface GridGrowView {
+  settlement_name: string
+  side: number
+  new_side: number
+  lots_gained: number
+  buildable_gained: number
+  price: number
+  treasury: number
 }
 
 export interface ConstructionLineView {
@@ -479,4 +542,6 @@ export interface CatalogueBuilding {
   name: Record<string, string>
   category?: string
   footprint: [number, number]
+  /** Free of the concurrent-construction cap, so it can be laid many at a time (roads). */
+  cap_exempt?: boolean
 }
