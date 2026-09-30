@@ -237,7 +237,7 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
             <div key={l.key} className={`vh-pill${isSel ? ' sel' : ''}`} style={{ left: l.x, top: l.y }}>
               {going && <Emboss name="clock" palette="gold" size={14} />}
               {isSel && <span>{buildingName(cat, b.type)}</span>}
-              {going && <span>{countdown(b.finish_at, now)}</span>}
+              {going && b.finish_at && <span>{countdown(b.finish_at, now)}</span>}
               {going && !isSel && b.started_at && <span style={{ opacity: 0.7 }}>{Math.round(constructionProgress(b, now) * 100)}%</span>}
             </div>
           )
@@ -313,6 +313,7 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
         <div className="vh-sheet-actions">
           <Slab tone="steel" radius={14} lip={4} onClick={() => { setInfoOpen(false); openLocal('village_overview') }}>{t('village.sheet.details')}</Slab>
           {own && member && <Slab tone="gold" radius={14} lip={4} onClick={() => { setInfoOpen(false); setDonateOpen(true) }}>{t('village.sheet.donate')}</Slab>}
+          {own && <Slab tone="steel" radius={14} lip={4} onClick={() => { setInfoOpen(false); openLocal('village_labor') }}>{t('labor.open_board')}</Slab>}
         </div>
       </BottomSheet>
       <DonateSheet open={donateOpen} onClose={() => setDonateOpen(false)} onDone={() => void overview.refresh()} />

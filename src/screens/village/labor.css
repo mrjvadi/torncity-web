@@ -1,0 +1,27 @@
+/* The labour market screens: the hiring board, a construction site, my work.
+   Chrome is the native kit's own (cards, bars, chips, slabs); only the layout
+   lives here. Class prefix `lb-`. */
+
+.lb-site { display: flex; flex-direction: column; gap: 10px; }
+.lb-list { display: flex; flex-direction: column; gap: 8px; }
+.lb-hint { font-size: 12.5px; line-height: 1.7; color: var(--text-dim); }
+.lb-hours { margin-top: 6px; font-size: 13px; color: var(--text-dim); }
+.lb-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.lb-btns .k-slab { flex: 1 1 auto; min-width: 84px; padding: 9px 12px; font-size: 14px; }
+.lb-site > .k-slab { padding: 13px 16px; font-size: 17px; }
+
+.lb-market-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.lb-market-title { font-size: 15px; color: var(--text); }
+.lb-market-rows { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin-top: 8px; font-size: 13px; color: var(--text-dim); }
+
+.lb-workers { display: flex; flex-direction: column; gap: 8px; }
+.lb-worker { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.lb-worker-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-worker-time { font-variant-numeric: tabular-nums; color: var(--gold); direction: ltr; }
+
+.lb-job-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 15px; }
+.lb-job-sub { margin-top: 4px; font-size: 13px; color: var(--text-dim); }
+
+.lb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lb-stat { font-size: 20px; }
+.lb-gold { color: var(--gold); }
