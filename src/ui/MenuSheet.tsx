@@ -10,6 +10,7 @@ const VILLAGE_ITEMS: { key: string; icon: string; palette: 'gold' | 'emerald' | 
   { key: 'overview', icon: 'chart', palette: 'sapphire', label: 'village.btn.overview', local: 'village_overview' },
   { key: 'who', icon: 'society', palette: 'emerald', label: 'village.btn.who', local: 'village_who' },
   { key: 'knowledge', icon: 'book', palette: 'violet', label: 'village.btn.knowledge', local: 'village_knowledge' },
+  { key: 'storage', icon: 'box', palette: 'sapphire', label: 'storage.open', local: 'village_storage' },
   { key: 'progress', icon: 'clock', palette: 'amber', label: 'village.btn.progress', local: 'village_progress' },
   { key: 'build', icon: 'house', palette: 'gold', label: 'village.btn.build', local: 'village_home', args: { build: '1' }, head: true },
   { key: 'donate', icon: 'gift', palette: 'gold', label: 'village.btn.donate', local: 'village_overview', args: { donate: '1' } },

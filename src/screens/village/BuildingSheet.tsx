@@ -29,7 +29,7 @@ interface Props {
   cat: Map<string, CatalogueBuilding>
   store: VillageStore | null
   /** Opens one of the village's own screens (the civic hall's doors). */
-  onOpen?: (screen: 'village_overview' | 'village_knowledge' | 'village_progress') => void
+  onOpen?: (screen: 'village_overview' | 'village_knowledge' | 'village_progress' | 'village_storage') => void
   /** Starts build mode on a building code (an upgrade line's button). */
   onBuild?: (code: string) => void
   onClose: () => void
@@ -177,6 +177,9 @@ function TypePanel({ kind, panel, onOpen, onClose }: {
             : (panel.stock ?? []).map((s) => (
               <div key={s.item.code} className="vh-stockrow"><span>{s.item.name}</span><b>{formatNumber(s.qty)}</b></div>
             ))}
+          {onOpen && (
+            <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</Slab>
+          )}
         </div>
       )}
       {kind === 'school' && (
@@ -199,6 +202,7 @@ function TypePanel({ kind, panel, onOpen, onClose }: {
               <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_overview') }}>{t('building.civic.overview')}</Slab>
               <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_knowledge') }}>{t('building.civic.knowledge')}</Slab>
               <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_progress') }}>{t('building.civic.progress')}</Slab>
+              <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</Slab>
             </div>
           )}
         </>

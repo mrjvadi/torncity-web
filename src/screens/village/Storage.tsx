@@ -1,0 +1,122 @@
+// «انبار و بازار»: the village's shared storage. Capacity used/total, what the
+// stock holds, and Support's market: the materials the village can buy, at a
+// unit price, with a quantity-preset and confirm flow for whoever the server
+// lets spend the treasury (`can_buy`). Reachable from the village menu and
+// from the civic hall and the granary, so a village with no granary can still
+// see its stock. Also the server screen `village_materials`.
+
+import { useState } from 'react'
+import BottomSheet from '../../ui/BottomSheet'
+import { Slab } from '../../kit'
+import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
+import { money } from '../native/kit/format'
+import { formatNumber } from '../../lib/persian'
+import { t } from '../../i18n'
+import type { ScreenProps } from '../types'
+import type { MaterialBuyConfirmView, MaterialMarketLineView, VillageMaterialsView } from '../../api/types'
+import { useVillageCommand } from '../../village/useVillage'
+import { useVillageView } from './common'
+import './village.css'
+
+export default function Storage({ response, openLocal }: ScreenProps) {
+  const cmd = useVillageCommand()
+  const { view: fetched, loading, refresh } = useVillageView<VillageMaterialsView>('settlement.materials', response?.screen === 'village_materials' ? response : null)
+  const [local, setLocal] = useState<{ view: VillageMaterialsView; base: VillageMaterialsView | null } | null>(null)
+  const [ask, setAsk] = useState<MaterialBuyConfirmView | null>(null)
+  const [busy, setBusy] = useState(false)
+  // a fresh answer from the server wins over a purchase result kept here
+  const v = local && local.base === fetched ? local.view : fetched
+  const back = () => openLocal('village_home')
+
+  async function prepare(line: MaterialMarketLineView, qty: number) {
+    setBusy(true)
+    const r = await cmd('settlement.materials.buy', { item: line.item.code, qty: String(qty) })
+    setBusy(false)
+    if (r.ok && r.res?.view) setAsk(r.res.view as unknown as MaterialBuyConfirmView)
+  }
+
+  async function confirm(a: MaterialBuyConfirmView) {
+    setBusy(true)
+    const r = await cmd('settlement.materials.buy', { item: a.item.code, qty: String(a.qty), confirm: 'confirm' }, { write: true })
+    setBusy(false)
+    setAsk(null)
+    if (r.ok && r.res?.view) setLocal({ view: r.res.view as unknown as VillageMaterialsView, base: fetched })
+    else void refresh()
+  }
+
+  if (loading && !v) return <ScreenScroll><Header title={t('storage.title')} tone="sapphire" onBack={back} /></ScreenScroll>
+  const stock = v?.stock ?? []
+  const market = v?.market ?? []
+  const frac = v && v.capacity > 0 ? Math.min(1, v.used / v.capacity) : 0
+  const full = !!v && v.capacity > 0 && v.used >= v.capacity
+
+  return (
+    <ScreenScroll>
+      <Header title={t('storage.title')} tone="sapphire" onBack={back} onRefresh={() => { setLocal(null); void refresh() }} />
+      {v && (
+        <>
+          {v.bought && (
+            <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: v.bought.item.name, total: money(v.bought.total) })}</Notice>
+          )}
+          <Card tone="sapphire">
+            <div className="vs-grid">
+              <div>
+                <div className="nx-stat-label">{t('storage.capacity')}</div>
+                <div className="display" style={{ fontSize: 20 }}><span className="vs-ltr">{formatNumber(v.used)} / {formatNumber(v.capacity)}</span></div>
+              </div>
+              <div>
+                <div className="nx-stat-label">{t('storage.treasury')}</div>
+                <div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div>
+              </div>
+            </div>
+            <Bar frac={frac} color={full ? '#e5484d' : '#5aa0f0'} label={t('storage.used', { p: Math.round(frac * 100) })} />
+            {full && <div className="vh-hint">{t('storage.full')}</div>}
+          </Card>
+
+          <SectionTitle>{t('storage.stock')}</SectionTitle>
+          {stock.length === 0
+            ? <Empty>{t('storage.stock_empty')}</Empty>
+            : (
+              <div className="vh-stock">
+                {stock.map((s) => (
+                  <div key={s.item.code} className="vh-stockrow"><span>{s.item.name}</span><b>{formatNumber(s.qty)}</b></div>
+                ))}
+              </div>
+            )}
+
+          <SectionTitle>{t('storage.market')}</SectionTitle>
+          <div className="vh-hint" style={{ textAlign: 'start' }}>{t('storage.market_hint')}</div>
+          {market.length === 0 && <Empty>{t('storage.market_empty')}</Empty>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {market.map((m) => (
+              <Card key={m.item.code}>
+                <ListRow icon="box" palette="steel" title={m.item.name} sub={t('storage.unit_price', { p: money(m.price) })} right={<Chip>{t('storage.source')}</Chip>} />
+                {v.can_buy && (
+                  <div className="vd-presets">
+                    {(v.presets ?? []).map((q) => (
+                      <Slab key={q} tone="gold" radius={12} lip={3} disabled={busy} onClick={() => void prepare(m, q)}>{t('storage.buy_qty', { q: formatNumber(q) })}</Slab>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+          {!v.can_buy && market.length > 0 && <div className="vh-hint">{t('storage.head_only')}</div>}
+        </>
+      )}
+
+      <BottomSheet open={!!ask} onClose={() => setAsk(null)} title={t('storage.confirm.title')}>
+        {ask && (
+          <>
+            <div className="vh-confirm">{t('storage.confirm.body', { qty: formatNumber(ask.qty), name: ask.item.name, unit: money(ask.unit), total: money(ask.total) })}</div>
+            <div className="vh-hint">{t('storage.confirm.hint', { treasury: money(ask.treasury), free: formatNumber(ask.free) })}</div>
+            <div className="vh-sheet-actions">
+              <Slab tone="steel" radius={14} lip={4} onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</Slab>
+              <Slab tone="green" radius={14} lip={4} onClick={() => void confirm(ask)} disabled={busy}>{t('storage.confirm.yes', { total: money(ask.total) })}</Slab>
+            </div>
+          </>
+        )}
+      </BottomSheet>
+    </ScreenScroll>
+  )
+}

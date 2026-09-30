@@ -57,7 +57,7 @@ export function useVillageCommand() {
       const res = await api.runCommand(command, args, key)
       if (res.ok === false) {
         const message = refusalText(res.error?.code, res.error?.message)
-        if (!opts.silent) toast.push(message)
+        if (!opts.silent) toast.push(message, res.error?.code === 'village_materials' ? { command: 'settlement.materials' } : undefined)
         return { ok: false, res, message, code: res.error?.code }
       }
       return { ok: true, res, message: '' }

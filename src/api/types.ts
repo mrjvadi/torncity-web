@@ -627,3 +627,34 @@ export interface MineView {
   debt_periods: number
   notice?: string
 }
+
+// -- village storage and market (settlement.materials, settlement.materials.buy) ------------------
+
+export interface MaterialStockLineView { item: Named; qty: number }
+export interface MaterialMarketLineView { item: Named; price: number }
+export interface MaterialBoughtView { item: Named; qty: number; total: number }
+
+/** `village_materials`: the village stock and Support's market. `can_buy` says
+ * whether the viewer may spend the treasury; `bought` is set right after a purchase. */
+export interface VillageMaterialsView {
+  village: string
+  treasury: number
+  stock: MaterialStockLineView[] | null
+  used: number
+  capacity: number
+  market: MaterialMarketLineView[] | null
+  can_buy: boolean
+  presets: number[] | null
+  bought?: MaterialBoughtView
+}
+
+/** `village_materials_buy_confirm`: the bill before a purchase. */
+export interface MaterialBuyConfirmView {
+  village: string
+  item: Named
+  qty: number
+  unit: number
+  total: number
+  treasury: number
+  free: number
+}

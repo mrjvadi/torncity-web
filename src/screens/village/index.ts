@@ -2,6 +2,7 @@ import type { ScreenSet } from '../types'
 import VillageHome from './VillageHome'
 import VillageCall from './VillageCall'
 import { Knowledge, Overview, Progress, Who } from './Status'
+import Storage from './Storage'
 import { LaborBoard, LaborMine, LaborSiteScreen } from './Labor'
 
 // The village: a local home screen (the 3D view) and the status screens,
@@ -12,6 +13,7 @@ const screens: ScreenSet = {
     village_overview: Overview,
     settlement_construction_progress: Progress,
     settlement_knowledge_list: Knowledge,
+    village_materials: Storage,
     labor_board: LaborBoard,
     labor_site: LaborSiteScreen,
     labor_mine: LaborMine,
@@ -24,6 +26,7 @@ const screens: ScreenSet = {
     village_knowledge: Knowledge,
     village_who: Who,
     village_labor: LaborBoard,
+    village_storage: Storage,
   },
 }
 

@@ -808,12 +808,44 @@ function growView(args: Record<string, unknown>) {
   return menuView()
 }
 
+// -- storage and market (settlement.materials, .buy) ---------------------------------------------
+const MARKET = [
+  { item: { code: 'timber', name: 'چوب' }, price: 22 },
+  { item: { code: 'stone', name: 'سنگ' }, price: 30 },
+  { item: { code: 'iron_bar', name: 'شمش آهن' }, price: 64 },
+]
+const MAT_STOCK: Record<string, number> = { timber: 15, stone: 8 }
+const MAT_BASE_CAP = 100
+function materialsView(bought?: { item: { code: string; name: string }; qty: number; total: number }) {
+  const cap = MAT_BASE_CAP
+  const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
+  const stock = Object.keys(MAT_STOCK).sort().map((c) => ({ item: { code: c, name: MARKET.find((m) => m.item.code === c)?.item.name ?? c }, qty: MAT_STOCK[c] }))
+  return { ok: true, screen: 'village_materials', text: 'انبار و بازار', view: { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: cap, market: MARKET, can_buy: true, presets: [5, 10, 25], ...(bought ? { bought } : {}) }, actions: [back('settlement.overview')] }
+}
+function materialsBuy(args: Record<string, unknown>) {
+  const line = MARKET.find((m) => m.item.code === String(args.item ?? ''))
+  const qty = Number(args.qty)
+  if (!line || !(qty >= 1)) return refusal('not_found', 'این کالا در بازار نیست.')
+  const total = line.price * qty
+  const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
+  if (used + qty > MAT_BASE_CAP) return refusal('storage_full', 'انبار روستا جا ندارد؛ انبار غله بسازید.')
+  if (args.confirm !== 'confirm') {
+    return { ok: true, screen: 'village_materials_buy_confirm', text: 'تأیید خرید', view: { village: 'آمل', item: line.item, qty, unit: line.price, total, treasury: st.treasury, free: MAT_BASE_CAP - used }, actions: [back('settlement.materials')] }
+  }
+  if (st.treasury < total) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این کار کافی نیست.')
+  st.treasury -= total
+  MAT_STOCK[line.item.code] = (MAT_STOCK[line.item.code] ?? 0) + qty
+  return materialsView({ item: line.item, qty, total })
+}
+
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.')) return null
   if (command.startsWith('settlement.labor.')) return mockLaborCommand(command, args)
   init()
   switch (command) {
     case 'settlement.overview': return overviewView()
+    case 'settlement.materials': return materialsView()
+    case 'settlement.materials.buy': return materialsBuy(args)
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true)
     case 'settlement.build.place': return place(args)
