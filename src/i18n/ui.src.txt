@@ -226,3 +226,57 @@ crime.tier | رتبه: {name} | Tier: {name}
 crime.tier_next | بعدی: {name} ({a}/{b}) | next: {name} ({a}/{b})
 crime.nerve_cost | {n} عصب | {n} nerve
 common.sep | ، | ,
+# -- jobs (board and detail) --------------------------------------------------------
+jobs.board | فرصت‌های شغلی | Job openings
+jobs.detail | فرصت شغلی | Job opening
+jobs.travelling | در سفر هستی؛ اینجا کاری پیدا نمی‌کنی. | You are travelling; you cannot find work here.
+jobs.current | الان {title} هستی. | You are currently {title}.
+jobs.none | در حال حاضر فرصتی نیست. | No openings right now.
+jobs.page | صفحه {a} از {b} | Page {a} of {b}
+jobs.energy_per_shift | {n} انرژی هر شیفت | {n} energy per shift
+jobs.employed_first | الان شاغل هستی؛ اول باید استعفا بدهی. | You are employed; resign first.
+req.level | سطح {need} | Level {need}
+req.have | (فعلاً {have}) | (now {have})
+req.skill | مهارت {skill} سطح {need} | Skill {skill} level {need}
+req.certificate | مدرک {name} | Certificate {name}
+req.residence | اقامت در {city} | Living in {city}
+req.performance | عملکرد {need} | Performance {need}
+req.time | {t} دیگر | {t} more
+req.shifts | {n} شیفت | {n} shifts
+req.top | بالاترین درجه | Top rank
+req.course_city | دوره در {city} | Course in {city}
+req.course_full | ظرفیت دوره پر است | The course is full
+req.already_certified | قبلاً این مدرک را داری | You already hold this certificate
+req.already_enrolled | در حال گذراندن {name} هستی | You are taking {name}
+# -- skills / achievements / card -----------------------------------------------------
+skills.title | مهارت‌ها | Skills
+skills.none | هنوز مهارتی کسب نکرده‌ای؛ با کار و جرم مهارت‌هایت بالا می‌رود. | You have no skills yet; work and crime raise them.
+skills.maxed | به اوج این مهارت رسیده‌ای | You have mastered this skill
+achievements.title | دستاوردها | Achievements
+achievements.none | هنوز دستاوردی ثبت نشده. | No achievements yet.
+achievements.rewarded | {n} پاداش گرفتی | You received {n} as a reward
+card.title | کارت بازیکن | Player card
+card.mine | کارت من | My card
+card.code | کد: {code} | Code: {code}
+card.no_bio | هنوز بیوگرافی ننوشته‌ای. | You have not written a bio yet.
+card.level | سطح | Level
+card.achievements | دستاورد | Achievements
+card.entries | خاطرات | Memories
+card.joined | عضویت | Joined
+# -- shops -----------------------------------------------------------------------
+shops.title | مغازه‌های شهر | City shops
+shops.title_at | مغازه‌های {place} | Shops of {place}
+shops.none | مغازه‌ای اینجا نیست. | No shops here.
+shops.here | همین‌جا، {place} | Right here, {place}
+# -- national bank --------------------------------------------------------------------
+finance.title | بانک ملی | National bank
+finance.no_lending | در حال حاضر بانک وامی نمی‌دهد. | The bank is not lending right now.
+finance.credit | اعتبار | Credit
+finance.policy_rate | نرخ سیاستی: {p} | Policy rate: {p}
+finance.missed | {n} قسط عقب‌افتاده | {n} missed instalments
+finance.defaults | {n} نکول | {n} defaults
+finance.product_sub | {p} سالانه · سقف {limit} | {p} a year · limit {limit}
+finance.my_loans | وام‌های من | My loans
+finance.loan_active | قسط بعدی {next} · مانده {owed} | Next instalment {next} · owed {owed}
+finance.loan_settled | تسویه شده | Settled
+finance.deposit | سپرده: {n} · سود {p} | Deposit: {n} · interest {p}

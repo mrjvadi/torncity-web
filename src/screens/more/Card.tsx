@@ -5,6 +5,7 @@ import type { ScreenProps } from '../types'
 import { Card as Panel, Header, Notice, ScreenScroll, Stat, StatPair } from '../native/kit/Parts'
 import Actions from '../native/kit/Actions'
 import { ago, formatNumber } from '../native/kit/format'
+import { t } from '../../i18n'
 
 interface Named { code?: string; name?: string; emoji?: string }
 
@@ -32,11 +33,11 @@ function joinedAgo(iso?: string | null): string | undefined {
 
 export default function PlayerCard({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as CardView
-  if (loading && !response) return <ScreenScroll><Header title="کارت بازیکن" tone="violet" /></ScreenScroll>
+  if (loading && !response) return <ScreenScroll><Header title={t('card.title')} tone="violet" /></ScreenScroll>
 
   return (
     <ScreenScroll>
-      <Header title={v.self ? 'کارت من' : (v.name ?? 'کارت بازیکن')} tone="violet"
+      <Header title={v.self ? t('card.mine') : (v.name ?? t('card.title'))} tone="violet"
         onBack={() => run('player.profile.get')} onRefresh={() => run('life.card', v.code ? { code: v.code } : undefined)} />
 
       {v.notice && <Notice>{v.notice}</Notice>}
@@ -47,22 +48,22 @@ export default function PlayerCard({ response, loading, onAction, run }: ScreenP
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="display" style={{ fontSize: 18, color: '#fff' }}>{v.name ?? '—'}</div>
             <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-              {[v.stage?.name, v.age ? `${formatNumber(v.age)} ساله` : undefined, v.code ? `کد: ${v.code}` : undefined].filter(Boolean).join(' · ')}
+              {[v.stage?.name, v.age ? t('common.years_old', { n: formatNumber(v.age) }) : undefined, v.code ? t('card.code', { code: v.code }) : undefined].filter(Boolean).join(' · ')}
             </div>
             {v.rank?.name && <span className="nx-chip nx-chip-gold" style={{ marginTop: 6, display: 'inline-block' }}>{v.rank.emoji} {v.rank.name}</span>}
           </div>
         </div>
         {v.self && v.bio && <div className="mx-bio" style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 10 }}>{v.bio}</div>}
-        {v.self && !v.bio && <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 10 }}>هنوز بیوگرافی ننوشته‌ای.</div>}
+        {v.self && !v.bio && <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 10 }}>{t('card.no_bio')}</div>}
       </Panel>
 
       <StatPair
-        left={<Stat icon="x_crown" palette="gold" label="سطح" value={formatNumber(v.level ?? 0)} />}
-        right={<Stat icon="trophy" palette="gold" label="دستاورد" value={formatNumber(v.achievements ?? 0)} />}
+        left={<Stat icon="x_crown" palette="gold" label={t('card.level')} value={formatNumber(v.level ?? 0)} />}
+        right={<Stat icon="trophy" palette="gold" label={t('card.achievements')} value={formatNumber(v.achievements ?? 0)} />}
       />
       <StatPair
-        left={<Stat icon="book" palette="violet" label="خاطرات" value={formatNumber(v.entries ?? 0)} />}
-        right={<Stat icon="clock" palette="steel" label="عضویت" value={joinedAgo(v.joined_at) ?? '—'} />}
+        left={<Stat icon="book" palette="violet" label={t('card.entries')} value={formatNumber(v.entries ?? 0)} />}
+        right={<Stat icon="clock" palette="steel" label={t('card.joined')} value={joinedAgo(v.joined_at) ?? '—'} />}
       />
 
       <Actions response={response} onAction={onAction} />

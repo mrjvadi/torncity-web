@@ -5,6 +5,7 @@ import type { ScreenProps } from '../types'
 import { Bar, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
 import Actions from '../native/kit/Actions'
 import { clamp01, formatNumber, money } from '../native/kit/format'
+import { t } from '../../i18n'
 
 interface Named { code?: string; name?: string }
 interface AchievementLine { achievement?: Named; count?: number; done?: number; reward?: number; earned?: boolean; cash?: number }
@@ -15,19 +16,19 @@ export default function Achievements({ response, loading, onAction, run }: Scree
   const lines = v.lines ?? []
   const earned = lines.filter((l) => l.earned)
   const open = lines.filter((l) => !l.earned)
-  if (loading && !response) return <ScreenScroll><Header title="دستاوردها" tone="gold" /></ScreenScroll>
+  if (loading && !response) return <ScreenScroll><Header title={t('achievements.title')} tone="gold" /></ScreenScroll>
 
   return (
     <ScreenScroll>
-      <Header title="دستاوردها" tone="gold" onBack={() => run('player.profile.get')} onRefresh={() => run('achievement.list')} />
+      <Header title={t('achievements.title')} tone="gold" onBack={() => run('player.profile.get')} onRefresh={() => run('achievement.list')} />
 
-      {lines.length === 0 && <Notice>هنوز دستاوردی ثبت نشده.</Notice>}
+      {lines.length === 0 && <Notice>{t('achievements.none')}</Notice>}
 
       {!!earned.length && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {earned.map((l, i) => (
             <ListRow key={i} icon="trophy" palette="gold" tone="gold" title={l.achievement?.name ?? '—'}
-              sub={l.cash ? `${money(l.cash)} پاداش گرفتی` : undefined} />
+              sub={l.cash ? t('achievements.rewarded', { n: money(l.cash) }) : undefined} />
           ))}
         </div>
       )}
