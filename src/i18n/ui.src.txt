@@ -965,3 +965,5 @@ bank.submit_withdraw | برداشت {n} | Withdraw {n}
 bank.enter_amount | مبلغ را وارد کن | Enter an amount
 bank.too_much | بیشتر از موجودی است | More than you have
 bank.jailed | در زندان هستی؛ به بانک دسترسی نداری. | You are in jail; the bank is out of reach.
+profile.map | نقشه‌ی شهر | City map
+profile.travel | سفر بین‌شهری | Intercity travel

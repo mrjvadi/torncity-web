@@ -943,4 +943,6 @@ export const uiEn: Record<UiKey, string> = {
   'bank.enter_amount': 'Enter an amount',
   'bank.too_much': 'More than you have',
   'bank.jailed': 'You are in jail; the bank is out of reach.',
+  'profile.map': 'City map',
+  'profile.travel': 'Intercity travel',
 }

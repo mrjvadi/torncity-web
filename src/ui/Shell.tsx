@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { takeResume, saveResume } from '../i18n/resume'
 import Hud from './Hud'
+import { Emboss } from '../kit'
 import Dock, { type TabKey } from './Dock'
 import GenericScreen from './GenericScreen'
 import { Screen } from '../kit'
@@ -56,7 +57,6 @@ export default function Shell() {
   })
   useEffect(() => { saveResume({ tab, screen: screenKey }) }, [tab, screenKey])
   const [menuOpen, setMenuOpen] = useState(false)
-  const [bellOpen, setBellOpen] = useState(false)
 
   // Opened without the parameter (the link was lost, or the game came from the
   // bot's chat): a player with no village who has an open founding draft of
@@ -106,13 +106,15 @@ export default function Shell() {
     <div className="shell">
       <Hud
         profile={profile}
-        unread={unread}
         onBank={() => onAction({ label: '', command: 'bank.show', row: 0, kind: 'navigation' })}
-        onBell={() => setBellOpen(true)}
-        onMenu={() => setMenuOpen(true)}
         onAvatar={() => selectTab('profile')}
       />
       <main className="shell-main">
+        {screenKey.local === 'village_home' && bootstrap?.settlement && (
+          <button className="vm-btn" onClick={() => setMenuOpen(true)} aria-label={t('village.menu.title')}>
+            <Emboss name="menu" palette="gold" size={22} />
+          </button>
+        )}
         {screenKey.local === 'village_home' && Local ? <Local {...props} />
           : (
             <Screen>
@@ -122,24 +124,21 @@ export default function Shell() {
             </Screen>
           )}
       </main>
-      <Dock active={tab} onSelect={selectTab} />
+      <Dock active={tab} onSelect={selectTab} badge={{ society: unread }} />
 
       <MenuSheet
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        onPick={(command) => { setTab('profile'); setScreenKey({ command }) }}
         village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, support: supportCity(bootstrap) } : undefined}
         onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
         onTravel={(city) => { setTab('profile'); run('travel.options', { city }) }}
-        onSignOut={signOut}
       />
-      <BottomSheet open={bellOpen} onClose={() => setBellOpen(false)} title={t('shell.bell')}>
-        <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '12px 0' }}>{t('shell.bell_empty')}</p>
-      </BottomSheet>
-
       <style>{`
         .shell { display: flex; flex-direction: column; height: 100%; }
-        .shell-main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .shell-main { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        /* the village menu: one small round button on the village view */
+        .vm-btn { position: absolute; z-index: 4; right: 10px; bottom: 44px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(7,10,20,0.55); border: 1.5px solid rgba(255,214,107,0.55); backdrop-filter: blur(3px); }
+        .vm-btn:active { transform: translateY(1px); }
       `}</style>
     </div>
   )

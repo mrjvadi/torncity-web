@@ -941,6 +941,8 @@ export const uiFa = {
   'bank.enter_amount': 'مبلغ را وارد کن',
   'bank.too_much': 'بیشتر از موجودی است',
   'bank.jailed': 'در زندان هستی؛ به بانک دسترسی نداری.',
+  'profile.map': 'نقشه‌ی شهر',
+  'profile.travel': 'سفر بین‌شهری',
 } as const
 
 export type UiKey = keyof typeof uiFa
