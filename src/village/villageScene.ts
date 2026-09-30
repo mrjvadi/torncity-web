@@ -7,14 +7,14 @@
 // moved, the layout changed or the water is animating.
 
 import {
-  ACESFilmicToneMapping, AmbientLight, Color, DirectionalLight, Fog, HemisphereLight, Material, Mesh, PerspectiveCamera,
+  ACESFilmicToneMapping, AmbientLight, PCFShadowMap, Color, DirectionalLight, Fog, HemisphereLight, Material, Mesh, PerspectiveCamera,
   Raycaster, Scene, SRGBColorSpace, TOUCH, Vector2, Vector3, WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { LayoutBuilding, VillageLayout, WorldInfo } from '../api/types'
 import { buildTerrain, GrassField, buildBoulders, type TerrainResult, type FieldResult } from '../demo/terrain'
 import { buildWater, buildCoarseWaterPatch, type WaterResult, type CoarseWaterResult } from '../demo/water'
-import { swapDiffuse, PHOTO_TEXTURES } from '../demo/photoTextures'
+import { swapNeutral } from './groundTextures'
 import type { VillageGround } from './terrainModel'
 import { buildModel, buildScaffold } from './buildingModels'
 import { ColorGeom } from './colorGeom'
@@ -23,9 +23,10 @@ import { buildVillageRoads, type RoadsMesh } from './villageRoads'
 import { LotOverlay } from './lotOverlay'
 import { TreeField, type TreeSpot } from './vegetation'
 import { createSky, type Sky } from './sky'
+import { constructionProgress } from './progress'
 import { seededRng } from './colorGeom'
 
-const SKY_TOP = 0x8fc3ec
+const SKY_TOP = 0x5f97d4
 const SKY_HORIZON = 0xe9f3f7
 const FOG_NEAR = 1400
 const FOG_FAR = 7000
@@ -46,15 +47,6 @@ export interface SceneOptions {
 
 type Pose = { cx: number; cz: number; W: number; D: number; base: number; foundation: number }
 
-/** Progress 0..1 of a building under construction from its timestamps. */
-export function constructionProgress(b: Pick<LayoutBuilding, 'started_at' | 'finish_at' | 'state'>, nowMs: number): number {
-  if (b.state === 'built' || b.state === 'damaged') return 1
-  if (b.state === 'planned' || !b.started_at || !b.finish_at) return 0.05
-  const s = Date.parse(b.started_at), f = Date.parse(b.finish_at)
-  if (!(f > s)) return 1
-  return Math.max(0, Math.min(1, (nowMs - s) / (f - s)))
-}
-
 export class VillageScene {
   private renderer: WebGLRenderer
   private scene = new Scene()
@@ -67,6 +59,7 @@ export class VillageScene {
   private grass!: GrassField
   private boulders: FieldResult | null = null
   private trees: TreeField | null = null
+  private treeList: TreeSpot[] = []
   private roads: RoadsMesh | null = null
   private mats: BuildingMaterials
   private overlay: LotOverlay
@@ -91,6 +84,11 @@ export class VillageScene {
   private reduced: boolean
   private lastLabelJson = ''
   private center = new Vector3()
+  private insets = { top: 0, bottom: 0 }
+  private userMoved = false
+  private lastMode: 'aerial' | 'close' | 'lot' = 'aerial'
+  private sun!: DirectionalLight
+  private shadowsOn = true
 
   private constructor(private canvas: HTMLCanvasElement, readonly ground: VillageGround, private world: WorldInfo, layout: VillageLayout, private opts: SceneOptions) {
     this.layout = layout
@@ -100,8 +98,9 @@ export class VillageScene {
     this.renderer.setPixelRatio(dpr)
     this.renderer.outputColorSpace = SRGBColorSpace
     this.renderer.toneMapping = ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.3
-    this.renderer.shadowMap.enabled = false
+    this.renderer.toneMappingExposure = 1.4
+    this.renderer.shadowMap.enabled = true
+    this.renderer.shadowMap.type = PCFShadowMap
     this.scene.background = new Color(SKY_HORIZON)
     this.camera = new PerspectiveCamera(46, 1, 2, 12000)
 
@@ -114,12 +113,17 @@ export class VillageScene {
     this.controls.maxPolarAngle = Math.PI / 2 - 0.06
     this.controls.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
     this.controls.addEventListener('change', this.onChange)
+    this.controls.addEventListener('start', () => { this.userMoved = true })
 
     this.sky = createSky(SUN, SKY_HORIZON, SKY_TOP)
     this.scene.add(this.sky.mesh)
-    const sun = new DirectionalLight(0xfff3dc, 2.5)
-    sun.position.copy(SUN).multiplyScalar(800)
-    this.scene.add(sun, new HemisphereLight(SKY_TOP, 0xd6cdb0, 1.05), new AmbientLight(0xffffff, 0.22))
+    const sun = this.sun = new DirectionalLight(0xfff3dc, 2.6)
+    sun.castShadow = true
+    const res = Math.min(2048, Math.max(1024, 1024 * Math.round(dpr)))
+    sun.shadow.mapSize.set(res, res)
+    sun.shadow.bias = -0.0005
+    sun.shadow.normalBias = 0.4
+    this.scene.add(sun, sun.target, new HemisphereLight(SKY_TOP, 0xd6cdb0, 0.95), new AmbientLight(0xffffff, 0.18))
     this.scene.fog = new Fog(SKY_HORIZON, FOG_NEAR, FOG_FAR)
 
     this.mats = makeBuildingMaterials()
@@ -148,10 +152,23 @@ export class VillageScene {
     }
     stage('terrain', () => {
       this.terrain = buildTerrain(grids)
+      for (const o of this.terrain.objects) o.receiveShadow = o.name === 'terrain-fine'
       this.scene.add(...this.terrain.objects)
     })
     stage('water', () => {
       this.water = buildWater(grids)
+      if (this.water.material) {
+        const u = this.water.material.uniforms
+        u.uDeep.value.set(0x2c7f9a)
+        u.uShallow.value.set(0x86d3dc)
+        u.uSky.value.set(SKY_TOP)
+        // the shader writes raw linear colour: give it the renderer's tone map and encoding
+        this.water.material.fragmentShader = this.water.material.fragmentShader.replace(
+          'gl_FragColor = vec4(color, vAlpha);',
+          'gl_FragColor = vec4(color, vAlpha);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>',
+        )
+        this.water.material.needsUpdate = true
+      }
       if (this.water.mesh) this.scene.add(this.water.mesh)
       this.coarseWater = buildCoarseWaterPatch(grids)
       if (this.coarseWater.mesh) this.scene.add(this.coarseWater.mesh)
@@ -168,7 +185,9 @@ export class VillageScene {
       this.scene.add(...this.boulders.objects)
     })
     stage('trees', () => {
-      this.trees = new TreeField(this.treeSpots())
+      this.treeList = this.treeSpots()
+      this.trees = new TreeField(this.treeList)
+      for (const o of this.trees.objects) { o.castShadow = true; o.receiveShadow = true }
       this.scene.add(...this.trees.objects)
     })
     this.rebuildBuildings()
@@ -179,8 +198,8 @@ export class VillageScene {
     this.request()
     // real photo textures for the ground, after the first frame
     if (this.terrain) {
-      void swapDiffuse(this.terrain.fineMaterial, PHOTO_TEXTURES.grassLawn, 1, 1, () => this.request())
-      void swapDiffuse(this.terrain.coarseMaterial, PHOTO_TEXTURES.leafyGrass, 1, 1, () => this.request())
+      void swapNeutral(this.terrain.fineMaterial, 'grass_lawn_diff.webp', () => this.request())
+      void swapNeutral(this.terrain.coarseMaterial, 'leafy_grass_diff.webp', () => this.request())
     }
   }
 
@@ -295,6 +314,7 @@ export class VillageScene {
     if (any) {
       this.builtMesh = new Mesh(merged.toGeometry(), this.mats.list)
       this.builtMesh.name = 'village-buildings'
+      this.builtMesh.castShadow = this.builtMesh.receiveShadow = true
       this.scene.add(this.builtMesh)
     }
     this.scaffoldKey = ''
@@ -326,6 +346,7 @@ export class VillageScene {
     }
     this.scaffoldMesh = new Mesh(merged.toGeometry(), this.mats.list)
     this.scaffoldMesh.name = 'village-scaffolds'
+    this.scaffoldMesh.castShadow = this.scaffoldMesh.receiveShadow = true
     this.scene.add(this.scaffoldMesh)
     return true
   }
@@ -378,8 +399,30 @@ export class VillageScene {
 
   // -- camera -------------------------------------------------------------------------
 
+  /** How much of the canvas the overlay covers at its top and bottom (CSS
+   * px): the camera's principal point moves so the village is centred in
+   * what is left, and the framing counts only that part. */
+  setInsets(top: number, bottom: number) {
+    if (this.insets.top === top && this.insets.bottom === bottom) return
+    this.insets = { top, bottom }
+    this.applyViewOffset()
+    // a camera the player has not touched keeps the village fitted to what is left
+    if (!this.userMoved && this.lastMode !== 'lot') this.frame(this.lastMode)
+    this.request()
+  }
+
+  private applyViewOffset() {
+    const w = this.canvas.clientWidth, h = this.canvas.clientHeight
+    if (!w || !h) return
+    const dy = (this.insets.top - this.insets.bottom) / 2
+    if (Math.abs(dy) < 1) this.camera.clearViewOffset()
+    else this.camera.setViewOffset(w, h, 0, -dy, w, h)
+  }
+
   /** Frames the whole village from above (`aerial`), tighter (`close`), or on one lot. */
   frame(mode: 'aerial' | 'close' | 'lot', lot?: { x: number; y: number }) {
+    this.userMoved = false
+    this.lastMode = mode
     const g = this.ground
     const n = g.n
     const mid = g.lotCentre((n - 1) / 2, (n - 1) / 2)
@@ -392,15 +435,26 @@ export class VillageScene {
     this.center.set(mid.x, ty, mid.z)
     this.controls.target.set(tx, ty, tz)
     const aspect = this.camera.aspect || 0.5
-    const vFov = (this.camera.fov * Math.PI) / 180
-    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect)
-    const polar = mode === 'aerial' ? 0.95 : 1.05
-    const span = mode === 'aerial' ? n * g.lot * 0.62 + 40 : mode === 'close' ? 62 : 46
-    const dist = Math.max(this.controls.minDistance, span / Math.tan(Math.min(hFov, vFov) / 2) * 0.62)
+    const H = this.canvas.clientHeight || 1
+    const free = Math.max(0.35, (H - this.insets.top - this.insets.bottom) / H)
+    // the lens as far as the free part of the canvas is concerned
+    const vFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * free)
+    const hFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * aspect)
+    const polar = mode === 'aerial' ? 0.95 : 1.1
+    const span = mode === 'aerial' ? n * g.lot * 1.12 : mode === 'close' ? 70 : 50
+    const dist = Math.max(this.controls.minDistance, (span / 2 / Math.tan(Math.min(hFov, vFov) / 2)) * (mode === 'aerial' ? 1.12 : 1))
     const az = -0.5
     this.camera.position.set(tx + dist * Math.sin(polar) * Math.sin(az), ty + dist * Math.cos(polar), tz + dist * Math.sin(polar) * Math.cos(az))
     this.controls.update()
     this.request()
+  }
+
+  /** Where lot (x, y)'s middle is on the page, in CSS px (for tests and hints). */
+  screenOfLot(x: number, y: number): { x: number; y: number } {
+    const c = this.ground.lotCentre(x, y)
+    const v = new Vector3(c.x, this.ground.groundY(c.x, c.z), c.z).project(this.camera)
+    const r = this.canvas.getBoundingClientRect()
+    return { x: r.left + ((v.x + 1) / 2) * r.width, y: r.top + ((1 - v.y) / 2) * r.height }
   }
 
   /** For tests and screenshots: place the camera exactly. */
@@ -429,6 +483,7 @@ export class VillageScene {
         if (lot.x >= b.x && lot.x < b.x + b.w && lot.y >= b.y && lot.y < b.y + b.h) { id = b.id ?? key; break }
       }
     }
+    if (new URLSearchParams(location.search).has('dbg')) console.log('DBG tap', JSON.stringify(lot), id)
     this.opts.onTap(lot, id)
   }
 
@@ -481,7 +536,10 @@ export class VillageScene {
     if (w === 0 || h === 0) return
     this.renderer.setSize(w, h, false)
     this.camera.aspect = w / h
+    // a portrait phone sees a thin slice sideways: open the lens up
+    this.camera.fov = w < h ? 58 : 46
     this.camera.updateProjectionMatrix()
+    this.applyViewOffset()
     this.request()
   }
 
@@ -500,8 +558,53 @@ export class VillageScene {
     if (this.disposed || this.contextLost) return
     this.controls.update()
     this.sky.mesh.position.copy(this.camera.position)
+    this.fitShadow()
     this.renderer.render(this.scene, this.camera)
+    this.watchFrameTime()
     this.emitLabels()
+  }
+
+  /** The sun's shadow box follows what the camera looks at, snapped to
+   * shadow texels so it does not shimmer as the camera moves. */
+  private fitShadow() {
+    if (!this.shadowsOn) return
+    const d = this.camera.position.distanceTo(this.controls.target)
+    const ext = Math.max(90, Math.min(320, d * 0.75))
+    const c = this.sun.shadow.camera
+    if (Math.abs(c.right - ext) > 1) {
+      c.left = -ext; c.right = ext; c.top = ext; c.bottom = -ext; c.near = 10; c.far = ext * 8
+      c.updateProjectionMatrix()
+    }
+    const step = (ext * 2) / this.sun.shadow.mapSize.x
+    const t = this.controls.target
+    const tx = Math.round(t.x / step) * step, tz = Math.round(t.z / step) * step
+    this.sun.target.position.set(tx, t.y, tz)
+    this.sun.position.set(tx + SUN.x * ext * 3, t.y + SUN.y * ext * 3, tz + SUN.z * ext * 3)
+    this.sun.target.updateMatrixWorld()
+  }
+
+  private slowFrames = 0
+  private lastFrameAt = 0
+  /** A device that cannot hold ~20 fps while the camera moves loses the
+   * shadows first (the priciest thing here), then render resolution. */
+  private watchFrameTime() {
+    const now = performance.now()
+    const dt = now - this.lastFrameAt
+    this.lastFrameAt = now
+    if (dt > 400 || navigator.webdriver) return // idle gap, or an automated run
+    this.slowFrames = dt > 55 ? this.slowFrames + 1 : Math.max(0, this.slowFrames - 1)
+    if (this.slowFrames > 30 && this.shadowsOn) {
+      this.shadowsOn = false
+      this.sun.castShadow = false
+      this.renderer.shadowMap.enabled = false
+      this.scene.traverse((o) => { const m = (o as Mesh).material as Material | Material[] | undefined; if (m) for (const x of Array.isArray(m) ? m : [m]) x.needsUpdate = true })
+      this.slowFrames = 0
+    } else if (this.slowFrames > 40) {
+      const pr = Math.max(0.75, this.renderer.getPixelRatio() * 0.8)
+      this.renderer.setPixelRatio(pr)
+      this.resize()
+      this.slowFrames = 0
+    }
   }
 
   private startTimers() {
@@ -567,10 +670,50 @@ export class VillageScene {
         hi = Math.max(hi, hit.point.y)
       }
       checked++
-      // the platform's top is base + 0.2; it must sit at or above the highest
+      // the platform's top is base + 0.16; it must sit at or above the highest
       // ground and its sunk foundation must reach below the lowest
       if (hi - p.base > 0.02) problems.push(`${id} (${p.building.type}) sinks: ground ${hi.toFixed(2)} above base ${p.base.toFixed(2)}`)
       if (p.base - p.foundation > lo + 0.02) problems.push(`${id} (${p.building.type}) floats: foundation bottom ${(p.base - p.foundation).toFixed(2)} over ground ${lo.toFixed(2)}`)
+    }
+    // everything else stands on groundY: it must be the rendered mesh's own height
+    const hitY = (x: number, z: number) => {
+      rc.ray.origin.set(x, 4000, z)
+      return rc.intersectObjects(targets, false)[0]?.point.y ?? NaN
+    }
+    const spots = this.treeList.filter((_, i) => i % 3 === 0)
+    let treeBad = 0
+    for (const t of spots) {
+      const y = hitY(t.x, t.z)
+      if (!(Math.abs(t.y - y) < 0.06)) treeBad++
+    }
+    checked += spots.length
+    if (treeBad) problems.push(`${treeBad} of ${spots.length} trees are off the ground`)
+    const rocks = this.boulders?.objects[0] as import('three').InstancedMesh | undefined
+    if (rocks) {
+      const m = new (rocks.matrixWorld.constructor as new () => import('three').Matrix4)()
+      const p = new Vector3()
+      let bad = 0
+      const n = Math.min(rocks.count, 300)
+      for (let i = 0; i < n; i++) {
+        rocks.getMatrixAt(i, m)
+        p.setFromMatrixPosition(m)
+        const d = p.y - hitY(p.x, p.z)
+        if (!(d > -0.2 && d < 1.6)) bad++
+      }
+      checked += n
+      if (bad) problems.push(`${bad} of ${n} boulders are off the ground`)
+    }
+    const road = this.roads?.mesh
+    if (road) {
+      const pos = road.geometry.attributes.position
+      let bad = 0
+      for (let i = 0; i < pos.count; i += 7) {
+        const y = hitY(pos.getX(i), pos.getZ(i))
+        const d = pos.getY(i) - y
+        if (!(d > 0.02 && d < 0.5)) bad++
+      }
+      checked += Math.ceil(pos.count / 7)
+      if (bad) problems.push(`${bad} road vertices sink into or hover over the ground`)
     }
     return { checked, problems }
   }

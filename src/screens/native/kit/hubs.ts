@@ -42,4 +42,5 @@ export const SOCIETY_TILES: HubTile[] = [
   { key: 'government', icon: 'gavel', palette: 'gold', title: 'دولت شهر', command: 'gov.city' },
   { key: 'war', icon: 'swords', palette: 'ruby', title: 'ارتش و جنگ', local: 'war' },
   { key: 'family', icon: 'f_hearts', palette: 'ruby', title: 'خانواده', local: 'family' },
+  { key: 'village', icon: 'house', palette: 'emerald', title: 'روستای من', local: 'village_home' },
 ]

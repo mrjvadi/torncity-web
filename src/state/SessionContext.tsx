@@ -6,6 +6,7 @@ import { report } from '../lib/reporter'
 import { friendlyError } from '../lib/errors'
 import { initTelegram, telegramInitData } from '../lib/telegram'
 import { useToast } from './ToastContext'
+import { setServerTime } from '../village/clock'
 
 type Status = 'checking' | 'signed_out' | 'signing_in' | 'signed_in'
 
@@ -78,6 +79,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         api.runCommand('player.profile.get'),
       ])
       setBootstrap(b)
+      setServerTime(b.server_time)
       if (p.ok && p.view) setProfile(p.view as unknown as ProfileView)
       setStatus('signed_in')
       report('boot', 'signed in and bootstrapped')
@@ -192,6 +194,36 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setLive(false)
     }
   }, [status, bootstrap?.realtime])
+
+  // Presence (client-api.md section 5.5): a player counts as online for
+  // `ttl_seconds` after any signed-in call, so while the app is open but idle
+  // the heartbeat is sent every half of that. Paused while the tab is hidden.
+  useEffect(() => {
+    if (status !== 'signed_in') return
+    let stopped = false
+    let timer = 0
+    let ttl = 30
+    const beat = async () => {
+      if (stopped) return
+      if (!document.hidden) {
+        try {
+          const r = await api.heartbeat()
+          if (r && typeof r.ttl_seconds === 'number' && r.ttl_seconds > 0) ttl = r.ttl_seconds
+        } catch {
+          // best effort: the next call of any kind counts as well
+        }
+      }
+      if (!stopped) timer = window.setTimeout(() => void beat(), Math.max(5, ttl / 2) * 1000)
+    }
+    void beat()
+    const back = () => { if (document.visibilityState === 'visible') { clearTimeout(timer); void beat() } }
+    document.addEventListener('visibilitychange', back)
+    return () => {
+      stopped = true
+      clearTimeout(timer)
+      document.removeEventListener('visibilitychange', back)
+    }
+  }, [status])
 
   const refreshProfile = useCallback(async () => {
     try {

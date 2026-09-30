@@ -75,6 +75,7 @@ export default function Shell() {
       />
       <main className="shell-main">
         {isCity ? <CityView onTab={selectTab} onInbox={() => setBellOpen(true)} />
+          : screenKey.local === 'village_home' && Local ? <Local {...props} />
           : (
             <Screen>
               {Local ? <Local {...props} />

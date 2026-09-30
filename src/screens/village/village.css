@@ -1,0 +1,90 @@
+/* Village screens: the 3D home and its build panel. Chrome is the kit's own
+   (frames, ribbon headers, plates, slabs, chips); only the layout over the
+   canvas lives here. Class prefix `vh-`. */
+
+.vh { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #e9f3f7; }
+.vh-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+.vh-top {
+  position: absolute; top: 8px; left: 10px; right: 10px; z-index: 3;
+  display: flex; flex-direction: column; gap: 6px; pointer-events: none;
+  --k-h: 40px; --k-btn: 40px;
+}
+.vh-top > * { pointer-events: auto; }
+.vh-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; pointer-events: none; }
+.vh-chips > * { pointer-events: auto; }
+.vh-note {
+  align-self: center; padding: 4px 12px; border-radius: 10px; font-size: 12px; color: #fff;
+  background: rgba(7, 10, 20, 0.72); border: 1px solid var(--gold-soft);
+}
+
+.vh-side { position: absolute; z-index: 3; right: 10px; top: 132px; display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
+.vh-side .k-hdr-btn { padding: 0; }
+
+.vh-bottom { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 8px; }
+.vh-nav { display: flex; justify-content: space-around; gap: 4px; padding: 8px 6px 6px; }
+.vh-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; background: none; color: #dfe4ff; font-size: 12px; }
+.vh-nav-btn:active { transform: translateY(2px); }
+.vh-nav-btn .k-plate { --k-size: 46px; --k-rim-w: 2.5px; }
+
+.vh-pill {
+  position: absolute; z-index: 2; transform: translate(-50%, -100%); pointer-events: none;
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  padding: 2px 9px 2px 7px; border-radius: 999px; font-size: 12px; color: #fff;
+  background: rgba(7, 10, 20, 0.8); border: 1px solid var(--gold-soft);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.vh-pill.sel { border-color: var(--gold); background: rgba(40, 30, 6, 0.86); }
+.vh-labels { position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+
+.vh-msg {
+  position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  color: #26343f; font-size: 15px; text-align: center; padding: 24px; background: rgba(233, 243, 247, 0.82);
+}
+.vh-msg .k-slab { padding: 10px 22px; font-size: 15px; }
+
+/* build panel */
+.vh-panel { padding: 10px 10px 10px; display: flex; flex-direction: column; gap: 8px; }
+.vh-panel-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.vh-panel-title { font-size: 15px; color: var(--gold); }
+.vh-x { flex: none; width: 34px; height: 34px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); color: #fff; font-size: 16px; }
+.vh-legend { display: flex; gap: 10px; font-size: 11px; color: var(--text-dim); align-items: center; flex-wrap: wrap; }
+.vh-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 4px; vertical-align: -1px; }
+.vh-cards { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; margin: 0 -2px; -webkit-overflow-scrolling: touch; }
+.vh-card {
+  flex: none; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+  padding: 6px 4px; border-radius: 14px; color: var(--text);
+  background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1.5px solid var(--gold-soft);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.14);
+}
+.vh-card.locked { opacity: 0.55; filter: grayscale(0.4); border-color: rgba(255, 255, 255, 0.18); }
+.vh-card:active { transform: scale(0.97); }
+.vh-card-name { font-size: 12.5px; line-height: 1.2; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
+.vh-card-meta { font-size: 11px; color: var(--text-dim); }
+.vh-card-cost { font-size: 12px; color: var(--gold); }
+.vh-row { display: flex; gap: 8px; align-items: stretch; }
+.vh-row .k-slab { flex: 1; padding: 10px 6px; font-size: 15px; }
+.vh-row .k-slab.narrow { flex: 0 0 auto; padding-inline: 14px; }
+.vh-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size: 13px; color: var(--text); }
+.vh-facts b { color: var(--gold); font-weight: 400; }
+.vh-hint { font-size: 12.5px; color: var(--text-dim); text-align: center; }
+.vh-hint.bad { color: #ff9a9e; }
+.vh-hint.good { color: #8fe0ac; }
+
+/* building sheet */
+.vh-sheet-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.vh-sheet-meta { font-size: 13px; color: var(--text-dim); }
+.vh-sheet-actions { display: flex; gap: 8px; margin-top: 12px; }
+.vh-sheet-actions .k-slab { flex: 1; padding: 11px 8px; font-size: 15px; }
+.vh-confirm { text-align: center; color: var(--text-dim); font-size: 13.5px; margin: 10px 0 4px; }
+
+/* status screens */
+.vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.vs-timer { font-size: 15px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.vs-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-inline-end: 6px; background: #5a6078; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4); }
+.vs-dot.on { background: #46d27a; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4), 0 0 8px #46d27a; }
+.vs-btns { display: flex; gap: 6px; margin-top: 8px; }
+.vs-btns .k-slab { flex: 1; padding: 8px 6px; font-size: 13.5px; }
+.vs-head { display: flex; align-items: center; gap: 10px; }
+.vs-head + * { margin-top: 10px; }
+.vs-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }

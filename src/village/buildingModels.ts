@@ -547,55 +547,83 @@ export function buildModel(type: string, W: number, D: number, seed: number, fou
   const rng = seededRng(seed || 1)
   // the platform: sunk into the ground, top a hand's breadth above the base
   const f = Math.max(0.6, foundation)
-  g.box(0, (0.2 - f) / 2, 0, W - 0.6, 0.2 + f, D - 0.6, STONE_DARK, G_PLAIN)
+  g.box(0, (0.16 - f) / 2, 0, W - 0.6, 0.16 + f, D - 0.6, STONE_DARK, G_PLAIN)
   const gen = GENS[type] ?? generic
   const height = gen({ W, D, rng, foundation: f, g })
   return { geom: g, height }
 }
 
-/** Under construction: a levelled pad, the walls raised to `progress` of the
- * finished height, scaffolding round them, stacks of materials, and a crane
- * on the big ones. */
+/** Under construction: a levelled pad and the building's frame rising
+ * storey by storey to `progress` of its finished height (columns, floor
+ * slabs, part of the walls), scaffolding round it, stacks of materials, and
+ * a crane on the big ones. */
 export function buildScaffold(type: string, W: number, D: number, seed: number, foundation: number, progress: number, finalHeight: number): Model {
   const g = new ColorGeom()
   const rng = seededRng((seed || 1) + 7)
   const f = Math.max(0.6, foundation)
-  g.box(0, (0.2 - f) / 2, 0, W - 0.6, 0.2 + f, D - 0.6, STONE_DARK, G_PLAIN)
-  patch(g, 0, 0, W - 1.6, D - 1.6, 0.22, 0x9b8b6c)
+  g.box(0, (0.16 - f) / 2, 0, W - 0.6, 0.16 + f, D - 0.6, STONE_DARK, G_PLAIN)
+  patch(g, 0, 0, W - 1.6, D - 1.6, 0.2, 0x9b8b6c)
   const p = Math.max(0.04, Math.min(1, progress))
-  const H = Math.max(3, finalHeight * 0.9)
+  const H = Math.max(4, finalHeight * 0.85)
   const bw = W * 0.62, bd = D * 0.62
-  // rising walls
-  const wallH = Math.max(0.6, H * p * 0.85)
-  g.box(0, wallH / 2 + 0.2, 0, bw, wallH, bd, pick(rng, WALLS), G_WALL)
-  // scaffold poles and boards
-  const top = Math.max(wallH + 2.4, 3)
-  const nx = Math.max(2, Math.round(bw / 5)), nz = Math.max(2, Math.round(bd / 5))
-  const sx = bw + 1.6, sz = bd + 1.6
-  const pole = (x: number, z: number) => g.box(x, top / 2 + 0.2, z, 0.14, top, 0.14, WOOD, G_PLAIN)
-  for (let i = 0; i <= nx; i++) { pole(-sx / 2 + (sx * i) / nx, -sz / 2); pole(-sx / 2 + (sx * i) / nx, sz / 2) }
-  for (let k = 1; k < nz; k++) { pole(-sx / 2, -sz / 2 + (sz * k) / nz); pole(sx / 2, -sz / 2 + (sz * k) / nz) }
-  for (let y = 2.2; y <= top; y += 2.6) {
+  const storey = 3.4
+  const reached = Math.max(0.5, H * p)
+  const floors = Math.max(1, Math.ceil(reached / storey))
+  const concrete = 0xb9b6ad
+  // foundation slab
+  g.box(0, 0.4, 0, bw + 0.6, 0.4, bd + 0.6, 0x8d8a82, G_PLAIN)
+  // frame: columns on a grid, a slab per finished storey
+  const nx = Math.max(2, Math.round(bw / 6)), nz = Math.max(2, Math.round(bd / 6))
+  let top = 0.6
+  for (let fl = 0; fl < floors; fl++) {
+    const y0 = 0.6 + fl * storey
+    const h = Math.min(storey, reached - fl * storey + 0.2)
+    if (h < 0.4) break
+    for (let i = 0; i <= nx; i++) for (let k = 0; k <= nz; k++) {
+      if (i > 0 && i < nx && k > 0 && k < nz && rng() < 0.4) continue
+      g.box(-bw / 2 + (bw * i) / nx, y0 + h / 2, -bd / 2 + (bd * k) / nz, 0.55, h, 0.55, concrete, G_PLAIN)
+    }
+    top = y0 + h
+    if (h > storey * 0.75 || fl < floors - 1) g.box(0, y0 + h - 0.15, 0, bw + 0.4, 0.3, bd + 0.4, concrete, G_PLAIN)
+    // masonry infill on the lower storeys, the back and one side
+    if (fl < floors - 1 || p > 0.55) {
+      g.box(0, y0 + h * 0.45, -bd / 2 + 0.1, bw, h * 0.9, 0.35, pick(rng, WALLS), G_WALL)
+      g.box(-bw / 2 + 0.1, y0 + h * 0.45, 0, 0.35, h * 0.9, bd, pick(rng, WALLS), G_WALL)
+    }
+  }
+  // rebar stubs on the top storey
+  for (let i = 0; i <= nx; i++) for (let k = 0; k <= nz; k++) g.box(-bw / 2 + (bw * i) / nx, top + 0.6, -bd / 2 + (bd * k) / nz, 0.06, 1.2, 0.06, 0x7a4a2a, G_PLAIN)
+  // scaffolding round the frame: poles, ledgers, boards, braces on the front
+  const sx = bw + 2.4, sz = bd + 2.4
+  const sTop = top + 1.6
+  const px = Math.max(2, Math.round(sx / 5)), pz = Math.max(2, Math.round(sz / 5))
+  const pole = (x: number, z: number) => g.box(x, sTop / 2 + 0.2, z, 0.14, sTop, 0.14, WOOD, G_PLAIN)
+  for (let i = 0; i <= px; i++) { pole(-sx / 2 + (sx * i) / px, -sz / 2); pole(-sx / 2 + (sx * i) / px, sz / 2) }
+  for (let k = 1; k < pz; k++) { pole(-sx / 2, -sz / 2 + (sz * k) / pz); pole(sx / 2, -sz / 2 + (sz * k) / pz) }
+  for (let y = 2.0; y <= sTop; y += 2.4) {
     g.box(0, y, sz / 2, sx, 0.12, 0.12, WOOD, G_PLAIN)
     g.box(0, y, -sz / 2, sx, 0.12, 0.12, WOOD, G_PLAIN)
     g.box(sx / 2, y, 0, 0.12, 0.12, sz, WOOD, G_PLAIN)
     g.box(-sx / 2, y, 0, 0.12, 0.12, sz, WOOD, G_PLAIN)
-    g.box(0, y - 0.1, sz / 2 + 0.5, sx, 0.1, 1.0, 0xa9834f, G_PLAIN)
+    g.box(0, y - 0.1, sz / 2 - 0.4, sx, 0.08, 0.9, 0xa9834f, G_PLAIN)
   }
-  // diagonal braces on the front
-  for (let i = 0; i < nx; i++) {
-    const x0 = -sx / 2 + (sx * i) / nx, x1 = x0 + sx / nx
-    g.quad(V(x0, 0.4, sz / 2 + 0.05), V(x0 + 0.1, 0.4, sz / 2 + 0.05), V(x1 + 0.1, top, sz / 2 + 0.05), V(x1, top, sz / 2 + 0.05), WOOD_DARK, 0.3, G_PLAIN)
+  for (let i = 0; i < px; i++) {
+    const x0 = -sx / 2 + (sx * i) / px, x1 = x0 + sx / px
+    g.quad(V(x0, 0.4, sz / 2 + 0.05), V(x0 + 0.1, 0.4, sz / 2 + 0.05), V(x1 + 0.1, sTop, sz / 2 + 0.05), V(x1, sTop, sz / 2 + 0.05), WOOD_DARK, 0.3, G_PLAIN)
   }
-  // materials
+  // a green safety net on the front
+  g.quad(V(-sx / 2, 1.0, sz / 2 + 0.08), V(-sx * 0.05, 1.0, sz / 2 + 0.08), V(-sx * 0.05, sTop - 0.6, sz / 2 + 0.08), V(-sx / 2, sTop - 0.6, sz / 2 + 0.08), 0x4c8a5a, 0.3, G_PLAIN)
+  // materials on site
   logStack(g, -W * 0.36, D * 0.4, 4, 3)
   crates(g, W * 0.34, D * 0.4, 4, rng)
   g.cone(W * 0.38, -D * 0.38, 2.2, 0.2, 1.8, 0xc9b98a, G_PLAIN, 8)
+  for (let i = 0; i < 4; i++) g.box(-W * 0.3 + i * 1.3, 0.55, -D * 0.42, 1.0, 0.7, 1.0, 0xc4c0b6, G_PLAIN)
   if (Math.min(W, D) > 40) {
     g.box(-W * 0.4, 9, -D * 0.4, 0.8, 18, 0.8, 0xd8a52a, G_PLAIN)
     g.box(-W * 0.4 + 6, 18, -D * 0.4, 14, 0.6, 0.6, 0xd8a52a, G_PLAIN)
+    g.box(-W * 0.4 + 12, 15, -D * 0.4, 0.1, 6, 0.1, 0x333333, G_PLAIN)
   }
-  return { geom: g, height: top }
+  return { geom: g, height: sTop }
 }
 
 /** A translucent block for previewing a building on a lot. */

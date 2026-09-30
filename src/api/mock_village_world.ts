@@ -44,10 +44,10 @@ export const MOCK_WORLD: WorldInfo = {
 }
 
 /** The village sits at this (fractional) tile of the mock face. */
-export const VILLAGE_TILE = { gx: 520 * EDGE + 13.3, gy: 515 * EDGE + 17.4 }
+export const VILLAGE_TILE = { gx: 520 * EDGE + 13.3, gy: 515 * EDGE + 17.80 }
 /** The river is a straight line of tile row centres (so the coarse stream
  * flags and the lot-level water agree exactly) crossing the village's south. */
-export const RIVER_GY = Math.floor(VILLAGE_TILE.gy) + 0.5 - 1
+export const RIVER_GY = Math.floor(VILLAGE_TILE.gy) + 0.5
 export const RIVER_HALF_TILES = 0.11
 
 const s01 = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t))

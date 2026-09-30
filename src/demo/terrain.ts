@@ -186,6 +186,46 @@ function coarseColorAt(grids: CityGrids, legend: Color[], i: number, j: number):
   return c
 }
 
+/** The height of fine-grid vertex (fx, fy) as the mesh is actually drawn:
+ * the raw lot elevation, eased toward the coarse backdrop over the last
+ * FINE_EDGE_BLEND_LOTS before the grid's edge, and lifted a little at the very
+ * edge so the fine surface stays above the coarse one there. Anything that
+ * stands on the ground must read this, not the raw grid. */
+export function renderedFineElev(grids: CityGrids, fx: number, fy: number): number {
+  const fw = grids.fine.w
+  const fh = grids.fine.h
+  const raw = grids.fineElevAt(fx, fy)
+  const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
+  let out = raw
+  if (edgeDist < FINE_EDGE_BLEND_LOTS) {
+    const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
+    const blend = t * t * (3 - 2 * t)
+    const { i, j } = grids.fineToCoarseTile(fx, fy)
+    out = raw * (1 - blend) + grids.coarseElevAt(i, j) * blend
+  }
+  // The coarse hole is matched to the fine grid's extent exactly (see
+  // coarseSkip in buildTerrain), so coarse resumes right at this mesh's own
+  // edge — a small safety margin (interpolation error within one tile, not a
+  // whole tile's worth of mismatch) keeps fine reliably on top exactly at
+  // that boundary, verified by verifyNoCoarseUnderFineGrid.
+  const EDGE_SAFETY_LOTS = 3
+  if (edgeDist < EDGE_SAFETY_LOTS) out += (1 - edgeDist / EDGE_SAFETY_LOTS) * 15
+  return out
+}
+
+/** The drawn surface at a fractional fine position: the mesh's own two
+ * triangles per cell (diagonal from (i+1, j) to (i, j+1)), so a tuft or a
+ * boulder placed with it touches the ground exactly. */
+export function renderedGroundAt(grids: CityGrids, fx: number, fy: number): number {
+  const i = Math.max(0, Math.min(grids.fine.w - 2, Math.floor(fx)))
+  const j = Math.max(0, Math.min(grids.fine.h - 2, Math.floor(fy)))
+  const u = Math.max(0, Math.min(1, fx - i))
+  const v = Math.max(0, Math.min(1, fy - j))
+  const a = renderedFineElev(grids, i, j), b = renderedFineElev(grids, i + 1, j)
+  const c = renderedFineElev(grids, i, j + 1), d = renderedFineElev(grids, i + 1, j + 1)
+  return (u + v <= 1 ? a + (b - a) * u + (c - a) * v : d + (b - d) * (1 - v) + (c - d) * (1 - u)) + FINE_GROUND_LIFT
+}
+
 export function buildTerrain(grids: CityGrids): TerrainResult {
   const legend = biomeColorLegend(grids)
   const detailTexture = makeGroundDetailTexture(256, 101)
@@ -226,27 +266,7 @@ export function buildTerrain(grids: CityGrids): TerrainResult {
   const fw = grids.fine.w
   const fh = grids.fine.h
 
-  const fineElevAt = (fx: number, fy: number): number => {
-    const raw = grids.fineElevAt(fx, fy)
-    const edgeDist = Math.min(fx, fy, fw - 1 - fx, fh - 1 - fy)
-    let out = raw
-    if (edgeDist < FINE_EDGE_BLEND_LOTS) {
-      const t = 1 - edgeDist / FINE_EDGE_BLEND_LOTS
-      const blend = t * t * (3 - 2 * t)
-      const { i, j } = grids.fineToCoarseTile(fx, fy)
-      out = raw * (1 - blend) + grids.coarseElevAt(i, j) * blend
-    }
-    // The coarse hole is matched to the fine grid's extent exactly (see
-    // coarseSkip above), so coarse resumes right at this mesh's own edge —
-    // a small safety margin (interpolation error within one tile, not a
-    // whole tile's worth of mismatch) keeps fine reliably on top exactly
-    // at that boundary, verified by verifyNoCoarseUnderFineGrid.
-    const EDGE_SAFETY_LOTS = 3
-    if (edgeDist < EDGE_SAFETY_LOTS) {
-      out += (1 - edgeDist / EDGE_SAFETY_LOTS) * 15
-    }
-    return out
-  }
+  const fineElevAt = (fx: number, fy: number): number => renderedFineElev(grids, fx, fy)
   const fineColorAt = (fx: number, fy: number): Color => {
     const idx = fy * fw + fx
     const biome = grids.fine.biome[idx]
@@ -477,7 +497,7 @@ export class GrassField {
         const wz = z + jz
         const fade = 1 - Math.max(0, Math.min(1, (s.d - (GRASS_RADIUS - GRASS_FADE_BAND)) / GRASS_FADE_BAND))
         if (fade <= 0.02) continue
-        const y = this.grids.fineElevAt(s.fx, s.fy) * ELEVATION_SCALE + FINE_GROUND_LIFT
+        const y = renderedGroundAt(this.grids, s.fx + jx / this.grids.doc.lotMeters, s.fy + jz / this.grids.doc.lotMeters) * ELEVATION_SCALE
         const scale = fade * (0.75 + hashG(s.fx, s.fy, 25 + k) * 0.5)
         q.setFromAxisAngle(up, hashG(s.fx, s.fy, 35 + k) * Math.PI * 2)
         this.tmpMatrix.compose(new Vector3(wx, y, wz), q, new Vector3(scale, scale, scale))
@@ -622,7 +642,7 @@ export function buildBoulders(grids: CityGrids): FieldResult {
   const q = new Quaternion()
   const color = new Color()
   spots.forEach((s, idx) => {
-    const y = grids.fineElevAt(s.x, s.y) * ELEVATION_SCALE + FINE_GROUND_LIFT
+    const y = renderedGroundAt(grids, s.x, s.y) * ELEVATION_SCALE
     const { x: sx, z: sz } = grids.fineScene(s.x, s.y)
     q.setFromAxisAngle(new Vector3(hashG(s.x, s.y, 320), 1, hashG(s.x, s.y, 330)).normalize(), hashG(s.x, s.y, 340) * Math.PI * 2)
     m.compose(new Vector3(sx, y + s.scale * 0.25, sz), q, new Vector3(s.scale, s.scale * 0.72, s.scale))

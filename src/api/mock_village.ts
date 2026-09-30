@@ -11,9 +11,12 @@ import { publishSettlement } from './settlementBus'
 import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
 
-const OWN_ID = 'mock-village-1'
-const OTHER_ID = 'mock-village-2'
+import { MOCK_VILLAGE_IDS } from './mock_village_ids'
+const OWN_ID = MOCK_VILLAGE_IDS.own
+const OTHER_ID = MOCK_VILLAGE_IDS.other
 const GRID = 5
+/** A gentler limit than the server's 15 so the offline hills stay buildable-looking. */
+const SLOPE_LIMIT = 8
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...headers } })
@@ -101,9 +104,9 @@ function makeLots(origin: { lat: number; lon: number }, bump: [number, number, n
       const river = wet[y][x]
       const tags = ['temperate_grassland']
       if (river) tags.push('river_lot')
-      if (slope > 15) tags.push('sloped_lot')
+      if (slope > SLOPE_LIMIT) tags.push('sloped_lot')
       row.push({
-        height_m: heights[y][x], slope_m: slope, buildable: !river && slope <= 15, biome: 'temperate_grassland',
+        height_m: heights[y][x], slope_m: slope, buildable: !river && slope <= SLOPE_LIMIT, biome: 'temperate_grassland',
         ...(river ? { water: 'river' as const } : {}), tags,
       })
     }
@@ -116,7 +119,7 @@ function init() {
   if (st.ready) return
   st.ready = true
   const place = mockVillagePlace(GRID)
-  st.lots = makeLots(place.origin, [[4, 3, 19]])
+  st.lots = makeLots(place.origin, [[4, 0, 11]])
   const lot = MOCK_WORLD.lot_m
   const shifted = offsetLatLon(place.origin.lat, place.origin.lon, 9 * lot, 5 * lot, MOCK_WORLD.planet_radius_km)
   st.otherLots = makeLots(shifted, [])
@@ -128,12 +131,11 @@ function init() {
   }
   st.buildings = [
     mk('civic_hall', 0, 3, 'built'),
-    mk('housing_block', 3, 3, 'built'),
-    mk('watch_hut', 3, 0, 'built'),
+    mk('watch_hut', 3, 3, 'built'),
     mk('carpentry_workshop', 0, 0, 'under_construction', { started: now - 14 * 60000, finish: now + 21 * 60000 }),
-    mk('militia_camp', 4, 0, 'under_construction', { rotated: true, started: now - 32 * 60000, finish: now + 13 * 60000 }),
+    mk('militia_camp', 2, 3, 'under_construction', { rotated: true, started: now - 32 * 60000, finish: now + 13 * 60000 }),
   ]
-  st.roads = [0, 1, 2, 3, 4].map((x) => ({ x, y: 2 })).concat([{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 3 }, { x: 2, y: 4 }])
+  st.roads = [0, 1, 2, 3, 4].map((x) => ({ x, y: 2 }))
   st.otherBuildings = [mk('civic_hall', 1, 1, 'built'), mk('farm_canal', 2, 2, 'built'), mk('watch_hut', 0, 4, 'built')]
   st.know = [
     { code: 'fire_making', state: 'held', cost: 0, time: 0, buy: 0, missing: [], terrain: true },
@@ -202,7 +204,7 @@ function layoutFor(id: string): VillageLayout {
     version: ver, detail,
     viewer: { member: own, can_place: own },
     settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'village', world_cell: own ? 18211 : 18990, centre },
-    grid: { lots: GRID, lot_m: lot, origin, slope_limit: 15 },
+    grid: { lots: GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
     lots: own ? st.lots : st.otherLots,
     buildings,
     ...(own ? { roads } : {}),
@@ -446,6 +448,12 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
 /** REST routes of the world and the village; null when the path is not one. */
 export function mockVillageRoute(path: string, method: string, headers: Headers): Response | null {
   if (path === '/api/v1/world') return json(MOCK_WORLD)
+  if (path === '/api/v1/content') {
+    return json({
+      version: 'v1', langs: ['en', 'fa'],
+      entries: { settlement_building: CAT.map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp })) },
+    })
+  }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)
   if (m) {
     const bytes = mockChunkBytes(+m[1], +m[2], +m[3], +m[4])
@@ -488,4 +496,3 @@ export function installVillageMockHandles(): void {
   }
 }
 
-export const MOCK_VILLAGE_IDS = { own: OWN_ID, other: OTHER_ID }

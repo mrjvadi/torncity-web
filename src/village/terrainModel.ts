@@ -17,7 +17,7 @@ import {
   WATER_KIND_LAKE, WATER_KIND_NONE, WATER_KIND_OCEAN, WATER_KIND_RIVER, WATER_KIND_STREAM,
 } from '../demo/cityExportTypes'
 import { CityGrids } from '../demo/grids'
-import { FINE_GROUND_LIFT } from '../demo/terrain'
+import { FINE_GROUND_LIFT, renderedFineElev } from '../demo/terrain'
 import { offsetLatLon } from './geo'
 import type { WorldSampler } from './worldSampler'
 
@@ -206,6 +206,10 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
     const sx = p10.x - p00.x // metres per fine cell along +x
     const sz = p01.z - p00.z
 
+    // the heights as the fine mesh draws them (edge blend included)
+    const drawn = new Float32Array(F * F)
+    for (let j = 0; j < F; j++) for (let i = 0; i < F; i++) drawn[j * F + i] = renderedFineElev(grids, i, j)
+
     const groundY = (x: number, z: number): number => {
       const fx = (x - p00.x) / sx
       const fy = (z - p00.z) / sz
@@ -213,7 +217,7 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
       const j = Math.max(0, Math.min(F - 2, Math.floor(fy)))
       const u = Math.max(0, Math.min(1, fx - i))
       const v = Math.max(0, Math.min(1, fy - j))
-      const a = fElev[j * F + i], b = fElev[j * F + i + 1], c = fElev[(j + 1) * F + i], d = fElev[(j + 1) * F + i + 1]
+      const a = drawn[j * F + i], b = drawn[j * F + i + 1], c = drawn[(j + 1) * F + i], d = drawn[(j + 1) * F + i + 1]
       // the mesh's triangles are (a,c,b) and (b,c,d): diagonal b-c
       const y = u + v <= 1 ? a + (b - a) * u + (c - a) * v : d + (b - d) * (1 - v) + (c - d) * (1 - u)
       return y + FINE_GROUND_LIFT
@@ -230,14 +234,18 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
       isWaterLot: (x, y) => lotWater[y * n + x] !== WATER_KIND_NONE,
       span(x0, z0, x1, z1) {
         let min = Infinity, max = -Infinity
-        const steps = 6
-        for (let a = 0; a <= steps; a++) {
-          for (let b = 0; b <= steps; b++) {
-            const h = groundY(x0 + ((x1 - x0) * a) / steps, z0 + ((z1 - z0) * b) / steps)
-            if (h < min) min = h
-            if (h > max) max = h
-          }
+        const see = (x: number, z: number) => {
+          const h = groundY(x, z)
+          if (h < min) min = h
+          if (h > max) max = h
         }
+        const steps = 6
+        for (let a = 0; a <= steps; a++) for (let b = 0; b <= steps; b++) see(x0 + ((x1 - x0) * a) / steps, z0 + ((z1 - z0) * b) / steps)
+        // and every mesh vertex inside: a peak between sample points would
+        // otherwise poke through a floor laid at the sampled maximum
+        const i0 = Math.ceil((x0 - p00.x) / sx), i1 = Math.floor((x1 - p00.x) / sx)
+        const j0 = Math.ceil((z0 - p00.z) / sz), j1 = Math.floor((z1 - p00.z) / sz)
+        for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) see(p00.x + i * sx, p00.z + j * sz)
         return { min, max }
       },
     }
