@@ -12,6 +12,7 @@ import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
 
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
+import { mockLaborCommand } from './mock_labor'
 const OWN_ID = MOCK_VILLAGE_IDS.own
 const OTHER_ID = MOCK_VILLAGE_IDS.other
 const GRID = 5
@@ -445,6 +446,7 @@ function donate(args: Record<string, unknown>) {
 
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.')) return null
+  if (command.startsWith('settlement.labor.')) return mockLaborCommand(command, args)
   init()
   switch (command) {
     case 'settlement.overview': return overviewView()
