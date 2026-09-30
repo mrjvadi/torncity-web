@@ -185,7 +185,7 @@ export interface Fit { b: KitBuilding; rot: 0 | 1; s: number }
 
 /** Every kit building of the given categories that fits the lot (scaled down
  * to at most 72%). */
-export function fits(kit: BuildingKit, cats: Category[], lot: Lot, gap: number, maxHeight = Infinity): Fit[] {
+export function fits(kit: BuildingKit, cats: Category[], lot: Lot, gap: number, maxHeight = Infinity, minScale = 0.72): Fit[] {
   const fw = lot[2] - gap, fd = lot[3] - gap
   const out: Fit[] = []
   for (const c of cats) for (const b of kit.byCat[c] ?? []) {
@@ -193,7 +193,7 @@ export function fits(kit: BuildingKit, cats: Category[], lot: Lot, gap: number, 
     for (const rot of [0, 1] as const) {
       const bw = rot ? b.depth : b.width, bd = rot ? b.width : b.depth
       const s = Math.min(1, fw / bw, fd / bd)
-      if (s >= 0.72) out.push({ b, rot, s })
+      if (s >= minScale) out.push({ b, rot, s })
     }
   }
   return out

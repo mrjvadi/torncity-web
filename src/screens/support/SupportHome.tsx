@@ -5,7 +5,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ScreenProps } from '../types'
-import { Emboss } from '../../kit'
+import { Emboss, Slab } from '../../kit'
 import * as api from '../../api/client'
 import { report } from '../../lib/reporter'
 import { t } from '../../i18n'
@@ -94,6 +94,7 @@ export default function SupportHome({ run, openLocal }: ScreenProps) {
   }, [ready])
 
   const byKey = useMemo(() => new Map((plan?.placed ?? []).map((p) => [p.key, p])), [plan])
+  const home = bootstrap?.settlement ? { code: bootstrap.settlement.code, name: bootstrap.settlement.name } : null
   const cityName = bootstrap?.cities.find((c) => c.code === 'support')?.name ?? t('sc.title')
 
   function setFrame(m: 'aerial' | 'street') {
@@ -128,6 +129,7 @@ export default function SupportHome({ run, openLocal }: ScreenProps) {
         <div className="sc-title">
           <Emboss name="city" palette="gold" size={16} />
           <span>{cityName}</span>
+          <span className="sc-visit">{t('sc.visitor')}</span>
         </div>
       </div>
 
@@ -135,6 +137,13 @@ export default function SupportHome({ run, openLocal }: ScreenProps) {
         <button className={`k-hdr-btn${mode === 'aerial' ? ' on' : ''}`} onClick={() => setFrame('aerial')} aria-label={t('sc.view.aerial')}><Emboss name="world" palette="gold" size={22} /></button>
         <button className={`k-hdr-btn${mode === 'street' ? ' on' : ''}`} onClick={() => setFrame('street')} aria-label={t('sc.view.street')}><Emboss name="eye" palette="gold" size={22} /></button>
         <button className="k-hdr-btn" onClick={() => openLocal('support_travel')} aria-label={t('sc.travel')}><Emboss name="plane" palette="teal" size={22} /></button>
+      </div>
+
+      <div className="sc-return">
+        <Slab tone={home ? 'gold' : 'steel'} radius={14} lip={4} onClick={() => openLocal('support_travel', home ? { to: home.code } : undefined)}>
+          <Emboss name={home ? 'house' : 'plane'} palette={home ? 'gold' : 'teal'} size={20} />
+          <span>{home ? t('sc.return', { name: home.name }) : t('sc.return_generic')}</span>
+        </Slab>
       </div>
 
       {!ready && !failed && <div className="sc-msg"><span>{t('sc.loading')}</span></div>}

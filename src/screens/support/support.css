@@ -50,3 +50,7 @@
 .sc-road span { position: absolute; top: 14px; font-size: 11.5px; color: #dfe4ff; white-space: nowrap; transform: translateX(-50%); }
 .sc-timer { font-size: 40px; color: var(--firouzeh, #2bc4b2); }
 .sc-soon { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 10px; text-align: center; }
+
+.sc-visit { padding-inline-start: 8px; margin-inline-start: 2px; border-inline-start: 1px solid rgba(255, 214, 107, 0.4); color: var(--gold); }
+.sc-return { position: absolute; z-index: 3; left: 12px; right: 12px; bottom: 46px; display: flex; justify-content: center; pointer-events: none; }
+.sc-return .k-slab { pointer-events: auto; padding: 9px 18px; font-size: 14.5px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45); }

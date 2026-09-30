@@ -1001,6 +1001,11 @@ export const uiFa = {
   'sc.journey.enter': 'ورود',
   'sc.journey.from': 'از {name}',
   'sc.visit.travel': 'سفر',
+  'sc.visitor': 'مهمان ساپورت',
+  'sc.visitor_hint': 'ساپورت شهر همه است؛ کسی در آن ساکن نمی‌شود.',
+  'sc.return': 'بازگشت به {name}',
+  'sc.return_generic': 'سفر به جای دیگر',
+  'sc.dest.home': 'خانه‌ی شما',
 } as const
 
 export type UiKey = keyof typeof uiFa

@@ -1003,4 +1003,9 @@ export const uiEn: Record<UiKey, string> = {
   'sc.journey.enter': 'Enter',
   'sc.journey.from': 'From {name}',
   'sc.visit.travel': 'Travel',
+  'sc.visitor': 'Visiting Support',
+  'sc.visitor_hint': 'Support is everyone\'s city; nobody lives here.',
+  'sc.return': 'Back to {name}',
+  'sc.return_generic': 'Travel elsewhere',
+  'sc.dest.home': 'Your home',
 }

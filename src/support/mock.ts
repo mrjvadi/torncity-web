@@ -17,7 +17,7 @@ const FAR = { kind: 'village' as const, code: 'v-z1p8', name: 'کوهدشت', se
 
 const DEST: TravelDestination[] = [
   { ...SUPPORT, distance_km: 42, duration_seconds: 900, fare: 6300 },
-  { ...OWN, distance_km: 0 },
+  { ...OWN, distance_km: 42, duration_seconds: 900, fare: 6300 },
   { ...OTHER, distance_km: 118, duration_seconds: 1800, fare: 9100 },
   { ...FAR, distance_km: 460, duration_seconds: 5400, fare: 24800 },
 ]

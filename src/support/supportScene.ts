@@ -184,9 +184,10 @@ export class SupportScene {
       m4.compose(new Vector3(lx + lw / 2, ROAD_TOP - 0.25, lz + ld / 2), new Quaternion(), new Vector3(lw, 0.5, ld))
       slabs.setMatrixAt(i, m4)
       if (p.kind === 'park') col.set(0x6f9a52)
-      else if (p.service) col.set(0x9a9a92).lerp(new Color(p.service.color), 0.5)
-      else if (p.kind === 'company') col.set(0x9a9a92).lerp(new Color('#e8a838'), 0.32)
-      else col.set(0x9a9a92)
+      else if (p.kind === 'plaza') col.set(0xc9c2b0)
+      else if (p.service) col.set(0xb4b2a8).lerp(new Color(p.service.color), 0.42)
+      else if (p.kind === 'company') col.set(0xb4b2a8).lerp(new Color('#e8a838'), 0.3)
+      else col.set(0xa9b59a)
       slabs.setColorAt(i, col)
     })
     slabs.receiveShadow = true
@@ -230,7 +231,7 @@ export class SupportScene {
     }
 
     // parks: lawn and trees
-    const parks = placed.filter((p) => p.kind === 'park')
+    const parks = placed.filter((p) => p.kind === 'park' || p.kind === 'plaza')
     const trunkG = new CylinderGeometry(0.5, 0.7, 4, 6), crownG = new SphereGeometry(3.6, 8, 6)
     const trunkM = new MeshStandardMaterial({ color: 0x6b4a2b, roughness: 1 }), crownM = new MeshStandardMaterial({ color: 0x4f8a3a, roughness: 0.9 })
     const spots: { x: number; z: number; k: number }[] = []
@@ -238,9 +239,10 @@ export class SupportScene {
     const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647 }
     for (const p of parks) {
       const [lx, lz, lw, ld] = p.lot
-      const n = Math.round(lw * ld / 190)
+      const n = Math.round(lw * ld / (p.kind === 'plaza' ? 420 : 170))
       for (let i = 0; i < n; i++) spots.push({ x: lx + 4 + rnd() * (lw - 8), z: lz + 4 + rnd() * (ld - 8), k: 0.8 + rnd() * 0.8 })
     }
+    for (const t of this.plan.trees) spots.push(t)
     const trunks = new InstancedMesh(trunkG, trunkM, spots.length), crowns = new InstancedMesh(crownG, crownM, spots.length)
     spots.forEach((t, i) => {
       m4.compose(new Vector3(t.x, ROAD_TOP + 2 * t.k, t.z), new Quaternion(), new Vector3(t.k, t.k, t.k)); trunks.setMatrixAt(i, m4)

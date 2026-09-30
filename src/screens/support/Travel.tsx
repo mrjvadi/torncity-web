@@ -60,6 +60,11 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
     loadDestinations().then(setData).catch(() => setFailed(true))
   }, [])
   useEffect(load, [load])
+  // «بازگشت به روستا»: open straight on the destination asked for
+  const want = localArgs?.to
+  useEffect(() => {
+    if (want && data) { const d = data.list.find((x) => x.code === want); if (d) setSel(d) }
+  }, [want, data])
 
   const list = useMemo(() => {
     const l = [...(data?.list ?? [])]
@@ -90,6 +95,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
       {!failed && !data && <Empty>{t('sc.loading')}</Empty>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {data && list.map((d) => {
+          const isHome = d.code === bootstrap?.settlement?.code
           const isHere = d.code === here || (!!d.settlement_id && d.settlement_id === loc?.settlement_id)
           return (
             <button key={d.code} className={`nx-row nx-row-tap${isHere ? ' nx-row-teal' : ''}`} disabled={isHere} onClick={() => setSel(d)} style={{ opacity: isHere ? 0.7 : 1 }}>
@@ -97,7 +103,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
               <span className="nx-row-text">
                 <span className="nx-row-title">{d.name}</span>
                 <span className="nx-row-sub">
-                  {isHere ? t('sc.dest.here') : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} · ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` · ${hms(d.duration_seconds)}` : ''}`}
+                  {isHere ? t('sc.dest.here') : isHome ? `${t('sc.dest.home')} · ` + `${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}` : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} · ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` · ${hms(d.duration_seconds)}` : ''}`}
                 </span>
               </span>
               {!isHere && d.fare !== undefined && <span className="nx-row-right">{money(d.fare)}</span>}

@@ -1026,3 +1026,8 @@ sc.journey.arrived | رسیدی! | You have arrived!
 sc.journey.enter | ورود | Enter
 sc.journey.from | از {name} | From {name}
 sc.visit.travel | سفر | Travel
+sc.visitor | مهمان ساپورت | Visiting Support
+sc.visitor_hint | ساپورت شهر همه است؛ کسی در آن ساکن نمی‌شود. | Support is everyone's city; nobody lives here.
+sc.return | بازگشت به {name} | Back to {name}
+sc.return_generic | سفر به جای دیگر | Travel elsewhere
+sc.dest.home | خانه‌ی شما | Your home
