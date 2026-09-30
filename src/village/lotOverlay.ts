@@ -10,6 +10,8 @@ export const TONE_NONE = 0
 export const TONE_OK = 1
 export const TONE_BAD = 2
 export const TONE_TAKEN = 3
+/** A lot the viewer owns (the citizen loop's land mode): gold. */
+export const TONE_OWN = 4
 
 const SUB = 4
 const LIFT = 0.28
@@ -18,6 +20,7 @@ const TONES: Record<number, [number, number, number, number]> = {
   [TONE_OK]: [0.25, 0.9, 0.42, 0.45],
   [TONE_BAD]: [0.92, 0.05, 0.06, 0.6],
   [TONE_TAKEN]: [0.62, 0.66, 0.85, 0.28],
+  [TONE_OWN]: [1, 0.8, 0.2, 0.55],
 }
 
 export class LotOverlay {

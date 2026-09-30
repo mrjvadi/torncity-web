@@ -5,7 +5,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ScreenProps } from '../types'
-import { Emboss, Plate, Slab } from '../../kit'
+import { Emboss, Frame, GLabel, Plate, Slab } from '../../kit'
 import { Header } from '../native/kit/Parts'
 import Emblem from '../../lib/emblem'
 import { emblemHex } from '../../lib/emblemPalette'
@@ -25,6 +25,8 @@ import type { VillageOverviewView } from '../../api/types'
 import { useBuildMode } from './useBuildMode'
 import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
+import { BuyLotSheet, HouseSheet, MineSheet, TakenLotSheet, WorkSheet } from './LandSheets'
+import { classifyLot, freeOwnLots, tonesForLand } from './citizen'
 import './village.css'
 
 export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
@@ -50,6 +52,39 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
   const overview = useVillageView<VillageOverviewView>('settlement.overview', null, {}, own)
   const build = useBuildMode(store, layout, sceneRef, cat)
   const tapRef = useRef<(lot: { x: number; y: number } | null, bid: string | null) => void>(() => undefined)
+
+  // The citizen loop (docs/adr/0033 section 4.4): a resident buys a free lot,
+  // builds a house on their own, sees their property. `landOn` is the land map
+  // (free lots green, own lots gold); a tap on a lot opens the sheet it needs.
+  const [landOn, setLandOn] = useState(false)
+  const [buyLot, setBuyLot] = useState<{ x: number; y: number } | null>(null)
+  const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
+  const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
+  const [mineOpen, setMineOpen] = useState(false)
+  const [workOpen, setWorkOpen] = useState(false)
+  const resident = !!layout?.viewer.resident && own
+  useEffect(() => {
+    if (!sceneReady) return
+    sceneRef.current?.setOverlayTones(landOn && layout && build.state.step === 'off' ? tonesForLand(layout) : null)
+  }, [landOn, layout, sceneReady, build.state.step])
+  // the overview's shortcuts open the village straight in one of the actions
+  const wantAction = useRef(localArgs?.land ? 'land' : localArgs?.mine ? 'mine' : localArgs?.work ? 'work' : localArgs?.house ? 'house' : '')
+  useEffect(() => {
+    if (!wantAction.current || !sceneReady || !layout?.viewer.resident) return
+    const a = wantAction.current
+    wantAction.current = ''
+    if (a === 'mine') setMineOpen(true)
+    else if (a === 'work') setWorkOpen(true)
+    else if (a === 'house' && freeOwnLots(layout) === 0) { toast.push(t('citizen.build.no_land')); setLandOn(true) }
+    else setLandOn(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, layout?.viewer.resident])
+  function startHouse() {
+    if (!layout) return
+    if (freeOwnLots(layout) === 0) { toast.push(t('citizen.build.no_land')); setLandOn(true); return }
+    setLandOn(true)
+    toast.push(t('citizen.land.hint'))
+  }
 
   // «ساخت» in the menu opens the village straight in build mode
   const wantBuild = useRef(!!localArgs?.build)
@@ -122,7 +157,7 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
     if (topRef.current) ro.observe(topRef.current)
     if (bottomRef.current) ro.observe(bottomRef.current)
     return () => ro.disconnect()
-  }, [sceneReady, build.state.step, layout?.viewer.member])
+  }, [sceneReady, build.state.step, layout?.viewer.member, landOn, resident])
 
   // layout changes -> what stands
   useEffect(() => {
@@ -136,6 +171,12 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
       return
     }
     if (build.state.step !== 'off') return
+    if (landOn && layout && lot && resident) {
+      const k = classifyLot(layout, lot.x, lot.y)
+      if (k.kind === 'free') { setSelectedId(null); setBuyLot(lot); return }
+      if (k.kind === 'mine') { setSelectedId(null); setHouseLot(lot); return }
+      if (k.kind === 'taken') { setSelectedId(null); setTakenLot({ ...lot, owner: k.owner }); return }
+    }
     setSelectedId(bid)
   }
 
@@ -226,9 +267,34 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
             onNext={() => void build.next()} onConfirm={() => void build.confirm()} onBack={build.back}
           />
         ) : null}
+        {!inBuild && resident && landOn && (
+          <Frame radius={20}>
+            <div className="vh-panel">
+              <div className="vh-panel-head">
+                <span style={{ width: 34 }} />
+                <GLabel className="vh-panel-title" top="#fff6c8" bottom="#ffb21f" stroke={1}>{t('citizen.bar.land')}</GLabel>
+                <button className="vh-x" onClick={() => setLandOn(false)} aria-label={t('citizen.land.exit')}>✕</button>
+              </div>
+              <div className="vh-legend">
+                <span><i className="vh-dot" style={{ background: '#40d96b' }} />{t('citizen.legend.free')}{layout?.terms ? ` · ${money(layout.terms.lot_price)}` : ''}</span>
+                <span><i className="vh-dot" style={{ background: '#ffcc33' }} />{t('citizen.legend.mine')}</span>
+                <span><i className="vh-dot" style={{ background: '#9aa0b4' }} />{t('citizen.legend.taken')}</span>
+              </div>
+              <div className="vh-hint">{t('citizen.land.hint')}</div>
+            </div>
+          </Frame>
+        )}
+        {!inBuild && resident && !landOn && (
+          <div className="vh-cbar">
+            <Slab tone="gold" radius={14} lip={4} onClick={() => setLandOn(true)}>{t('citizen.bar.land')}</Slab>
+            <Slab tone="green" radius={14} lip={4} onClick={startHouse}>{t('citizen.bar.build')}</Slab>
+            <Slab tone="steel" radius={14} lip={4} onClick={() => setMineOpen(true)}>{t('citizen.bar.mine')}</Slab>
+            <Slab tone="blue" radius={14} lip={4} onClick={() => setWorkOpen(true)}>{t('citizen.bar.work')}</Slab>
+          </div>
+        )}
       </div>
-      {!inBuild && canPlace && member && (
-        <button className="vh-fab" onClick={() => void build.enter()} aria-label={t('village.btn.build')}>
+      {!inBuild && canPlace && member && !landOn && (
+        <button className={`vh-fab${resident ? ' above' : ''}`} onClick={() => void build.enter()} aria-label={t('village.btn.build')}>
           <Plate size={54} rim="#ffd66b"><Emboss name="house" palette="gold" size={32} /></Plate>
           <span>{t('village.build_fab')}</span>
         </button>
@@ -249,7 +315,12 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
       </BottomSheet>
       <DonateSheet open={donateOpen} onClose={() => setDonateOpen(false)} onDone={() => void overview.refresh()} />
 
-      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)} />
+      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)} onMine={() => { setSelectedId(null); setMineOpen(true) }} />
+      <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} />
+      <HouseSheet lot={houseLot} cat={cat} onClose={() => setHouseLot(null)} store={store} />
+      <TakenLotSheet lot={takenLot} owner={takenLot?.owner} onClose={() => setTakenLot(null)} />
+      <MineSheet open={mineOpen} cat={cat} onClose={() => setMineOpen(false)} store={store} />
+      <WorkSheet open={workOpen} city={overview.view?.support?.name ?? ''} onClose={() => setWorkOpen(false)} />
 
       {(v.status === 'loading' || (v.status === 'ready' && !sceneReady && !sceneError)) && <div className="vh-msg" style={{ background: 'linear-gradient(180deg,#dcebf3,#eaf3ee)' }}><span>{t('village.loading')}</span></div>}
       {(v.status === 'error' || sceneError) && (

@@ -303,18 +303,32 @@ export interface LayoutBuilding {
   finish_at?: string
   damage_bps?: number
   visual_seed: number
+  /** A resident's building (contract 1.4, members only): its owner's name and
+   * whether it is the viewer's own. */
+  private?: boolean
+  owner?: string
+  mine?: boolean
 }
+
+/** One lot that has an owner (contract 1.4, members only); any lot not listed
+ * is commons, on sale at `terms.lot_price`. */
+export interface LayoutTenure { x: number; y: number; tenure: 'freehold' | 'leased'; mine: boolean; owner?: string }
+
+/** What a lot, a permit and the property tax cost in this village. */
+export interface LayoutTerms { lot_price: number; permit_fee: number; tax_bps: number }
 
 /** GET /api/v1/settlements/{id}/layout */
 export interface VillageLayout {
   version: string
   detail: 'full' | 'coarse'
-  viewer: { member: boolean; can_place: boolean }
+  viewer: { member: boolean; can_place: boolean; resident?: boolean }
   settlement: { id: string; code: string; name: string; tier: string; world_cell: number; centre: PlaceRef }
   grid: { lots: number; lot_m: number; origin: { lat: number; lon: number }; slope_limit: number }
   lots: LayoutLot[][]
   buildings: LayoutBuilding[]
   roads?: { x: number; y: number }[]
+  tenure?: LayoutTenure[]
+  terms?: LayoutTerms
 }
 
 export type PresenceActivity = 'idle' | 'travelling' | 'working' | 'studying' | 'training' | 'hospital' | 'jail' | 'building' | 'fighting'
@@ -346,7 +360,7 @@ export interface SettlementEvent {
   type:
     | 'build_started' | 'build_finished' | 'build_cancelled' | 'build_salvaged'
     | 'research_started' | 'research_finished' | 'knowledge_bought' | 'literacy_changed'
-    | 'head_changed' | 'member_joined' | 'member_left'
+    | 'head_changed' | 'member_joined' | 'member_left' | 'lot_bought'
   settlement_id: string
   seq: number
   at: string
@@ -479,4 +493,72 @@ export interface CatalogueBuilding {
   name: Record<string, string>
   category?: string
   footprint: [number, number]
+}
+
+// -- the citizen loop (contract 1.4): land and private buildings ------------------
+
+export interface LotBuyView {
+  village: string
+  settlement_id: string
+  x: number
+  y: number
+  price: number
+  cash: number
+  treasury: number
+}
+
+export interface PrivateMaterialView { component: Named; need: number; have: number; buy: number; buy_cost: number }
+
+export interface PrivateLineView {
+  building: Named
+  home: boolean
+  class: string
+  cost_money: number
+  permit_fee: number
+  materials: PrivateMaterialView[] | null
+  build_time_seconds: number
+  footprint_w: number
+  footprint_h: number
+  total: number
+  affordable: boolean
+}
+
+export interface PrivateMenuView {
+  village: string
+  cash: number
+  owned_lots: number
+  free_lots: number
+  lines: PrivateLineView[] | null
+}
+
+export interface PrivateConfirmView {
+  village: string
+  building: Named
+  x: number
+  y: number
+  rotated: boolean
+  cost_money: number
+  permit_fee: number
+  materials: PrivateMaterialView[] | null
+  materials_cost: number
+  total: number
+  cash: number
+  build_time_seconds: number
+}
+
+export interface MineLotView { x: number; y: number; building?: string; state?: string; left_seconds?: number }
+
+export interface MineView {
+  village: string
+  cash: number
+  lots: MineLotView[] | null
+  home?: Named | null
+  can_rest: boolean
+  rest_wait_seconds: number
+  assessed: number
+  tax_per_period: number
+  tax_bps: number
+  debt: number
+  debt_periods: number
+  notice?: string
 }

@@ -55,6 +55,20 @@ export function Overview({ response, openLocal, localArgs }: ScreenProps) {
               </div>
             )}
           </Card>
+          {v.resident !== false && (
+            <Card tone="gold">
+              <SectionTitle>{t('citizen.hub.title')}</SectionTitle>
+              <div className="vh-hint" style={{ textAlign: 'start' }}>{t('citizen.hub.hint')}</div>
+              <div className="vc-hub">
+                <Slab tone="gold" radius={14} lip={4} onClick={() => openLocal('village_home', { land: '1' })}>{t('citizen.bar.land')}</Slab>
+                <Slab tone="green" radius={14} lip={4} onClick={() => openLocal('village_home', { house: '1' })}>{t('citizen.bar.build')}</Slab>
+                <Slab tone="blue" radius={14} lip={4} onClick={() => openLocal('village_home', { work: '1' })}>{t('citizen.bar.work')}</Slab>
+                <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('village_home', { mine: '1' })}>{t('citizen.bar.mine')}</Slab>
+                <Slab tone="gold" radius={14} lip={4} onClick={() => setDonate(true)}>{t('citizen.hub.donate')}</Slab>
+                <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('village_who')}>{t('citizen.hub.who')}</Slab>
+              </div>
+            </Card>
+          )}
           <Card>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {bars.map((b) => (

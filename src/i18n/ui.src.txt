@@ -965,3 +965,81 @@ bank.submit_withdraw | برداشت {n} | Withdraw {n}
 bank.enter_amount | مبلغ را وارد کن | Enter an amount
 bank.too_much | بیشتر از موجودی است | More than you have
 bank.jailed | در زندان هستی؛ به بانک دسترسی نداری. | You are in jail; the bank is out of reach.
+# -- citizen loop: land, a private house, one's own property (contract 1.4) -----
+citizen.bar.land | زمین بخر | Buy land
+citizen.bar.build | خانه بساز | Build a house
+citizen.bar.mine | دارایی من | My property
+citizen.bar.work | کار کن | Work
+citizen.hub.title | کارهای تو در روستا | What you can do here
+citizen.hub.hint | اینجا خانهٔ توست؛ زمین بخر، خانه بساز و روستا را آباد کن. | This is your home: buy land, build a house and help the village grow.
+citizen.hub.donate | کمک به خزانه | Help the treasury
+citizen.hub.who | ساکنان | Residents
+citizen.legend.free | زمین آزاد | Free lot
+citizen.legend.mine | زمین تو | Yours
+citizen.legend.taken | زمین دیگران | Others'
+citizen.land.exit | بستن نقشهٔ زمین‌ها | Close the land map
+citizen.land.hint | روی یک زمین آزاد بزن تا بخری، یا روی زمین خودت (طلایی) تا بسازی. | Tap a free lot to buy it, or one of yours (gold) to build.
+citizen.land.build_hint | روی زمین خودت (طلایی) بزن تا {name} آنجا ساخته شود. | Tap one of your own lots (gold) to build {name} there.
+citizen.buy.title | خرید زمین | Buy a lot
+citizen.buy.lot | ردیف {y}، ستون {x} | Row {y}, column {x}
+citizen.buy.price | قیمت زمین | Lot price
+citizen.buy.cash | پول تو | Your cash
+citizen.buy.after | پس از خرید | After buying
+citizen.buy.note | پول به خزانهٔ روستا می‌رود و زمین برای همیشه مال تو می‌شود. | The money goes to the village treasury and the lot is yours for good.
+citizen.buy.confirm | بخر - {p} | Buy - {p}
+citizen.buy.done | زمین مال توست. حالا می‌توانی رویش خانه بسازی. | The lot is yours. You can build a house on it now.
+citizen.buy.no_cash | پولت برای خرید این زمین کافی نیست. | You cannot afford this lot.
+citizen.taken_by | زمین {name} | {name}'s lot
+citizen.taken | این زمین شخصی است. | This lot is private.
+citizen.taken_note | فقط صاحبش می‌تواند رویش بسازد. | Only its owner can build on it.
+citizen.build.title | ساخت روی زمین تو | Build on your lot
+citizen.build.pick | چه می‌خواهی بسازی؟ | What do you want to build?
+citizen.build.empty | فعلاً چیزی برای ساخت باز نشده؛ با پیشرفت دانش روستا بیشتر می‌شود. | Nothing is open to build yet; more opens as the village learns.
+citizen.build.no_land | برای ساختن اول باید یک زمین داشته باشی. | You need a lot before you can build.
+citizen.build.cost | هزینهٔ ساختمان | Building cost
+citizen.build.permit | مجوز ساخت (به خزانه) | Building permit (to the treasury)
+citizen.build.materials | مصالح خریداری‌شده | Materials bought
+citizen.build.total | جمع نقدی | Cash total
+citizen.build.time | زمان ساخت | Build time
+citizen.build.start | تأیید و ساخت - {p} | Confirm and build - {p}
+citizen.build.started | ساخت شروع شد. | Construction started.
+citizen.build.short | پولت کافی نیست | Not enough cash
+citizen.build.pay_note | هزینه از جیب خودت است؛ الوارِ کم‌آمده به قیمت مرجع خریده می‌شود. | You pay from your own pocket; missing timber is bought at the reference price.
+citizen.build.material | {name}: {need} واحد (داری {have}، می‌خری {buy}) | {name}: {need} (you have {have}, buy {buy})
+citizen.build.back | برگشت به فهرست | Back to the list
+citizen.mine.title | دارایی من | My property
+citizen.mine.home | خانهٔ من | My home
+citizen.mine.no_home | هنوز خانه نداری؛ روی زمینت خانه بساز تا ساکن آن شوی. | You have no house yet; build one on your lot to live in it.
+citizen.mine.lots | زمین‌های من | My lots
+citizen.mine.no_lots | زمینی نداری. | You own no lots.
+citizen.mine.lot_bare | زمین خالی | Empty lot
+citizen.mine.assessed | ارزش مشمول مالیات | Taxable value
+citizen.mine.tax | مالیات هر دوره | Tax each period
+citizen.mine.debt | بدهی مالیاتی | Tax debt
+citizen.mine.cash | پول تو | Your cash
+citizen.mine.rest | استراحت در خانه | Rest at home
+citizen.mine.rest_wait | استراحت ({t} دیگر) | Rest ({t} left)
+citizen.mine.rested | در خانه استراحت کردی و سرحال‌تر شدی. | You rested at home and feel better.
+citizen.mine.pay | پرداخت مالیات - {p} | Pay the tax - {p}
+citizen.mine.paid | مالیات پرداخت شد. | Tax paid.
+citizen.mine.nothing_paid | پولت برای پرداخت کافی نبود. | You could not afford to pay.
+citizen.owner | مالک: {name} | Owner: {name}
+citizen.owner_you | مالک: تو | Owner: you
+citizen.private_building | ساختمان شخصی | Private building
+citizen.work.title | کار در روستا | Work in the village
+citizen.work.body | کارگاه‌ها و مزرعه‌های روستا با ساخته‌شدن باز می‌شوند. تا آن روز کار و شغل در «{city}» است. | The village's workshops and farms open as they are built. Until then, jobs are in {city}.
+citizen.work.go | رفتن به {city} | Go to {city}
+event.lot_bought | زمینی خریداری شد | A lot was bought
+refusal.village_citizen_lot_taken | این زمین را همین حالا کس دیگری خرید. | Someone bought this lot just now.
+refusal.village_citizen_lot_limit | به سقف زمین‌های شخصی رسیده‌ای؛ اول روی زمین‌هایت بساز. | You have reached the personal lot limit; build on your lots first.
+refusal.village_citizen_zoning | سهم زمین‌های شخصی این روستا پر شده است. | The share of private lots in this village is full.
+refusal.village_citizen_not_owner | این زمین مال تو نیست؛ فقط روی زمین خودت می‌توانی بسازی. | This lot is not yours; you can only build on your own lot.
+refusal.village_citizen_no_cash | پولت برای این کار کافی نیست. | You do not have enough money for this.
+refusal.village_citizen_private_only | این ساختمان شخصی است و ساکنان روی زمین خودشان می‌سازند. | This is a private building: residents build it on their own lot.
+refusal.village_citizen_lot_private | این زمین شخصی است و مال یکی از اهالی است. | This lot is private and belongs to a resident.
+refusal.village_citizen_rest_wait | هنوز سرحال هستی؛ کمی بعد دوباره استراحت کن. | You are still rested; try again a little later.
+refusal.village_citizen_no_house | برای استراحت اول باید خانه‌ات ساخته شود. | You need a finished house to rest at home.
+refusal.village_citizen_terms_range | این عدد خارج از محدودهٔ مجاز است. | That number is outside the allowed range.
+refusal.village_citizen_no_debt | بدهی مالیاتی‌ای نداری. | You have no tax debt.
+refusal.village_citizen_off | خرید زمین هنوز در این روستا باز نشده است. | Buying land is not open in this village yet.
+refusal.village_citizen_no_lots | زمینی نداری؛ اول یک زمین بخر. | You own no lots; buy one first.

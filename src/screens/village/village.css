@@ -119,3 +119,23 @@
 /* the call to found a village */
 .vc-title { font-size: 20px; color: var(--gold); text-align: center; margin-bottom: 8px; }
 .vc-body { font-size: 14px; line-height: 1.8; color: var(--text-dim); text-align: center; }
+
+/* citizen loop: the resident's bar, the land map panel, the sheets' lists */
+.vh-cbar { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 8px; display: flex; gap: 6px; --k-h: 40px; }
+.vh-cbar .k-slab { flex: 1; padding: 9px 4px; font-size: 13px; line-height: 1.25; }
+.vh-fab.above { bottom: 66px; }
+.vc-list { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 6px; }
+.vc-line {
+  display: flex; align-items: center; gap: 10px; text-align: start; padding: 8px 10px; border-radius: 14px; color: var(--text);
+  background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1.5px solid var(--gold-soft);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.14);
+}
+.vc-line:active { transform: scale(0.985); }
+.vc-line.locked { opacity: 0.6; }
+.vc-line-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.vc-line-name { font-size: 14.5px; }
+.vc-line-sub { font-size: 11.5px; color: var(--text-dim); }
+.vc-line-sub.bad { color: #ff9a9e; }
+.vc-line-price { font-size: 14px; color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vc-hub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.vc-hub .k-slab { padding: 10px 6px; font-size: 14px; }

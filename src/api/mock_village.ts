@@ -48,10 +48,12 @@ const KNOW_NAMES: Record<string, string> = {
   fire_making: 'آتش‌افروزی', masonry: 'سنگ‌تراشی', irrigation: 'آبیاری', writing: 'خط و نوشتن', metallurgy: 'فلزکاری', geometry: 'هندسه', archery: 'کمانداری',
 }
 const CONCURRENT_CAP = 3
+/** ?role=resident: the viewer is a normal resident, not the head. */
+const IS_HEAD = (() => { try { return new URLSearchParams(location.search).get('role') !== 'resident' } catch { return true } })()
 
 // -- state ------------------------------------------------------------------------
 
-interface MBuilding { id: string; type: string; x: number; y: number; w: number; h: number; rotated: boolean; state: BuildingState; started?: number; finish?: number; seed: number }
+interface MBuilding { id: string; type: string; x: number; y: number; w: number; h: number; rotated: boolean; state: BuildingState; started?: number; finish?: number; seed: number; priv?: boolean; owner?: string; mine?: boolean }
 interface Knowledge { code: string; state: 'held' | 'researching' | 'available' | 'locked'; cost: number; time: number; buy: number; missing: string[]; terrain: boolean; finish?: number }
 
 const st = {
@@ -183,6 +185,7 @@ function toLayoutBuilding(b: MBuilding, full: boolean): LayoutBuilding {
     out.id = b.id
     if (b.started) out.started_at = new Date(b.started).toISOString()
     if (b.finish) out.finish_at = new Date(b.finish).toISOString()
+    if (b.priv) { out.private = true; out.owner = b.owner; out.mine = !!b.mine }
   }
   return out
 }
@@ -197,17 +200,18 @@ function layoutFor(id: string): VillageLayout {
   const list = own ? st.buildings : st.otherBuildings.filter((b) => b.state === 'built')
   const roads = own ? st.roads : []
   const detail = own ? 'full' : 'coarse'
-  const ver = own ? `h${st.ver}` : `p${st.ver}`
+  seedCitizen()
+  const ver = own ? `${IS_HEAD ? 'h' : 'm'}${st.ver}` : `p${st.ver}`
   const buildings: LayoutBuilding[] = list.map((b) => toLayoutBuilding(b, own))
   for (const r of roads) buildings.push({ type: 'road', x: r.x, y: r.y, w: 1, h: 1, rotated: false, state: 'built', visual_seed: 7, ...(own ? { id: `road-${r.x}-${r.y}` } : {}) })
   return {
     version: ver, detail,
-    viewer: { member: own, can_place: own },
+    viewer: { member: own, can_place: own && IS_HEAD, ...(own ? { resident: true } : {}) },
     settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'village', world_cell: own ? 18211 : 18990, centre },
     grid: { lots: GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
     lots: own ? st.lots : st.otherLots,
     buildings,
-    ...(own ? { roads } : {}),
+    ...(own ? { roads, tenure: cz.tenure.map((l) => ({ x: l.x, y: l.y, tenure: 'freehold' as const, mine: l.mine, owner: l.owner })), terms: { lot_price: LOT_PRICE, permit_fee: PERMIT_FEE, tax_bps: TAX_BPS } } : {}),
   }
 }
 
@@ -216,7 +220,7 @@ export function mockBootstrapSettlement(): BootstrapSettlement {
   const place = mockVillagePlace(GRID)
   return {
     id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'village', world_cell: 18211,
-    centre: place.centre, is_head: true, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: GRID, layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
+    centre: place.centre, is_head: IS_HEAD, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: GRID, layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
   }
 }
 
@@ -236,7 +240,7 @@ function roster(): SettlementPlayers {
 
 // -- views ---------------------------------------------------------------------------------------
 
-function nameOf(code: string) { const e = CAT.find((c) => c.code === code); return { code, name: e?.fa ?? code } }
+function nameOf(code: string) { const e = CAT.find((c) => c.code === code) ?? citizenEntry(code); return { code, name: e?.fa ?? code } }
 function kn(code: string) { return { code, name: KNOW_NAMES[code] ?? code } }
 const back = (command: string) => ({ label: 'بازگشت', command, row: 9, kind: 'back', icon: 'action:player' })
 
@@ -443,6 +447,151 @@ function donate(args: Record<string, unknown>) {
   return { ok: true, screen: 'village_donate_done', text: 'ممنون', view: view(amount), actions: [back('settlement.overview')] }
 }
 
+// -- the citizen loop (contract 1.4): land, a private house, one's own property ----------
+// ?role=resident opens the village as a normal resident (not the head), the
+// player this feature is for; without it the viewer is the head, who lives
+// here too. Prices follow configs/config.yml (settlement.citizen_*).
+
+const LOT_PRICE = 400, PERMIT_FEE = 100, TAX_BPS = 200, MAX_LOTS = 3, TIMBER_UNIT = 18
+
+interface MLot { x: number; y: number; owner: string; mine: boolean }
+const cz = { tenure: [] as MLot[], cash: 5000, lastRest: 0, seeded: false }
+
+const CITIZEN_CAT: CatEntry[] = [
+  { code: 'cottage', fa: 'کلبهٔ روستایی', en: 'Cottage', fp: [1, 1], cost: 800, time: 7200, role: '', materials: [['timber', 'الوار', 3]] },
+  { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 1800, time: 14400, role: '', needs: ['carpentry'], materials: [['timber', 'الوار', 8]] },
+  { code: 'home_workshop', fa: 'کارگاه خانگی', en: 'Home workshop', fp: [2, 1], cost: 1500, time: 10800, role: 'craft', needs: ['carpentry'], materials: [['timber', 'الوار', 6]] },
+  { code: 'market_stall', fa: 'غرفهٔ بازار', en: 'Market stall', fp: [1, 1], cost: 500, time: 3600, role: 'market', materials: [['timber', 'الوار', 2]] },
+]
+const HOMES = new Set(['cottage', 'village_house'])
+
+function citizenEntry(code: string): CatEntry | undefined { return CITIZEN_CAT.find((c) => c.code === code) }
+
+function seedCitizen() {
+  if (cz.seeded) return
+  cz.seeded = true
+  const occ = occupiedMap()
+  const free: [number, number][] = []
+  for (let y = 0; y < GRID; y++) for (let x = 0; x < GRID; x++) if (st.lots[y][x].buildable && !occ[y][x]) free.push([x, y])
+  // a neighbour, Sara, already owns two lots and lives in one
+  const picks = free.slice(-2)
+  picks.forEach(([x, y], i) => {
+    cz.tenure.push({ x, y, owner: 'سارا', mine: false })
+    if (i === 0) {
+      const e = citizenEntry('cottage')!
+      st.buildings.push({ id: `b-${st.nextId++}`, type: 'cottage', x, y, w: e.fp[0], h: e.fp[1], rotated: false, state: 'built', seed: 55103 + x * 7 + y, priv: true, owner: 'سارا', mine: false })
+    }
+  })
+}
+
+function tenureAt(x: number, y: number) { return cz.tenure.find((l) => l.x === x && l.y === y) }
+function bill(e: CatEntry) {
+  const mats = (e.materials ?? []).map(([code, name, need]) => ({ component: { code, name }, need, have: 0, buy: need, buy_cost: need * TIMBER_UNIT }))
+  const materials_cost = mats.reduce((s, m) => s + m.buy_cost, 0)
+  return { mats, materials_cost, total: e.cost + PERMIT_FEE + materials_cost }
+}
+function citizenUnmet(e: CatEntry): boolean { return unmet(e).length > 0 }
+
+function lotBuy(args: Record<string, unknown>) {
+  seedCitizen()
+  const x = Number(args.x), y = Number(args.y)
+  if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= GRID || y >= GRID) return refusal('not_found', 'قطعهٔ نامعتبر.')
+  if (tenureAt(x, y)) return refusal('citizen_lot_taken', 'این زمین را همین حالا کس دیگری خرید. زمین دیگری انتخاب کن.')
+  if (!st.lots[y][x].buildable) return refusal('unbuildable', '🌊 روی این قطعه نمی‌توان ساخت.')
+  if (occupiedMap()[y][x]) return refusal('occupied', 'این قطعه پیش‌تر ساخته شده است.')
+  if (cz.tenure.filter((l) => l.mine).length >= MAX_LOTS) return refusal('citizen_lot_limit', 'به سقف زمین‌های شخصی رسیده‌ای؛ اول روی زمین‌هایت بساز.')
+  if (cz.cash < LOT_PRICE) return refusal('citizen_no_cash', 'پولت برای این کار کافی نیست.')
+  const view = (cash: number, treasury: number) => ({ village: 'آمل', settlement_id: OWN_ID, x, y, price: LOT_PRICE, cash, treasury })
+  if (args.confirm !== 'confirm') return { ok: true, screen: 'settlement_lot_buy_confirm', text: 'خرید زمین', view: view(cz.cash, st.treasury), actions: [back('settlement.land')] }
+  cz.cash -= LOT_PRICE
+  st.treasury += LOT_PRICE
+  cz.tenure.push({ x, y, owner: 'تو', mine: true })
+  st.ver++
+  emit({ type: 'lot_bought', lot_x: x, lot_y: y, layout_version: versions() })
+  return { ok: true, screen: 'settlement_lot_buy_done', text: 'زمین مال توست', view: view(cz.cash, st.treasury), actions: [back('settlement.land')] }
+}
+
+function privateMenu() {
+  seedCitizen()
+  const owned = cz.tenure.filter((l) => l.mine)
+  const occ = occupiedMap()
+  const freeOwn = owned.filter((l) => !occ[l.y][l.x]).length
+  const lines = CITIZEN_CAT.filter((e) => !citizenUnmet(e)).map((e) => {
+    const b = bill(e)
+    return {
+      building: nameOf(e.code), home: HOMES.has(e.code), class: e.role || 'residential', cost_money: e.cost, permit_fee: PERMIT_FEE,
+      materials: b.mats, build_time_seconds: e.time, footprint_w: e.fp[0], footprint_h: e.fp[1], total: b.total, affordable: cz.cash >= b.total,
+    }
+  })
+  return { ok: true, screen: 'settlement_private_menu', text: 'ساخت‌وساز شخصی', view: { village: 'آمل', cash: cz.cash, owned_lots: owned.length, free_lots: freeOwn, lines }, actions: [back('settlement.overview')] }
+}
+
+function privatePlace(args: Record<string, unknown>) {
+  seedCitizen()
+  const code = String(args.code ?? '')
+  const e = citizenEntry(code)
+  if (!e) return refusal('not_found', 'این ساختمان شناخته نشد.')
+  const x = Number(args.x), y = Number(args.y)
+  if (!Number.isInteger(x) || !Number.isInteger(y)) return refusal('not_found', 'قطعهٔ نامعتبر.')
+  const occ = occupiedMap()
+  for (let yy = y; yy < y + e.fp[1]; yy++) {
+    for (let xx = x; xx < x + e.fp[0]; xx++) {
+      if (xx >= GRID || yy >= GRID) return refusal('out_of_bounds', 'ساختمان از محدودهٔ روستا بیرون می‌زند.')
+      if (occ[yy][xx]) return refusal('occupied', 'این قطعه پیش‌تر ساخته شده است.')
+      if (!tenureAt(xx, yy)?.mine) return refusal('citizen_not_owner', 'این زمین مال تو نیست؛ فقط روی زمین خودت می‌توانی بسازی.')
+    }
+  }
+  if (citizenUnmet(e)) return refusal('prerequisite', 'دانش یا ساختمانِ پیش‌نیاز کامل نیست.')
+  const b = bill(e)
+  if (cz.cash < b.total) return refusal('citizen_no_cash', 'پولت برای این کار کافی نیست.')
+  if (args.confirm !== 'confirm') {
+    return {
+      ok: true, screen: 'settlement_private_confirm', text: 'تأیید ساخت',
+      view: { village: 'آمل', building: nameOf(code), x, y, rotated: false, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time },
+      actions: [back('settlement.private.lots')],
+    }
+  }
+  cz.cash -= b.total
+  st.treasury += PERMIT_FEE
+  const sec = 40
+  const started = Date.now()
+  const nb: MBuilding = { id: `b-${st.nextId++}`, type: code, x, y, w: e.fp[0], h: e.fp[1], rotated: false, state: 'under_construction', started, finish: started + sec * 1000, seed: 77021 + st.nextId * 17, priv: true, owner: 'تو', mine: true }
+  st.buildings.push(nb)
+  st.ver++
+  schedule(nb)
+  emit({ type: 'build_started', building_id: nb.id, type_code: code, lot_x: x, lot_y: y, rotated: false, finish_at: new Date(nb.finish!).toISOString(), layout_version: versions() })
+  return mineView('')
+}
+
+function mineView(notice: string) {
+  seedCitizen()
+  const now = Date.now()
+  const mineB = st.buildings.filter((b) => b.priv && b.mine)
+  const lots = cz.tenure.filter((l) => l.mine).map((l) => {
+    const b = mineB.find((x) => l.x >= x.x && l.x < x.x + x.w && l.y >= x.y && l.y < x.y + x.h)
+    return { x: l.x, y: l.y, ...(b ? { building: b.type, state: b.state, left_seconds: b.finish ? Math.max(0, Math.round((b.finish - now) / 1000)) : 0 } : {}) }
+  })
+  const home = mineB.find((b) => b.state === 'built' && HOMES.has(b.type))
+  const assessed = cz.tenure.filter((l) => l.mine).length * LOT_PRICE + mineB.reduce((s, b) => s + (citizenEntry(b.type)?.cost ?? 0) + (citizenEntry(b.type)?.materials ?? []).reduce((m, [, , n]) => m + n * 15, 0), 0)
+  const wait = Math.max(0, Math.round((cz.lastRest + 6 * 3600_000 - now) / 1000))
+  return {
+    ok: true, screen: 'settlement_mine', text: 'دارایی من',
+    view: {
+      village: 'آمل', settlement_id: OWN_ID, cash: cz.cash, lots, home: home ? nameOf(home.type) : null, can_rest: !!home && wait === 0, rest_wait_seconds: wait,
+      assessed, tax_per_period: Math.floor(assessed * TAX_BPS / 10000), tax_bps: TAX_BPS, debt: 0, debt_periods: 0, ...(notice ? { notice } : {}),
+    },
+    actions: [back('settlement.overview')],
+  }
+}
+
+function homeRest() {
+  const v = mineView('') as { view: { home: unknown; can_rest: boolean } }
+  if (!v.view.home) return refusal('citizen_no_house', 'برای استراحت اول باید خانه‌ات ساخته شود.')
+  if (!v.view.can_rest) return refusal('citizen_rest_wait', 'هنوز سرحال هستی؛ کمی بعد دوباره استراحت کن.')
+  cz.lastRest = Date.now()
+  return mineView('rested')
+}
+
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.')) return null
   init()
@@ -458,6 +607,11 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.knowledge.research': return knowledgeAct(args, false)
     case 'settlement.knowledge.buy': return knowledgeAct(args, true)
     case 'settlement.donate': return donate(args)
+    case 'settlement.lot.buy': return lotBuy(args)
+    case 'settlement.private': return privateMenu()
+    case 'settlement.private.place': return privatePlace(args)
+    case 'settlement.mine': return mineView('')
+    case 'settlement.home.rest': return homeRest()
     case 'settlement.who': return { ok: true, screen: 'settlement_who', text: 'ساکنان', actions: [back('settlement.overview')] }
     default: return null
   }
@@ -469,7 +623,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
   if (path === '/api/v1/content') {
     return json({
       version: 'v1', langs: ['en', 'fa'],
-      entries: { settlement_building: CAT.map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp })) },
+      entries: { settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp })) },
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)
