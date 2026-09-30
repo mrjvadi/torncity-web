@@ -47,7 +47,7 @@ const LAKE_DEPTH_PER_LOT_M = 0.5
 /** A lake level sits this far under its lowest bank. */
 const LAKE_FREEBOARD_M = 0.3
 /** How many lots a stream or river running into the village's water is followed as a lobe of it. */
-const LOBE_LOTS = 3
+const LOBE_LOTS = 1
 const STREAM_HALF_WIDTH = 0.11 // in tiles
 
 const smooth = (t: number) => t * t * (3 - 2 * t)
@@ -306,7 +306,7 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
       let level: number
       if (bank.length) {
         const lowest = Math.min(...bank.map((k) => fElev[k]))
-        level = Math.max(lowest - LAKE_FREEBOARD_M, median - 4.5)
+        level = Math.max(lowest - LAKE_FREEBOARD_M, median - 3)
         for (const k of bank) {
           const bx = k % F, by = (k - bx) / F
           if (!inBlock(bx, by) && fElev[k] < level + 0.5) fElev[k] = level + 0.5
@@ -404,7 +404,8 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
           // the ring: a lot beside the lake, but only the part of it that lies towards the lake
           const l2 = lakeAtLot(ci + di, cj + dj)
           if (Number.isNaN(l2)) continue
-          if (Math.hypot(si / SUB - (ci + di), sj / SUB - (cj + dj)) <= 1.0) lv = l2
+          // (and only where the ground is not already far under it: a lake never spills over a lower slope)
+          if (Math.hypot(si / SUB - (ci + di), sj / SUB - (cj + dj)) <= 1.0 && heights[sj * N + si] + FINE_GROUND_LIFT >= l2 - 0.4) lv = l2
         }
         lakeSub[sj * N + si] = lv
       }
