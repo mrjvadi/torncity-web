@@ -46,9 +46,8 @@ export function buildFields(ground: VillageGround, legend: { code: string }[]): 
   const wetB = blur(wet0, F, 1)
   const wet = new Float32Array(F * F)
   for (let k = 0; k < F * F; k++) wet[k] = Math.min(1, wetB[k] * 2.6)
-  const riverB = blur(river0, F, 1)
-  const wetRiver = new Float32Array(F * F)
-  for (let k = 0; k < F * F; k++) wetRiver[k] = Math.min(1, riverB[k] * 2.6)
+  // rivers and streams: the bilinear tent of their own lots (as wide as the water plus a bank)
+  const wetRiver = river0
   const forest = blur(blur(forest0, F, 2), F, 1)
   const { x0, z0, stepX, stepZ, SUB } = ground.sub
   const sx = stepX * SUB, sz = stepZ * SUB

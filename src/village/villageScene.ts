@@ -193,7 +193,7 @@ export class VillageScene {
       this.scene.add(fineMesh, ...t.objects)
     })
     stage('water', () => {
-      this.water = buildWater(grids, { skipLakes: true })
+      this.water = buildWater(grids, { skipLakes: true, thinStreams: true })
       this.waterNormals = makeWaterNormals(128)
       this.waterMat = createWaterMaterial({ normals: this.waterNormals, sunDir: SUN, horizon: SKY_HORIZON, top: SKY_TOP })
       if (this.water.mesh) {
@@ -286,11 +286,11 @@ export class VillageScene {
       for (const [dx, dy] of [[1, 0], [0, 1]] as const) {
         if (has.has(`${r.x + dx},${r.y + dy}`)) {
           const o = g.lotCentre(r.x + dx, r.y + dy)
-          this.roadSegs.push({ ax: c.x, az: c.z, bx: o.x, bz: o.z, half: 3.6 })
+          this.roadSegs.push({ ax: c.x, az: c.z, bx: o.x, bz: o.z, half: 4.2 })
           arms++
         }
       }
-      if (arms === 0) this.roadSegs.push({ ax: c.x - 5, az: c.z, bx: c.x + 5, bz: c.z, half: 3.6 })
+      if (arms === 0) this.roadSegs.push({ ax: c.x - g.lot / 2, az: c.z, bx: c.x + g.lot / 2, bz: c.z, half: 4.2 })
     }
     const { sub, lot } = g
     const size = (sub.N - 1) * sub.stepX
@@ -559,7 +559,7 @@ export class VillageScene {
       const c = g.lotCentre(lot.x, lot.y)
       tx = c.x; tz = c.z
     }
-    const ty = g.groundY(tx, tz) + 4
+    const ty = Math.max(g.groundY(tx, tz), g.lakeLevelAt(tx, tz) ?? -Infinity) + 4
     this.center.set(mid.x, ty, mid.z)
     this.controls.target.set(tx, ty, tz)
     const aspect = this.camera.aspect || 0.5
@@ -569,7 +569,7 @@ export class VillageScene {
     const vFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * free)
     const hFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * aspect)
     const polar = mode === 'aerial' ? 0.95 : 1.1
-    const span = mode === 'aerial' ? n * g.lot * 1.12 : mode === 'close' ? 70 : 50
+    const span = mode === 'aerial' ? Math.max(n + 2, 7) * g.lot : mode === 'close' ? 70 : 50
     const dist = Math.max(this.controls.minDistance, (span / 2 / Math.tan(Math.min(hFov, vFov) / 2)) * (mode === 'aerial' ? 1.12 : 1))
     const az = -0.5
     this.camera.position.set(tx + dist * Math.sin(polar) * Math.sin(az), ty + dist * Math.cos(polar), tz + dist * Math.sin(polar) * Math.cos(az))

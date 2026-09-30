@@ -190,7 +190,7 @@ function bilinear(field: Float32Array | Int16Array, w: number, h: number, fx: nu
   return top + (bot - top) * ty
 }
 
-export function buildWater(grids: CityGrids, opts: { skipLakes?: boolean } = {}): WaterResult {
+export function buildWater(grids: CityGrids, opts: { skipLakes?: boolean; thinStreams?: boolean } = {}): WaterResult {
   const { w, h } = grids.fine
   const wet = new Float32Array(w * h)
   for (let i = 0; i < w * h; i++) wet[i] = grids.fine.water[i] !== 0 && !(opts.skipLakes && grids.fine.water[i] === WATER_KIND_LAKE) ? 1 : 0
@@ -199,7 +199,12 @@ export function buildWater(grids: CityGrids, opts: { skipLakes?: boolean } = {})
   if (!anyWet) {
     return { mesh: null, material: null, tick() {}, setCamera() {}, dispose() {} }
   }
-  const wetBlurred = boxBlur(wet, w, h, WATER_BLUR_RADIUS_LOTS)
+  let wetBlurred = boxBlur(wet, w, h, WATER_BLUR_RADIUS_LOTS)
+  if (opts.thinStreams) {
+    // a stream is one lot wide: blurred over five lots it would fall under the cutoff and vanish, so
+    // it keeps its own tent-shaped mask (about a lot and a bit wide once cut at the threshold)
+    wetBlurred = wetBlurred.map((v, i) => (grids.fine.water[i] === WATER_KIND_STREAM ? Math.max(v, 1) : v))
+  }
 
   const sw = (w - 1) * SS + 1
   const sh = (h - 1) * SS + 1

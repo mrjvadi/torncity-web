@@ -46,6 +46,8 @@ const LAKE_SHORE_DEPTH_M = 0.9
 const LAKE_DEPTH_PER_LOT_M = 0.5
 /** A lake level sits this far under its lowest bank. */
 const LAKE_FREEBOARD_M = 0.3
+/** How many lots a stream or river running into the village's water is followed as a lobe of it. */
+const LOBE_LOTS = 3
 const STREAM_HALF_WIDTH = 0.11 // in tiles
 
 const smooth = (t: number) => t * t * (3 - 2 * t)
@@ -202,7 +204,10 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
           const x = fx - originX
           const y = n - 1 - (fy - originY)
           fElev[k] = lotHeight[y * n + x]
-          fWater[k] = lotWater[y * n + x]
+          // a river or stream the server marks on a lot of the block is standing water there (the block
+          // is 150 m: one flat surface, like a lake); beyond the block the chunks' own ribbons continue
+          const wk = lotWater[y * n + x]
+          fWater[k] = wk === WATER_KIND_RIVER || wk === WATER_KIND_STREAM ? WATER_KIND_LAKE : wk
         } else if (d <= BLEND_LOTS) {
           const x = cx - originX
           const y = n - 1 - (cy - originY)
@@ -210,6 +215,31 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
           fElev[k] = Math.max(MIN_ELEV_M, base[k] + delta[y * n + x] * w)
         }
       }
+    }
+    // Streams and rivers of the chunks are one lot wide: too thin to draw as water at this resolution
+    // and, on a slope, a tilted sheet. Where they run into the village's own water they are its
+    // lobes (a few lots, standing water at the same level); everywhere else they are not drawn.
+    {
+      const N8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]] as const
+      const isRun = (k: number) => fWater[k] === WATER_KIND_STREAM || fWater[k] === WATER_KIND_RIVER
+      let frontier: number[] = []
+      for (let k = 0; k < F * F; k++) if (fWater[k] === WATER_KIND_LAKE) frontier.push(k)
+      for (let step = 0; step < LOBE_LOTS && frontier.length; step++) {
+        const next: number[] = []
+        for (const c of frontier) {
+          const cx = c % F, cy = (c - cx) / F
+          for (const [dx, dy] of N8) {
+            const nx = cx + dx, ny = cy + dy
+            if (nx < 0 || ny < 0 || nx >= F || ny >= F) continue
+            const k = ny * F + nx
+            if (!isRun(k)) continue
+            fWater[k] = WATER_KIND_LAKE
+            next.push(k)
+          }
+        }
+        frontier = next
+      }
+      for (let k = 0; k < F * F; k++) if (isRun(k)) fWater[k] = WATER_KIND_NONE
     }
     const edgeDist = (fx: number, fy: number) => Math.min(fx, fy, F - 1 - fx, F - 1 - fy)
 
@@ -224,6 +254,7 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
     }
     const seen = new Uint8Array(F * F)
     const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]] as const
+    const N8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]] as const
     for (let start = 0; start < F * F; start++) {
       if (seen[start] || fWater[start] !== WATER_KIND_LAKE) continue
       const cells: number[] = [start]
@@ -231,7 +262,7 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
       for (let q = 0; q < cells.length; q++) {
         const c = cells[q]
         const cx = c % F, cy = (c - cx) / F
-        for (const [dx, dy] of N4) {
+        for (const [dx, dy] of N8) {
           const nx = cx + dx, ny = cy + dy
           if (nx < 0 || ny < 0 || nx >= F || ny >= F) continue
           const k = ny * F + nx
