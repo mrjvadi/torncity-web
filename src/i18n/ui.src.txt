@@ -1086,7 +1086,7 @@ labor.no_job | برای این کارگاه آگهی استخدامی نیست. 
 labor.post | ثبت آگهی استخدام | Post a job
 labor.hire | استخدام کارگر | Hire workers
 labor.hire_hint | کارگر آزاد: {a} · مزد هر شیفت: {w} | Free labourers: {a} · wage per shift: {w}
-labor.hire_n | {n} کارگر | {n} workers
+labor.hire_n | {n} کارگر | Hire {n}
 labor.hire_none | مرخص کردن خدمه | Release the crew
 labor.wage_set | دستمزد بازیکن‌ها | Wage for players
 labor.close | بستن آگهی | Close the job

@@ -1062,7 +1062,7 @@ export const uiEn: Record<UiKey, string> = {
   'labor.post': 'Post a job',
   'labor.hire': 'Hire workers',
   'labor.hire_hint': 'Free labourers: {a} · wage per shift: {w}',
-  'labor.hire_n': '{n} workers',
+  'labor.hire_n': 'Hire {n}',
   'labor.hire_none': 'Release the crew',
   'labor.wage_set': 'Wage for players',
   'labor.close': 'Close the job',
