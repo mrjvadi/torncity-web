@@ -105,7 +105,8 @@ function makeLots(origin: { lat: number; lon: number }, bump: [number, number, n
         slope = Math.max(slope, Math.abs(heights[y][x] - heights[ny][nx]))
       }
       slope = Math.round(slope * 10) / 10
-      const river = wet[y][x]
+      // (the offline river only crosses the founding lots; bought land is dry ground)
+      const river = wet[y][x] && x < GRID && y < GRID
       const tags = ['temperate_grassland']
       if (river) tags.push('river_lot')
       if (slope > SLOPE_LIMIT) tags.push('sloped_lot')
@@ -136,6 +137,8 @@ function init() {
   st.buildings = [
     mk('civic_hall', 0, 3, 'built'),
     mk('watch_hut', 3, 3, 'built'),
+    mk('granary', 3, 4, 'built'),
+    mk('teaching_circle', 4, 3, 'built'),
     mk('carpentry_workshop', 0, 0, 'under_construction', { started: now - 14 * 60000, finish: now + 21 * 60000 }),
     mk('militia_camp', 2, 3, 'under_construction', { rotated: true, started: now - 32 * 60000, finish: now + 13 * 60000 }),
   ]

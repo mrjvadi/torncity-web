@@ -114,8 +114,8 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
       {upgrade && <UpgradeList panel={panel} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
 
       {going && canAct && ask === null && (
-        <div className="vh-sheet-actions">
-          <Slab tone="red" radius={14} lip={4} onClick={() => setAsk('cancel')}>{t('building.cancel')}</Slab>
+        <div className="vh-quiet">
+          <button className="vh-linkbtn" onClick={() => setAsk('cancel')}>{t('building.cancel')}</button>
         </div>
       )}
       {ask && (
