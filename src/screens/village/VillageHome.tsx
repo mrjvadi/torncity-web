@@ -224,6 +224,8 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
             state={build.state} fits={build.fits} footprint={build.footprint} cat={cat}
             onExit={build.exit} onChoose={(c) => void build.choose(c)} onRotate={() => void build.rotate()}
             onNext={() => void build.next()} onConfirm={() => void build.confirm()} onBack={build.back}
+            onUndo={build.undoPick} onClear={build.clearPicks} onPathMode={build.setPathMode}
+            onGrowAsk={() => void build.growAsk()} onGrowConfirm={() => void build.growConfirm()}
           />
         ) : null}
       </div>
@@ -249,7 +251,8 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
       </BottomSheet>
       <DonateSheet open={donateOpen} onClose={() => setDonateOpen(false)} onDone={() => void overview.refresh()} />
 
-      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)} />
+      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)}
+        onOpen={(screen) => openLocal(screen)} onBuild={(code) => { void build.enter().then(() => build.choose(code)) }} />
 
       {(v.status === 'loading' || (v.status === 'ready' && !sceneReady && !sceneError)) && <div className="vh-msg" style={{ background: 'linear-gradient(180deg,#dcebf3,#eaf3ee)' }}><span>{t('village.loading')}</span></div>}
       {(v.status === 'error' || sceneError) && (

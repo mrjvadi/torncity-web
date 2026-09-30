@@ -15,6 +15,8 @@ import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 const OWN_ID = MOCK_VILLAGE_IDS.own
 const OTHER_ID = MOCK_VILLAGE_IDS.other
 const GRID = 5
+/** The grid's side now: the base plus the expansions bought. */
+const size = () => GRID + st.growth
 /** A gentler limit than the server's 15 so the offline hills stay buildable-looking. */
 const SLOPE_LIMIT = 8
 
@@ -24,11 +26,12 @@ function json(body: unknown, status = 200, headers: Record<string, string> = {})
 
 // -- catalogue -----------------------------------------------------------------
 
-interface CatEntry { code: string; fa: string; en: string; fp: [number, number]; cost: number; time: number; role: string; needs?: string[]; materials?: [string, string, number][] }
+interface CatEntry { capExempt?: boolean; code: string; fa: string; en: string; fp: [number, number]; cost: number; time: number; role: string; needs?: string[]; materials?: [string, string, number][] }
 
 const CAT: CatEntry[] = [
-  { code: 'road', fa: 'جاده', en: 'Road', fp: [1, 1], cost: 50, time: 600, role: '' },
+  { code: 'road', fa: 'جاده', en: 'Road', fp: [1, 1], cost: 50, time: 600, role: '', capExempt: true },
   { code: 'civic_hall', fa: 'خانهٔ دهیاری', en: 'Civic hall', fp: [2, 2], cost: 1000, time: 7200, role: '', materials: [['timber', 'چوب', 5]] },
+  { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 700, time: 2700, role: '', materials: [['timber', 'چوب', 2]] },
   { code: 'housing_block', fa: 'بلوک مسکونی', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 10]] },
   { code: 'park', fa: 'پارک', en: 'Park', fp: [2, 2], cost: 800, time: 3600, role: '' },
   { code: 'watch_hut', fa: 'برج نگهبانی', en: 'Watch hut', fp: [1, 1], cost: 400, time: 1800, role: 'security' },
@@ -57,6 +60,7 @@ interface Knowledge { code: string; state: 'held' | 'researching' | 'available' 
 const st = {
   seq: 1790724836000,
   ver: 1,
+  growth: 0,
   treasury: 24600,
   literacy: 34,
   buildings: [] as MBuilding[],
@@ -75,14 +79,14 @@ function lotNoise(x: number, y: number, s: number): number {
   return (h - Math.floor(h)) * 2 - 1
 }
 
-function makeLots(origin: { lat: number; lon: number }, bump: [number, number, number][]): LayoutLot[][] {
+function makeLots(origin: { lat: number; lon: number }, bump: [number, number, number][], n = GRID): LayoutLot[][] {
   const lot = MOCK_WORLD.lot_m
   const rows: LayoutLot[][] = []
   const heights: number[][] = []
   const wet: boolean[][] = []
-  for (let y = 0; y < GRID; y++) {
+  for (let y = 0; y < n; y++) {
     heights.push([]); wet.push([])
-    for (let x = 0; x < GRID; x++) {
+    for (let x = 0; x < n; x++) {
       const ll = offsetLatLon(origin.lat, origin.lon, x * lot, y * lot, MOCK_WORLD.planet_radius_km)
       const t = latLonToTile(ll.lat, ll.lon, MOCK_WORLD.chunk.max_lod, MOCK_WORLD.chunk.tile_edge)
       let h = mockHeight(t.gx, t.gy) + lotNoise(x, y, 1) * 0.9
@@ -91,13 +95,13 @@ function makeLots(origin: { lat: number; lon: number }, bump: [number, number, n
       wet[y].push(t.face === MOCK_FACE && Math.abs(t.gy - RIVER_GY) < RIVER_HALF_TILES)
     }
   }
-  for (let y = 0; y < GRID; y++) {
+  for (let y = 0; y < n; y++) {
     const row: LayoutLot[] = []
-    for (let x = 0; x < GRID; x++) {
+    for (let x = 0; x < n; x++) {
       let slope = 0
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         const nx = x + dx, ny = y + dy
-        if (nx < 0 || ny < 0 || nx >= GRID || ny >= GRID) continue
+        if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue
         slope = Math.max(slope, Math.abs(heights[y][x] - heights[ny][nx]))
       }
       slope = Math.round(slope * 10) / 10
@@ -122,7 +126,7 @@ function init() {
   st.lots = makeLots(place.origin, [[4, 0, 11]])
   const lot = MOCK_WORLD.lot_m
   const shifted = offsetLatLon(place.origin.lat, place.origin.lon, 9 * lot, 5 * lot, MOCK_WORLD.planet_radius_km)
-  st.otherLots = makeLots(shifted, [])
+  st.otherLots = makeLots(shifted, [], GRID)
   const now = Date.now()
   const mk = (type: string, x: number, y: number, state: BuildingState, extra: Partial<MBuilding> = {}): MBuilding => {
     const e = CAT.find((c) => c.code === type)!
@@ -204,7 +208,7 @@ function layoutFor(id: string): VillageLayout {
     version: ver, detail,
     viewer: { member: own, can_place: own },
     settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'village', world_cell: own ? 18211 : 18990, centre },
-    grid: { lots: GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
+    grid: { lots: own ? size() : GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
     lots: own ? st.lots : st.otherLots,
     buildings,
     ...(own ? { roads } : {}),
@@ -216,7 +220,7 @@ export function mockBootstrapSettlement(): BootstrapSettlement {
   const place = mockVillagePlace(GRID)
   return {
     id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'village', world_cell: 18211,
-    centre: place.centre, is_head: true, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: GRID, layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
+    centre: place.centre, is_head: true, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: size(), layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
   }
 }
 
@@ -249,11 +253,11 @@ function refusal(kind: string, text: string) {
   }
 }
 
-function running() { return st.buildings.filter((b) => b.state === 'under_construction' || b.state === 'planned').length }
+function running() { return st.buildings.filter((b) => b.type !== 'road' && (b.state === 'under_construction' || b.state === 'planned')).length }
 function unmet(e: CatEntry): string[] { return (e.needs ?? []).filter((n) => st.know.find((k) => k.code === n)?.state !== 'held') }
 
 function occupiedMap(): boolean[][] {
-  const m: boolean[][] = Array.from({ length: GRID }, () => Array(GRID).fill(false))
+  const m: boolean[][] = Array.from({ length: size() }, () => Array(size()).fill(false))
   for (const b of st.buildings) for (let yy = b.y; yy < b.y + b.h; yy++) for (let xx = b.x; xx < b.x + b.w; xx++) m[yy][xx] = true
   for (const r of st.roads) m[r.y][r.x] = true
   return m
@@ -274,14 +278,14 @@ function lotsView(code: string, rotate: boolean) {
     return 'free'
   }
   const fits = (x: number, y: number) => {
-    if (x + w > GRID || y + h > GRID) return false
+    if (x + w > size() || y + h > size()) return false
     for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) if (cellState(xx, yy) !== 'free') return false
     return true
   }
   const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: cellState(x, y), fits: fits(x, y) })))
   return {
     ok: true, screen: 'settlement_build_lots', text: 'قطعه را انتخاب کن',
-    view: { settlement_name: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated: rotate, grid_lots: GRID, rows },
+    view: { settlement_name: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated: rotate, grid_lots: size(), rows },
     actions: [back('settlement.build')],
   }
 }
@@ -338,7 +342,7 @@ function place(args: Record<string, unknown>) {
   const rotated = args.rotated === true || args.rotated === 'true' || args.rotated === '1' || args.rotated === 1
   if (!Number.isInteger(x) || !Number.isInteger(y)) return refusal('not_found', 'قطعه‌ی نامعتبر.')
   const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
-  if (x < 0 || y < 0 || x + w > GRID || y + h > GRID) return refusal('out_of_bounds', 'ساختمان از محدوده‌ی روستا بیرون می‌زند.')
+  if (x < 0 || y < 0 || x + w > size() || y + h > size()) return refusal('out_of_bounds', 'ساختمان از محدوده‌ی روستا بیرون می‌زند.')
   const occ = occupiedMap()
   for (let yy = y; yy < y + h; yy++) {
     for (let xx = x; xx < x + w; xx++) {
@@ -348,20 +352,25 @@ function place(args: Record<string, unknown>) {
   }
   const miss = unmet(e)
   if (miss.length) return refusal('prerequisite', `پیش‌نیاز ناقص است: ${miss.map((m) => KNOW_NAMES[m] ?? m).join('، ')}`)
-  if (running() >= CONCURRENT_CAP) return refusal('concurrent_cap', 'همزمان بیش از این نمی‌توان ساخت.')
-  if (st.treasury < e.cost) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این ساخت کافی نیست.')
+  if (code !== 'road' && running() >= CONCURRENT_CAP) return refusal('concurrent_cap', 'همزمان بیش از این نمی‌توان ساخت.')
+  const street = code === 'road' ? [] : planAutoRoads(x, y, w, h)
+  if (street === 'none') return refusal('no_road', 'به این بنا هیچ راهی نمی‌رسد؛ اطرافش جای آزادِ قابل‌ساخت برای جاده نیست.')
+  const fee = street.length * AUTO_ROAD_FEE
+  if (st.treasury < e.cost + fee) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این ساخت کافی نیست.')
   if (args.confirm !== 'confirm') {
     return {
       ok: true, screen: 'settlement_build_confirm', text: 'تأیید ساخت',
       view: {
-        settlement_name: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost,
+        settlement_name: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost + fee, auto_roads: street.length,
         materials: e.materials ? e.materials.map(([c, n, q]) => ({ component: { code: c, name: n }, quantity: q })) : null,
         build_time_seconds: e.time,
       },
       actions: [back('settlement.build')],
     }
   }
-  st.treasury -= e.cost
+  st.treasury -= e.cost + fee
+  // the game lays the connecting street at once
+  const laid = street.map((q) => { const r = mkRoad(q.x, q.y, 'built'); st.buildings.push(r); return { building_id: r.id, lot_x: q.x, lot_y: q.y } })
   // the mock builds faster than the real duration so a demo sees it finish
   const sec = Math.min(90, Math.max(25, Math.round(e.time / 120)))
   const started = Date.now()
@@ -369,7 +378,7 @@ function place(args: Record<string, unknown>) {
   st.buildings.push(b)
   st.ver++
   schedule(b)
-  emit({ type: 'build_started', building_id: b.id, type_code: code, lot_x: x, lot_y: y, rotated, finish_at: new Date(b.finish!).toISOString(), layout_version: versions() })
+  emit({ type: 'build_started', building_id: b.id, type_code: code, lot_x: x, lot_y: y, rotated, finish_at: new Date(b.finish!).toISOString(), ...(laid.length ? { auto_roads: laid } : {}), layout_version: versions() })
   return progressView()
 }
 
@@ -443,6 +452,209 @@ function donate(args: Record<string, unknown>) {
   return { ok: true, screen: 'village_donate_done', text: 'ممنون', view: view(amount), actions: [back('settlement.overview')] }
 }
 
+// -- roads: automatic and in batches (contract 1.4) ------------------------------------------
+
+const AUTO_ROAD_FEE = 10
+const GROW_LOT_PRICE = 50
+const GROW_STEP_BPS = 500
+const GROW_MAX = 41
+
+function isRoadAt(x: number, y: number): boolean {
+  return st.roads.some((r) => r.x === x && r.y === y) || st.buildings.some((b) => b.type === 'road' && b.x === x && b.y === y)
+}
+
+/** The street a new building needs: a breadth-first walk (the server plans by cost; the mock only has to look
+ * plausible) from the free lots beside the footprint to a lot beside a road or the hall. */
+function planAutoRoads(x: number, y: number, w: number, h: number): { x: number; y: number }[] | 'none' {
+  const n = size()
+  const occ = occupiedMap()
+  for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) occ[yy][xx] = true
+  const hall = st.buildings.find((b) => b.type === 'civic_hall')
+  const inNet = (a: number, b: number) => isRoadAt(a, b) || (!!hall && a >= hall.x && a < hall.x + hall.w && b >= hall.y && b < hall.y + hall.h)
+  const touches = (a: number, b: number) => [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => inNet(a + dx, b + dy))
+  for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) if (touches(xx, yy)) return []
+  const free = (a: number, b: number) => a >= 0 && b >= 0 && a < n && b < n && st.lots[b][a].buildable && !occ[b][a]
+  const prev = new Map<string, string | null>()
+  const queue: [number, number][] = []
+  for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+    for (const [dx, dy] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) {
+      const a = xx + dx, b = yy + dy
+      if (free(a, b) && !prev.has(`${a},${b}`)) { prev.set(`${a},${b}`, null); queue.push([a, b]) }
+    }
+  }
+  while (queue.length) {
+    const [a, b] = queue.shift()!
+    if (touches(a, b)) {
+      const path: { x: number; y: number }[] = []
+      let k: string | null = `${a},${b}`
+      while (k) { const [px, py] = k.split(',').map(Number); path.push({ x: px, y: py }); k = prev.get(k) ?? null }
+      return path.reverse()
+    }
+    for (const [dx, dy] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) {
+      const a2 = a + dx, b2 = b + dy
+      if (free(a2, b2) && !prev.has(`${a2},${b2}`)) { prev.set(`${a2},${b2}`, `${a},${b}`); queue.push([a2, b2]) }
+    }
+  }
+  return 'none'
+}
+
+function mkRoad(x: number, y: number, state: BuildingState, finishIn?: number): MBuilding {
+  const now = Date.now()
+  return {
+    id: `b-${st.nextId++}`, type: 'road', x, y, w: 1, h: 1, rotated: false, state, seed: 7 + x * 31 + y,
+    ...(state === 'under_construction' ? { started: now, finish: now + (finishIn ?? 30_000) } : {}),
+  }
+}
+
+function placeMany(args: Record<string, unknown>) {
+  const code = String(args.code ?? '')
+  const e = CAT.find((c) => c.code === code)
+  if (!e) return refusal('not_found', 'این ساختمان شناخته نشد.')
+  const raw = Array.isArray(args.lots) ? args.lots : []
+  const lots: { x: number; y: number }[] = []
+  for (const l of raw) {
+    const tok = typeof l === 'string' ? l.split('-').map(Number) : [Number((l as { x: number }).x), Number((l as { y: number }).y)]
+    if (!Number.isInteger(tok[0]) || !Number.isInteger(tok[1])) return refusal('not_found', 'قطعهٔ نامعتبر.')
+    if (!lots.some((q) => q.x === tok[0] && q.y === tok[1])) lots.push({ x: tok[0], y: tok[1] })
+  }
+  if (!lots.length) return refusal('not_found', 'قطعه‌ای انتخاب نشده است.')
+  if (e.fp[0] !== 1 || e.fp[1] !== 1 || !e.capExempt) return refusal('not_available', 'این بنا را نمی‌شود گروهی ساخت.')
+  const occ = occupiedMap()
+  const bad: { x: number; y: number; kind: string }[] = []
+  for (const l of lots) {
+    if (l.x < 0 || l.y < 0 || l.x >= size() || l.y >= size()) bad.push({ ...l, kind: 'out_of_bounds' })
+    else if (occ[l.y][l.x]) bad.push({ ...l, kind: 'occupied' })
+    else if (!st.lots[l.y][l.x].buildable) bad.push({ ...l, kind: 'unbuildable' })
+  }
+  if (bad.length) {
+    return {
+      ok: false, screen: 'village_refusal', text: 'ساخت گروهی انجام نشد و چیزی پرداخت نشد.',
+      view: { kind: 'batch', back: '', lots: bad },
+      error: { code: 'village_batch', message: 'ساخت گروهی انجام نشد و چیزی پرداخت نشد.' }, actions: [back('settlement.overview')],
+    }
+  }
+  const total = e.cost * lots.length
+  if (st.treasury < total) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این ساخت کافی نیست.')
+  if (args.confirm !== 'confirm') {
+    return {
+      ok: true, screen: 'settlement_build_batch_confirm', text: 'تأیید',
+      view: { settlement_name: 'آمل', building: nameOf(code), lots, count: lots.length, cost_money: total, materials: null, build_time_seconds: e.time },
+      actions: [back('settlement.build')],
+    }
+  }
+  st.treasury -= total
+  const made = lots.map((l) => { const b = mkRoad(l.x, l.y, 'under_construction', 25_000); st.buildings.push(b); schedule(b); return b })
+  st.ver++
+  emit({
+    type: 'build_batch_started', type_code: code, count: made.length,
+    buildings: made.map((b) => ({ building_id: b.id, lot_x: b.x, lot_y: b.y })), finish_at: new Date(made[0].finish!).toISOString(), layout_version: versions(),
+  })
+  return progressView()
+}
+
+// -- the building panel ----------------------------------------------------------------------
+
+const DESC: Record<string, string> = {
+  road: 'جادهٔ روستا؛ قطعه‌ها را به هم می‌رساند و راه رفت‌وآمد اهالی است. کار دیگری ندارد.',
+  civic_hall: 'دل اداریِ روستا؛ دهیار از اینجا روستا را اداره می‌کند. خزانه، دانش و ساخت‌وساز روستا از همین‌جا در دسترس است.',
+  security: 'پاسداری از روستا؛ امنیت محلی را بالا می‌برد.',
+  craft: 'کارگاه ساخت‌وساز و صنعت؛ پایهٔ تولید کالا در روستاست.',
+  food: 'تولید خوراک روستا؛ پوشش خوراک اهالی را بالا می‌برد.',
+  health: 'مراقبت از سلامت و درمان اهالی.',
+  education: 'آموزش اهالی؛ تا وقتی این بنا سر پاست، سواد میان اهالی کم‌کم پخش می‌شود.',
+  market: 'جای دادوستد اهالی؛ کالا اینجا دست‌به‌دست می‌شود.',
+  storage: 'انبار روستا؛ مواد و کالای مشترک روستا اینجا نگهداری می‌شود و ساخت‌وساز از همین موجودی برمی‌دارد.',
+  water_infra: 'مهار و رساندن آب برای زندگی و کشاورزی روستا.',
+  house: 'خانه‌ای یک‌قطعه‌ای برای چند نفر؛ ظرفیت جمعیت روستا را کمی بالا می‌برد.',
+  generic: 'بنایی از روستا.',
+}
+const EFFECTS: Record<string, { target: string; value: number }[]> = {
+  watch_hut: [{ target: 'local_security_bps', value: 300 }],
+  militia_camp: [{ target: 'local_security_bps', value: 350 }],
+  village_house: [{ target: 'housing_capacity', value: 4 }],
+  housing_block: [{ target: 'housing_capacity', value: 20 }],
+  park: [{ target: 'happiness_bps', value: 150 }],
+  farm_canal: [{ target: 'food_coverage_bps', value: 700 }],
+}
+const STOCK = [{ item: { code: 'timber', name: 'چوب' }, kind: 'component', qty: 15 }, { item: { code: 'stone', name: 'سنگ' }, kind: 'component', qty: 8 }, { item: { code: 'wheat', name: 'گندم' }, kind: 'item', qty: 120 }]
+
+function panelKind(type: string, role: string): string {
+  if (type === 'road') return 'road'
+  if (type === 'civic_hall') return 'civic_hall'
+  if (role === 'storage') return 'storage'
+  if (role === 'education') return 'school'
+  if (role === 'security') return 'security'
+  return 'generic'
+}
+
+function buildingView(args: Record<string, unknown>) {
+  const id = String(args.building_id ?? '')
+  const b = st.buildings.find((x) => x.id === id) ?? (() => {
+    const m = id.match(/^road-(\d+)-(\d+)$/)
+    return m ? ({ id, type: 'road', x: +m[1], y: +m[2], w: 1, h: 1, rotated: false, state: 'built', seed: 7 } as MBuilding) : undefined
+  })()
+  if (!b) return refusal('not_found', 'ساختمان پیدا نشد.')
+  const e = CAT.find((c) => c.code === b.type)
+  const role = e?.role ?? ''
+  const kind = panelKind(b.type, role)
+  const going = b.state === 'under_construction' || b.state === 'planned'
+  const mode = args.mode === 'up' ? 'up' : ''
+  const view: Record<string, unknown> = {
+    id: b.id, building: nameOf(b.type), role, tier: 1, kind, state: going ? 'building' : 'complete', mode,
+    x: b.x, y: b.y, w: b.w, h: b.h, rotated: b.rotated, upkeep: b.type === 'road' ? 2 : 20, can_manage: true,
+    description: DESC[b.type] ?? DESC[role] ?? (b.type === 'village_house' ? DESC.house : DESC.generic),
+    effects: EFFECTS[b.type] ?? null,
+  }
+  if (going) {
+    const started = b.started ?? Date.now(), finish = b.finish ?? Date.now()
+    view.started_at = new Date(started).toISOString()
+    view.finish_at = new Date(finish).toISOString()
+    view.left_seconds = Math.max(0, Math.round((finish - Date.now()) / 1000))
+    view.progress_percent = Math.max(0, Math.min(100, Math.round(((Date.now() - started) / Math.max(1, finish - started)) * 100)))
+  } else {
+    if (kind === 'storage') view.stock = STOCK
+    if (kind === 'school') { view.literacy_percent = st.literacy; view.teaching = true }
+    if (kind === 'civic_hall') {
+      view.treasury = st.treasury; view.population = 34
+      const run = st.know.find((k) => k.state === 'researching')
+      view.research = run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? Date.now()).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? Date.now()) - Date.now()) / 1000)) } : null
+    }
+    if (role === 'education') {
+      view.has_upgrade = true
+      if (mode === 'up') {
+        const sc = CAT.find((c) => c.code === 'school')!
+        const miss = unmet(sc)
+        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, available: miss.length === 0, missing: miss.length ? miss.map(kn) : null }]
+      }
+    }
+  }
+  return { ok: true, screen: 'settlement_building_view', text: '', view, actions: [back('settlement.build.progress')] }
+}
+
+// -- land -------------------------------------------------------------------------------------------
+
+function growView(args: Record<string, unknown>) {
+  const side = size()
+  if (side + 1 > GROW_MAX) return refusal('grid_max', 'زمین روستا به بیشینهٔ فنیِ اندازهٔ نقشه رسیده است.')
+  const lotsGained = 2 * side + 1
+  const price = Math.floor((lotsGained * GROW_LOT_PRICE * (10_000 + GROW_STEP_BPS * st.growth)) / 10_000)
+  if (args.confirm !== 'confirm') {
+    return {
+      ok: true, screen: 'settlement_grid_grow', text: 'گسترش زمین',
+      view: { settlement_name: 'آمل', side, new_side: side + 1, lots_gained: lotsGained, buildable_gained: Math.round(lotsGained * 0.82), price, treasury: st.treasury },
+      actions: [back('settlement.build')],
+    }
+  }
+  if (st.treasury < price) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این کار کافی نیست.')
+  st.treasury -= price
+  st.growth++
+  const place = mockVillagePlace(GRID)
+  st.lots = makeLots(place.origin, [[4, 0, 11]], size())
+  st.ver++
+  emit({ type: 'grid_grown', grid_lots: size(), layout_version: versions() })
+  return menuView()
+}
+
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.')) return null
   init()
@@ -451,6 +663,9 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true)
     case 'settlement.build.place': return place(args)
+    case 'settlement.build.place_many': return placeMany(args)
+    case 'settlement.building.view': return buildingView(args)
+    case 'settlement.grid.grow': return growView(args)
     case 'settlement.build.cancel': return cancelOrDemolish(args, false)
     case 'settlement.build.demolish': return cancelOrDemolish(args, true)
     case 'settlement.build.progress': return progressView()
@@ -469,7 +684,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
   if (path === '/api/v1/content') {
     return json({
       version: 'v1', langs: ['en', 'fa'],
-      entries: { settlement_building: CAT.map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp })) },
+      entries: { settlement_building: CAT.map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })) },
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)

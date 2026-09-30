@@ -6,15 +6,15 @@
 // go. Every refusal is shown by its code (i18n refusalText).
 
 import { useCallback, useEffect, useMemo, useState, type MutableRefObject } from 'react'
-import type { BuildMenuView, CatalogueBuilding, LotConfirmView, LotGridView, VillageLayout } from '../../api/types'
+import type { BatchConfirmView, BuildMenuView, CatalogueBuilding, GridGrowView, LotConfirmView, LotGridView, VillageLayout } from '../../api/types'
 import type { VillageScene } from '../../village/villageScene'
-import { TONE_BAD, TONE_NONE, TONE_OK, TONE_TAKEN } from '../../village/lotOverlay'
+import { TONE_BAD, TONE_NONE, TONE_OK, TONE_PICK, TONE_TAKEN } from '../../village/lotOverlay'
 import { useToast } from '../../state/ToastContext'
 import { t } from '../../i18n'
 import { useVillageCommand } from '../../village/useVillage'
 import type { VillageStore } from '../../village/villageStore'
 
-export type BuildStep = 'off' | 'menu' | 'lot' | 'confirm'
+export type BuildStep = 'off' | 'menu' | 'lot' | 'confirm' | 'grow'
 
 export interface BuildState {
   step: BuildStep
@@ -25,9 +25,29 @@ export interface BuildState {
   anchor: { x: number; y: number } | null
   confirm: LotConfirmView | null
   busy: boolean
+  /** Several lots at once (roads): the picked lots, in the order tapped. */
+  picks: { x: number; y: number }[]
+  /** In path mode a tap adds the whole run from the last pick to the tapped lot. */
+  pathMode: boolean
+  batch: BatchConfirmView | null
+  /** Lots a refused batch named. */
+  badLots: { x: number; y: number; kind: string }[]
+  grow: GridGrowView | null
 }
 
-const OFF: BuildState = { step: 'off', menu: null, code: null, rotated: false, lots: null, anchor: null, confirm: null, busy: false }
+const OFF: BuildState = {
+  step: 'off', menu: null, code: null, rotated: false, lots: null, anchor: null, confirm: null, busy: false,
+  picks: [], pathMode: false, batch: null, badLots: [], grow: null,
+}
+
+/** The run of lots from a to b: along the row, then down the column (the server's own rule). */
+export function lineBetween(a: { x: number; y: number }, b: { x: number; y: number }): { x: number; y: number }[] {
+  const out: { x: number; y: number }[] = []
+  const sx = b.x >= a.x ? 1 : -1, sy = b.y >= a.y ? 1 : -1
+  for (let x = a.x; ; x += sx) { out.push({ x, y: a.y }); if (x === b.x) break }
+  for (let y = a.y + sy; a.y !== b.y; y += sy) { out.push({ x: b.x, y }); if (y === b.y) break }
+  return out
+}
 
 /** What the layout alone says about each lot, before any building is chosen. */
 export function tonesFromLayout(layout: VillageLayout): Uint8Array {
@@ -43,7 +63,7 @@ export function tonesFromLayout(layout: VillageLayout): Uint8Array {
   return out
 }
 
-function tonesFromLots(lots: LotGridView): Uint8Array {
+function tonesFromLots(lots: LotGridView, picks: { x: number; y: number }[] = [], bad: { x: number; y: number }[] = []): Uint8Array {
   const n = lots.grid_lots
   const out = new Uint8Array(n * n)
   for (const row of lots.rows) {
@@ -51,7 +71,15 @@ function tonesFromLots(lots: LotGridView): Uint8Array {
       out[c.y * n + c.x] = c.fits ? TONE_OK : c.state === 'occupied' || c.state === 'road' ? TONE_TAKEN : c.state === 'free' ? TONE_NONE : TONE_BAD
     }
   }
+  for (const p of picks) if (p.x >= 0 && p.y >= 0 && p.x < n && p.y < n) out[p.y * n + p.x] = TONE_PICK
+  for (const p of bad) if (p.x >= 0 && p.y >= 0 && p.x < n && p.y < n) out[p.y * n + p.x] = TONE_BAD
   return out
+}
+
+/** Whether a building code can be laid many at a time: one lot and exempt from the cap (roads). */
+export function isMulti(cat: Map<string, CatalogueBuilding>, code: string | null): boolean {
+  const e = code ? cat.get(code) : undefined
+  return !!e && !!e.cap_exempt && e.footprint[0] === 1 && e.footprint[1] === 1
 }
 
 export function footprintOf(cat: Map<string, CatalogueBuilding>, code: string | null, rotated: boolean): { w: number; h: number } {
@@ -112,13 +140,33 @@ export function useBuildMode(
 
   const exit = useCallback(() => setS(OFF), [])
 
+  /** Land: ask for the price of the next expansion, then buy it. */
+  const growAsk = useCallback(async () => {
+    setS((p) => ({ ...p, busy: true }))
+    const r = await cmd('settlement.grid.grow')
+    setS((p) => (r.ok && r.res?.screen === 'settlement_grid_grow'
+      ? { ...p, step: 'grow', grow: r.res.view as unknown as GridGrowView, busy: false }
+      : { ...p, busy: false }))
+  }, [cmd])
+
+  const growConfirm = useCallback(async () => {
+    setS((p) => ({ ...p, busy: true }))
+    const r = await cmd('settlement.grid.grow', { confirm: 'confirm' }, { write: true })
+    if (r.ok) {
+      toast.push(t('grow.done'))
+      void store?.refetchLayout()
+      const menu = r.res?.screen === 'settlement_build_menu' ? (r.res.view as unknown as BuildMenuView) : null
+      setS((p) => ({ ...p, step: 'menu', grow: null, busy: false, menu: menu ?? p.menu }))
+    } else setS((p) => ({ ...p, busy: false }))
+  }, [cmd, store, toast])
+
   const loadLots = useCallback(async (code: string, rotated: boolean) => {
     const r = await cmd('settlement.build.lots', rotated ? { code, rotate: '1' } : { code })
     return r.ok ? ((r.res?.view as LotGridView | undefined) ?? null) : null
   }, [cmd])
 
   const choose = useCallback(async (code: string) => {
-    setS((p) => ({ ...p, busy: true, code, rotated: false, anchor: null, lots: null, confirm: null }))
+    setS((p) => ({ ...p, busy: true, code, rotated: false, anchor: null, lots: null, confirm: null, picks: [], batch: null, badLots: [], pathMode: false }))
     const lots = await loadLots(code, false)
     setS((p) => (lots ? { ...p, step: 'lot', lots, busy: false } : { ...p, step: 'menu', code: null, busy: false }))
   }, [loadLots])
@@ -140,6 +188,19 @@ export function useBuildMode(
   const tapLot = useCallback((lot: { x: number; y: number }) => {
     setS((p) => {
       if (p.step !== 'lot' || !p.lots) return p
+      if (isMulti(cat, p.code)) {
+        const fitsAt = (q: { x: number; y: number }) => !!p.lots?.rows[q.y]?.[q.x]?.fits
+        const last = p.picks[p.picks.length - 1]
+        if (p.pathMode && last && (last.x !== lot.x || last.y !== lot.y)) {
+          // the run from the last pick: every fitting lot on it not yet picked
+          const have = new Set(p.picks.map((q) => `${q.x},${q.y}`))
+          const add = lineBetween(last, lot).filter((q) => fitsAt(q) && !have.has(`${q.x},${q.y}`))
+          return { ...p, picks: [...p.picks, ...add], badLots: [] }
+        }
+        const at = p.picks.findIndex((q) => q.x === lot.x && q.y === lot.y)
+        if (at >= 0) return { ...p, picks: p.picks.filter((_, i) => i !== at), badLots: [] }
+        return fitsAt(lot) ? { ...p, picks: [...p.picks, lot], badLots: [] } : p
+      }
       const fp = footprintOf(cat, p.code, p.rotated)
       return { ...p, anchor: anchorFor(p.lots, lot, fp.w, fp.h) }
     })
@@ -150,16 +211,49 @@ export function useBuildMode(
     return !!s.lots.rows[s.anchor.y]?.[s.anchor.x]?.fits
   }, [s.lots, s.anchor])
 
+  const undoPick = useCallback(() => setS((p) => ({ ...p, picks: p.picks.slice(0, -1), badLots: [] })), [])
+  const clearPicks = useCallback(() => setS((p) => ({ ...p, picks: [], badLots: [] })), [])
+  const setPathMode = useCallback((pathMode: boolean) => setS((p) => ({ ...p, pathMode })), [])
+
   const next = useCallback(async () => {
+    if (s.code && isMulti(cat, s.code)) {
+      if (!s.picks.length) return
+      setS((p) => ({ ...p, busy: true }))
+      const r = await cmd('settlement.build.place_many', { code: s.code, lots: s.picks.map((q) => ({ x: q.x, y: q.y })) }, { silent: true })
+      if (r.ok && r.res?.screen === 'settlement_build_batch_confirm') {
+        setS((p) => ({ ...p, step: 'confirm', batch: r.res!.view as unknown as BatchConfirmView, busy: false }))
+      } else {
+        const bad = (r.res?.view as { lots?: { x: number; y: number; kind: string }[] } | undefined)?.lots ?? []
+        toast.push(r.res?.error?.code === 'village_batch' ? t('build.batch.refused', { n: bad.length }) : r.message)
+        setS((p) => ({ ...p, busy: false, badLots: bad }))
+        if (bad.length && s.code) void loadLots(s.code, false).then((lots) => lots && setS((p) => ({ ...p, lots })))
+      }
+      return
+    }
     if (!s.code || !s.anchor || !fits) return
     setS((p) => ({ ...p, busy: true }))
     const r = await cmd('settlement.build.place', { code: s.code, x: s.anchor.x, y: s.anchor.y, rotated: s.rotated })
     setS((p) => (r.ok && r.res?.screen === 'settlement_build_confirm'
       ? { ...p, step: 'confirm', confirm: r.res.view as unknown as LotConfirmView, busy: false }
       : { ...p, busy: false }))
-  }, [s.code, s.anchor, s.rotated, fits, cmd])
+  }, [s.code, s.anchor, s.rotated, s.picks, fits, cmd, cat, toast, loadLots])
 
   const confirm = useCallback(async () => {
+    if (s.code && isMulti(cat, s.code) && s.picks.length) {
+      setS((p) => ({ ...p, busy: true }))
+      const r = await cmd('settlement.build.place_many', { code: s.code, lots: s.picks.map((q) => ({ x: q.x, y: q.y })), confirm: 'confirm' }, { write: true, silent: true })
+      if (r.ok) {
+        toast.push(t('build.batch.started', { n: s.picks.length }))
+        void store?.refetchLayout()
+        setS(OFF)
+      } else {
+        const bad = (r.res?.view as { lots?: { x: number; y: number; kind: string }[] } | undefined)?.lots ?? []
+        toast.push(r.res?.error?.code === 'village_batch' ? t('build.batch.refused', { n: bad.length }) : r.message)
+        setS((p) => ({ ...p, busy: false, step: 'lot', batch: null, badLots: bad }))
+        if (s.code) void loadLots(s.code, false).then((lots) => lots && setS((p) => ({ ...p, lots })))
+      }
+      return
+    }
     if (!s.code || !s.anchor) return
     setS((p) => ({ ...p, busy: true }))
     const r = await cmd('settlement.build.place', { code: s.code, x: s.anchor.x, y: s.anchor.y, rotated: s.rotated, confirm: 'confirm' }, { write: true })
@@ -172,12 +266,13 @@ export function useBuildMode(
       setS((p) => ({ ...p, busy: false, step: r.code === 'village_occupied' || r.code === 'village_unbuildable' ? 'lot' : p.step }))
       if (r.code === 'village_occupied') void loadLots(s.code, s.rotated).then((lots) => lots && setS((p) => ({ ...p, lots })))
     }
-  }, [s.code, s.anchor, s.rotated, cmd, store, toast, loadLots])
+  }, [s.code, s.anchor, s.rotated, s.picks, cmd, cat, store, toast, loadLots])
 
   const back = useCallback(() => {
     setS((p) => {
-      if (p.step === 'confirm') return { ...p, step: 'lot', confirm: null }
-      if (p.step === 'lot') return { ...p, step: 'menu', code: null, lots: null, anchor: null, rotated: false }
+      if (p.step === 'grow') return { ...p, step: 'menu', grow: null }
+      if (p.step === 'confirm') return { ...p, step: 'lot', confirm: null, batch: null }
+      if (p.step === 'lot') return { ...p, step: 'menu', code: null, lots: null, anchor: null, rotated: false, picks: [], badLots: [], pathMode: false }
       return OFF
     })
   }, [])
@@ -193,15 +288,15 @@ export function useBuildMode(
       scene.setGhost(null)
       return
     }
-    scene.setOverlayTones(s.step === 'menu' || !s.lots ? tonesFromLayout(layout) : tonesFromLots(s.lots))
-    if (s.step !== 'menu' && s.code && s.anchor) {
+    scene.setOverlayTones(s.step === 'menu' || s.step === 'grow' || !s.lots ? tonesFromLayout(layout) : tonesFromLots(s.lots, s.picks, s.badLots))
+    if (s.step !== 'menu' && s.step !== 'grow' && s.code && s.anchor && !isMulti(cat, s.code)) {
       scene.setSelection({ x: s.anchor.x, y: s.anchor.y, w: fp.w, h: fp.h, ok: fits })
       scene.setGhost({ type: s.code, x: s.anchor.x, y: s.anchor.y, w: fp.w, h: fp.h, rotated: s.rotated, ok: fits })
     } else {
       scene.setSelection(null)
       scene.setGhost(null)
     }
-  }, [s.step, s.lots, s.anchor, s.code, s.rotated, fits, layout, fp.w, fp.h, sceneRef])
+  }, [s.step, s.lots, s.anchor, s.code, s.rotated, s.picks, s.badLots, fits, layout, fp.w, fp.h, sceneRef, cat])
 
   // leaving build mode (unmount) clears the overlay
   useEffect(() => () => {
@@ -211,5 +306,5 @@ export function useBuildMode(
     scene?.setGhost(null)
   }, [sceneRef])
 
-  return { state: s, fits, footprint: fp, enter, exit, choose, rotate, tapLot, next, confirm, back }
+  return { state: s, fits, footprint: fp, enter, exit, choose, rotate, tapLot, next, confirm, back, undoPick, clearPicks, setPathMode, growAsk, growConfirm }
 }

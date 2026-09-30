@@ -119,3 +119,34 @@
 /* the call to found a village */
 .vc-title { font-size: 20px; color: var(--gold); text-align: center; margin-bottom: 8px; }
 .vc-body { font-size: 14px; line-height: 1.8; color: var(--text-dim); text-align: center; }
+
+/* building panels (contract 1.4) */
+.vh-desc { margin: 0 0 10px; font-size: 13.5px; line-height: 1.7; color: var(--text); }
+.vh-panelbody { display: flex; flex-direction: column; gap: 8px; }
+.vh-sub { font-size: 12.5px; color: var(--gold); margin-bottom: 4px; }
+.vh-stock { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
+.vh-stockrow { display: flex; justify-content: space-between; font-size: 14px; }
+.vh-stockrow b { color: var(--gold); font-weight: 400; font-variant-numeric: tabular-nums; }
+.vh-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.vh-tile { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; color: var(--text-dim); }
+.vh-tile b { font-size: 16px; color: var(--gold); font-weight: 400; }
+.vh-doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
+.vh-doors .k-slab { padding: 9px 4px; font-size: 13px; }
+.vh-effects { display: flex; flex-wrap: wrap; gap: 6px; }
+.vh-effect { font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: rgba(64, 217, 107, 0.12); border: 1px solid rgba(64, 217, 107, 0.35); color: #9fe8b6; }
+.vh-upgrades { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.vh-upgrade { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--gold-soft); }
+.vh-upgrade.locked { opacity: 0.75; border-color: rgba(255, 255, 255, 0.14); }
+.vh-upgrade-name { font-size: 14.5px; }
+.vh-upgrade .k-slab { padding: 8px 6px; font-size: 14px; }
+.vh-quiet { display: flex; justify-content: center; margin-top: 14px; }
+.vh-linkbtn { background: none; border: 0; padding: 6px 12px; font-size: 12.5px; color: rgba(255, 154, 158, 0.75); text-decoration: underline; text-underline-offset: 3px; }
+.vh-linkbtn:active { color: #ff9a9e; }
+
+/* multi-select roads */
+.vh-modes { display: inline-flex; gap: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-soft); }
+.vh-mode { padding: 5px 12px; font-size: 12.5px; background: transparent; color: var(--text-dim); border: 0; }
+.vh-mode.on { background: var(--gold); color: #3a2a06; }
+.vh-multi-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--text); }
+.vh-multi-total b { color: var(--gold); font-weight: 400; font-size: 16px; }
+.vh-bad-lots { font-size: 12px; color: #ff9a9e; text-align: center; }
