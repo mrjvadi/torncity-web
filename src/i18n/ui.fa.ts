@@ -340,7 +340,7 @@ export const uiFa = {
   'settings.account': 'حساب',
   'settings.devices': 'دستگاه‌های متصل',
   'settings.sign_out': 'خروج از حساب',
-  'settings.version': 'نسخه {v}',
+  'settings.version': 'نسخهٔ {v}',
   'settings.credits': 'نمادها: game-icons.net (CC BY 3.0)',
   'msg.result': 'نتیجه',
   'msg.notice': 'اعلان',

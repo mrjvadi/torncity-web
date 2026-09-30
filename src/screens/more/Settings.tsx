@@ -8,7 +8,7 @@ import { Card, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts
 import Actions from '../native/kit/Actions'
 import LangSwitch from '../native/kit/LangSwitch'
 import { useSession } from '../../state/SessionContext'
-import { BUILD_ID } from '../../lib/freshness'
+import { APP_VERSION, BUILD_ID } from '../../lib/freshness'
 import { t } from '../../i18n'
 
 interface SettingsView {
@@ -39,7 +39,7 @@ export default function Settings({ response, loading, onAction, run }: ScreenPro
       <ListRow icon="close" palette="ruby" tone="ruby" title={t('settings.sign_out')} onClick={signOut} />
 
       <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-dim)', opacity: 0.75, marginTop: 6 }}>
-        <div dir="ltr">{t('settings.version', { v: BUILD_ID })}</div>
+        <div title={`#${BUILD_ID}`}>{t('settings.version', { v: APP_VERSION })}</div>
         <div>{t('settings.credits')}</div>
       </div>
 

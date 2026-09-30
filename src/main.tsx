@@ -5,9 +5,10 @@ import './styles/global.css'
 import './styles/i18n.css'
 import './styles/shell-fix.css'
 import { installGlobalReporter, report } from './lib/reporter'
-import { watchForNewBuild } from './lib/freshness'
+import { watchForNewBuild, APP_VERSION, BUILD_ID } from './lib/freshness'
 
 installGlobalReporter()
+report('boot', `client v${APP_VERSION} (${BUILD_ID})`)
 
 const params = new URLSearchParams(location.search)
 async function boot() {

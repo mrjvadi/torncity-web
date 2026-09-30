@@ -342,7 +342,7 @@ export const uiEn: Record<UiKey, string> = {
   'settings.account': 'Account',
   'settings.devices': 'Linked devices',
   'settings.sign_out': 'Sign out',
-  'settings.version': 'Version {v}',
+  'settings.version': 'Version v{v}',
   'settings.credits': 'Icons: game-icons.net (CC BY 3.0)',
   'msg.result': 'Result',
   'msg.notice': 'Notice',
