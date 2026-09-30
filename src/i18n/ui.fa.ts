@@ -340,7 +340,7 @@ export const uiFa = {
   'settings.account': 'حساب',
   'settings.devices': 'دستگاه‌های متصل',
   'settings.sign_out': 'خروج از حساب',
-  'settings.version': 'نسخه {v}',
+  'settings.version': 'نسخهٔ {v}',
   'settings.credits': 'نمادها: game-icons.net (CC BY 3.0)',
   'msg.result': 'نتیجه',
   'msg.notice': 'اعلان',
@@ -1006,6 +1006,13 @@ export const uiFa = {
   'sc.return': 'بازگشت به {name}',
   'sc.return_generic': 'سفر به جای دیگر',
   'sc.dest.home': 'خانه‌ی شما',
+  'profile.map': 'نقشه‌ی شهر',
+  'profile.travel': 'سفر بین‌شهری',
+  'common.prev': 'قبلی',
+  'common.next': 'بعدی',
+  'toast.unnamed': 'یک مورد',
+  'shell.tab.village': 'روستا',
+  'shell.tab.town': 'شهر',
 } as const
 
 export type UiKey = keyof typeof uiFa

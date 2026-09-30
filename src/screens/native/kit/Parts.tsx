@@ -6,6 +6,7 @@
 import type { ReactNode } from 'react'
 import Icon, { type IconPalette } from '../../../ui/Icon'
 import './header.css'
+import { useNav } from '../../../state/NavContext'
 import { t, isRtl } from '../../../i18n'
 
 export type Tone = 'gold' | 'ruby' | 'violet' | 'emerald' | 'sapphire' | 'teal'
@@ -37,17 +38,20 @@ export function ScreenScroll({ children }: { children: ReactNode }) {
  * needs "reload me", not a help sheet. DOM order is back-first,
  * refresh-last so the app's RTL flex row lands back on the right — see
  * kit/index.tsx `Ribbon` for the same convention. */
-export function Header({ title, tone = 'gold', onBack, onRefresh }: {
+export function Header({ title, onBack }: {
   title: string
   tone?: Tone
+  /** used only outside the shell; inside it the header always goes back through the shell's history */
   onBack?: () => void
+  /** ignored: screens refetch by themselves; kept so older calls compile */
   onRefresh?: () => void
 }) {
+  const nav = useNav()
+  const back = nav ? nav.back : onBack
   return (
-    <div className={`cx-hdr cx-hdr-${tone}`}>
-      {onBack && <button className="cx-hdr-btn" onClick={onBack} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>}
+    <div className="cx-hdr">
+      {back && <button className="cx-hdr-btn" onClick={back} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>}
       <span className="cx-hdr-title display">{title}</span>
-      {onRefresh && <button className="cx-hdr-btn cx-hdr-refresh" onClick={onRefresh} aria-label={t('common.refresh')}>↻</button>}
     </div>
   )
 }

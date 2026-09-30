@@ -1,8 +1,14 @@
 // The shared actions renderer: every native screen ends with one of these,
-// fed the server answer's `actions`. Same interaction rules as
-// ui/GenericScreen.tsx (primary pinned CTA, danger/confirm asks first, an
-// input opens a sheet) so the two feel identical to the player — kept as
-// our own copy since we may not edit ui/*.
+// fed the server answer's `actions`. The server sends them as Telegram
+// keyboard rows; here they become native controls:
+//   * back and refresh buttons are dropped (the header's back button and the
+//     app's navigation do that job),
+//   * page buttons (‹ ›, page=N) become one small pager,
+//   * the one lead primary is a prominent slab, other primaries an outlined
+//     slab, danger/confirm a red slab (asks first),
+//   * a row of several actions becomes a row of small chips,
+//   * a single navigation/secondary action is a list row with a chevron.
+// Input actions open a sheet for the value.
 
 import { useMemo, useState } from 'react'
 import type { Action, CommandResponse } from '../../../api/types'
@@ -10,59 +16,61 @@ import { toWesternDigits } from '../../../lib/persian'
 import { cleanLabel } from './format'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
-import { t } from '../../../i18n'
+import { isRtl, t } from '../../../i18n'
+import './actions.css'
+
+const REFRESH = /(تازه‌سازی|refresh)\s*$/i
+const PREV = /^[\s\p{Extended_Pictographic}️]*[‹«◀⬅←]|^(\S*\s)?(قبلی|prev)/iu
+const NEXT = /^[\s\p{Extended_Pictographic}️]*[›»▶➡→]|^(\S*\s)?(بعدی|next)/iu
+const PAGE_ARROW = /^[\s\p{Extended_Pictographic}️]*[‹›«»◀▶⬅➡←→]/u
+
+/** A "previous page" / "next page" button of the server's keyboard. */
+export function pagerDir(a: Action): 'prev' | 'next' | null {
+  if (a.kind === 'primary' || a.kind === 'danger' || a.kind === 'confirm') return null
+  const paged = a.args && a.args.page !== undefined
+  if (!paged && !PAGE_ARROW.test(a.label)) return null
+  if (PREV.test(a.label)) return 'prev'
+  if (NEXT.test(a.label)) return 'next'
+  return null
+}
 
 export default function Actions({ response, onAction, only, refreshCommand }: {
   response: CommandResponse | null
   onAction: (a: Action) => void
-  /** Render only these rows (e.g. skip row 0 when a screen already drew
-   * its own primary CTA from the view). */
+  /** Render only these actions (e.g. skip ones a screen already drew itself). */
   only?: (a: Action) => boolean
-  /** The command the screen's own header ↻ button already sends (e.g.
-   * `bank.show`). The server also hands back a "تازه‌سازی" tile that usually
-   * sends this exact same command — drop it here so the action isn't
-   * offered twice. Set on every screen that draws a header refresh. */
+  /** Kept for older callers; refresh buttons are always dropped now. */
   refreshCommand?: string
 }) {
   const [pendingInput, setPendingInput] = useState<Action | null>(null)
   const [pendingConfirm, setPendingConfirm] = useState<Action | null>(null)
   const [inputValue, setInputValue] = useState('')
+  void refreshCommand
 
-  const rows = useMemo(() => {
-    const actions = (response?.actions ?? []).filter((a) => !only || only(a))
-      // A screen with its own header refresh never needs the server's
-      // "تازه‌سازی" tile too — it usually repeats this exact command, but a
-      // deeper view (e.g. a market order book) can send its list screen's
-      // command instead while still meaning "reload me", so a plain
-      // navigation action labelled exactly "تازه‌سازی" is dropped as well.
-      .filter((a) => !refreshCommand || (a.command !== refreshCommand && !(a.kind === 'navigation' && /(تازه‌سازی|refresh)\s*$/i.test(a.label))))
+  const { rows, pager } = useMemo(() => {
+    const all = (response?.actions ?? [])
+      .filter((a) => !only || only(a))
+      .filter((a) => a.kind !== 'back' && !(a.kind === 'navigation' && REFRESH.test(a.label)))
+    const pager: { prev?: Action; next?: Action } = {}
     const byRow = new Map<number, Action[]>()
-    for (const a of actions) {
+    for (const a of all) {
+      const d = pagerDir(a)
+      if (d) { pager[d] = a; continue }
       const list = byRow.get(a.row) ?? []
       list.push(a)
       byRow.set(a.row, list)
     }
-    return [...byRow.entries()].sort((a, b) => a[0] - b[0])
-  }, [response, only, refreshCommand])
+    return { rows: [...byRow.entries()].sort((x, y) => x[0] - y[0]), pager }
+  }, [response, only])
 
   const lead = rows.flatMap(([, list]) => list).find((a) => a.kind === 'primary')
 
-  if (rows.length === 0) return null
+  if (rows.length === 0 && !pager.prev && !pager.next) return null
 
   function handleClick(a: Action) {
-    if (a.url) {
-      window.open(a.url, '_blank', 'noopener')
-      return
-    }
-    if (a.input) {
-      setInputValue('')
-      setPendingInput(a)
-      return
-    }
-    if (a.kind === 'danger' || a.kind === 'confirm') {
-      setPendingConfirm(a)
-      return
-    }
+    if (a.url) { window.open(a.url, '_blank', 'noopener'); return }
+    if (a.input) { setInputValue(''); setPendingInput(a); return }
+    if (a.kind === 'danger' || a.kind === 'confirm') { setPendingConfirm(a); return }
     onAction(a)
   }
 
@@ -76,11 +84,27 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
 
   return (
     <div className="nx-actions">
-      {rows.map(([row, actions]) => (
-        <div className="nx-action-row" key={row}>
-          {actions.map((a, i) => <ActionButton key={`${row}-${i}`} action={a} lead={a === lead} onClick={() => handleClick(a)} />)}
-        </div>
+      {rows.map(([row, list]) => (
+        list.length > 1 && list.every((a) => a.kind !== 'danger' && a.kind !== 'confirm')
+          ? (
+            <div className="ax-chips" key={row}>
+              {list.map((a, i) => (
+                <button key={i} className={`ax-chip${a.kind === 'primary' ? ' ax-chip-primary' : ''}`} onClick={() => handleClick(a)}>
+                  {a.icon && <Icon name={a.icon} palette={a.kind === 'primary' ? 'gold' : 'steel'} size={16} />}
+                  <span>{cleanLabel(a.label)}</span>
+                </button>
+              ))}
+            </div>
+          )
+          : list.map((a, i) => <ActionButton key={`${row}-${i}`} action={a} lead={a === lead} onClick={() => handleClick(a)} />)
       ))}
+
+      {(pager.prev || pager.next) && (
+        <div className="ax-pager">
+          {pager.prev ? <button className="ax-page" onClick={() => onAction(pager.prev!)}>{isRtl() ? '›' : '‹'} {t('common.prev')}</button> : <span />}
+          {pager.next ? <button className="ax-page" onClick={() => onAction(pager.next!)}>{t('common.next')} {isRtl() ? '‹' : '›'}</button> : <span />}
+        </div>
+      )}
 
       <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput ? cleanLabel(pendingInput.label) : undefined}>
         <input
@@ -89,7 +113,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
           onChange={(e) => setInputValue(pendingInput?.input?.text ? e.target.value : toWesternDigits(e.target.value))}
           inputMode={pendingInput?.input?.text ? 'text' : 'numeric'}
           autoFocus
-          dir={pendingInput?.input?.text ? 'rtl' : 'ltr'}
+          dir={pendingInput?.input?.text ? 'auto' : 'ltr'}
         />
         <button className="nx-sheet-primary display" onClick={submitInput}>{t('common.confirm')}</button>
       </BottomSheet>
@@ -105,14 +129,15 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
   )
 }
 
-/** Only the lead primary is a gold slab; a second or third primary on the
- * same screen steps down to an outlined button, so one choice leads. */
+/** One action that has its row to itself. Only the lead primary is a gold
+ * slab; a second primary steps down to an outlined slab. */
 function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean; onClick: () => void }) {
+  const label = cleanLabel(action.label)
   if (action.kind === 'primary') {
     return (
       <button className={`nx-primary${lead ? '' : ' nx-primary-alt'} display`} onClick={onClick}>
         <Icon name={action.icon ?? 'box'} palette={lead ? 'cream' : 'gold'} size={18} />
-        <span>{cleanLabel(action.label)}</span>
+        <span>{label}</span>
       </button>
     )
   }
@@ -120,22 +145,15 @@ function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean
     return (
       <button className="nx-action-danger display" onClick={onClick}>
         <Icon name={action.icon ?? 'box'} palette="ruby" size={18} />
-        <span>{cleanLabel(action.label)}</span>
-      </button>
-    )
-  }
-  if (action.kind === 'back') {
-    return (
-      <button className="nx-action-tile nx-action-back" onClick={onClick}>
-        <span className="nx-action-back-arrow" aria-hidden>›</span>
-        <span className="nx-action-tile-label">{cleanLabel(action.label)}</span>
+        <span>{label}</span>
       </button>
     )
   }
   return (
-    <button className="nx-action-tile" onClick={onClick}>
-      <Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={20} />
-      <span className="nx-action-tile-label">{cleanLabel(action.label)}</span>
+    <button className="ax-row" onClick={onClick}>
+      <span className="ax-row-plate"><Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={18} /></span>
+      <span className="ax-row-label">{label}</span>
+      <span className="ax-row-chev" aria-hidden>{isRtl() ? '‹' : '›'}</span>
     </button>
   )
 }

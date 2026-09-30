@@ -5,8 +5,10 @@
 // running now, reloads onto the new build. The URL's hash (Telegram's launch
 // data) is kept; a guard stops a reload loop if a cache keeps lying.
 
-/** When this build was made (vite.config.ts), shown in the menu. */
+/** The commit this build is made from (debug detail). */
 export const BUILD_ID: string = __BUILD_ID__
+/** The version players see: 1.2.<n>, n grows with every commit. */
+export const APP_VERSION: string = __APP_VERSION__
 
 const GUARD = 'tc-fresh-reload'
 const ENTRY = /assets\/index-[\w-]+\.js/

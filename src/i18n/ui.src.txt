@@ -361,7 +361,7 @@ settings.saved | زبان تغییر کرد. | Language changed.
 settings.account | حساب | Account
 settings.devices | دستگاه‌های متصل | Linked devices
 settings.sign_out | خروج از حساب | Sign out
-settings.version | نسخه {v} | Version {v}
+settings.version | نسخهٔ {v} | Version v{v}
 settings.credits | نمادها: game-icons.net (CC BY 3.0) | Icons: game-icons.net (CC BY 3.0)
 # -- fallback screens -----------------------------------------------------------------
 msg.result | نتیجه | Result
@@ -1031,3 +1031,10 @@ sc.visitor_hint | ساپورت شهر همه است؛ کسی در آن ساکن 
 sc.return | بازگشت به {name} | Back to {name}
 sc.return_generic | سفر به جای دیگر | Travel elsewhere
 sc.dest.home | خانه‌ی شما | Your home
+profile.map | نقشه‌ی شهر | City map
+profile.travel | سفر بین‌شهری | Intercity travel
+common.prev | قبلی | Previous
+common.next | بعدی | Next
+toast.unnamed | یک مورد | An item
+shell.tab.village | روستا | Village
+shell.tab.town | شهر | Town

@@ -161,16 +161,22 @@ input {
 }
 
 .toast {
-  background: linear-gradient(180deg, #2a1216, #170a0c);
-  border: 1px solid var(--anar);
-  color: #ffd9db;
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-size: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  max-width: 480px;
-  text-align: center;
+  pointer-events: auto; display: flex; align-items: center; gap: 10px; max-width: 480px; width: fit-content;
+  padding: 8px 14px 8px 8px; border-radius: 16px; text-align: start; font-size: 13.5px; line-height: 1.5; color: var(--text);
+  background-image: var(--girih), linear-gradient(180deg, #1c2246, #0b0e22); background-size: 46px 46px, auto; background-blend-mode: overlay, normal;
+  border: 2px solid var(--gold-soft); box-shadow: 0 8px 24px rgba(0,0,0,0.55), inset 0 1.5px 0 rgba(255,255,255,0.16);
+  animation: toast-in 0.22s ease-out;
 }
+.toast-icon { flex: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.35); border: 2px solid var(--gold-soft); }
+.toast-success { border-color: rgba(76,196,126,0.85); box-shadow: 0 8px 24px rgba(0,0,0,0.55), 0 0 14px rgba(76,196,126,0.3), inset 0 1.5px 0 rgba(255,255,255,0.16); }
+.toast-success .toast-icon { border-color: var(--leaf); }
+.toast-info { border-color: rgba(80,110,230,0.85); }
+.toast-info .toast-icon { border-color: #5b78ee; }
+.toast-warning { border-color: rgba(245,166,35,0.9); }
+.toast-warning .toast-icon { border-color: var(--saffron); }
+.toast-error { border-color: rgba(229,72,77,0.9); box-shadow: 0 8px 24px rgba(0,0,0,0.55), 0 0 14px rgba(229,72,77,0.3), inset 0 1.5px 0 rgba(255,255,255,0.16); }
+.toast-error .toast-icon { border-color: var(--anar); }
+@keyframes toast-in { from { transform: translateY(-10px); } to { transform: none; } }
 
 /* the sanitized Telegram-HTML output (sanitizeTelegramHtml): shared by the
    generic screen and the city's plot sheet, so it must live outside either

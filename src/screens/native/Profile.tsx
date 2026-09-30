@@ -155,6 +155,8 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
         <Tile icon="chart" palette="violet" title={t('profile.skills')} onClick={() => run('skills.list')} />
         <Tile icon="f_house" palette="emerald" title={t('profile.life')} onClick={() => run('life.me')} />
         <Tile icon="person" palette="gold" title={t('profile.card')} onClick={() => run('life.card')} />
+        <Tile icon="x_map" palette="teal" title={t('profile.map')} onClick={() => run('map.list')} />
+        <Tile icon="plane" palette="sapphire" title={t('profile.travel')} onClick={() => run('map.cities')} />
         <Tile icon="phone" palette="sapphire" title={t('profile.devices')} onClick={() => run('device.list')} />
       </TileGrid>
 
