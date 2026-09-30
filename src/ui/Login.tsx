@@ -2,6 +2,8 @@ import { useState, type ClipboardEvent, type FormEvent } from 'react'
 import { useSession } from '../state/SessionContext'
 import { extractLinkCode, typedLinkCode } from '../lib/persian'
 import Icon from './Icon'
+import LangSwitch from '../screens/native/kit/LangSwitch'
+import { t } from '../i18n'
 
 export default function Login() {
   const { loginWithCode, status, error, inTelegram } = useSession()
@@ -13,8 +15,8 @@ export default function Login() {
       <div className="login-screen">
         <div className="login-card">
           <div className="login-badge"><Icon name="city" palette="gold" size={44} /></div>
-          <h1 className="display">در حال ورود…</h1>
-          <p className="login-hint">اتصال از طریق تلگرام</p>
+          <h1 className="display">{t('login.signing_in')}</h1>
+          <p className="login-hint">{t('login.via_telegram')}</p>
         </div>
         <LoginStyles />
       </div>
@@ -42,9 +44,9 @@ export default function Login() {
     <div className="login-screen">
       <div className="login-card">
         <div className="login-badge"><Icon name="city" palette="gold" size={44} /></div>
-        <h1 className="display">تورن‌سیتی</h1>
+        <h1 className="display">{t('login.title')}</h1>
         <p className="login-hint">
-          در چت خصوصی با ربات دستور <b>اتصال</b> (/link) را بفرستید و کد 8 حرفی را اینجا وارد کنید.
+          {t('login.hint')}
         </p>
         <form onSubmit={onSubmit} className="login-form">
           <input
@@ -65,10 +67,11 @@ export default function Login() {
             dir="ltr"
           />
           <button className="login-submit display" type="submit" disabled={code.length !== 8 || busy}>
-            {busy ? 'در حال ورود…' : 'ورود'}
+            {busy ? t('login.signing_in') : t('login.submit')}
           </button>
         </form>
         {error && <p className="login-error">{error}</p>}
+        <div style={{ marginTop: 14 }}><LangSwitch compact /></div>
       </div>
       <LoginStyles />
     </div>

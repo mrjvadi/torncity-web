@@ -1,107 +1,182 @@
+// The profile: the "me" tab's home, after the prototype's profile screen
+// (torncity-client proto/screens_proto.gd `_s_profile`): the identity card
+// with the XP ring, the wealth grid, the needs bars and the achievement
+// medals; below them the doors to everything that is about the player.
+// Facts come from the `profile` view; the net worth (life.me) and the medals
+// (achievement.list) are read from their own views.
+
+import type { CSSProperties } from 'react'
 import type { ScreenProps } from '../types'
-import { Card, Header, Notice, ScreenScroll, Stat, StatPair } from './kit/Parts'
+import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair, Tile, TileGrid } from './kit/Parts'
 import Actions from './kit/Actions'
+import LangSwitch from './kit/LangSwitch'
+import { useView } from './kit/useView'
 import { clamp01, formatNumber, hms, money } from './kit/format'
 import Icon from '../../ui/Icon'
+import { GLabel } from '../../kit'
+import { t } from '../../i18n'
+import './profile.css'
 
+interface Named { code?: string; name?: string; emoji?: string }
 interface ProfileView {
   name?: string; code?: string; avatar?: string; city?: string
   place?: { name?: string }
+  walk?: { to?: Named; remaining_seconds?: number } | null
   level?: number; xp?: number; next_level_xp?: number
+  energy?: number; max_energy?: number; health?: number; max_health?: number
   cash?: number; bank?: number
-  rank?: { name?: string; emoji?: string }
-  age?: number; stage?: { name?: string }
+  travelling?: boolean; travel_to?: string; travel_remaining_seconds?: number
+  rank?: Named | null
+  age?: number; stage?: Named
   achievements?: number
-  needs?: { hunger?: number; sleep?: number; stress?: number; happiness?: number }
+  needs?: { hunger?: number; sleep?: number; stress?: number; happiness?: number } | null
+  work?: {
+    job?: { job?: { title?: string }; pay?: number; shift_ends_in_seconds?: number } | null
+    course?: { course?: Named; remaining_seconds?: number; paused?: boolean } | null
+    certificates?: number
+  } | null
   jail?: { city?: string; remaining_seconds?: number } | null
   hospital?: { city?: string; remaining_seconds?: number } | null
 }
+interface LifeView { worth?: { total?: number } }
+interface AchievementsView { lines?: { achievement?: Named; earned?: boolean }[] | null }
+
+/** commands the profile draws itself, so the server's copies are not repeated */
+const OWN = new Set(['skills.list', 'achievement.list', 'life.me', 'life.card', 'player.settings', 'device.list', 'life.avatar', 'player.profile.get'])
 
 export default function Profile({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as ProfileView
-  if (loading && !response) return <ScreenScroll><Header title="پروفایل" tone="violet" /></ScreenScroll>
+  const life = useView<LifeView>('life.me')
+  const ach = useView<AchievementsView>('achievement.list')
+  if (loading && !response) return <ScreenScroll><Header title={t('profile.title')} tone="teal" /></ScreenScroll>
 
   const xpFrac = v.next_level_xp ? clamp01((v.xp ?? 0) / v.next_level_xp) : 0
   const needs = v.needs
+  const lines = ach?.lines ?? []
+  const medals = [...lines].sort((a, b) => Number(!!b.earned) - Number(!!a.earned)).slice(0, 8)
+  const earned = lines.filter((l) => l.earned).length
+  const subline = [v.rank?.name, v.stage?.name && v.age ? t('common.years_old', { n: v.age }) : null].filter(Boolean).join(' · ')
 
   return (
     <ScreenScroll>
-      <Header title="پروفایل" tone="violet" onRefresh={() => run('player.profile.get')} />
+      <Header title={t('profile.title')} tone="teal" onRefresh={() => run('player.profile.get')} />
 
-      <Card tone="violet">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="display" style={{ fontSize: 22, color: '#fff' }}>{v.name ?? '…'}</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', margin: '4px 0' }}>
-              {[v.rank?.name, v.stage?.name && v.age ? `${v.age} ساله` : null].filter(Boolean).join(' · ')}
-            </div>
-            <div className="nx-bar-wrap" style={{ marginTop: 6 }}>
-              <div className="nx-bar" style={{ borderColor: 'var(--firouzeh)', height: 22 }}>
-                <div className="nx-bar-fill" style={{ width: `${xpFrac * 100}%`, background: 'var(--firouzeh)' }} />
-                <span className="nx-bar-label display" style={{ lineHeight: '18px', fontSize: 13 }}>
-                  <span dir="ltr">{formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}</span>
-                </span>
+      <Card tone="teal" className="pf-card">
+        <div className="pf-id">
+          <div className="pf-avatar" style={{ '--pf-xp': `${xpFrac * 360}deg` } as CSSProperties}>
+            <span className="pf-avatar-in">{v.avatar ? <span className="pf-emoji">{v.avatar}</span> : <Icon name="fox" palette="fox" size={54} />}</span>
+            <span className="pf-level display">{formatNumber(v.level ?? 0)}</span>
+          </div>
+          <div className="pf-id-text">
+            <GLabel className="pf-name" top="#ffffff" bottom="#ffe6b8" stroke={1.4}>{v.name || '…'}</GLabel>
+            {subline && <div className="pf-sub">{subline}</div>}
+            <div className="pf-xp">
+              <div className="pf-xp-bar">
+                <div className="pf-xp-fill" style={{ width: `${xpFrac * 100}%` }} />
+                <span className="pf-xp-label display" dir="ltr">{formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}</span>
               </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
-              <span className="nx-chip nx-chip-gold">سطح {formatNumber(v.level ?? 0)}</span>
-              {v.code && <span className="nx-chip">{v.code}</span>}
+              <span className="nx-chip nx-chip-gold">{t('common.level', { n: formatNumber(v.level ?? 0) })}</span>
             </div>
           </div>
-          <div style={{ width: 78, height: 78, borderRadius: '50%', background: 'radial-gradient(circle at 40% 30%, #14655f, #0a2a27)', border: '2px solid var(--gold-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-            <Icon name="person" palette="teal" size={36} />
-          </div>
+        </div>
+        {v.code && (
+          <div className="pf-code"><span>{t('profile.code')}</span><b dir="ltr">{v.code}</b></div>
+        )}
+        <div className="pf-btns">
+          <button className="pf-btn" onClick={() => run('player.settings')}><Icon name="gears" palette="steel" size={20} />{t('profile.settings')}</button>
+          <button className="pf-btn pf-btn-violet" onClick={() => run('life.avatar')}><Icon name="fox" palette="violet" size={20} />{t('profile.avatar')}</button>
+        </div>
+        <LangSwitch compact />
+      </Card>
+
+      {v.jail && <Notice alert>{t('dashboard.jail', { city: v.jail.city ?? '', t: hms(v.jail.remaining_seconds) })}</Notice>}
+      {v.hospital && <Notice alert>{t('dashboard.hospital', { city: v.hospital.city ?? '', t: hms(v.hospital.remaining_seconds) })}</Notice>}
+      {v.travelling && <Notice>{t('profile.travelling', { city: v.travel_to ?? '', t: hms(v.travel_remaining_seconds) })}</Notice>}
+      {v.walk && <Notice>{t('profile.walking', { place: v.walk.to?.name ?? '', t: hms(v.walk.remaining_seconds) })}</Notice>}
+
+      <StatPair
+        left={<Stat icon="coins" palette="gold" label={t('profile.cash')} value={money(v.cash)} />}
+        right={<Stat icon="bank" palette="sapphire" label={t('profile.bank')} value={money(v.bank)} />}
+      />
+      <StatPair
+        left={<Stat icon="crowncoin" palette="emerald" label={t('profile.net_worth')} value={life?.worth?.total !== undefined ? money(life.worth.total) : '—'} />}
+        right={<Stat icon="rank" palette="gold" label={t('profile.wealth_rank')} value={v.rank?.name ?? '—'} />}
+      />
+      <StatPair
+        left={<Stat icon="city" palette="steel" label={t('profile.city')} value={v.city || '—'} />}
+        right={<Stat icon="x_map" palette="steel" label={t('profile.place')} value={v.place?.name || '—'} />}
+      />
+
+      <div className="pf-sec display">{t('profile.needs')}</div>
+      <Card>
+        <div className="pf-needs">
+          <NeedBar icon="energy" palette="amber" color="var(--saffron)" label={t('profile.energy')} value={v.energy} max={v.max_energy} />
+          <NeedBar icon="health" palette="ruby" color="var(--anar)" label={t('profile.health')} value={v.health} max={v.max_health} />
+          {needs && <>
+            <NeedBar icon="sleepy" palette="violet" color="var(--violet)" label={t('need.sleep')} value={needs.sleep} />
+            <NeedBar icon="bread" palette="amber" color="var(--saffron)" label={t('need.hunger')} value={needs.hunger} />
+            <NeedBar icon="sun" palette="emerald" color="var(--leaf)" label={t('need.happiness')} value={needs.happiness} />
+            <NeedBar icon="x_flame" palette="ruby" color="var(--anar)" label={t('need.stress')} value={needs.stress} />
+          </>}
         </div>
       </Card>
 
-      {v.jail && (
-        <Notice alert>در زندان {v.jail.city ?? ''} · {hms(v.jail.remaining_seconds)} مانده</Notice>
-      )}
-      {v.hospital && (
-        <Notice alert>در بیمارستان {v.hospital.city ?? ''} · {hms(v.hospital.remaining_seconds)} مانده</Notice>
-      )}
-
-      <StatPair
-        left={<Stat icon="coins" palette="gold" label="پول نقد" value={money(v.cash)} />}
-        right={<Stat icon="bank" palette="sapphire" label="موجودی بانک" value={money(v.bank)} />}
-      />
-      <StatPair
-        left={<Stat icon="city" palette="steel" label="شهر" value={v.city ?? '—'} />}
-        right={<Stat icon="trophy" palette="gold" label="دستاوردها" value={formatNumber(v.achievements ?? 0)} />}
-      />
-
-      {needs && (
-        <Card>
-          <div className="nx-sec" style={{ marginBottom: 8 }}>نیازها</div>
-          <NeedsGrid needs={needs} />
-        </Card>
+      {(v.work?.job || v.work?.course) && (
+        <div className="pf-list">
+          {v.work?.job && (
+            <ListRow icon="work" palette="emerald" title={v.work.job.job?.title ?? t('profile.work')}
+              sub={v.work.job.shift_ends_in_seconds ? t('profile.shift_ends', { t: hms(v.work.job.shift_ends_in_seconds) }) : t('profile.per_shift', { pay: money(v.work.job.pay) })}
+              onClick={() => run('job.status')} />
+          )}
+          {v.work?.course && (
+            <ListRow icon="study" palette="violet" title={v.work.course.course?.name ?? t('profile.study')}
+              sub={v.work.course.paused ? t('education.paused') : t('profile.course_left', { t: hms(v.work.course.remaining_seconds) })}
+              onClick={() => run('education.list')} />
+          )}
+        </div>
       )}
 
-      <Actions response={response} onAction={onAction} refreshCommand="player.profile.get" />
+      <button className="pf-sec pf-sec-link display" onClick={() => run('achievement.list')}>
+        {ach ? t('profile.achievements', { a: formatNumber(earned), b: formatNumber(lines.length) })
+          : t('profile.achievements_n', { a: formatNumber(v.achievements ?? 0) })}
+      </button>
+      {medals.length > 0 ? (
+        <div className="pf-medals">
+          {medals.map((m, i) => (
+            <button key={i} className={`pf-medal${m.earned ? '' : ' pf-medal-off'}`} title={m.achievement?.name} onClick={() => run('achievement.list')}>
+              <Icon name={['trophy', 'medal', 'ribbon', 'x_star', 'x_laurel', 'x_crown', 'x_gem', 'shield'][i % 8]} palette={m.earned ? 'gold' : 'steel'} size={30} />
+            </button>
+          ))}
+        </div>
+      ) : ach ? <Notice>{t('profile.no_achievements')}</Notice> : null}
+
+      <div className="pf-sec display">{t('profile.more')}</div>
+      <TileGrid>
+        <Tile icon="chart" palette="violet" title={t('profile.skills')} onClick={() => run('skills.list')} />
+        <Tile icon="f_house" palette="emerald" title={t('profile.life')} onClick={() => run('life.me')} />
+        <Tile icon="person" palette="gold" title={t('profile.card')} onClick={() => run('life.card')} />
+        <Tile icon="phone" palette="sapphire" title={t('profile.devices')} onClick={() => run('device.list')} />
+      </TileGrid>
+
+      <Actions response={response} onAction={onAction} only={(a) => !OWN.has(a.command ?? '')} refreshCommand="player.profile.get" />
     </ScreenScroll>
   )
 }
 
-function NeedsGrid({ needs }: { needs: NonNullable<ProfileView['needs']> }) {
-  const items: { key: keyof typeof needs; label: string; color: string; icon: string }[] = [
-    { key: 'sleep', label: 'خواب', color: 'var(--violet)', icon: 'moon' },
-    { key: 'hunger', label: 'گرسنگی', color: 'var(--saffron)', icon: 'bread' },
-    { key: 'happiness', label: 'شادی', color: 'var(--leaf)', icon: 'sun' },
-    { key: 'stress', label: 'استرس', color: 'var(--anar)', icon: 'x_flame' },
-  ]
+function NeedBar({ icon, palette, color, label, value, max = 100 }: {
+  icon: string; palette: 'amber' | 'ruby' | 'violet' | 'emerald'; color: string; label: string; value?: number; max?: number
+}) {
+  if (value === undefined) return null
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-      {items.filter((i) => needs[i.key] !== undefined).map((i) => (
-        <div key={i.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div className="nx-bar-wrap" style={{ flex: 1 }}>
-            <div className="nx-bar" style={{ borderColor: i.color, height: 22 }}>
-              <div className="nx-bar-fill" style={{ width: `${clamp01((needs[i.key] as number) / 100) * 100}%`, background: i.color }} />
-              <span className="nx-bar-label display" style={{ lineHeight: '18px', fontSize: 12 }}>{formatNumber(needs[i.key] as number)}</span>
-            </div>
-          </div>
-          <Icon name={i.icon} palette="steel" size={18} />
+    <div className="pf-need">
+      <span className="pf-need-icon"><Icon name={icon} palette={palette} size={22} /></span>
+      <div className="pf-need-main">
+        <span className="pf-need-label">{label}</span>
+        <div className="nx-bar" style={{ borderColor: color, height: 20 }}>
+          <div className="nx-bar-fill" style={{ width: `${clamp01(value / (max || 100)) * 100}%`, background: color }} />
+          <span className="nx-bar-label display" style={{ lineHeight: '16px', fontSize: 12 }}>{formatNumber(value)}{max !== 100 ? ` / ${formatNumber(max)}` : ''}</span>
         </div>
-      ))}
+      </div>
     </div>
   )
 }

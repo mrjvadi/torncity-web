@@ -1,0 +1,23 @@
+/* the fallback family (Message.tsx): headline badge, fact rows, paragraphs */
+.bs-head { display: flex; align-items: center; gap: 12px; }
+.bs-head-text { flex: 1; min-width: 0; }
+.bs-title { font-size: 19px; color: #fff; line-height: 1.35; }
+.bs-badge {
+  flex: none; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 40% 30%, rgba(255,255,255,0.14), rgba(0,0,0,0.35));
+  border: 2px solid var(--gold-soft); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.18);
+}
+.bs-badge-refusal { border-color: rgba(229,72,77,0.7); }
+.bs-badge-result { border-color: rgba(76,196,126,0.7); }
+.bs-badge-notice { border-color: rgba(53,82,200,0.7); }
+.bs-badge-page { border-color: rgba(142,108,240,0.7); }
+.bs-blocks { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+.bs-head + .bs-blocks:empty { display: none; }
+.bs-gap { height: 4px; }
+.bs-fact {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  background: rgba(0,0,0,0.26); border: 1px solid rgba(255,255,255,0.07); border-radius: 11px; padding: 8px 11px;
+}
+.bs-fact-l { font-size: 12.5px; color: var(--text-dim); flex: none; }
+.bs-fact-v { font-family: 'Lalezar','Vazirmatn',sans-serif; font-size: 15px; color: var(--text); text-align: end; min-width: 0; overflow-wrap: anywhere; }
+.bs-para { margin: 0; font-size: 13.5px; line-height: 1.75; color: var(--text); }

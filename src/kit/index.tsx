@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import Icon from '../ui/Icon'
 import { shade } from './color'
 import './kit.css'
+import { t, isRtl } from '../i18n'
 
 export type { IconPalette } from '../ui/Icon'
 export type { IconPalette as Palette } from '../ui/Icon'
@@ -265,11 +266,11 @@ export function Ribbon({ title, tint, onBack, onHelp, height, className }: Ribbo
   } as CSSProperties
   return (
     <div className={`k-hdr${className ? ` ${className}` : ''}`}>
-      <button className="k-hdr-btn" disabled={!onBack} onClick={onBack} aria-label="بازگشت">›</button>
+      <button className="k-hdr-btn" disabled={!onBack} onClick={onBack} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>
       <div className="k-ribbon" style={vars}>
         <GLabel className="k-ribbon-title" top="#ffffff" bottom="#ffe6b8" stroke={1.4}>{title}</GLabel>
       </div>
-      <button className="k-hdr-btn" disabled={!onHelp} onClick={onHelp} aria-label="راهنما">؟</button>
+      <button className="k-hdr-btn" disabled={!onHelp} onClick={onHelp} aria-label={t('shell.help')}>؟</button>
     </div>
   )
 }

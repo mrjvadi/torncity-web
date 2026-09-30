@@ -29,11 +29,12 @@ async function retry<T>(load: () => Promise<T>, tries = 4): Promise<T> {
 }
 
 export const screensReady: Promise<void> = Promise.all([
-  retry(() => import('./native')), retry(() => import('./features')), retry(() => import('./more')), retry(() => import('./village')), retry(() => import('./founding')),
+  retry(() => import('./native')), retry(() => import('./features')), retry(() => import('./more')), retry(() => import('./village')), retry(() => import('./founding')), retry(() => import('./basic')),
 ]).then(
-  ([native, features, more, village, founding]) => {
-    Object.assign(SERVER_SCREENS, features.default.SERVER, native.default.SERVER, more.default.SERVER, village.default.SERVER, founding.default.SERVER)
-    Object.assign(LOCAL_SCREENS, features.default.LOCAL, native.default.LOCAL, more.default.LOCAL, village.default.LOCAL, founding.default.LOCAL)
+  ([native, features, more, village, founding, basic]) => {
+    // basic goes first: the bespoke screens of every other area override it
+    Object.assign(SERVER_SCREENS, basic.default.SERVER, features.default.SERVER, native.default.SERVER, more.default.SERVER, village.default.SERVER, founding.default.SERVER)
+    Object.assign(LOCAL_SCREENS, basic.default.LOCAL, features.default.LOCAL, native.default.LOCAL, more.default.LOCAL, village.default.LOCAL, founding.default.LOCAL)
   },
   () => undefined,
 )

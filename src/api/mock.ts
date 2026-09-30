@@ -7,6 +7,7 @@ import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
 import { mockFoundingCommand } from './mock_founding'
+import { mockBasicCommand } from './mock_basic'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 
 function json(body: unknown, status = 200): Response {
@@ -16,7 +17,9 @@ function json(body: unknown, status = 200): Response {
   })
 }
 
-const MOCK_PLAYER = { id: 'mock-1', code: 'K7Q2M9A', name: 'سارا', lang: 'fa', city_code: 'calderis', city: 'کالدریس' }
+// the language the mock "server" holds for the player (player.language.set changes it)
+let mockLang: 'fa' | 'en' = (() => { try { return localStorage.getItem('tc.lang') === 'en' ? 'en' : 'fa' } catch { return 'fa' } })()
+const MOCK_PLAYER = { id: 'mock-1', code: 'K7Q2M9A', name: 'سارا', get lang() { return mockLang }, city_code: 'calderis', city: 'کالدریس' }
 
 const MOCK_AUTH = {
   access_token: 'mock.access.token',
@@ -85,9 +88,18 @@ const MOCK_PROFILE_ACTIONS = [
 ]
 
 function mockCommand(command: string, args?: Record<string, unknown>) {
-  if (command === 'player.profile.get') {
-    return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view: MOCK_PROFILE_VIEW, actions: MOCK_PROFILE_ACTIONS })
+  if (command === 'player.language.set') {
+    mockLang = args?.lang === 'en' ? 'en' : 'fa'
+    return json({ ok: true, screen: 'settings', text: 'settings', view: { language: mockLang, languages: ['en', 'fa'], language_changed: true }, actions: [] })
   }
+  if (command === 'player.profile.get') {
+    const view = mockLang === 'en'
+      ? { ...MOCK_PROFILE_VIEW, name: 'Sara', city: 'Calderis', place: { code: 'old_town', name: 'Old Town' }, rank: { code: 'citizen', name: 'Citizen', emoji: '🎖' }, stage: { code: 'adult', name: 'Adult' }, age: 27, needs: { hunger: 34, sleep: 52, stress: 22, happiness: 71 }, achievements: 4 }
+      : { ...MOCK_PROFILE_VIEW, stage: { code: 'adult', name: 'بزرگسال' }, age: 27, needs: { hunger: 34, sleep: 52, stress: 22, happiness: 71 }, achievements: 4 }
+    return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view, actions: MOCK_PROFILE_ACTIONS })
+  }
+  const basic = mockBasicCommand(command, args)
+  if (basic) return json({ ok: true, ...basic })
   // war/military (no structured view yet) and friends/search (structured):
   // the features area's own mock data (src/api/mock_features.ts).
   const founding = mockFoundingCommand(command, args)

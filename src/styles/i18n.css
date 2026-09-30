@@ -12,10 +12,7 @@ html[dir='ltr'] .k-bar-fill.k-from-end { right: auto; }
    English too, only its text changes. */
 html[dir='ltr'] .hud,
 html[dir='ltr'] .dock,
-html[dir='ltr'] .city-view,
-html[dir='ltr'] .sheet-panel { direction: rtl; }
-html[dir='ltr'] .sheet-panel .nx-actions,
-html[dir='ltr'] .sheet-panel .nx-sheet-input { direction: ltr; }
+html[dir='ltr'] .city-view { direction: rtl; }
 
 /* Latin text: the display face's Latin glyphs are fine, but tighten the
    tracking a little and use the body face for long runs */

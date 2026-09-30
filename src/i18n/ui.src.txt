@@ -323,3 +323,185 @@ crime.started | جرم آغاز شد | Crime started
 crime.until_end | {t} تا پایان | {t} to go
 crime.nerve_left | عصب باقی‌مانده: {a}/{b} | Nerve left: {a}/{b}
 crime.result_later | نتیجه وقتی جرم تمام شد، در همین‌جا اعلام می‌شود. | The result will appear here when the crime ends.
+# -- profile -------------------------------------------------------------------------
+profile.title | پروفایل | Profile
+profile.code | کد بازیکن | Player code
+profile.settings | تنظیمات | Settings
+profile.avatar | ویرایش آواتار | Edit avatar
+profile.cash | پول نقد | Cash
+profile.bank | موجودی بانک | Bank balance
+profile.net_worth | ارزش خالص | Net worth
+profile.wealth_rank | رتبه‌ی ثروت | Wealth rank
+profile.energy | انرژی | Energy
+profile.health | سلامت | Health
+profile.needs | نیازها | Needs
+profile.achievements | دستاوردها · {a} از {b} | Achievements · {a} of {b}
+profile.achievements_n | دستاوردها · {a} | Achievements · {a}
+profile.no_achievements | هنوز دستاوردی نداری. | No achievements yet.
+profile.work | شغل | Job
+profile.study | تحصیل | Studying
+profile.per_shift | {pay} هر شیفت | {pay} per shift
+profile.shift_ends | شیفت تا {t} دیگر | Shift ends in {t}
+profile.course_left | {t} تا پایان دوره | {t} until the course ends
+profile.city | شهر | City
+profile.place | مکان | Place
+profile.more | بیشتر | More
+profile.skills | مهارت‌ها | Skills
+profile.life | زندگی | Life
+profile.card | کارت من | My card
+profile.devices | دستگاه‌ها | Devices
+profile.certificates | {n} مدرک | {n} certificates
+profile.travelling | در سفر به {city} · {t} | Travelling to {city} · {t}
+profile.walking | در راه {place} · {t} | Walking to {place} · {t}
+# -- settings -------------------------------------------------------------------------
+settings.title | تنظیمات | Settings
+settings.language | زبان بازی | Game language
+settings.language_hint | زبان بازی و ربات یکی است. | The game and the bot share one language.
+settings.saved | زبان تغییر کرد. | Language changed.
+settings.account | حساب | Account
+settings.devices | دستگاه‌های متصل | Linked devices
+settings.sign_out | خروج از حساب | Sign out
+settings.version | نسخه {v} | Version {v}
+settings.credits | نمادها: game-icons.net (CC BY 3.0) | Icons: game-icons.net (CC BY 3.0)
+# -- fallback screens -----------------------------------------------------------------
+msg.result | نتیجه | Result
+msg.notice | اعلان | Notice
+msg.refusal | انجام نشد | Not possible
+msg.confirm | تأیید | Confirm
+msg.page | جزئیات | Details
+msg.loading | در حال بارگذاری… | Loading…
+msg.empty | اطلاعاتی نیست. | Nothing to show.
+fact.amount | مبلغ | Amount
+fact.fee | کارمزد | Fee
+fact.total | جمع | Total
+fact.to | به | To
+fact.from | از | From
+fact.after | باقی‌مانده | Left after
+fact.gross | درآمد ناخالص | Gross pay
+fact.tax | مالیات | Tax
+fact.net | خالص | Net pay
+fact.xp | تجربه | XP
+fact.performance | عملکرد | Performance
+fact.energy | انرژی | Energy
+fact.duration | مدت | Duration
+fact.fare | کرایه | Fare
+fact.mode | وسیله | Mode
+fact.paid | پرداخت‌شده | Paid
+fact.left | باقی | Left
+fact.item | کالا | Item
+fact.course | دوره | Course
+fact.price | قیمت | Price
+fact.reward | پاداش | Reward
+fact.bail | وثیقه | Bail
+fact.remaining | زمان باقی‌مانده | Time left
+screen.city_map | نقشه‌ی شهر | City map
+screen.cities | شهرها | Cities
+screen.item_detail | کالا | Item
+screen.jail | زندان | Jail
+screen.crime_record | سوابق | Record
+screen.cases | پرونده‌ها | Cases
+screen.course_detail | دوره | Course
+screen.my_orders | سفارش‌های من | My orders
+screen.sell_offers | فروش | Sell
+screen.stock | سهام | Stock
+screen.stock_order | سفارش سهام | Stock order
+screen.listing | عرضه | Listing
+screen.dividend | سود سهام | Dividend
+screen.gold | طلا | Gold
+screen.gold_trade | معامله‌ی طلا | Gold trade
+screen.savings | پس‌انداز | Savings
+screen.insurance | بیمه | Insurance
+screen.loan_offer | پیشنهاد وام | Loan offer
+screen.loan_detail | وام | Loan
+screen.faction_page | جناح | Faction
+screen.faction_members | اعضای جناح | Faction members
+screen.faction_bank | صندوق جناح | Faction treasury
+screen.faction_crime | عملیات جناح | Faction operation
+screen.property | ملک | Property
+screen.property_type | نوع ملک | Property type
+screen.property_offer | پیشنهاد ملک | Property offer
+screen.my_office | مقام من | My office
+screen.lever_edit | ویرایش سیاست | Edit policy
+screen.allocation_edit | تخصیص بودجه | Budget allocation
+screen.budget | بودجه | Budget
+screen.bills | لوایح | Bills
+screen.bill | لایحه | Bill
+screen.treaties | پیمان‌ها | Treaties
+screen.propose | پیشنهاد پیمان | Propose a treaty
+screen.end_treaty | پایان پیمان | End a treaty
+screen.sanctions | تحریم‌ها | Sanctions
+screen.impose | اعمال تحریم | Impose a sanction
+screen.lift | لغو تحریم | Lift a sanction
+screen.diplomacy_history | تاریخچه‌ی دیپلماسی | Diplomacy history
+screen.auctions | حراج‌ها | Auctions
+screen.auction_detail | حراج | Auction
+screen.auction_new | حراج جدید | New auction
+screen.my_auctions | حراج‌های من | My auctions
+screen.mission | مأموریت | Mission
+screen.missions_mine | مأموریت‌های من | My missions
+screen.recruit_campaign | کارزار جذب | Recruitment campaign
+screen.recruit_draft | پیش‌نویس کارزار | Campaign draft
+screen.recruit_hub | جذب نیرو | Recruitment
+screen.specialists | متخصصان | Specialists
+screen.devices | دستگاه‌های متصل | Linked devices
+screen.device_link | اتصال دستگاه | Link a device
+screen.avatars | آواتار | Avatar
+screen.history | تاریخچه | History
+screen.pay | پرداخت | Payment
+screen.sleep_pay | پرداخت هزینه‌ی خواب | Pay for a bed
+screen.shop_detail | مغازه | Shop
+# -- login / errors / shell (shell strings are used by ui/*) ------------------------
+login.signing_in | در حال ورود… | Signing in…
+login.via_telegram | اتصال از طریق تلگرام | Connecting through Telegram
+login.title | تورن‌سیتی | TornCity
+login.hint | در چت خصوصی با ربات دستور /link (اتصال) را بفرستید و کد 8 حرفی را اینجا وارد کنید. | In a private chat with the bot send /link and enter the 8-character code here.
+login.submit | ورود | Sign in
+err.invalid_code | این کد درست نیست، یا قبلاً استفاده شده، یا منقضی شده. از ربات یک کد تازه بگیرید. | This code is wrong, already used or expired. Get a new one from the bot.
+err.invalid_init_data | ورود از طریق تلگرام انجام نشد. صفحه را دوباره باز کنید. | Telegram sign-in failed. Open the page again.
+err.init_data_expired | اطلاعات ورود تلگرام قدیمی شده. صفحه را دوباره باز کنید. | The Telegram sign-in data is stale. Open the page again.
+err.init_data_replayed | این ورود قبلاً استفاده شده. صفحه را دوباره باز کنید. | This sign-in was already used. Open the page again.
+err.rate_limited | درخواست‌ها زیاد شد. چند ثانیه صبر کنید و دوباره امتحان کنید. | Too many requests. Wait a few seconds and try again.
+err.refresh_token_reused | برای امنیت، از این دستگاه خارج شدید. دوباره وارد شوید. | For your safety you were signed out of this device. Sign in again.
+err.invalid_refresh_token | نشست شما تمام شده. دوباره وارد شوید. | Your session ended. Sign in again.
+err.unauthorized | نشست شما تمام شده. دوباره وارد شوید. | Your session ended. Sign in again.
+err.banned | این حساب مسدود شده است. | This account is banned.
+err.timeout | سرور دیر جواب داد. دوباره امتحان کنید. | The server was slow to answer. Try again.
+err.internal | مشکلی پیش آمد. کمی بعد دوباره امتحان کنید. | Something went wrong. Try again in a moment.
+err.network | ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید. | Could not reach the server. Check your connection.
+shell.tab.profile | من | Me
+shell.tab.activity | فعالیت | Activity
+shell.tab.city | شهر | City
+shell.tab.market | اقتصاد | Economy
+shell.tab.society | جامعه | Society
+shell.menu | منو | Menu
+shell.menu.profile | پروفایل | Profile
+shell.menu.bank | بانک | Bank
+shell.menu.inventory | کوله‌پشتی | Backpack
+shell.menu.job | وضعیت شغل | Job status
+shell.menu.life | زندگی | Life
+shell.menu.map | نقشه‌ی شهر | City map
+shell.menu.cities | سفر بین‌شهری | Intercity travel
+shell.menu.settings | تنظیمات | Settings
+shell.menu.devices | دستگاه‌های متصل | Linked devices
+shell.menu.sign_out | خروج از حساب | Sign out
+shell.menu.version | نسخه | Version
+shell.bell | اعلان‌ها | Notifications
+shell.bell_empty | اعلانی وجود ندارد. | No notifications.
+shell.profile | پروفایل | Profile
+shell.help | راهنما | Help
+city.loading | در حال بارگذاری شهر… | Loading the city…
+city.load_failed | نقشه‌ی شهر بارگذاری نشد. | The city map did not load.
+city.no_info | اطلاعاتی برای این کسب‌وکار یافت نشد. | No information for this business.
+city.go_to | برو به {name} | Go to {name}
+city.shift_ready | شیفت آماده | Shift ready
+city.course_ready | مدرک آماده | Certificate ready
+city.gift_soon | جایزه‌ی روز به‌زودی اضافه می‌شود | The daily reward is coming soon
+city.energy_full | انرژی {n} دقیقه دیگه پر می‌شه | Energy full in {n} minutes
+city.shift_pay | یه شیفت برو که هدر نره  ·  +{pay} | Work a shift so it is not wasted  ·  +{pay}
+city.shift_go | یه شیفت برو که هدر نره | Work a shift so it is not wasted
+city.start_shift | شروع شیفت | Start shift
+plate.missions | مأموریت | Missions
+plate.gift | جایزه‌ی روز | Daily reward
+plate.rank | رتبه | Rank
+plate.inbox | پیام‌ها | Messages
+plate.faction | جناح | Faction

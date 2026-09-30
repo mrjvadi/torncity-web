@@ -82,7 +82,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         api.runCommand('player.profile.get'),
       ])
       // the server's language wins, so the bot and the web agree
-      adoptServerLanguage(b.player?.lang)
+      await adoptServerLanguage(b.player?.lang)
       setBootstrap(b)
       setServerTime(b.server_time)
       if (p.ok && p.view) setProfile(p.view as unknown as ProfileView)
