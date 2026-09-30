@@ -3,6 +3,7 @@ import Icon from '../../../ui/Icon'
 import type { IconPalette } from '../../../ui/Icon'
 import { TINT_ICON_PALETTE, type Tint } from './theme'
 import { useToast } from '../../../state/ToastContext'
+import { t } from '../../../i18n'
 
 /** The scrollable page every feature screen sits in (like GenericScreen's
  * own .screen-scroll, so the two feel the same when the user moves between
@@ -16,7 +17,7 @@ export function ComingSoonBanner({ note }: { note?: string }) {
   return (
     <div className="ft-banner-soon">
       <Icon name="clock" palette="gold" size={20} />
-      <span><b className="display">به‌زودی</b> — {note ?? 'این بخش هنوز در بازی فعال نیست؛ آنچه می‌بینید نمونه است.'}</span>
+      <span><b className="display">{t('f.parts.248')}</b> — {note ?? t('f.parts.249')}</span>
     </div>
   )
 }
@@ -165,7 +166,7 @@ export function SoonBtn({ kind = 'gold', icon, children }: { kind?: BtnKind; ico
   return (
     <button
       className={`ft-btn ft-btn-${kind} ft-disabled display`}
-      onClick={() => toast.push('این بخش هنوز در بازی فعال نیست.')}
+      onClick={() => toast.push(t('f.parts.250'))}
     >
       {icon && <Icon name={icon} palette="cream" size={20} />}
       <span>{children}</span>

@@ -8,7 +8,7 @@
 //   the bot meanwhile.
 
 import * as api from '../api/client'
-import { setLang, getLang, type Lang } from './index'
+import { setLang, getLang, isStored, type Lang } from './index'
 
 const LS_PENDING = 'tc.lang.pending'
 
@@ -35,11 +35,20 @@ async function send(lang: Lang): Promise<boolean> {
   }
 }
 
-/** Switches the web to `lang` at once, then tells the server. */
+/** Some text is fixed when its module loads (the client-only previews'
+ * sample data), so a language change starts the page over in the new
+ * language, once the choice is safely stored; without working storage the
+ * app just re-renders in place (App remounts on the language). */
+function restart(lang: Lang): void {
+  if (typeof location !== 'undefined' && isStored(lang)) location.reload()
+}
+
+/** Switches the web to `lang`, tells the server, then reloads. */
 export async function changeLanguage(lang: Lang): Promise<void> {
   if (getLang() === lang) return
   setLang(lang)
   pending(!(api.isLoggedIn() && (await send(lang))))
+  restart(lang)
 }
 
 /** Called with the bootstrap's player language after a sign-in. */
@@ -51,4 +60,5 @@ export async function adoptServerLanguage(serverLang: unknown): Promise<void> {
     return
   }
   setLang(l)
+  restart(l)
 }

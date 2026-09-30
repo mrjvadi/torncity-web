@@ -4,6 +4,7 @@ import Skeleton from '../../../ui/Skeleton'
 import { Scroll, Card, Hero } from './parts'
 import ActionButtons from './ActionButtons'
 import { FEATURE_META, type FeatureMeta } from './theme'
+import { t } from '../../../i18n'
 
 /**
  * A real server screen the client has not been given a structured `view`
@@ -18,7 +19,7 @@ import { FEATURE_META, type FeatureMeta } from './theme'
  * key.
  */
 export default function NativeText({ response, loading, onAction }: ScreenProps) {
-  const meta: FeatureMeta = FEATURE_META[response?.screen ?? ''] ?? { title: 'نظامی', icon: 'shield', tint: 'steel' }
+  const meta: FeatureMeta = FEATURE_META[response?.screen ?? ''] ?? { title: t('f.NativeText.247'), icon: 'shield', tint: 'steel' }
 
   if (loading && !response) {
     return (

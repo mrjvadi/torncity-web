@@ -3,6 +3,7 @@ import type { Action } from '../../../api/types'
 import { toWesternDigits } from '../../../lib/persian'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
+import { t } from '../../../i18n'
 
 /**
  * Renders a server answer's `actions` in the feature card language (shared
@@ -61,14 +62,14 @@ export default function ActionButtons({ actions, onAction }: { actions: Action[]
           autoFocus
           dir={pendingInput?.input?.text ? 'rtl' : 'ltr'}
         />
-        <button className="ft-sheet-primary-btn display" onClick={submitInput}>تأیید</button>
+        <button className="ft-sheet-primary-btn display" onClick={submitInput}>{t('f.ActionButtons.244')}</button>
       </BottomSheet>
 
-      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title="مطمئن هستید؟">
+      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('f.ActionButtons.245')}>
         <p className="ft-confirm-label">{pendingConfirm?.label}</p>
         <div className="ft-confirm-buttons">
-          <button className="ft-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>تأیید</button>
-          <button className="ft-confirm-no display" onClick={() => setPendingConfirm(null)}>انصراف</button>
+          <button className="ft-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('f.ActionButtons.244')}</button>
+          <button className="ft-confirm-no display" onClick={() => setPendingConfirm(null)}>{t('f.ActionButtons.246')}</button>
         </div>
       </BottomSheet>
     </>

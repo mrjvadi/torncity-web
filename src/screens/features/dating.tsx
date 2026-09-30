@@ -4,25 +4,26 @@ import {
   ChipRow, Chip, Ladder, LockedRow, SoonBtn, BtnRow,
 } from './kit/parts'
 import { RELATIONSHIP_LADDER } from './kit/theme'
+import { t } from '../../i18n'
 
 // Meeting, courting and dating (torncity-client/proto features/screens_proto:
 // _s_meet, _s_relationship, _s_date). Not on the server — previews only.
 
 const PEOPLE = [
-  { name: 'آرش', icon: 'a_wolf', palette: 'steel' as const, line: 'سطح 9  ·  مهندس ارشد', tag: 'هم‌کلاس اقتصاد', state: 'known' },
-  { name: 'مهتاب', icon: 'a_raccoon', palette: 'cream' as const, line: 'سطح 6  ·  پرستار', tag: 'هم‌جناح', state: 'new' },
-  { name: 'بردیا', icon: 'lion', palette: 'gold' as const, line: 'سطح 12  ·  وکیل', tag: '', state: 'pending' },
-  { name: 'نگار', icon: 'eagle', palette: 'sapphire' as const, line: 'سطح 4  ·  دانشجو', tag: 'تازه‌وارد', state: 'new' },
+  { name: t('f.chats.39'), icon: 'a_wolf', palette: 'steel' as const, line: t('f.dating.130'), tag: t('f.dating.131'), state: 'known' },
+  { name: t('f.chats.42'), icon: 'a_raccoon', palette: 'cream' as const, line: t('f.dating.132'), tag: t('f.dating.133'), state: 'new' },
+  { name: t('f.casino.30'), icon: 'lion', palette: 'gold' as const, line: t('f.dating.134'), tag: '', state: 'pending' },
+  { name: t('f.casino.22'), icon: 'eagle', palette: 'sapphire' as const, line: t('f.dating.135'), tag: t('f.dating.136'), state: 'new' },
 ]
 
 const Meet: ScreenComponent = () => (
   <Scroll>
     <ComingSoonBanner />
-    <Hero tint="rose" icon="f_heartplus" title="آشنایی" sub="فقط کسانی که این را روشن کرده‌اند دیده می‌شوند" />
+    <Hero tint="rose" icon="f_heartplus" title={t('f.dating.137')} sub={t('f.dating.138')} />
     <Card>
-      <Row icon="walk" palette="steel" title="مرکز شهر فنویک" sub="14 نفر پذیرای آشنایی" right="سلام امروز: 3 از 5" />
+      <Row icon="walk" palette="steel" title={t('f.dating.139')} sub={t('f.dating.140')} right={t('f.dating.141')} />
     </Card>
-    <Section title="این‌جا">
+    <Section title={t('f.dating.142')}>
       {PEOPLE.map((p) => (
         <Row
           key={p.name}
@@ -30,38 +31,38 @@ const Meet: ScreenComponent = () => (
           palette={p.palette}
           title={p.name}
           sub={p.line}
-          right={p.tag ? <Chip text={p.tag} color="var(--violet)" /> : (p.state === 'pending' ? 'منتظر پاسخ' : 'سلام بده')}
+          right={p.tag ? <Chip text={p.tag} color="var(--violet)" /> : (p.state === 'pending' ? t('f.dating.143') : t('f.dating.144'))}
         />
       ))}
     </Section>
-    <SoonBtn>سلام بده</SoonBtn>
+    <SoonBtn>{t('f.dating.144')}</SoonBtn>
   </Scroll>
 )
 
 const Relationship: ScreenComponent = () => (
   <Scroll>
     <ComingSoonBanner />
-    <Hero tint="rose" icon="f_hearts" title="آرش" sub="12 روز آشنایی  ·  از کلاس اقتصاد" />
+    <Hero tint="rose" icon="f_hearts" title={t('f.chats.39')} sub={t('f.dating.145')} />
     <Card>
       <div className="display" style={{ textAlign: 'center', fontSize: 26, marginBottom: 10 }}>{RELATIONSHIP_LADDER[3]}</div>
       <Ladder steps={RELATIONSHIP_LADDER} at={3} />
-      <div style={{ textAlign: 'center', marginTop: 10, color: 'var(--rose)', fontSize: 13 }}>تا «دلداده»: 64%</div>
+      <div style={{ textAlign: 'center', marginTop: 10, color: 'var(--rose)', fontSize: 13 }}>{t('f.dating.146')}</div>
     </Card>
     <TileGrid>
-      <Tile icon="m_chat" palette="sapphire" title="34" sub="پیام" />
-      <Tile icon="f_rose" palette="ruby" title="3" sub="هدیه" />
-      <Tile icon="m_coffee" palette="amber" title="2" sub="قرار" />
+      <Tile icon="m_chat" palette="sapphire" title="34" sub={t('f.dating.147')} />
+      <Tile icon="f_rose" palette="ruby" title="3" sub={t('f.dating.148')} />
+      <Tile icon="m_coffee" palette="amber" title="2" sub={t('f.dating.149')} />
     </TileGrid>
     <BtnRow>
-      <SoonBtn kind="blue" icon="m_chat">پیام</SoonBtn>
-      <SoonBtn kind="steel" icon="f_rose">هدیه</SoonBtn>
-      <SoonBtn kind="gold" icon="m_coffee">قرار</SoonBtn>
+      <SoonBtn kind="blue" icon="m_chat">{t('f.dating.147')}</SoonBtn>
+      <SoonBtn kind="steel" icon="f_rose">{t('f.dating.148')}</SoonBtn>
+      <SoonBtn kind="gold" icon="m_coffee">{t('f.dating.149')}</SoonBtn>
     </BtnRow>
-    <Section title="خواستگاری">
-      <LockedRow ok text="هر دو مجرد" />
-      <LockedRow ok text="دست‌کم 7 روز آشنایی (12 روز)" />
-      <LockedRow ok text="هر دو سطح 5 یا بالاتر" />
-      <LockedRow ok={false} text="رابطه در «دلداده» (الان: صمیمی)" />
+    <Section title={t('f.dating.150')}>
+      <LockedRow ok text={t('f.dating.151')} />
+      <LockedRow ok text={t('f.dating.152')} />
+      <LockedRow ok text={t('f.dating.153')} />
+      <LockedRow ok={false} text={t('f.dating.154')} />
     </Section>
   </Scroll>
 )
@@ -69,24 +70,24 @@ const Relationship: ScreenComponent = () => (
 const Date_: ScreenComponent = () => (
   <Scroll>
     <ComingSoonBanner />
-    <Hero tint="rose" icon="m_meal" title="دعوت از آرش" sub="هر دو در فنویک هستید" stat={{ label: 'وضعیت رابطه', value: 'صمیمی' }} />
-    <Section title="کجا؟">
+    <Hero tint="rose" icon="m_meal" title={t('f.dating.155')} sub={t('f.dating.156')} stat={{ label: t('f.dating.157'), value: t('f.chats.58') }} />
+    <Section title={t('f.dating.158')}>
       <TileGrid>
-        <Tile icon="m_coffee" palette="amber" title="کافه" sub="200 ساپ  ·  1 انرژی  ·  صمیمیت +6" />
-        <Tile icon="m_meal" palette="gold" title="رستوران" sub="800 ساپ  ·  1 انرژی  ·  صمیمیت +12" glow />
-        <Tile icon="m_popcorn" palette="ruby" title="سینما" sub="400 ساپ  ·  2 انرژی  ·  صمیمیت +9" />
-        <Tile icon="m_bench" palette="emerald" title="پارک" sub="رایگان  ·  2 انرژی  ·  صمیمیت +4" />
+        <Tile icon="m_coffee" palette="amber" title={t('f.dating.159')} sub={t('f.dating.160')} />
+        <Tile icon="m_meal" palette="gold" title={t('f.dating.161')} sub={t('f.dating.162')} glow />
+        <Tile icon="m_popcorn" palette="ruby" title={t('f.dating.163')} sub={t('f.dating.164')} />
+        <Tile icon="m_bench" palette="emerald" title={t('f.dating.165')} sub={t('f.dating.166')} />
       </TileGrid>
     </Section>
-    <Section title="کی؟">
+    <Section title={t('f.dating.167')}>
       <ChipRow>
-        <Chip text="الان" color="var(--steel)" />
-        <Chip text="امشب 20:00" color="var(--rose)" />
-        <Chip text="فردا" color="var(--steel)" />
+        <Chip text={t('f.dating.168')} color="var(--steel)" />
+        <Chip text={t('f.dating.169')} color="var(--rose)" />
+        <Chip text={t('f.dating.170')} color="var(--steel)" />
       </ChipRow>
     </Section>
-    <Card><div className="screen-text">آرش باید دعوت را بپذیرد  ·  هزینه با دعوت‌کننده  ·  روزی یک قرار</div></Card>
-    <SoonBtn>فرستادن دعوت  ·  800 ساپ</SoonBtn>
+    <Card><div className="screen-text">{t('f.dating.171')}</div></Card>
+    <SoonBtn>{t('f.dating.172')}</SoonBtn>
   </Scroll>
 )
 

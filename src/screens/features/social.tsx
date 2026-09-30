@@ -3,6 +3,7 @@ import type { ScreenProps } from '../types'
 import Skeleton from '../../ui/Skeleton'
 import { Scroll, Card, Hero, Row, ChipRow, Chip } from './kit/parts'
 import ActionButtons from './kit/ActionButtons'
+import { t } from '../../i18n'
 
 // social.* is real (friend.list -> screen "friends", search -> screen
 // "search" — internal/telegram/screens/social.go, views.go). Structured
@@ -13,7 +14,7 @@ interface FriendLine { id: string; name: string; status: string; incoming: boole
 interface FriendsView { friends: FriendLine[] | null; page: number; pages: number }
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: 'در انتظار پاسخ', blocked: 'مسدود',
+  pending: t('f.social.422'), blocked: t('f.social.423'),
 }
 
 const FriendsScreen: ScreenComponent = ({ response, loading, onAction }) => {
@@ -25,27 +26,27 @@ const FriendsScreen: ScreenComponent = ({ response, loading, onAction }) => {
 
   return (
     <Scroll>
-      <Hero tint="sapphire" icon="society" title="دوستان" sub={`صفحه‌ی ${v.page} از ${v.pages}`} />
-      {friends.length === 0 && <Card><div className="screen-text">هنوز دوستی ثبت نشده است.</div></Card>}
+      <Hero tint="sapphire" icon="society" title={t('f.social.424')} sub={t('f.social.425', { p0: v.page, p1: v.pages })} />
+      {friends.length === 0 && <Card><div className="screen-text">{t('f.social.426')}</div></Card>}
 
       {incoming.length > 0 && (
         <div className="ft-section">
-          <div className="ft-section-title display">درخواست‌های تازه</div>
+          <div className="ft-section-title display">{t('f.social.427')}</div>
           {incoming.map((f) => (
-            <Row key={f.id} icon="person" palette="sapphire" title={f.name || 'بازیکن ناشناس'} sub="منتظر پاسخ توست — دکمه‌ی قبول در پایین صفحه" />
+            <Row key={f.id} icon="person" palette="sapphire" title={f.name || t('f.social.428')} sub={t('f.social.429')} />
           ))}
         </div>
       )}
 
       {rest.length > 0 && (
         <div className="ft-section">
-          <div className="ft-section-title display">فهرست</div>
+          <div className="ft-section-title display">{t('f.social.430')}</div>
           {rest.map((f) => (
             <Row
               key={f.id}
               icon="person"
               palette={f.status === 'blocked' ? 'ruby' : 'steel'}
-              title={f.name || 'بازیکن ناشناس'}
+              title={f.name || t('f.social.428')}
               sub={f.status === 'accepted' ? undefined : STATUS_LABEL[f.status] ?? f.status}
               online={f.status === 'accepted'}
             />
@@ -70,19 +71,19 @@ const SearchScreen: ScreenComponent = (props: ScreenProps) => {
 
   return (
     <Scroll>
-      <Hero tint="sapphire" icon="m_search" title="جستجو" sub={v.query ? `عبارت: ${v.query}` : undefined} />
+      <Hero tint="sapphire" icon="m_search" title={t('f.social.431')} sub={v.query ? t('f.social.432', { p0: v.query }) : undefined} />
 
       {v.help && (
         <Card>
           <div className="screen-text">
-            یک نام کاربری (با @)، کد بازیکن، یا آیدی تلگرام را بفرستید تا بازیکن پیدا شود.
+            {t('f.social.433')}
           </div>
         </Card>
       )}
 
       {!v.help && !v.found && (
         <Card>
-          <div className="screen-text">بازیکنی با این مشخصات پیدا نشد.</div>
+          <div className="screen-text">{t('f.social.434')}</div>
         </Card>
       )}
 
@@ -91,12 +92,12 @@ const SearchScreen: ScreenComponent = (props: ScreenProps) => {
           <Row
             icon="person"
             palette={v.found.self ? 'gold' : 'sapphire'}
-            title={v.found.name || 'بازیکن ناشناس'}
-            sub={v.found.code ? `کد: ${v.found.code}` : undefined}
+            title={v.found.name || t('f.social.428')}
+            sub={v.found.code ? t('f.social.435', { p0: v.found.code }) : undefined}
           />
           {v.found.self && (
             <div style={{ marginTop: 10 }}>
-              <ChipRow><Chip text="این خودت هستی" color="var(--gold)" /></ChipRow>
+              <ChipRow><Chip text={t('f.social.436')} color="var(--gold)" /></ChipRow>
             </div>
           )}
         </Card>

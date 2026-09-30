@@ -505,3 +505,440 @@ plate.gift | جایزه‌ی روز | Daily reward
 plate.rank | رتبه | Rank
 plate.inbox | پیام‌ها | Messages
 plate.faction | جناح | Faction
+# -- client-only previews (screens/features): sample data of features the server has not built -----
+f.casino.1 | ژتون‌ها | Chips
+f.casino.2 | موجودی | Balance
+f.casino.3 | خرید ژتون | Buy chips
+f.casino.4 | فروش | Sell
+f.casino.5 | سقف باخت امروز | Today's loss limit
+f.casino.6 | 1,200 از 5,000 | 1,200 of 5,000
+f.casino.7 | اسلات | Slots
+f.casino.8 | برد تا x500 | Win up to x500
+f.casino.9 | بلک‌جک | Blackjack
+f.casino.10 | در برابر دیلر | Against the dealer
+f.casino.11 | تاس | Dice
+f.casino.12 | بیشتر یا کمتر از 7 | Over or under 7
+f.casino.13 | بخت‌آزمایی | Lottery
+f.casino.14 | قرعه‌کشی جمعه | Friday draw
+f.casino.15 | جایزه‌ی بزرگ جمعه | Friday jackpot
+f.casino.16 | بلیت: 100 ساپ  ·  2 روز و 4 ساعت | Ticket: 100 SUP  ·  2 days 4 hours
+f.casino.17 | بازی مسئولانه: سقف روزانه را خودت تعیین می‌کنی و از آن بیشتر نمی‌شود. | Play responsibly: you set your own daily limit and it can never be exceeded.
+f.casino.18 | گنج پارسی | Persian Treasure
+f.casino.19 | برد! 3 تاج · 5,000 | Win! 3 crowns · 5,000
+f.casino.20 | شرط هر چرخش | Bet per spin
+f.casino.21 | بچرخان! | Spin!
+f.casino.22 | نگار | Negar
+f.casino.23 | تندباد GT | Tondbad GT
+f.casino.24 | سارا | Sara
+f.casino.25 | شاهین R | Shahin R
+f.casino.26 | +0.8 ثانیه | +0.8 s
+f.casino.27 | کاوه | Kaveh
+f.casino.28 | کویر 4x4 | Kavir 4x4
+f.casino.29 | +2.1 ثانیه | +2.1 s
+f.casino.30 | بردیا | Bardia
+f.casino.31 | پلنگ S | Palang S
+f.casino.32 | +4.5 ثانیه | +4.5 s
+f.casino.33 | جاده‌ی ساحلی آزور | Azure Coast Road
+f.casino.34 | دور 2 از 3  ·  زنده | Lap 2 of 3  ·  live
+f.casino.35 | رتبه‌بندی | Standings
+f.casino.36 | سرعت 220  ·  شتاب 7.1  ·  کنترل 68 | Speed 220  ·  Acceleration 7.1  ·  Handling 68
+f.casino.37 | جایزه‌ی نفر اول: 12,000 ساپ | First place prize: 12,000 SUP
+f.casino.38 | نیترو x2 | Nitro x2
+f.chats.39 | آرش | Arash
+f.chats.40 | امشب ساعت 8 رستوران؟ | Dinner at 8 tonight?
+f.chats.41 | در حال نوشتن… | Typing…
+f.chats.42 | مهتاب | Mahtab
+f.chats.43 | مرسی بابت کمک توی بیمارستان | Thanks for helping at the hospital
+f.chats.44 | قرارداد رو امضا کردی؟ | Did you sign the contract?
+f.chats.45 | دیروز | Yesterday
+f.chats.46 | گفتگوها | Chats
+f.chats.47 | جستجوی بازیکن یا گروه… | Search a player or group…
+f.chats.48 | کانال‌ها | Channels
+f.chats.49 | شهر فنویک | Fenwick city
+f.chats.50 | 1,240 آنلاین | 1,240 online
+f.chats.51 | شیرهای البرز | Alborz Lions
+f.chats.52 | جناح  ·  38 عضو | Faction  ·  38 members
+f.chats.53 | کلاس اقتصاد | Economics class
+f.chats.54 | همکلاسی‌ها | Classmates
+f.chats.55 | پیام‌های خصوصی | Private messages
+f.chats.56 | آنلاین  ·  در مرکز شهر | Online  ·  in the city centre
+f.chats.57 | صمیمیت | Closeness
+f.chats.58 | صمیمی | Close
+f.chats.59 | سلام! امروز کلاس اقتصاد خیلی خوب بود | Hi! Economics class was great today
+f.chats.60 | آره، مخصوصاً بحث بورس. سهم آراز رو خریدی؟ | Yes, especially the stock market part. Did you buy Araz shares?
+f.chats.61 | هنوز نه، منتظرم عرضه‌ی اولیه تموم بشه | Not yet, waiting for the IPO to finish
+f.chats.62 | آرش یک شاخه گل رز فرستاد  ·  صمیمیت +3 | Arash sent a rose  ·  Closeness +3
+f.chats.63 | دعوت به قرار | Date invitation
+f.chats.64 | رستوران · امشب 20:00 · صمیمیت +12 | Restaurant · tonight 20:00 · Closeness +12
+f.chats.65 | پیام بنویسید… | Write a message…
+f.combat.66 | قدرت | Strength
+f.combat.67 | سرعت | Speed
+f.combat.68 | دفاع | Defence
+f.combat.69 | چالاکی | Agility
+f.combat.70 | باشگاه آهنین | Iron Gym
+f.combat.71 | رده 3 از 8  ·  هر تمرین 20% بیشتر | Tier 3 of 8  ·  each session 20% more
+f.combat.72 | قدرت نبرد | Combat power
+f.combat.73 | انرژی | Energy
+f.combat.74 | 85 از 100 | 85 of 100
+f.combat.75 | +12 در هر تمرین | +12 per session
+f.combat.76 | تمرین · 5 انرژی | Train · 5 energy
+f.combat.77 | شادی تو 78 است: هرچه شادتر باشی تمرین اثر بیشتری دارد. خواب و غذا را فراموش نکن. | Your happiness is 78: the happier you are, the more training helps. Do not forget sleep and food.
+f.combat.78 | بردیا  در برابر  سارا | Bardia  vs  Sara
+f.combat.79 | سطح 12  ·  مرکز شهر | Level 12  ·  city centre
+f.combat.80 | جایزه روی سرش: 5,000 ساپ | Bounty on his head: 5,000 SUP
+f.combat.81 | تجهیزات | Gear
+f.combat.82 | تفنگ شکاری | Hunting rifle
+f.combat.83 | آسیب 62  ·  دقت 70% | Damage 62  ·  Accuracy 70%
+f.combat.84 | چاقوی ضامن‌دار | Switchblade
+f.combat.85 | آسیب 28 | Damage 28
+f.combat.86 | جلیقه‌ی ضدگلوله | Bulletproof vest
+f.combat.87 | زره 45 | Armour 45
+f.combat.88 | احتمال پیروزی | Chance to win
+f.combat.89 | هزینه: 25 انرژی | Cost: 25 energy
+f.combat.90 | اگر ببازی: حدود 40 دقیقه بیمارستان | If you lose: about 40 minutes in hospital
+f.combat.91 | حمله | Attack
+f.combat.92 | گزارش نبرد نمونه است. | The battle report is a sample.
+f.combat.93 | پیروز شدی! | You won!
+f.combat.94 | بردیا در 4 دور از پا درآمد | Bardia went down in 4 rounds
+f.combat.95 | 740 از 1,000 | 740 of 1,000
+f.combat.96 | 0 از 1,200 | 0 of 1,200
+f.combat.97 | گزارش نبرد | Battle report
+f.combat.98 | دور 1: با تفنگ شلیک کردی | Round 1: you fired the rifle
+f.combat.99 | 186 آسیب | 186 damage
+f.combat.100 | دور 1: بردیا با مشت زد | Round 1: Bardia punched
+f.combat.101 | 92 آسیب | 92 damage
+f.combat.102 | دور 2: از ضربه‌ی چاقو جاخالی دادی | Round 2: you dodged the knife
+f.combat.103 | بدون آسیب | No damage
+f.combat.104 | دور 3: با چاقو زدی | Round 3: you stabbed
+f.combat.105 | 310 آسیب | 310 damage
+f.combat.106 | دور 4: شلیک آخر | Round 4: the final shot
+f.combat.107 | 464 آسیب | 464 damage
+f.combat.108 | با بردیا چه کنی؟ | What will you do with Bardia?
+f.combat.109 | جیبش را بزن | Pick his pocket
+f.combat.110 | 3,200 ساپ | 3,200 SUP
+f.combat.111 | بیمارستان | Hospital
+f.combat.112 | 2 ساعت | 2 hours
+f.combat.113 | رهایش کن | Let him go
+f.combat.114 | تجربه +50 | XP +50
+f.combat.115 | جایزه‌ی سر: 5,000 ساپ به حسابت آمد | Bounty: 5,000 SUP credited to your account
+f.combat.116 | ناشناس | Unknown
+f.combat.117 | رضا گرگه | Reza the Wolf
+f.combat.118 | جناح شیرها | Lions faction
+f.combat.119 | مینا | Mina
+f.combat.120 | در بیمارستان | In hospital
+f.combat.121 | سامان | Saman
+f.combat.122 | دولت شهر | City government
+f.combat.123 | در سفر | Travelling
+f.combat.124 | تحت تعقیب | Wanted
+f.combat.125 | هر کس هدف را به بیمارستان بفرستد جایزه را می‌برد | Whoever sends the target to hospital takes the bounty
+f.combat.126 | + گذاشتن جایزه | + Place a bounty
+f.combat.127 | · سطح | · level
+f.combat.128 | ساپ | SUP
+f.combat.129 | از طرف: | From:
+f.dating.130 | سطح 9  ·  مهندس ارشد | Level 9  ·  Senior engineer
+f.dating.131 | هم‌کلاس اقتصاد | Economics classmate
+f.dating.132 | سطح 6  ·  پرستار | Level 6  ·  Nurse
+f.dating.133 | هم‌جناح | Same faction
+f.dating.134 | سطح 12  ·  وکیل | Level 12  ·  Lawyer
+f.dating.135 | سطح 4  ·  دانشجو | Level 4  ·  Student
+f.dating.136 | تازه‌وارد | Newcomer
+f.dating.137 | آشنایی | Meet
+f.dating.138 | فقط کسانی که این را روشن کرده‌اند دیده می‌شوند | Only people who turned this on are shown
+f.dating.139 | مرکز شهر فنویک | Fenwick city centre
+f.dating.140 | 14 نفر پذیرای آشنایی | 14 people open to meeting
+f.dating.141 | سلام امروز: 3 از 5 | Hellos today: 3 of 5
+f.dating.142 | این‌جا | Here
+f.dating.143 | منتظر پاسخ | Waiting for a reply
+f.dating.144 | سلام بده | Say hello
+f.dating.145 | 12 روز آشنایی  ·  از کلاس اقتصاد | 12 days acquainted  ·  from economics class
+f.dating.146 | تا «دلداده»: 64% | To "Sweetheart": 64%
+f.dating.147 | پیام | Messages
+f.dating.148 | هدیه | Gifts
+f.dating.149 | قرار | Dates
+f.dating.150 | خواستگاری | Proposal
+f.dating.151 | هر دو مجرد | Both single
+f.dating.152 | دست‌کم 7 روز آشنایی (12 روز) | At least 7 days acquainted (12 days)
+f.dating.153 | هر دو سطح 5 یا بالاتر | Both level 5 or higher
+f.dating.154 | رابطه در «دلداده» (الان: صمیمی) | Relationship at "Sweetheart" (now: Close)
+f.dating.155 | دعوت از آرش | Invite Arash
+f.dating.156 | هر دو در فنویک هستید | You are both in Fenwick
+f.dating.157 | وضعیت رابطه | Relationship status
+f.dating.158 | کجا؟ | Where?
+f.dating.159 | کافه | Cafe
+f.dating.160 | 200 ساپ  ·  1 انرژی  ·  صمیمیت +6 | 200 SUP  ·  1 energy  ·  Closeness +6
+f.dating.161 | رستوران | Restaurant
+f.dating.162 | 800 ساپ  ·  1 انرژی  ·  صمیمیت +12 | 800 SUP  ·  1 energy  ·  Closeness +12
+f.dating.163 | سینما | Cinema
+f.dating.164 | 400 ساپ  ·  2 انرژی  ·  صمیمیت +9 | 400 SUP  ·  2 energy  ·  Closeness +9
+f.dating.165 | پارک | Park
+f.dating.166 | رایگان  ·  2 انرژی  ·  صمیمیت +4 | Free  ·  2 energy  ·  Closeness +4
+f.dating.167 | کی؟ | When?
+f.dating.168 | الان | Now
+f.dating.169 | امشب 20:00 | Tonight 20:00
+f.dating.170 | فردا | Tomorrow
+f.dating.171 | آرش باید دعوت را بپذیرد · هزینه با دعوت‌کننده · روزی یک قرار | Arash must accept · the inviter pays · one date a day
+f.dating.172 | فرستادن دعوت · 800 ساپ | Send invitation · 800 SUP
+f.family.173 | نیلا | Nila
+f.family.174 | کلاس سوم | Third grade
+f.family.175 | کیان | Kian
+f.family.176 | نیازمند مراقبت | Needs care
+f.family.177 | نوزاد | Baby
+f.family.178 | 12 روزه | 12 days old
+f.family.179 | خانواده | Family
+f.family.180 | سارا و آرش  ·  متأهل از 42 روز پیش | Sara and Arash  ·  married for 42 days
+f.family.181 | +10% شادی | +10% happiness
+f.family.182 | خانه‌ی مشترک | Shared home
+f.family.183 | حساب مشترک 24,000 | Joint account 24,000
+f.family.184 | قرار عاشقانه | Romantic date
+f.family.185 | حساب مشترک | Joint account
+f.family.186 | خانه | Home
+f.family.187 | فرزندان  ·  ظرفیت خانه: 3 از 4 | Children  ·  home capacity: 3 of 4
+f.family.188 | {p0} سال | {p0} years
+f.family.189 | بچه‌دار شدن | Have a child
+f.family.190 | طلاق | Divorce
+f.family.191 | خواستگاری از آرش | Propose to Arash
+f.family.192 | سطح 9  ·  مهندس ارشد  ·  فنویک | Level 9  ·  Senior engineer  ·  Fenwick
+f.family.193 | وضعیت | Status
+f.family.194 | مجرد | Single
+f.family.195 | آشنایی: 12 روز · 34 پیام · 2 قرار | Acquainted: 12 days · 34 messages · 2 dates
+f.family.196 | انگشتر | Ring
+f.family.197 | نقره | Silver
+f.family.198 | 500 ساپ  ·  +5 صمیمیت | 500 SUP  ·  +5 closeness
+f.family.199 | طلا | Gold
+f.family.200 | 2,500 ساپ  ·  +15 صمیمیت | 2,500 SUP  ·  +15 closeness
+f.family.201 | الماس | Diamond
+f.family.202 | 12,000 ساپ  ·  +40 صمیمیت | 12,000 SUP  ·  +40 closeness
+f.family.203 | مهریه | Dowry
+f.family.204 | 1,000 ساپ | 1,000 SUP
+f.family.205 | اگر همسر در طلاق بخواهد، پرداخت می‌شود | Paid if the spouse asks for a divorce
+f.family.206 | «از روزی که در بازار آزور دیدمت، هر روزم بهتر شده. با من ازدواج می‌کنی؟» | "Every day has been better since I met you at the Azure bazaar. Will you marry me?"
+f.family.207 | خواستگاری · 2,500 ساپ | Propose · 2,500 SUP
+f.family.208 | 9 سال  ·  فرزند سارا و آرش | 9 years  ·  child of Sara and Arash
+f.family.209 | تولد بعدی | Next birthday
+f.family.210 | 4 روز | 4 days
+f.family.211 | وارث اول | First heir
+f.family.212 | حال نیلا | Nila's condition
+f.family.213 | سلامت | Health
+f.family.214 | شادی | Happiness
+f.family.215 | تحصیل | Education
+f.family.216 | کارها | Activities
+f.family.217 | مدرسه | School
+f.family.218 | هر روز  ·  120 ساپ  ·  تحصیل + | Daily  ·  120 SUP  ·  Education +
+f.family.219 | ثبت‌نام شده | Enrolled
+f.family.220 | بازی در پارک | Play in the park
+f.family.221 | شادی +15  ·  1 انرژی | Happiness +15  ·  1 energy
+f.family.222 | کلاس زبان | Language class
+f.family.223 | تحصیل +10  ·  300 ساپ | Education +10  ·  300 SUP
+f.family.224 | جدایی از آرش | Separating from Arash
+f.family.225 | 42 روز ازدواج  ·  صمیمیت 18% | 42 days married  ·  closeness 18%
+f.family.226 | پس از درخواست، 3 روز مهلت آشتی هست. اگر هیچ‌کدام پس نگیرید، طلاق ثبت می‌شود. | After the request there are 3 days to reconcile. If neither of you withdraws, the divorce is recorded.
+f.family.227 | تقسیم دارایی | Splitting assets
+f.family.228 | 24,000 ساپ  ·  نصف به نصف | 24,000 SUP  ·  half and half
+f.family.229 | خانه‌ی خانوادگی | Family home
+f.family.230 | ارزش 180,000 ساپ | Worth 180,000 SUP
+f.family.231 | به سارا | To Sara
+f.family.232 | به آرش | To Arash
+f.family.233 | فروش و تقسیم | Sell and split
+f.family.234 | آرش خواسته پرداخت شود | Arash asked to be paid
+f.family.235 | حضانت فرزندان | Children's custody
+f.family.236 | مشاوره‌ی خانواده | Family counselling
+f.family.237 | درخواست طلاق | Request divorce
+f.family.238 | مراسم ازدواج هنوز در بازی فعال نیست؛ این‌طور جشن گرفته می‌شود. | The wedding ceremony is not in the game yet; this is how it will be celebrated.
+f.family.239 | مبارک باشد! | Congratulations!
+f.family.240 | سارا و آرش ازدواج کردند | Sara and Arash got married
+f.family.241 | جایزه‌های عروسی | Wedding gifts
+f.family.242 | شادی +20 | Happiness +20
+f.family.243 | به خانه برویم | Let's go home
+f.ActionButtons.244 | تأیید | Confirm
+f.ActionButtons.245 | مطمئن هستید؟ | Are you sure?
+f.ActionButtons.246 | انصراف | Cancel
+f.NativeText.247 | نظامی | Military
+f.parts.248 | به‌زودی | Coming soon
+f.parts.249 | این بخش هنوز در بازی فعال نیست؛ آنچه می‌بینید نمونه است. | This section is not in the game yet; what you see is a sample.
+f.parts.250 | این بخش هنوز در بازی فعال نیست. | This section is not in the game yet.
+f.theme.251 | وزارت دفاع | Ministry of Defence
+f.theme.252 | نیروهای مسلح | Armed forces
+f.theme.253 | یگان‌ها | Units
+f.theme.254 | استقرار | Deployment
+f.theme.255 | تدارکات | Procurement
+f.theme.256 | خرید تسلیحات | Buy weapons
+f.theme.257 | مجوزهای دفاعی | Defence licences
+f.theme.258 | مجوز دفاعی | Defence licence
+f.theme.259 | جنگ | War
+f.theme.260 | اعلان جنگ | Declare war
+f.theme.261 | پیوستن به جنگ | Join the war
+f.theme.262 | پیشنهاد صلح | Offer peace
+f.theme.263 | پاسخ به پیشنهاد | Answer the offer
+f.theme.264 | از سرگیری جنگ | Resume the war
+f.theme.265 | اتاق جنگ | War room
+f.theme.266 | هدف | Target
+f.theme.267 | شروع عملیات | Start the operation
+f.theme.268 | فرزند | Child
+f.theme.269 | عروسی | Wedding
+f.theme.270 | رابطه | Relationship
+f.theme.271 | گفتگو | Chat
+f.theme.272 | راهنما | Guide
+f.theme.273 | جایزه‌ی روزانه | Daily reward
+f.theme.274 | باشگاه | Gym
+f.theme.275 | نتیجه‌ی نبرد | Battle result
+f.theme.276 | روزنامه | Newspaper
+f.theme.277 | دعوت دوستان | Invite friends
+f.theme.278 | کازینو | Casino
+f.theme.279 | مسابقه | Race
+f.theme.280 | زمین‌ها | Land
+f.theme.281 | وصیت‌نامه | Will
+f.theme.282 | ظاهر | Look
+f.theme.283 | جشن نوروز | Nowruz festival
+f.theme.284 | ارتقای سطح | Level up
+f.theme.285 | غریبه | Stranger
+f.theme.286 | آشنا | Acquaintance
+f.theme.287 | دوست | Friend
+f.theme.288 | دلداده | Sweetheart
+f.theme.289 | نامزد | Fiance
+f.theme.290 | همسر | Spouse
+f.misc.291 | زمین‌های شهر هنوز خرید و فروش نمی‌شوند. | City land cannot be bought or sold yet.
+f.misc.292 | محله‌ی باغ‌ها | Gardens district
+f.misc.293 | مسکونی  ·  20 قطعه | Residential  ·  20 plots
+f.misc.294 | مال من | Mine
+f.misc.295 | فروشی | For sale
+f.misc.296 | دیگران | Others
+f.misc.297 | فضای سبز | Green space
+f.misc.298 | قطعه‌ی V-15 | Plot V-15
+f.misc.299 | 600 متر  ·  کاربری مسکونی  ·  نبش | 600 m²  ·  residential  ·  corner
+f.misc.300 | همسایه‌ها: آرش و مهتاب · نزدیک پارک · مالیات سالانه 1% | Neighbours: Arash and Mahtab · near the park · annual tax 1%
+f.misc.301 | چه می‌توان ساخت؟ | What can be built?
+f.misc.302 | 60,000  ·  4 روز | 60,000  ·  4 days
+f.misc.303 | 140,000  ·  7 روز | 140,000  ·  7 days
+f.misc.304 | ویلا با استخر | Villa with pool
+f.misc.305 | 320,000  ·  12 روز | 320,000  ·  12 days
+f.misc.306 | خرید زمین | Buy the plot
+f.misc.307 | پیشنهاد قیمت | Offer a price
+f.misc.308 | وصیت‌نامه‌ی سارا | Sara's will
+f.misc.309 | ثبت‌شده در محضر فنویک · آخرین تغییر: 3 روز پیش · وصی: آرش | Registered at the Fenwick notary · last changed 3 days ago · executor: Arash
+f.misc.310 | دارایی‌ها  ·  حدود 412,000 ساپ | Assets  ·  about 412,000 SUP
+f.misc.311 | نقد و بانک | Cash and bank
+f.misc.312 | نیمی از خانه‌ی خانوادگی | Half of the family home
+f.misc.313 | 1,200 سهم صنایع آراز | 1,200 Araz Industries shares
+f.misc.314 | کافه‌ی سارا  ·  100% | Sara's cafe  ·  100%
+f.misc.315 | وارث‌ها  ·  جمع 100% | Heirs  ·  total 100%
+f.misc.316 | 9 سال  ·  تا 18 سالگی نزد قیم | 9 years  ·  with a guardian until 18
+f.misc.317 | 3 سال  ·  تا 18 سالگی نزد قیم | 3 years  ·  with a guardian until 18
+f.misc.318 | 12 روزه  ·  تا 18 سالگی نزد قیم | 12 days old  ·  with a guardian until 18
+f.misc.319 | ثبت در محضر · 500 ساپ | Register at the notary · 500 SUP
+f.misc.320 | ظاهر فقط زیبایی است؛ قدرتی نمی‌دهد. | Looks are cosmetic only; they give no power.
+f.misc.321 | «سلطان بازار» | "Bazaar Sultan"
+f.misc.322 | قاب | Frame
+f.misc.323 | لقب | Title
+f.misc.324 | رنگ نام | Name colour
+f.misc.325 | پس‌زمینه | Background
+f.misc.326 | طلایی | Golden
+f.misc.327 | در حال استفاده | In use
+f.misc.328 | فیروزه | Turquoise
+f.misc.329 | مالکِ آن | Its owner
+f.misc.330 | آتش | Fire
+f.misc.331 | بهار | Spring
+f.misc.332 | فقط در نوروز | Only at Nowruz
+f.misc.333 | شاهی | Royal
+f.misc.334 | 40 طلا | 40 gold
+f.misc.335 | جشن فصلی هنوز در بازی فعال نیست. | Seasonal festivals are not in the game yet.
+f.misc.336 | بهار آمد! | Spring is here!
+f.misc.337 | 12 روز تا پایان جشن | 12 days until the festival ends
+f.misc.338 | دارایی جشن | Festival wealth
+f.misc.339 | 340 سکه‌ی بهار | 340 spring coins
+f.misc.340 | مسیر جایزه  ·  مرحله 4 | Reward track  ·  step 4
+f.misc.341 | پاس ویژه ⭐ 150 | Special pass ⭐ 150
+f.misc.342 | مرحله | Step
+f.misc.343 | کارهای جشن | Festival tasks
+f.misc.344 | هفت‌سین را کامل کن | Complete the Haft-sin
+f.misc.345 | 5 از 7 سین در شهر پیدا شد | 5 of 7 items found in the city
+f.misc.346 | چهارشنبه‌سوری | Chaharshanbe Suri
+f.misc.347 | سه‌شنبه شب در پارک | Tuesday night in the park
+f.misc.348 | به 3 دوست عیدی بده | Give 3 friends a gift
+f.misc.349 | 1 از 3 | 1 of 3
+f.misc.350 | جشن ارتقای سطح نمونه است؛ سطح از سرورهای واقعی می‌آید. | The level-up celebration is a sample; the level comes from the real servers.
+f.misc.351 | سطح 8! | Level 8!
+f.misc.352 | به سطح جدید رسیدی | You reached a new level
+f.misc.353 | تجربه | XP
+f.misc.354 | 0 از 7,200 | 0 of 7,200
+f.misc.355 | چیزهایی که باز شد | Unlocked
+f.misc.356 | جرم درجه 4 | Tier 4 crime
+f.misc.357 | بازار سهام | Stock market
+f.misc.358 | +1 امتیاز مهارت | +1 skill point
+f.misc.359 | ادامه | Continue
+f.onboarding.360 | راهنمای قدم‌به‌قدم هنوز در بازی فعال نیست. | The step-by-step guide is not in the game yet.
+f.onboarding.361 | اول یک شغل پیدا کن! | First, find a job!
+f.onboarding.362 | مرحله 2 از 6 | Step 2 of 6
+f.onboarding.363 | با شغل هر شیفت پول می‌گیری و مهارتت بالا می‌رود. روی «کار» بزن تا شغل‌های شهر را ببینی. | A job pays you every shift and raises your skills. Tap "Work" to see the city's jobs.
+f.onboarding.364 | جایزه‌ی پایان: 1,000 ساپ | Final reward: 1,000 SUP
+f.onboarding.365 | رد کردن | Skip
+f.onboarding.366 | 500 ساپ | 500 SUP
+f.onboarding.367 | انرژی +10 | Energy +10
+f.onboarding.368 | 800 ساپ | 800 SUP
+f.onboarding.369 | دارو ×2 | Medicine ×2
+f.onboarding.370 | 5 طلا | 5 gold
+f.onboarding.371 | 1,500 ساپ | 1,500 SUP
+f.onboarding.372 | صندوق هفته | Weekly chest
+f.onboarding.373 | 3 جرم انجام بده | Commit 3 crimes
+f.onboarding.374 | 300 ساپ | 300 SUP
+f.onboarding.375 | در باشگاه تمرین کن | Train at the gym
+f.onboarding.376 | انرژی +5 | Energy +5
+f.onboarding.377 | به یک دوست پیام بده | Message a friend
+f.onboarding.378 | 100 ساپ | 100 SUP
+f.onboarding.379 | یک شیفت کار کن | Work one shift
+f.onboarding.380 | تجربه +20 | XP +20
+f.onboarding.381 | 5 روز پشت‌سرهم | 5 days in a row
+f.onboarding.382 | اگر یک روز نیایی، از روز 1 شروع می‌شود | If you miss a day, it starts again from day 1
+f.onboarding.383 | روز بعد تا | Next day in
+f.onboarding.384 | روز {p0} | Day {p0}
+f.onboarding.385 | گرفتن جایزه‌ی روز 5 | Claim the day 5 reward
+f.onboarding.386 | کارهای امروز | Today's tasks
+f.onboarding.387 | بگیر  ·  {p0} | Claim  ·  {p0}
+f.press.388 | فنویک امروز | Fenwick Today
+f.press.389 | یکشنبه 12 مهر · شماره‌ی 214 · روز 3 جنگ | Sunday 12 Mehr · issue 214 · day 3 of the war
+f.press.390 | همه | All
+f.press.391 | سیاست | Politics
+f.press.392 | اقتصاد | Economy
+f.press.393 | جامعه | Society
+f.press.394 | جرم | Crime
+f.press.395 | موشک‌های فنویک پایگاه هوایی کالدریس را هدف گرفتند | Fenwick missiles targeted the Calderis air base
+f.press.396 | ستاد کل: 7 موشک از پدافند گذشت و باند فرودگاه آسیب سنگین دید. کالدریس هنوز واکنشی نشان نداده است. | General staff: 7 missiles passed the air defence and the runway was badly damaged. Calderis has not responded yet.
+f.press.397 | 12 دقیقه پیش | 12 minutes ago
+f.press.398 | بقیه‌ی روزنامه | Rest of the paper
+f.press.399 | آرش کمالی با 54% رأی شهردار فنویک شد | Arash Kamali became Fenwick's mayor with 54% of the vote
+f.press.400 | 1 ساعت | 1 hour
+f.press.401 | سهام صنایع آراز امروز 12% بالا رفت | Araz Industries shares rose 12% today
+f.press.402 | سارا و آرش در تالار آزور ازدواج کردند | Sara and Arash married at the Azure hall
+f.press.403 | 3 ساعت | 3 hours
+f.press.404 | سرقت از بانک مرکزی؛ 3 نفر در زندان | Central bank robbery; 3 in jail
+f.press.405 | 5 ساعت | 5 hours
+f.press.406 | لایحه‌ی مالیات بازار با 31 رأی تصویب شد | Market tax bill passed with 31 votes
+f.press.407 | مجلس | Parliament
+f.press.408 | صندوق طلایی | Golden chest
+f.press.409 | قاب ویژه | Special frame
+f.press.410 | ماشین مسابقه | Race car
+f.press.411 | لقب «سفیر» | "Ambassador" title
+f.press.412 | دوستانت را بیاور | Bring your friends
+f.press.413 | وقتی دوستت به سطح 5 برسد، هر دو جایزه می‌گیرید. | When your friend reaches level 5, you both get a reward.
+f.press.414 | اشتراک در تلگرام | Share on Telegram
+f.press.415 | جایزه‌های دعوت  ·  4 نفر | Invite rewards  ·  4 people
+f.press.416 | دعوت‌شده‌ها | Invited
+f.press.417 | به سطح 5 رسید  ·  جایزه گرفتید | Reached level 5  ·  you got the reward
+f.press.418 | سینا | Sina
+f.press.419 | سطح 3 از 5 | Level 3 of 5
+f.press.420 | دنیا | Donya
+f.press.421 | سطح 1 از 5 | Level 1 of 5
+f.social.422 | در انتظار پاسخ | Awaiting a reply
+f.social.423 | مسدود | Blocked
+f.social.424 | دوستان | Friends
+f.social.425 | صفحه‌ی {p0} از {p1} | Page {p0} of {p1}
+f.social.426 | هنوز دوستی ثبت نشده است. | No friends yet.
+f.social.427 | درخواست‌های تازه | New requests
+f.social.428 | بازیکن ناشناس | Unknown player
+f.social.429 | منتظر پاسخ توست — دکمه‌ی قبول در پایین صفحه | Waiting for your reply — the accept button is at the bottom
+f.social.430 | فهرست | List
+f.social.431 | جستجو | Search
+f.social.432 | عبارت: {p0} | Query: {p0}
+f.social.433 | یک نام کاربری (با @)، کد بازیکن، یا آیدی تلگرام را بفرستید تا بازیکن پیدا شود. | Send a username (with @), a player code or a Telegram id to find a player.
+f.social.434 | بازیکنی با این مشخصات پیدا نشد. | No player matches.
+f.social.435 | کد: {p0} | Code: {p0}
+f.social.436 | این خودت هستی | This is you

@@ -39,6 +39,11 @@ function readStored(): Lang | null {
 let current: Lang = readStored() ?? 'fa'
 const listeners = new Set<() => void>()
 
+/** True when `lang` really is what the next page load will read back. */
+export function isStored(lang: Lang): boolean {
+  return readStored() === lang
+}
+
 export function getLang(): Lang {
   return current
 }
