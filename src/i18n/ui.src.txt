@@ -1043,3 +1043,4 @@ refusal.village_citizen_terms_range | این عدد خارج از محدودهٔ
 refusal.village_citizen_no_debt | بدهی مالیاتی‌ای نداری. | You have no tax debt.
 refusal.village_citizen_off | خرید زمین هنوز در این روستا باز نشده است. | Buying land is not open in this village yet.
 refusal.village_citizen_no_lots | زمینی نداری؛ اول یک زمین بخر. | You own no lots; buy one first.
+citizen.pct | {p}٪ | {p}%

@@ -1018,6 +1018,7 @@ export const uiFa = {
   'refusal.village_citizen_no_debt': 'بدهی مالیاتی‌ای نداری.',
   'refusal.village_citizen_off': 'خرید زمین هنوز در این روستا باز نشده است.',
   'refusal.village_citizen_no_lots': 'زمینی نداری؛ اول یک زمین بخر.',
+  'citizen.pct': '{p}٪',
 } as const
 
 export type UiKey = keyof typeof uiFa

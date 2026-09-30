@@ -1020,4 +1020,5 @@ export const uiEn: Record<UiKey, string> = {
   'refusal.village_citizen_no_debt': 'You have no tax debt.',
   'refusal.village_citizen_off': 'Buying land is not open in this village yet.',
   'refusal.village_citizen_no_lots': 'You own no lots; buy one first.',
+  'citizen.pct': '{p}%',
 }

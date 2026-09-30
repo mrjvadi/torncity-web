@@ -267,7 +267,7 @@ export function MineSheet({ open, cat, onClose, store }: { open: boolean; cat: M
                 value={l.building ? buildingName(cat, l.building) : t('citizen.mine.lot_bare')} />
             ))}
             <Fact label={t('citizen.mine.assessed')} value={money(view.assessed)} />
-            <Fact label={t('citizen.mine.tax')} value={`${money(view.tax_per_period)} · ${view.tax_bps / 100}%`} />
+            <Fact label={t('citizen.mine.tax')} value={`${money(view.tax_per_period)} (${t('citizen.pct', { p: view.tax_bps / 100 })})`} />
             {view.debt > 0 && <Fact label={t('citizen.mine.debt')} value={money(view.debt)} gold />}
           </div>
           <div className="vh-sheet-actions">

@@ -49,11 +49,6 @@ export function Overview({ response, openLocal, localArgs }: ScreenProps) {
               <div><div className="nx-stat-label">{t('overview.population')}</div><div className="display" style={{ fontSize: 20 }}><span className="vs-ltr">{formatNumber(v.population)} / {formatNumber(v.population_cap)}</span></div></div>
               <div><div className="nx-stat-label">{t('overview.treasury')}</div><div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
             </div>
-            {v.resident !== false && (
-              <div className="vs-btns">
-                <Slab tone="gold" radius={12} lip={3} onClick={() => setDonate(true)}>{t('village.btn.donate')}</Slab>
-              </div>
-            )}
           </Card>
           {v.resident !== false && (
             <Card tone="gold">

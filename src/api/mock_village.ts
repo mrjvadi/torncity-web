@@ -455,7 +455,7 @@ function donate(args: Record<string, unknown>) {
 const LOT_PRICE = 400, PERMIT_FEE = 100, TAX_BPS = 200, MAX_LOTS = 3, TIMBER_UNIT = 18
 
 interface MLot { x: number; y: number; owner: string; mine: boolean }
-const cz = { tenure: [] as MLot[], cash: 5000, lastRest: 0, seeded: false }
+const cz = { tenure: [] as MLot[], cash: 12450, lastRest: 0, seeded: false }
 
 const CITIZEN_CAT: CatEntry[] = [
   { code: 'cottage', fa: 'کلبهٔ روستایی', en: 'Cottage', fp: [1, 1], cost: 800, time: 7200, role: '', materials: [['timber', 'الوار', 3]] },
