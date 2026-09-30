@@ -40,10 +40,33 @@ have no view at all (contract 3.1).
 The mock (`src/api/mock*.ts`) answers 53 screens; the rest cannot be opened in
 mock mode.
 
+## After this work (feat/screens-native)
+
+* **`src/screens/basic`** registers the 146 screens that had no native layout
+  (results, notices, refusals, confirmations and the content long tail) under
+  five kinds; each reads the answer's text into headline / fact rows /
+  paragraphs, adds exact facts from simple views (pay, shift, item, enrol,
+  travel...), strips the Telegram emoji and draws the actions with the kit.
+  After it, `GenericScreen` is reached only by a screen name the server adds
+  in the future, and by the village screens' own area.
+* Bespoke native (from the profile down): profile, settings, bank (number
+  pad), backpack (chips and glyphs), and every earlier native screen now
+  speaks fa/en.
+* Still text-derived, waiting for bespoke layouts (priority 5-6 above): the
+  `page` kind screens (city_map, cities, item_detail, jail, savings, loans,
+  faction pages, governance edits, diplomacy, auctions, recruitment, devices).
+
 ## Language
 
 Before: `t()` had Persian only, and ~1,400 Persian literals were inlined in
 screens and shell. There was no language switch and `dir` was hard-wired RTL.
+
+Now: `src/i18n` holds fa and en (`ui.src.txt` is the one source for both, run
+`npm run i18n:gen`; `npm run i18n:check` lists gaps in the village/founding
+table). The language sits on `<html lang dir>`, is stored in localStorage
+and is sent to the server with `player.language.set`; sign-in adopts the
+server's language (or pushes a choice made on the login screen). A switch
+restarts the page so module-level text refreshes.
 
 ## Priority (what to port, in order)
 

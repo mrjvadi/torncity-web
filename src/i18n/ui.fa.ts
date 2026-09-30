@@ -929,6 +929,18 @@ export const uiFa = {
   'inventory.cat.metal_ore': 'سنگ فلز',
   'inventory.cat.vehicles': 'خودرو',
   'inventory.cat.other': 'سایر',
+  'bank.deposit_tab': 'واریز',
+  'bank.withdraw_tab': 'برداشت',
+  'bank.all': 'همه',
+  'bank.after_deposit': 'نقد تو {cash} · بعد از واریز: {a} نقد، {b} در بانک',
+  'bank.after_withdraw': 'نقد تو {cash} · بعد از برداشت: {a} نقد، {b} در بانک',
+  'bank.no_fee': 'بدون کارمزد',
+  'bank.fee_pct': 'کارمزد {p}',
+  'bank.submit_deposit': 'واریز {n}',
+  'bank.submit_withdraw': 'برداشت {n}',
+  'bank.enter_amount': 'مبلغ را وارد کن',
+  'bank.too_much': 'بیشتر از موجودی است',
+  'bank.jailed': 'در زندان هستی؛ به بانک دسترسی نداری.',
 } as const
 
 export type UiKey = keyof typeof uiFa

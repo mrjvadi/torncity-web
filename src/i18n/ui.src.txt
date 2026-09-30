@@ -953,3 +953,15 @@ inventory.cat.mineral | کانی | Minerals
 inventory.cat.metal_ore | سنگ فلز | Metal ore
 inventory.cat.vehicles | خودرو | Vehicles
 inventory.cat.other | سایر | Other
+bank.deposit_tab | واریز | Deposit
+bank.withdraw_tab | برداشت | Withdraw
+bank.all | همه | All
+bank.after_deposit | نقد تو {cash} · بعد از واریز: {a} نقد، {b} در بانک | Cash {cash} · after depositing: {a} cash, {b} in the bank
+bank.after_withdraw | نقد تو {cash} · بعد از برداشت: {a} نقد، {b} در بانک | Cash {cash} · after withdrawing: {a} cash, {b} in the bank
+bank.no_fee | بدون کارمزد | No fee
+bank.fee_pct | کارمزد {p} | Fee {p}
+bank.submit_deposit | واریز {n} | Deposit {n}
+bank.submit_withdraw | برداشت {n} | Withdraw {n}
+bank.enter_amount | مبلغ را وارد کن | Enter an amount
+bank.too_much | بیشتر از موجودی است | More than you have
+bank.jailed | در زندان هستی؛ به بانک دسترسی نداری. | You are in jail; the bank is out of reach.
