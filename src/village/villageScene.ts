@@ -12,9 +12,14 @@ import {
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import type { LayoutBuilding, VillageLayout, WorldInfo } from '../api/types'
-import { buildTerrain, GrassField, buildBoulders, type TerrainResult, type FieldResult } from '../demo/terrain'
+import { buildTerrain, buildBoulders, type TerrainResult, type FieldResult } from '../demo/terrain'
 import { buildWater, buildCoarseWaterPatch, type WaterResult, type CoarseWaterResult } from '../demo/water'
-import { swapNeutral } from './groundTextures'
+import { BufferAttribute, ShaderMaterial, type Mesh as ThreeMesh } from 'three'
+import { bakeControl, createGroundMaterial, loadPhotoSet, makeMacroNoise, makeWaterNormals, type GroundMaterial } from './groundMaterial'
+import { biomeTints, buildFineGroundMesh } from './groundMesh'
+import { buildFields, type Fields } from './groundFields'
+import { GrassTufts } from './grassTufts'
+import { createWaterMaterial } from './waterMaterial'
 import type { VillageGround } from './terrainModel'
 import { buildModel, buildScaffold } from './buildingModels'
 import { ColorGeom } from './colorGeom'
@@ -33,6 +38,13 @@ const FOG_FAR = 7000
 const SUN = new Vector3(-0.5, 0.7, 0.45).normalize()
 const MARGIN = 1.2 // metres left between two neighbouring buildings
 const WATER_TICK_MS = 1000 / 30
+function valueNoise(x: number, y: number): number {
+  const h = (i: number, j: number) => { const t = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return t - Math.floor(t) }
+  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy
+  const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy)
+  return (h(ix, iy) * (1 - u) + h(ix + 1, iy) * u) * (1 - v) + (h(ix, iy + 1) * (1 - u) + h(ix + 1, iy + 1) * u) * v
+}
+const smoothstep = (a: number, b: number, v: number) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t) }
 
 export interface ScreenLabel { key: string; x: number; y: number; visible: boolean }
 
@@ -56,7 +68,14 @@ export class VillageScene {
   private terrain!: TerrainResult
   private water: WaterResult | null = null
   private coarseWater: CoarseWaterResult | null = null
-  private grass!: GrassField
+  private grass: GrassTufts | null = null
+  private groundMats: GroundMaterial[] = []
+  private ctlMat!: GroundMaterial
+  private macro: import('three').DataTexture | null = null
+  private waterMat: ShaderMaterial | null = null
+  private fields!: Fields
+  private waterNormals: import('three').DataTexture | null = null
+  private grassTime = 0
   private boulders: FieldResult | null = null
   private trees: TreeField | null = null
   private treeList: TreeSpot[] = []
@@ -150,35 +169,49 @@ export class VillageScene {
     const stage = (name: string, fn: () => void) => {
       try { fn() } catch (e) { console.error(`[village] ${name} failed`, e) }
     }
+    this.fields = buildFields(this.ground, grids.doc.biomeLegend)
     stage('terrain', () => {
-      this.terrain = buildTerrain(grids)
-      for (const o of this.terrain.objects) o.receiveShadow = o.name === 'terrain-fine'
-      this.scene.add(...this.terrain.objects)
+      const t = buildTerrain(grids)
+      // the demo's coarse backdrop and skirt stay; its fine mesh is replaced by the subdivided one
+      const fine = t.objects.find((o) => o.name === 'terrain-fine') as ThreeMesh
+      fine.geometry.dispose()
+      t.objects.splice(t.objects.indexOf(fine), 1)
+      this.terrain = t
+      const tint = biomeTints(this.ground, grids.doc.biomeLegend)
+      this.macro = makeMacroNoise(128)
+      const ctl = bakeControl(this.controlInput(), 256)
+      this.ctlMat = createGroundMaterial({ ctl: ctl.tex, org: ctl.org, size: ctl.size, macro: this.macro, vertexColors: true })
+      const coarseMat = createGroundMaterial({ ctl: ctl.tex, org: ctl.org, size: ctl.size, macro: this.macro, vertexColors: true })
+      this.groundMats = [this.ctlMat, coarseMat]
+      const fineMesh = buildFineGroundMesh(this.ground, this.ctlMat.mat, tint)
+      fineMesh.receiveShadow = true
+      const coarse = t.objects.find((o) => o.name === 'terrain-coarse') as ThreeMesh
+      const col = coarse.geometry.getAttribute('color') as BufferAttribute
+      for (let i = 0; i < col.count; i++) col.setXYZ(i, Math.min(1.7, col.getX(i) / tint.ref.r), Math.min(1.7, col.getY(i) / tint.ref.g), Math.min(1.7, col.getZ(i) / tint.ref.b))
+      coarse.material = coarseMat.mat
+      this.terrainFine = fineMesh
+      this.scene.add(fineMesh, ...t.objects)
     })
     stage('water', () => {
       this.water = buildWater(grids)
-      if (this.water.material) {
-        const u = this.water.material.uniforms
-        u.uDeep.value.set(0x2c7f9a)
-        u.uShallow.value.set(0x86d3dc)
-        u.uSky.value.set(SKY_TOP)
-        // the shader writes raw linear colour: give it the renderer's tone map and encoding
-        this.water.material.fragmentShader = this.water.material.fragmentShader.replace(
-          'gl_FragColor = vec4(color, vAlpha);',
-          'gl_FragColor = vec4(color, vAlpha);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>',
-        )
-        this.water.material.needsUpdate = true
+      this.waterNormals = makeWaterNormals(128)
+      this.waterMat = createWaterMaterial({ normals: this.waterNormals, sunDir: SUN, horizon: SKY_HORIZON, top: SKY_TOP })
+      if (this.water.mesh) {
+        this.water.mesh.material = this.waterMat
+        this.water.mesh.renderOrder = 2
+        this.scene.add(this.water.mesh)
       }
-      if (this.water.mesh) this.scene.add(this.water.mesh)
       this.coarseWater = buildCoarseWaterPatch(grids)
       if (this.coarseWater.mesh) this.scene.add(this.coarseWater.mesh)
     })
     stage('roads', () => this.rebuildRoads())
     stage('grass', () => {
-      this.grass = new GrassField(grids)
-      const { originX, originY, n } = this.ground
-      this.grass.removeCandidates((fx, fy) => fx >= originX - 1 && fx <= originX + n && fy >= originY - 1 && fy <= originY + n)
-      this.scene.add(this.grass.object)
+      this.grass = new GrassTufts({
+        groundY: this.ground.groundY,
+        blocked: (x, z) => this.blockedForGrowth(x, z),
+        forest: (x, z) => this.fields.at(this.fields.forest, x, z),
+      })
+      this.scene.add(...this.grass.objects)
     })
     stage('boulders', () => {
       this.boulders = buildBoulders(grids)
@@ -193,13 +226,81 @@ export class VillageScene {
     this.rebuildBuildings()
     this.frame('aerial')
     this.trees?.update(this.camera.position, true)
-    this.grass?.update(this.camera.position)
+    this.grass?.update(this.camera.position, 0)
     this.startTimers()
     this.request()
     // real photo textures for the ground, after the first frame
-    if (this.terrain) {
-      void swapNeutral(this.terrain.fineMaterial, 'grass_lawn_diff.webp', () => this.request())
-      void swapNeutral(this.terrain.coarseMaterial, 'leafy_grass_diff.webp', () => this.request())
+    const base = `${import.meta.env.BASE_URL}world-city/textures/`
+    void loadPhotoSet(this.renderer, base, [
+      ['grass', 'grass_lawn_diff.webp'], ['leafy', 'leafy_grass_diff.webp'], ['dirt', 'dirt_floor_diff.webp'],
+      ['rock', 'river_small_rocks_diff.webp'], ['gravel', 'gravel_floor_02_diff.webp'], ['grassN', 'grass_lawn_nor_gl_256.webp', false],
+    ]).then((set) => {
+      if (this.disposed) return
+      for (const m of this.groundMats) m.apply(set)
+      this.request()
+    })
+  }
+
+  private terrainFine: ThreeMesh | null = null
+
+  /** True where nothing should grow: water and its banks, roads, building pads. */
+  private blockedForGrowth(x: number, z: number): boolean {
+    if (this.fields.at(this.fields.wet, x, z) > 0.25) return true
+    for (const r of this.padRects) if (x > r.x0 - 2 && x < r.x1 + 2 && z > r.z0 - 2 && z < r.z1 + 2) return true
+    for (const s of this.roadSegs) {
+      const dx = s.bx - s.ax, dz = s.bz - s.az
+      const t = Math.max(0, Math.min(1, ((x - s.ax) * dx + (z - s.az) * dz) / (dx * dx + dz * dz || 1)))
+      if (Math.hypot(x - (s.ax + dx * t), z - (s.az + dz * t)) < s.half + 1.5) return true
+    }
+    return false
+  }
+
+  private padRects: { x0: number; z0: number; x1: number; z1: number }[] = []
+  private roadSegs: { ax: number; az: number; bx: number; bz: number; half: number }[] = []
+
+  /** What the control map paints: recomputed when the layout changes. */
+  private controlInput() {
+    const g = this.ground
+    this.padRects = []
+    for (const b of this.layout.buildings) {
+      if (b.type === 'road') continue
+      const p = this.poseOf(b)
+      this.padRects.push({ x0: p.cx - p.W / 2, z0: p.cz - p.D / 2, x1: p.cx + p.W / 2, z1: p.cz + p.D / 2 })
+    }
+    this.roadSegs = []
+    const roads = this.roadLots()
+    const has = new Set(roads.map((r) => `${r.x},${r.y}`))
+    for (const r of roads) {
+      const c = g.lotCentre(r.x, r.y)
+      let arms = 0
+      for (const [dx, dy] of [[1, 0], [0, 1]] as const) {
+        if (has.has(`${r.x + dx},${r.y + dy}`)) {
+          const o = g.lotCentre(r.x + dx, r.y + dy)
+          this.roadSegs.push({ ax: c.x, az: c.z, bx: o.x, bz: o.z, half: 3.6 })
+          arms++
+        }
+      }
+      if (arms === 0) this.roadSegs.push({ ax: c.x - 5, az: c.z, bx: c.x + 5, bz: c.z, half: 3.6 })
+    }
+    const { sub, lot } = g
+    const size = (sub.N - 1) * sub.stepX
+    const f = this.fields
+    return {
+      x0: sub.x0, z0: sub.z0, size,
+      wet: (x: number, z: number) => Math.min(1, f.at(f.wet, x, z)),
+      forest: (x: number, z: number) => Math.min(1, f.at(f.forest, x, z)) * (0.15 + 0.85 * smoothstep(lot * 0.6, lot * 4, f.blockDist(x, z))),
+      lawn: (x: number, z: number) => 1 - smoothstep(lot * 0.3, lot * 2.6, f.blockDist(x, z)),
+      verges: this.roadSegs,
+      pads: this.padRects,
+    }
+  }
+
+  private rebakeControl() {
+    if (!this.ctlMat) return
+    const ctl = bakeControl(this.controlInput(), 256)
+    for (const m of this.groundMats) {
+      ;(m.U.uCtl.value as import('three').Texture | null)?.dispose()
+      m.U.uCtl.value = ctl.tex
     }
   }
 
@@ -225,6 +326,14 @@ export class VillageScene {
         if (grids.fine.water[idx] !== 0) continue
         const code = legend[grids.fine.biome[idx]]?.code ?? ''
         let p = density(code)
+        const cs = grids.fineScene(fx, fy)
+        // forests come in stands: a slow noise thickens some places and thins others
+        const nz = valueNoise(fx * 0.12 + 3.1, fy * 0.12 + 7.7) * 0.7 + valueNoise(fx * 0.31, fy * 0.31 + 1.3) * 0.3
+        p *= 0.12 + 2.1 * smoothstep(0.42, 0.68, nz)
+        // and gather along water
+        const wetHere = this.fields.wet[fy * w + fx]
+        if (wetHere > 0.02 && wetHere < 0.9 && !/desert|ice|tundra/.test(code)) p = Math.max(p, 0.55 * (1 - Math.abs(wetHere - 0.35)))
+        void cs
         if (p === 0) continue
         if (grids.fineSlopeAt(fx, fy) > 0.5) continue
         const inBlock = fx >= originX && fx < originX + n && fy >= originY && fy < originY + n
@@ -244,7 +353,7 @@ export class VillageScene {
       }
     }
     void lot
-    return spots.slice(0, 2600)
+    return spots.slice(0, 4200)
   }
 
   private occupied(lx: number, ly: number): boolean {
@@ -277,6 +386,7 @@ export class VillageScene {
     this.layout = layout
     this.rebuildRoads()
     this.rebuildBuildings()
+    this.rebakeControl()
     this.request()
   }
 
@@ -527,7 +637,7 @@ export class VillageScene {
     const floor = this.ground.groundY(cp.x, cp.z) + 3
     if (cp.y < floor) cp.y = floor
     this.trees?.update(cp)
-    this.grass?.update(cp)
+    this.grass?.update(cp, this.waterClock)
     this.request()
   }
 
@@ -612,10 +722,9 @@ export class VillageScene {
       if (this.disposed || this.contextLost || !this.active) return
       const now = Date.now() + (this.opts.clockSkewMs?.() ?? 0)
       let dirty = this.updateScaffolds(now)
-      if (this.water?.mesh && !this.reduced && performance.now() - this.lastMoved < 4000) {
+      if (this.waterMat && !this.reduced && performance.now() - this.lastMoved < 4000) {
         this.waterClock += WATER_TICK_MS / 1000
-        this.water.tick(this.waterClock)
-        this.water.setCamera(this.camera.position)
+        this.waterMat.uniforms.uTime.value = this.waterClock
         this.sky.material.uniforms.uTime.value = this.waterClock
         dirty = true
       }
@@ -656,7 +765,7 @@ export class VillageScene {
   verifyGrounding(): { checked: number; problems: string[] } {
     const rc = new Raycaster()
     rc.ray.direction.set(0, -1, 0)
-    const targets = this.terrain.objects.filter((o) => o.name === 'terrain-fine')
+    const targets = this.terrainFine ? [this.terrainFine] : []
     const problems: string[] = []
     let checked = 0
     for (const [id, p] of this.poses) {
@@ -675,11 +784,9 @@ export class VillageScene {
       if (hi - p.base > 0.02) problems.push(`${id} (${p.building.type}) sinks: ground ${hi.toFixed(2)} above base ${p.base.toFixed(2)}`)
       if (p.base - p.foundation > lo + 0.02) problems.push(`${id} (${p.building.type}) floats: foundation bottom ${(p.base - p.foundation).toFixed(2)} over ground ${lo.toFixed(2)}`)
     }
-    // everything else stands on groundY: it must be the rendered mesh's own height
-    const hitY = (x: number, z: number) => {
-      rc.ray.origin.set(x, 4000, z)
-      return rc.intersectObjects(targets, false)[0]?.point.y ?? NaN
-    }
+    // everything else stands on groundY: it must be the height of the rendered mesh's
+    // own vertex buffer (read triangle by triangle, which is what a ray would hit)
+    const hitY = (x: number, z: number) => this.meshHeightAt(x, z)
     const spots = this.treeList.filter((_, i) => i % 3 === 0)
     let treeBad = 0
     for (const t of spots) {
@@ -718,6 +825,18 @@ export class VillageScene {
     return { checked, problems }
   }
 
+  /** Height of the drawn ground mesh at x/z, from its vertex buffer. */
+  private meshHeightAt(x: number, z: number): number {
+    const { N, x0, z0, stepX, stepZ } = this.ground.sub
+    const pos = this.terrainFine!.geometry.attributes.position
+    const fx = (x - x0) / stepX, fz = (z - z0) / stepZ
+    const i = Math.max(0, Math.min(N - 2, Math.floor(fx))), j = Math.max(0, Math.min(N - 2, Math.floor(fz)))
+    const u = fx - i, v = fz - j
+    const y = (ii: number, jj: number) => pos.getY(jj * N + ii)
+    const a = y(i, j), b = y(i + 1, j), c = y(i, j + 1), d = y(i + 1, j + 1)
+    return u + v <= 1 ? a + (b - a) * u + (c - a) * v : d + (b - d) * (1 - v) + (c - d) * (1 - u)
+  }
+
   debug() {
     return { scene: this.scene, camera: this.camera, controls: this.controls, renderer: this.renderer }
   }
@@ -735,6 +854,11 @@ export class VillageScene {
     this.controls.removeEventListener('change', this.onChange)
     this.controls.dispose()
     this.terrain?.dispose()
+    this.terrainFine?.geometry.dispose()
+    for (const m of this.groundMats) { (m.U.uCtl.value as import('three').Texture | null)?.dispose(); m.mat.dispose() }
+    this.macro?.dispose()
+    this.waterNormals?.dispose()
+    this.waterMat?.dispose()
     this.water?.dispose()
     this.coarseWater?.dispose()
     this.grass?.dispose()

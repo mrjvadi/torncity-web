@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 
 // The app is served at https://webomm.ir404.site/v2/
 export default defineConfig({
-  base: '/v2/',
+  base: process.env.E2E_API ? '/' : '/v2/',
   plugins: [react()],
   // The build's own stamp (UTC), shown in the menu so a player can say which
   // version they are looking at.
@@ -37,5 +37,11 @@ export default defineConfig({
   },
   server: {
     host: true,
+    // a dev build against a local stack (VITE_API_BASE= VITE_WS_BASE=ws://<this host>, base /): same-origin proxies
+    // stand in for the reverse proxy that answers CORS in production
+    proxy: process.env.E2E_API ? {
+      '/api': process.env.E2E_API,
+      '/connection': { target: process.env.E2E_WS ?? '', ws: true },
+    } : undefined,
   },
 })

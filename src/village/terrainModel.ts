@@ -23,8 +23,10 @@ import type { WorldSampler } from './worldSampler'
 
 /** Fine grid side (lots) and coarse grid side (tiles). The fine window is 2.4 km,
  * the backdrop 19.5 km: a phone draws ~13k triangles for both. */
-export const FINE_LOTS = 80
+export const FINE_LOTS = 56
 export const COARSE_TILES = 64
+/** Ground mesh vertices per lot edge (a lot centre is always one of them). */
+export const GROUND_SUB = 3
 /** Below this a sea floor is not worth drawing deeper (the water hides it). */
 const MIN_ELEV_M = -30
 /** How far river/lake beds sit under their water. */
@@ -47,6 +49,10 @@ export interface VillageGround {
   lotCentre(x: number, y: number): { x: number; z: number }
   /** The lot under a scene x/z, or null outside the village grid. */
   lotAt(x: number, z: number): { x: number; y: number } | null
+  /** Vertices per lot edge of the ground mesh, and the height grid it is drawn from
+   * (raw metres, without FINE_GROUND_LIFT): (F-1)*SUB+1 squared, row-major, with the
+   * server's lot heights exactly at every SUB-th vertex. */
+  sub: { N: number; SUB: number; heights: Float32Array; x0: number; z0: number; stepX: number; stepZ: number }
   /** Water at a lot of the village. */
   isWaterLot(x: number, y: number): boolean
   /** Lowest/highest mesh height across a scene-space rectangle. */
@@ -106,7 +112,9 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
         const k = j * C + i
         cElev[k] = Math.max(MIN_ELEV_M, Math.round(s.elev))
         cBiome[k] = s.biome
-        cFlags[k] = s.flags
+        // a lake outside the fine window would be filled by the demo's flat patch at its rim height, floating
+        // over the slopes between: the backdrop keeps ocean and streams only, lakes are the fine grid's
+        cFlags[k] = s.flags & ~TILE_FLAG_LAKE
       }
     }
     const coarse: DecodedGrid = { w: C, h: C, elevation: cElev, biome: cBiome, water: cFlags }
@@ -210,14 +218,33 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
     const drawn = new Float32Array(F * F)
     for (let j = 0; j < F; j++) for (let i = 0; i < F; i++) drawn[j * F + i] = renderedFineElev(grids, i, j)
 
+    // Catmull-Rom through the drawn lot heights, SUB vertices per lot: smooth
+    // ground that still passes exactly through every lot's own height
+    const SUB = GROUND_SUB
+    const N = (F - 1) * SUB + 1
+    const heights = new Float32Array(N * N)
+    const cr = (a: number, b: number, c: number, d: number, t: number) =>
+      b + 0.5 * t * (c - a + t * (2 * a - 5 * b + 4 * c - d + t * (3 * (b - c) + d - a)))
+    const at = (i: number, j: number) => drawn[Math.max(0, Math.min(F - 1, j)) * F + Math.max(0, Math.min(F - 1, i))]
+    for (let sj = 0; sj < N; sj++) {
+      const fy = sj / SUB, j1 = Math.floor(fy), ty = fy - j1
+      for (let si = 0; si < N; si++) {
+        const fx = si / SUB, i1 = Math.floor(fx), tx = fx - i1
+        if (tx === 0 && ty === 0) { heights[sj * N + si] = at(i1, j1); continue }
+        const rows = [j1 - 1, j1, j1 + 1, j1 + 2].map((jj) => cr(at(i1 - 1, jj), at(i1, jj), at(i1 + 1, jj), at(i1 + 2, jj), tx))
+        heights[sj * N + si] = cr(rows[0], rows[1], rows[2], rows[3], ty)
+      }
+    }
+    const stepX = sx / SUB, stepZ = sz / SUB
+
     const groundY = (x: number, z: number): number => {
-      const fx = (x - p00.x) / sx
-      const fy = (z - p00.z) / sz
-      const i = Math.max(0, Math.min(F - 2, Math.floor(fx)))
-      const j = Math.max(0, Math.min(F - 2, Math.floor(fy)))
+      const fx = (x - p00.x) / stepX
+      const fy = (z - p00.z) / stepZ
+      const i = Math.max(0, Math.min(N - 2, Math.floor(fx)))
+      const j = Math.max(0, Math.min(N - 2, Math.floor(fy)))
       const u = Math.max(0, Math.min(1, fx - i))
       const v = Math.max(0, Math.min(1, fy - j))
-      const a = drawn[j * F + i], b = drawn[j * F + i + 1], c = drawn[(j + 1) * F + i], d = drawn[(j + 1) * F + i + 1]
+      const a = heights[j * N + i], b = heights[j * N + i + 1], c = heights[(j + 1) * N + i], d = heights[(j + 1) * N + i + 1]
       // the mesh's triangles are (a,c,b) and (b,c,d): diagonal b-c
       const y = u + v <= 1 ? a + (b - a) * u + (c - a) * v : d + (b - d) * (1 - v) + (c - d) * (1 - u)
       return y + FINE_GROUND_LIFT
@@ -225,6 +252,7 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
 
     return {
       grids, lot, n, originX, originY, groundY,
+      sub: { N, SUB, heights, x0: p00.x, z0: p00.z, stepX, stepZ },
       lotCentre: (x, y) => grids.fineScene(originX + x, originY + (n - 1 - y)),
       lotAt: (x, z) => {
         const lx = Math.round((x - p00.x) / sx - originX)
@@ -243,9 +271,9 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
         for (let a = 0; a <= steps; a++) for (let b = 0; b <= steps; b++) see(x0 + ((x1 - x0) * a) / steps, z0 + ((z1 - z0) * b) / steps)
         // and every mesh vertex inside: a peak between sample points would
         // otherwise poke through a floor laid at the sampled maximum
-        const i0 = Math.ceil((x0 - p00.x) / sx), i1 = Math.floor((x1 - p00.x) / sx)
-        const j0 = Math.ceil((z0 - p00.z) / sz), j1 = Math.floor((z1 - p00.z) / sz)
-        for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) see(p00.x + i * sx, p00.z + j * sz)
+        const i0 = Math.ceil((x0 - p00.x) / stepX), i1 = Math.floor((x1 - p00.x) / stepX)
+        const j0 = Math.ceil((z0 - p00.z) / stepZ), j1 = Math.floor((z1 - p00.z) / stepZ)
+        for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) see(p00.x + i * stepX, p00.z + j * stepZ)
         return { min, max }
       },
     }

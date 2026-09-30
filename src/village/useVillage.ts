@@ -50,7 +50,7 @@ let keySeq = 0
  * by its code. Writes carry an idempotency key. */
 export function useVillageCommand() {
   const toast = useToast()
-  return useCallback(async (command: string, args: Record<string, string> = {}, opts: { write?: boolean; silent?: boolean } = {}): Promise<VillageResult> => {
+  return useCallback(async (command: string, args: api.CommandArgs = {}, opts: { write?: boolean; silent?: boolean } = {}): Promise<VillageResult> => {
     try {
       const key = opts.write ? `web-v-${Date.now().toString(36)}-${++keySeq}` : undefined
       const res = await api.runCommand(command, args, key)

@@ -258,7 +258,18 @@ export class VillageStore {
       this.playersTimer = window.setTimeout(() => void this.refetchPlayers(), 400)
     }
     this.set({ lastEvent: ev, tick: this.snap.tick + 1 })
-    if (refetch) void this.refetchLayout()
+    if (refetch) void this.refetchTo(ev.layout_version && layout ? versionFor(layout, ev.layout_version) : null)
+  }
+
+  /** Fetches the layout and, when the publication named the version it will have
+   * and the answer is still the older one (the change had not committed yet),
+   * asks again a few times. */
+  private async refetchTo(expected: string | null): Promise<void> {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      await this.refetchLayout()
+      if (!expected || this.snap.layout?.version === expected) return
+      await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)))
+    }
   }
 }
 

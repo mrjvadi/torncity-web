@@ -153,7 +153,7 @@ export function useBuildMode(
   const next = useCallback(async () => {
     if (!s.code || !s.anchor || !fits) return
     setS((p) => ({ ...p, busy: true }))
-    const r = await cmd('settlement.build.place', { code: s.code, x: String(s.anchor.x), y: String(s.anchor.y), rotated: s.rotated ? 'true' : 'false' })
+    const r = await cmd('settlement.build.place', { code: s.code, x: s.anchor.x, y: s.anchor.y, rotated: s.rotated })
     setS((p) => (r.ok && r.res?.screen === 'settlement_build_confirm'
       ? { ...p, step: 'confirm', confirm: r.res.view as unknown as LotConfirmView, busy: false }
       : { ...p, busy: false }))
@@ -162,7 +162,7 @@ export function useBuildMode(
   const confirm = useCallback(async () => {
     if (!s.code || !s.anchor) return
     setS((p) => ({ ...p, busy: true }))
-    const r = await cmd('settlement.build.place', { code: s.code, x: String(s.anchor.x), y: String(s.anchor.y), rotated: s.rotated ? 'true' : 'false', confirm: 'confirm' }, { write: true })
+    const r = await cmd('settlement.build.place', { code: s.code, x: s.anchor.x, y: s.anchor.y, rotated: s.rotated, confirm: 'confirm' }, { write: true })
     if (r.ok) {
       toast.push(t('build.started'))
       void store?.refetchLayout()

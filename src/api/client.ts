@@ -1,12 +1,13 @@
 import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary, RealtimeToken, WorldInfo, VillageLayout, SettlementPlayers, PlayerStatus } from './types'
 import { report } from '../lib/reporter'
 
-const API_BASE = 'https://apimmo.ir404.site'
+// VITE_API_BASE / VITE_WS_BASE point a dev build at a local stack (never set in production builds)
+const API_BASE: string = import.meta.env.VITE_API_BASE ?? 'https://apimmo.ir404.site'
 const ASSET_BASE = 'https://webomm.ir404.site'
 // Centrifugo's WebSocket endpoint (src/api/realtime.ts); same host pattern
 // as API_BASE, defined the same way — a plain constant, no CDN, no
 // telegram.org/Google dependency (players are in Iran).
-const WS_BASE = 'wss://wsmmo.ir404.site'
+const WS_BASE: string = import.meta.env.VITE_WS_BASE ?? 'wss://wsmmo.ir404.site'
 
 const LS_ACCESS = 'tc.access_token'
 const LS_REFRESH = 'tc.refresh_token'
@@ -185,9 +186,13 @@ export function onView(fn: (view: Record<string, unknown>, screen: string) => vo
   return () => viewListeners.delete(fn)
 }
 
+/** Command arguments: strings, except where the contract names a number or a
+ * bool (settlement.build.place takes x and y as numbers, rotated as a bool). */
+export type CommandArgs = Record<string, string | number | boolean>
+
 export async function runCommand(
   command: string,
-  args: Record<string, string> = {},
+  args: CommandArgs = {},
   idempotencyKey?: string,
 ): Promise<CommandResponse> {
   const res = await authed<CommandResponse>('/api/v1/command', {
