@@ -111,7 +111,7 @@ export default function FoundingForm({ localArgs, openLocal }: ScreenProps) {
         <Card>
           <div className="ff-msg">
             <div className="ff-msg-icon">📝</div>
-            <div className="ff-msg-title display">{t('founding.none.title')}</div>
+            <div className="ff-msg-title">{t('founding.none.title')}</div>
             <div className="ff-msg-body">{t('founding.none.body')}</div>
           </div>
         </Card>
@@ -139,7 +139,7 @@ export default function FoundingForm({ localArgs, openLocal }: ScreenProps) {
           {view.state === 'other' && (
             <>
               <Emblem {...emblemProps(view, view.default_emblem)} size={96} />
-              <div className="ff-msg-title display">{t('founding.other.title', { founder: view.founder })}</div>
+              <div className="ff-msg-title">{t('founding.other.title', { founder: view.founder })}</div>
               <div className="ff-msg-body">{t('founding.other.body')}</div>
               <Chip tone="gold">{t('founding.time_left', { time: timeLeft(view.expires_at, Date.now()) })}</Chip>
             </>
@@ -147,14 +147,14 @@ export default function FoundingForm({ localArgs, openLocal }: ScreenProps) {
           {view.state === 'expired' && (
             <>
               <div className="ff-msg-icon">⏳</div>
-              <div className="ff-msg-title display">{t('founding.expired.title')}</div>
+              <div className="ff-msg-title">{t('founding.expired.title')}</div>
               <div className="ff-msg-body">{t('founding.expired.body')}</div>
             </>
           )}
           {view.state === 'founded' && (
             <>
               <div className="ff-msg-icon">🏡</div>
-              <div className="ff-msg-title display">{t('founding.founded.title', { name: view.settlement_name ?? '' })}</div>
+              <div className="ff-msg-title">{t('founding.founded.title', { name: view.settlement_name ?? '' })}</div>
               <div className="ff-msg-body">{t('founding.founded.body')}</div>
               {bootstrap?.settlement?.id === view.settlement_id || view.settlement_id
                 ? <PrimaryButton onClick={() => void goHome()}>{t('founding.founded.go')}</PrimaryButton>
@@ -291,7 +291,7 @@ function Editor({ view, onDone, onBack, toast }: {
 
       <Card tone="emerald" className="ff-preview">
         <div className="ff-preview-tag">{t('founding.preview')}</div>
-        <Emblem shape={f.emblem.shape} colorA={colorA} colorB={colorB} icon={f.emblem.icon} size={104} />
+        <Emblem shape={f.emblem.shape} colorA={colorA} colorB={colorB} icon={f.emblem.icon} size={76} />
         <div className="ff-preview-name display">{f.name.trim() || t('founding.preview_name_empty')}</div>
         {f.motto.trim() && <div className="ff-preview-motto">«{f.motto.trim()}»</div>}
         {(f.currencyName.trim() || f.currencyCode) && (
