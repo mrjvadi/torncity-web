@@ -947,4 +947,5 @@ export const uiEn: Record<UiKey, string> = {
   'profile.travel': 'Intercity travel',
   'common.prev': 'Previous',
   'common.next': 'Next',
+  'toast.unnamed': 'An item',
 }

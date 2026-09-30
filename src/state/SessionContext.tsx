@@ -267,15 +267,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const exec = useCallback(async (command: string, args: Record<string, string> = {}) => {
     try {
       const res = await api.runCommand(command, args, `web-${Date.now().toString(36)}`)
+      // only the answer to a command the player just ran is toasted here;
+      // background refreshes (refreshProfile, screens' own fetches) never are
       if (!res.ok && res.error) {
-        toast.push(res.error.message)
+        toast.push(res.error.message, { kind: 'error', user: true })
       } else if (res.notice) {
-        toast.push(res.notice.text)
+        toast.push(res.notice.text, { kind: res.notice.alert ? 'warning' : undefined, user: true })
       }
       void refreshProfile()
       return res
     } catch (e) {
-      toast.push(friendlyError(e))
+      toast.push(friendlyError(e), { kind: 'error', user: true })
       report('command', `${command} failed: ${String(e)}`)
       return null
     }

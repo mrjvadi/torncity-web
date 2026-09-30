@@ -945,6 +945,7 @@ export const uiFa = {
   'profile.travel': 'سفر بین‌شهری',
   'common.prev': 'قبلی',
   'common.next': 'بعدی',
+  'toast.unnamed': 'یک مورد',
 } as const
 
 export type UiKey = keyof typeof uiFa

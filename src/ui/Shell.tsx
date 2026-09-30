@@ -14,6 +14,7 @@ import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 import { foundingDraftFromLaunch } from '../lib/telegram'
 import * as api from '../api/client'
 import { t } from '../i18n'
+import { useToast } from '../state/ToastContext'
 import { NavCtx } from '../state/NavContext'
 
 /** The village tab: the player's village, or the call to found one. Support
@@ -76,6 +77,8 @@ export default function Shell() {
   }, [])
 
   // the screens opened on the way, so the header's back returns to the previous one
+  const toastApi = useToast()
+  useEffect(() => { toastApi.bindOpener((command, args) => run(command, args)); return () => toastApi.bindOpener(null) })
   const [hist, setHist] = useState<ScreenKey[]>([])
 
   /** The screen a tab opens on. */

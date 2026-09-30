@@ -969,3 +969,4 @@ profile.map | نقشه‌ی شهر | City map
 profile.travel | سفر بین‌شهری | Intercity travel
 common.prev | قبلی | Previous
 common.next | بعدی | Next
+toast.unnamed | یک مورد | An item
