@@ -5,6 +5,7 @@
 // settlement channel reports a change.
 
 import { useEffect, useState } from 'react'
+import DonateSheet from './Donate'
 import type { ScreenProps } from '../types'
 import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
@@ -25,9 +26,10 @@ const back = (openLocal: ScreenProps['openLocal']) => () => openLocal('village_h
 
 // -- overview ----------------------------------------------------------------------------------
 
-export function Overview({ response, openLocal }: ScreenProps) {
+export function Overview({ response, openLocal, localArgs }: ScreenProps) {
   const cat = useBuildingCatalogue()
   const { view: v, loading, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
+  const [donate, setDonate] = useState(!!localArgs?.donate)
   if (loading && !v) return <ScreenScroll><Header title={t('overview.title')} tone="emerald" onBack={back(openLocal)} /></ScreenScroll>
   const bars: { key: Key; frac: number; color: string }[] = v ? [
     { key: 'overview.food', frac: v.food_percent / 100, color: '#4cc47e' },
@@ -47,6 +49,11 @@ export function Overview({ response, openLocal }: ScreenProps) {
               <div><div className="nx-stat-label">{t('overview.population')}</div><div className="display" style={{ fontSize: 20 }}><span className="vs-ltr">{formatNumber(v.population)} / {formatNumber(v.population_cap)}</span></div></div>
               <div><div className="nx-stat-label">{t('overview.treasury')}</div><div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
             </div>
+            {v.resident !== false && (
+              <div className="vs-btns">
+                <Slab tone="gold" radius={12} lip={3} onClick={() => setDonate(true)}>{t('village.btn.donate')}</Slab>
+              </div>
+            )}
           </Card>
           <Card>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -68,6 +75,7 @@ export function Overview({ response, openLocal }: ScreenProps) {
           </div>
         </>
       )}
+      <DonateSheet open={donate} onClose={() => setDonate(false)} onDone={() => void refresh()} />
     </ScreenScroll>
   )
 }

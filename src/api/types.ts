@@ -385,6 +385,21 @@ export interface VillageOverviewView {
   literacy_percent: number
   treasury: number
   buildings: { role: string; building: Named; tier: number }[] | null
+  /** The starter city whose services are a journey away (contract 1.4). */
+  support?: { code: string; name: string }
+  resident?: boolean
+}
+
+/** `settlement.donate`: the amounts, the confirm and the result (contract 1.4). */
+export interface DonateView {
+  village: string
+  amount: number
+  presets: number[] | null
+  min: number
+  max: number
+  treasury: number
+  cash: number
+  settlement_id: string
 }
 
 export interface BuildLineView {

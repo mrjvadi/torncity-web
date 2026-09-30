@@ -5,8 +5,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ScreenProps } from '../types'
-import { Chip, Emboss, Frame, Plate, Slab } from '../../kit'
+import { Emboss, Plate, Slab } from '../../kit'
 import { Header } from '../native/kit/Parts'
+import Emblem from '../../lib/emblem'
+import { emblemHex } from '../../lib/emblemPalette'
+import BottomSheet from '../../ui/BottomSheet'
+import { money } from '../native/kit/format'
+import DonateSheet from './Donate'
 import { t } from '../../i18n'
 import { useSession } from '../../state/SessionContext'
 import { useToast } from '../../state/ToastContext'
@@ -22,14 +27,9 @@ import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
 import './village.css'
 
-const NAV: { key: string; icon: string; palette: 'gold' | 'emerald' | 'violet' | 'sapphire' | 'amber'; label: Parameters<typeof t>[0]; local: string }[] = [
-  { key: 'progress', icon: 'clock', palette: 'amber', label: 'village.btn.progress', local: 'village_progress' },
-  { key: 'knowledge', icon: 'book', palette: 'violet', label: 'village.btn.knowledge', local: 'village_knowledge' },
-  { key: 'who', icon: 'society', palette: 'emerald', label: 'village.btn.who', local: 'village_who' },
-  { key: 'overview', icon: 'chart', palette: 'sapphire', label: 'village.btn.overview', local: 'village_overview' },
-]
-
 export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
+  const [infoOpen, setInfoOpen] = useState(false)
+  const [donateOpen, setDonateOpen] = useState(false)
   const id = useSettlementId(localArgs?.id)
   const v = useVillage(id)
   const { layout, ground, world, store } = v
@@ -50,6 +50,13 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
   const overview = useVillageView<VillageOverviewView>('settlement.overview', null, {}, own)
   const build = useBuildMode(store, layout, sceneRef, cat)
   const tapRef = useRef<(lot: { x: number; y: number } | null, bid: string | null) => void>(() => undefined)
+
+  // «ساخت» in the menu opens the village straight in build mode
+  const wantBuild = useRef(!!localArgs?.build)
+  useEffect(() => {
+    if (wantBuild.current && sceneReady && layout?.viewer.can_place) { wantBuild.current = false; void build.enter() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneReady, layout?.viewer.can_place])
 
   // the ground (chunks -> grids) is made on request; only this screen wants it
   useEffect(() => {
@@ -197,13 +204,12 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
       </div>
 
       <div className="vh-top" ref={topRef}>
-        <HeaderBar title={name} onBack={() => openLocal('society_hub')} onRefresh={() => store?.recover()} />
-        <div className="vh-chips">
-          <Chip tone="#3f8a5a" fontSize={12}>{t(`village.tier.${tier}` as never)}</Chip>
-          {literacy !== null && <Chip tone="#6a4bb8" fontSize={12}>{t('village.literacy', { p: literacy })}</Chip>}
-          {online !== undefined && <Chip tone="#2b7fc4" fontSize={12}>{t('village.online', { n: online })}</Chip>}
-          {layout && <Chip tone={canPlace ? '#b8860b' : '#5a6078'} fontSize={12}>{canPlace ? t('village.head') : member ? t('village.member') : t('village.visitor')}</Chip>}
-        </div>
+        <button className="vh-pill-btn" onClick={() => setInfoOpen(true)} aria-label={t('village.pill.aria')}>
+          {bootstrap?.settlement?.emblem
+            ? <Emblem shape={bootstrap.settlement.emblem.shape} colorA={emblemHex(bootstrap.settlement.emblem.color_a)} colorB={emblemHex(bootstrap.settlement.emblem.color_b)} icon={bootstrap.settlement.emblem.icon} size={18} />
+            : <Emboss name="house" palette="gold" size={16} />}
+          <span className="vh-pill-name">{name}</span>
+        </button>
         {layout && !member && <div className="vh-note">{t('village.coarse_note')}</div>}
       </div>
 
@@ -219,25 +225,29 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
             onExit={build.exit} onChoose={(c) => void build.choose(c)} onRotate={() => void build.rotate()}
             onNext={() => void build.next()} onConfirm={() => void build.confirm()} onBack={build.back}
           />
-        ) : member ? (
-          <Frame radius={20}>
-            <div className="vh-nav">
-              {canPlace && (
-                <button className="vh-nav-btn" onClick={() => void build.enter()}>
-                  <Plate size={46} rim="#ffd66b"><Emboss name="house" palette="gold" size={28} /></Plate>
-                  <span>{t('village.btn.build')}</span>
-                </button>
-              )}
-              {NAV.map((n) => (
-                <button key={n.key} className="vh-nav-btn" onClick={() => openLocal(n.local)}>
-                  <Plate size={46}><Emboss name={n.icon} palette={n.palette} size={28} /></Plate>
-                  <span>{t(n.label)}</span>
-                </button>
-              ))}
-            </div>
-          </Frame>
         ) : null}
       </div>
+      {!inBuild && canPlace && member && (
+        <button className="vh-fab" onClick={() => void build.enter()} aria-label={t('village.btn.build')}>
+          <Plate size={54} rim="#ffd66b"><Emboss name="house" palette="gold" size={32} /></Plate>
+          <span>{t('village.build_fab')}</span>
+        </button>
+      )}
+
+      <BottomSheet open={infoOpen} onClose={() => setInfoOpen(false)} title={t('village.sheet.title', { name })}>
+        <div className="vh-info">
+          <InfoRow label={t('village.sheet.tier')} value={t(`village.tier.${tier}` as never)} />
+          {literacy !== null && <InfoRow label={t('village.sheet.literacy')} value={`${literacy}%`} />}
+          {online !== undefined && <InfoRow label={t('village.sheet.online')} value={String(online)} />}
+          {layout && <InfoRow label={t('village.sheet.role')} value={canPlace ? t('village.head') : member ? t('village.member') : t('village.visitor')} />}
+          {own && overview.view && <InfoRow label={t('village.sheet.treasury')} value={money(overview.view.treasury)} gold />}
+        </div>
+        <div className="vh-sheet-actions">
+          <Slab tone="steel" radius={14} lip={4} onClick={() => { setInfoOpen(false); openLocal('village_overview') }}>{t('village.sheet.details')}</Slab>
+          {own && member && <Slab tone="gold" radius={14} lip={4} onClick={() => { setInfoOpen(false); setDonateOpen(true) }}>{t('village.sheet.donate')}</Slab>}
+        </div>
+      </BottomSheet>
+      <DonateSheet open={donateOpen} onClose={() => setDonateOpen(false)} onDone={() => void overview.refresh()} />
 
       <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)} />
 
@@ -250,6 +260,10 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
       )}
     </div>
   )
+}
+
+function InfoRow({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
+  return <div className="vh-info-row"><span>{label}</span><b style={gold ? { color: 'var(--gold)' } : undefined}>{value}</b></div>
 }
 
 function HeaderBar({ title, onBack, onRefresh }: { title: string; onBack?: () => void; onRefresh?: () => void }) {

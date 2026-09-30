@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import type { ReactNode } from 'react'
 
 interface BottomSheetProps {
@@ -9,7 +10,10 @@ interface BottomSheetProps {
 
 export default function BottomSheet({ open, onClose, children, title }: BottomSheetProps) {
   if (!open) return null
-  return (
+  // Rendered at the document body, not inside the screen that asked: a sheet
+  // opened from a screen with its own stacking context (the village's 3D
+  // view, a scroller) would otherwise sit under the dock and the menus.
+  return createPortal(
     <div className="sheet-backdrop" onClick={onClose}>
       <div className="sheet-panel" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-grip" />
@@ -17,7 +21,8 @@ export default function BottomSheet({ open, onClose, children, title }: BottomSh
         {children}
       </div>
       <SheetStyles />
-    </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -27,7 +32,7 @@ function SheetStyles() {
       .sheet-backdrop {
         position: fixed; inset: 0; background: rgba(3,4,10,0.65);
         display: flex; align-items: flex-end; justify-content: center;
-        z-index: 900; backdrop-filter: blur(2px);
+        z-index: 5000; backdrop-filter: blur(2px);
       }
       .sheet-panel {
         width: 100%; max-width: 520px;
@@ -35,8 +40,9 @@ function SheetStyles() {
         border: 1px solid var(--gold-soft);
         border-bottom: none;
         border-radius: 24px 24px 0 0;
-        padding: 10px 18px calc(20px + var(--safe-b));
-        max-height: 78vh;
+        padding: 10px 18px calc(20px + var(--safe-b, env(safe-area-inset-bottom, 0px)));
+        max-height: min(78vh, calc(100dvh - var(--safe-t, 0px) - 24px));
+        overscroll-behavior: contain;
         overflow-y: auto;
         box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
         animation: sheet-up 0.22s ease-out;
