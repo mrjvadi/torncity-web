@@ -5,8 +5,8 @@
 // spent by opening a sheet. All render at the document body (BottomSheet).
 
 import { useEffect, useState } from 'react'
-import BottomSheet from '../../ui/BottomSheet'
-import { Emboss, Plate, Slab } from '../../kit'
+import Popup, { ActionButton, ActionRow, CostSummary, Hero, RequirementList, Medallion, Note, Section, StatCard, StatGrid } from '../../ui/Popup'
+import { Emboss } from '../../kit'
 import { t } from '../../i18n'
 import { money } from '../native/kit/format'
 import { useToast } from '../../state/ToastContext'
@@ -19,10 +19,6 @@ import { durationText } from './common'
 import './village.css'
 
 type Lot = { x: number; y: number }
-
-function Fact({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
-  return <div className="vh-info-row"><span>{label}</span><b style={gold ? { color: 'var(--gold)' } : undefined}>{value}</b></div>
-}
 
 function materialLine(m: PrivateMaterialView, cat: Map<string, CatalogueBuilding>): string {
   void cat
@@ -66,36 +62,35 @@ export function BuyLotSheet({ lot, price, onClose, store }: { lot: Lot | null; p
   }
 
   return (
-    <BottomSheet open={!!lot} onClose={onClose} title={t('citizen.buy.title')}>
+    <Popup
+      open={!!lot} onClose={onClose} title={t('citizen.buy.title')} tone="green" dismissible={!busy}
+      footer={lot && (done
+        ? <ActionButton tone="gold" onClick={onClose}>{t('common.close')}</ActionButton>
+        : (
+          <ActionRow>
+            <ActionButton tone="steel" small onClick={onClose} disabled={busy}>{t('common.cancel')}</ActionButton>
+            <ActionButton tone="green" onClick={() => void buy()} disabled={busy || !view || (!!view && view.cash < view.price)} reason={view && view.cash < view.price ? t('citizen.buy.no_cash') : undefined}>{t('citizen.buy.confirm', { p: money(view?.price ?? price ?? 0) })}</ActionButton>
+          </ActionRow>
+        ))}
+    >
       {lot && (
         <>
-          <div className="vh-sheet-row">
-            <Plate size={52} square><Emboss name="x_field" palette="emerald" size={32} /></Plate>
-            <div>
-              <div className="vh-sheet-meta">{t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })}</div>
-              <div className="vh-sheet-meta">{t('citizen.buy.price')}: <b style={{ color: 'var(--gold)' }}>{money(view?.price ?? price ?? 0)}</b></div>
-            </div>
-          </div>
-          {view && (
-            <div className="vh-info">
-              <Fact label={t('citizen.buy.cash')} value={money(done ? view.cash : view.cash)} />
-              {!done && <Fact label={t('citizen.buy.after')} value={money(view.cash - view.price)} gold />}
-            </div>
+          <Hero><Medallion icon="x_field" palette="emerald" ring="#2f9d5b" chip={t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })} /></Hero>
+          {view && !done && (
+            <RequirementList lines={[
+              { icon: 'money', palette: 'emerald', label: t('citizen.buy.cash'), state: view.cash >= view.price ? 'met' : 'missing', detail: t('citizen.buy.need_d', { have: money(view.cash), need: money(view.price) }) },
+            ]} />
           )}
-          {!done && <div className="vh-hint">{t('citizen.buy.note')}</div>}
-          {note && <div className={`vh-hint ${note.tone}`}>{note.text}</div>}
-          {done && <div className="vh-hint good">{t('citizen.buy.done')}</div>}
-          <div className="vh-sheet-actions">
-            {done
-              ? <Slab tone="gold" radius={14} lip={4} onClick={onClose}>{t('common.close')}</Slab>
-              : <>
-                <Slab tone="steel" radius={14} lip={4} onClick={onClose} disabled={busy}>{t('common.cancel')}</Slab>
-                <Slab tone="green" radius={14} lip={4} onClick={() => void buy()} disabled={busy || !view}>{t('citizen.buy.confirm', { p: money(view?.price ?? price ?? 0) })}</Slab>
-              </>}
-          </div>
+          <CostSummary
+            lines={[{ label: t('citizen.buy.price'), amount: money(view?.price ?? price ?? 0) }]}
+            total={{ label: view && !done ? t('citizen.buy.after') : undefined, amount: view && !done ? money(view.cash - view.price) : money(view?.price ?? price ?? 0) }}
+          />
+          {!done && <Note>{t('citizen.buy.note')}</Note>}
+          {note && <Note tone={note.tone}>{note.text}</Note>}
+          {done && <Note tone="good">{t('citizen.buy.done')}</Note>}
         </>
       )}
-    </BottomSheet>
+    </Popup>
   )
 }
 
@@ -103,20 +98,17 @@ export function BuyLotSheet({ lot, price, onClose, store }: { lot: Lot | null; p
 
 export function TakenLotSheet({ lot, owner, onClose }: { lot: Lot | null; owner?: string; onClose: () => void }) {
   return (
-    <BottomSheet open={!!lot} onClose={onClose} title={owner ? t('citizen.taken_by', { name: owner }) : t('citizen.taken')}>
+    <Popup
+      open={!!lot} onClose={onClose} title={owner ? t('citizen.taken_by', { name: owner }) : t('citizen.taken')} tone="navy"
+      footer={<ActionButton tone="steel" onClick={onClose}>{t('common.close')}</ActionButton>}
+    >
       {lot && (
         <>
-          <div className="vh-sheet-row">
-            <Plate size={52} square><Emboss name="m_lock" palette="steel" size={30} /></Plate>
-            <div>
-              <div className="vh-sheet-meta">{t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })}</div>
-              <div className="vh-sheet-meta">{t('citizen.taken_note')}</div>
-            </div>
-          </div>
-          <div className="vh-sheet-actions"><Slab tone="steel" radius={14} lip={4} onClick={onClose}>{t('common.close')}</Slab></div>
+          <Hero><Medallion icon="m_lock" palette="steel" ring="#8e97b4" chip={t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })} /></Hero>
+          <Note>{t('citizen.taken_note')}</Note>
         </>
       )}
-    </BottomSheet>
+    </Popup>
   )
 }
 
@@ -163,15 +155,24 @@ export function HouseSheet({ lot, cat, onClose, store }: { lot: Lot | null; cat:
   }
 
   return (
-    <BottomSheet open={!!lot} onClose={onClose} title={t('citizen.build.title')}>
+    <Popup
+      open={!!lot} onClose={onClose} title={t('citizen.build.title')} tone="gold" dismissible={!busy}
+      footer={lot && bill && (
+        <ActionRow>
+          <ActionButton tone="steel" small onClick={() => setBill(null)} disabled={busy}>{t('citizen.build.back')}</ActionButton>
+          <ActionButton tone="green" onClick={() => void build()} disabled={busy || bill.cash < bill.total} reason={bill.cash < bill.total ? t('citizen.build.short') : undefined}>{t('citizen.build.start', { p: money(bill.total) })}</ActionButton>
+        </ActionRow>
+      )}
+    >
       {lot && !bill && (
         <>
-          <div className="vh-confirm" style={{ margin: '0 0 6px' }}>{t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })} · {t('citizen.build.pick')}</div>
-          {menu && (menu.lines ?? []).length === 0 && <div className="vh-hint">{t('citizen.build.empty')}</div>}
+          <Hero><Medallion icon="house" palette="gold" ring="#d99a1f" chip={t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })} /></Hero>
+          <Section>{t('citizen.build.pick')}</Section>
+          {menu && (menu.lines ?? []).length === 0 && <Note>{t('citizen.build.empty')}</Note>}
           <div className="vc-list">
             {(menu?.lines ?? []).map((l) => (
               <button key={l.building.code} className={`vc-line${l.affordable ? '' : ' locked'}`} disabled={busy} onClick={() => void pick(l)}>
-                <Plate size={40} square><Emboss name="house" palette={l.home ? 'gold' : 'amber'} size={26} /></Plate>
+                <Emboss name="house" palette={l.home ? 'gold' : 'amber'} size={34} />
                 <span className="vc-line-text">
                   <span className="vc-line-name">{buildingName(cat, l.building.code, l.building.name)}</span>
                   <span className="vc-line-sub">{durationText(l.build_time_seconds)} · {l.footprint_w}×{l.footprint_h}</span>
@@ -181,34 +182,29 @@ export function HouseSheet({ lot, cat, onClose, store }: { lot: Lot | null; cat:
               </button>
             ))}
           </div>
-          {!menu && <div className="vh-hint">…</div>}
-          <div className="vh-hint">{t('citizen.build.pay_note')}</div>
+          {!menu && <Note>…</Note>}
+          <Note>{t('citizen.build.pay_note')}</Note>
         </>
       )}
       {lot && bill && (
         <>
-          <div className="vh-sheet-row">
-            <Plate size={52} square><Emboss name="house" palette="gold" size={32} /></Plate>
-            <div>
-              <div className="vh-sheet-meta" style={{ color: 'var(--text)' }}>{buildingName(cat, bill.building.code, bill.building.name)}</div>
-              <div className="vh-sheet-meta">{t('citizen.buy.lot', { x: bill.x + 1, y: bill.y + 1 })}</div>
-            </div>
-          </div>
-          <div className="vh-info">
-            <Fact label={t('citizen.build.cost')} value={money(bill.cost_money)} />
-            <Fact label={t('citizen.build.permit')} value={money(bill.permit_fee)} />
-            {bill.materials_cost > 0 && <Fact label={t('citizen.build.materials')} value={money(bill.materials_cost)} />}
-            <Fact label={t('citizen.build.total')} value={money(bill.total)} gold />
-            <Fact label={t('citizen.build.time')} value={durationText(bill.build_time_seconds)} />
-          </div>
-          {(bill.materials ?? []).map((m) => <div key={m.component.code} className="vh-hint">{materialLine(m, cat)}</div>)}
-          <div className="vh-sheet-actions">
-            <Slab tone="steel" radius={14} lip={4} onClick={() => setBill(null)} disabled={busy}>{t('citizen.build.back')}</Slab>
-            <Slab tone="green" radius={14} lip={4} onClick={() => void build()} disabled={busy || bill.cash < bill.total}>{t('citizen.build.start', { p: money(bill.total) })}</Slab>
-          </div>
+          <Hero><Medallion icon="house" palette="gold" ring="#d99a1f" chip={buildingName(cat, bill.building.code, bill.building.name)} /></Hero>
+          <RequirementList lines={[
+            { icon: 'money', palette: 'emerald', label: t('citizen.buy.cash'), state: bill.cash >= bill.total ? 'met' : 'missing', detail: t('citizen.buy.need_d', { have: money(bill.cash), need: money(bill.total) }) },
+            { icon: 'stopwatch', palette: 'sapphire', label: t('citizen.build.time'), state: 'info', price: durationText(bill.build_time_seconds) },
+          ]} />
+          <CostSummary
+            lines={[
+              { label: t('citizen.build.cost'), amount: money(bill.cost_money) },
+              { label: t('citizen.build.permit'), amount: money(bill.permit_fee) },
+              ...(bill.materials_cost > 0 ? [{ label: t('citizen.build.materials'), amount: money(bill.materials_cost) }] : []),
+            ]}
+            total={{ label: t('citizen.build.total'), amount: money(bill.total) }}
+          />
+          {(bill.materials ?? []).map((m) => <Note key={m.component.code}>{materialLine(m, cat)}</Note>)}
         </>
       )}
-    </BottomSheet>
+    </Popup>
   )
 }
 
@@ -246,45 +242,47 @@ export function MineSheet({ open, cat, onClose, store }: { open: boolean; cat: M
 
   const lots = view?.lots ?? []
   return (
-    <BottomSheet open={open} onClose={onClose} title={t('citizen.mine.title')}>
+    <Popup
+      open={open} onClose={onClose} title={t('citizen.mine.title')} tone="gold" dismissible={!busy}
+      footer={view && (
+        <ActionRow>
+          {view.home && (
+            <ActionButton tone="green" small disabled={busy || !view.can_rest} onClick={() => void act('settlement.home.rest')}>
+              {view.can_rest ? t('citizen.mine.rest') : t('citizen.mine.rest_wait', { t: durationText(view.rest_wait_seconds) })}
+            </ActionButton>
+          )}
+          {view.debt > 0 && (
+            <ActionButton tone="gold" small disabled={busy} onClick={() => void act('settlement.tax.pay')}>{t('citizen.mine.pay', { p: money(view.debt) })}</ActionButton>
+          )}
+          {!view.home && view.debt <= 0 && <ActionButton tone="steel" small onClick={onClose}>{t('common.close')}</ActionButton>}
+        </ActionRow>
+      )}
+    >
       {view && (
         <>
-          <div className="vh-sheet-row">
-            <Plate size={52} square><Emboss name="house" palette={view.home ? 'gold' : 'steel'} size={32} /></Plate>
-            <div>
-              <div className="vh-sheet-meta" style={{ color: 'var(--text)' }}>
-                {view.home ? `${t('citizen.mine.home')}: ${buildingName(cat, view.home.code, view.home.name)}` : t('citizen.mine.no_home')}
-              </div>
-              <div className="vh-sheet-meta">{t('citizen.mine.cash')}: <b style={{ color: 'var(--gold)' }}>{money(view.cash)}</b></div>
-            </div>
-          </div>
-          <div className="vh-info">
-            <div className="vh-sheet-meta" style={{ padding: '0 4px' }}>{t('citizen.mine.lots')}</div>
-            {lots.length === 0 && <div className="vh-hint">{t('citizen.mine.no_lots')}</div>}
-            {lots.map((l) => (
-              <Fact key={`${l.x}-${l.y}`}
-                label={t('citizen.buy.lot', { x: l.x + 1, y: l.y + 1 })}
-                value={l.building ? buildingName(cat, l.building) : t('citizen.mine.lot_bare')} />
-            ))}
-            <Fact label={t('citizen.mine.assessed')} value={money(view.assessed)} />
-            <Fact label={t('citizen.mine.tax')} value={`${money(view.tax_per_period)} (${t('citizen.pct', { p: view.tax_bps / 100 })})`} />
-            {view.debt > 0 && <Fact label={t('citizen.mine.debt')} value={money(view.debt)} gold />}
-          </div>
-          <div className="vh-sheet-actions">
-            {view.home && (
-              <Slab tone="green" radius={14} lip={4} disabled={busy || !view.can_rest} onClick={() => void act('settlement.home.rest')}>
-                {view.can_rest ? t('citizen.mine.rest') : t('citizen.mine.rest_wait', { t: durationText(view.rest_wait_seconds) })}
-              </Slab>
-            )}
-            {view.debt > 0 && (
-              <Slab tone="gold" radius={14} lip={4} disabled={busy} onClick={() => void act('settlement.tax.pay')}>{t('citizen.mine.pay', { p: money(view.debt) })}</Slab>
-            )}
-            {!view.home && view.debt <= 0 && <Slab tone="steel" radius={14} lip={4} onClick={onClose}>{t('common.close')}</Slab>}
-          </div>
+          <Hero><Medallion icon="house" palette={view.home ? 'gold' : 'steel'} ring="#d99a1f" chip={view.home ? buildingName(cat, view.home.code, view.home.name) : t('citizen.mine.no_home_chip')} /></Hero>
+          {!view.home && <Note>{t('citizen.mine.no_home')}</Note>}
+          <StatGrid>
+            <StatCard icon="money" palette="emerald" label={t('citizen.mine.cash')} value={money(view.cash)} />
+            <StatCard icon="chart" palette="sapphire" label={t('citizen.mine.assessed')} value={money(view.assessed)} />
+            <StatCard icon="quill" palette="violet" label={t('citizen.mine.tax')} value={`${money(view.tax_per_period)} (${t('citizen.pct', { p: view.tax_bps / 100 })})`} />
+            {view.debt > 0 && <StatCard icon="x_wanted" palette="ruby" label={t('citizen.mine.debt')} value={money(view.debt)} />}
+          </StatGrid>
+          <Section>{t('citizen.mine.lots')}</Section>
+          {lots.length === 0 && <Note>{t('citizen.mine.no_lots')}</Note>}
+          {lots.length > 0 && (
+            <StatGrid>
+              {lots.map((l) => (
+                <StatCard key={`${l.x}-${l.y}`} icon={l.building ? 'house' : 'x_field'} palette={l.building ? 'gold' : 'emerald'}
+                  label={t('citizen.buy.lot', { x: l.x + 1, y: l.y + 1 })}
+                  value={l.building ? buildingName(cat, l.building) : t('citizen.mine.lot_bare')} />
+              ))}
+            </StatGrid>
+          )}
         </>
       )}
-      {!view && <div className="vh-hint">…</div>}
-    </BottomSheet>
+      {!view && <Note>…</Note>}
+    </Popup>
   )
 }
 
@@ -292,12 +290,12 @@ export function MineSheet({ open, cat, onClose, store }: { open: boolean; cat: M
 
 export function WorkSheet({ open, city, onClose }: { open: boolean; city: string; onClose: () => void }) {
   return (
-    <BottomSheet open={open} onClose={onClose} title={t('citizen.work.title')}>
-      <div className="vh-sheet-row">
-        <Plate size={52} square><Emboss name="gears" palette="amber" size={32} /></Plate>
-        <div className="vh-sheet-meta" style={{ lineHeight: 1.8 }}>{t('citizen.work.body', { city })}</div>
-      </div>
-      <div className="vh-sheet-actions"><Slab tone="steel" radius={14} lip={4} onClick={onClose}>{t('common.close')}</Slab></div>
-    </BottomSheet>
+    <Popup
+      open={open} onClose={onClose} title={t('citizen.work.title')} tone="navy"
+      footer={<ActionButton tone="steel" onClick={onClose}>{t('common.close')}</ActionButton>}
+    >
+      <Hero><Medallion icon="gears" palette="amber" ring="#3552c8" /></Hero>
+      <Note>{t('citizen.work.body', { city })}</Note>
+    </Popup>
   )
 }

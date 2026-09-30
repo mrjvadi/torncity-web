@@ -15,7 +15,7 @@ import type { Action, CommandResponse } from '../../../api/types'
 import { toWesternDigits } from '../../../lib/persian'
 import { cleanLabel } from './format'
 import Icon from '../../../ui/Icon'
-import BottomSheet from '../../../ui/BottomSheet'
+import Popup, { ActionButton as PopupAction, ActionRow, Note } from '../../../ui/Popup'
 import { isRtl, t } from '../../../i18n'
 import './actions.css'
 
@@ -106,7 +106,10 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
         </div>
       )}
 
-      <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput ? cleanLabel(pendingInput.label) : undefined}>
+      <Popup
+        open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput ? cleanLabel(pendingInput.label) : undefined} tone="navy"
+        footer={<PopupAction tone="green" onClick={submitInput}>{t('common.confirm')}</PopupAction>}
+      >
         <input
           className="nx-sheet-input"
           value={inputValue}
@@ -115,16 +118,19 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
           autoFocus
           dir={pendingInput?.input?.text ? 'auto' : 'ltr'}
         />
-        <button className="nx-sheet-primary display" onClick={submitInput}>{t('common.confirm')}</button>
-      </BottomSheet>
+      </Popup>
 
-      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')}>
-        <p className="nx-confirm-label">{pendingConfirm ? cleanLabel(pendingConfirm.label) : ''}</p>
-        <div className="nx-confirm-buttons">
-          <button className="nx-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</button>
-          <button className="nx-confirm-no display" onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</button>
-        </div>
-      </BottomSheet>
+      <Popup
+        open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')} tone="red"
+        footer={(
+          <ActionRow>
+            <PopupAction tone="steel" small onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</PopupAction>
+            <PopupAction tone="green" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</PopupAction>
+          </ActionRow>
+        )}
+      >
+        <Note>{pendingConfirm ? cleanLabel(pendingConfirm.label) : ''}</Note>
+      </Popup>
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { getCityMap } from '../api/client'
 import type { CityMap, CityPlot, CommandResponse } from '../api/types'
 import { useSession } from '../state/SessionContext'
 import { useToast } from '../state/ToastContext'
-import BottomSheet from './BottomSheet'
+import Popup, { ActionButton, Note } from './Popup'
 import SidePlates from './home/SidePlates'
 import WorldBubbles, { type WorldBubbleDef } from './home/WorldBubbles'
 import ReadyToast from './home/ReadyToast'
@@ -228,26 +228,19 @@ function PlotSheet({ plot, onClose, exec }: { plot: CityPlot | null; onClose: ()
   const name = plot.name?.fa || plot.name?.en || plot.id
 
   return (
-    <BottomSheet open={!!plot} onClose={onClose} title={name}>
+    <Popup open={!!plot} onClose={onClose} title={name} tone="navy" footer={plot.kind === 'place' && plot.ref?.code ? (
+      <ActionButton tone="gold" onClick={() => { void exec('place.go', { place: plot.ref!.code! }); onClose() }}>{t('city.go_to', { name })}</ActionButton>
+    ) : undefined}>
       {plot.kind === 'company' && (
         busy ? (
           <div className="skeleton" style={{ height: 60 }} />
         ) : company?.text ? (
           <div className="screen-text" dangerouslySetInnerHTML={{ __html: sanitizeTelegramHtml(company.text) }} />
         ) : (
-          <p style={{ color: 'var(--text-dim)' }}>{t('city.no_info')}</p>
+          <Note>{t('city.no_info')}</Note>
         )
       )}
-      {plot.kind === 'place' && plot.ref?.code && (
-        <button
-          className="action-primary display"
-          style={{ width: '100%' }}
-          onClick={() => { void exec('place.go', { place: plot.ref!.code! }); onClose() }}
-        >
-          {t('city.go_to', { name })}
-        </button>
-      )}
-      {plot.kind === 'decor' && <p style={{ color: 'var(--text-dim)' }}>{name}</p>}
-    </BottomSheet>
+      {plot.kind === 'decor' && <Note>{name}</Note>}
+    </Popup>
   )
 }

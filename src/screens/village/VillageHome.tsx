@@ -9,7 +9,7 @@ import { Emboss, Frame, GLabel, Plate, Slab } from '../../kit'
 import { Header } from '../native/kit/Parts'
 import Emblem from '../../lib/emblem'
 import { emblemHex } from '../../lib/emblemPalette'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup, { ActionButton, ActionRow, Hero, Medallion, StatCard, StatGrid } from '../../ui/Popup'
 import { money } from '../native/kit/format'
 import DonateSheet from './Donate'
 import { t } from '../../i18n'
@@ -302,20 +302,28 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
         </button>
       )}
 
-      <BottomSheet open={infoOpen} onClose={() => setInfoOpen(false)} title={t('village.sheet.title', { name })}>
-        <div className="vh-info">
-          <InfoRow label={t('village.sheet.tier')} value={t(`village.tier.${tier}` as never)} />
-          {literacy !== null && <InfoRow label={t('village.sheet.literacy')} value={`${literacy}%`} />}
-          {online !== undefined && <InfoRow label={t('village.sheet.online')} value={String(online)} />}
-          {layout && <InfoRow label={t('village.sheet.role')} value={canPlace ? t('village.head') : member ? t('village.member') : t('village.visitor')} />}
-          {own && overview.view && <InfoRow label={t('village.sheet.treasury')} value={money(overview.view.treasury)} gold />}
-        </div>
-        <div className="vh-sheet-actions">
-          <Slab tone="steel" radius={14} lip={4} onClick={() => { setInfoOpen(false); openLocal('village_overview') }}>{t('village.sheet.details')}</Slab>
-          {own && member && <Slab tone="gold" radius={14} lip={4} onClick={() => { setInfoOpen(false); setDonateOpen(true) }}>{t('village.sheet.donate')}</Slab>}
-          {own && <Slab tone="steel" radius={14} lip={4} onClick={() => { setInfoOpen(false); openLocal('village_labor') }}>{t('labor.open_board')}</Slab>}
-        </div>
-      </BottomSheet>
+      <Popup
+        open={infoOpen} onClose={() => setInfoOpen(false)} title={t('village.sheet.title', { name })} tone="navy"
+        footer={(
+          <>
+            <ActionButton tone="green" onClick={() => { setInfoOpen(false); openLocal('village_overview') }}>{t('village.sheet.details')}</ActionButton>
+            {(own && member) || own ? (
+              <ActionRow>
+                {own && member && <ActionButton tone="gold" small onClick={() => { setInfoOpen(false); setDonateOpen(true) }}>{t('village.sheet.donate')}</ActionButton>}
+                {own && <ActionButton tone="steel" small onClick={() => { setInfoOpen(false); openLocal('village_labor') }}>{t('labor.open_board')}</ActionButton>}
+              </ActionRow>
+            ) : null}
+          </>
+        )}
+      >
+        <Hero><Medallion icon="city" palette="gold" ring="#3552c8" chip={t(`village.tier.${tier}` as never)} /></Hero>
+        <StatGrid>
+          {literacy !== null && <StatCard icon="book" palette="violet" label={t('village.sheet.literacy')} value={`${literacy}%`} />}
+          {online !== undefined && <StatCard icon="society" palette="emerald" label={t('village.sheet.online')} value={String(online)} />}
+          {layout && <StatCard icon="rank" palette="amber" label={t('village.sheet.role')} value={canPlace ? t('village.head') : member ? t('village.member') : t('village.visitor')} />}
+          {own && overview.view && <StatCard icon="coins" palette="gold" label={t('village.sheet.treasury')} value={money(overview.view.treasury)} />}
+        </StatGrid>
+      </Popup>
       <DonateSheet open={donateOpen} onClose={() => setDonateOpen(false)} onDone={() => void overview.refresh()} />
 
       <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)}

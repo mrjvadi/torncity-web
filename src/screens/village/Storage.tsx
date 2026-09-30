@@ -6,7 +6,7 @@
 // see its stock. Also the server screen `village_materials`.
 
 import { useState } from 'react'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup, { ActionButton, ActionRow, CostSummary, Hero, Medallion, RequirementList } from '../../ui/Popup'
 import { Slab } from '../../kit'
 import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import { money } from '../native/kit/format'
@@ -105,18 +105,31 @@ export default function Storage({ response, openLocal }: ScreenProps) {
         </>
       )}
 
-      <BottomSheet open={!!ask} onClose={() => setAsk(null)} title={t('storage.confirm.title')}>
+      <Popup
+        open={!!ask} onClose={() => setAsk(null)} title={t('storage.confirm.title')} tone="green" dismissible={!busy}
+        footer={ask && (
+          <ActionRow>
+            <ActionButton tone="steel" small onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</ActionButton>
+            <ActionButton tone="green" onClick={() => void confirm(ask)} busy={busy} disabled={ask.treasury < ask.total || ask.free < ask.qty} reason={ask.treasury < ask.total ? t('storage.need.funds_short') : ask.free < ask.qty ? t('storage.need.space_short') : undefined}>{t('storage.confirm.yes', { total: money(ask.total) })}</ActionButton>
+          </ActionRow>
+        )}
+      >
         {ask && (
           <>
-            <div className="vh-confirm">{t('storage.confirm.body', { qty: formatNumber(ask.qty), name: ask.item.name, unit: money(ask.unit), total: money(ask.total) })}</div>
-            <div className="vh-hint">{t('storage.confirm.hint', { treasury: money(ask.treasury), free: formatNumber(ask.free) })}</div>
-            <div className="vh-sheet-actions">
-              <Slab tone="steel" radius={14} lip={4} onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</Slab>
-              <Slab tone="green" radius={14} lip={4} onClick={() => void confirm(ask)} disabled={busy}>{t('storage.confirm.yes', { total: money(ask.total) })}</Slab>
-            </div>
+            <Hero><Medallion icon="box" palette="amber" ring="#2f9d5b" chip={ask.item.name} /></Hero>
+            <RequirementList
+              lines={[
+                { icon: 'coins', palette: 'gold', label: t('storage.need.funds'), state: ask.treasury >= ask.total ? 'met' : 'missing', detail: t('storage.need.funds_d', { have: money(ask.treasury), need: money(ask.total) }) },
+                { icon: 'box', palette: 'amber', label: t('storage.need.space'), state: ask.free >= ask.qty ? 'met' : 'missing', detail: t('storage.need.space_d', { free: formatNumber(ask.free), need: formatNumber(ask.qty) }) },
+              ]}
+            />
+            <CostSummary
+              lines={[{ label: t('storage.cost.line', { qty: formatNumber(ask.qty), name: ask.item.name, unit: money(ask.unit) }), amount: money(ask.total) }]}
+              total={{ amount: money(ask.total) }}
+            />
           </>
         )}
-      </BottomSheet>
+      </Popup>
     </ScreenScroll>
   )
 }

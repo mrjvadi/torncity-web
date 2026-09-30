@@ -7,7 +7,7 @@
 // sheet) and inside the board.
 
 import { useCallback, useEffect, useState } from 'react'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup from '../../ui/Popup'
 import { Slab } from '../../kit'
 import { Bar, Card, Chip, Empty, Header, Notice, ScreenScroll, SectionTitle, type Tone } from '../native/kit/Parts'
 import { hms, money } from '../native/kit/format'
@@ -179,9 +179,9 @@ function SiteSheetBody({ buildingId, title, onClose }: { buildingId: string; tit
   const { view, refresh, act, busy } = useSite(buildingId, null)
   useRefreshOn(refresh, tick)
   return (
-    <BottomSheet open onClose={onClose} title={title}>
+    <Popup open onClose={onClose} title={title} tone="gold">
       {view ? <SitePanel view={view} act={act} busy={busy} /> : <Empty>…</Empty>}
-    </BottomSheet>
+    </Popup>
   )
 }
 
