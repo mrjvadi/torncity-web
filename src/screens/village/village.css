@@ -11,14 +11,30 @@
   --k-h: 40px; --k-btn: 40px;
 }
 .vh-top > * { pointer-events: auto; }
-.vh-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; pointer-events: none; }
-.vh-chips > * { pointer-events: auto; }
+/* the village's identity on the scene: a small dark-glass pill (emblem and
+   name), not a band; tapping it opens the overview sheet */
+.vh-top { align-items: flex-start; }
+.vh-pill-btn {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 60%; padding: 3px 12px 3px 8px; border-radius: 999px;
+  color: #fff; font-size: 12.5px; background: rgba(7, 10, 20, 0.5); border: 1px solid rgba(255, 214, 107, 0.35);
+  backdrop-filter: blur(3px);
+}
+.vh-pill-btn .vh-pill-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vh-info { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.vh-info-row { display: flex; justify-content: space-between; padding: 8px 12px; border-radius: 12px; background: var(--panel-2); font-size: 14px; color: var(--text-dim); }
+.vh-info-row b { color: var(--text); font-weight: 400; }
+/* the one floating control: build, above the app's dock */
+.vh-fab {
+  position: absolute; z-index: 3; left: 12px; bottom: 12px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; color: #fff; font-size: 11.5px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.vh-fab:active { transform: translateY(2px); }
 .vh-note {
   align-self: center; padding: 4px 12px; border-radius: 10px; font-size: 12px; color: #fff;
   background: rgba(7, 10, 20, 0.72); border: 1px solid var(--gold-soft);
 }
 
-.vh-side { position: absolute; z-index: 3; right: 10px; top: 132px; display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
+.vh-side { position: absolute; z-index: 3; right: 10px; top: 56px; display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
 .vh-side .k-hdr-btn { padding: 0; }
 
 .vh-bottom { position: absolute; z-index: 3; left: 10px; right: 10px; bottom: 8px; }
@@ -88,3 +104,18 @@
 .vs-head { display: flex; align-items: center; gap: 10px; }
 .vs-head + * { margin-top: 10px; }
 .vs-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+/* donate sheet */
+.vd-presets { display: flex; gap: 8px; margin: 12px 0 10px; }
+.vd-presets .k-slab { flex: 1; padding: 11px 6px; font-size: 15px; }
+.vd-custom { display: flex; gap: 8px; align-items: stretch; }
+.vd-custom .k-slab { flex: 0 0 auto; padding: 0 20px; font-size: 15px; }
+.vd-input {
+  flex: 1; min-width: 0; padding: 10px 12px; border-radius: 14px; font-size: 16px; text-align: center; color: var(--text);
+  background: var(--panel-2); border: 1.5px solid var(--gold-soft); outline: none;
+}
+.vd-input:focus { border-color: var(--gold); }
+
+/* the call to found a village */
+.vc-title { font-size: 20px; color: var(--gold); text-align: center; margin-bottom: 8px; }
+.vc-body { font-size: 14px; line-height: 1.8; color: var(--text-dim); text-align: center; }

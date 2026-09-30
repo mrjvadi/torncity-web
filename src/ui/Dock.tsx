@@ -6,7 +6,7 @@ export type TabKey = 'profile' | 'activity' | 'city' | 'market' | 'society'
 const TABS: { key: TabKey; icon: string; label: string }[] = [
   { key: 'profile', icon: 'person', label: 'من' },
   { key: 'activity', icon: 'activity', label: 'فعالیت' },
-  { key: 'city', icon: 'city', label: 'شهر' },
+  { key: 'city', icon: 'city', label: 'روستا' },
   { key: 'market', icon: 'market', label: 'اقتصاد' },
   { key: 'society', icon: 'society', label: 'جامعه' },
 ]

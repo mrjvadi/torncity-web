@@ -216,7 +216,7 @@ export function mockBootstrapSettlement(): BootstrapSettlement {
   const place = mockVillagePlace(GRID)
   return {
     id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'village', world_cell: 18211,
-    centre: place.centre, is_head: true, resident: false, grid_lots: GRID, layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
+    centre: place.centre, is_head: true, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: GRID, layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
   }
 }
 
@@ -315,7 +315,7 @@ function overviewView() {
     view: {
       name: 'آمل', tier: 'village', population: 34, population_cap: 60,
       food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
-      treasury: st.treasury,
+      treasury: st.treasury, resident: true, support: { code: 'support', name: 'ساپورت' },
       buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
     },
     actions: [back('player.profile.get')],
@@ -426,6 +426,23 @@ function unlock() {
   }
 }
 
+let cash = 12450
+function donate(args: Record<string, unknown>) {
+  const view = (amount: number) => ({ village: 'آمل', amount, presets: [250, 1000, 5000], min: 100, max: 100000, treasury: st.treasury, cash, settlement_id: OWN_ID })
+  const raw = String(args.amount ?? '')
+  if (!raw) return { ok: true, screen: 'village_donate_menu', text: 'کمک به خزانه', view: view(0), actions: [back('settlement.overview')] }
+  const amount = Number(raw)
+  if (!(amount >= 100 && amount <= 100000)) return refusal('donate_range', 'مبلغ کمک باید بین ۱۰۰ و ۱۰۰٬۰۰۰ باشد.')
+  if (args.confirm !== 'confirm') {
+    if (cash < amount) return refusal('donate_no_cash', 'پول نقد شما کافی نیست.')
+    return { ok: true, screen: 'village_donate_confirm', text: 'تأیید', view: view(amount), actions: [back('settlement.donate')] }
+  }
+  if (cash < amount) return refusal('donate_no_cash', 'پول نقد شما کافی نیست.')
+  cash -= amount
+  st.treasury += amount
+  return { ok: true, screen: 'village_donate_done', text: 'ممنون', view: view(amount), actions: [back('settlement.overview')] }
+}
+
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.')) return null
   init()
@@ -440,6 +457,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.knowledge': return knowledgeView()
     case 'settlement.knowledge.research': return knowledgeAct(args, false)
     case 'settlement.knowledge.buy': return knowledgeAct(args, true)
+    case 'settlement.donate': return donate(args)
     case 'settlement.who': return { ok: true, screen: 'settlement_who', text: 'ساکنان', actions: [back('settlement.overview')] }
     default: return null
   }
