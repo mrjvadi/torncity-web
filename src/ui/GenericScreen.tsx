@@ -5,6 +5,7 @@ import { toWesternDigits } from '../lib/persian'
 import Icon from './Icon'
 import BottomSheet from './BottomSheet'
 import Skeleton from './Skeleton'
+import { t } from '../i18n'
 
 interface GenericScreenProps {
   response: CommandResponse | null
@@ -92,14 +93,14 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
           autoFocus
           dir={pendingInput?.input?.text ? 'rtl' : 'ltr'}
         />
-        <button className="sheet-primary-btn display" onClick={submitInput}>تأیید</button>
+        <button className="sheet-primary-btn display" onClick={submitInput}>{t('common.confirm')}</button>
       </BottomSheet>
 
-      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title="مطمئن هستید؟">
+      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')}>
         <p className="confirm-label">{pendingConfirm?.label}</p>
         <div className="confirm-buttons">
-          <button className="confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>تأیید</button>
-          <button className="confirm-no display" onClick={() => setPendingConfirm(null)}>انصراف</button>
+          <button className="confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</button>
+          <button className="confirm-no display" onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</button>
         </div>
       </BottomSheet>
 
@@ -175,7 +176,7 @@ function GenericStyles() {
         border: 1px solid rgba(242,194,85,0.18);
         border-radius: 12px; padding: 9px 10px;
       }
-      .action-tile-label { font-size: 13px; color: var(--text); text-align: right; }
+      .action-tile-label { font-size: 13px; color: var(--text); text-align: start; }
       .action-back { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); justify-content: center; }
       .action-back .action-tile-label { color: var(--text-dim); }
       .action-back-arrow { font-size: 18px; line-height: 1; color: var(--text-dim); }

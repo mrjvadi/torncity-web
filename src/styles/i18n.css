@@ -1,0 +1,33 @@
+/* Left-to-right (English) overrides. Screens are direction-neutral (flex
+   rows, start/end alignment) and mirror by themselves when <html dir=ltr>;
+   only what is drawn from a physical edge needs a rule here. */
+
+/* progress fills grow from the reading edge */
+html[dir='ltr'] .nx-bar-fill { left: 2px; right: auto; }
+html[dir='ltr'] .k-bar-fill { inset: 2px auto 2px 2px; right: auto; }
+html[dir='ltr'] .k-bar-fill.k-from-end { right: auto; }
+
+/* The home chrome (top bar, dock, city overlays) is drawn on the prototype's
+   fixed 720-wide canvas, laid out right-to-left: it keeps that geometry in
+   English too, only its text changes. */
+html[dir='ltr'] .hud,
+html[dir='ltr'] .dock,
+html[dir='ltr'] .city-view,
+html[dir='ltr'] .sheet-panel { direction: rtl; }
+html[dir='ltr'] .sheet-panel .nx-actions,
+html[dir='ltr'] .sheet-panel .nx-sheet-input { direction: ltr; }
+
+/* Latin text: the display face's Latin glyphs are fine, but tighten the
+   tracking a little and use the body face for long runs */
+html[lang='en'] .display { letter-spacing: 0.4px; }
+html[lang='en'] body { font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+
+/* the language switch (screens/native/kit/LangSwitch.tsx) */
+.lang-switch { display: flex; gap: 8px; }
+.lang-opt {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 12px; border-radius: 14px; font-size: 15px;
+  background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.12); color: var(--text-dim);
+}
+.lang-opt.active { border-color: var(--gold); color: #fff; background: linear-gradient(180deg, rgba(242,194,85,0.22), rgba(242,194,85,0.06)); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.18); }
+.lang-opt .lang-name { font-family: 'Vazirmatn', sans-serif; font-weight: 700; }

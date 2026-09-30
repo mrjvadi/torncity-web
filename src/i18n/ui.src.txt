@@ -280,3 +280,46 @@ finance.my_loans | وام‌های من | My loans
 finance.loan_active | قسط بعدی {next} · مانده {owed} | Next instalment {next} · owed {owed}
 finance.loan_settled | تسویه شده | Settled
 finance.deposit | سپرده: {n} · سود {p} | Deposit: {n} · interest {p}
+# -- crime detail / result ------------------------------------------------------------
+req.shifts_have | {n} شیفت{have} | {n} shifts{have}
+req.crime_tier | رتبه‌ی جنایی {name}{have} | Criminal tier {name}{have}
+req.venue_ok | مکان: {names} | Place: {names}
+req.venue_here | اینجا: {name} | Here: {name}
+req.facility | امکانات: {name} | Facility: {name}
+req.tool | ابزار لازم: {name} | Tool needed: {name}
+crime.blocked.jail | در زندان هستی | You are in jail
+crime.blocked.hospital | در بیمارستان بستری هستی | You are in hospital
+crime.blocked.busy | مشغول جرم دیگری هستی | You are busy with another crime
+crime.blocked.work | سر کار هستی | You are at work
+crime.blocked.travelling | در سفر هستی | You are travelling
+crime.blocked.walking | در حال پیاده‌روی هستی | You are walking
+crime.blocked.cooldown | هنوز باید استراحت کنی | You still need to rest
+crime.blocked.nerve | عصب کافی نداری | Not enough nerve
+crime.blocked.nowhere | اول باید در یک شهر باشی | You must be in a city first
+crime.blocked.default | در حال حاضر ممکن نیست | Not possible right now
+crime.chance | شانس موفقیت {p} | Success chance {p}
+crime.chip_nerve | عصب {n} | Nerve {n}
+crime.chip_duration | مدت {t} | Duration {t}
+crime.chip_take | غنیمت {a} تا {b} | Loot {a} to {b}
+crime.if_caught | در صورت دستگیری: {a}–{b} زندان | If caught: {a}–{b} in jail
+crime.fine | جریمه {a}–{b} | Fine {a}–{b}
+crime.result | نتیجه | Result
+crime.result_title | نتیجه‌ی جرم | Crime result
+crime.result.succeeded | موفق شدی | You succeeded
+crime.result.escaped | فرار کردی | You escaped
+crime.result.caught | دستگیر شدی | You were caught
+crime.earned | {n} به دست آوردی | You earned {n}
+crime.dry | سهمیه‌ی امروز پر شده بود | Today's quota was already full
+crime.xp | {n} تجربه | {n} XP
+crime.criminal_xp | {n} تجربه‌ی جنایی | {n} criminal XP
+crime.level_up | رسیدی به سطح {n} | You reached level {n}
+crime.jailed | دستگیر شدی · {t} حبس | Caught · {t} in jail
+crime.fine_line | جریمه {a} | Fine {a}
+crime.fine_paid | {a} پرداخت شد | {a} paid
+crime.loot | غنیمت | Loot
+crime.skill_xp | {n} تجربه | {n} XP
+crime.skill_level | رسید به سطح {n} | reached level {n}
+crime.started | جرم آغاز شد | Crime started
+crime.until_end | {t} تا پایان | {t} to go
+crime.nerve_left | عصب باقی‌مانده: {a}/{b} | Nerve left: {a}/{b}
+crime.result_later | نتیجه وقتی جرم تمام شد، در همین‌جا اعلام می‌شود. | The result will appear here when the crime ends.

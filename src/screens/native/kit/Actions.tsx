@@ -9,6 +9,7 @@ import type { Action, CommandResponse } from '../../../api/types'
 import { toWesternDigits } from '../../../lib/persian'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
+import { t } from '../../../i18n'
 
 export default function Actions({ response, onAction, only, refreshCommand }: {
   response: CommandResponse | null
@@ -33,7 +34,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
       // deeper view (e.g. a market order book) can send its list screen's
       // command instead while still meaning "reload me", so a plain
       // navigation action labelled exactly "تازه‌سازی" is dropped as well.
-      .filter((a) => !refreshCommand || (a.command !== refreshCommand && !(a.kind === 'navigation' && a.label === 'تازه‌سازی')))
+      .filter((a) => !refreshCommand || (a.command !== refreshCommand && !(a.kind === 'navigation' && /(تازه‌سازی|refresh)\s*$/i.test(a.label))))
     const byRow = new Map<number, Action[]>()
     for (const a of actions) {
       const list = byRow.get(a.row) ?? []
@@ -89,14 +90,14 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
           autoFocus
           dir={pendingInput?.input?.text ? 'rtl' : 'ltr'}
         />
-        <button className="nx-sheet-primary display" onClick={submitInput}>تأیید</button>
+        <button className="nx-sheet-primary display" onClick={submitInput}>{t('common.confirm')}</button>
       </BottomSheet>
 
-      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title="مطمئن هستید؟">
+      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')}>
         <p className="nx-confirm-label">{pendingConfirm?.label}</p>
         <div className="nx-confirm-buttons">
-          <button className="nx-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>تأیید</button>
-          <button className="nx-confirm-no display" onClick={() => setPendingConfirm(null)}>انصراف</button>
+          <button className="nx-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</button>
+          <button className="nx-confirm-no display" onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</button>
         </div>
       </BottomSheet>
     </div>
