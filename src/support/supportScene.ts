@@ -104,7 +104,7 @@ export class SupportScene {
     this.controls.enableDamping = false
     this.controls.screenSpacePanning = false
     this.controls.minDistance = 26
-    this.controls.maxDistance = plan.span * 1.5
+    this.controls.maxDistance = plan.span * 2.6
     this.controls.minPolarAngle = 0.15
     this.controls.maxPolarAngle = Math.PI / 2 - 0.02
     this.controls.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN }
@@ -271,7 +271,7 @@ export class SupportScene {
     const wx = (b.x - (net.w - 1) / 2) * M
     const zA = (b.z1 - (net.h - 1) / 2) * M, zB = (b.z0 - (net.h - 1) / 2) * M
     const zc = (zA + zB) / 2
-    return { pos: new Vector3(wx, 4.2, zc + Math.min(zA - zc, 90) - 8), target: new Vector3(wx, 28, zc - Math.min(zc - zB, 90)) }
+    return { pos: new Vector3(wx, 3.8, zc + Math.min(zA - zc, 90) - 8), target: new Vector3(wx, 3.4, zc - Math.min(zc - zB, 90)) }
   }
 
   // -- camera -----------------------------------------------------------------
@@ -280,7 +280,7 @@ export class SupportScene {
     let pos: Vector3, target: Vector3
     if (mode === 'street') { pos = this.streetPose.pos.clone(); target = this.streetPose.target.clone() }
     else {
-      const d = this.plan.span * 1.08
+      const d = this.plan.span * Math.max(0.9, Math.min(2.4, 1.0 / this.camera.aspect))
       target = new Vector3(0, 24, 0)
       pos = new Vector3(d * 0.62, d * 0.56, d * 0.78).add(target)
     }
@@ -292,9 +292,9 @@ export class SupportScene {
     const p = this.plan.placed.find((x) => x.key === key)
     if (!p?.fit) return
     const h = p.fit.b.height * p.fit.s
-    const target = new Vector3(p.x, Math.min(h * 0.45, 60), p.z)
-    const dist = Math.max(70, Math.min(230, Math.max(p.fit.b.width, p.fit.b.depth) * 2.4 + h * 0.5))
-    const dir = new Vector3(0.45, 0.32, 0.83).normalize()
+    const target = new Vector3(p.x, Math.min(h * 0.4, 45), p.z)
+    const dist = Math.max(90, Math.min(460, Math.max(p.fit.b.width, p.fit.b.depth) * 1.9 + h * 1.15))
+    const dir = new Vector3(0.4, 0.42, 0.82).normalize()
     this.flyTo(target.clone().addScaledVector(dir, dist), target, true)
   }
 
@@ -393,7 +393,7 @@ export class SupportScene {
       v.copy(a.pos).project(this.camera)
       const dist = camPos.distanceTo(a.pos)
       const onScreen = v.z < 1 && v.x > -1.05 && v.x < 1.05 && v.y > -1.05 && v.y < 1.05
-      return { a, x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, dist, onScreen }
+      return { a, x: Math.max(56, Math.min(w - 56, (v.x * 0.5 + 0.5) * w)), y: (-v.y * 0.5 + 0.5) * h, dist, onScreen }
     })
     // the most important labels first; a label that would overlap one already placed is dropped
     const order = list.filter((l) => l.onScreen).sort((p, q) => (q.a.weight - p.a.weight) || (p.dist - q.dist))

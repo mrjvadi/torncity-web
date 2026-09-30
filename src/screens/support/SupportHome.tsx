@@ -57,6 +57,7 @@ export default function SupportHome({ run, openLocal }: ScreenProps) {
         if (cancelled) { scene.dispose(); return }
         sceneRef.current = scene
         scene.resize()
+        scene.frame('aerial', false)
         ro = new ResizeObserver(() => scene?.resize())
         ro.observe(canvas)
         setPlan(p)
@@ -65,7 +66,7 @@ export default function SupportHome({ run, openLocal }: ScreenProps) {
           ;(window as unknown as { __support?: unknown }).__support = { scene, plan: p }
         }
       } catch (e) {
-        report('support', 'scene failed: ' + String(e))
+        report('support', 'scene failed: ' + String(e)); console.error('support scene', e)
         if (!cancelled) setFailed(true)
       }
     })()

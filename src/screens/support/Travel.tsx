@@ -166,7 +166,7 @@ function ConfirmSheet({ dest, hint, onClose, onGo }: { dest: TravelDestination |
           />
         ))}
       </div>
-      <Slab tone="gold" radius={14} lip={4} disabled={!chosen || busy} onClick={() => { if (!chosen) return; setBusy(true); void onGo(dest, chosen.mode_code, chosen.fare).finally(() => setBusy(false)) }}>
+      <Slab tone="gold" radius={14} lip={4} style={{ width: '100%' }} disabled={!chosen || busy} onClick={() => { if (!chosen) return; setBusy(true); void onGo(dest, chosen.mode_code, chosen.fare).finally(() => setBusy(false)) }}>
         {t('sc.confirm.go')}{chosen ? ` · ${money(chosen.fare)}` : ''}
       </Slab>
     </BottomSheet>
@@ -229,7 +229,7 @@ export function VillageVisit(props: ScreenProps) {
   return (
     <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <VillageHome {...props} />
-      <div className="sc-side" style={{ top: 56 }}>
+      <div className="sc-side" style={{ top: 172 }}>
         <button className="k-hdr-btn" onClick={() => props.openLocal('support_travel')} aria-label={t('sc.travel')}><Emboss name="plane" palette="teal" size={22} /></button>
       </div>
     </div>
