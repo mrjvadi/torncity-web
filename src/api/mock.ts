@@ -6,6 +6,7 @@ import { API_BASE } from './client'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
+import { mockFoundingCommand } from './mock_founding'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 
 function json(body: unknown, status = 200): Response {
@@ -89,6 +90,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   }
   // war/military (no structured view yet) and friends/search (structured):
   // the features area's own mock data (src/api/mock_features.ts).
+  const founding = mockFoundingCommand(command, args)
+  if (founding) return json(founding)
   const village = mockVillageCommand(command, args)
   if (village) return json(village)
   const feature = mockFeatureCommand(command, args)
