@@ -51,3 +51,10 @@ export function clamp01(v: number): number {
   if (!isFinite(v)) return 0
   return Math.max(0, Math.min(1, v))
 }
+
+/** A server button label without its leading emoji: the kit draws its own
+ * embossed icon for the action, so the Telegram emoji would double it. */
+export function cleanLabel(label: string): string {
+  const s = label.replace(/^[\s\p{Extended_Pictographic}‍️⃣]+/u, '').trim()
+  return s || label
+}

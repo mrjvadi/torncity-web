@@ -7,6 +7,7 @@
 import { useMemo, useState } from 'react'
 import type { Action, CommandResponse } from '../../../api/types'
 import { toWesternDigits } from '../../../lib/persian'
+import { cleanLabel } from './format'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
 import { t } from '../../../i18n'
@@ -81,7 +82,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
         </div>
       ))}
 
-      <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput?.label}>
+      <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput ? cleanLabel(pendingInput.label) : undefined}>
         <input
           className="nx-sheet-input"
           value={inputValue}
@@ -94,7 +95,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
       </BottomSheet>
 
       <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')}>
-        <p className="nx-confirm-label">{pendingConfirm?.label}</p>
+        <p className="nx-confirm-label">{pendingConfirm ? cleanLabel(pendingConfirm.label) : ''}</p>
         <div className="nx-confirm-buttons">
           <button className="nx-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</button>
           <button className="nx-confirm-no display" onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</button>
@@ -111,7 +112,7 @@ function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean
     return (
       <button className={`nx-primary${lead ? '' : ' nx-primary-alt'} display`} onClick={onClick}>
         <Icon name={action.icon ?? 'box'} palette={lead ? 'cream' : 'gold'} size={18} />
-        <span>{action.label}</span>
+        <span>{cleanLabel(action.label)}</span>
       </button>
     )
   }
@@ -119,7 +120,7 @@ function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean
     return (
       <button className="nx-action-danger display" onClick={onClick}>
         <Icon name={action.icon ?? 'box'} palette="ruby" size={18} />
-        <span>{action.label}</span>
+        <span>{cleanLabel(action.label)}</span>
       </button>
     )
   }
@@ -127,14 +128,14 @@ function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean
     return (
       <button className="nx-action-tile nx-action-back" onClick={onClick}>
         <span className="nx-action-back-arrow" aria-hidden>›</span>
-        <span className="nx-action-tile-label">{action.label}</span>
+        <span className="nx-action-tile-label">{cleanLabel(action.label)}</span>
       </button>
     )
   }
   return (
     <button className="nx-action-tile" onClick={onClick}>
       <Icon name={action.icon ?? 'box'} palette={action.kind === 'navigation' ? 'sapphire' : 'steel'} size={20} />
-      <span className="nx-action-tile-label">{action.label}</span>
+      <span className="nx-action-tile-label">{cleanLabel(action.label)}</span>
     </button>
   )
 }

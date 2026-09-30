@@ -942,3 +942,14 @@ f.social.433 | یک نام کاربری (با @)، کد بازیکن، یا آی
 f.social.434 | بازیکنی با این مشخصات پیدا نشد. | No player matches.
 f.social.435 | کد: {p0} | Code: {p0}
 f.social.436 | این خودت هستی | This is you
+inventory.all | همه | All
+inventory.total | {n} قلم کالا · {m} عدد | {n} kinds of goods · {m} items
+inventory.cat.food | خوراکی | Food
+inventory.cat.medicine | دارو | Medicine
+inventory.cat.gear | ابزار | Gear
+inventory.cat.electronics | لوازم برقی | Electronics
+inventory.cat.defence | دفاعی | Defence
+inventory.cat.mineral | کانی | Minerals
+inventory.cat.metal_ore | سنگ فلز | Metal ore
+inventory.cat.vehicles | خودرو | Vehicles
+inventory.cat.other | سایر | Other

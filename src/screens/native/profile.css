@@ -46,3 +46,7 @@
 .pf-medal { flex: none; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 40% 30%, #3a2f12, #15110a); border: 2.5px solid var(--gold); box-shadow: inset 0 2px 4px rgba(255,255,255,0.15), 0 3px 6px rgba(0,0,0,0.4); }
 .pf-medal-off { border-color: rgba(255,255,255,0.18); background: rgba(0,0,0,0.35); opacity: 0.75; }
 .pf-medals { flex: none; }
+
+/* the backpack (Inventory.tsx) */
+.inv-banner { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #fff; }
+.inv-badge { left: 6px; top: 6px; }

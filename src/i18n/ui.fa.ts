@@ -918,6 +918,17 @@ export const uiFa = {
   'f.social.434': 'بازیکنی با این مشخصات پیدا نشد.',
   'f.social.435': 'کد: {p0}',
   'f.social.436': 'این خودت هستی',
+  'inventory.all': 'همه',
+  'inventory.total': '{n} قلم کالا · {m} عدد',
+  'inventory.cat.food': 'خوراکی',
+  'inventory.cat.medicine': 'دارو',
+  'inventory.cat.gear': 'ابزار',
+  'inventory.cat.electronics': 'لوازم برقی',
+  'inventory.cat.defence': 'دفاعی',
+  'inventory.cat.mineral': 'کانی',
+  'inventory.cat.metal_ore': 'سنگ فلز',
+  'inventory.cat.vehicles': 'خودرو',
+  'inventory.cat.other': 'سایر',
 } as const
 
 export type UiKey = keyof typeof uiFa
