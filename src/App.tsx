@@ -4,6 +4,7 @@ import { ToastProvider } from './state/ToastContext'
 import Login from './ui/Login'
 import Shell from './ui/Shell'
 import { screensReady } from './screens/registry'
+import { useLang } from './i18n'
 
 /** True once the native/feature screen chunks (registry.ts) have landed.
  * They start fetching at boot, in parallel with login, so this is normally
@@ -29,10 +30,12 @@ function Root() {
 }
 
 export default function App() {
+  // A language change remounts the screens (they refetch in the new language)
+  const lang = useLang()
   return (
     <ToastProvider>
       <SessionProvider>
-        <Root />
+        <Root key={lang} />
       </SessionProvider>
     </ToastProvider>
   )

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { adoptServerLanguage } from '../i18n/sync'
 import * as api from '../api/client'
 import type { Bootstrap, CommandResponse, ProfileView, RealtimeVitals } from '../api/types'
 import type { RealtimeHandle } from '../api/realtime'
@@ -80,6 +81,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         api.getBootstrap(),
         api.runCommand('player.profile.get'),
       ])
+      // the server's language wins, so the bot and the web agree
+      adoptServerLanguage(b.player?.lang)
       setBootstrap(b)
       setServerTime(b.server_time)
       if (p.ok && p.view) setProfile(p.view as unknown as ProfileView)
