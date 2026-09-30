@@ -3,6 +3,7 @@ import { Header, Notice, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
 import { formatNumber } from './kit/format'
 import Icon from '../../ui/Icon'
+import { t } from '../../i18n'
 
 interface InventoryLine {
   item?: { code?: string; name?: string }
@@ -16,16 +17,16 @@ interface InventoryView { lines?: InventoryLine[] | null; page?: number; pages?:
 
 export default function Inventory({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as InventoryView
-  if (loading && !response) return <ScreenScroll><Header title="کوله‌پشتی" tone="gold" /></ScreenScroll>
+  if (loading && !response) return <ScreenScroll><Header title={t('inventory.title')} tone="gold" /></ScreenScroll>
 
   const lines = v.lines ?? []
 
   return (
     <ScreenScroll>
-      <Header title="کوله‌پشتی" tone="gold" onRefresh={() => run('inventory.show')} />
+      <Header title={t('inventory.title')} tone="gold" onRefresh={() => run('inventory.show')} />
 
-      {lines.length === 0 && <Notice>کوله‌پشتی‌ات خالی است.</Notice>}
-      {!!v.in_escrow && <Notice>{formatNumber(v.in_escrow)} در امانت (سفارش‌های باز)</Notice>}
+      {lines.length === 0 && <Notice>{t('inventory.empty')}</Notice>}
+      {!!v.in_escrow && <Notice>{t('inventory.escrow', { n: formatNumber(v.in_escrow) })}</Notice>}
 
       <div className="nx-tilegrid">
         {lines.map((l, i) => (
@@ -39,7 +40,7 @@ export default function Inventory({ response, loading, onAction, run }: ScreenPr
             <span className="nx-tile-title display">{l.item?.name ?? l.item?.code ?? '—'}</span>
             {(l.durability !== undefined || l.uses_left !== undefined) && (
               <span className="nx-tile-sub">
-                {l.durability !== undefined ? `دوام ${formatNumber(l.durability)}%` : `${formatNumber(l.uses_left ?? 0)} بار مصرف`}
+                {l.durability !== undefined ? t('inventory.durability', { n: formatNumber(l.durability) }) : t('inventory.uses', { n: formatNumber(l.uses_left ?? 0) })}
               </span>
             )}
           </button>

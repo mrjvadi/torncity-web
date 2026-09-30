@@ -1,0 +1,177 @@
+# key | Persian | English      (run: python3 scripts/gen-i18n.py)
+# -- common ------------------------------------------------------------------
+common.back | بازگشت | Back
+common.refresh | تازه‌سازی | Refresh
+common.confirm | تأیید | Confirm
+common.cancel | انصراف | Cancel
+common.sure | مطمئن هستید؟ | Are you sure?
+common.free | رایگان | Free
+common.left | {t} مانده | {t} left
+common.ago | {t} پیش | {t} ago
+common.yes | بله | Yes
+common.no | خیر | No
+common.close | بستن | Close
+common.load_failed | بارگذاری نشد. | Could not load.
+common.level | سطح {n} | Level {n}
+common.of_level | از سطح {n} | from level {n}
+common.years_old | {n} ساله | {n} years old
+common.none | چیزی نیست. | Nothing here.
+# -- bank / wallet -----------------------------------------------------------
+bank.title | بانک | Bank
+bank.travelling | در سفر هستید؛ به بانک دسترسی ندارید. | You are travelling; the bank is out of reach.
+bank.cash | نقد | Cash
+bank.balance | موجودی بانک | Bank balance
+bank.branch | شعبه‌ی {city} | {city} branch
+bank.fee | کارمزد برداشت: {p} | Withdrawal fee: {p}
+# -- inventory ---------------------------------------------------------------
+inventory.title | کوله‌پشتی | Backpack
+inventory.empty | کوله‌پشتی‌ات خالی است. | Your backpack is empty.
+inventory.escrow | {n} در امانت (سفارش‌های باز) | {n} held in escrow (open orders)
+inventory.durability | دوام {n}% | Durability {n}%
+inventory.uses | {n} بار مصرف | {n} uses left
+# -- education ---------------------------------------------------------------
+education.title | تحصیل | Education
+education.current | در حال تحصیل | Studying now
+education.paused | متوقف (زندان) | Paused (jail)
+education.certificates | مدرک‌های تو | Your certificates
+# -- dashboard ---------------------------------------------------------------
+dashboard.title | داشبورد | Dashboard
+dashboard.travelling | در سفر | Travelling
+dashboard.jail | در زندان {city} · {t} مانده | In {city} jail · {t} left
+dashboard.hospital | در بیمارستان {city} · {t} مانده | In {city} hospital · {t} left
+# -- life / needs --------------------------------------------------------------
+life.title | زندگی | Life
+need.sleep | خواب | Sleep
+need.hunger | گرسنگی | Hunger
+need.happiness | شادی | Happiness
+need.stress | استرس | Stress
+life.stage_age | {stage} · {age} ساله | {stage} · {age} years old
+life.net_worth | ارزش خالص | Net worth
+life.cash_bank | نقد + بانک | Cash + bank
+life.property | ملک | Property
+life.sleep_spots | جای خواب | Places to sleep
+life.spot_sub | {place} · +{rest} انرژی | {place} · +{rest} energy
+life.sleep_again | دوباره می‌توانی بخوابی: {t} دیگر | You can sleep again in {t}
+# -- job ----------------------------------------------------------------------
+job.title | کار | Work
+job.none | هنوز شغلی نداری. | You do not have a job yet.
+job.performance | عملکرد | Performance
+job.per_shift | {pay} هر شیفت | {pay} per shift
+job.shifts | {n} شیفت | {n} shifts
+job.shift_running | شیفت در حال انجام · {t} مانده | Shift in progress · {t} left
+job.walk_to | {t} پیاده تا {place} | {t} on foot to {place}
+job.current_rank | جایگاه فعلی | Current position
+job.promo_ready | آماده‌ی ترفیع | Ready for promotion
+job.next_rank | مرحله‌ی بعد | Next step
+# -- hospital -----------------------------------------------------------------
+hospital.title | بیمارستان | Hospital
+hospital.cause.crime | در جیب‌بری | During a pickpocketing
+hospital.cause.mugged | مورد سرقت | Mugged
+hospital.cause.shift | حادثه‌ی کاری | Work accident
+hospital.cause.fight | درگیری | Fight
+hospital.discharge | مرخص: {t} | Discharge: {t}
+hospital.health_of | سلامت {a} از {b} | Health {a} of {b}
+hospital.health | سلامت {a}/{b} | Health {a}/{b}
+hospital.full_in | پر در {t} | full in {t}
+hospital.treated | این بستری قبلاً درمان شده. | This stay was already treated.
+hospital.clinics | درمانگاه‌ها | Clinics
+hospital.doctor | پزشک {n} | Doctor {n}
+hospital.saves | {t} کمتر | {t} shorter
+hospital.closed | تعطیل | Closed
+# -- travel -------------------------------------------------------------------
+travel.title | سفر | Travel
+travel.to | سفر به {city} | Travel to {city}
+travel.energy_busy | {t} · {n} انرژی{busy} | {t} · {n} energy{busy}
+travel.busy | شلوغ | busy
+travel.on_way | در راه | On the way
+travel.until_arrival | تا رسیدن | until arrival
+# -- missions -----------------------------------------------------------------
+missions.title | مأموریت‌ها | Missions
+missions.blocked.requires | نیازمندی‌ها را نداری | Requirements not met
+missions.blocked.cooldown | در استراحت | Cooling down
+missions.blocked.active | در حال انجام | In progress
+missions.need_board | باید سر تابلوی مأموریت باشی تا مأموریت بگیری. | You must be at the mission board to take a mission.
+# -- leaderboard --------------------------------------------------------------
+board.title | رتبه‌ها | Rankings
+board.companies | شرکت‌ها | Companies
+board.workers | کارگران | Workers
+board.investors | سرمایه‌گذاران | Investors
+board.cities | شهرها | Cities
+# -- inbox --------------------------------------------------------------------
+inbox.title | پیام‌ها | Messages
+inbox.empty | پیامی نداری. | No messages.
+inbox.empty_cat | پیامی در این دسته نیست. | No messages in this category.
+inbox.count | {n} پیام | {n} messages
+inbox.cat.finance | مالی | Finance
+inbox.cat.faction | جناح | Faction
+inbox.cat.work | کار | Work
+inbox.cat.crime | جرم | Crime
+inbox.cat.social | اجتماعی | Social
+inbox.cat.politics | سیاست | Politics
+inbox.cat.property | ملک | Property
+inbox.cat.trade | بازار | Market
+# -- hubs ---------------------------------------------------------------------
+hub.activity | فعالیت | Activity
+hub.economy | اقتصاد | Economy
+hub.society | جامعه | Society
+hub.crime | جرم | Crime
+hub.job | کار | Work
+hub.education | تحصیل | Education
+hub.hospital | بیمارستان | Hospital
+hub.missions | مأموریت‌ها | Missions
+hub.leaderboard | رتبه‌ها | Rankings
+hub.gym | باشگاه | Gym
+hub.daily | جایزه‌ی روز | Daily reward
+hub.inventory | کوله‌پشتی | Backpack
+hub.market | بازار | Market
+hub.bank | بانک | Bank
+hub.companies | شرکت‌های من | My companies
+hub.property | ملک | Property
+hub.stocks | بورس | Stock exchange
+hub.inbox | پیام‌ها | Messages
+hub.faction | جناح | Faction
+hub.friends | دوستان | Friends
+hub.elections | انتخابات | Elections
+hub.government | دولت شهر | City government
+hub.war | ارتش و جنگ | Army and war
+hub.family | خانواده | Family
+hub.village | روستای من | My village
+hub.neighbour | روستای همسایه | Neighbouring village
+# -- market / stocks / property ----------------------------------------------
+market.title | بازار | Market
+market.book_title | دفتر | Order book
+market.book_fallback | دفتر بازار | Market book
+market.walk | {t} پیاده تا {place} | {t} on foot to {place}
+market.walk_place | بازار | the market
+market.bid_ask | خرید {bid} · فروش {ask} | Buy {bid} · Sell {ask}
+market.no_book | کالاهای تو بدون دفتر اینجا | Your goods without a book here
+market.last_price | آخرین قیمت | Last price
+market.you_hold | موجودی تو | You hold
+market.buy | خرید | Buy
+market.sell | فروش | Sell
+market.recent | معاملات اخیر | Recent trades
+stocks.title | بورس | Stock exchange
+stocks.portfolio | سبد دارایی | Portfolio
+stocks.portfolio_value | ارزش سبد | Portfolio value
+stocks.gain | سود | Gain
+stocks.shares | {n} سهم | {n} shares
+stocks.open_orders | سفارش‌های باز | Open orders
+stocks.gold | طلا | Gold
+stocks.savings | پس‌انداز | Savings
+property.title | ملک | Property
+property.market | بازار ملک | Property market
+property.no_city | در هیچ شهری نیستی. | You are not in any city.
+property.size | {n} متر | {n} m²
+property.left | {n} باقی‌مانده | {n} left
+property.offers | پیشنهادهای مالکان | Owners' offers
+property.rent | اجاره | Rent
+property.sale | فروش | Sale
+property.mine | ملک من | My property
+property.can_rest | می‌توانی استراحت کنی (+{n} انرژی) | You can rest (+{n} energy)
+property.rest_in | تا استراحت بعدی: {t} | Until the next rest: {t}
+property.none | هنوز ملکی نداری. | You do not own any property yet.
+property.home | مسکونی | Residential
+property.commercial | تجاری | Commercial
+property.rented_to | اجاره داده به {name} | Rented to {name}
+property.rent_amount | اجاره {n} | Rent {n}
+property.overdue | {n} دوره معوق | {n} overdue periods

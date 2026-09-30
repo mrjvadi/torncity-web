@@ -2,16 +2,14 @@ import type { ScreenProps } from '../types'
 import { Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
 import { ago, formatNumber } from './kit/format'
+import { t, type Key } from '../../i18n'
 
-const CAT_FA: Record<string, { label: string; icon: string }> = {
-  finance: { label: 'مالی', icon: 'bank' },
-  faction: { label: 'جناح', icon: 'lion' },
-  work: { label: 'کار', icon: 'work' },
-  crime: { label: 'جرم', icon: 'crime' },
-  social: { label: 'اجتماعی', icon: 'society' },
-  politics: { label: 'سیاست', icon: 'vote' },
-  property: { label: 'ملک', icon: 'house' },
-  trade: { label: 'بازار', icon: 'cart' },
+const CAT_ICON: Record<string, string> = {
+  finance: 'bank', faction: 'lion', work: 'work', crime: 'crime', social: 'society', politics: 'vote', property: 'house', trade: 'cart',
+}
+function catMeta(c: string | undefined): { label: string; icon: string } {
+  const k = c ?? ''
+  return k in CAT_ICON ? { label: t(`inbox.cat.${k}` as Key), icon: CAT_ICON[k] } : { label: k || t('inbox.title'), icon: 'inbox' }
 }
 
 interface InboxCategoryCount { category?: string; count?: number }
@@ -19,18 +17,18 @@ interface InboxHubView { total?: number; categories?: InboxCategoryCount[] | nul
 
 export function InboxHub({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as InboxHubView
-  if (loading && !response) return <ScreenScroll><Header title="پیام‌ها" tone="sapphire" /></ScreenScroll>
+  if (loading && !response) return <ScreenScroll><Header title={t('inbox.title')} tone="sapphire" /></ScreenScroll>
 
   return (
     <ScreenScroll>
-      <Header title="پیام‌ها" tone="sapphire" onRefresh={() => run('inbox.show')} />
-      {!v.total && <Notice>پیامی نداری.</Notice>}
+      <Header title={t('inbox.title')} tone="sapphire" onRefresh={() => run('inbox.show')} />
+      {!v.total && <Notice>{t('inbox.empty')}</Notice>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {(v.categories ?? []).map((c, i) => {
-          const meta = CAT_FA[c.category ?? ''] ?? { label: c.category ?? '—', icon: 'inbox' }
+          const meta = catMeta(c.category)
           return (
             <ListRow key={i} icon={meta.icon} palette="sapphire" title={meta.label}
-              sub={`${formatNumber(c.count ?? 0)} پیام`}
+              sub={t('inbox.count', { n: formatNumber(c.count ?? 0) })}
               onClick={() => c.category && run('inbox.category', { category: c.category })} />
           )
         })}
@@ -45,8 +43,8 @@ interface InboxCategoryView { category?: string; items?: InboxItemLine[] | null;
 
 export function InboxCategory({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as InboxCategoryView
-  const meta = CAT_FA[v.category ?? ''] ?? { label: v.category ?? 'پیام‌ها', icon: 'inbox' }
-  if (loading && !response) return <ScreenScroll><Header title="پیام‌ها" tone="sapphire" /></ScreenScroll>
+  const meta = catMeta(v.category)
+  if (loading && !response) return <ScreenScroll><Header title={t('inbox.title')} tone="sapphire" /></ScreenScroll>
 
   return (
     <ScreenScroll>
@@ -59,7 +57,7 @@ export function InboxCategory({ response, loading, onAction, run }: ScreenProps)
             <div style={{ fontSize: 14, color: 'var(--text)' }}>{it.text}</div>
           </div>
         ))}
-        {!(v.items && v.items.length) && <Notice>پیامی در این دسته نیست.</Notice>}
+        {!(v.items && v.items.length) && <Notice>{t('inbox.empty_cat')}</Notice>}
       </div>
       <Actions response={response} onAction={onAction} refreshCommand="inbox.category" />
     </ScreenScroll>

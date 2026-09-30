@@ -2,6 +2,7 @@ import type { ScreenProps } from '../types'
 import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair } from './kit/Parts'
 import Actions from './kit/Actions'
 import { formatNumber, money, pct } from './kit/format'
+import { t } from '../../i18n'
 
 interface Named { code?: string; name?: string }
 interface ListedLine { company?: Named; type?: Named; city?: Named; price?: number; prev?: number; cap?: number; volume?: number }
@@ -14,11 +15,11 @@ function changeFrac(price?: number, prev?: number): number | null {
 
 export function Exchange({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as ExchangeView
-  if (loading && !response) return <ScreenScroll><Header title="بورس" tone="emerald" /></ScreenScroll>
+  if (loading && !response) return <ScreenScroll><Header title={t('stocks.title')} tone="emerald" /></ScreenScroll>
 
   return (
     <ScreenScroll>
-      <Header title="بورس" tone="emerald" onRefresh={() => run('stock.list')} />
+      <Header title={t('stocks.title')} tone="emerald" onRefresh={() => run('stock.list')} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {(v.lines ?? []).map((l, i) => {
           const chg = changeFrac(l.price, l.prev)
@@ -46,23 +47,23 @@ interface PortfolioView {
 
 export function Portfolio({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as PortfolioView
-  if (loading && !response) return <ScreenScroll><Header title="سبد دارایی" tone="emerald" /></ScreenScroll>
+  if (loading && !response) return <ScreenScroll><Header title={t('stocks.portfolio')} tone="emerald" /></ScreenScroll>
 
   return (
     <ScreenScroll>
-      <Header title="سبد دارایی" tone="emerald" onRefresh={() => run('stock.mine')} />
+      <Header title={t('stocks.portfolio')} tone="emerald" onRefresh={() => run('stock.mine')} />
       {v.notice && <Notice>{v.notice}</Notice>}
 
       <StatPair
-        left={<Stat icon="crowncoin" palette="gold" label="ارزش سبد" value={money(v.value)} />}
-        right={<Stat icon="chart" palette="emerald" label="سود" value={money(v.gain)} />}
+        left={<Stat icon="crowncoin" palette="gold" label={t('stocks.portfolio_value')} value={money(v.value)} />}
+        right={<Stat icon="chart" palette="emerald" label={t('stocks.gain')} value={money(v.gain)} />}
       />
 
       {!!(v.holdings && v.holdings.length) && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {v.holdings!.map((h, i) => (
             <ListRow key={i} icon="chart" palette="emerald" title={h.company?.name ?? '—'}
-              sub={`${formatNumber(h.shares ?? 0)} سهم`}
+              sub={t('stocks.shares', { n: formatNumber(h.shares ?? 0) })}
               right={money(h.value)}
               onClick={() => h.company?.code && run('stock.view', { code: h.company.code })} />
           ))}
@@ -71,12 +72,12 @@ export function Portfolio({ response, loading, onAction, run }: ScreenProps) {
 
       {!!(v.orders && v.orders.length) && (
         <Card>
-          <div className="nx-sec" style={{ marginBottom: 8 }}>سفارش‌های باز</div>
+          <div className="nx-sec" style={{ marginBottom: 8 }}>{t('stocks.open_orders')}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {v.orders!.map((o, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
                 <span>{o.company?.name}</span>
-                <span>{o.side === 'buy' ? 'خرید' : 'فروش'} {formatNumber(o.filled ?? 0)}/{formatNumber(o.qty ?? 0)} @ {formatNumber(o.price ?? 0)}</span>
+                <span>{o.side === 'buy' ? t('market.buy') : t('market.sell')} {formatNumber(o.filled ?? 0)}/{formatNumber(o.qty ?? 0)} @ {formatNumber(o.price ?? 0)}</span>
               </div>
             ))}
           </div>
@@ -85,8 +86,8 @@ export function Portfolio({ response, loading, onAction, run }: ScreenProps) {
 
       {(!!v.gold || !!v.savings) && (
         <StatPair
-          left={<Stat icon="ring" palette="gold" label="طلا" value={money(v.gold_val)} />}
-          right={<Stat icon="bank" palette="sapphire" label="پس‌انداز" value={money(v.savings)} />}
+          left={<Stat icon="ring" palette="gold" label={t('stocks.gold')} value={money(v.gold_val)} />}
+          right={<Stat icon="bank" palette="sapphire" label={t('stocks.savings')} value={money(v.savings)} />}
         />
       )}
 

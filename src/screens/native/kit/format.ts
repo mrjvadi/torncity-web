@@ -9,7 +9,7 @@ export { formatNumber }
 /** Money in minor units, with the currency word after it (ساپ, matching
  * the bot's own rendering). Negative values keep their sign. */
 export function money(n: number | undefined | null): string {
-  if (n === undefined || n === null) return '۰'.replace('۰', '0')
+  if (n === undefined || n === null) return '0'
   return `${formatNumber(n)} ${t('unit.money')}`
 }
 
@@ -28,17 +28,17 @@ export function hms(seconds: number | undefined | null): string {
  * ("6 ساعت", "12 روز"), not a countdown. */
 export function roughDuration(seconds: number | undefined | null): string {
   const s = Math.max(0, Math.floor(seconds ?? 0))
-  if (s <= 0) return '۰'.replace('۰', '0')
+  if (s <= 0) return '0'
   const day = 86400, hour = 3600, min = 60
-  if (s >= day) return `${Math.round(s / day)} روز`
-  if (s >= hour) return `${Math.round(s / hour)} ساعت`
-  if (s >= min) return `${Math.round(s / min)} دقیقه`
-  return `${s} ثانیه`
+  if (s >= day) return t('time.d', { n: Math.round(s / day) })
+  if (s >= hour) return t('time.h', { n: Math.round(s / hour) })
+  if (s >= min) return t('time.m', { n: Math.round(s / min) })
+  return t('time.s', { n: s })
 }
 
 /** How long ago, from a whole-second age. */
 export function ago(seconds: number | undefined | null): string {
-  return `${roughDuration(seconds)} پیش`
+  return t('common.ago', { t: roughDuration(seconds) })
 }
 
 /** A percent from a 0..1 fraction, one decimal dropped when whole. */
