@@ -1038,3 +1038,64 @@ common.next | بعدی | Next
 toast.unnamed | یک مورد | An item
 shell.tab.village | روستا | Village
 shell.tab.town | شهر | Town
+# -- the labour market (hiring board, construction sites) ---------------------
+labor.board.title | تابلوی استخدام | Hiring board
+labor.board.empty | فعلاً آگهی استخدامی نیست. هر ساختمانِ در حال ساخت برای کارگر آگهی می‌دهد. | No jobs are posted right now. Every building going up posts one.
+labor.board.sites | کارگاه‌های بدون آگهی | Sites with no job posted
+labor.open_board | تابلوی استخدام | Hiring board
+labor.site.title | کارگاه ساخت | Building site
+labor.mine.title | کار من | My work
+labor.mine.productivity | بازده {p}٪ | Output {p}%
+labor.mine.shifts | شیفت‌های کارکرده | Shifts worked
+labor.mine.earned | درآمد کل | Total earned
+labor.mine.next | {n} شیفت دیگر تا «{l}» | {n} more shifts to {l}
+labor.mine.idle | الان شیفتی ندارید. از تابلوی استخدام کار بردارید. | You have no shift now. Pick up a job from the hiring board.
+labor.market.title | بازار کار | Labour market
+labor.market.slack | کارگر فراوان | Workers plentiful
+labor.market.balanced | متعادل | Balanced
+labor.market.tight | کارگر کم‌یاب | Workers scarce
+labor.market.short | کمبود کارگر | Labour shortage
+labor.market.pool | {a} از {p} کارگر آزاد | {a} of {p} labourers free
+labor.market.wage | مزد کارگر روزمزد: {w} | Day-labour wage: {w}
+labor.market.min | حداقل مزد: {w} | Minimum wage: {w}
+labor.market.hint | خانهٔ بیشتر یعنی ساکن و کارگر بیشتر؛ کمبود کارگر مزد را بالا می‌برد. | More homes mean more residents and workers; a shortage pushes wages up.
+labor.job.construction | ساخت‌وساز | Construction
+labor.job.production | تولید | Production
+labor.employer.village | دهیاری | The village
+labor.employer.player | {name} | {name}
+labor.per_shift | {w} / شیفت | {w} / shift
+labor.wage_per_shift | دستمزد هر شیفت: {w} | Wage per shift: {w}
+labor.shifts_left | {n} شیفت باقی | {n} shifts left
+labor.left_hours | {left} نفر-ساعت مانده · {n} کارگر مشغول | {left} worker-hours left · {n} working
+labor.progress | {p}٪ ساخته شده | {p}% built
+labor.hours | {done} از {total} نفر-ساعت انجام شده · {left} مانده | {done} of {total} worker-hours done · {left} left
+labor.work | کار کن (+{w}) | Work (+{w})
+labor.cannot_work | الان نمی‌توانید روی این کارگاه کار کنید: کارگر کافی مشغول است یا شیفتی دارید. | You cannot work here now: enough workers are on it, or you already have a shift.
+labor.points | این شیفت {m} نفر-دقیقه به ساختمان اضافه می‌کند. | This shift adds {m} worker-minutes to the building.
+labor.working | شیفت شما در جریان است · {t} مانده | Your shift is running · {t} left
+labor.finishing | در حال پایان | Finishing
+labor.done | این ساختمان ساخته شده است. | This building is built.
+labor.workers | کارگران روی کارگاه | Workers on site
+labor.workers.none | الان کسی کار نمی‌کند؛ ساختمان بدون کارگر جلو نمی‌رود. | Nobody is working; a building does not advance without workers.
+labor.npc | کارگر روزمزد | Day labourer
+labor.level.apprentice | شاگرد | Apprentice
+labor.level.journeyman | کارگر ماهر | Journeyman
+labor.level.master | استادکار | Master
+labor.crew | خدمه: {n} کارگر روزمزد نگه داشته می‌شود | Crew: {n} day labourers kept on site
+labor.no_job | برای این کارگاه آگهی استخدامی نیست. | There is no job posted for this site.
+labor.post | ثبت آگهی استخدام | Post a job
+labor.hire | استخدام کارگر | Hire workers
+labor.hire_hint | کارگر آزاد: {a} · مزد هر شیفت: {w} | Free labourers: {a} · wage per shift: {w}
+labor.hire_n | {n} کارگر | {n} workers
+labor.hire_none | مرخص کردن خدمه | Release the crew
+labor.wage_set | دستمزد بازیکن‌ها | Wage for players
+labor.close | بستن آگهی | Close the job
+labor.not_resident | شما ساکن این روستا نیستید؛ تا وقتی اینجا هستید می‌توانید روزمزد کار کنید. | You do not live here, but you can work by the day while you are in the village.
+labor.btn.site | کارگاه | Site
+labor.btn.mine | کار من | My work
+labor.btn.board | تابلوی استخدام | Hiring board
+labor.just.worked | شیفت شما شروع شد. | Your shift has started.
+labor.just.hired | کارگرها استخدام شدند. | Workers hired.
+labor.just.wage | دستمزد تغییر کرد. | Wage changed.
+labor.just.posted | آگهی روی تابلو رفت. | The job is on the board.
+labor.just.closed | آگهی بسته شد. | The job is closed.

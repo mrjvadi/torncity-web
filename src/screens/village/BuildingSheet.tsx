@@ -13,6 +13,7 @@ import { serverNow } from '../../village/clock'
 import { countdown, iconForRole } from './common'
 import { useToast } from '../../state/ToastContext'
 import type { VillageStore } from '../../village/villageStore'
+import { SiteSheet } from './Labor'
 
 interface Props {
   building: LayoutBuilding | null
@@ -28,6 +29,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onClo
   const toast = useToast()
   const [ask, setAsk] = useState<'cancel' | 'demolish' | null>(null)
   const [busy, setBusy] = useState(false)
+  const [site, setSite] = useState(false)
   if (!b) return null
 
   const entry = cat.get(b.type)
@@ -59,9 +61,15 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onClo
           <div className="vh-sheet-meta">{t('building.at', { x: b.x + 1, y: b.y + 1 })} · {t('build.footprint', { w: b.w, h: b.h })}</div>
         </div>
       </div>
-      {building && (
+      {building && b.finish_at && (
         <Bar frac={p} color="#f5a11f" label={`${countdown(b.finish_at, now)}  ·  ${t('progress.percent', { p: Math.round(p * 100) })}`} />
       )}
+      {building && !b.finish_at && b.id && (
+        <div className="vh-sheet-actions">
+          <Slab tone="gold" radius={14} lip={4} onClick={() => setSite(true)}>{t('labor.btn.site')}</Slab>
+        </div>
+      )}
+      {site && b.id && <SiteSheet buildingId={b.id} title={name} onClose={() => setSite(false)} />}
       {canAct && ask === null && (
         <div className="vh-sheet-actions">
           {building
