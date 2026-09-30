@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { adoptServerLanguage } from '../i18n/sync'
+import { noticeText, refusalText } from '../i18n'
 import * as api from '../api/client'
 import type { Bootstrap, CommandResponse, ProfileView, RealtimeVitals } from '../api/types'
 import type { RealtimeHandle } from '../api/realtime'
@@ -270,9 +271,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       // only the answer to a command the player just ran is toasted here;
       // background refreshes (refreshProfile, screens' own fetches) never are
       if (!res.ok && res.error) {
-        toast.push(res.error.message, { kind: 'error', user: true })
+        toast.push(refusalText(res.error.code, res.error.message, res.error.args), { kind: 'error', user: true })
       } else if (res.notice) {
-        toast.push(res.notice.text, { kind: res.notice.alert ? 'warning' : undefined, user: true })
+        const text = noticeText(res.notice)
+        if (text) toast.push(text, { kind: res.notice.alert ? 'warning' : undefined, user: true })
       }
       void refreshProfile()
       return res

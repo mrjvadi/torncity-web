@@ -66,8 +66,8 @@ export function tonesFromLayout(layout: VillageLayout): Uint8Array {
 function tonesFromLots(lots: LotGridView, picks: { x: number; y: number }[] = [], bad: { x: number; y: number }[] = []): Uint8Array {
   const n = lots.grid_lots
   const out = new Uint8Array(n * n)
-  for (const row of lots.rows) {
-    for (const c of row) {
+  for (const row of lots.rows ?? []) {
+    for (const c of row ?? []) {
       out[c.y * n + c.x] = c.fits ? TONE_OK : c.state === 'occupied' || c.state === 'road' ? TONE_TAKEN : c.state === 'free' ? TONE_NONE : TONE_BAD
     }
   }
@@ -94,7 +94,7 @@ export function blockReason(lots: LotGridView | null, anchor: { x: number; y: nu
   if (anchor.x < 0 || anchor.y < 0 || anchor.x + w > n || anchor.y + h > n) return t('build.reason.bounds')
   for (let y = anchor.y; y < anchor.y + h; y++) {
     for (let x = anchor.x; x < anchor.x + w; x++) {
-      const s = lots.rows[y]?.[x]?.state
+      const s = lots.rows?.[y]?.[x]?.state
       if (s === 'water') return t('build.reason.water')
       if (s === 'steep') return t('build.reason.steep')
       if (s === 'occupied') return t('build.reason.occupied')
@@ -113,7 +113,7 @@ export function anchorFor(lots: LotGridView, tap: { x: number; y: number }, w: n
     for (let ax = tap.x - w + 1; ax <= tap.x; ax++) {
       const cx = ax + (w - 1) / 2, cy = ay + (h - 1) / 2
       const inside = ax >= 0 && ay >= 0 && ax + w <= n && ay + h <= n
-      cands.push({ x: ax, y: ay, d: Math.hypot(cx - tap.x, cy - tap.y), fits: inside && !!lots.rows[ay]?.[ax]?.fits })
+      cands.push({ x: ax, y: ay, d: Math.hypot(cx - tap.x, cy - tap.y), fits: inside && !!lots.rows?.[ay]?.[ax]?.fits })
     }
   }
   cands.sort((a, b) => Number(b.fits) - Number(a.fits) || a.d - b.d)
@@ -189,7 +189,7 @@ export function useBuildMode(
     setS((p) => {
       if (p.step !== 'lot' || !p.lots) return p
       if (isMulti(cat, p.code)) {
-        const fitsAt = (q: { x: number; y: number }) => !!p.lots?.rows[q.y]?.[q.x]?.fits
+        const fitsAt = (q: { x: number; y: number }) => !!p.lots?.rows?.[q.y]?.[q.x]?.fits
         const last = p.picks[p.picks.length - 1]
         if (p.pathMode && last && (last.x !== lot.x || last.y !== lot.y)) {
           // the run from the last pick: every fitting lot on it not yet picked
@@ -208,7 +208,7 @@ export function useBuildMode(
 
   const fits = useMemo(() => {
     if (!s.lots || !s.anchor) return false
-    return !!s.lots.rows[s.anchor.y]?.[s.anchor.x]?.fits
+    return !!s.lots.rows?.[s.anchor.y]?.[s.anchor.x]?.fits
   }, [s.lots, s.anchor])
 
   const undoPick = useCallback(() => setS((p) => ({ ...p, picks: p.picks.slice(0, -1), badLots: [] })), [])

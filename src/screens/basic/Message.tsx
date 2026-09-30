@@ -53,7 +53,7 @@ export function makeMessage(kind: Kind, name: string): ScreenComponent {
     const headTitle = title === known ? (parsed.title || t(k.title)) : title
     const facts = useMemo(() => factsFor(name, response?.view), [response?.view])
     const back = (response?.actions ?? []).find((a) => a.kind === 'back')
-    const refresh = (response?.actions ?? []).find((a) => a.kind === 'navigation' && /(تازه‌سازی|refresh)\s*$/i.test(a.label))
+    const refresh = (response?.actions ?? []).find((a) => a.kind === 'navigation' && (a.id === 'refresh' || /(تازه‌سازی|refresh)\s*$/i.test(a.label ?? '')))
 
     if (loading && !response) {
       return <ScreenScroll><Header title={headTitle} tone={k.tone} /><Card><Skeleton lines={3} /></Card></ScreenScroll>

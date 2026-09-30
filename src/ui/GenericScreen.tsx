@@ -23,9 +23,9 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
     const actions = response?.actions ?? []
     const byRow = new Map<number, Action[]>()
     for (const a of actions) {
-      const list = byRow.get(a.row) ?? []
+      const list = byRow.get(a.row ?? 0) ?? []
       list.push(a)
-      byRow.set(a.row, list)
+      byRow.set(a.row ?? 0, list)
     }
     return [...byRow.entries()].sort((a, b) => a[0] - b[0])
   }, [response])

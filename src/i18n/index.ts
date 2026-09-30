@@ -90,13 +90,40 @@ export function t(key: Key, params?: Record<string, string | number>): string {
   return s
 }
 
-/** The text for a server refusal by its `error.code`, falling back to the
- * server's own sentence (already in the player's language) and then a
- * generic line. */
-export function refusalText(code: string | undefined, serverMessage?: string): string {
-  const key = `refusal.${code ?? ''}` as Key
-  if (code && (key in FA)) return t(key)
+/** True when a string with this key exists in the active language tables. */
+export function hasKey(key: string): boolean {
+  return key in FA || (current === 'en' && key in EN)
+}
+
+/** The text for a server refusal by its `error.code`; `args` are the data the
+ * server sent with it ({min}, {max}, {remaining}...). A code this client has no
+ * wording for falls back to the legacy sentence the server may still send, and
+ * then to a generic line. */
+export function refusalText(code: string | undefined, serverMessage?: string, args?: Record<string, unknown>): string {
+  const key = `refusal.${code ?? ''}`
+  if (code && hasKey(key)) {
+    const params: Record<string, string | number> = {}
+    for (const [k, v] of Object.entries(args ?? {})) if (typeof v === 'string' || typeof v === 'number') params[k] = v
+    // the server's bounds are money; a wait comes as whole seconds
+    for (const k of ['min', 'max']) if (typeof params[k] === 'number') params[k] = `${Number(params[k]).toLocaleString('en-US')} ${t('unit.money')}`
+    if (typeof params.remaining_seconds === 'number') {
+      const s = Math.max(0, Math.round(params.remaining_seconds))
+      params.time = s >= 3600 ? t('time.h', { n: Math.ceil(s / 3600) }) : s >= 60 ? t('time.m', { n: Math.ceil(s / 60) }) : t('time.s', { n: s })
+    }
+    return t(key as Key, params)
+  }
   return serverMessage && serverMessage.trim() ? serverMessage : t('refusal.unknown')
+}
+
+/** The line for a notice: the legacy sentence when the server still sends one, else this client's
+ * own wording of its `code` (keys `notice.<code>`); empty when there is neither. */
+export function noticeText(n: { text?: string; code?: string; args?: Record<string, unknown> }): string {
+  if (n.text && n.text.trim()) return n.text
+  const key = `notice.${n.code ?? ''}`
+  if (!n.code || !hasKey(key)) return ''
+  const params: Record<string, string | number> = {}
+  for (const [k, v] of Object.entries(n.args ?? {})) if (typeof v === 'string' || typeof v === 'number') params[k] = v
+  return t(key as Key, params)
 }
 
 /** Picks the text for the active language from a {fa, en} pair (content

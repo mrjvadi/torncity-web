@@ -14,11 +14,14 @@ import { useMemo, useState } from 'react'
 import type { Action, CommandResponse } from '../../../api/types'
 import { toWesternDigits } from '../../../lib/persian'
 import { cleanLabel } from './format'
+import { actionLabel } from '../../village/wording'
 import Icon from '../../../ui/Icon'
 import BottomSheet from '../../../ui/BottomSheet'
 import { isRtl, t } from '../../../i18n'
 import './actions.css'
 
+/** The text of an action: Telegram's label while the server still sends one, else the web's wording of its id. */
+const L = (a: Action) => a.label ?? actionLabel(a)
 const REFRESH = /(تازه‌سازی|refresh)\s*$/i
 const PREV = /^[\s\p{Extended_Pictographic}️]*[‹«◀⬅←]|^(\S*\s)?(قبلی|prev)/iu
 const NEXT = /^[\s\p{Extended_Pictographic}️]*[›»▶➡→]|^(\S*\s)?(بعدی|next)/iu
@@ -28,9 +31,9 @@ const PAGE_ARROW = /^[\s\p{Extended_Pictographic}️]*[‹›«»◀▶⬅➡←
 export function pagerDir(a: Action): 'prev' | 'next' | null {
   if (a.kind === 'primary' || a.kind === 'danger' || a.kind === 'confirm') return null
   const paged = a.args && a.args.page !== undefined
-  if (!paged && !PAGE_ARROW.test(a.label)) return null
-  if (PREV.test(a.label)) return 'prev'
-  if (NEXT.test(a.label)) return 'next'
+  if (!paged && !PAGE_ARROW.test(L(a))) return null
+  if (PREV.test(L(a))) return 'prev'
+  if (NEXT.test(L(a))) return 'next'
   return null
 }
 
@@ -50,15 +53,15 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
   const { rows, pager } = useMemo(() => {
     const all = (response?.actions ?? [])
       .filter((a) => !only || only(a))
-      .filter((a) => a.kind !== 'back' && !(a.kind === 'navigation' && REFRESH.test(a.label)))
+      .filter((a) => a.kind !== 'back' && !(a.kind === 'navigation' && (a.id === 'refresh' || REFRESH.test(L(a)))))
     const pager: { prev?: Action; next?: Action } = {}
     const byRow = new Map<number, Action[]>()
     for (const a of all) {
       const d = pagerDir(a)
       if (d) { pager[d] = a; continue }
-      const list = byRow.get(a.row) ?? []
+      const list = byRow.get(a.row ?? 0) ?? []
       list.push(a)
-      byRow.set(a.row, list)
+      byRow.set(a.row ?? 0, list)
     }
     return { rows: [...byRow.entries()].sort((x, y) => x[0] - y[0]), pager }
   }, [response, only])
@@ -91,7 +94,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
               {list.map((a, i) => (
                 <button key={i} className={`ax-chip${a.kind === 'primary' ? ' ax-chip-primary' : ''}`} onClick={() => handleClick(a)}>
                   {a.icon && <Icon name={a.icon} palette={a.kind === 'primary' ? 'gold' : 'steel'} size={16} />}
-                  <span>{cleanLabel(a.label)}</span>
+                  <span>{cleanLabel(L(a))}</span>
                 </button>
               ))}
             </div>
@@ -106,7 +109,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
         </div>
       )}
 
-      <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput ? cleanLabel(pendingInput.label) : undefined}>
+      <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput ? cleanLabel(L(pendingInput)) : undefined}>
         <input
           className="nx-sheet-input"
           value={inputValue}
@@ -119,7 +122,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
       </BottomSheet>
 
       <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')}>
-        <p className="nx-confirm-label">{pendingConfirm ? cleanLabel(pendingConfirm.label) : ''}</p>
+        <p className="nx-confirm-label">{pendingConfirm ? cleanLabel(L(pendingConfirm)) : ''}</p>
         <div className="nx-confirm-buttons">
           <button className="nx-confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</button>
           <button className="nx-confirm-no display" onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</button>
@@ -132,7 +135,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
 /** One action that has its row to itself. Only the lead primary is a gold
  * slab; a second primary steps down to an outlined slab. */
 function ActionButton({ action, lead, onClick }: { action: Action; lead: boolean; onClick: () => void }) {
-  const label = cleanLabel(action.label)
+  const label = cleanLabel(L(action))
   if (action.kind === 'primary') {
     return (
       <button className={`nx-primary${lead ? '' : ' nx-primary-alt'} display`} onClick={onClick}>

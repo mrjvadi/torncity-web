@@ -24,20 +24,37 @@ export interface ActionInput {
 }
 
 export interface Action {
-  label: string
+  /** Telegram's button text. The neutral contract (client-api 1.4) sends none for
+   * a migrated screen: the web words an action by its `id` (screens/village/actionLabel.ts). */
+  label?: string
+  /** What the action is, by meaning ("citizen.land", "back", "confirm"); empty = the command. */
+  id?: string
+  /** The content code the action is about (a building, a knowledge, an item). */
+  subject?: string
   command?: string
   args?: Record<string, string>
   input?: ActionInput
   url?: string
-  row: number
+  /** Keyboard row of the legacy contract; absent for a migrated screen. */
+  row?: number
   kind: 'primary' | 'secondary' | 'danger' | 'navigation' | 'back' | 'confirm' | string
   icon?: string
   group?: string
 }
 
 export interface Notice {
-  text: string
+  /** The legacy sentence; a migrated screen sends `code` and `args` instead. */
+  text?: string
+  code?: string
+  args?: Record<string, unknown>
   alert: boolean
+}
+
+/** A refusal: a stable `code` and data (`args`); `message` is the legacy sentence. */
+export interface ApiErrorBody {
+  code: string
+  message?: string
+  args?: Record<string, unknown>
 }
 
 export interface CommandResponse {
@@ -48,7 +65,7 @@ export interface CommandResponse {
   view?: Record<string, unknown>
   actions?: Action[]
   notice?: Notice
-  error?: { code: string; message: string }
+  error?: ApiErrorBody
 }
 
 export interface RealtimeToken {
@@ -388,167 +405,19 @@ export interface SettlementEvent {
   via?: 'travel' | 'residence'
 }
 
-// -- Village views (Go XxxView structs, snake_case, durations as *_seconds) --
+// -- Village views: generated from the Go view types (views.gen.ts, do not edit) --
+// The names below are the ones the village code already uses.
 
-export interface Named { code: string; name: string }
-
-export interface VillageOverviewView {
-  name: string
-  tier: string
-  population: number
-  population_cap: number
-  food_percent: number
-  job_percent: number
-  service_percent: number
-  happiness_percent: number
-  security_percent: number
-  literacy_percent: number
-  treasury: number
-  buildings: { role: string; building: Named; tier: number }[] | null
-  /** The starter city whose services are a journey away (contract 1.4). */
-  support?: { code: string; name: string }
-  resident?: boolean
-}
-
-/** `settlement.donate`: the amounts, the confirm and the result (contract 1.4). */
-export interface DonateView {
-  village: string
-  amount: number
-  presets: number[] | null
-  min: number
-  max: number
-  treasury: number
-  cash: number
-  settlement_id: string
-}
-
-export interface BuildLineView {
-  building: Named
-  role: string
-  state: 'available' | 'locked' | string
-  cost_money: number
-  build_time_seconds: number
-  missing: Named[] | null
-}
-
-export interface BuildMenuView {
-  name: string
-  treasury: number
-  running_builds: number
-  concurrent_cap: number
-  lines: BuildLineView[] | null
-}
-
-export interface LotCellView { x: number; y: number; state: 'free' | 'occupied' | 'water' | 'steep' | 'road' | string; fits: boolean }
-
-export interface LotGridView {
-  settlement_name: string
-  building: Named
-  can_rotate: boolean
-  rotated: boolean
-  grid_lots: number
-  rows: LotCellView[][]
-}
-
-export interface LotConfirmView {
-  settlement_name: string
-  building: Named
-  x: number
-  y: number
-  rotated: boolean
-  cost_money: number
-  materials: { component: Named; quantity: number }[] | null
-  build_time_seconds: number
-  /** Lots of road the game lays with it (contract 1.4). */
-  auto_roads?: number
-}
-
-/** The panel of one placed building (settlement.building.view, contract 1.4). */
-export interface BuildingPanelView {
-  id: string
-  building: Named
-  role?: string
-  tier?: number
-  /** Which panel to draw; an unknown kind is drawn as 'generic'. */
-  kind: 'road' | 'civic_hall' | 'storage' | 'school' | 'security' | 'generic' | string
-  state: 'complete' | 'building'
-  mode?: '' | 'up' | 'dm' | 'cx'
-  x: number
-  y: number
-  w: number
-  h: number
-  rotated: boolean
-  upkeep?: number
-  description?: string
-  effects?: { target: string; value: number }[] | null
-  can_manage: boolean
-  started_at?: string
-  finish_at?: string
-  left_seconds?: number
-  progress_percent?: number
-  stock?: { item: Named; kind: string; qty: number }[] | null
-  literacy_percent?: number
-  teaching?: boolean
-  treasury?: number
-  population?: number
-  research?: { knowledge: Named; finish_at: string; left_seconds: number } | null
-  has_upgrade?: boolean
-  upgrades?: { building: Named; tier: number; cost_money: number; build_time_seconds: number; available: boolean; missing?: Named[] | null }[] | null
-}
-
-/** The total of a batch (settlement.build.place_many without confirm). */
-export interface BatchConfirmView {
-  settlement_name: string
-  building: Named
-  lots: { x: number; y: number }[] | null
-  count: number
-  cost_money: number
-  materials: { component: Named; quantity: number }[] | null
-  build_time_seconds: number
-}
-
-/** The price of the next expansion of the land (settlement.grid.grow). */
-export interface GridGrowView {
-  settlement_name: string
-  side: number
-  new_side: number
-  lots_gained: number
-  buildable_gained: number
-  price: number
-  treasury: number
-}
-
-export interface ConstructionLineView {
-  building: Named
-  lot_x: number
-  lot_y: number
-  state: 'queued' | 'building' | string
-  finish_at: string | null
-  left_seconds: number
-}
-
-export interface ConstructionProgressView { name: string; lines: ConstructionLineView[] | null }
-
-export interface KnowledgeLineView {
-  knowledge: Named
-  state: 'held' | 'researching' | 'available' | 'locked' | string
-  research_cost: number
-  research_time_seconds: number
-  buy_price: number
-  missing: Named[] | null
-  terrain_ok: boolean
-}
-
-export interface KnowledgeListView {
-  name: string
-  treasury: number
-  literacy_percent: number
-  running: { knowledge: Named; finish_at: string | null; left_seconds: number } | null
-  lines: KnowledgeLineView[] | null
-  hidden: number
-}
-
-export interface VillageRefusalView { kind: string; back: string }
+export type {
+  Named, VillageOverviewView, DonateView, BuildMenuView, LotGridView, LotConfirmView, GridGrowView,
+  ConstructionProgressView, KnowledgeListView, LotBuyView, PrivateMenuView, PrivateConfirmView, MineView,
+  MaterialBuyView as MaterialBuyConfirmView, MaterialsView as VillageMaterialsView, BuildingView as BuildingPanelView,
+  LotBatchConfirmView as BatchConfirmView, VillageRefusalView, PromotionView, ResidenceView, WorkView, TermsView,
+  LandView, SettlementWhoView, PrivateLotsView, VillageNeed, ScreenViews,
+  BuildLine as BuildLineView, LotCell as LotCellView, ConstructionLine as ConstructionLineView, KnowledgeLine as KnowledgeLineView,
+  PrivateMaterial as PrivateMaterialView, PrivateLine as PrivateLineView, MineLot as MineLotView,
+  MaterialStockLine as MaterialStockLineView, MaterialMarketLine as MaterialMarketLineView, MaterialBought as MaterialBoughtView,
+} from './views.gen'
 
 /** One settlement_building entry of the content catalogue (section 4.1). */
 export interface CatalogueBuilding {
@@ -558,103 +427,4 @@ export interface CatalogueBuilding {
   footprint: [number, number]
   /** Free of the concurrent-construction cap, so it can be laid many at a time (roads). */
   cap_exempt?: boolean
-}
-
-// -- the citizen loop (contract 1.4): land and private buildings ------------------
-
-export interface LotBuyView {
-  village: string
-  settlement_id: string
-  x: number
-  y: number
-  price: number
-  cash: number
-  treasury: number
-}
-
-export interface PrivateMaterialView { component: Named; need: number; have: number; buy: number; buy_cost: number }
-
-export interface PrivateLineView {
-  building: Named
-  home: boolean
-  class: string
-  cost_money: number
-  permit_fee: number
-  materials: PrivateMaterialView[] | null
-  build_time_seconds: number
-  footprint_w: number
-  footprint_h: number
-  total: number
-  affordable: boolean
-}
-
-export interface PrivateMenuView {
-  village: string
-  cash: number
-  owned_lots: number
-  free_lots: number
-  lines: PrivateLineView[] | null
-}
-
-export interface PrivateConfirmView {
-  village: string
-  building: Named
-  x: number
-  y: number
-  rotated: boolean
-  cost_money: number
-  permit_fee: number
-  materials: PrivateMaterialView[] | null
-  materials_cost: number
-  total: number
-  cash: number
-  build_time_seconds: number
-}
-
-export interface MineLotView { x: number; y: number; building?: string; state?: string; left_seconds?: number }
-
-export interface MineView {
-  village: string
-  cash: number
-  lots: MineLotView[] | null
-  home?: Named | null
-  can_rest: boolean
-  rest_wait_seconds: number
-  assessed: number
-  tax_per_period: number
-  tax_bps: number
-  debt: number
-  debt_periods: number
-  notice?: string
-}
-
-// -- village storage and market (settlement.materials, settlement.materials.buy) ------------------
-
-export interface MaterialStockLineView { item: Named; qty: number }
-export interface MaterialMarketLineView { item: Named; price: number }
-export interface MaterialBoughtView { item: Named; qty: number; total: number }
-
-/** `village_materials`: the village stock and Support's market. `can_buy` says
- * whether the viewer may spend the treasury; `bought` is set right after a purchase. */
-export interface VillageMaterialsView {
-  village: string
-  treasury: number
-  stock: MaterialStockLineView[] | null
-  used: number
-  capacity: number
-  market: MaterialMarketLineView[] | null
-  can_buy: boolean
-  presets: number[] | null
-  bought?: MaterialBoughtView
-}
-
-/** `village_materials_buy_confirm`: the bill before a purchase. */
-export interface MaterialBuyConfirmView {
-  village: string
-  item: Named
-  qty: number
-  unit: number
-  total: number
-  treasury: number
-  free: number
 }
