@@ -54,3 +54,28 @@ export function initTelegram(): void {
 export function telegramInitData(): string {
   return getTelegramWebApp()?.initData ?? ''
 }
+
+/** The start parameter the game was opened with: Telegram's own
+ * `start_param` of a direct-link Mini App (t.me/<bot>?startapp=<param>), or
+ * the `tgWebAppStartParam` launch parameter it also travels as, or - in a
+ * plain browser - `?startapp=` / `?found=`. Empty when there is none. */
+export function launchStartParam(): string {
+  const wa = getTelegramWebApp() as unknown as { initDataUnsafe?: { start_param?: string } } | null
+  const fromTelegram = wa?.initDataUnsafe?.start_param
+  if (fromTelegram) return fromTelegram
+  const read = (q: string) => {
+    const p = new URLSearchParams(q)
+    return p.get('tgWebAppStartParam') || p.get('startapp') || ''
+  }
+  const fromUrl = read(window.location.search) || read(window.location.hash.replace(/^#/, ''))
+  if (fromUrl) return fromUrl
+  const found = new URLSearchParams(window.location.search).get('found')
+  return found ? `found_${found.replace(/-/g, '')}` : ''
+}
+
+/** The founding draft a launch asks for (start parameter `found_<id>`), or
+ * '' - the id comes without dashes and is sent to the server as it is. */
+export function foundingDraftFromLaunch(): string {
+  const m = /^found_([0-9a-fA-F]{32})$/.exec(launchStartParam())
+  return m ? m[1].toLowerCase() : ''
+}

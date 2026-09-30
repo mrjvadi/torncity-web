@@ -173,6 +173,83 @@ export interface BootstrapSettlement {
   resident: boolean
   grid_lots: number
   layout_path: string
+  /** The founding form's choices (contract 1.3); absent on an older village. */
+  emblem?: EmblemCodes
+  motto?: string
+  currency?: { code: string; name: string; symbol: string }
+}
+
+// -- The founding form (client-api.md section 4.4, contract 1.3) ---------------
+
+/** A village emblem: four codes of the catalogue, drawn as an SVG. */
+export interface EmblemCodes {
+  shape: string
+  color_a: string
+  color_b: string
+  icon: string
+}
+
+export interface FoundingChoice { code: string; name: string; emoji: string; hex?: string }
+
+export interface FoundingLimits {
+  name_min: number
+  name_max: number
+  motto_max: number
+  currency_name_min: number
+  currency_name_max: number
+  currency_code_len: number
+  currency_symbol_max: number
+}
+
+export type FoundingState = 'mine' | 'other' | 'expired' | 'founded'
+
+/** `founding_form`: what the form needs. */
+export interface FoundingFormView {
+  state: FoundingState
+  draft: string
+  expires_at: string
+  founder: string
+  suggested_name: string
+  default_emblem: EmblemCodes
+  limits: FoundingLimits
+  shapes: FoundingChoice[]
+  palette: FoundingChoice[]
+  icons: FoundingChoice[]
+  neutral_currency: string
+  settlement_id?: string
+  settlement_name?: string
+}
+
+export interface FoundingProblem { field: string; code: string }
+
+/** The form fields a problem can name. */
+export type FoundingField = 'name' | 'motto' | 'currency_name' | 'currency_code' | 'currency_symbol' | 'emblem'
+
+/** What `settlement.found.submit` takes. */
+export interface FoundingSubmitArgs {
+  draft: string
+  name: string
+  motto: string
+  currency_name: string
+  currency_code: string
+  currency_symbol: string
+  shape: string
+  color_a: string
+  color_b: string
+  icon: string
+  check?: string
+}
+
+/** `settlement_founded`. */
+export interface SettlementFoundedView {
+  name: string
+  settlement_id: string
+  emblem: EmblemCodes
+  emblem_text?: string
+  motto?: string
+  currency_name?: string
+  currency_code?: string
+  currency_symbol?: string
 }
 
 export interface ChunkAddrRef { face: number; lod: number; x: number; y: number }
