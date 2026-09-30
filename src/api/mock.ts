@@ -6,6 +6,7 @@ import { API_BASE } from './client'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
+import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -88,6 +89,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   }
   // war/military (no structured view yet) and friends/search (structured):
   // the features area's own mock data (src/api/mock_features.ts).
+  const village = mockVillageCommand(command, args)
+  if (village) return json(village)
   const feature = mockFeatureCommand(command, args)
   if (feature) return json(feature)
   // Native screens with a real view (src/screens/native/*): real shapes
@@ -110,6 +113,7 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
 }
 
 export function installMockApi(): void {
+  installVillageMockHandles()
   const realFetch = window.fetch.bind(window)
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -128,8 +132,11 @@ export function installMockApi(): void {
         places: [{ code: 'old_town', name: 'مرکز شهر' }],
         server_time: new Date().toISOString(),
         realtime: false,
+        settlement: mockBootstrapSettlement(),
       })
     }
+    const villageRes = mockVillageRoute(path, (init?.method ?? 'GET').toUpperCase(), new Headers(init?.headers))
+    if (villageRes) return villageRes
     if (path === '/api/v1/world/city') {
       return json(MOCK_CITY_MAP)
     }

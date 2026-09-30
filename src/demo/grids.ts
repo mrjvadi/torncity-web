@@ -26,11 +26,17 @@ export class CityGrids {
    * coarseWorldMeters/fineWorldMeters result to get scene metres. */
   readonly originX: number
   readonly originZ: number
+  /** How far the fine terrain is cut below a river/stream/lake surface (the
+   * village view carves beds so water sits in them); 0 for the export demo. */
+  riverCarveM = 0
 
-  constructor(doc: CityExportJSON) {
+  /** `pre` supplies grids that are already decoded (the village view builds
+   * them from live chunks, not from an export file) and already graded to
+   * the village's own lots, so the export-city plateau grading is skipped. */
+  constructor(doc: CityExportJSON, pre?: { coarse: DecodedGrid; fine: DecodedGrid }) {
     this.doc = doc
-    this.coarse = decodeCoarseGrid(doc)
-    this.fine = decodeFineGrid(doc)
+    this.coarse = pre ? pre.coarse : decodeCoarseGrid(doc)
+    this.fine = pre ? pre.fine : decodeFineGrid(doc)
     // NOTE: fineWorldMeters, not cityWorldMeters — cityWorldMeters already
     // adds doc.city.originX/Y itself (it takes CITY-LOCAL coordinates), and
     // originX/size/2 below is already a FINE-GRID index, so going through
@@ -41,7 +47,7 @@ export class CityGrids {
     this.originX = center.x
     this.originZ = center.z
 
-    this.gradeCityFootprint()
+    if (!pre) this.gradeCityFootprint()
   }
 
   /** Grades the fine grid's elevation to one smooth plateau under the

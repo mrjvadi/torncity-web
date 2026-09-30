@@ -271,7 +271,7 @@ export function buildWater(grids: CityGrids): WaterResult {
   const yAt = (fx: number, fy: number): number => {
     const e = bilinear(grids.fine.elevation, w, h, fx, fy) * ELEVATION_SCALE
     const kindNear = grids.fine.water[grids.fineIndex(Math.round(fx), Math.round(fy))]
-    const y = kindNear === WATER_KIND_OCEAN ? Math.min(0, e) : e
+    const y = kindNear === WATER_KIND_OCEAN ? Math.min(0, e) : e + (grids.riverCarveM ?? 0)
     return y + FINE_GROUND_LIFT + 0.06
   }
 

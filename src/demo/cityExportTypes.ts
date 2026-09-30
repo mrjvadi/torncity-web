@@ -151,7 +151,7 @@ export function decodeInt16LE(b64: string): Int16Array {
 export interface DecodedGrid {
   w: number
   h: number
-  elevation: Int16Array
+  elevation: Int16Array | Float32Array
   biome: Uint8Array
   /** coarse: TILE_FLAG_* bitmask. fine: WATER_KIND_* enum value. Same
    * array shape, different meaning — see isWetCoarse/isWetFine below. */

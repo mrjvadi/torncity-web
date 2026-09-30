@@ -438,6 +438,12 @@ export class GrassField {
     this.object.frustumCulled = false
   }
 
+  /** Drops scatter cells the caller wants kept bare (the village's own lots). */
+  removeCandidates(drop: (fx: number, fy: number) => boolean): void {
+    this.candidates = this.candidates.filter((c) => !drop(c.fx, c.fy))
+    this.lastCamera.set(Infinity, Infinity, Infinity)
+  }
+
   /** Re-scatters tufts around `cameraPos` (scene metres) if the camera has
    * moved far enough since the last scatter to matter. Cheap enough to call
    * from the same throttle water.ts's ripple animation uses; grass itself

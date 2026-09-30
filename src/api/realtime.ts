@@ -15,6 +15,8 @@ import type { Centrifuge as CentrifugeClient } from 'centrifuge'
 import type { RealtimeVitals } from './types'
 import { getRealtimeToken, WS_BASE } from './client'
 import { report } from '../lib/reporter'
+import { publishSettlement, setSettlementLive } from './settlementBus'
+import type { SettlementEvent } from './types'
 
 export type VitalsListener = (v: RealtimeVitals) => void
 export type InboxListener = (unread: number) => void
@@ -68,6 +70,15 @@ export async function connectRealtime(
   }
 
   client.on('publication', (ctx) => {
+    // a settlement's channel (client-api.md section 5.4), subscribed
+    // server-side by the connection token: handed to the village store
+    if (typeof ctx.channel === 'string' && ctx.channel.startsWith('settlement:')) {
+      const ev = ctx.data as SettlementEvent | null | undefined
+      if (ev && typeof ev === 'object' && typeof ev.type === 'string') {
+        publishSettlement({ ...ev, settlement_id: ev.settlement_id || ctx.channel.slice('settlement:'.length) })
+      }
+      return
+    }
     const data = ctx.data as { type?: string; unread?: number } | null | undefined
     if (!data || typeof data !== 'object') return
     if (data.type === 'vitals') {
@@ -79,14 +90,15 @@ export async function connectRealtime(
   client.on('error', (ctx) => {
     report('realtime', `centrifugo ${ctx.type}: ${ctx.error?.message ?? ''}`)
   })
-  client.on('connected', () => onLive?.(true))
-  client.on('disconnected', () => onLive?.(false))
+  client.on('connected', () => { onLive?.(true); setSettlementLive(true) })
+  client.on('disconnected', () => { onLive?.(false); setSettlementLive(false) })
 
   client.connect()
 
   return {
     disconnect: () => {
       onLive?.(false)
+      setSettlementLive(false)
       try {
         client.disconnect()
       } catch {
