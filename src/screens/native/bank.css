@@ -3,29 +3,18 @@
 .bk-tabs { display: flex; gap: 10px; }
 .bk-tab { flex: 1; padding: 11px 8px; border-radius: 22px; font-size: 16px; color: var(--text-dim); background: rgba(2,3,8,0.6); border: 1.5px solid rgba(255,255,255,0.14); }
 .bk-tab.on { color: #fff; background: linear-gradient(180deg, #6b5210, #3a2c08); border-color: var(--gold); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.2); }
-.bk-amount {
-  display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 20px;
-  background: linear-gradient(180deg, #14183a, #070a1e); border: 2.5px solid var(--gold);
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
-}
+/* the amount: a plain input the phone keyboard types into */
+.bk-amount { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 16px; background: rgba(2,3,8,0.7); border: 1.5px solid var(--gold-soft); }
+.bk-amount:focus-within { border-color: var(--gold); }
+.bk-input { flex: 1; min-width: 0; width: 100%; background: none; border: 0; outline: 0; font-size: 26px; color: var(--gold); text-align: end; }
+.bk-input::placeholder { color: rgba(242,194,85,0.35); }
 .bk-amount.over { border-color: var(--anar); }
-.bk-amount-value { flex: 1; font-size: 40px; line-height: 1.1; color: var(--gold); text-align: end; }
-.bk-amount.over .bk-amount-value { color: #ff9a9e; }
-.bk-amount-unit { font-size: 15px; color: var(--text-dim); padding-inline-start: 12px; border-inline-start: 2px solid rgba(242,194,85,0.55); }
-.bk-clear { width: 38px; height: 38px; border-radius: 50%; font-size: 20px; color: #fff; background: linear-gradient(180deg, #8a91aa, #4a5068); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.3); }
-.bk-clear:disabled { opacity: 0.4; }
+.bk-amount.over .bk-input { color: #ff9a9e; }
+.bk-amount-unit { flex: none; font-size: 14px; color: var(--text-dim); padding-inline-start: 12px; border-inline-start: 2px solid rgba(242,194,85,0.55); }
 .bk-hint { text-align: center; font-size: 12px; color: var(--text-dim); margin-top: -4px; }
 .bk-quick { display: flex; gap: 8px; }
-.bk-chip { flex: 1; padding: 9px 4px; border-radius: 18px; font-size: 13px; font-weight: 700; color: #dbe4ff; background: linear-gradient(180deg, #1c2a70, #0d1440); border: 1.5px solid rgba(80,110,230,0.7); }
-.bk-chip-all { color: #fff; background: linear-gradient(180deg, #6b5210, #3a2c08); border-color: var(--gold); }
-.bk-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-.bk-key {
-  padding: 13px 0; border-radius: 16px; font-size: 24px; color: #fff; text-align: center;
-  background: linear-gradient(180deg, #9aa3bd, #565e78); box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 4px 0 #262c40;
-}
-.bk-key:active { transform: translateY(3px); box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), 0 1px 0 #262c40; }
-.bk-key-blue { background: linear-gradient(180deg, #5b78ee, #2a3fa8); box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 4px 0 #101a5a; }
-.bk-key-red { background: linear-gradient(180deg, #ff8a8e, #c02a32); box-shadow: inset 0 2px 0 rgba(255,255,255,0.35), 0 4px 0 #5e1014; }
+/* quick amounts: small and quiet */
+.bk-chip { flex: 1; padding: 6px 4px; border-radius: 14px; font-size: 12px; color: var(--text-dim); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
 .bk-submit {
   position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
   padding: 14px 14px; border-radius: 18px; color: #3a1c00;

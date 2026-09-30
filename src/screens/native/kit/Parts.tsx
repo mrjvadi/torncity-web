@@ -3,9 +3,9 @@
 // cards, pill progress bars, a percent ring, list rows and hub tiles.
 // CSS lives in src/styles/global.css under the `/* screens */` block.
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import Icon, { type IconPalette } from '../../../ui/Icon'
-import { GLabel } from '../../../kit'
+import './header.css'
 import { t, isRtl } from '../../../i18n'
 
 export type Tone = 'gold' | 'ruby' | 'violet' | 'emerald' | 'sapphire' | 'teal'
@@ -43,14 +43,11 @@ export function Header({ title, tone = 'gold', onBack, onRefresh }: {
   onBack?: () => void
   onRefresh?: () => void
 }) {
-  const [top, bottom] = TONE[tone]
   return (
-    <div className="k-hdr">
-      <button className="k-hdr-btn" disabled={!onBack} onClick={onBack} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>
-      <div className="k-ribbon" style={{ '--k-top': top, '--k-bottom': bottom } as CSSProperties}>
-        <GLabel className="k-ribbon-title" top="#ffffff" bottom="#ffe6b8" stroke={1.2}>{title}</GLabel>
-      </div>
-      <button className="k-hdr-btn" disabled={!onRefresh} onClick={onRefresh} aria-label={t('common.refresh')}>↻</button>
+    <div className={`cx-hdr cx-hdr-${tone}`}>
+      {onBack && <button className="cx-hdr-btn" onClick={onBack} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>}
+      <span className="cx-hdr-title display">{title}</span>
+      {onRefresh && <button className="cx-hdr-btn cx-hdr-refresh" onClick={onRefresh} aria-label={t('common.refresh')}>↻</button>}
     </div>
   )
 }

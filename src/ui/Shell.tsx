@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { takeResume, saveResume } from '../i18n/resume'
 import Hud from './Hud'
 import Dock, { type TabKey } from './Dock'
 import GenericScreen from './GenericScreen'
@@ -42,14 +43,18 @@ type ScreenKey = { command: string; args?: Record<string, string>; local?: strin
 
 export default function Shell() {
   const { profile, unread, exec, signOut, bootstrap } = useSession()
-  const [tab, setTab] = useState<TabKey>('city')
+  // a language switch restarts the page: come back to the same screen
+  const resumed = useRef(takeResume()).current
+  const [tab, setTab] = useState<TabKey>((resumed?.tab as TabKey | undefined) ?? 'city')
   // The group's «تکمیل اطلاعات روستا» button opens the game with the draft's id
   // as the start parameter: land on the founding form.
   const [screenKey, setScreenKey] = useState<ScreenKey>(() => {
+    if (resumed?.screen) return resumed.screen as ScreenKey
     const draft = foundingDraftFromLaunch()
     if (draft) return { command: '', local: 'founding_form', args: { draft } }
     return { command: '', local: bootstrap?.settlement ? 'village_home' : 'village_call' }
   })
+  useEffect(() => { saveResume({ tab, screen: screenKey }) }, [tab, screenKey])
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
 

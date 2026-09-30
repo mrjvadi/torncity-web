@@ -1,0 +1,11 @@
+/* The screen header: a small, quiet bar (compact back button, small title,
+   optional small refresh). Replaces the big ribbon band. */
+.cx-hdr { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 2px; }
+.cx-hdr-title { flex: 1; min-width: 0; font-size: 16px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0.92; }
+.cx-hdr-btn {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; line-height: 1; color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+}
+.cx-hdr-btn:active { background: rgba(255,255,255,0.14); }
+.cx-hdr-refresh { font-size: 16px; }

@@ -10,6 +10,7 @@ import { Card, Header, Notice, ScreenScroll, Stat, StatPair } from './kit/Parts'
 import Actions from './kit/Actions'
 import { formatNumber, money, pct } from './kit/format'
 import { t } from '../../i18n'
+import { toWesternDigits } from '../../lib/persian'
 import './bank.css'
 
 interface BankView {
@@ -37,7 +38,6 @@ export default function Bank({ response, loading, onAction, run }: ScreenProps) 
   const locked = !!(v.travelling || v.jailed || v.no_city) || (mode === 'deposit' ? v.can_deposit === false : v.can_withdraw === false)
   const ready = amount > 0 && !over && !locked
 
-  const push = (d: string) => setDigits((cur) => (cur + d).replace(/^0+/, '').slice(0, MAX_DIGITS))
   const after = mode === 'deposit'
     ? t('bank.after_deposit', { cash: formatNumber(cash), a: formatNumber(cash - amount), b: formatNumber(bank + amount) })
     : t('bank.after_withdraw', { cash: formatNumber(cash), a: formatNumber(cash + amount - fee), b: formatNumber(bank - amount) })
@@ -77,25 +77,21 @@ export default function Bank({ response, loading, onAction, run }: ScreenProps) 
         ))}
       </div>
 
-      <div className={`bk-amount${over ? ' over' : ''}`}>
-        <button className="bk-clear" aria-label="clear" onClick={() => setDigits('')} disabled={!digits}>×</button>
-        <span className="bk-amount-value display" dir="ltr">{formatNumber(amount)}</span>
+      <label className={`bk-amount${over ? ' over' : ''}`}>
+        <input
+          className="bk-input display" dir="ltr" inputMode="numeric" autoComplete="off" placeholder="0"
+          value={digits ? formatNumber(amount) : ''}
+          onChange={(e) => setDigits(toWesternDigits(e.target.value).replace(/\D/g, '').replace(/^0+/, '').slice(0, MAX_DIGITS))}
+        />
         <span className="bk-amount-unit">{t('unit.money')}</span>
-      </div>
+      </label>
       <div className="bk-hint">{over ? t('bank.too_much') : after}</div>
 
       <div className="bk-quick">
         {QUICK.map((q) => (
           <button key={q} className="bk-chip" onClick={() => setDigits(String(Math.min(source, (amount || 0) + q)))}>+{formatNumber(q)}</button>
         ))}
-        <button className="bk-chip bk-chip-all" onClick={() => setDigits(String(source))}>{t('bank.all')}</button>
-      </div>
-
-      <div className="bk-pad">
-        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => <button key={d} className="bk-key display" onClick={() => push(d)}>{d}</button>)}
-        <button className="bk-key bk-key-blue display" onClick={() => push('000')}>000</button>
-        <button className="bk-key display" onClick={() => push('0')}>0</button>
-        <button className="bk-key bk-key-red display" aria-label="backspace" onClick={() => setDigits((c) => c.slice(0, -1))}>⌫</button>
+        <button className="bk-chip" onClick={() => setDigits(String(source))}>{t('bank.all')}</button>
       </div>
 
       <button className="bk-submit" disabled={!ready} onClick={submit}>

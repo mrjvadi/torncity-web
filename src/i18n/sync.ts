@@ -8,6 +8,7 @@
 //   the bot meanwhile.
 
 import * as api from '../api/client'
+import { markResume } from './resume'
 import { setLang, getLang, isStored, type Lang } from './index'
 
 const LS_PENDING = 'tc.lang.pending'
@@ -40,7 +41,7 @@ async function send(lang: Lang): Promise<boolean> {
  * language, once the choice is safely stored; without working storage the
  * app just re-renders in place (App remounts on the language). */
 function restart(lang: Lang): void {
-  if (typeof location !== 'undefined' && isStored(lang)) location.reload()
+  if (typeof location !== 'undefined' && isStored(lang)) { markResume(); location.reload() }
 }
 
 /** Switches the web to `lang`, tells the server, then reloads. */

@@ -1,0 +1,7 @@
+/* The dock's canvas has a 38/720 transparent band above its bar (where the
+   active tile rises). Laid out normally it left a strip of the page
+   background between the content and the bar; instead the dock overlaps
+   the content by that band, so the bar meets the content directly. */
+.dock { margin-top: calc(-38 * var(--u)); position: relative; z-index: 6; pointer-events: none; }
+.dock .dock-tab, .dock .dock-bg { pointer-events: auto; }
+.nx-scroll, .screen-scroll { padding-bottom: calc(28px + var(--safe-b)); }

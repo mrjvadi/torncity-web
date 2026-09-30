@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './styles/global.css'
 import './styles/i18n.css'
+import './styles/shell-fix.css'
 import { installGlobalReporter, report } from './lib/reporter'
 import { watchForNewBuild } from './lib/freshness'
 
