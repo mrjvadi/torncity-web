@@ -5,3 +5,7 @@
 .dock { margin-top: calc(-38 * var(--u)); position: relative; z-index: 6; pointer-events: none; }
 .dock .dock-tab, .dock .dock-bg { pointer-events: auto; }
 .nx-scroll, .screen-scroll { padding-bottom: calc(28px + var(--safe-b)); }
+
+/* content scale: every direct child of a screen's scroll area is zoomed by
+   --zs (lib/scale.ts), so type and cards grow with the shell canvas */
+.nx-scroll > *, .screen-scroll > *, .ft-scroll > * { zoom: var(--zs, 1); }
