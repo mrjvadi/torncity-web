@@ -946,6 +946,8 @@ export const uiFa = {
   'common.prev': 'قبلی',
   'common.next': 'بعدی',
   'toast.unnamed': 'یک مورد',
+  'shell.tab.village': 'روستا',
+  'shell.tab.town': 'شهر',
 } as const
 
 export type UiKey = keyof typeof uiFa

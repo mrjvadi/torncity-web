@@ -948,4 +948,6 @@ export const uiEn: Record<UiKey, string> = {
   'common.prev': 'Previous',
   'common.next': 'Next',
   'toast.unnamed': 'An item',
+  'shell.tab.village': 'Village',
+  'shell.tab.town': 'Town',
 }

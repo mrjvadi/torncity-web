@@ -970,3 +970,5 @@ profile.travel | سفر بین‌شهری | Intercity travel
 common.prev | قبلی | Previous
 common.next | بعدی | Next
 toast.unnamed | یک مورد | An item
+shell.tab.village | روستا | Village
+shell.tab.town | شهر | Town

@@ -42,6 +42,14 @@ function supportCity(b: { cities: { code: string; name: string }[] } | null | un
   return { code: c?.code ?? 'support', name: c?.name ?? 'Support' }
 }
 
+/** Where the player is, for the place tab: a `location` of the bootstrap when the
+ * server sends one, else the settlement they live in (a player without one still sees the village call, so
+ * the tab reads village). */
+function placeTier(b: unknown): string | undefined {
+  const x = b as { location?: { tier?: string }; settlement?: { tier?: string } } | null | undefined
+  return x?.location?.tier ?? x?.settlement?.tier ?? (x ? 'village' : undefined)
+}
+
 type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
 
 export default function Shell() {
@@ -154,7 +162,7 @@ export default function Shell() {
             </Screen>
           )}
       </main>
-      <Dock active={tab} onSelect={selectTab} badge={{ society: unread }} />
+      <Dock active={tab} onSelect={selectTab} badge={{ society: unread }} place={placeTier(bootstrap)} />
 
       <MenuSheet
         open={menuOpen}
