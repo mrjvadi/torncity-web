@@ -5,6 +5,7 @@ import { toWesternDigits } from '../lib/persian'
 import Icon from './Icon'
 import BottomSheet from './BottomSheet'
 import Skeleton from './Skeleton'
+import Actions from '../screens/native/kit/Actions'
 import { t } from '../i18n'
 
 interface GenericScreenProps {
@@ -78,31 +79,7 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
         </div>
       )}
 
-      {rows.map(([row, actions]) => (
-        <div className="action-row" key={row}>
-          {actions.map((a, i) => <ActionButton key={`${row}-${i}`} action={a} lead={a === lead} onClick={() => handleClick(a)} />)}
-        </div>
-      ))}
-
-      <BottomSheet open={!!pendingInput} onClose={() => setPendingInput(null)} title={pendingInput?.label}>
-        <input
-          className="sheet-input"
-          value={inputValue}
-          onChange={(e) => setInputValue(pendingInput?.input?.text ? e.target.value : toWesternDigits(e.target.value))}
-          inputMode={pendingInput?.input?.text ? 'text' : 'numeric'}
-          autoFocus
-          dir={pendingInput?.input?.text ? 'rtl' : 'ltr'}
-        />
-        <button className="sheet-primary-btn display" onClick={submitInput}>{t('common.confirm')}</button>
-      </BottomSheet>
-
-      <BottomSheet open={!!pendingConfirm} onClose={() => setPendingConfirm(null)} title={t('common.sure')}>
-        <p className="confirm-label">{pendingConfirm?.label}</p>
-        <div className="confirm-buttons">
-          <button className="confirm-yes display" onClick={() => { onAction(pendingConfirm!); setPendingConfirm(null) }}>{t('common.confirm')}</button>
-          <button className="confirm-no display" onClick={() => setPendingConfirm(null)}>{t('common.cancel')}</button>
-        </div>
-      </BottomSheet>
+      <Actions response={response} onAction={onAction} />
 
       <GenericStyles />
     </div>

@@ -16,6 +16,8 @@ interface DockProps {
   active: TabKey
   onSelect: (tab: TabKey) => void
   badge?: Partial<Record<TabKey, number>>
+  /** where the player is: the place tab reads village / town / city and draws that icon */
+  place?: 'village' | 'town' | 'city' | string
 }
 
 /** The dock, one solid bar of five tabs with the active one raised on a lit
@@ -24,14 +26,21 @@ interface DockProps {
  * active one) sum to exactly 720, so a plain flex-basis per tab reproduces
  * the layout with no gap or rounding slack; the active tile then rises out
  * of the bar on its own, taller than the bar's own background. */
-export default function Dock({ active, onSelect, badge }: DockProps) {
-  const activeIndex = TABS.findIndex((t) => t.key === active)
+const PLACE_TAB: Record<string, { label: Key; icon: string }> = {
+  village: { label: 'shell.tab.village', icon: 'house' },
+  town: { label: 'shell.tab.town', icon: 'city' },
+  city: { label: 'shell.tab.city', icon: 'city' },
+}
+
+export default function Dock({ active, onSelect, badge, place }: DockProps) {
+  const tabs = TABS.map((x) => (x.key === 'city' && place && PLACE_TAB[place] ? { ...x, ...PLACE_TAB[place] } : x))
+  const activeIndex = tabs.findIndex((t) => t.key === active)
   return (
     <nav className="dock">
       <div className="dock-canvas dock-bar">
         <div className="dock-bg" />
         <div className="dock-row">
-          {TABS.map((t, i) => {
+          {tabs.map((t, i) => {
             const isActive = t.key === active
             const count = badge?.[t.key] ?? 0
             // the groove between neighbours is skipped beside the raised

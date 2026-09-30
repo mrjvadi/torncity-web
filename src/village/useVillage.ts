@@ -6,6 +6,7 @@ import * as api from '../api/client'
 import type { CatalogueBuilding, CommandResponse } from '../api/types'
 import { useSession } from '../state/SessionContext'
 import { useToast } from '../state/ToastContext'
+import { getLang } from '../i18n'
 import { refusalText } from '../i18n'
 import { getVillageStore, type VillageSnapshot, type VillageStore } from './villageStore'
 import { serverNow } from './clock'
@@ -97,5 +98,6 @@ export function useBuildingCatalogue(): Map<string, CatalogueBuilding> {
 
 /** A building's Persian name: the catalogue's `fa` entry, else the authored one. */
 export function buildingName(cat: Map<string, CatalogueBuilding>, code: string, authored?: string): string {
-  return cat.get(code)?.name?.fa || authored || code
+  const n = cat.get(code)?.name
+  return (n && (getLang() === 'en' ? n.en || n.fa : n.fa || n.en)) || authored || code
 }

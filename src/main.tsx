@@ -4,10 +4,13 @@ import App from './App'
 import './styles/global.css'
 import './styles/i18n.css'
 import './styles/shell-fix.css'
+import { installScale } from './lib/scale'
 import { installGlobalReporter, report } from './lib/reporter'
-import { watchForNewBuild } from './lib/freshness'
+import { watchForNewBuild, APP_VERSION, BUILD_ID } from './lib/freshness'
 
 installGlobalReporter()
+installScale()
+report('boot', `client v${APP_VERSION} (${BUILD_ID})`)
 
 const params = new URLSearchParams(location.search)
 async function boot() {

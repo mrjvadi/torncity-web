@@ -265,6 +265,8 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
             state={build.state} fits={build.fits} footprint={build.footprint} cat={cat}
             onExit={build.exit} onChoose={(c) => void build.choose(c)} onRotate={() => void build.rotate()}
             onNext={() => void build.next()} onConfirm={() => void build.confirm()} onBack={build.back}
+            onUndo={build.undoPick} onClear={build.clearPicks} onPathMode={build.setPathMode}
+            onGrowAsk={() => void build.growAsk()} onGrowConfirm={() => void build.growConfirm()}
           />
         ) : null}
         {!inBuild && resident && landOn && (
@@ -315,7 +317,9 @@ export default function VillageHome({ localArgs, openLocal }: ScreenProps) {
       </BottomSheet>
       <DonateSheet open={donateOpen} onClose={() => setDonateOpen(false)} onDone={() => void overview.refresh()} />
 
-      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)} onMine={() => { setSelectedId(null); setMineOpen(true) }} />
+      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)}
+        onOpen={(screen) => openLocal(screen)} onBuild={(code) => { void build.enter().then(() => build.choose(code)) }}
+        onMine={() => { setSelectedId(null); setMineOpen(true) }} />
       <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} />
       <HouseSheet lot={houseLot} cat={cat} onClose={() => setHouseLot(null)} store={store} />
       <TakenLotSheet lot={takenLot} owner={takenLot?.owner} onClose={() => setTakenLot(null)} />

@@ -1,14 +1,25 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { execSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+
+// The version shown to players is major.minor from package.json plus a build
+// number that only grows: the git commit count (the deploy script passes it as
+// TC_BUILD because its snapshot has no .git). Never a date.
+function git(args: string): string {
+  try { return execSync(`git ${args}`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() } catch { return '' }
+}
+const [major, minor] = (JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version as string).split('.')
+const build = process.env.TC_BUILD || git('rev-list --count HEAD') || '0'
+const commit = process.env.TC_COMMIT || git('rev-parse --short HEAD') || 'dev'
 
 // The app is served at https://webomm.ir404.site/v2/
 export default defineConfig({
   base: process.env.E2E_API ? '/' : '/v2/',
   plugins: [react()],
-  // The build's own stamp (UTC), shown in the menu so a player can say which
-  // version they are looking at.
-  define: { __BUILD_ID__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')) },
+  // version number (settings, boot log) and the commit for the debug detail
+  define: { __APP_VERSION__: JSON.stringify(`${major}.${minor}.${build}`), __BUILD_ID__: JSON.stringify(commit) },
   build: {
     target: 'es2020',
     sourcemap: false,
