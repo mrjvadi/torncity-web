@@ -197,6 +197,8 @@ export default function Shell() {
         /* the village menu: one small round button on the village view */
         .vm-btn { position: absolute; z-index: 4; right: 10px; bottom: 44px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(7,10,20,0.55); border: 1.5px solid rgba(255,214,107,0.55); backdrop-filter: blur(3px); }
         .vm-btn:active { transform: translateY(1px); }
+        /* build mode and the land map have their own panel at the bottom: the menu button steps aside */
+        .shell-main:has(.vh-panel) .vm-btn { display: none; }
       `}</style>
     </div>
     </NavCtx.Provider>

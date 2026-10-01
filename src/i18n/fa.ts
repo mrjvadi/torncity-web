@@ -199,7 +199,7 @@ export const fa = {
   'know.terrain': 'زمین این روستا مناسب نیست',
   'know.hidden': '{n} مورد دورتر هنوز دیده نمی‌شود',
   'know.empty': 'هنوز دانشی ثبت نشده است.',
-  'know.confirm_buy': '«{name}» به قیمت {price} از ساپورت خریده شود؟',
+  'know.confirm_buy': '«{name}» به قیمت {price} خریده شود؟',
   'know.confirm_research': 'پژوهش «{name}» با هزینهٔ {cost} آغاز شود؟',
   'know.done': 'انجام شد.',
   'know.only_head': 'فقط دهیار می‌تواند پژوهش یا خرید کند.',

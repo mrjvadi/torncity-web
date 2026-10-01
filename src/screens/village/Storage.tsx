@@ -20,6 +20,7 @@ import './village.css'
 
 export default function Storage({ response, openLocal }: ScreenProps) {
   const names = useContentNames()
+  const city = names.name('city', 'support', 'support')
   const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
   const cmd = useVillageCommand()
   const { view: fetched, loading, refresh } = useVillageView<VillageMaterialsView>('settlement.materials', response?.screen === 'village_materials' ? response : null)
@@ -87,12 +88,12 @@ export default function Storage({ response, openLocal }: ScreenProps) {
             )}
 
           <SectionTitle>{t('storage.market')}</SectionTitle>
-          <div className="vh-hint" style={{ textAlign: 'start' }}>{t('storage.market_hint')}</div>
+          <div className="vh-hint" style={{ textAlign: 'start' }}>{t('storage.market_hint', { city })}</div>
           {market.length === 0 && <Empty>{t('storage.market_empty')}</Empty>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {market.map((m) => (
               <Card key={m.item.code}>
-                <ListRow icon="box" palette="steel" title={goods(m.item)} sub={t('storage.unit_price', { p: money(m.price) })} right={<Chip>{t('storage.source')}</Chip>} />
+                <ListRow icon="box" palette="steel" title={goods(m.item)} sub={t('storage.unit_price', { p: money(m.price) })} right={<Chip>{t('storage.source', { city })}</Chip>} />
                 {v.can_buy && (
                   <div className="vd-presets">
                     {(v.presets ?? []).map((q) => (

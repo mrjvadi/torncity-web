@@ -62,7 +62,7 @@ function NeedLine({ ctx, n }: { ctx: FlowCtx; n: VillageNeed }) {
         <div className="vf-need-head">
           <span>{t('vx.need.material', { name, need: formatNumber(n.need), have: formatNumber(n.have) })}</span>
         </div>
-        <Bar frac={n.need > 0 ? n.have / n.need : 0} color="#f5a11f" label={`${formatNumber(n.have)} / ${formatNumber(n.need)}`} />
+        <Bar frac={n.need > 0 ? n.have / n.need : 0} color="#f5a11f" label={<span className="vs-ltr">{formatNumber(n.have)} / {formatNumber(n.need)}</span>} />
         <ul className="vf-src">
           {(n.makers ?? []).map((m) => (
             <li key={m.building.code}>{t(m.built ? 'vx.need.made_built' : 'vx.need.made_unbuilt', { building: ctx.bname(m.building.code, m.building.name) })}</li>
@@ -95,7 +95,7 @@ const Refusal = flow<VillageRefusalView>(({ view: v, ctx }) => {
   return (
     <Page title={t('vx.rf.title')} tone="ruby">
       <Panel tone="ruby">
-        <Lead tone="bad">{refusalText(code, undefined, args)}</Lead>
+        <Lead tone="bad">{hasKey(`vx.rf.screen.${code}`) ? t(key(`vx.rf.screen.${code}`), args as Record<string, string | number>) : refusalText(code, undefined, args)}</Lead>
         {lots.length > 0 && (
           <ul className="vf-src">
             {lots.map((l) => (

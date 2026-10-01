@@ -1159,10 +1159,10 @@ export const uiFa = {
   'storage.stock': 'موجودی انبار',
   'storage.stock_empty': 'انبار فعلاً خالی است.',
   'storage.market': 'بازار مصالح',
-  'storage.market_hint': 'مصالحی که روستا می‌تواند از بازار پشتیبان بخرد؛ پولش از خزانه برداشته می‌شود و کالا به انبار می‌رود.',
+  'storage.market_hint': 'مصالحی که روستا می‌تواند از بازار {city} بخرد؛ پولش از خزانه برداشته می‌شود و کالا به انبار می‌رود.',
   'storage.market_empty': 'فعلاً چیزی برای خرید نیست.',
   'storage.unit_price': 'هر واحد {p}',
-  'storage.source': 'بازار پشتیبان',
+  'storage.source': 'بازار {city}',
   'storage.buy_qty': 'خرید {q}',
   'storage.head_only': 'خرید از خزانه فقط با کسی است که مسئول روستاست.',
   'storage.confirm.title': 'تأیید خرید',
@@ -1432,6 +1432,7 @@ export const uiFa = {
   'menu.leave': 'ترک روستا',
   'vx.work.open': 'کارگاه‌های روستا',
   'vx.call.body': 'روستا خانهٔ گروه شماست: خزانه، ساخت‌وساز و دانش مشترک دارد و همهٔ اهالی در آن سهیم‌اند. فرم ساخت روستا را باز کن و روستای خودت را بساز.',
+  'vx.rf.screen.village_materials': 'مصالح انبار روستا برای این ساخت کافی نیست.',
 } as const
 
 export type UiKey = keyof typeof uiFa

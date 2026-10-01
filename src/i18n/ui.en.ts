@@ -1161,10 +1161,10 @@ export const uiEn: Record<UiKey, string> = {
   'storage.stock': 'In stock',
   'storage.stock_empty': 'The store is empty for now.',
   'storage.market': 'Materials market',
-  'storage.market_hint': 'Materials the village can buy from the Support market: paid from the treasury, delivered to the store.',
+  'storage.market_hint': 'Materials the village can buy from the {city} market: paid from the treasury, delivered to the store.',
   'storage.market_empty': 'Nothing to buy right now.',
   'storage.unit_price': '{p} each',
-  'storage.source': 'Support market',
+  'storage.source': '{city} market',
   'storage.buy_qty': 'Buy {q}',
   'storage.head_only': 'Only the village head can spend the treasury on purchases.',
   'storage.confirm.title': 'Confirm purchase',
@@ -1434,4 +1434,5 @@ export const uiEn: Record<UiKey, string> = {
   'menu.leave': 'Leave the village',
   'vx.work.open': 'Village workshops',
   'vx.call.body': 'A village is your group\'s home: it has a shared treasury, building and knowledge, and all its villagers share in it. Open the founding form to found yours.',
+  'vx.rf.screen.village_materials': 'The village store lacks the materials for this.',
 }

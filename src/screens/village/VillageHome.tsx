@@ -59,13 +59,14 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     if (!sceneReady) return
     sceneRef.current?.setOverlayTones(landOn && layout && build.state.step === 'off' ? tonesForLand(layout) : null)
   }, [landOn, layout, sceneReady, build.state.step])
-  // the menu's «زمین و قطعه‌ها» opens the village straight on the land map
-  const wantLand = useRef(!!localArgs?.land)
+  // the menu's «زمین و قطعه‌ها» opens the village straight on the land map (the page may already be showing:
+  // the arguments are new each time the entry is pressed)
+  const handledLand = useRef<unknown>(null)
   useEffect(() => {
-    if (!wantLand.current || !sceneReady || !layout?.viewer.resident) return
-    wantLand.current = false
+    if (!localArgs?.land || handledLand.current === localArgs || !sceneReady || !layout?.viewer.resident) return
+    handledLand.current = localArgs
     setLandOn(true)
-  }, [sceneReady, layout?.viewer.resident])
+  }, [localArgs, sceneReady, layout?.viewer.resident])
 
   // «ساخت» in the menu opens the village straight in build mode
   const wantBuild = useRef(!!localArgs?.build)

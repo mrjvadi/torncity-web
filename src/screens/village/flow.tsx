@@ -14,7 +14,7 @@ import type { ScreenComponent, ScreenProps } from '../types'
 import { Card, Header, ScreenScroll, type Tone } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import Skeleton from '../../ui/Skeleton'
-import { refusalText, t } from '../../i18n'
+import { noticeText, refusalText, t } from '../../i18n'
 import { useNav } from '../../state/NavContext'
 import { useToast } from '../../state/ToastContext'
 import { buildingName, useBuildingCatalogue, useContentNames, type ContentNames } from '../../village/useVillage'
@@ -142,7 +142,12 @@ export function registerFlow(screens: Record<string, FlowScreen>): void {
 }
 
 /** The component the shell mounts for each of these screen names. */
-export const FlowHost: ScreenComponent = ({ response, loading, run, openLocal }: ScreenProps) => {
+/** Village screens that have a layout file of their own (status, queue, knowledge, store, labour): a write that
+ * answers one of them hands the answer over, so the player lands on that screen. */
+export const NATIVE: Record<string, ScreenComponent> = {}
+
+export const FlowHost: ScreenComponent = (props: ScreenProps) => {
+  const { response, loading, run, openLocal } = props
   const nav = useNav()
   const toast = useToast()
   const [res, setRes] = useState<CommandResponse | null>(response)
@@ -159,7 +164,11 @@ export const FlowHost: ScreenComponent = ({ response, loading, run, openLocal }:
     try {
       const r = await api.runCommand(a.command, a.args ?? {}, `web-v-${Date.now().toString(36)}-${++keySeq}`)
       if (r.ok === false && r.screen !== 'village_refusal') toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args))
-      else setRes(r)
+      else {
+        setRes(r)
+        const note = r.notice ? noticeText(r.notice) : ''
+        if (note) toast.push(note, { kind: r.notice?.alert ? 'warning' : undefined, user: true })
+      }
     } catch (e) {
       toast.push(refusalText((e as { code?: string })?.code ?? 'network'))
     } finally {
@@ -173,6 +182,8 @@ export const FlowHost: ScreenComponent = ({ response, loading, run, openLocal }:
     return <ScreenScroll><Header title={t('vx.loading')} /><Card>{loading ? <Skeleton lines={3} /> : null}</Card></ScreenScroll>
   }
   const Screen = FLOW[res.screen]
+  const Own = NATIVE[res.screen]
+  if (!Screen && Own) return <Own {...props} response={res} />
   if (!Screen) {
     return (
       <Page title={t('vx.unknown.title')} tone="sapphire">

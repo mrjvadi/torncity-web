@@ -1187,10 +1187,10 @@ storage.full | انبار پر است؛ برای جا باز کردن، انبا
 storage.stock | موجودی انبار | In stock
 storage.stock_empty | انبار فعلاً خالی است. | The store is empty for now.
 storage.market | بازار مصالح | Materials market
-storage.market_hint | مصالحی که روستا می‌تواند از بازار پشتیبان بخرد؛ پولش از خزانه برداشته می‌شود و کالا به انبار می‌رود. | Materials the village can buy from the Support market: paid from the treasury, delivered to the store.
+storage.market_hint | مصالحی که روستا می‌تواند از بازار {city} بخرد؛ پولش از خزانه برداشته می‌شود و کالا به انبار می‌رود. | Materials the village can buy from the {city} market: paid from the treasury, delivered to the store.
 storage.market_empty | فعلاً چیزی برای خرید نیست. | Nothing to buy right now.
 storage.unit_price | هر واحد {p} | {p} each
-storage.source | بازار پشتیبان | Support market
+storage.source | بازار {city} | {city} market
 storage.buy_qty | خرید {q} | Buy {q}
 storage.head_only | خرید از خزانه فقط با کسی است که مسئول روستاست. | Only the village head can spend the treasury on purchases.
 storage.confirm.title | تأیید خرید | Confirm purchase
@@ -1464,3 +1464,4 @@ menu.terms | شرایط زمین | Land terms
 menu.leave | ترک روستا | Leave the village
 vx.work.open | کارگاه‌های روستا | Village workshops
 vx.call.body | روستا خانهٔ گروه شماست: خزانه، ساخت‌وساز و دانش مشترک دارد و همهٔ اهالی در آن سهیم‌اند. فرم ساخت روستا را باز کن و روستای خودت را بساز. | A village is your group's home: it has a shared treasury, building and knowledge, and all its villagers share in it. Open the founding form to found yours.
+vx.rf.screen.village_materials | مصالح انبار روستا برای این ساخت کافی نیست. | The village store lacks the materials for this.

@@ -155,7 +155,8 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
                 sub={`${t('building.at', { x: l.lot_x + 1, y: l.lot_y + 1 })} · ${t('vx.prog.by_work')}`}
                 right={<span className="vs-timer">{t('progress.percent', { p: Math.floor(l.progress_bps / 100) })}</span>}
               >
-                <Bar frac={l.progress_bps / 10000} color="#f5a11f" label={t('vx.prog.hours', { done: hours(l.done_minutes), total: hours(l.required_minutes) })} />
+                <Bar frac={l.progress_bps / 10000} color="#f5a11f" label={`${Math.floor(l.progress_bps / 100)}%`} />
+                <div className="vh-hint">{t('vx.prog.hours', { done: hours(l.done_minutes), total: hours(l.required_minutes) })}</div>
                 <div className="vs-btns">
                   <Slab tone="gold" radius={12} lip={3} onClick={() => run(siteAct?.command ?? 'settlement.labor.site', siteAct?.args ?? { id: l.id })}>{t('act.construction.site')}</Slab>
                 </div>

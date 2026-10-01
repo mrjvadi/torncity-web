@@ -165,7 +165,7 @@ export const en: Partial<Record<Key, string>> = {
   'know.terrain': 'This village\'s terrain is not suitable',
   'know.hidden': '{n} farther items are not visible yet',
   'know.empty': 'No knowledge recorded yet.',
-  'know.confirm_buy': 'Buy "{name}" from Support for {price}?',
+  'know.confirm_buy': 'Buy "{name}" for {price}?',
   'know.confirm_research': 'Start researching "{name}" for {cost}?',
   'know.done': 'Done.',
   'know.only_head': 'Only the village head can research or buy.',
