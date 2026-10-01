@@ -7,8 +7,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ScreenProps } from '../types'
 import { Emboss, Frame, GLabel, Plate, Slab } from '../../kit'
 import { Header } from '../native/kit/Parts'
-import Emblem from '../../lib/emblem'
-import { emblemHex } from '../../lib/emblemPalette'
 import { money } from '../native/kit/format'
 import { t } from '../../i18n'
 import { useSession } from '../../state/SessionContext'
@@ -198,7 +196,6 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const name = layout?.settlement.name ?? bootstrap?.settlement?.name ?? t('village.title')
   const member = !!layout?.viewer.member
   const canPlace = !!layout?.viewer.can_place
-  const tier = layout?.settlement.tier ?? 'village'
   const buildingsByKey = new Map((layout?.buildings ?? []).map((b, i) => [keyOf(i, b), b]))
   const inBuild = build.state.step !== 'off'
 
