@@ -11,6 +11,9 @@ import { formatNumber } from './kit/format'
 import Icon from '../../ui/Icon'
 import { t, type Key } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
+import { useSession } from '../../state/SessionContext'
+import { useStoreView } from '../../state/useSync'
+import { entitiesOf } from '../../state/store'
 
 interface InventoryLine {
   item?: { code?: string; name?: string }
@@ -33,13 +36,40 @@ const KNOWN_CATEGORIES = ['food', 'medicine', 'gear', 'electronics', 'defence', 
 const itemIcon = (l: InventoryLine) => ITEM_ICON[l.item?.code ?? ''] ?? CATEGORY_ICON[l.category ?? ''] ?? 'box'
 const catLabel = (c: string) => (KNOWN_CATEGORIES.includes(c) ? t(`inventory.cat.${c}` as Key) : c.replace(/_/g, ' '))
 
+/** The view's lines with the store's quantities: a line whose item the
+ * store no longer holds goes, an item the view did not list yet is added
+ * (named from the catalogue by its code). A unique piece keeps its own line. */
+function fromStore(lines: InventoryLine[], held: [string, import('../../state/syncTypes').InventoryData][]): InventoryLine[] {
+  const byCode = new Map(held)
+  const out: InventoryLine[] = []
+  const seen = new Set<string>()
+  for (const l of lines) {
+    const code = l.item?.code ?? ''
+    const inv = byCode.get(code)
+    if (!inv) continue
+    seen.add(code)
+    if (l.serial || inv.pieces.length > 0) {
+      if (!l.serial || inv.pieces.some((p) => p.id === l.serial)) out.push(l)
+      else if (!seen.has(code + '#')) { seen.add(code + '#'); out.push({ ...l, serial: undefined, qty: inv.qty }) }
+      continue
+    }
+    out.push({ ...l, qty: inv.qty })
+  }
+  for (const [code, inv] of held) if (!seen.has(code)) out.push({ item: { code }, qty: inv.qty })
+  return out
+}
+
 export default function Inventory({ response, loading, onAction, run }: ScreenProps) {
   const [cat, setCat] = useState('')
   const names = useContentNames()
   const v = (response?.view ?? {}) as InventoryView
+  // state sync: the quantities are the store's, so a used, bought or given
+  // item shows at once and an item gained elsewhere appears without a refresh
+  const { synced } = useSession()
+  const view = useStoreView()
   if (loading && !response) return <ScreenScroll><Header title={t('inventory.title')} tone="gold" /></ScreenScroll>
 
-  const all = v.lines ?? []
+  const all = synced && view.ready ? fromStore(v.lines ?? [], entitiesOf(view, 'inventory')) : (v.lines ?? [])
   const cats = [...new Set(all.map((l) => l.category).filter((c): c is string => !!c))]
   const lines = cat ? all.filter((l) => l.category === cat) : all
   const pieces = all.reduce((s, l) => s + (l.qty ?? 1), 0)

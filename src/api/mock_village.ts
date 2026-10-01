@@ -1200,3 +1200,33 @@ export function installVillageMockHandles(): void {
   }
 }
 
+// -- state sync (client-api.md 5.6): the settlement summary the mock server's log carries -------
+
+/** The own village as the store's `settlement` entity shows it to this viewer. */
+export function mockVillageSummary(): {
+  id: string; code: string; name: string; tier: string; viewer: 'head' | 'member'; grid_lots: number; layout_version: string
+  treasury: number; knowledge: number
+} {
+  init()
+  return {
+    id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'village', viewer: IS_HEAD ? 'head' : 'member', grid_lots: size(),
+    layout_version: `${IS_HEAD ? 'h' : 'm'}${st.ver}`, treasury: st.treasury,
+    knowledge: st.know.filter((k) => k.state === 'held').length,
+  }
+}
+
+/** A change the settlement channel never announced (its publication was lost): only the
+ * store's summary can tell the village screen its layout is stale. */
+export function mockVillageQuietChange(): boolean {
+  init()
+  const b = st.buildings.find((x) => x.state === 'under_construction')
+  if (!b) return false
+  const t = st.timers.get(b.id)
+  if (t) window.clearTimeout(t)
+  b.state = 'built'
+  delete b.started
+  delete b.finish
+  st.ver++
+  return true
+}
+
