@@ -23,6 +23,532 @@ bank.cash | نقد | Cash
 bank.balance | موجودی بانک | Bank balance
 bank.branch | شعبه‌ی {city} | {city} branch
 bank.fee | کارمزد برداشت: {p} | Withdrawal fee: {p}
+# -- economy and finance (docs/adr/0039): the web's own words for the neutral contract ---------------------------
+# actions, by the id the server sends ({n} an amount, grams or a count, {name} a content name)
+eco.act.bank.deposit | واریز {n} | Deposit {n}
+eco.act.bank.deposit_all | واریز همه ({n}) | Deposit all ({n})
+eco.act.bank.deposit_custom | واریز مبلغ دلخواه | Deposit another amount
+eco.act.bank.withdraw | برداشت {n} | Withdraw {n}
+eco.act.bank.withdraw_all | برداشت همه ({n}) | Withdraw all ({n})
+eco.act.bank.withdraw_custom | برداشت مبلغ دلخواه | Withdraw another amount
+eco.act.bank.pay | پرداخت به بازیکن | Pay a player
+eco.act.bank.finance | بانک ملی | The national bank
+eco.act.bank.show | بانک | Bank
+eco.act.pay.cash | نقد {n} | Cash {n}
+eco.act.pay.cash_all | نقد، همه ({n}) | Cash, all ({n})
+eco.act.pay.cash_custom | نقد، مبلغ دلخواه | Cash, another amount
+eco.act.pay.card | کارت {n} | Card {n}
+eco.act.pay.card_all | کارت، همه ({n}) | Card, all ({n})
+eco.act.pay.card_custom | کارت، مبلغ دلخواه | Card, another amount
+eco.act.pay.confirm | تأیید و پرداخت | Confirm and pay
+eco.act.pay.cancel | انصراف | Cancel
+eco.act.pay.again | پرداخت دوباره | Pay again
+eco.act.payment.cash | پرداخت نقد | Pay in cash
+eco.act.payment.card | پرداخت با کارت | Pay by card
+eco.act.payment.back | برگشت | Back
+eco.act.social.search | پیدا کردن بازیکن | Find a player
+eco.act.budget.change | پیشنهاد تقسیم تازه | Propose a new split
+eco.act.budget.bills | لایحه‌ها | Bills
+eco.act.gold.buy | خرید {n} گرم | Buy {n} g
+eco.act.gold.sell | فروش {n} گرم | Sell {n} g
+eco.act.gold.sell_yes | بله، بفروش | Yes, sell
+eco.act.finance.portfolio | سبد دارایی من | My portfolio
+eco.act.finance.exchange | بورس | The exchange
+eco.act.finance.gold | طلافروشی | The gold dealer
+eco.act.finance.savings | پس‌انداز | Savings
+eco.act.finance.insurance | بیمه | Insurance
+eco.act.finance.product | {name} | {name}
+eco.act.finance.loan | وام من | My loan
+eco.act.finance.pledge | این وثیقه | This pledge
+eco.act.finance.option | {n} | {n}
+eco.act.finance.take | گرفتن وام | Take the loan
+eco.act.finance.payoff | تسویهٔ کامل | Pay it all off
+eco.act.finance.payoff_yes | بله، تسویه شود | Yes, pay it off
+eco.act.savings.deposit | گذاشتن {n} | Put in {n}
+eco.act.savings.withdraw | برداشتن {n} | Take out {n}
+eco.act.savings.deposit_custom | گذاشتن مبلغ دلخواه | Put in another amount
+eco.act.savings.withdraw_custom | برداشتن مبلغ دلخواه | Take out another amount
+eco.act.insurance.insure | بیمه کردن | Insure
+eco.act.insurance.insure_property | بیمهٔ ملک | Insure a property
+eco.act.insurance.cancel | لغو بیمه | Cancel the policy
+eco.act.insurance.cancel_yes | بله، لغو شود | Yes, cancel it
+eco.act.stock.open | باز کردن | Open
+eco.act.stock.buy | خرید سهم | Buy shares
+eco.act.stock.sell | فروش سهم | Sell shares
+eco.act.stock.ipo | عرضه در بورس | List on the exchange
+eco.act.stock.dividend | تقسیم سود | Pay a dividend
+eco.act.stock.confirm_buy | ثبت خرید | Place the buy
+eco.act.stock.confirm_sell | ثبت فروش | Place the sell
+eco.act.stock.cancel | لغو سفارش | Cancel the order
+eco.act.stock.ipo_yes | بله، عرضه شود | Yes, list it
+eco.act.stock.ipo_option | عرضه {qty} سهم | List {qty} shares
+eco.act.stock.dividend_yes | بله، سود پرداخت شود | Yes, pay it
+eco.act.stock.dividend_option | تقسیم {n} | Pay out {n}
+eco.act.market.book | دفتر سفارش | Order book
+eco.act.market.mine | سفارش‌های من | My orders
+eco.act.market.auctions | حراجی | The auction house
+eco.act.market.goods | کالاهای شرکت‌های من | My companies' goods
+eco.act.market.buy_at | خرید یک عدد | Buy one
+eco.act.market.bid_at | پیشنهاد خرید | Place a bid
+eco.act.market.sell_at | فروش یک عدد | Sell one
+eco.act.market.ask_at | فروش | Sell
+eco.act.market.ask_all | فروش همه | Sell all
+eco.act.market.cancel | لغو سفارش | Cancel the order
+eco.act.market.list | بازار | The market
+eco.act.place.walk | رفتن به آنجا | Go there
+eco.act.support.travel | سفر به {name} | Travel to {name}
+eco.act.shop.open | باز کردن مغازه | Open the shop
+eco.act.shop.all | همهٔ مغازه‌های شهر | All shops of the city
+eco.act.shop.buy | خرید | Buy
+eco.act.shop.qty | خرید {n} عدد | Buy {n}
+eco.act.shop.sell_to | فروش به این مغازه | Sell to this shop
+eco.act.shop.list | مغازه‌ها | Shops
+eco.act.item.bag | کوله‌پشتی | Backpack
+eco.act.auction.open | دیدن حراج | See the auction
+eco.act.auction.mine | حراج‌های من | My auctions
+eco.act.auction.terms | شروع حراج | Start the auction
+eco.act.auction.house | حراجی | The auction house
+# a service that is not offered here
+eco.na.from | {service} از «{stage}» به بالا هست؛ اینجا هنوز {here} است. | {service} starts at the {stage} stage; this is still a {here}.
+eco.na.only_support | {service} فقط در {place} هست. | {service} is only in {place}.
+eco.na.somewhere | شهر مرکزی | the central city
+eco.na.hint | ساختمان لازم: {buildings}. دهیار می‌تواند آن را بسازد. | Building needed: {buildings}. The village head can build it.
+eco.na.go | سفر به {city} | Travel to {city}
+eco.service.bank | بانک | The bank
+eco.service.credit | امتیاز اعتبار | The credit score
+eco.service.loans | وام بانکی | Bank loans
+eco.service.savings | پس‌انداز | Savings
+eco.service.insurance | بیمه | Insurance
+eco.service.stocks | بورس | The stock exchange
+eco.service.gold | خرید و فروش طلا | The gold dealer
+eco.service.auction_house | حراج | The auction house
+eco.service.unknown | این خدمت | This service
+eco.stage.village | روستا | village
+eco.stage.town | شهرک | town
+eco.stage.city | شهر | city
+eco.stage.country | کشور | country
+eco.stage.support | شهر مرکزی | central city
+eco.stage.unknown | جای دیگر | somewhere else
+eco.someone | یک بازیکن | a player
+eco.walk_there | رفتن به {place} ({t}) | Walk to {place} ({t})
+eco.trade_line | {qty} عدد به {price} | {qty} at {price}
+eco.refused.title | نشد | Not possible
+# notices a screen carries: the bank, paying, finance, gold, the exchange
+eco.notice.bank.deposited | {amount} به حساب بانکی‌ات واریز شد. | {amount} was put into your bank account.
+eco.notice.bank.withdrew | {amount} نقد برداشتی. | You withdrew {amount} in cash.
+eco.notice.bank.withdrew_fee | {amount} نقد برداشتی و کارمزد {fee} هم از بانک کم شد. | You withdrew {amount} in cash and a fee of {fee} was taken from the bank.
+eco.notice.pay.not_together | پول نقد را فقط به کسی می‌توانی بدهی که با تو در یک شهر باشد. با کارت پرداخت کن؛ پرداخت با کارت از همه‌جا ممکن است. | You can only hand cash to someone in the same city. Pay by card instead; it works from anywhere.
+eco.notice.pay.short_cash | پول نقدت کافی نیست. نقد همراهت: {available}. | You do not have enough cash. Cash on you: {available}.
+eco.notice.pay.short_bank | موجودی بانک با کارمزد کافی نیست. لازم است {needed} و داری {available}. | Your bank balance does not cover it with the fee. Needed {needed}, you have {available}.
+eco.notice.finance.taken | وام گرفته شد و پولش به حسابت آمد. | The loan was taken and the money is in your account.
+eco.notice.finance.paid_off | وام کامل تسویه شد. آفرین! | The loan is fully paid off. Well done!
+eco.notice.finance.deposited | {amount} به پس‌انداز رفت. | {amount} went into your savings.
+eco.notice.finance.withdrawn | {amount} از پس‌انداز به حساب بانکی برگشت. | {amount} came back from savings to your bank account.
+eco.notice.finance.insured | بیمه‌نامه صادر شد. | The policy was issued.
+eco.notice.finance.cancelled | بیمه‌نامه لغو شد. | The policy was cancelled.
+eco.notice.gold.buy_done | {grams} گرم طلا خریدی و {total} پرداختی. | You bought {grams} g of gold and paid {total}.
+eco.notice.gold.sell_done | {grams} گرم طلا فروختی و {total} به حساب بانکی‌ات آمد. | You sold {grams} g of gold and {total} came to your bank account.
+eco.notice.stock.listed | شرکت در بورس عرضه شد و سهم‌های عرضه‌شده در دفتر سفارش است. | The company is listed and its shares are in the order book.
+eco.notice.stock.cancelled | سفارش شمارهٔ {no} لغو شد و پول یا سهمش برگشت. | Order {no} was cancelled and its money or shares came back.
+# the bank
+eco.bank.no_city | هنوز در هیچ شهری مستقر نیستی؛ واریز و برداشت پس از رسیدن به شهر ممکن است. | You are not settled in any city yet; deposits and withdrawals work once you are in one.
+eco.bank.pay_sub | به بازیکن دیگر پول بده | Send money to another player
+eco.bank.finance_sub | وام، پس‌انداز و بیمه | Loans, savings and insurance
+# paying a player
+eco.pay.title | پرداخت به {player} | Pay {player}
+eco.pay.title_plain | پرداخت به بازیکن | Pay a player
+eco.pay.help | برای پول دادن به یک بازیکن، نام کاربری یا کد او را بفرست؛ مثلاً «پرداخت» و نام او. | To pay a player, send their username or code.
+eco.pay.help_cash | پول نقد فقط وقتی دست‌به‌دست می‌شود که هر دو در یک شهر باشید؛ پرداخت با کارت از همه‌جا ممکن است. | Cash only changes hands when you are both in the same city; card payments work from anywhere.
+eco.pay.code | کد بازیکن | Player code
+eco.pay.cash | نقد | Cash
+eco.pay.bank | موجودی بانک | Bank balance
+eco.pay.together | هر دو در {city} هستید؛ نقد هم می‌شود داد. | You are both in {city}, so cash works too.
+eco.pay.apart | با هم در یک شهر نیستید؛ فقط با کارت. | You are not in the same city; card only.
+eco.pay.card_fee | کارمزد کارت در {city} {p} است. | The card fee in {city} is {p}.
+eco.pay.card_free | پرداخت با کارت در {city} کارمزد ندارد. | Card payments in {city} have no fee.
+eco.pay.by_cash | پرداخت نقد | In cash
+eco.pay.by_card | پرداخت با کارت | By card
+eco.pay.hint | مبلغ را از دکمه‌ها انتخاب کن یا مبلغ دلخواه را بنویس. | Pick an amount or type your own.
+eco.pay.cannot_afford | با موجودی فعلی نمی‌توانی چیزی بپردازی. | You cannot pay anything with what you hold.
+eco.pay.confirm_title | تأیید پرداخت به {player} | Confirm paying {player}
+eco.pay.method_cash | از پول نقدت پرداخت می‌شود. | It is paid from your cash.
+eco.pay.method_card | با کارت از حساب بانکی‌ات پرداخت می‌شود. | It is paid by card from your bank account.
+eco.pay.amount | مبلغ | Amount
+eco.pay.fee | کارمزد | Fee
+eco.pay.after_cash | بعد از پرداخت {n} نقد برایت می‌ماند. | You will have {n} in cash left.
+eco.pay.after_bank | بعد از پرداخت {n} در بانک برایت می‌ماند. | You will have {n} left in the bank.
+eco.pay.sent_title | پرداخت شد | Paid
+eco.pay.sent_cash | {amount} نقد به {player} دادی. | You gave {player} {amount} in cash.
+eco.pay.sent_card | {amount} با کارت به {player} پرداختی. | You paid {player} {amount} by card.
+eco.pay.sent_fee | کارمزد کارت {fee} بود. | The card fee was {fee}.
+eco.pay.held | پرداخت {amount} به {player} برای بررسی نگه داشته شد؛ پولش از تو رفته و در امانت می‌ماند تا بررسی تمام شود. | The payment of {amount} to {player} was held for review; the money has left you and waits in escrow.
+eco.pay.declined_title | پول کافی نداری | Not enough money
+eco.pay.declined | قیمت {amount} است و با پول نقد و بانکت نمی‌شود پرداخت. | The price is {amount}, which your cash and bank cannot cover.
+eco.pay.cash_only | این‌جا فقط نقد پذیرفته می‌شود. | Only cash is taken here.
+eco.pay.card_only | این‌جا فقط کارت پذیرفته می‌شود. | Only card is taken here.
+eco.pay.only_card | نقدت کافی نیست؛ فقط با کارت می‌شود. | You do not have the cash; only card works.
+eco.pay.only_cash | موجودی بانکت کافی نیست؛ فقط نقد می‌شود. | Your bank balance is short; only cash works.
+eco.pay.cannot | برای {amount} پول کافی نداری. | You do not have enough for {amount}.
+eco.pay.paid_cash | از پول نقدت پرداخت شد. | Paid from your cash.
+eco.pay.paid_card | با کارت از بانکت پرداخت شد. | Paid by card from your bank.
+# the city budget
+eco.budget.title | بودجهٔ {city} | Budget of {city}
+eco.budget.title_plain | بودجهٔ شهر | The city budget
+eco.budget.no_city | هنوز در هیچ شهری مستقر نیستی. بعد از استقرار، بودجهٔ شهرت همین‌جا دیده می‌شود. | You are not settled in any city yet. Once you are, your city's budget shows here.
+eco.budget.treasury | موجودی خزانه | Treasury
+eco.budget.spend_share | سقف خرج هر دوره | Most spent per period
+eco.budget.allocation | تقسیم فعلی: {shares} | Current split: {shares}
+eco.budget.nothing | هیچ خطی سهمی ندارد و چیزی خرج نمی‌شود | no line has a share, so nothing is spent
+eco.budget.share | {line} {share} | {line} {share}
+eco.budget.pending | تقسیم تازه {when} دیگر اجرا می‌شود: {shares} | A new split starts in {when}: {shares}
+eco.budget.last | دورهٔ گذشته {spent} خرج شد: | Last period spent {spent}:
+eco.budget.no_period | هنوز هیچ دورهٔ بودجه‌ای تمام نشده است. | No budget period has ended yet.
+eco.budget.next | دورهٔ بعد: {in} دیگر | Next period in {in}
+eco.budget.effect.investigation | پیگیری پرونده‌ها {share} جدی‌تر | Case work {share} more serious
+eco.budget.effect.hospital_price | بیمارستان شهر {share} ارزان‌تر | The city hospital {share} cheaper
+eco.budget.effect.transit_fare | حمل‌ونقل عمومی {share} ارزان‌تر | Public transport {share} cheaper
+eco.budget.effect.course_fee | آموزش {share} ارزان‌تر | Courses {share} cheaper
+eco.budget.effect.war_repair | {share} از خرابی جنگ بازسازی شد | {share} of the war damage was repaired
+eco.budget.effect.npc_demand | خرید مردم از شرکت‌ها {share} بیشتر | People buy {share} more from companies
+eco.budget.effect.defence_fund | به صندوق دفاع کشور رفت | Went to the national defence fund
+# gold
+eco.gold.title | طلافروشی | The gold dealer
+eco.gold.buy_price | خرید از ما | Buy from us
+eco.gold.sell_price | فروش به ما | Sell to us
+eco.gold.up | قیمت {p} بالا رفته | Price up {p}
+eco.gold.down | قیمت {p} پایین آمده | Price down {p}
+eco.gold.flat | قیمت تغییری نکرده | Price unchanged
+eco.gold.stock | طلای موجود: {n} گرم | In stock: {n} g
+eco.gold.next | قیمت بعدی ساعت {t} | Next price at {t}
+eco.gold.holding | طلای تو | Your gold
+eco.gold.grams | {n} گرم | {n} g
+eco.gold.value | ارزش امروز | Worth today
+eco.gold.cost | بهای خرید | What it cost you
+eco.gold.buy | خرید | Buy
+eco.gold.sell | فروش | Sell
+eco.gold.option | {n} گرم ({price}) | {n} g ({price})
+eco.gold.history | قیمت‌های اخیر | Recent prices
+eco.gold.confirm_buy | خرید {n} گرم طلا | Buying {n} g of gold
+eco.gold.confirm_sell | فروش {n} گرم طلا | Selling {n} g of gold
+eco.gold.amount | مقدار | Amount
+eco.gold.price_each | قیمت هر گرم | Price per gram
+# loans
+eco.loan.products | وام‌هایی که می‌دهیم | Loans on offer
+eco.loan.title_plain | وام | Loan
+eco.loan.status.active | در جریان | Running
+eco.loan.status.repaid | تسویه شده | Paid off
+eco.loan.status.defaulted | نکول شده | In default
+eco.loan.line | قسط بعدی {next} - {left} قسط مانده - بدهی {owed} | Next {next} - {left} left - owed {owed}
+eco.loan.line_arrears | قسط بعدی {next} - {arrears} قسط عقب‌افتاده - بدهی {owed} | Next {next} - {arrears} overdue - owed {owed}
+eco.loan.next_due | قسط‌ها ساعت {t} سررسید می‌شوند. | Instalments fall due at {t}.
+eco.loan.kind.player | وام بدون وثیقه، به خود تو. | An unsecured loan to you.
+eco.loan.kind.mortgage | وام با وثیقهٔ ملک: تا وام تسویه نشود ملک فروخته نمی‌شود و اگر نکول کنی، شهر آن را پس می‌گیرد. | A loan secured by a property: you cannot sell it until the loan is paid, and if you default the city takes it back.
+eco.loan.kind.company | وام برای شرکتی که در اختیار توست. | A loan for a company you control.
+eco.loan.choose_pledge.mortgage | کدام ملک وثیقهٔ این وام باشد؟ | Which property secures this loan?
+eco.loan.choose_pledge.company | کدام شرکت وام را بگیرد؟ | Which company takes the loan?
+eco.loan.choose_pledge.player | چه چیزی وثیقه باشد؟ | What secures it?
+eco.loan.rate | سود سالانه | Yearly rate
+eco.loan.late_fee | جریمهٔ دیرکرد | Late fee
+eco.loan.default_after | نکول بعد از | Default after
+eco.loan.instalments | {n} قسط عقب‌افتاده | {n} missed instalments
+eco.loan.pledged | وثیقه: {pledge} | Pledge: {pledge}
+eco.loan.secures | تا {n} وام می‌دهد | Secures up to {n}
+eco.loan.nothing | با امتیاز و وثیقهٔ فعلی‌ات مبلغی برای این وام نمی‌ماند. | With your score and pledge there is nothing to lend you on this.
+eco.loan.limit | بیشترین وام: {n} | Most you can borrow: {n}
+eco.loan.option_sub | {term} قسط، هر قسط {instalment} | {term} instalments of {instalment}
+eco.loan.confirm_title | شرایط {product} | Terms of {product}
+eco.loan.amount | مبلغ وام | Loan amount
+eco.loan.interest | سود ({p} در سال) | Interest ({p} a year)
+eco.loan.instalment | هر قسط ({n} قسط) | Each instalment ({n})
+eco.loan.total | جمع بازپرداخت | Total to repay
+eco.loan.first | اولین قسط: {t} | First instalment: {t}
+eco.loan.warning | اگر قسط‌ها عقب بیفتد جریمه می‌شوی و امتیاز اعتباری‌ات کم می‌شود. | If instalments fall behind you pay a fee and your credit score drops.
+eco.loan.take | گرفتن وام {n} | Take the loan of {n}
+eco.loan.detail_title | وام شمارهٔ {no} - {product} | Loan {no} - {product}
+eco.loan.principal | مبلغ وام | Principal
+eco.loan.opened | تاریخ گرفتن | Taken on
+eco.loan.progress | قسط‌ها | Instalments
+eco.loan.progress_of | {paid} از {n} پرداخت شده، {missed} عقب‌افتاده | {paid} of {n} paid, {missed} missed
+eco.loan.owed | بدهی فعلی | Owed now
+eco.loan.next | قسط بعدی | Next instalment
+eco.loan.arrears | {n} قسط عقب‌افتاده و {fees} جریمه | {n} overdue instalments and {fees} in fees
+eco.loan.defaulted | این وام نکول شد. بانک {recovered} از وثیقه برگرداند و {lost} سوخت شد. | This loan defaulted. The bank recovered {recovered} from the pledge and {lost} was lost.
+eco.loan.repaid | این وام تسویه شده است. | This loan is paid off.
+eco.loan.payoff_confirm | با {n} همهٔ وام تسویه می‌شود. مطمئنی؟ | {n} pays the whole loan off. Are you sure?
+eco.loan.payoff | تسویهٔ کامل ({n}) | Pay it all off ({n})
+eco.loan.payoff_yes | بله، تسویه شود ({n}) | Yes, pay it off ({n})
+eco.credit.band.poor | امتیاز اعتباری: ضعیف | Credit score: poor
+eco.credit.band.fair | امتیاز اعتباری: متوسط | Credit score: fair
+eco.credit.band.good | امتیاز اعتباری: خوب | Credit score: good
+eco.credit.band.very_good | امتیاز اعتباری: خیلی خوب | Credit score: very good
+eco.credit.band.excellent | امتیاز اعتباری: عالی | Credit score: excellent
+eco.pledge.company | شرکت «{company}» | The company "{company}"
+eco.pledge.property | ملک شمارهٔ {no}: {type} در {city} - ارزش {value} | Property {no}: {type} in {city} - worth {value}
+eco.pledge.property_short | ملک شمارهٔ {no}: {type} در {city} | Property {no}: {type} in {city}
+eco.pledge.worth | ارزش {n} | Worth {n}
+# savings
+eco.savings.title | پس‌انداز | Savings
+eco.savings.balance | پس‌انداز | Saved
+eco.savings.bank | موجودی بانک | Bank balance
+eco.savings.rate | سود سالانه | Yearly rate
+eco.savings.earned | تا حالا سود گرفته‌ای | Interest earned so far
+eco.savings.next | سود دورهٔ بعد | Interest next period
+eco.savings.hint | پولی که پس‌انداز می‌کنی سود می‌گیرد؛ هر وقت خواستی به حساب بانکی برمی‌گردد. | Money you save earns interest, and comes back to your bank account whenever you like.
+eco.savings.next_at | سود ساعت {t} حساب می‌شود. | Interest is paid at {t}.
+eco.savings.put | گذاشتن در پس‌انداز | Put in savings
+eco.savings.take | برداشتن از پس‌انداز | Take from savings
+# insurance
+eco.insurance.title | صندوق بیمهٔ {country} | Insurance fund of {country}
+eco.insurance.title_plain | بیمه | Insurance
+eco.insurance.fund | موجودی صندوق | Fund balance
+eco.insurance.covers.health | هزینهٔ درمان را پوشش می‌دهد | Covers treatment costs
+eco.insurance.covers.war_damage | خسارت جنگ به یک ملک را پوشش می‌دهد | Covers war damage to one property
+eco.insurance.covers.theft | دزدی را پوشش می‌دهد | Covers theft
+eco.insurance.premium | حق بیمه (هر دورهٔ بازی) | Premium (each game period)
+eco.insurance.premium_valued | {fixed} و {p} از ارزش ملک | {fixed} plus {p} of the property's value
+eco.insurance.cover | پوشش | Covers
+eco.insurance.max | بیشترین خسارت | Most it pays
+eco.insurance.wait | زمان انتظار تا اولین خسارت | Waiting time before a claim
+eco.insurance.insure | گرفتن این بیمه | Take this policy
+eco.insurance.insure_for | بیمه کردن: {pledge} | Insure: {pledge}
+eco.insurance.held | همین بیمه را داری. | You already have this policy.
+eco.insurance.mine | بیمه‌نامه‌های من | My policies
+eco.insurance.policy | شمارهٔ {no} - {product} | No. {no} - {product}
+eco.insurance.policy_sub | حق بیمه {premium} - خسارت گرفته‌ای: {paid} | Premium {premium} - claimed so far: {paid}
+eco.insurance.active | فعال | Active
+eco.insurance.waiting | از ساعت {t} پوشش می‌دهد | Covers from {t}
+eco.insurance.ended.cancelled | لغو شد | Cancelled
+eco.insurance.ended.lapsed | حق بیمه پرداخت نشد؛ از کار افتاد | Lapsed: the premium was not paid
+eco.insurance.ended.gone | ملک دیگر مال تو نیست | The property is no longer yours
+eco.insurance.cancel_confirm | بیمه‌نامهٔ {no} ({product}) لغو شود؟ | Cancel policy {no} ({product})?
+eco.insurance.confirm_title | {product} | {product}
+eco.insurance.for | برای: {pledge} | For: {pledge}
+eco.insurance.every_period | حق بیمه هر دورهٔ بازی از بانک کم می‌شود. | The premium is taken from your bank every game period.
+eco.insurance.hint | هر وقت بخواهی بیمه را لغو می‌کنی؛ خسارت فقط بعد از زمان انتظار داده می‌شود. | You can cancel any time; claims are paid only after the waiting time.
+# the finance refusals
+eco.finance.refused.no_bank | هنوز ساکن هیچ کشوری نیستی و بانک ملی نداری. | You do not live in any country yet, so you have no national bank.
+eco.finance.refused.score | امتیاز اعتباری‌ات برای این وام کافی نیست؛ دست‌کم {score} لازم است. قسط‌ها را به‌موقع بده و بدهی‌ات را کم کن. | Your credit score is too low for this loan; at least {score} is needed. Pay instalments on time and lower your debt.
+eco.finance.refused.too_many | بیش از {count} وام هم‌زمان نمی‌شود داشت. اول یکی را تسویه کن. | You cannot have more than {count} loans at once. Pay one off first.
+eco.finance.refused.bank_dry | بانک ملی الان پول کافی برای این وام ندارد. بعداً دوباره سر بزن. | The national bank does not have the money for this loan right now. Try again later.
+eco.finance.refused.amount | این مبلغ پذیرفته نیست. بیشترین یا کمترین مبلغ مجاز: {amount}. | That amount is not accepted. The most or least allowed: {amount}.
+eco.finance.refused.pledge | وثیقهٔ مناسبی برای این وام نداری. | You have no suitable pledge for this loan.
+eco.finance.refused.not_owner | فقط کسی که شرکت را در اختیار دارد این کار را می‌کند. | Only whoever controls the company can do this.
+eco.finance.refused.short | موجودی‌ات کافی نیست. لازم است: {amount}. | You do not have enough. Needed: {amount}.
+eco.finance.refused.savings_cap | موجودی پس‌انداز نمی‌تواند از {amount} بیشتر شود. | Savings cannot go above {amount}.
+eco.finance.refused.no_product | این محصول دیگر عرضه نمی‌شود. | This product is no longer offered.
+eco.finance.refused.held | همین بیمه را همین حالا داری. | You already hold this policy.
+eco.finance.refused.pledged | این ملک وثیقهٔ یک وام است. | This property secures a loan.
+eco.finance.refused.not_listed | این شرکت در بورس نیست. | This company is not on the exchange.
+eco.finance.refused.listed | این شرکت همین حالا در بورس است. | This company is already on the exchange.
+eco.finance.refused.too_young | این شرکت هنوز جوان‌تر از آن است که عرضه شود. | This company is too young to be listed.
+eco.finance.refused.too_small | درآمد این شرکت هنوز برای عرضه کافی نیست. | This company's income is not enough to be listed yet.
+eco.finance.refused.in_debt | شرکتی که بدهی دارد عرضه نمی‌شود و سود نمی‌دهد. | A company in debt cannot be listed or pay a dividend.
+eco.finance.refused.bad_float | این مقدار سهم یا این قیمت برای عرضه پذیرفته نیست. | This number of shares or this price is not accepted for a listing.
+eco.finance.refused.no_shares | سهم آزاد کافی نداری. سهم آزاد تو: {count}. | You do not have enough free shares. Your free shares: {count}.
+eco.finance.refused.no_money | پول آزاد شرکت کافی نیست. لازم است: {amount}. | The company does not have enough free money. Needed: {amount}.
+eco.finance.refused.too_many_orders | بیش از {count} سفارش باز نمی‌شود داشت. یکی را لغو کن. | You cannot have more than {count} open orders. Cancel one.
+eco.finance.refused.order | این سفارش پذیرفته نیست. | This order is not accepted.
+eco.finance.refused.gold_stock | طلافروش فقط {count} گرم طلا دارد. | The dealer only has {count} g of gold.
+eco.finance.refused.gold_held | این‌قدر طلا نداری. | You do not have that much gold.
+eco.finance.refused.not_yours | این مال تو نیست. | This is not yours.
+eco.finance.refused.own_company | با سهم شرکت خودت نمی‌شود این کار را کرد. | You cannot do this with your own company's shares.
+eco.finance.refused.fund_closed | صندوق بیمه الان بسته است. | The insurance fund is closed right now.
+eco.finance.refused.no_player | بازیکنی با این مشخصات پیدا نشد. | No player was found like that.
+# the stock exchange
+eco.stock.empty | هنوز هیچ شرکتی در بورس عرضه نشده است. صاحب شرکت می‌تواند از صفحهٔ شرکتش آن را عرضه کند. | No company is listed yet. A company's owner can list it from the company's page.
+eco.stock.hint | قیمت هر سهم فقط از خرید و فروش بازیکنان درمی‌آید. سود سهام را صاحب شرکت از پول آزاد شرکت می‌دهد. | A share's price comes only from players buying and selling. The owner pays dividends from the company's free money.
+eco.stock.sub | {type} در {city} | {type} in {city}
+eco.stock.price | قیمت هر سهم | Price per share
+eco.stock.ipo_price | قیمت عرضهٔ اولیه | Listing price
+eco.stock.not_listed | این شرکت در بورس عرضه نشده است. | This company is not on the exchange.
+eco.stock.book | ارزش دفتری هر سهم | Book value per share
+eco.stock.total | کل سهم‌ها | All shares
+eco.stock.cap | ارزش بازار | Market value
+eco.stock.controller | اختیار شرکت با | Controlled by
+eco.stock.last_div | آخرین سود هر سهم | Last dividend per share
+eco.stock.holding | سهم تو: {shares} ({locked} در سفارش فروش) - بهای خرید {cost} | Your shares: {shares} ({locked} in sell orders) - cost {cost}
+eco.stock.bids | خریداران | Buyers
+eco.stock.asks | فروشندگان | Sellers
+eco.stock.trades | آخرین معامله‌ها | Latest trades
+eco.stock.buy | خرید | Buy
+eco.stock.sell | فروش | Sell
+eco.stock.option | {qty} سهم، {price} | {qty} shares, {price}
+eco.stock.fee | کارمزد بازار شهر شرکت، {p}، از پول فروشنده کم می‌شود. | The market fee of the company's city, {p}, is taken from the seller.
+eco.stock.order_buy_title | خرید سهم {company} | Buying shares of {company}
+eco.stock.order_sell_title | فروش سهم {company} | Selling shares of {company}
+eco.stock.confirm_buy | ثبت خرید | Place the buy
+eco.stock.confirm_sell | ثبت فروش | Place the sell
+eco.stock.qty | تعداد سهم | Shares
+eco.stock.up_to | تا قیمت | Up to
+eco.stock.from | دست‌کم به قیمت | At least
+eco.stock.reserve | کنار گذاشته می‌شود | Set aside
+eco.stock.locked | قفل می‌شود | Locked
+eco.stock.shares | {n} سهم | {n} shares
+eco.stock.reserve_note | از حساب بانکی‌ات کنار گذاشته می‌شود (موجودی: {bank})؛ اگر ارزان‌تر بخری، باقی برمی‌گردد. | Taken from your bank account (balance: {bank}); if you buy cheaper the rest comes back.
+eco.stock.placed_title | سفارش شمارهٔ {no} | Order {no}
+eco.stock.placed_buy | سفارش خرید {qty} سهم «{company}» تا {price} ثبت شد. | Order placed to buy {qty} shares of "{company}" up to {price}.
+eco.stock.placed_sell | سفارش فروش {qty} سهم «{company}» از {price} ثبت شد. | Order placed to sell {qty} shares of "{company}" from {price}.
+eco.stock.filled_buy | {filled} سهم خریدی و {spent} پرداختی. | You bought {filled} shares and paid {spent}.
+eco.stock.filled_sell | {filled} سهم فروختی و {got} به حساب بانکی‌ات آمد. | You sold {filled} shares and {got} came to your bank account.
+eco.stock.rests | باقی سفارش در دفتر می‌ماند تا ساعت {t}. | The rest of the order stays in the book until {t}.
+eco.stock.loss | زیان نسبت به پولی که گذاشته‌ای | Loss against what you put in
+eco.stock.no_shares | هنوز سهمی نداری. | You hold no shares yet.
+eco.stock.holding_line | {shares} سهم به قیمت {price} - بهای خرید {cost} | {shares} shares at {price} - cost {cost}
+eco.stock.holding_private | عرضه‌نشده: {shares} سهم - بهای خرید {cost} | Not listed: {shares} shares - cost {cost}
+eco.stock.order_line_buy | شمارهٔ {no}: خرید {qty} سهم تا {price} | No. {no}: buy {qty} shares up to {price}
+eco.stock.order_line_sell | شمارهٔ {no}: فروش {qty} سهم از {price} | No. {no}: sell {qty} shares from {price}
+eco.stock.cancel | لغو سفارش {no} | Cancel order {no}
+eco.ipo.title | عرضهٔ اولیهٔ {company} | Listing {company}
+eco.ipo.rules | شرط‌ها: دست‌کم {age} عمر، {revenue} درآمد و بی‌بدهی. هزینهٔ عرضه {fee} از حساب شرکت به شهر می‌رسد. | Conditions: at least {age} old, {revenue} in income and no debt. The listing fee of {fee} goes from the company's account to the city.
+eco.ipo.book | ارزش دفتری هر سهم {book} - کل سهم‌ها {total} | Book value per share {book} - all shares {total}
+eco.ipo.refused.too_young | شرکت هنوز جوان است؛ {wait} دیگر صبر کن. | The company is still young; wait {wait} more.
+eco.ipo.refused.too_small | درآمد شرکت تا امروز {revenue} است و هنوز کافی نیست. | The company's income so far is {revenue}, which is not enough yet.
+eco.ipo.refused.in_debt | اول بدهی نگهداری شرکت را بپرداز. | Pay the company's upkeep debt first.
+eco.ipo.refused.bad_float | سهم آزاد کافی برای عرضه نداری. | You do not have enough free shares to list.
+eco.ipo.choose | چند سهم و به چه قیمتی عرضه شود؟ اختیار شرکت با تو می‌ماند، مگر کسی بیش از نیمی از سهم‌ها را بخرد. | How many shares at what price? You keep control unless someone buys more than half.
+eco.ipo.option | {shares} سهم، هر سهم {price} | {shares} shares at {price} each
+eco.ipo.confirm_title | عرضهٔ {company} | Listing {company}
+eco.ipo.shares | تعداد سهم | Shares
+eco.ipo.price_each | قیمت هر سهم | Price per share
+eco.ipo.fee | هزینهٔ عرضه | Listing fee
+eco.ipo.yes | بله، عرضه شود | Yes, list it
+eco.dividend.title | سود سهام {company} | Dividend of {company}
+eco.dividend.free | پول آزاد شرکت | The company's free money
+eco.dividend.tax | مالیات شرکت | Company tax
+eco.dividend.shares | کل سهم‌ها | All shares
+eco.dividend.refused.in_debt | شرکتی که بدهی دارد سود نمی‌دهد. | A company in debt pays no dividend.
+eco.dividend.refused.no_money | پول آزاد شرکت برای سود دادن کافی نیست. | The company's free money is not enough for a dividend.
+eco.dividend.paid | سود پرداخت شد: هر سهم {per} و روی هم {paid} به {holders} سهامدار. | Dividend paid: {per} a share, {paid} in all to {holders} shareholders.
+eco.dividend.option | {amount} (هر سهم {per}) | {amount} ({per} a share)
+eco.dividend.confirm_title | سود سهام {company} | Dividend of {company}
+eco.dividend.per_share | به هر سهم | Per share
+eco.dividend.taken | برداشت از پول آزاد شرکت | Taken from the company's free money
+eco.dividend.tax_note | مالیات به شهر می‌رود. | The tax goes to the city.
+eco.dividend.yes | بله، سود پرداخت شود | Yes, pay it
+# the item market
+eco.market.away | خرید و فروش در بازار انجام می‌شود. برای معامله به آنجا برو. | Trading happens at the market. Go there to trade.
+eco.market.empty | الان کسی در اینجا نمی‌خرد و نمی‌فروشد. | Nobody is buying or selling here right now.
+eco.market.buy | خرید | Buy
+eco.market.sell | فروش | Sell
+eco.market.buy_at | خرید یک عدد به {price} | Buy one at {price}
+eco.market.bid_at | پیشنهاد خرید {price} | Bid {price}
+eco.market.sell_at | فروش یک عدد به {price} | Sell one at {price}
+eco.market.ask_at | فروش به {price} | Sell at {price}
+eco.market.ask_all | فروش همهٔ {qty} عدد به {price} | Sell all {qty} at {price}
+eco.market.fee_note | کارمزد بازار را فروشنده می‌دهد و نرخش را شهر تعیین می‌کند. | The seller pays the market fee, and the city sets its rate.
+eco.market.checkout_title | خرید {item} | Buying {item}
+eco.market.qty | تعداد | Quantity
+eco.market.price_each | قیمت هر عدد | Price each
+eco.market.reserve | کنار گذاشته می‌شود | Set aside
+eco.market.escrow_how | این مبلغ تا انجام سفارش یا لغو آن کنار گذاشته می‌شود. | This sum is set aside until the order is filled or cancelled.
+eco.market.placed_title | سفارش شمارهٔ {no} | Order {no}
+eco.market.placed_buy | سفارش خرید {item} ثبت شد: {qty} عدد به {price}. | Buy order placed for {item}: {qty} at {price}.
+eco.market.placed_sell | سفارش فروش {item} ثبت شد: {qty} عدد به {price}. | Sell order placed for {item}: {qty} at {price}.
+eco.market.filled_buy | همان لحظه خریدی: {filled} عدد به {spent}. | Bought right away: {filled} for {spent}.
+eco.market.filled_sell | همان لحظه فروختی: {filled} عدد به {got}. | Sold right away: {filled} for {got}.
+eco.market.rests | {left} عدد در دفتر سفارش منتظر طرف مقابل می‌ماند؛ سفارش تا ساعت {t} باز است. | {left} stay in the order book waiting for the other side; the order is open until {t}.
+eco.market.embargoed | از {count} پیشنهاد کشوری که با کشور ما زیر تحریم تجاری است صرف‌نظر شد. | {count} offers from a country under a trade embargo with ours were skipped.
+eco.market.cancelled_title | سفارش شمارهٔ {no} لغو شد | Order {no} cancelled
+eco.market.cancelled_buy | سفارش {no} لغو شد و {refund} به تو برگشت. | Order {no} was cancelled and {refund} came back to you.
+eco.market.cancelled_sell | سفارش {no} لغو شد و {left} عدد {item} به کوله‌پشتی‌ات برگشت. | Order {no} was cancelled and {left} of {item} went back to your backpack.
+eco.market.mine_title | سفارش‌های من | My orders
+eco.market.mine_none | هیچ سفارشی نداری. | You have no orders.
+eco.market.order_buy | سفارش {no}: خرید {item} | Order {no}: buy {item}
+eco.market.order_sell | سفارش {no}: فروش {item} | Order {no}: sell {item}
+eco.market.order_sub | {filled} از {qty} به {price} - {city} | {filled} of {qty} at {price} - {city}
+eco.market.status.open | باز | Open
+eco.market.status.filled | انجام‌شده | Filled
+eco.market.status.cancelled | لغوشده | Cancelled
+eco.market.status.expired | پایان‌یافته | Expired
+eco.market.cancel | لغو سفارش {no} | Cancel order {no}
+eco.market.refused.not_traded | {item} در بازار معامله نمی‌شود. | {item} is not traded on the market.
+eco.market.refused.too_big | این سفارش از سقف مجاز بازار بزرگ‌تر است. | This order is above the market's limit.
+eco.market.refused.too_many | همین حالا {count} سفارش باز داری. یکی را لغو کن یا صبر کن تا انجام شود. | You already have {count} open orders. Cancel one or wait for one to fill.
+eco.market.refused.not_enough | این‌قدر {item} همراهت نیست. | You do not have that much {item} on you.
+eco.market.refused.no_order | چنین سفارشی از تو وجود ندارد. | You have no such order.
+eco.market.refused.closed | این سفارش دیگر باز نیست. | This order is no longer open.
+# the shops
+eco.shops.in_city | مغازه‌های {city} | Shops of {city}
+eco.shops.none_at | در {place} مغازه‌ای نیست. | There are no shops at {place}.
+eco.shops.away | این مغازه در {place} است. برای خرید به آنجا برو. | This shop is at {place}. Go there to buy.
+eco.shops.at_counter | پای پیشخوان هستی. | You are at the counter.
+eco.shops.empty | تمام شده | Sold out
+eco.shops.stock | {n} عدد موجود | {n} in stock
+eco.shops.busy | پرطرفدار | in demand
+eco.shops.buys | می‌خرد به {n} | buys at {n}
+eco.shops.no_shelves | قفسه‌ها خالی است. | The shelves are empty.
+eco.shops.tax_note | مالیات فروش در اینجا: {p} | Sales tax here: {p}
+eco.shops.checkout_title | {shop} | {shop}
+eco.shops.checkout_item | {item} - {qty} عدد، هر عدد {unit} | {item} - {qty}, {unit} each
+eco.shops.price | قیمت | Price
+eco.shops.tax | مالیات فروش ({p}) | Sales tax ({p})
+eco.shops.due | مبلغ پرداختی | To pay
+eco.shops.qty | خرید {n} عدد | Buy {n}
+eco.shops.bought_title | خرید انجام شد | Bought
+eco.shops.bought | {item} خریدی: {qty} عدد به {total}. | You bought {item}: {qty} for {total}.
+eco.shops.bought_tax | {tax} از این مبلغ مالیات فروش است و به شهر می‌رسد. | {tax} of this is sales tax and goes to the city.
+eco.shops.offers_title | چه کسی {item} می‌خرد | Who buys {item}
+eco.shops.offers_none | هیچ مغازه‌ای در این شهر این را نمی‌خرد. | No shop in this city buys this.
+eco.shops.sold_title | فروش انجام شد | Sold
+eco.shops.sold | {item} را به {shop} به {price} فروختی. | You sold {item} to {shop} for {price}.
+eco.shops.left | {n} عدد برایت مانده. | You have {n} left.
+eco.shops.restock | بار بعدی می‌رسد | Next delivery
+eco.shops.refused.no_shop | این مغازه در این شهر نیست. | This shop is not in this city.
+eco.shops.refused.not_sold | {shop} این را نمی‌فروشد. | {shop} does not sell this.
+eco.shops.refused.sold_out | {item} در {shop} تمام شده است. منتظر بار بعدی بمان. | {item} is sold out at {shop}. Wait for the next delivery.
+eco.shops.refused.not_held | {item} همراهت نیست. | You do not have {item} on you.
+eco.shops.refused.no_buyback | {shop} {item} نمی‌خرد. | {shop} does not buy {item}.
+# the auction house
+eco.auction.title | حراجی {city} | Auction house of {city}
+eco.auction.title_plain | حراجی | The auction house
+eco.auction.away | پیشنهاد دادن در حراجی انجام می‌شود. برای شرکت به آنجا برو. | Bids are placed at the auction house. Go there to take part.
+eco.auction.none | الان چیزی در اینجا حراج نمی‌شود. | Nothing is up for auction here right now.
+eco.auction.line | حراج {no}: {item} (کیفیت {quality}) | Auction {no}: {item} (quality {quality})
+eco.auction.high_bid | بالاترین پیشنهاد {n} | highest bid {n}
+eco.auction.from | از {n} | from {n}
+eco.auction.remaining | {t} مانده | {t} left
+eco.auction.status.open | باز | Open
+eco.auction.status.sold | فروخته شد | Sold
+eco.auction.status.unsold | فروخته نشد | Unsold
+eco.auction.role_seller | مال تو | Yours
+eco.auction.role_leading | بالاترین پیشنهاد | Leading
+eco.auction.detail_title | حراج {no} | Auction {no}
+eco.auction.item | {item} - کیفیت {quality} | {item} - quality {quality}
+eco.auction.seller | فروشنده | Seller
+eco.auction.reserve | حداقل قیمت | Lowest price
+eco.auction.high_bid_label | بالاترین پیشنهاد | Highest bid
+eco.auction.high_bid_of | {n} ({bids} پیشنهاد) | {n} ({bids} bids)
+eco.auction.ends | پایان | Ends
+eco.auction.no_bids | هنوز پیشنهادی نرسیده است. | No bid yet.
+eco.auction.yours | این حراج مال توست. | This auction is yours.
+eco.auction.leading | بالاترین پیشنهاد مال توست. | The highest bid is yours.
+eco.auction.bid_how | پیشنهاد {n} تا وقتی کسی بالاتر ندهد یا حراج را ببری کنار گذاشته می‌شود. پرداخت کن: | A bid of {n} is set aside until someone outbids you or you win. Pay with:
+eco.auction.new_title | حراج {item} (کیفیت {quality}) | Auction {item} (quality {quality})
+eco.auction.new_hint | کمترین قیمتی را که می‌پذیری و مدت حراج را انتخاب کن. | Pick the lowest price you accept and how long it runs.
+eco.auction.duration | مدت: {t} | Length: {t}
+eco.auction.reserve_option | از {n} | from {n}
+eco.auction.opened_title | حراج {no} باز شد | Auction {no} opened
+eco.auction.opened | حراج {no}: {item} از {reserve} به مدت {duration} باز شد. | Auction {no}: {item} from {reserve}, for {duration}.
+eco.auction.ends_at | پایان در ساعت {t} | Ends at {t}
+eco.auction.bid_title | پیشنهاد برای حراج {no} | Bid on auction {no}
+eco.auction.bid_placed | برای حراج {no} ({item}) {amount} پیشنهاد دادی. | You bid {amount} on auction {no} ({item}).
+eco.auction.bid_escrow | مبلغ پیشنهادت کنار گذاشته شد. اگر کسی بالاتر بدهد، به تو برمی‌گردد. | Your bid is set aside. If someone bids higher it comes back to you.
+eco.auction.mine_title | حراج‌های من | My auctions
+eco.auction.mine_none | نه چیزی حراج گذاشته‌ای و نه برای چیزی پیشنهاد داده‌ای. | You have not put anything up and have not bid on anything.
+eco.auction.refused.none | چنین حراجی وجود ندارد. | There is no such auction.
+eco.auction.refused.closed | این حراج تمام شده است. | This auction is over.
+eco.auction.refused.too_low | پیشنهاد باید دست‌کم {min} باشد. | The bid must be at least {min}.
+eco.auction.refused.own | برای حراج خودت نمی‌توانی پیشنهاد بدهی. | You cannot bid on your own auction.
+eco.auction.refused.leading | بالاترین پیشنهاد همین حالا مال توست. | You already hold the highest bid.
+eco.auction.refused.not_held | این شیء همراهت نیست. | You do not have this item on you.
+eco.auction.refused.too_many | همین حالا {count} حراج باز داری. | You already have {count} open auctions.
+eco.auction.refused.not_sellable | این را نمی‌شود حراج گذاشت. فقط اشیای یکتا به حراج می‌روند. | This cannot be auctioned. Only one-of-a-kind items go to auction.
+# the extra refusal codes' toasts (the server's error.code)
+refusal.finance_score | امتیاز اعتباری‌ات برای این وام کافی نیست. | Your credit score is too low for this loan.
+refusal.finance_short | موجودی‌ات کافی نیست. | You do not have enough.
+refusal.market_too_many | سفارش باز زیادی داری. | You have too many open orders.
+refusal.shop_sold_out | این کالا تمام شده است. | This item is sold out.
+refusal.auction_too_low | پیشنهادت کمتر از حد لازم است. | Your bid is below the minimum.
 # -- inventory ---------------------------------------------------------------
 inventory.title | کوله‌پشتی | Backpack
 inventory.empty | کوله‌پشتی‌ات خالی است. | Your backpack is empty.

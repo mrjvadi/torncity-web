@@ -3,6 +3,7 @@
 // backend. Never enabled unless the query string asks for it.
 
 import { API_BASE } from './client'
+import { mockEconomyCommand } from './mock_economy'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
@@ -91,6 +92,9 @@ const MOCK_PROFILE_ACTIONS = [
 
 function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.language.set') mockLang = args?.lang === 'en' ? 'en' : 'fa'
+  // the economy and finance area: neutral answers of every screen of it (src/api/mock_economy.ts)
+  const economy = mockEconomyCommand(command, args ?? {})
+  if (economy) return json(economy)
   const support = mockSupportCommand(command, args)
   if (support) return json(support)
   // the life area answers in the neutral contract (src/api/mock_life.ts)
@@ -141,7 +145,7 @@ export function installMockApi(): void {
         player: MOCK_PLAYER,
         content_version: 1,
         languages: [{ code: 'fa', name: 'فارسی' }],
-        cities: [{ code: 'calderis', name: 'Calderis' }, { code: 'support', name: 'Support' }],
+        cities: [{ code: 'calderis', name: 'کالدریس' }, { code: 'support', name: 'شهر مرکزی' }],
         places: [{ code: 'old_town', name: 'مرکز شهر' }],
         server_time: new Date().toISOString(),
         realtime: false,

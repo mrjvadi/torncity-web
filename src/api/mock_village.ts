@@ -4,6 +4,7 @@
 // 5.5). Everything here is a stand-in for the server: shapes follow the
 // contract, values are plausible Persian sample data.
 
+import { ECONOMY_CONTENT } from './mock_economy'
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
@@ -799,7 +800,7 @@ function promotionScreen(kind: 'view' | 'ask' | 'done') {
 }
 
 function residence(leaving: boolean, args: Record<string, unknown>) {
-  const view: ResidenceView = { leaving, village: 'آمل', home: 'ساپورت', home_code: 'support', cooldown_seconds: 86400, population: 3, settlement_id: OWN_ID }
+  const view: ResidenceView = { leaving, village: 'آمل', home: 'شهر مرکزی', home_code: 'support', cooldown_seconds: 86400, population: 3, settlement_id: OWN_ID }
   const cmd = leaving ? 'settlement.leave' : 'settlement.join'
   if (leaving && IS_HEAD) return refusal('holds_office')
   if (args.confirm !== 'confirm') return mockOk('village_residence_confirm', view, [confirmA(cmd), back('settlement.overview')])
@@ -1133,18 +1134,19 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
       entries: {
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
-        city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Support', fa: 'ساپورت' } }],
-        place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }],
+        city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
+        place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
         component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
-        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }],
+        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
+        shop: ECONOMY_CONTENT.shop, budget_line: ECONOMY_CONTENT.budget_line, company_type: ECONOMY_CONTENT.company_type,
         // what the pushed notices name (api/client-api.md section 4.1)
         crime: [{ code: 'pickpocket', name: { en: 'Pickpocketing', fa: 'جیب‌بری' } }, { code: 'warehouse_heist', name: { en: 'Warehouse heist', fa: 'دزدی از انبار' } }],
         achievement: [{ code: 'first_job', name: { en: 'First job', fa: 'اولین کار' } }],
         mission: [{ code: 'deliver_flour', name: { en: 'Deliver the flour', fa: 'رساندن آرد' } }],
-        property_type: [{ code: 'cottage', name: { en: 'Cottage', fa: 'کلبه' } }],
+        property_type: [{ code: 'cottage', name: { en: 'Cottage', fa: 'کلبه' } }, ...ECONOMY_CONTENT.property_type],
         treaty_type: [{ code: 'trade', name: { en: 'trade treaty', fa: 'پیمان تجاری' } }],
-        loan_product: [{ code: 'personal', name: { en: 'Personal loan', fa: 'وام شخصی' } }],
-        insurance_product: [{ code: 'property_cover', name: { en: 'Property cover', fa: 'بیمهٔ ملک' } }],
+        loan_product: ECONOMY_CONTENT.loan_product,
+        insurance_product: [{ code: 'property_cover', name: { en: 'Property cover', fa: 'بیمهٔ ملک' } }, ...ECONOMY_CONTENT.insurance_product],
         office: [{ code: 'mayor', name: { en: 'Mayor', fa: 'شهردار' } }, { code: 'deputy_mayor', name: { en: 'Deputy mayor', fa: 'معاون شهردار' } }, { code: 'city_council', name: { en: 'City council', fa: 'شورای شهر' } }],
         skill: [{ code: 'baking', name: { en: 'Baking', fa: 'نانوایی' } }],
         life_rank: [{ code: 'merchant', name: { en: 'Merchant', fa: 'بازرگان' } }, { code: 'citizen', name: { en: 'Citizen', fa: 'شهروند' } }],

@@ -10,7 +10,7 @@
 import type { PlayerLocation, TravelDestination } from './location'
 import { MOCK_VILLAGE_IDS } from '../api/mock_village_ids'
 
-const SUPPORT = { kind: 'city' as const, code: 'support', name: 'ساپورت' }
+const SUPPORT = { kind: 'city' as const, code: 'support', name: 'شهر مرکزی' }
 const OWN = { kind: 'village' as const, code: 'v-k3x9', name: 'آمل', settlement_id: MOCK_VILLAGE_IDS.own, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, motto: 'با هم می‌سازیم' }
 const OTHER = { kind: 'village' as const, code: 'v-q7m2', name: 'سرخه', settlement_id: MOCK_VILLAGE_IDS.other, emblem: { shape: 'banner', color_a: 'azure', color_b: 'ivory', icon: 'tree' }, motto: 'سرزمین درختان' }
 const FAR = { kind: 'village' as const, code: 'v-z1p8', name: 'کوهدشت', settlement_id: 'mock-village-3', emblem: { shape: 'hexagon', color_a: 'green', color_b: 'gold', icon: 'wheat' }, motto: '' }
@@ -67,7 +67,7 @@ export function mockSupportCommand(command: string, args: Record<string, unknown
     const to = DEST.find((d) => d.code === args.city)
     if (!to) return { ok: false, screen: 'error', text: 'no', error: { code: 'not_found', message: 'مقصد نامعتبر' } }
     trip = { to, mode: String(args.mode ?? 'bus'), started: Date.now(), total: 15000 }
-    return { ok: true, screen: 'travel_status', text: 'سفر آغاز شد', view: { from: 'ساپورت', to: to.name, mode_name: MODE_NAME[trip.mode], remaining_seconds: 15 }, actions: [] }
+    return { ok: true, screen: 'travel_status', text: 'سفر آغاز شد', view: { from: 'شهر مرکزی', to: to.name, mode_name: MODE_NAME[trip.mode], remaining_seconds: 15 }, actions: [] }
   }
   return null
 }
