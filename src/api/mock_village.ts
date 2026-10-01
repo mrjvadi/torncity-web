@@ -338,7 +338,7 @@ function lotsView(code: string, rotate: boolean, from = '') {
     for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) if (cellState(xx, yy) !== 'free') return false
     return true
   }
-  const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: cellState(x, y), fits: fits(x, y) })))
+  const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: cellState(x, y), own: false, fits: fits(x, y) })))
   const multi = !!e.capExempt && e.fp[0] === 1 && e.fp[1] === 1
   const m = /^(\d+)-(\d+)/.exec(from)
   const line = !multi ? '' : from === 'line' ? 'line' : m ? 'end' : ''
@@ -683,7 +683,7 @@ function privateLots(args: Record<string, unknown>) {
     }
     return true
   }
-  const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: stateOf(x, y), fits: fits(x, y) })))
+  const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: stateOf(x, y), own: fits(x, y), fits: fits(x, y) })))
   const view: PrivateLotsView = { village: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated, grid_lots: size(), rows }
   return mockOk('settlement_private_lots', view, [...(view.can_rotate ? [A('lots.rotate', 'settlement.private.lots', { code, rotate: rotated ? '0' : '1' })] : []), back('settlement.private'), refreshA('settlement.private.lots', { code })])
 }
@@ -796,7 +796,7 @@ function promotionScreen(kind: 'view' | 'ask' | 'done') {
 }
 
 function residence(leaving: boolean, args: Record<string, unknown>) {
-  const view: ResidenceView = { leaving, village: 'آمل', home: 'calderis', cooldown_seconds: 86400, population: 3, settlement_id: OWN_ID }
+  const view: ResidenceView = { leaving, village: 'آمل', home: 'ساپورت', home_code: 'support', cooldown_seconds: 86400, population: 3, settlement_id: OWN_ID }
   const cmd = leaving ? 'settlement.leave' : 'settlement.join'
   if (leaving && IS_HEAD) return refusal('holds_office')
   if (args.confirm !== 'confirm') return mockOk('village_residence_confirm', view, [confirmA(cmd), back('settlement.overview')])

@@ -236,7 +236,7 @@ const Promoted = flow<PromotionView>(({ view: v, ctx }) => (
 // -- residence -------------------------------------------------------------------------------
 
 const ResidenceConfirm = flow<ResidenceView>(({ view: v, ctx }) => {
-  const home = ctx.names.name(['city'], v.home, v.home)
+  const home = ctx.names.name(['city'], v.home_code, v.home)
   return (
     <Page title={v.leaving ? t('vx.res.leave_title', { village: v.village }) : t('vx.res.join_title', { village: v.village })} tone="emerald">
       <Panel tone="emerald">
@@ -250,7 +250,7 @@ const ResidenceConfirm = flow<ResidenceView>(({ view: v, ctx }) => {
 })
 
 const ResidenceDone = flow<ResidenceView>(({ view: v, ctx }) => {
-  const home = ctx.names.name(['city'], v.home, v.home)
+  const home = ctx.names.name(['city'], v.home_code, v.home)
   return (
     <Page title={v.leaving ? t('vx.res.left_title') : t('vx.res.joined_title', { village: v.village })} tone="emerald">
       <Panel tone="emerald">
@@ -397,7 +397,7 @@ const PrivateLots = flow<PrivateLotsView>(({ view: v, ctx }) => (
       <Lead>{t('vx.private.pick')}</Lead>
       <Legend items={[{ cls: 'mine', label: t('vx.private.yours') }, { cls: 'taken', label: t('citizen.legend.taken') }, { cls: 'free', label: t('citizen.legend.free') }]} />
       <LotMap
-        rows={(v.rows as (LotCell[] | null)[] | null)?.map((r) => (r ?? []).map((c) => (c.fits ? { ...c, state: 'mine' } : c))) ?? null}
+        rows={(v.rows as (LotCell[] | null)[] | null)?.map((r) => (r ?? []).map((c) => (c.own || c.fits ? { ...c, state: 'mine' } : c))) ?? null}
         pick={(c) => !!c.fits}
         onPick={(c) => ctx.go({ command: 'settlement.private.place', args: { code: v.building.code, lot: token(c.x, c.y, v.rotated) }, kind: 'primary', id: 'private.place' })}
       />
