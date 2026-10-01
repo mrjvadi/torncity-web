@@ -13,6 +13,8 @@ import type { Action, CommandResponse } from '../../api/types'
 import type { ScreenComponent, ScreenProps } from '../types'
 import { Card, Header, ScreenScroll, type Tone } from '../native/kit/Parts'
 import { Slab } from '../../kit'
+import Popup, { ActionButton } from '../../ui/Popup'
+import { toWesternDigits } from '../../lib/persian'
 import Skeleton from '../../ui/Skeleton'
 import { noticeText, refusalText, t } from '../../i18n'
 import { useNav } from '../../state/NavContext'
@@ -51,9 +53,17 @@ export function flow<V>(fn: (p: { view: V; ctx: FlowCtx }) => ReactNode): FlowSc
 const WRITE_COMMANDS = new Set(['settlement.home.rest', 'settlement.tax.pay', 'settlement.work', 'settlement.terms'])
 let keySeq = 0
 
+/** Other screen areas that run through the host say which of their actions change the world. */
+const WRITE_TESTS: ((a: Action) => boolean)[] = []
+
+export function registerWrite(test: (a: Action) => boolean): void {
+  WRITE_TESTS.push(test)
+}
+
 /** A write changes the world: it asks for the screen's answer itself (never twice). */
 export function isWrite(a: Action): boolean {
   if (a.kind === 'confirm' || a.id === 'confirm' || a.args?.confirm) return true
+  if (WRITE_TESTS.some((test) => test(a))) return true
   return !!a.command && WRITE_COMMANDS.has(a.command) && (a.command !== 'settlement.work' || !!a.args?.id)
 }
 
@@ -152,10 +162,12 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
   const toast = useToast()
   const [res, setRes] = useState<CommandResponse | null>(response)
   const [busy, setBusy] = useState(false)
+  const [asking, setAsking] = useState<Action | null>(null)
   useEffect(() => setRes(response), [response])
 
   const go = useCallback(async (a: Action) => {
     if (a.url) { window.open(a.url, '_blank', 'noopener'); return }
+    if (a.input && !a.args?.[a.input.field]) { setAsking(a); return }
     if (a.id === 'village.found') { openLocal('founding_form'); return }
     if (!a.command) return
     if (isBack(a)) { if (nav?.back) nav.back(); else run(a.command, a.args); return }
@@ -163,7 +175,7 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
     setBusy(true)
     try {
       const r = await api.runCommand(a.command, a.args ?? {}, `web-v-${Date.now().toString(36)}-${++keySeq}`)
-      if (r.ok === false && r.screen !== 'village_refusal') toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args))
+      if (r.ok === false && !FLOW[r.screen]) toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args))
       else {
         setRes(r)
         const note = r.notice ? noticeText(r.notice) : ''
@@ -183,6 +195,10 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
   }
   const Screen = FLOW[res.screen]
   const Own = NATIVE[res.screen]
+  const asked = asking && (
+    <AskPopup action={asking} ctx={ctx} onClose={() => setAsking(null)}
+      onSubmit={(value) => { const a = asking; setAsking(null); void go({ ...a, args: { ...(a.args ?? {}), [a.input!.field]: value } }) }} />
+  )
   if (!Screen && Own) return <Own {...props} response={res} />
   if (!Screen) {
     return (
@@ -191,5 +207,20 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
       </Page>
     )
   }
-  return <Screen key={res.screen} view={res.view} ctx={ctx} />
+  return <><Screen key={res.screen} view={res.view} ctx={ctx} />{asked}</>
+}
+
+/** The value an action asks the player to type (an amount, a name), over the screen. */
+function AskPopup({ action, ctx, onClose, onSubmit }: { action: Action; ctx: FlowCtx; onClose: () => void; onSubmit: (value: string) => void }) {
+  const [value, setValue] = useState('')
+  const text = !!action.input?.text
+  const clean = text ? value.trim() : toWesternDigits(value).replace(/[^0-9]/g, '')
+  return (
+    <Popup open onClose={onClose} title={ctx.label(action)} tone="navy"
+      footer={<ActionButton tone="green" disabled={!clean} onClick={() => onSubmit(clean)}>{t('common.confirm')}</ActionButton>}>
+      <input className="vd-input" inputMode={text ? 'text' : 'numeric'} dir={text ? 'auto' : 'ltr'} autoFocus value={value}
+        onChange={(e) => setValue(e.target.value)} aria-label={ctx.label(action)}
+        onKeyDown={(e) => { if (e.key === 'Enter' && clean) onSubmit(clean) }} />
+    </Popup>
+  )
 }

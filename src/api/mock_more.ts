@@ -103,20 +103,6 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
     ],
   }),
 
-  'shop.list': () => ({
-    screen: 'shops', text: 'مغازه‌ها',
-    view: {
-      city: 'کالدریس', city_code: 'calderis', place: { code: 'bazaar', name: 'بازار' },
-      shops: [
-        { shop: { code: 'grocery', name: 'خواربارفروشی' }, place: { code: 'bazaar', name: 'بازار' }, here: true },
-        { shop: { code: 'hardware_store', name: 'ابزارفروشی' }, place: { code: 'bazaar', name: 'بازار' }, here: false },
-      ],
-    },
-    actions: [
-      { label: 'کیف', command: 'inventory.show', row: 0, kind: 'secondary', icon: 'm_backpack' },
-      back('map.list'),
-    ],
-  }),
 
   'player.settings': () => ({
     screen: 'settings', text: 'تنظیمات',
@@ -167,33 +153,6 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
     ],
   }),
 
-  'loan.hub': () => ({
-    screen: 'finance_hub', text: 'بانک',
-    view: {
-      country: { code: 'default_country', kind: 'country', name: 'مشترک‌المنافع' },
-      credit: { score: 672, min: 300, max: 850, payment_bps: 9000, debt_bps: 7500, history_bps: 4000, income_bps: 6500, worth_bps: 3000, missed: 1, defaults: 0 },
-      policy_bps: 1500,
-      products: [
-        { product: { code: 'personal', name: 'وام شخصی' }, kind: 'player', rate_bps: 2600, limit: 40000, min_score: 500 },
-        { product: { code: 'mortgage', name: 'وام مسکن' }, kind: 'mortgage', rate_bps: 2100, limit: 320000, min_score: 560 },
-        { product: { code: 'business', name: 'وام کسب‌وکار' }, kind: 'company', rate_bps: 2300, limit: 0, min_score: 700 },
-      ],
-      loans: [
-        { no: 12, product: { code: 'personal', name: 'وام شخصی' }, company: { code: '', name: '' }, status: 'active', next: 1786, owed: 21430, left: 12, arrears: 0 },
-        { no: 9, product: { code: 'business', name: 'وام کسب‌وکار' }, company: { code: 'Q7M2K9B', name: 'نان و شیرینی کاوه' }, status: 'active', next: 3900, owed: 42000, left: 11, arrears: 0 },
-        { no: 4, product: { code: 'personal', name: 'وام شخصی' }, company: { code: '', name: '' }, status: 'repaid', next: 0, owed: 0, left: 0, arrears: 0 },
-      ],
-      savings: 15000, savings_bps: 900, lendable: 800000, notice: '',
-    },
-    actions: [
-      { label: 'سپرده', command: 'save.show', row: 0, kind: 'secondary', icon: 'coins' },
-      { label: 'بیمه', command: 'insure.list', row: 0, kind: 'secondary', icon: 'shield' },
-      { label: 'بورس', command: 'stock.list', row: 1, kind: 'navigation', icon: 'chart' },
-      { label: 'طلا', command: 'gold.show', row: 1, kind: 'navigation', icon: 'diamond' },
-      { label: 'دارایی‌های من', command: 'stock.mine', row: 2, kind: 'navigation', icon: 'briefcase' },
-      back('bank.show'),
-    ],
-  }),
 }
 
 export function mockMoreCommand(command: string, args?: Record<string, unknown>): { screen: string; text: string; view?: unknown; actions?: unknown[] } | undefined {

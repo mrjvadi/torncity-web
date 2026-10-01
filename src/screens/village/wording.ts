@@ -36,9 +36,20 @@ function amountOf(a: Action): string {
   return ''
 }
 
+/** Other screen areas word their own actions: a labeler answers for the ids it knows and gives up (undefined) for the rest. */
+const LABELERS: ((a: Action, names?: ContentNames) => string | undefined)[] = []
+
+export function registerLabeler(fn: (a: Action, names?: ContentNames) => string | undefined): void {
+  LABELERS.push(fn)
+}
+
 /** The text of an action's button. Falls back to the command's own key, then to a neutral
  * word, so a screen never shows a raw id. */
 export function actionLabel(a: Action, names?: ContentNames): string {
+  for (const fn of LABELERS) {
+    const s = fn(a, names)
+    if (s !== undefined) return s
+  }
   const id = a.id || ''
   const subject = a.subject ?? ''
   const name = subject && names ? names.name(subjectTables(id), subject) : subject

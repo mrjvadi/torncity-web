@@ -6,15 +6,12 @@ import SocietyHub from './SocietyHub'
 
 import Profile from './Profile'
 import Dashboard from './Dashboard'
-import Bank from './Bank'
 import Inventory from './Inventory'
-import { Market, Book } from './Market'
 import JobStatus from './JobStatus'
 import CrimeHub, { CrimeList } from './CrimeHub'
 import Education from './Education'
 import Life from './Life'
 import { PropertyMarket, PropertyMine } from './Property'
-import { Exchange, Portfolio } from './Stocks'
 import { FactionHome, FactionList } from './Factions'
 import { Elections, Election } from './Elections'
 import Governance from './Governance'
@@ -30,10 +27,7 @@ const screens: ScreenSet = {
   SERVER: {
     profile: Profile,
     dashboard: Dashboard,
-    bank: Bank,
     inventory: Inventory,
-    market: Market,
-    book: Book,
     job_status: JobStatus,
     crime_hub: CrimeHub,
     crime_list: CrimeList,
@@ -41,8 +35,6 @@ const screens: ScreenSet = {
     life: Life,
     property_market: PropertyMarket,
     property_mine: PropertyMine,
-    exchange: Exchange,
-    portfolio: Portfolio,
     faction_home: FactionHome,
     faction_list: FactionList,
     elections: Elections,
