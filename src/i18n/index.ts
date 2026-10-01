@@ -105,7 +105,7 @@ export function refusalText(code: string | undefined, serverMessage?: string, ar
     const params: Record<string, string | number> = {}
     for (const [k, v] of Object.entries(args ?? {})) if (typeof v === 'string' || typeof v === 'number') params[k] = v
     // the server's bounds are money; a wait comes as whole seconds
-    for (const k of ['min', 'max']) if (typeof params[k] === 'number') params[k] = `${Number(params[k]).toLocaleString('en-US')} ${t('unit.money')}`
+    for (const k of ['min', 'max', 'fee', 'cash']) if (typeof params[k] === 'number') params[k] = `${Number(params[k]).toLocaleString('en-US')} ${t('unit.money')}`
     const wait = typeof params.remaining_seconds === 'number' ? params.remaining_seconds : params.wait_seconds
     if (typeof wait === 'number') {
       const s = Math.max(0, Math.round(wait))

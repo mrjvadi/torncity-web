@@ -41,7 +41,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
           <span className="nx-chip nx-chip-gold">{t('life.stage_age', { stage: names.name('life_stage', v.stage?.code ?? '', v.stage?.name) || '—', age: formatNumber(v.age ?? 0) })}</span>
-          {v.rank?.name && <span className="nx-chip">{v.rank.emoji} {names.name('rank', v.rank.code ?? '', v.rank.name)}</span>}
+          {v.rank?.name && <span className="nx-chip">{names.name('rank', v.rank.code ?? '', v.rank.name)}</span>}
         </div>
         {needs && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

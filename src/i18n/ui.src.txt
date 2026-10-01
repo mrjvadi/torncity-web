@@ -1499,11 +1499,12 @@ lf.time | زمان | Time
 lf.energy | انرژی | Energy
 lf.arrives_at | ساعت رسیدن | Arrival
 lf.page | صفحهٔ {page} از {pages} | Page {page} of {pages}
-lf.pay.cash | با پول نقد | With cash
-lf.pay.card | با کارت بانکی | With the bank card
+lf.pay.cash | پرداخت نقدی | Pay with cash
+lf.pay.card | پرداخت با کارت | Pay by card
 lf.pay.balances | نقد: {cash} · بانک: {bank} | Cash: {cash} · Bank: {bank}
 lf.pay.cannot | پولت کافی نیست. نقد: {cash} · بانک: {bank} | You cannot afford it. Cash: {cash} · Bank: {bank}
-lf.map.departures | {mode} از اینجا حرکت می‌کند | {mode} leaves from here
+lf.map.departures | از اینجا با {modes} می‌شود رفت | You can leave from here by {modes}
+lf.map.shops_at | مغازه‌های {place} | Shops at {place}
 lf.map.you_here | اینجا هستی | You are here
 lf.map.walk | {t} پیاده‌روی | {t} on foot
 lf.map.village_empty | هنوز ساختمانی در روستا نیست. | There are no buildings in the village yet.
@@ -1631,7 +1632,7 @@ lf.link.lead | این کد را در دستگاه دیگر وارد کن: | Ente
 lf.link.valid | مدت اعتبار | Valid for
 lf.link.until | تا ساعت | Until
 lf.link.help | کد یک‌بار مصرف است و فقط یک دستگاه را وارد حسابت می‌کند. | The code works once and signs in a single device.
-refusal.life_bio_length | بیوگرافی باید بین {min} تا {max} حرف باشد. | A bio must be between {min} and {max} characters.
+refusal.life_bio_length | بیوگرافی باید بین {min_chars} تا {max_chars} حرف باشد. | A bio must be between {min_chars} and {max_chars} characters.
 refusal.life_bio_link | بیوگرافی نمی‌تواند لینک، نشانی سایت یا نام کاربری داشته باشد. | A bio cannot hold a link, a web address or a username.
 refusal.life_bio_blocked | این متن کلمه‌ای دارد که در بیوگرافی مجاز نیست؛ مؤدبانه بنویس. | This text has a word that is not allowed in a bio; please write politely.
 refusal.life_bio_chars | بیوگرافی نویسه‌هایی دارد که نمی‌شود نشان داد؛ ساده‌تر بنویس. | The bio has characters that cannot be shown; write it simpler.
@@ -1893,8 +1894,8 @@ act.travel.go | برو | Go
 act.travel.options | وسیلهٔ دیگر | Another way
 act.travel.elsewhere | سفر به جای دیگر | Travel elsewhere
 act.journey | ببین کجای راهی | See your journey
-act.pay.cash | با پول نقد | With cash
-act.pay.card | با کارت بانکی | With the bank card
+act.pay.cash | پرداخت نقدی | Pay with cash
+act.pay.card | پرداخت با کارت | Pay by card
 act.life.sleep | بخواب | Sleep
 act.life.sleep_walk | برو و بخواب | Walk there and sleep
 act.life.home_rest | استراحت در خانه | Rest at home

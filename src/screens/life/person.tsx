@@ -81,7 +81,7 @@ export const SleepPay = flow<SleepPayView>(({ view: v, ctx }) => {
       <Popup
         open onClose={() => back && ctx.go(back)} tone="violet" dismissible={!ctx.busy}
         title={t('lf.sleep.title', { spot: nameOf(ctx, 'sleep_spot', v.spot) })}
-        footer={<ActionRow>{pays.map((a) => <ActionButton key={a.id} tone="gold" cost={money(v.payment.amount)} costIcon="coins" costPalette="gold" busy={ctx.busy} onClick={() => ctx.go(a)}>{tx(`lf.pay.${a.id!.slice(4)}`)}</ActionButton>)}</ActionRow>}
+        footer={<ActionRow>{pays.map((a) => <ActionButton key={a.id} tone="gold" busy={ctx.busy} onClick={() => ctx.go(a)}>{tx(`lf.pay.${a.id!.slice(4)}`)}</ActionButton>)}</ActionRow>}
       >
         <StatGrid>
           <StatCard icon="coins" palette="gold" label={t('lf.fare')} value={v.payment.amount > 0 ? money(v.payment.amount) : t('common.free')} />
@@ -101,7 +101,7 @@ export const SleepPay = flow<SleepPayView>(({ view: v, ctx }) => {
 export const LifeRefusal = flow<LifeRefusalView>(({ view: v, ctx }) => (
   <Page title={t('msg.refusal')} tone="ruby">
     <Panel tone="ruby">
-      <Lead tone="bad">{refusalText(ctx.res.error?.code ?? `life_${v.kind}`, undefined, { ...(ctx.res.error?.args ?? {}), min: v.min, max: v.max, wait_seconds: v.wait_seconds })}</Lead>
+      <Lead tone="bad">{refusalText(ctx.res.error?.code ?? `life_${v.kind}`, undefined, { ...(ctx.res.error?.args ?? {}), min_chars: v.min, max_chars: v.max, wait_seconds: v.wait_seconds })}</Lead>
     </Panel>
     <Rest ctx={ctx} />
     <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />

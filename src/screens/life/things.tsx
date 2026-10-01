@@ -176,7 +176,7 @@ function Decide({ ctx, price, payment, blocked, max, way }: {
       {afford
         ? <Note>{t('lf.pay.balances', { cash: money(payment.cash), bank: money(payment.bank) })}</Note>
         : <Note tone="bad">{t('lf.pay.cannot', { cash: money(payment.cash), bank: money(payment.bank) })}</Note>}
-      <ActionRow>{pays.map((a) => <ActionButton key={a.id} tone="gold" cost={money(price)} costIcon="coins" costPalette="gold" busy={ctx.busy} onClick={() => ctx.go(a)}>{tx(`lf.pay.${a.id!.slice(4)}`)}</ActionButton>)}</ActionRow>
+      <ActionRow>{pays.map((a) => <ActionButton key={a.id} tone="gold" busy={ctx.busy} onClick={() => ctx.go(a)}>{tx(`lf.pay.${a.id!.slice(4)}`)}</ActionButton>)}</ActionRow>
     </>
   )
 }

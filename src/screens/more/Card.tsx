@@ -54,7 +54,7 @@ export default function PlayerCard({ response, loading, onAction, run }: ScreenP
             <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
               {[stage, v.age ? t('common.years_old', { n: formatNumber(v.age) }) : undefined, v.code ? t('card.code', { code: v.code }) : undefined].filter(Boolean).join(' · ')}
             </div>
-            {rank && <span className="nx-chip nx-chip-gold" style={{ marginTop: 6, display: 'inline-block' }}>{v.rank?.emoji} {rank}</span>}
+            {rank && <span className="nx-chip nx-chip-gold" style={{ marginTop: 6, display: 'inline-block' }}>{rank}</span>}
           </div>
         </div>
         {v.self && v.bio && <div className="mx-bio" style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 10 }}>{v.bio}</div>}

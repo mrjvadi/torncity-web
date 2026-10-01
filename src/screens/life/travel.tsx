@@ -19,7 +19,10 @@ import { iconForRole } from '../village/common'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, isRefresh } from '../village/flow'
 import { bps, cityName, clockText, nameOf, tx } from './common'
 
-const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane' }
+/** The name of a city place by its code. */
+const tx2 = (ctx: Parameters<Parameters<typeof flow>[0]>[0]['ctx'], code?: string): string => (code ? ctx.names.name('place', code, code) : '')
+
+const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane', bicycle: 'x_car', walk: 'walk', cart: 'x_car' }
 
 // -- the map of where the player is ---------------------------------------------------------------
 
@@ -27,7 +30,7 @@ const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'tr
 function PlaceRow({ l, ctx, walking }: { l: NonNullable<CityMapView['places']>[number]; ctx: Parameters<Parameters<typeof flow>[0]>[0]['ctx']; walking: boolean }) {
   const what = [
     ...(l.services ?? []).map((s) => tx(`lf.service.${s}`)),
-    ...(l.departures ?? []).map((m) => t('lf.map.departures', { mode: ctx.names.name('mode', m, m) })),
+    ...((l.departures ?? []).length ? [t('lf.map.departures', { modes: (l.departures ?? []).map((m) => ctx.names.name('mode', m, m)).join(' و ') })] : []),
     ...(l.shops ?? []).map((s) => ctx.names.name('shop', s.code, s.name)),
   ].join('، ')
   const go = ctx.acts.find((a) => a.id === 'walk' && a.subject === l.place.code)
@@ -102,7 +105,9 @@ export const CityMap = flow<CityMapView>(({ view: v, ctx }) => {
             : places.length
               ? <div className="vf-list">{places.map((l) => <PlaceRow key={l.place.code} l={l} ctx={ctx} walking={walking} />)}</div>
               : <Empty>{t('lf.map.no_places')}</Empty>}
-          <Btns ctx={ctx} list={[...ctx.by('shops.here'), ...ctx.by('shops.at')]} />
+          {[...ctx.by('shops.here'), ...ctx.by('shops.at')].map((a) => (
+            <ListRow key={`${a.id}-${a.subject}`} icon="cart" palette="amber" title={t('lf.map.shops_at', { place: tx2(ctx, a.subject) })} onClick={() => ctx.go(a)} />
+          ))}
           <Btns ctx={ctx} list={[...ctx.by('map.cities'), ...ctx.by('city.gov')]} />
         </>
       )}
@@ -135,7 +140,7 @@ export const Cities = flow<MapView>(({ view: v, ctx }) => {
               return (
                 <ListRow
                   key={d.code} icon={d.village ? 'house' : 'city'} palette={d.village ? 'emerald' : 'gold'}
-                  title={`${d.emblem ? `${d.emblem} ` : ''}${cityName(ctx, d.code, d.name)}`}
+                  title={cityName(ctx, d.code, d.name)}
                   sub={[t('sc.dest.km', { n: formatNumber(d.distance_km) }), d.wait_seconds > 0 ? hms(d.wait_seconds) : ''].filter(Boolean).join(' · ')}
                   right={d.wait_seconds > 0 ? (d.fare > 0 ? money(d.fare) : t('common.free')) : undefined}
                   onClick={go ? () => ctx.go(go) : undefined}
@@ -176,7 +181,7 @@ export const TravelOptions = flow<TravelOptionsView>(({ view: v, ctx }) => {
               key={o.mode_code} icon={MODE_ICON[o.mode_code] ?? 'plane'} palette="teal"
               title={own || ctx.names.name('mode', o.mode_code, o.mode_name)}
               sub={[hms(o.wait_seconds), t('lf.options.energy', { n: formatNumber(o.energy) }), o.busy ? t('travel.busy') : '', o.vehicle ? t('lf.options.condition', { n: bps(o.condition) }) : ''].filter(Boolean).join(' · ')}
-              right={o.vehicle ? t('lf.options.fuel', { n: money(o.fare) }) : o.fare > 0 ? money(o.fare) : t('common.free')}
+              right={o.fare > 0 ? (o.vehicle ? t('lf.options.fuel', { n: money(o.fare) }) : money(o.fare)) : t('common.free')}
               onClick={go ? () => ctx.go(go) : undefined}
             />
           )
@@ -205,7 +210,7 @@ export const TravelCheckout = flow<TravelCheckoutView>(({ view: v, ctx }) => {
           <>
             <ActionRow>
               {pays.map((a) => (
-                <ActionButton key={a.id} tone="gold" cost={money(v.fare)} costIcon="coins" costPalette="gold" busy={ctx.busy} onClick={() => ctx.go(a)}>{tx(`lf.pay.${a.id!.slice(4)}`)}</ActionButton>
+                <ActionButton key={a.id} tone="gold" busy={ctx.busy} onClick={() => ctx.go(a)}>{tx(`lf.pay.${a.id!.slice(4)}`)}</ActionButton>
               ))}
             </ActionRow>
             {!afford && ctx.by('bank')[0] && <ActionButton tone="steel" small onClick={() => ctx.go(ctx.by('bank')[0])}>{t('lf.checkout.bank')}</ActionButton>}
