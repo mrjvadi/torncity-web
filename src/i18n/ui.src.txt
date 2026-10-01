@@ -1516,8 +1516,8 @@ pn.case.shortfall | {amount} قابل بازگرداندن نبود. | {amount} 
 pn.convicted | محکوم شدی: دزدی‌ات در {city} ({crime}) رو شد. {restored} را پس دادی، {fine} جریمه پرداختی و {term} زندان گرفتی. | You were convicted: your theft in {city} ({crime}) came out. You paid back {restored}, paid {fine} in fines and got {term} in jail.
 pn.convicted.unpaid | {debt} هنوز پرداخت نشده و در سابقه‌ات می‌ماند. | {debt} is still unpaid and stays on your record.
 pn.treaty | {country} پیشنهاد {kind} داده (شمارهٔ {no}). {time} وقت داری جواب بدهی. | {country} proposed a {kind} (no. {no}). You have {time} to answer.
-pn.election.won | در {election} برگزیده شدی: {votes} رأی از {cast} رأی. | You won {election}: {votes} of {cast} votes.
-pn.election.lost | در {election} برگزیده نشدی: {votes} رأی از {cast} رأی گرفتی. | You did not win {election}: you got {votes} of {cast} votes.
+pn.election.won | در انتخابات {election} برگزیده شدی: {votes} رأی از {cast} رأی. | You won the {election} election: {votes} of {cast} votes.
+pn.election.lost | در انتخابات {election} برگزیده نشدی: {votes} رأی از {cast} رأی گرفتی. | You did not win the {election} election: you got {votes} of {cast} votes.
 pn.election.deposit_back | ودیعهٔ {deposit} به تو برگشت. | Your {deposit} deposit was returned.
 pn.election.deposit_kept | رأی‌هایت به حد لازم نرسید و ودیعهٔ {deposit} به خزانهٔ شهر رفت. | Your votes fell short and the {deposit} deposit went to the city treasury.
 pn.faction.invite | {player} تو را به {faction} دعوت کرد. | {player} invited you to {faction}.
