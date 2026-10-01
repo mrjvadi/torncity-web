@@ -4,6 +4,7 @@
 // 5.5). Everything here is a stand-in for the server: shapes follow the
 // contract, values are plausible Persian sample data.
 
+import { ECONOMY_CONTENT } from './mock_economy'
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
@@ -1131,9 +1132,11 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
-        place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }],
+        place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
         component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
-        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }],
+        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, ...ECONOMY_CONTENT.item],
+        shop: ECONOMY_CONTENT.shop, loan_product: ECONOMY_CONTENT.loan_product, insurance_product: ECONOMY_CONTENT.insurance_product,
+        budget_line: ECONOMY_CONTENT.budget_line, property_type: ECONOMY_CONTENT.property_type, company_type: ECONOMY_CONTENT.company_type,
         knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
       },
     })

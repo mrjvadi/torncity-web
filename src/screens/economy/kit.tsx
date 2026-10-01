@@ -12,6 +12,7 @@ import Popup, { ActionButton, ActionRow, Note, Unavailable as UnavailableBlock }
 import { t } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, isBack, isRefresh, type FlowCtx } from '../village/flow'
 import { unavailableReason } from './wording'
+import './economy.css'
 
 /** The actions of a screen with this id. */
 export const byId = (ctx: FlowCtx, ...ids: string[]): Action[] => ctx.acts.filter((a) => ids.includes(a.id ?? ''))

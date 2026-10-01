@@ -27,6 +27,12 @@ export function pledgeName(ctx: FlowCtx, p: PledgeLine): string {
   })
 }
 
+/** A pledge's short name, for a row title: no value. */
+function pledgeTitle(ctx: FlowCtx, p: PledgeLine): string {
+  if (p.code) return t('eco.pledge.company', { company: p.type.name })
+  return t('eco.pledge.property_short', { no: formatNumber(p.no), type: nameOf(ctx, ['property_type'], p.type), city: ctx.names.name(['city'], p.city.code, p.city.name) })
+}
+
 // -- the gold dealer -------------------------------------------------------------------------
 
 const Gold = flow<GoldView>(({ view: v, ctx }) => {
@@ -60,14 +66,14 @@ const Gold = flow<GoldView>(({ view: v, ctx }) => {
         <div className="vf-btns row">
           {options.map((g) => {
             const a = find(ctx, 'gold.buy', { grams: g })
-            return a && <button key={g} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{t('eco.gold.option', { n: formatNumber(g), price: money(g * v.buy) })}</button>
+            return a && <button key={g} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.gold.grams', { n: formatNumber(g) })}</b><small>{money(g * v.buy)}</small></button>
           })}
         </div>
         {options.some((g) => g <= v.grams) && <Lead>{t('eco.gold.sell')}</Lead>}
         <div className="vf-btns row">
           {options.filter((g) => g <= v.grams).map((g) => {
             const a = find(ctx, 'gold.sell', { grams: g })
-            return a && <button key={g} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{t('eco.gold.option', { n: formatNumber(g), price: money(g * v.sell) })}</button>
+            return a && <button key={g} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.gold.grams', { n: formatNumber(g) })}</b><small>{money(g * v.sell)}</small></button>
           })}
         </div>
       </Panel>
@@ -192,7 +198,7 @@ const LoanOffer = flow<LoanOfferView>(({ view: v, ctx }) => {
           <Lead>{t(key(`eco.loan.choose_pledge.${v.kind}`))}</Lead>
           {pledges.map((p) => {
             const a = find(ctx, 'finance.pledge', { pledge: p.code || p.no })
-            return <ListRow key={p.code || p.no} icon="house" palette="sapphire" title={pledgeName(ctx, p)} sub={t('eco.loan.secures', { n: money(p.limit) })} onClick={() => a && ctx.go(a)} />
+            return <ListRow key={p.code || p.no} icon="house" palette="sapphire" title={pledgeTitle(ctx, p)} sub={p.code ? t('eco.loan.secures', { n: money(p.limit) }) : `${t('eco.pledge.worth', { n: money(p.value) })} · ${t('eco.loan.secures', { n: money(p.limit) })}`} onClick={() => a && ctx.go(a)} />
           })}
         </Panel>
       )}

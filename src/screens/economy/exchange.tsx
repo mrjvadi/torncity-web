@@ -30,7 +30,7 @@ function Move({ price, prev }: { price: number; prev: number }) {
 /** The two sides of an order book, side by side. */
 export function BookTables({ bids, asks, titleBids, titleAsks }: { bids: BookLevel[] | null; asks: BookLevel[] | null; titleBids: string; titleAsks: string }) {
   return (
-    <div style={{ display: 'flex', gap: 10 }}>
+    <div style={{ display: 'flex', gap: 10 }} className="eco-book">
       <Card className="nx-card-emerald" tone="emerald">
         <div className="nx-sec">{titleBids}</div>
         {(bids ?? []).slice(0, 5).map((b, i) => (
@@ -123,11 +123,11 @@ const Stock = flow<StockView>(({ view: v, ctx }) => {
         <Panel>
           <Lead>{t('eco.stock.buy')}</Lead>
           <div className="vf-btns row">
-            {(v.buys ?? []).map((o) => { const a = find(ctx, 'stock.buy', { qty: o.qty, price: o.price }); return a && <button key={`b${o.qty}-${o.price}`} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{t('eco.stock.option', { qty: formatNumber(o.qty), price: money(o.price) })}</button> })}
+            {(v.buys ?? []).map((o) => { const a = find(ctx, 'stock.buy', { qty: o.qty, price: o.price }); return a && <button key={`b${o.qty}-${o.price}`} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.stock.shares', { n: formatNumber(o.qty) })}</b><small>{money(o.price)}</small></button> })}
           </div>
           {(v.sells ?? []).length > 0 && <Lead>{t('eco.stock.sell')}</Lead>}
           <div className="vf-btns row">
-            {(v.sells ?? []).map((o) => { const a = find(ctx, 'stock.sell', { qty: o.qty, price: o.price }); return a && <button key={`s${o.qty}-${o.price}`} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{t('eco.stock.option', { qty: formatNumber(o.qty), price: money(o.price) })}</button> })}
+            {(v.sells ?? []).map((o) => { const a = find(ctx, 'stock.sell', { qty: o.qty, price: o.price }); return a && <button key={`s${o.qty}-${o.price}`} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.stock.shares', { n: formatNumber(o.qty) })}</b><small>{money(o.price)}</small></button> })}
           </div>
           <Hint>{t('eco.stock.fee', { p: pct(v.fee_bps / 10000) })}</Hint>
         </Panel>

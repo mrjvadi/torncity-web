@@ -284,6 +284,8 @@ eco.credit.band.very_good | امتیاز اعتباری: خیلی خوب | Credi
 eco.credit.band.excellent | امتیاز اعتباری: عالی | Credit score: excellent
 eco.pledge.company | شرکت «{company}» | The company "{company}"
 eco.pledge.property | ملک شمارهٔ {no}: {type} در {city} - ارزش {value} | Property {no}: {type} in {city} - worth {value}
+eco.pledge.property_short | ملک شمارهٔ {no}: {type} در {city} | Property {no}: {type} in {city}
+eco.pledge.worth | ارزش {n} | Worth {n}
 # savings
 eco.savings.title | پس‌انداز | Savings
 eco.savings.balance | پس‌انداز | Saved
@@ -299,16 +301,16 @@ eco.savings.take | برداشتن از پس‌انداز | Take from savings
 eco.insurance.title | صندوق بیمهٔ {country} | Insurance fund of {country}
 eco.insurance.title_plain | بیمه | Insurance
 eco.insurance.fund | موجودی صندوق | Fund balance
-eco.insurance.covers.health | بیمهٔ درمان | Health cover
-eco.insurance.covers.war_damage | بیمهٔ خسارت جنگ برای یک ملک | War damage cover for one property
-eco.insurance.covers.theft | بیمهٔ دزدی | Theft cover
+eco.insurance.covers.health | هزینهٔ درمان را پوشش می‌دهد | Covers treatment costs
+eco.insurance.covers.war_damage | خسارت جنگ به یک ملک را پوشش می‌دهد | Covers war damage to one property
+eco.insurance.covers.theft | دزدی را پوشش می‌دهد | Covers theft
 eco.insurance.premium | حق بیمه (هر دورهٔ بازی) | Premium (each game period)
 eco.insurance.premium_valued | {fixed} و {p} از ارزش ملک | {fixed} plus {p} of the property's value
 eco.insurance.cover | پوشش | Covers
 eco.insurance.max | بیشترین خسارت | Most it pays
 eco.insurance.wait | زمان انتظار تا اولین خسارت | Waiting time before a claim
-eco.insurance.insure | بیمهٔ {name} | Insure: {name}
-eco.insurance.insure_for | بیمهٔ {pledge} | Insure {pledge}
+eco.insurance.insure | گرفتن این بیمه | Take this policy
+eco.insurance.insure_for | بیمه کردن: {pledge} | Insure: {pledge}
 eco.insurance.held | همین بیمه را داری. | You already have this policy.
 eco.insurance.mine | بیمه‌نامه‌های من | My policies
 eco.insurance.policy | شمارهٔ {no} - {product} | No. {no} - {product}
@@ -319,7 +321,7 @@ eco.insurance.ended.cancelled | لغو شد | Cancelled
 eco.insurance.ended.lapsed | حق بیمه پرداخت نشد؛ از کار افتاد | Lapsed: the premium was not paid
 eco.insurance.ended.gone | ملک دیگر مال تو نیست | The property is no longer yours
 eco.insurance.cancel_confirm | بیمه‌نامهٔ {no} ({product}) لغو شود؟ | Cancel policy {no} ({product})?
-eco.insurance.confirm_title | بیمهٔ {product} | Insuring: {product}
+eco.insurance.confirm_title | {product} | {product}
 eco.insurance.for | برای: {pledge} | For: {pledge}
 eco.insurance.every_period | حق بیمه هر دورهٔ بازی از بانک کم می‌شود. | The premium is taken from your bank every game period.
 eco.insurance.hint | هر وقت بخواهی بیمه را لغو می‌کنی؛ خسارت فقط بعد از زمان انتظار داده می‌شود. | You can cancel any time; claims are paid only after the waiting time.
@@ -372,8 +374,8 @@ eco.stock.buy | خرید | Buy
 eco.stock.sell | فروش | Sell
 eco.stock.option | {qty} سهم، {price} | {qty} shares, {price}
 eco.stock.fee | کارمزد بازار شهر شرکت، {p}، از پول فروشنده کم می‌شود. | The market fee of the company's city, {p}, is taken from the seller.
-eco.stock.order_buy_title | خرید سهم «{company}» | Buying shares of "{company}"
-eco.stock.order_sell_title | فروش سهم «{company}» | Selling shares of "{company}"
+eco.stock.order_buy_title | خرید سهم {company} | Buying shares of {company}
+eco.stock.order_sell_title | فروش سهم {company} | Selling shares of {company}
 eco.stock.confirm_buy | ثبت خرید | Place the buy
 eco.stock.confirm_sell | ثبت فروش | Place the sell
 eco.stock.qty | تعداد سهم | Shares
@@ -396,7 +398,7 @@ eco.stock.holding_private | عرضه‌نشده: {shares} سهم - بهای خر
 eco.stock.order_line_buy | شمارهٔ {no}: خرید {qty} سهم تا {price} | No. {no}: buy {qty} shares up to {price}
 eco.stock.order_line_sell | شمارهٔ {no}: فروش {qty} سهم از {price} | No. {no}: sell {qty} shares from {price}
 eco.stock.cancel | لغو سفارش {no} | Cancel order {no}
-eco.ipo.title | عرضهٔ اولیهٔ «{company}» | Listing "{company}"
+eco.ipo.title | عرضهٔ اولیهٔ {company} | Listing {company}
 eco.ipo.rules | شرط‌ها: دست‌کم {age} عمر، {revenue} درآمد و بی‌بدهی. هزینهٔ عرضه {fee} از حساب شرکت به شهر می‌رسد. | Conditions: at least {age} old, {revenue} in income and no debt. The listing fee of {fee} goes from the company's account to the city.
 eco.ipo.book | ارزش دفتری هر سهم {book} - کل سهم‌ها {total} | Book value per share {book} - all shares {total}
 eco.ipo.refused.too_young | شرکت هنوز جوان است؛ {wait} دیگر صبر کن. | The company is still young; wait {wait} more.
@@ -405,12 +407,12 @@ eco.ipo.refused.in_debt | اول بدهی نگهداری شرکت را بپرد�
 eco.ipo.refused.bad_float | سهم آزاد کافی برای عرضه نداری. | You do not have enough free shares to list.
 eco.ipo.choose | چند سهم و به چه قیمتی عرضه شود؟ اختیار شرکت با تو می‌ماند، مگر کسی بیش از نیمی از سهم‌ها را بخرد. | How many shares at what price? You keep control unless someone buys more than half.
 eco.ipo.option | {shares} سهم، هر سهم {price} | {shares} shares at {price} each
-eco.ipo.confirm_title | عرضهٔ «{company}» | Listing "{company}"
+eco.ipo.confirm_title | عرضهٔ {company} | Listing {company}
 eco.ipo.shares | تعداد سهم | Shares
 eco.ipo.price_each | قیمت هر سهم | Price per share
 eco.ipo.fee | هزینهٔ عرضه | Listing fee
 eco.ipo.yes | بله، عرضه شود | Yes, list it
-eco.dividend.title | سود سهام «{company}» | Dividend of "{company}"
+eco.dividend.title | سود سهام {company} | Dividend of {company}
 eco.dividend.free | پول آزاد شرکت | The company's free money
 eco.dividend.tax | مالیات شرکت | Company tax
 eco.dividend.shares | کل سهم‌ها | All shares
@@ -418,7 +420,7 @@ eco.dividend.refused.in_debt | شرکتی که بدهی دارد سود نمی�
 eco.dividend.refused.no_money | پول آزاد شرکت برای سود دادن کافی نیست. | The company's free money is not enough for a dividend.
 eco.dividend.paid | سود پرداخت شد: هر سهم {per} و روی هم {paid} به {holders} سهامدار. | Dividend paid: {per} a share, {paid} in all to {holders} shareholders.
 eco.dividend.option | {amount} (هر سهم {per}) | {amount} ({per} a share)
-eco.dividend.confirm_title | سود سهام «{company}» | Dividend of "{company}"
+eco.dividend.confirm_title | سود سهام {company} | Dividend of {company}
 eco.dividend.per_share | به هر سهم | Per share
 eco.dividend.taken | برداشت از پول آزاد شرکت | Taken from the company's free money
 eco.dividend.tax_note | مالیات به شهر می‌رود. | The tax goes to the city.

@@ -9,6 +9,21 @@ import type {
 } from './views.gen'
 
 const N = (code: string, name: string): Named => ({ code, name })
+
+type Entry = { code: string; name: { en: string; fa: string } }
+const e = (code: string, en: string, fa: string): Entry => ({ code, name: { en, fa } })
+
+/** The catalogue names of everything the economy screens mention (the web never shows the view's authored name). */
+export const ECONOMY_CONTENT: Record<string, Entry[]> = {
+  item: [e('bread', 'Bread', 'نان'), e('sword', 'Sword', 'شمشیر'), e('plank', 'Plank', 'تخته'), e('rice', 'Rice', 'برنج')],
+  place: [e('bazaar', 'Bazaar', 'بازارچه'), e('market_square', 'Market square', 'میدان بازار'), e('clinic', 'Clinic', 'درمانگاه'), e('square', 'Square', 'میدان')],
+  shop: [e('grocery', 'Grocery', 'خواربارفروشی'), e('pharmacy', 'Pharmacy', 'داروخانه')],
+  loan_product: [e('personal', 'Personal loan', 'وام شخصی'), e('mortgage', 'Mortgage', 'وام مسکن'), e('business', 'Business loan', 'وام کسب‌وکار')],
+  insurance_product: [e('health', 'Health cover', 'بیمهٔ درمان'), e('war_cover', 'War cover', 'بیمهٔ جنگ')],
+  budget_line: [e('infrastructure', 'Infrastructure', 'زیرساخت'), e('health', 'Health', 'سلامت'), e('education', 'Education', 'آموزش')],
+  property_type: [e('house', 'House', 'خانه')],
+  company_type: [e('studio', 'Studio', 'استودیو'), e('bakery', 'Bakery', 'نانوایی')],
+}
 const ref = (command: string, args: string[] | null = null): Ref => ({ command, args })
 const AT = '2026-10-01T14:30:00Z'
 const LATER = '2026-10-01T18:00:00Z'
