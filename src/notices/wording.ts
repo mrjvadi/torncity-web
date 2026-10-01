@@ -231,6 +231,29 @@ export function noticeLine(screen: string, view: unknown, n: Namer): NoticeLine 
       })
       return { text: items.length > 1 ? `${text} ${t('pn.news.more', { n: items.length - 1 })}` : text, tone: 'info' }
     }
+    case 'move_arrived_notice': {
+      const v = view as V.MilitaryNoticeView
+      return line('pn.military.arrived', { qty: num(v.qty), good: n('item', v.good.item.code, v.good.item.name), city: n('city', v.city_code, v.city), branch: n('branch', v.branch.code, v.branch.name) }, 'success')
+    }
+    case 'licence_notice': {
+      const v = view as V.LicenceNoticeView
+      const kind = ['applied', 'approved', 'rejected', 'revoked'].includes(v.kind) ? v.kind : 'applied'
+      const left = v.effective_at ? Math.max(0, Math.round((Date.parse(v.effective_at) - Date.now()) / 1000)) : 0
+      return line(`pn.licence.${kind}`, { company: v.company.name || v.company.code, country: placeName(n, v.country), time: span(left) }, kind === 'approved' ? 'success' : kind === 'applied' ? 'info' : 'warning')
+    }
+    case 'war_notice': {
+      const v = view as V.WarNoticeView
+      const kind = ['struck', 'ally', 'proposal', 'declared'].includes(v.kind) ? v.kind : 'declared'
+      const text = t(`pn.war.${kind}` as Key, {
+        city: n('city', v.city_code, v.city), band: n('war_damage', v.band, v.band), other: placeName(n, v.other), ally: placeName(n, v.ally), country: placeName(n, v.country),
+        kind: n('war_proposal', v.proposal_kind, v.proposal_kind), time: span(v.in_seconds), no: num(v.war_no),
+      })
+      return { text: v.injury?.hospital ? `${text} ${t('pn.war.hospital')}` : text, tone: kind === 'proposal' ? 'info' : 'warning' }
+    }
+    case 'strike_report': {
+      const v = view as V.StrikeReportView
+      return line('pn.war.report', { no: num(v.no), city: n('city', v.city_code, v.city), band: n('war_damage', v.damage_band, v.damage_band) }, 'info')
+    }
     default:
       return null
   }
@@ -246,4 +269,5 @@ const NOTICE_SCREENS = new Set([
   'treaty_proposed_notice', 'election_result_notice', 'faction_request_notice', 'faction_answer_notice', 'faction_crime_notice',
   'finance_notice', 'hospitalised_notice', 'clinic_treated_notice', 'bill_decided_notice', 'rank_notice', 'hunger_notice',
   'market_filled_notice', 'mission_completed_notice', 'property_notice', 'recruit_notice', 'stock_notice', 'village_news',
+  'move_arrived_notice', 'licence_notice', 'war_notice', 'strike_report',
 ])

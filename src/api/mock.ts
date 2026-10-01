@@ -4,6 +4,7 @@
 
 import { API_BASE } from './client'
 import { mockEconomyCommand } from './mock_economy'
+import { mockMilitaryCommand } from './mock_military'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
@@ -93,6 +94,9 @@ const MOCK_PROFILE_ACTIONS = [
 
 function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.language.set') mockLang = args?.lang === 'en' ? 'en' : 'fa'
+  // the military, war and defence area (src/api/mock_military.ts)
+  const military = mockMilitaryCommand(command, args ?? {})
+  if (military) return json(military)
   // the economy and finance area: neutral answers of every screen of it (src/api/mock_economy.ts)
   const economy = mockEconomyCommand(command, args ?? {})
   if (economy) return json(economy)

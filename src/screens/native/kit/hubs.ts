@@ -48,5 +48,5 @@ export const SOCIETY_TILES: HubTile[] = [
   { key: 'friends', icon: 'society', palette: 'emerald', title: 'hub.friends', command: 'social.friend.list' },
   { key: 'elections', icon: 'vote', palette: 'violet', title: 'hub.elections', command: 'election.list' },
   { key: 'government', icon: 'gavel', palette: 'gold', title: 'hub.government', command: 'gov.city' },
-  { key: 'war', icon: 'swords', palette: 'ruby', title: 'hub.war', local: 'war', needs: { kind: 'government_action', code: 'country.war' } },
+  { key: 'war', icon: 'swords', palette: 'ruby', title: 'hub.war', command: 'military.ministry', needs: { kind: 'government_action', code: 'country.war' } },
 ]

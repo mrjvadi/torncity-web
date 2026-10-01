@@ -3142,3 +3142,348 @@ act.inbox.open | دیدن پیام‌ها | See messages
 act.inbox.read_all | خواندن همه | Mark all read
 act.inbox.open_item | باز کردن | Open
 act.founding.open_form | تکمیل اطلاعات روستا | Fill in the village form
+
+# the military, war and defence screens (src/screens/military, keys mil.*), and their notices (pn.military.*, pn.licence.*, pn.war.*)
+mil.title | ارتش و جنگ | Army and war
+mil.service.armed_forces | نیروهای مسلح | The armed forces
+mil.service.procurement | خرید تسلیحات | Arms procurement
+mil.service.war | جنگ | War
+mil.service.defence_licence | مجوز دفاعی | Defence licences
+mil.unnamed_office | مقام مربوط | the office concerned
+mil.readiness | آمادگی | Readiness
+mil.upkeep | هزینهٔ نگه‌داری | Upkeep
+mil.moving | در راه پادگان | On the way to a garrison
+mil.ministry.title | وزارت دفاع {country} | Ministry of defence of {country}
+mil.ministry.money | پول و بودجه | Money and budget
+mil.ministry.treasury | خزانهٔ کشور | National treasury
+mil.ministry.fund | صندوق دفاع | Defence fund
+mil.ministry.share | سهم کشور از درآمد شهرها | The country's share of the cities' revenue
+mil.ministry.budget | سهم دفاع از آن | The defence share of it
+mil.ministry.exports | صادرات تسلیحات | Arms exports
+mil.ministry.last | آخرین دورهٔ تسویه | The last settled period
+mil.ministry.next | دورهٔ بعد {in} دیگر بسته می‌شود. | The next period closes in {in}.
+mil.ministry.offices | مسئولان دفاع | Defence offices
+mil.ministry.acting | جانشین: {who} | Acting: {who}
+mil.ministry.vacant | جای این مقام خالی است. | The seat is empty.
+mil.ministry.no_offices | مقامی ثبت نشده است. | No offices are recorded.
+mil.ministry.forces | نیروها | Forces
+mil.period.levy | عوارض گرفته‌شده | Levy collected
+mil.period.appropriation | اعتبار دفاع | Defence appropriation
+mil.period.upkeep_due | هزینهٔ نگه‌داری | Upkeep due
+mil.period.upkeep_paid | نگه‌داریِ پرداخت‌شده | Upkeep paid
+mil.nav.military.forces | نیروها و تجهیزات هر یگان | Forces and the equipment of each branch
+mil.nav.military.procure | خرید سلاح و تجهیزات برای کشور | Buying arms and equipment for the state
+mil.nav.military.war | جنگ‌ها، اعلان جنگ و اتاق عملیات | Wars, declarations and the war room
+mil.nav.military.licences | شرکت‌هایی که اجازهٔ ساخت سلاح دارند | Companies that may make arms
+mil.nav.military.sanctions | تحریم‌هایی که زده‌ایم یا خورده‌ایم | Sanctions we imposed or suffered
+mil.nav.military.treaties | پیمان‌های کشور با دیگران | The country's treaties
+mil.nav.pending | {n} درخواست | {n} waiting
+mil.forces.title | نیروهای مسلح | Armed forces
+mil.forces.title_of | نیروهای مسلح {country} | Armed forces of {country}
+mil.forces.none | هنوز تجهیزاتی نیست. | There is no equipment yet.
+mil.forces.bands_only | شمار دقیق نیروها را فقط وزیر و فرماندهان می‌دانند؛ بقیه اندازهٔ تقریبی را می‌بینند. | Only the minister and the commanders know the exact numbers; everyone else sees a rough size.
+mil.branch.moves | تجهیزات در راه | Equipment on the move
+mil.branch.move | {qty} × {good} به {city} | {qty} × {good} to {city}
+mil.branch.none | در این یگان هنوز تجهیزاتی نیست. | This branch has no equipment yet.
+mil.group.count | تعداد | Count
+mil.group.quality | کیفیت میانگین | Average quality
+mil.group.depot | در انبار، بدون پادگان | In the depot, no garrison yet
+mil.group.moving | در راه | On the way
+mil.group.committed | درگیر عملیات | In an operation
+mil.group.damaged | آسیب‌دیده | Damaged
+mil.group.garrisons | پادگان‌ها | Garrisons
+mil.group.seen_at | رادار مرجع این تجهیز را از {km} کیلومتری می‌بیند. | A reference radar sees it from {km} km.
+mil.station.title | استقرار {good} | Stationing {good}
+mil.station.good | تجهیز | Equipment
+mil.station.qty | تعداد | Number
+mil.station.to | مقصد | Destination
+mil.station.takes | مدت جابه‌جایی | Journey time
+mil.station.available | قابل فرستادن | Available to send
+mil.station.pick_city | به کدام شهر فرستاده شود؟ | Which city should it go to?
+mil.station.no_cities | شهری برای استقرار نیست. | There is no city to station it in.
+mil.station.pick_qty | چند عدد به {city} فرستاده شود؟ | How many go to {city}?
+mil.station.confirm_hint | تا رسیدن، این تعداد در عملیات به کار نمی‌آید. | Until they arrive, these cannot be used in an operation.
+mil.retrofit.title | نوسازی تجهیز دولتی | Retrofit of a state asset
+mil.retrofit.good | تجهیز | Equipment
+mil.retrofit.version | نسخه | Version
+mil.retrofit.versions | از {from} به {to} | {from} to {to}
+mil.retrofit.takes | مدت کار | Duration
+mil.retrofit.confirm_hint | کیت ارتقا مصرف می‌شود و تجهیز تا پایان کار از دسترس خارج است. | The upgrade kit is used up and the equipment is out of action until the job ends.
+mil.retrofit.started | نوسازی شروع شد. | The retrofit has started.
+mil.kit.title | کیت ارتقا | Upgrade kits
+mil.kit.bought | کیت ارتقا از «{seller}» خریده شد. | Upgrade kits were bought from {seller}.
+mil.kit.plan | خرید کیت ارتقا از «{seller}». | Buying upgrade kits from {seller}.
+mil.arrived.title | تجهیزات رسید | Equipment arrived
+mil.arrived.body | {qty} × {good} به پادگان {city} رسید و به {branch} پیوست. | {qty} × {good} reached the {city} garrison and joined {branch}.
+mil.procure.title | خرید تسلیحات | Arms procurement
+mil.procure.title_of | خرید تسلیحات {country} | Arms procurement of {country}
+mil.procure.fund | صندوق دفاع | Defence fund
+mil.procure.hint | کالاهای نظامیِ روی بازار که دولت اجازهٔ خریدشان را دارد. | Military goods on the market that the state may buy.
+mil.procure.offer_sub | {company} · {city} · {left} عدد | {company} · {city} · {left} left
+mil.procure.none | الان کالای نظامی برای خرید نیست. | No military goods are for sale right now.
+mil.procure.blocked.export | صادراتش آزاد نیست | Export is not allowed
+mil.procure.blocked.embargo | تحریم تسلیحاتی دارد | Under an arms embargo
+mil.procure.blocked.other | قابل خرید نیست | Cannot be bought
+mil.buy.confirm_title | تأیید خرید | Confirm the purchase
+mil.buy.good | کالا | Goods
+mil.buy.qty | تعداد | Number
+mil.buy.each | قیمت هر عدد | Price each
+mil.buy.total | جمع | Total
+mil.buy.after | صندوق دفاع بعد از خرید | Defence fund afterwards
+mil.buy.confirm_hint | پول از صندوق دفاع کشور کم می‌شود و کالا به انبار نیروها می‌رود. | The money leaves the defence fund and the goods go to the forces' depot.
+mil.buy.seller | فروشنده | Seller
+mil.buy.where | جای کالا | Where it is
+mil.buy.left | موجودی | In stock
+mil.buy.cannot | موجودی یا صندوق دفاع برای خرید کافی نیست. | There is not enough stock or defence fund to buy.
+mil.buy.pick_qty | چند عدد می‌خری؟ | How many do you buy?
+mil.refused.title | نشد | Not possible
+mil.refused.not_found | این مورد پیدا نشد. | That was not found.
+mil.refused.not_holder | این کار با {office} است. | That is for the {office}.
+mil.refused.not_arms | این کالا نظامی نیست. | That is not military goods.
+mil.refused.export | صادرات این کالا به این کشور آزاد نیست. | Export of this good to this country is not allowed.
+mil.refused.funds | صندوق دفاع کافی نیست؛ {need} لازم است و فقط {have} هست. | The defence fund is short: {need} needed, only {have} available.
+mil.refused.stock | این‌قدر موجودی نیست؛ حداکثر {max} عدد. | Not that many are available; at most {max}.
+mil.refused.city | این شهر برای استقرار درست نیست. | That city does not fit for stationing.
+mil.refused.no_country | تو ساکن هیچ کشوری نیستی. | You do not live in any country.
+mil.refused.licence_state | دربارهٔ این مجوز قبلاً تصمیم گرفته شده است. | This licence has been decided already.
+mil.war_refused.not_holder | این کار با {office} است. | That is for the {office}.
+mil.war_refused.no_country | تو ساکن هیچ کشوری نیستی. | You do not live in any country.
+mil.war_refused.not_found | این جنگ یا این هدف پیدا نشد. | That war or target was not found.
+mil.war_refused.self | به کشور خودت نمی‌شود اعلان جنگ داد. | You cannot declare war on your own country.
+mil.war_refused.at_war | همین حالا با این کشور در جنگی. | You are already at war with this country.
+mil.war_refused.state | جنگ در وضعیتی نیست که این کار شدنی باشد. | The war is not in a state where that can be done.
+mil.war_refused.not_enemy | این کشور در این جنگ دشمن تو نیست. | This country is not your enemy in this war.
+mil.war_refused.not_yet | هنوز زود است؛ {in} دیگر شدنی می‌شود. | It is too early; it becomes possible in {in}.
+mil.war_refused.no_forces | نیروی آماده برای این عملیات نداری. | You have no forces ready for this operation.
+mil.war_refused.no_munitions | مهمات کافی در پادگان نیست. | There are not enough munitions at the garrison.
+mil.war_refused.open | همین حالا پیشنهادی از همین نوع باز است. | A proposal of this kind is already open.
+mil.war_refused.no_ally | هم‌پیمانی نیست که به جنگش بپیوندی. | There is no ally whose war you may join.
+mil.war_refused.stock | موجودی کافی نیست؛ حداکثر {max} عدد. | Not enough in stock; at most {max}.
+mil.blocked.title | راه بسته است | The way is closed
+mil.blocked.border | مرز {from} و {to} بسته است، چون این دو کشور در جنگ‌اند. | The border between {from} and {to} is closed, because the two countries are at war.
+mil.blocked.city | {city} بعد از حمله بسته شده؛ تا {in} دیگر نمی‌شود واردش شد. | {city} is closed after a strike; you cannot enter for {in}.
+mil.notice.station_started | {count} × {good} به {city} فرستاده شد؛ {time} دیگر می‌رسد. | {count} × {good} were sent to {city}; they arrive in {time}.
+mil.notice.buy_done | {count} × {good} به مبلغ {total} خریده شد. | {count} × {good} were bought for {total}.
+mil.notice.declare_done | به {target} اعلان جنگ داده شد؛ {time} دیگر می‌شود جنگید. | War was declared on {target}; fighting is possible in {time}.
+mil.notice.resume_done | جنگ از سر گرفته شد؛ {time} دیگر می‌شود جنگید. | The war was resumed; fighting is possible in {time}.
+mil.notice.launch_done | عملیات «{kind}» علیه {city} فرمان داده شد؛ {time} دیگر انجام می‌شود. | The {kind} against {city} was ordered; it strikes in {time}.
+mil.notice.join_done | کشور به جنگ پیوست، کنار {target}. | The country joined the war beside {target}.
+mil.notice.propose_done | {kind} به {target} پیشنهاد شد. | A {kind} was proposed to {target}.
+mil.notice.answer_accept | پیشنهاد را پذیرفتی. | You accepted the proposal.
+mil.notice.answer_decline | پیشنهاد را رد کردی. | You declined the proposal.
+mil.war.board_title | جنگ | War
+mil.war.board_of | جنگ‌های {country} | Wars of {country}
+mil.war.wars | جنگ‌ها | Wars
+mil.war.none | الان جنگی در کار نیست. | No war is under way.
+mil.war.title | {attacker} علیه {defender} | {attacker} against {defender}
+mil.war.no | جنگ شمارهٔ {no} | War no. {no}
+mil.war.ground | دلیل: {ground} | Ground: {ground}
+mil.war.status.declared | اعلام شده؛ {in} دیگر می‌شود جنگید | Declared; fighting starts in {in}
+mil.war.status.active | در جریان، از {since} پیش | Under way for {since}
+mil.war.status.ceasefire | آتش‌بس | Ceasefire
+mil.war.status.ended | تمام شده | Ended
+mil.war.attacker_allies | هم‌پیمانان مهاجم: {list} | Allies of the attacker: {list}
+mil.war.defender_allies | هم‌پیمانان مدافع: {list} | Allies of the defender: {list}
+mil.war.broke | این اعلان جنگ، پیمانی را که میان این دو کشور بود شکست. | This declaration broke a treaty between the two.
+mil.war.proposal_in | {other} {kind} پیشنهاد داده؛ تا {in} دیگر جواب بده. | {other} proposes a {kind}; answer within {in}.
+mil.war.proposal_out | ما به {other} {kind} پیشنهاد داده‌ایم؛ {in} وقت دارند جواب بدهند. | We proposed a {kind} to {other}; they have {in} to answer.
+mil.war.joinable | جنگ‌هایی که می‌شود به آن‌ها پیوست | Wars you may join
+mil.war.join_line | {ally} با {enemy} در جنگ است؛ می‌توانی کنار {ally} بجنگی. | {ally} is at war with {enemy}; you may fight beside {ally}.
+mil.war.operations | عملیات‌ها | Operations
+mil.war.cities | شهرهای درگیر | Cities in the war
+mil.war.occupied | {city} در دست {controller} است (جزو {owner}) | {city} is held by {controller} (it belongs to {owner})
+mil.war.damaged | {city}: خرابی {band} | {city}: {band} damage
+mil.war.closed_for | تا {in} بسته است | closed for {in}
+mil.war.room_sub | شهرهای دشمن و عملیات‌های در جریان | Enemy cities and the operations under way
+mil.war.declare_sub | اعلان جنگ به یک کشور | Declare war on a country
+mil.op.title | {kind} · {objective} · {city} | {kind} · {objective} · {city}
+mil.op.sides | {country} علیه {target} | {country} against {target}
+mil.op.called_off | عملیات لغو شد. | The operation was called off.
+mil.op.pending | {in} دیگر انجام می‌شود. | It strikes in {in}.
+mil.op.damage | خرابی | Damage
+mil.op.lost | تلفات خودی | Own losses
+mil.op.enemy_lost | تلفات دشمن | Enemy losses
+mil.op.captured | شهر گرفته شد. | The city was taken.
+mil.op.ago | {ago} پیش | {ago} ago
+mil.declare.title | اعلان جنگ | Declaring war
+mil.declare.confirm_title | اعلان جنگ به {target} | Declare war on {target}
+mil.declare.target | کشور مقابل | The other country
+mil.declare.ground | دلیل جنگ | Ground for war
+mil.declare.notice | مهلت تا شروع جنگ | Notice before fighting
+mil.declare.breaks | این اعلان این پیمان‌ها را پایان می‌دهد: {list} | This ends these treaties: {list}
+mil.declare.allies | هم‌پیمانان آن کشور خبردار می‌شوند: {list} | Its allies will be told: {list}
+mil.declare.confirm_hint | اعلان جنگ پس گرفتنی نیست. | A declaration of war cannot be taken back.
+mil.declare.pick_target | به کدام کشور اعلان جنگ می‌دهی؟ | Which country do you declare war on?
+mil.declare.no_targets | کشوری برای اعلان جنگ نیست. | There is no country to declare war on.
+mil.declare.pick_ground | به {target} با چه دلیلی اعلان جنگ می‌دهی؟ | On what ground do you declare war on {target}?
+mil.decision.join.title | پیوستن به جنگ | Joining a war
+mil.decision.join.body | کنار {ally} وارد جنگ شمارهٔ {no} با {other} می‌شوی. | You enter war no. {no} beside {ally}, against {other}.
+mil.decision.ceasefire.title | پیشنهاد آتش‌بس | Proposing a ceasefire
+mil.decision.ceasefire.body | به {other} آتش‌بس پیشنهاد می‌دهی. اگر تا {ttl} جواب ندهد، پیشنهاد باطل می‌شود. | You propose a ceasefire to {other}. If it does not answer within {ttl}, the offer lapses.
+mil.decision.peace.title | پیشنهاد صلح | Proposing peace
+mil.decision.peace.body | به {other} صلح پیشنهاد می‌دهی. اگر تا {ttl} جواب ندهد، پیشنهاد باطل می‌شود. | You propose peace to {other}. If it does not answer within {ttl}, the offer lapses.
+mil.decision.resume.title | از سرگیری جنگ | Resuming the war
+mil.decision.resume.body | جنگ شمارهٔ {no} با {other} دوباره شروع می‌شود و {notice} دیگر می‌شود جنگید. | War no. {no} against {other} starts again; fighting is possible in {notice}.
+mil.room.title | اتاق عملیات | War room
+mil.room.targets | شهرهای دشمن | Enemy cities
+mil.room.no_targets | الان شهر دشمنی در دسترس نیست. | No enemy city is within reach right now.
+mil.room.distance | {km} کیلومتر | {km} km
+mil.room.running | عملیات‌های ما | Our operations
+mil.target.country | کشور | Country
+mil.target.distance | فاصله | Distance
+mil.target.damage | خرابی | Damage
+mil.target.options | عملیات ممکن | Possible operations
+mil.target.no_options | از اینجا هیچ عملیاتی شدنی نیست. | No operation is possible from here.
+mil.target.ready | آماده | Ready
+mil.target.from | از پادگان | From the garrison of
+mil.target.munitions | مهمات | Munitions
+mil.target.not_yours | فقط {office} می‌تواند این عملیات را فرمان بدهد. | Only the {office} can order this operation.
+mil.launch.title | {kind} علیه {city} | {kind} against {city}
+mil.launch.class | تجهیز | Equipment
+mil.launch.kind | عملیات | Operation
+mil.launch.objective | هدف | Objective
+mil.launch.qty | تعداد | Number
+mil.launch.prepare | آماده‌سازی | Preparation
+mil.launch.estimate | برآورد فرماندهی (تقریبی است، نه شمارش دقیق) | The command's estimate (rough, not an exact count)
+mil.launch.chance | شانس موفقیت | Chance of success
+mil.launch.loss | تلفات خودی | Own losses
+mil.launch.damage | خرابی دشمن | Damage to the enemy
+mil.launch.confirm_hint | بعد از تأیید، تجهیزات تا پایان عملیات درگیرند. | Once confirmed, the equipment is committed until the operation ends.
+mil.launch.pick_objective | هدف عملیات چیست؟ | What is the objective?
+mil.launch.pick_qty | برای «{objective}» چند عدد می‌فرستی؟ | How many do you send for {objective}?
+mil.report.title_ours | گزارش عملیات شمارهٔ {no} | Report of operation no. {no}
+mil.report.title_theirs | گزارش حمله به ما، شمارهٔ {no} | Report of the attack on us, no. {no}
+mil.report.head_ours | {kind} علیه {city} ({target}) با {class}؛ هدف: {objective}. | {kind} against {city} ({target}) with {class}; objective: {objective}.
+mil.report.head_theirs | {country} با «{kind}» به {city} حمله کرد؛ هدف: {objective}. | {country} struck {city} with a {kind}; objective: {objective}.
+mil.report.committed | فرستاده‌شده | Committed
+mil.report.lost | تلفات خودی | Own losses
+mil.report.damaged | آسیب‌دیدهٔ خودی | Own damaged
+mil.report.enemy_lost | تلفات دشمن | Enemy losses
+mil.report.enemy_dmg | آسیب‌دیدهٔ دشمن | Enemy damaged
+mil.report.fired | شلیک‌شده | Fired
+mil.report.hits | اصابت | Hits
+mil.report.seen_at | دیده‌شدن از | Seen from
+mil.report.damage | خرابی شهر | Damage to the city
+mil.report.captured | شهر گرفته شد. | The city was taken.
+mil.report.liberated | شهر آزاد شد. | The city was liberated.
+mil.notice_title.struck | شهر زیر حمله | A city under attack
+mil.notice_title.ally | هم‌پیمان زیر حمله | An ally under attack
+mil.notice_title.proposal | پیشنهاد در جنگ | A proposal in the war
+mil.notice_title.declared | اعلان جنگ | A declaration of war
+mil.war_notice.struck | {city} هدف حمله قرار گرفت؛ خرابی {band}. | {city} was struck; {band} damage.
+mil.war_notice.ally | {ally} مورد حمله قرار گرفت؛ می‌توانی کنارش وارد جنگ شوی. | {ally} was attacked; you may join the war beside it.
+mil.war_notice.proposal | {other} {kindname} پیشنهاد داده؛ تا {in} دیگر جواب بده. | {other} proposes a {kindname}; answer within {in}.
+mil.war_notice.declared | {other} به {country} اعلان جنگ داد؛ {in} دیگر می‌شود جنگید. | {other} declared war on {country}; fighting is possible in {in}.
+mil.injury.damage | آسیب | Damage
+mil.injury.health | سلامت | Health
+mil.injury.of | {health} از {max} | {health} of {max}
+mil.injury.hospital | بیمارستان | Hospital
+mil.injury.in_hospital | به بیمارستان منتقل شدی | You were taken to hospital
+mil.lic.title | مجوزهای دفاعی | Defence licences
+mil.lic.title_of | مجوزهای دفاعی {country} | Defence licences of {country}
+mil.lic.pending | درخواست‌های منتظر | Applications waiting
+mil.lic.none_pending | درخواستی منتظر نیست. | No application is waiting.
+mil.lic.in_force | مجوزهای برقرار | Licences in force
+mil.lic.none_in_force | مجوز برقراری نیست. | No licence is in force.
+mil.lic.ended | مجوزهای تمام‌شده | Ended licences
+mil.lic.no | مجوز شمارهٔ {no} | Licence no. {no}
+mil.lic.ends_in | {in} دیگر تمام می‌شود | ends in {in}
+mil.lic.kind.manufacturer | سازنده | Manufacturer
+mil.lic.kind.contractor | پیمانکار دفاعی | Defence contractor
+mil.lic.basis.rank | بر پایهٔ درجهٔ بنیان‌گذار در نیروهای مسلح | Based on the founder's armed-forces rank
+mil.lic.basis.contractor | بر پایهٔ شرکت پیمانکارِ بنیان‌گذار | Based on the founder's contractor company
+mil.lic.basis.minister | به تأیید وزیر دفاع | Approved by the defence minister
+mil.lic.basis.grandfathered | از پیش از برقراری مجوزها بوده | Existed before licences
+mil.lic.status.pending | منتظر وزیر | Waiting for the minister
+mil.lic.status.active | برقرار | In force
+mil.lic.status.revoking | در مهلت لغو، هنوز برقرار | Being revoked, still in force
+mil.lic.status.revoked | لغو شده | Revoked
+mil.lic.status.rejected | رد شده | Rejected
+mil.lic.company | شرکت | Company
+mil.lic.kind | نوع | Kind
+mil.lic.basis | پایه | Basis
+mil.lic.status | وضعیت | Status
+mil.lic.revoke_title | لغو مجوز | Revoking a licence
+mil.lic.revoke_hint | لغو یک‌دفعه اجرا نمی‌شود؛ تا {in} دیگر مجوز برقرار می‌ماند. | The revocation is not immediate; the licence stands for {in} more.
+mil.lic.public_hint | فهرست مجوزها برای همه باز است؛ تصمیم با وزیر دفاع است. | The registry is open to all; the defence minister decides.
+mil.lic.notice.approve | مجوز «{company}» تأیید شد. | The licence of {company} was approved.
+mil.lic.notice.reject | درخواست «{company}» رد شد. | The application of {company} was rejected.
+mil.lic.notice.revoke | مجوز «{company}» لغو شد و مهلت لغو شروع شد. | The licence of {company} was revoked and its notice has started.
+mil.def.title | مجوز دفاعی «{company}» | Defence licence of {company}
+mil.def.state.manufacturer | این شرکت در بخش دفاعی است و ساخت سلاح برایش آزاد است. | This company is in the defence sector and may make arms.
+mil.def.state.none | این شرکت غیرنظامی است و مجوز دفاعی ندارد. اگر فناوری کافی داشته باشد و وزیر دفاع تأیید کند، پیمانکار دفاعی می‌شود. | This is a civilian company with no defence licence. With enough technology and the defence minister's approval it becomes a defence contractor.
+mil.def.state.pending | درخواست پیمانکاری این شرکت منتظر تصمیم وزیر دفاع است. | The company's contractor application waits for the defence minister.
+mil.def.state.active | مجوز پیمانکاری این شرکت برقرار است. | The company's contractor licence is in force.
+mil.def.state.revoking | مجوز این شرکت لغو شده، ولی تا پایان مهلت برقرار است. | The licence was revoked but stands until its notice runs out.
+mil.def.state.revoked | مجوز این شرکت لغو شده است. | The company's licence was revoked.
+mil.def.state.rejected | درخواست پیمانکاری این شرکت رد شد. | The company's contractor application was rejected.
+mil.def.applied | درخواست ثبت شد. | The application was filed.
+mil.def.standing | فناوری شرکت | The company's technology
+mil.def.techs | فناوری‌های خودش | Technologies of its own
+mil.def.tier | عمیق‌ترین رده | Deepest tier
+mil.def.of | {have} از {need} | {have} of {need}
+mil.def.no_minister | الان کسی جای وزیر دفاع نیست؛ درخواست تا آمدنش می‌ماند. | Nobody holds the defence minister's seat; an application waits until someone does.
+mil.lic_notice.title_applied | درخواست مجوز تازه | A new licence application
+mil.lic_notice.title_approved | مجوز تأیید شد | Licence approved
+mil.lic_notice.title_rejected | درخواست مجوز رد شد | Licence application rejected
+mil.lic_notice.title_revoked | مجوز لغو شد | Licence revoked
+mil.lic_notice.applied | «{company}» برای مجوز پیمانکاری دفاعی {country} درخواست داده است. | {company} applied for a defence contractor licence of {country}.
+mil.lic_notice.approved | مجوز «{company}» از طرف {country} تأیید شد. | The licence of {company} was approved by {country}.
+mil.lic_notice.rejected | درخواست مجوز «{company}» از طرف {country} رد شد. | The licence application of {company} was rejected by {country}.
+mil.lic_notice.revoked | مجوز «{company}» لغو شد؛ {in} دیگر از کار می‌افتد. | The licence of {company} was revoked; it ends in {in}.
+mil.act.military.forces | نیروهای مسلح | Armed forces
+mil.act.military.procure | خرید تسلیحات | Procurement
+mil.act.military.sanctions | تحریم‌ها | Sanctions
+mil.act.military.treaties | پیمان‌ها | Treaties
+mil.act.military.war | جنگ | War
+mil.act.military.licences | مجوزهای دفاعی | Defence licences
+mil.act.military.branch | {name} | {name}
+mil.act.military.station | استقرار {name} | Station {name}
+mil.act.military.station_city | {name} | {name}
+mil.act.military.station_qty | {qty} عدد | {qty}
+mil.act.military.station_custom | تعداد دیگر | Another number
+mil.act.military.station_confirm | تأیید و ارسال | Confirm and send
+mil.act.military.buy_open | خرید {name} | Buy {name}
+mil.act.military.buy_qty | {qty} عدد | {qty}
+mil.act.military.buy_custom | تعداد دیگر | Another number
+mil.act.military.buy_confirm | تأیید خرید | Confirm the purchase
+mil.act.military.retrofit_confirm | تأیید نوسازی | Confirm the retrofit
+mil.act.war.accept | پذیرفتن | Accept
+mil.act.war.decline | رد کردن | Decline
+mil.act.war.ceasefire | پیشنهاد آتش‌بس | Propose a ceasefire
+mil.act.war.peace | پیشنهاد صلح | Propose peace
+mil.act.war.resume | از سرگیری جنگ | Resume the war
+mil.act.war.join | پیوستن به جنگ | Join the war
+mil.act.war.room | اتاق عملیات | War room
+mil.act.war.declare | اعلان جنگ | Declare war
+mil.act.war.declare_target | {name} | {name}
+mil.act.war.declare_ground | {name} | {name}
+mil.act.war.declare_confirm | اعلان جنگ می‌دهم | Declare war
+mil.act.war.join_confirm | وارد جنگ می‌شوم | Join the war
+mil.act.war.resume_confirm | جنگ را از سر می‌گیرم | Resume the war
+mil.act.war.propose_confirm | پیشنهاد را می‌فرستم | Send the proposal
+mil.act.war.target | {name} | {name}
+mil.act.war.launch_open | {name} | {name}
+mil.act.war.launch_objective | {name} | {name}
+mil.act.war.launch_qty | {qty} عدد | {qty}
+mil.act.war.launch_confirm | فرمان عملیات | Order the operation
+mil.act.war.hospital | بیمارستان | Hospital
+mil.act.defence.apply | درخواست مجوز | Apply for a licence
+mil.act.defence.lab | آزمایشگاه شرکت | The company laboratory
+mil.act.defence.registry | فهرست مجوزها | The registry
+mil.act.defence.company | مجوز شرکت | The company's licence
+mil.act.defence.approve | تأیید | Approve
+mil.act.defence.reject | رد | Reject
+mil.act.defence.revoke | لغو | Revoke
+mil.act.defence.revoke_confirm | لغو می‌کنم | Revoke it
+pn.military.arrived | {qty} × {good} به پادگان {city} رسید و به {branch} پیوست. | {qty} × {good} reached the {city} garrison and joined {branch}.
+pn.licence.applied | «{company}» برای مجوز پیمانکاری دفاعی درخواست داده؛ منتظر تصمیم وزیر است. | {company} applied for a defence contractor licence and waits for the minister.
+pn.licence.approved | مجوز دفاعی «{company}» تأیید شد. | The defence licence of {company} was approved.
+pn.licence.rejected | درخواست مجوز دفاعی «{company}» رد شد. | The defence licence application of {company} was rejected.
+pn.licence.revoked | مجوز دفاعی «{company}» لغو شد؛ {time} دیگر از کار می‌افتد. | The defence licence of {company} was revoked; it ends in {time}.
+pn.war.struck | {city} هدف حمله قرار گرفت؛ خرابی {band}. | {city} was struck; {band} damage.
+pn.war.ally | {ally} مورد حمله قرار گرفت؛ می‌توانی کنارش وارد جنگ شوی. | {ally} was attacked; you may join the war beside it.
+pn.war.proposal | {other} {kind} پیشنهاد داده؛ {time} وقت داری جواب بدهی. | {other} proposes a {kind}; you have {time} to answer.
+pn.war.declared | {other} به {country} اعلان جنگ داد؛ {time} دیگر می‌شود جنگید. | {other} declared war on {country}; fighting is possible in {time}.
+pn.war.hospital | به بیمارستان منتقل شدی. | You were taken to hospital.
+pn.war.report | گزارش عملیات شمارهٔ {no} دربارهٔ {city} رسید؛ خرابی {band}. | The report of operation no. {no} on {city} arrived; {band} damage.

@@ -6,6 +6,7 @@
 
 import { SOCIETY_CONTENT, mergeTables } from './mock_society'
 import { ECONOMY_CONTENT } from './mock_economy'
+import { MILITARY_CONTENT } from './mock_military'
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
@@ -239,11 +240,16 @@ function layoutFor(id: string): VillageLayout {
   }
 }
 
+/** ?tier=city (or town, country) shows the world as a player of that stage sees it; a village by default. */
+function mockTier(): string {
+  try { return new URLSearchParams(location.search).get('tier') || 'village' } catch { return 'village' }
+}
+
 export function mockBootstrapSettlement(): BootstrapSettlement {
   init()
   const place = mockVillagePlace(GRID)
   return {
-    id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'village', world_cell: 18211,
+    id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: mockTier(), world_cell: 18211,
     centre: place.centre, is_head: IS_HEAD, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: size(), layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
   }
 }
@@ -1133,7 +1139,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     return json({
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
-      entries: mergeTables(SOCIETY_CONTENT.entries, {
+      entries: mergeTables(MILITARY_CONTENT, mergeTables(SOCIETY_CONTENT.entries, {
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
@@ -1155,7 +1161,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
         // what the life area names: cities, places, ways to travel, ranks, goods, property...
         ...LIFE_CONTENT,
-      }),
+      })),
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)
