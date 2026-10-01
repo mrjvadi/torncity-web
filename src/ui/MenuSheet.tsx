@@ -1,19 +1,44 @@
 import BottomSheet from './BottomSheet'
 import Icon from './Icon'
 import { t, type Key } from '../i18n'
+import { useContentNames } from '../village/useVillage'
 
 /** What the village adds to the menu: its own screens, and the services that
  * are a journey away in Support. */
-export interface MenuVillage { name: string; isHead: boolean; support: { code: string; name: string } }
+export interface MenuVillage { name: string; isHead: boolean; resident?: boolean; support: { code: string; name: string } }
 
-const VILLAGE_ITEMS: { key: string; icon: string; palette: 'gold' | 'emerald' | 'violet' | 'sapphire' | 'amber'; label: Key; local: string; args?: Record<string, string>; head?: boolean }[] = [
-  { key: 'overview', icon: 'chart', palette: 'sapphire', label: 'village.btn.overview', local: 'village_overview' },
+type Palette = 'gold' | 'emerald' | 'violet' | 'sapphire' | 'amber'
+interface VillageItem {
+  key: string; icon: string; palette: Palette; label: Key
+  /** a local screen of the village... */
+  local?: string
+  args?: Record<string, string>
+  /** ...or a server command whose screen opens */
+  command?: string
+  head?: boolean
+  /** not for the head: the head cannot leave while holding the office */
+  notHead?: boolean
+  resident?: boolean
+}
+
+/** The village menu is sections, never actions (docs/ui/web-structure.md 5.3): «زندگی من»
+ * first, then the village itself. The build button is on the village page, not here. */
+const MY_LIFE: VillageItem[] = [
+  { key: 'land', icon: 'x_field', palette: 'emerald', label: 'menu.land', local: 'village_home', args: { land: '1' }, resident: true },
+  { key: 'house', icon: 'house', palette: 'gold', label: 'menu.house', command: 'settlement.private', resident: true },
+  { key: 'mine', icon: 'box', palette: 'amber', label: 'menu.mine', command: 'settlement.mine', resident: true },
+  { key: 'work', icon: 'gears', palette: 'sapphire', label: 'menu.work', local: 'village_labor', resident: true },
+]
+
+const THE_VILLAGE: VillageItem[] = [
+  { key: 'storage', icon: 'box', palette: 'sapphire', label: 'storage.open', local: 'village_storage' },
+  { key: 'overview', icon: 'chart', palette: 'sapphire', label: 'menu.status', local: 'village_overview' },
   { key: 'who', icon: 'society', palette: 'emerald', label: 'village.btn.who', local: 'village_who' },
   { key: 'knowledge', icon: 'book', palette: 'violet', label: 'village.btn.knowledge', local: 'village_knowledge' },
-  { key: 'storage', icon: 'box', palette: 'sapphire', label: 'storage.open', local: 'village_storage' },
   { key: 'progress', icon: 'clock', palette: 'amber', label: 'village.btn.progress', local: 'village_progress' },
-  { key: 'build', icon: 'house', palette: 'gold', label: 'village.btn.build', local: 'village_home', args: { build: '1' }, head: true },
-  { key: 'donate', icon: 'gift', palette: 'gold', label: 'village.btn.donate', local: 'village_overview', args: { donate: '1' } },
+  { key: 'donate', icon: 'gift', palette: 'gold', label: 'village.btn.donate', local: 'village_overview', args: { donate: '1' }, resident: true },
+  { key: 'terms', icon: 'gavel', palette: 'gold', label: 'menu.terms', command: 'settlement.terms', head: true },
+  { key: 'leave', icon: 'walk', palette: 'amber', label: 'menu.leave', command: 'settlement.leave', resident: true, notHead: true },
 ]
 
 const SUPPORT_ITEMS: { key: string; icon: string; label: Key }[] = [
@@ -30,24 +55,38 @@ interface MenuSheetProps {
   onClose: () => void
   village?: MenuVillage
   onVillage?: (local: string, args?: Record<string, string>) => void
+  /** Opens the screen a server command answers with. */
+  onCommand?: (command: string, args?: Record<string, string>) => void
   onTravel?: (cityCode: string) => void
 }
 
-export default function MenuSheet({ open, onClose, village, onVillage, onTravel }: MenuSheetProps) {
+export default function MenuSheet({ open, onClose, village, onVillage, onCommand, onTravel }: MenuSheetProps) {
+  const names = useContentNames()
   return (
     <BottomSheet open={open} onClose={onClose} title={village ? village.name : t('village.menu.title')}>
       {village && (
         <>
-          <div className="menu-sec">{t('village.title')} · {village.name}</div>
-          <div className="menu-grid">
-            {VILLAGE_ITEMS.filter((i) => !i.head || village.isHead).map((i) => (
-              <button key={i.key} className="menu-item" onClick={() => { onVillage?.(i.local, i.args); onClose() }}>
-                <Icon name={i.icon} palette={i.palette} size={22} />
-                <span>{t(i.label)}</span>
-              </button>
-            ))}
-          </div>
-          <div className="menu-sec">{t('village.menu.support', { city: village.support.name })}</div>
+          {[
+            { title: t('menu.my_life'), items: MY_LIFE },
+            { title: t('village.title') + ' · ' + village.name, items: THE_VILLAGE },
+          ].map((g) => {
+            const items = g.items.filter((i) => (!i.head || village.isHead) && !(i.notHead && village.isHead) && (!i.resident || village.resident !== false))
+            if (!items.length) return null
+            return (
+              <div key={g.title}>
+                <div className="menu-sec">{g.title}</div>
+                <div className="menu-grid">
+                  {items.map((i) => (
+                    <button key={i.key} className="menu-item" onClick={() => { if (i.command) onCommand?.(i.command); else onVillage?.(i.local!, i.args); onClose() }}>
+                      <Icon name={i.icon} palette={i.palette} size={22} />
+                      <span>{t(i.label)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+          <div className="menu-sec">{t('village.menu.support', { city: names.name('city', village.support.code, village.support.name) })}</div>
           <div className="menu-grid">
             {SUPPORT_ITEMS.map((i) => (
               <button key={i.key} className="menu-item" onClick={() => { onTravel?.(village.support.code); onClose() }}>

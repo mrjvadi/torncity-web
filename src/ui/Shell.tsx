@@ -65,6 +65,11 @@ export default function Shell() {
   // as the start parameter: land on the founding form.
   const [screenKey, setScreenKey] = useState<ScreenKey>(() => {
     if (resumed?.screen) return resumed.screen as ScreenKey
+    // ?mock=1&open=<command> (&args={"id":"..."}) opens a screen straight, for screenshots of the mock
+    const q = new URLSearchParams(location.search)
+    if (q.get('mock') === '1' && q.get('open')) {
+      try { return { command: q.get('open')!, args: q.get('args') ? JSON.parse(q.get('args')!) : undefined } } catch { /* a bad hook is ignored */ }
+    }
     const draft = foundingDraftFromLaunch()
     if (draft) return { command: '', local: 'founding_form', args: { draft } }
     const h = homeScreen(bootstrap)
@@ -181,8 +186,9 @@ export default function Shell() {
       <MenuSheet
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, support: supportCity(bootstrap) } : undefined}
+        village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, resident: bootstrap.settlement.resident, support: supportCity(bootstrap) } : undefined}
         onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
+        onCommand={(command, args) => { setTab('city'); run(command, args) }}
         onTravel={() => { setTab('city'); openLocal('support_travel') }}
       />
       <style>{`
