@@ -2033,14 +2033,14 @@ lf.map.departures | از اینجا با {modes} می‌شود رفت | You can 
 lf.map.shops_at | مغازه‌های {place} | Shops at {place}
 lf.map.you_here | اینجا هستی | You are here
 lf.map.walk | {t} پیاده‌روی | {t} on foot
-lf.map.village_empty | هنوز ساختمانی در روستا نیست. | There are no buildings in the village yet.
+lf.map.village_empty | هنوز ساختمانی اینجا نیست. | There are no buildings here yet.
 lf.map.mine | مال تو | Yours
 lf.map.going_up | در حال ساخت | Going up
-lf.map.village_standing | ساختمان‌های روستا | The village's buildings
+lf.map.village_standing | ساختمان‌های اینجا | Buildings here
 lf.map.village_going | در حال ساخت | Being built
 lf.map.travelling | در سفر به {city} هستی؛ نقشه تا رسیدن بسته است. | You are travelling to {city}; the map is closed until you arrive.
 lf.map.no_city | هنوز در هیچ شهر یا روستایی نیستی. | You are not in any city or village yet.
-lf.map.village_title | جاهای روستا | Places in the village
+lf.map.village_title | جاهای اینجا | Places here
 lf.map.city_title | جاهای {city} | Places in {city}
 lf.map.walking | در راه {place} هستی؛ {t} مانده، ساعت {at} می‌رسی. | You are walking to {place}; {t} left, you arrive at {at}.
 lf.map.here | اینجا: {place} | You are at {place}
