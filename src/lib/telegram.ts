@@ -18,6 +18,7 @@ interface TelegramWebApp {
   requestFullscreen?(): void
   lockOrientation?(): void
   isFullscreen?: boolean
+  BackButton?: { show(): void; hide(): void; onClick(cb: () => void): void; offClick(cb: () => void): void }
 }
 
 declare global {

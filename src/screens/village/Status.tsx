@@ -9,7 +9,7 @@ import DonateSheet from './Donate'
 import type { ScreenProps } from '../types'
 import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { hms, money } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import { hasKey, t, type Key } from '../../i18n'
@@ -285,21 +285,29 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
           {v.hidden > 0 && <div className="nx-bar-sub" style={{ textAlign: 'center' }}>{t('know.hidden', { n: formatNumber(v.hidden) })}</div>}
         </>
       )}
-      <BottomSheet open={!!ask} onClose={() => setAsk(null)} title={ask ? kname(ask.line.knowledge) : undefined}>
+      <Popup
+        open={!!ask} onClose={() => setAsk(null)} title={ask ? kname(ask.line.knowledge) : undefined} tone="violet" dismissible={!busy}
+        footer={ask && (
+          <ActionRow>
+            <ActionButton tone="steel" small onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</ActionButton>
+            <ActionButton tone={ask.kind === 'buy' ? 'gold' : 'green'} onClick={() => void go()} busy={busy}>{t('building.yes')}</ActionButton>
+          </ActionRow>
+        )}
+      >
         {ask && (
           <>
-            <div className="vh-confirm">
+            <Hero><Medallion icon="book" palette="violet" ring="#8e6cf0" /></Hero>
+            <StatGrid>
+              <StatCard icon="coins" palette="gold" label={t(ask.kind === 'buy' ? 'know.stat.buy' : 'know.stat.research')} value={money(ask.kind === 'buy' ? ask.line.buy_price : ask.line.research_cost)} />
+            </StatGrid>
+            <Note>
               {ask.kind === 'buy'
                 ? t('know.confirm_buy', { name: kname(ask.line.knowledge), price: money(ask.line.buy_price) })
                 : t('know.confirm_research', { name: kname(ask.line.knowledge), cost: money(ask.line.research_cost) })}
-            </div>
-            <div className="vh-sheet-actions">
-              <Slab tone="steel" radius={14} lip={4} onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</Slab>
-              <Slab tone="green" radius={14} lip={4} onClick={() => void go()} disabled={busy}>{t('building.yes')}</Slab>
-            </div>
+            </Note>
           </>
         )}
-      </BottomSheet>
+      </Popup>
     </ScreenScroll>
   )
 }

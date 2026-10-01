@@ -15,7 +15,7 @@ import { formatNumber } from '../../lib/persian'
 import { Emboss, Slab } from '../../kit'
 import Emblem from '../../lib/emblem'
 import { emblemHex } from '../../lib/emblemPalette'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup, { ActionButton, Hero, Note, StatCard, StatGrid } from '../../ui/Popup'
 import * as api from '../../api/client'
 import { useSession } from '../../state/SessionContext'
 import { useToast } from '../../state/ToastContext'
@@ -144,21 +144,31 @@ function ConfirmSheet({ dest, hint, onClose, onGo }: { dest: TravelDestination |
   if (!dest) return null
   const chosen = options?.find((o) => o.mode_code === mode)
   return (
-    <BottomSheet open onClose={onClose} title={t('sc.confirm.title', { name: dest.name })}>
-      <div className="sc-sheet-head">
-        <DestEmblem d={dest} size={52} />
-        <div style={{ flex: 1 }}>
-          <div className="display" style={{ fontSize: 17 }}>{dest.name}</div>
-          {dest.motto && <div style={{ fontSize: 12.5, color: 'var(--text-dim)' }}>{dest.motto}</div>}
+    <Popup
+      open onClose={onClose} title={t('sc.confirm.title', { name: dest.name })} tone="navy" dismissible={!busy}
+      footer={(
+        <ActionButton
+          tone="gold" cost={chosen ? (chosen.fare > 0 ? money(chosen.fare) : t('common.free')) : undefined} costIcon="coins" costPalette="gold"
+          disabled={!chosen} busy={busy}
+          onClick={() => { if (!chosen) return; setBusy(true); void onGo(dest, chosen.mode_code, chosen.fare).finally(() => setBusy(false)) }}
+        >
+          {t('sc.confirm.go')}
+        </ActionButton>
+      )}
+    >
+      <Hero>
+        <div className="pp-medal-wrap">
+          <div className="sc-emblem"><DestEmblem d={dest} size={92} /></div>
+          {dest.motto && <div className="pp-medal-chip">{dest.motto}</div>}
         </div>
-      </div>
-      <div className="sc-sheet-facts">
-        <span>{t('sc.confirm.distance')}</span><b>{t('sc.dest.km', { n: formatNumber(Math.round(dest.distance_km)) })}</b>
-        {dest.duration_seconds ? <><span>{t('sc.confirm.time')}</span><b>{hms(dest.duration_seconds)}</b></> : null}
-      </div>
+      </Hero>
+      <StatGrid>
+        <StatCard icon="x_map" palette="sapphire" label={t('sc.confirm.distance')} value={t('sc.dest.km', { n: formatNumber(Math.round(dest.distance_km)) })} />
+        {dest.duration_seconds ? <StatCard icon="stopwatch" palette="amber" label={t('sc.confirm.time')} value={hms(dest.duration_seconds)} /> : null}
+      </StatGrid>
       <div className="sc-modes">
-        {options === null && <Empty>{t('sc.confirm.loading')}</Empty>}
-        {options?.length === 0 && <Empty>{t('sc.confirm.no_mode')}</Empty>}
+        {options === null && <Note>{t('sc.confirm.loading')}</Note>}
+        {options?.length === 0 && <Note tone="bad">{t('sc.confirm.no_mode')}</Note>}
         {options?.map((o) => (
           <ListRow
             key={o.mode_code}
@@ -172,10 +182,7 @@ function ConfirmSheet({ dest, hint, onClose, onGo }: { dest: TravelDestination |
           />
         ))}
       </div>
-      <Slab tone="gold" radius={14} lip={4} style={{ width: '100%' }} disabled={!chosen || busy} onClick={() => { if (!chosen) return; setBusy(true); void onGo(dest, chosen.mode_code, chosen.fare).finally(() => setBusy(false)) }}>
-        {t('sc.confirm.go')}{chosen ? ` · ${money(chosen.fare)}` : ''}
-      </Slab>
-    </BottomSheet>
+    </Popup>
   )
 }
 

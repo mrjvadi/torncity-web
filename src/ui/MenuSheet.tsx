@@ -1,4 +1,4 @@
-import BottomSheet from './BottomSheet'
+import Popup from './Popup'
 import Icon from './Icon'
 import { t, type Key } from '../i18n'
 import { useContentNames } from '../village/useVillage'
@@ -63,7 +63,7 @@ interface MenuSheetProps {
 export default function MenuSheet({ open, onClose, village, onVillage, onCommand, onTravel }: MenuSheetProps) {
   const names = useContentNames()
   return (
-    <BottomSheet open={open} onClose={onClose} title={village ? village.name : t('village.menu.title')}>
+    <Popup open={open} onClose={onClose} title={village ? village.name : t('village.menu.title')} tone="navy">
       {village && (
         <>
           {[
@@ -102,6 +102,6 @@ export default function MenuSheet({ open, onClose, village, onVillage, onCommand
         .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
         .menu-item { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid rgba(242,194,85,0.18); border-radius: 14px; padding: 14px 6px; font-size: 12px; color: var(--text-dim); }
                       `}</style>
-    </BottomSheet>
+    </Popup>
   )
 }

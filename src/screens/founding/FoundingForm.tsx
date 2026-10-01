@@ -13,7 +13,7 @@ import type {
 } from '../../api/types'
 import { Card, Chip, Empty, Header, PrimaryButton, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import Emblem, { Glyph } from '../../lib/emblem'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup, { ActionButton, Note } from '../../ui/Popup'
 import { t, type Key } from '../../i18n'
 import { friendlyError } from '../../lib/errors'
 import { useSession } from '../../state/SessionContext'
@@ -415,7 +415,15 @@ function Editor({ view, onDone, onBack, toast }: {
         </PrimaryButton>
       </div>
 
-      <BottomSheet open={confirm} onClose={() => !busy && setConfirm(false)} title={t('founding.confirm_title')}>
+      <Popup
+        open={confirm} onClose={() => setConfirm(false)} title={t('founding.confirm_title')} tone="gold" dismissible={!busy}
+        footer={(
+          <>
+            <ActionButton tone="green" onClick={() => void found()} busy={busy}>{busy ? t('founding.founding') : t('founding.confirm_yes')}</ActionButton>
+            <button className="ff-link" onClick={() => setConfirm(false)} disabled={busy}>{t('founding.confirm_edit')}</button>
+          </>
+        )}
+      >
         <div className="ff-confirm">
           <Emblem shape={f.emblem.shape} colorA={colorA} colorB={colorB} icon={f.emblem.icon} size={92} />
           <div className="ff-preview-name display">{f.name.trim()}</div>
@@ -426,12 +434,10 @@ function Editor({ view, onDone, onBack, toast }: {
             <span className="ff-ltr ff-code">{f.currencyCode}</span>
             <span className="ff-ltr ff-sym">{symbolShown}</span>
           </div>
-          <div className="ff-note">{t('founding.currency_note', { neutral: t('unit.money') })}</div>
-          <div className="ff-note">{t('founding.confirm_body')}</div>
-          <PrimaryButton onClick={() => void found()} disabled={busy}>{busy ? t('founding.founding') : t('founding.confirm_yes')}</PrimaryButton>
-          <button className="ff-link" onClick={() => setConfirm(false)} disabled={busy}>{t('founding.confirm_edit')}</button>
+          <Note>{t('founding.currency_note', { neutral: t('unit.money') })}</Note>
+          <Note>{t('founding.confirm_body')}</Note>
         </div>
-      </BottomSheet>
+      </Popup>
     </ScreenScroll>
   )
 }

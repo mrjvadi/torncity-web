@@ -5,7 +5,7 @@
 // so it and its buttons are above every menu.
 
 import { useEffect, useState } from 'react'
-import BottomSheet from '../../ui/BottomSheet'
+import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { Slab } from '../../kit'
 import { t } from '../../i18n'
 import { money } from '../native/kit/format'
@@ -53,44 +53,54 @@ export default function DonateSheet({ open, onClose, onDone }: { open: boolean; 
   const valid = !!v && typedAmount >= v.min && typedAmount <= v.max
 
   return (
-    <BottomSheet open={open} onClose={onClose} title={t('donate.title')}>
+    <Popup
+      open={open} onClose={onClose} title={t('donate.title')} tone="gold" dismissible={!busy}
+      footer={v && step?.kind === 'menu' ? (
+        <>
+          <input
+            className="vd-input" inputMode="numeric" dir="ltr" placeholder={t('donate.custom')}
+            value={typed} onChange={(e) => setTyped(e.target.value)} aria-label={t('donate.custom')}
+          />
+          <ActionButton tone="green" disabled={busy || !valid} onClick={() => void ask(typedAmount)}>{t('donate.next')}</ActionButton>
+        </>
+      ) : v && step?.kind === 'ask' ? (
+        <ActionRow>
+          <ActionButton tone="steel" small onClick={() => setStep({ kind: 'menu', view: v })} disabled={busy}>{t('building.no')}</ActionButton>
+          <ActionButton tone="green" onClick={() => void give(v.amount)} busy={busy}>{t('donate.yes')}</ActionButton>
+        </ActionRow>
+      ) : v && step?.kind === 'done' ? (
+        <ActionButton tone="gold" onClick={onClose}>{t('donate.close')}</ActionButton>
+      ) : undefined}
+    >
       {v && step?.kind === 'menu' && (
         <>
-          <div className="vh-confirm">{t('donate.body', { treasury: money(v.treasury), cash: money(v.cash) })}</div>
-          <div className="vh-hint">{t('donate.range', { min: money(v.min), max: money(v.max) })}</div>
+          <Hero><Medallion icon="gift" palette="gold" ring="#d99a1f" /></Hero>
+          <StatGrid>
+            <StatCard icon="coins" palette="gold" label={t('donate.stat.treasury')} value={money(v.treasury)} />
+            <StatCard icon="money" palette="emerald" label={t('donate.stat.cash')} value={money(v.cash)} />
+          </StatGrid>
+          <Note>{t('donate.range', { min: money(v.min), max: money(v.max) })}</Note>
           <div className="vd-presets">
             {(v.presets ?? []).map((p) => (
-              <Slab key={p} tone="gold" radius={14} lip={4} disabled={busy || p > v.cash} onClick={() => void ask(p)}>{money(p)}</Slab>
+              <ActionButton key={p} tone="gold" small disabled={busy || p > v.cash} onClick={() => void ask(p)}>{money(p)}</ActionButton>
             ))}
-          </div>
-          <div className="vd-custom">
-            <input
-              className="vd-input" inputMode="numeric" dir="ltr" placeholder={t('donate.custom')}
-              value={typed} onChange={(e) => setTyped(e.target.value)} aria-label={t('donate.custom')}
-            />
-            <Slab tone="blue" radius={14} lip={4} disabled={busy || !valid} onClick={() => void ask(typedAmount)}>{t('donate.next')}</Slab>
           </div>
         </>
       )}
       {v && step?.kind === 'ask' && (
         <>
-          <div className="vh-confirm">{t('donate.ask', { amount: money(v.amount) })}</div>
-          <div className="vh-hint">{t('donate.ask_hint')}</div>
-          <div className="vh-sheet-actions">
-            <Slab tone="steel" radius={14} lip={4} onClick={() => setStep({ kind: 'menu', view: v })} disabled={busy}>{t('building.no')}</Slab>
-            <Slab tone="green" radius={14} lip={4} onClick={() => void give(v.amount)} disabled={busy}>{t('donate.yes')}</Slab>
-          </div>
+          <Hero><Medallion icon="gift" palette="gold" ring="#d99a1f" /></Hero>
+          <Note>{t('donate.ask', { amount: money(v.amount) })}</Note>
+          <Note>{t('donate.ask_hint')}</Note>
         </>
       )}
       {v && step?.kind === 'done' && (
         <>
-          <div className="vh-confirm">{t('donate.done', { amount: money(v.amount) })}</div>
-          <div className="vh-hint good">{t('donate.done_body', { treasury: money(v.treasury) })}</div>
-          <div className="vh-sheet-actions">
-            <Slab tone="gold" radius={14} lip={4} onClick={onClose}>{t('donate.close')}</Slab>
-          </div>
+          <Hero><Medallion icon="check" palette="emerald" ring="#2f9d5b" /></Hero>
+          <Note tone="good">{t('donate.done', { amount: money(v.amount) })}</Note>
+          <Note>{t('donate.done_body', { treasury: money(v.treasury) })}</Note>
         </>
       )}
-    </BottomSheet>
+    </Popup>
   )
 }

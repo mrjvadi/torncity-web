@@ -9,11 +9,9 @@
 // call), the sheet falls back to what the layout itself says.
 
 import { useCallback, useEffect, useState } from 'react'
-import BottomSheet from '../../ui/BottomSheet'
-import { Slab, Plate, Emboss } from '../../kit'
+import Popup, { ActionButton, ActionRow, EffectChip, EffectRow, Gauge, Hero, Medallion, Note, ProgressRow, Section, StatCard, StatGrid } from '../../ui/Popup'
 import type { BuildingPanelView, CatalogueBuilding, LayoutBuilding } from '../../api/types'
 import { t, type Key } from '../../i18n'
-import { Bar } from '../native/kit/Parts'
 import { formatNumber, money } from '../native/kit/format'
 import { buildingName, useContentNames, useNow, useVillageCommand, type ContentNames } from '../../village/useVillage'
 import { buildingBlurb } from './wording'
@@ -94,62 +92,52 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
 
   const showUpgrade = !going && canAct && (panel?.has_upgrade ?? false)
 
-  return (
-    <BottomSheet open onClose={() => { setAsk(null); onClose() }} title={name}>
-      <div className="vh-sheet-row">
-        <Plate size={52} square><Emboss name={icon} palette={palette} size={32} /></Plate>
-        <div>
-          <div className="vh-sheet-meta">{t(`building.state.${b.state}` as Key)}</div>
-          <div className="vh-sheet-meta">{t('building.at', { x: b.x + 1, y: b.y + 1 })} · {t('build.footprint', { w: b.w, h: b.h })}</div>
-          {b.private && <div className="vh-sheet-meta" style={{ color: b.mine ? 'var(--gold)' : undefined }}>{b.mine ? t('citizen.owner_you') : t('citizen.owner', { name: b.owner ?? '' })}</div>}
-        </div>
-      </div>
+  const footer = ask ? (
+    <ActionRow>
+      <ActionButton tone="steel" small onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</ActionButton>
+      <ActionButton tone="red" small onClick={() => void run(ask)} disabled={busy}>{t('building.yes')}</ActionButton>
+    </ActionRow>
+  ) : (going && b.id) ? (
+    <ActionButton tone="gold" onClick={() => setSite(true)}>{t('labor.btn.site')}</ActionButton>
+  ) : (b.private && b.mine && !going && onMine) ? (
+    <ActionRow>
+      <ActionButton tone="green" small onClick={onMine}>{t('citizen.mine.rest')}</ActionButton>
+      <ActionButton tone="steel" small onClick={onMine}>{t('citizen.bar.mine')}</ActionButton>
+    </ActionRow>
+  ) : (showUpgrade && !upgrade) ? (
+    <ActionButton tone="gold" onClick={() => void reveal()}>{t('building.upgrade')}</ActionButton>
+  ) : undefined
 
-      {panel && <p className="vh-desc">{buildingBlurb(panel)}</p>}
+  return (
+    <Popup open onClose={() => { setAsk(null); onClose() }} title={name} tone="gold" footer={footer}>
+      <Hero>
+        {going && <Gauge frac={p} color="var(--saffron)" numTone="gold" value={t('progress.percent', { p: Math.round(p * 100) })} caption={b.finish_at ? countdown(b.finish_at, now) : t('labor.btn.site')} />}
+        <Medallion icon={icon} palette={palette} ring="#d99a1f" chip={t(`building.state.${b.state}` as Key)} />
+      </Hero>
+
+      {panel && <Note>{buildingBlurb(panel)}</Note>}
+
+      <StatGrid>
+        <StatCard icon="x_map" palette="sapphire" label={t('building.stat.spot')} value={t('building.at', { x: b.x + 1, y: b.y + 1 })} />
+        <StatCard icon="box" palette="steel" label={t('building.stat.size')} value={`${b.w}×${b.h}`} />
+        {b.private && <StatCard icon="person" palette={b.mine ? 'gold' : 'steel'} label={t('building.stat.owner')} value={b.mine ? t('building.stat.you') : (b.owner ?? '')} />}
+        {!going && (panel?.upkeep ?? 0) > 0 && kind !== 'road' && <StatCard icon="coins" palette="amber" label={t('building.stat.upkeep')} value={money(panel?.upkeep ?? 0)} />}
+      </StatGrid>
 
       {going ? (
-        b.finish_at
-          ? <Bar frac={p} color="#f5a11f" label={`${countdown(b.finish_at, now)}  ·  ${t('progress.percent', { p: Math.round(p * 100) })}`} />
-          : <p className="vh-desc">{t('labor.by_work_hint')}</p>
+        !b.finish_at && <Note>{t('labor.by_work_hint')}</Note>
       ) : (
         <TypePanel kind={kind} panel={panel} names={names} onOpen={onOpen} onClose={onClose} />
       )}
-      {/* A building raised by work, a citizen's private one too, is worked
-          and hired for at its site. */}
-      {going && b.id && (
-        <div className="vh-sheet-actions">
-          <Slab tone="gold" radius={14} lip={4} onClick={() => setSite(true)}>{t('labor.btn.site')}</Slab>
-        </div>
-      )}
       {site && b.id && <SiteSheet buildingId={b.id} title={name} onClose={() => setSite(false)} />}
-      {b.private && b.mine && !going && onMine && (
-        <div className="vh-sheet-actions">
-          <Slab tone="green" radius={14} lip={4} onClick={onMine}>{t('citizen.mine.rest')}</Slab>
-          <Slab tone="steel" radius={14} lip={4} onClick={onMine}>{t('citizen.bar.mine')}</Slab>
-        </div>
-      )}
 
-
-      {showUpgrade && !upgrade && (
-        <div className="vh-sheet-actions">
-          <Slab tone="steel" radius={14} lip={4} onClick={() => void reveal()}>⬆ {t('building.upgrade')}</Slab>
-        </div>
-      )}
       {upgrade && <UpgradeList panel={panel} cat={cat} names={names} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
 
+      {ask && <Note>{t(ask === 'cancel' ? 'building.confirm_cancel' : 'building.confirm_demolish')}</Note>}
       {going && canAct && ask === null && (
         <div className="vh-quiet">
           <button className="vh-linkbtn" onClick={() => setAsk('cancel')}>{t('building.cancel')}</button>
         </div>
-      )}
-      {ask && (
-        <>
-          <div className="vh-confirm">{t(ask === 'cancel' ? 'building.confirm_cancel' : 'building.confirm_demolish')}</div>
-          <div className="vh-sheet-actions">
-            <Slab tone="steel" radius={14} lip={4} onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</Slab>
-            <Slab tone="red" radius={14} lip={4} onClick={() => void run(ask)} disabled={busy}>{t('building.yes')}</Slab>
-          </div>
-        </>
       )}
       {/* the one destructive action: small, last, never the face of the panel */}
       {!going && canAct && ask === null && (
@@ -157,7 +145,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
           <button className="vh-linkbtn" onClick={() => setAsk('demolish')}>{t('building.demolish_small')}</button>
         </div>
       )}
-    </BottomSheet>
+    </Popup>
   )
 }
 
@@ -171,73 +159,76 @@ function TypePanel({ kind, panel, names, onOpen, onClose }: {
   if (!panel) return null
   const effects = (panel.effects ?? []).filter((e) => EFFECT_KEYS.includes(e.target))
   return (
-    <div className="vh-panelbody">
+    <>
       {kind === 'storage' && (
-        <div className="vh-stock">
-          <div className="vh-sub">{t('building.storage.title')}</div>
+        <>
+          <Section>{t('building.storage.title')}</Section>
           {(panel.stock ?? []).length === 0
-            ? <div className="vh-hint">{t('building.storage.empty')}</div>
-            : (panel.stock ?? []).map((s) => (
-              <div key={s.item.code} className="vh-stockrow"><span>{names.name(['component', 'item'], s.item.code, s.item.name)}</span><b>{formatNumber(s.qty)}</b></div>
-            ))}
+            ? <Note>{t('building.storage.empty')}</Note>
+            : (
+              <StatGrid>
+                {(panel.stock ?? []).map((s) => (
+                  <StatCard key={s.item.code} icon="box" palette="amber" label={names.name(['component', 'item'], s.item.code, s.item.name)} value={formatNumber(s.qty)} />
+                ))}
+              </StatGrid>
+            )}
           {onOpen && (
-            <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</Slab>
+            <ActionButton tone="steel" small onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</ActionButton>
           )}
-        </div>
+        </>
       )}
       {kind === 'school' && (
         <>
-          <Bar frac={(panel.literacy_percent ?? 0) / 100} color="#8f7cff" label={t('building.school.literacy', { p: panel.literacy_percent ?? 0 })} />
-          <div className="vh-hint">{panel.teaching ? t('building.school.teaching') : t('building.school.idle')}</div>
+          <ProgressRow frac={(panel.literacy_percent ?? 0) / 100} color="#8f7cff" icon="book" palette="violet" label={t('building.school.literacy', { p: panel.literacy_percent ?? 0 })} />
+          <Note>{panel.teaching ? t('building.school.teaching') : t('building.school.idle')}</Note>
         </>
       )}
       {kind === 'civic_hall' && (
         <>
-          <div className="vh-tiles">
-            <div className="vh-tile"><span>{t('building.civic.population')}</span><b>{formatNumber(panel.population ?? 0)}</b></div>
-            <div className="vh-tile"><span>{t('building.civic.treasury')}</span><b>{money(panel.treasury ?? 0)}</b></div>
-          </div>
-          <div className="vh-hint">
+          <StatGrid>
+            <StatCard icon="society" palette="emerald" label={t('building.civic.population')} value={formatNumber(panel.population ?? 0)} />
+            <StatCard icon="coins" palette="gold" label={t('building.civic.treasury')} value={money(panel.treasury ?? 0)} />
+          </StatGrid>
+          <Note>
             {panel.research ? t('building.civic.research', { name: names.name('knowledge', panel.research.knowledge.code, panel.research.knowledge.name), t: durationText(panel.research.left_seconds) }) : t('building.civic.no_research')}
-          </div>
+          </Note>
           {onOpen && (
             <div className="vh-doors">
-              <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_overview') }}>{t('building.civic.overview')}</Slab>
-              <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_knowledge') }}>{t('building.civic.knowledge')}</Slab>
-              <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_progress') }}>{t('building.civic.progress')}</Slab>
-              <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</Slab>
+              <ActionButton tone="steel" small onClick={() => { onClose(); onOpen('village_overview') }}>{t('building.civic.overview')}</ActionButton>
+              <ActionButton tone="steel" small onClick={() => { onClose(); onOpen('village_knowledge') }}>{t('building.civic.knowledge')}</ActionButton>
+              <ActionButton tone="steel" small onClick={() => { onClose(); onOpen('village_progress') }}>{t('building.civic.progress')}</ActionButton>
+              <ActionButton tone="steel" small onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</ActionButton>
             </div>
           )}
         </>
       )}
       {effects.length > 0 && (
-        <div className="vh-effects">
+        <EffectRow>
           {effects.map((e) => (
-            <span key={e.target} className="vh-effect">{t(`building.effect.${e.target}` as Key, { v: formatNumber(e.target === 'housing_capacity' ? e.value : Math.round(e.value / 100)) })}</span>
+            <EffectChip key={e.target} tone="good">{t(`building.effect.${e.target}` as Key, { v: formatNumber(e.target === 'housing_capacity' ? e.value : Math.round(e.value / 100)) })}</EffectChip>
           ))}
-        </div>
+        </EffectRow>
       )}
-      {(panel.upkeep ?? 0) > 0 && kind !== 'road' && <div className="vh-hint">{t('building.upkeep', { amount: money(panel.upkeep ?? 0) })}</div>}
-    </div>
+    </>
   )
 }
 
 function UpgradeList({ panel, cat, names, onBuild }: { panel: BuildingPanelView | null; cat: Map<string, CatalogueBuilding>; names: ContentNames; onBuild: (code: string) => void }) {
   const ups = panel?.upgrades ?? null
-  if (!panel || panel.mode !== 'up') return <div className="vh-hint">…</div>
-  if (!ups || ups.length === 0) return <div className="vh-hint">{t('building.upgrade.none')}</div>
+  if (!panel || panel.mode !== 'up') return <Note>…</Note>
+  if (!ups || ups.length === 0) return <Note>{t('building.upgrade.none')}</Note>
   return (
-    <div className="vh-upgrades">
-      <div className="vh-sub">{t('building.upgrade.intro')}</div>
+    <>
+      <Section>{t('building.upgrade.intro')}</Section>
       {ups.map((u) => (
         <div key={u.building.code} className={`vh-upgrade${u.available ? '' : ' locked'}`}>
           <div className="vh-upgrade-name">{buildingName(cat, u.building.code, u.building.name)}</div>
           <div className="vh-hint">{money(u.cost_money)} · {durationText(u.build_time_seconds)}</div>
           {u.available
-            ? <Slab tone="gold" radius={12} lip={3} onClick={() => onBuild(u.building.code)}>{t('building.upgrade.build')}</Slab>
+            ? <ActionButton tone="gold" small onClick={() => onBuild(u.building.code)}>{t('building.upgrade.build')}</ActionButton>
             : <div className="vh-hint bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') }) : t('building.upgrade.locked')}</div>}
         </div>
       ))}
-    </div>
+    </>
   )
 }
