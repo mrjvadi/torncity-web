@@ -1569,6 +1569,7 @@ export const uiFa = {
   'soc.office.appoints': 'منصب‌هایی که تو منصوب می‌کنی',
   'soc.edit.now': 'مقدار فعلی',
   'soc.edit.bounds': 'محدودهٔ مجاز',
+  'soc.edit.range': 'از {min} تا {max}',
   'soc.edit.default_label': 'پیش‌فرض',
   'soc.edit.notice': 'اجرا پس از اعلام',
   'soc.edit.cooldown': 'فاصله میان دو تغییر',

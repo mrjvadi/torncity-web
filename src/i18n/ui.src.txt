@@ -1605,6 +1605,7 @@ soc.office.by_vote | با رأی {office} تعیین می‌شود؛ تو می�
 soc.office.appoints | منصب‌هایی که تو منصوب می‌کنی | Offices you appoint
 soc.edit.now | مقدار فعلی | In force now
 soc.edit.bounds | محدودهٔ مجاز | Allowed range
+soc.edit.range | از {min} تا {max} | {min} to {max}
 soc.edit.default_label | پیش‌فرض | Default
 soc.edit.notice | اجرا پس از اعلام | Takes effect after
 soc.edit.cooldown | فاصله میان دو تغییر | Between two changes

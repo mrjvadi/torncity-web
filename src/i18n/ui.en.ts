@@ -1571,6 +1571,7 @@ export const uiEn: Record<UiKey, string> = {
   'soc.office.appoints': 'Offices you appoint',
   'soc.edit.now': 'In force now',
   'soc.edit.bounds': 'Allowed range',
+  'soc.edit.range': '{min} to {max}',
   'soc.edit.default_label': 'Default',
   'soc.edit.notice': 'Takes effect after',
   'soc.edit.cooldown': 'Between two changes',

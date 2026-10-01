@@ -16,7 +16,7 @@ export const SOCIETY_CONTENT = {
   entries: {
     office: [
       ['mayor', nm('Mayor', 'شهردار')], ['deputy_mayor', nm('Deputy mayor', 'معاون شهردار')], ['city_council', nm('City council', 'شورای شهر')],
-      ['village_head', nm('Village head', 'دهیار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')],
+      ['village_head', nm('Village head', 'دهیار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
       ['defence_minister', nm('Defence minister', 'وزیر دفاع')], ['parliament', nm('Parliament', 'مجلس')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     lever: [

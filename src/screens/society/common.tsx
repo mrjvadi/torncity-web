@@ -39,9 +39,12 @@ export function playerText(p: GovPlayer | null | undefined): string {
 export const playersText = (ps: GovPlayer[] | null | undefined): string => (ps ?? []).map(playerText).join(t('common.sep') + ' ')
 
 /** A whole-second span from a minute up, in the coarsest useful unit. */
-export const span = (seconds: number): string => (seconds >= 2 * 86400
-  ? word('soc.span_dh', '', { d: Math.floor(seconds / 86400), h: Math.round((seconds % 86400) / 3600) })
-  : durationText(seconds))
+export const span = (seconds: number): string => {
+  const h = Math.round((seconds % 86400) / 3600)
+  return seconds >= 2 * 86400 && h > 0
+    ? word('soc.span_dh', '', { d: Math.floor(seconds / 86400), h })
+    : durationText(seconds)
+}
 
 /** A percentage of basis points: 450 is 4.5%. Kept as one left-to-right run so the sign stays beside its digits. */
 export const bpsText = (bps: number): string => `\u2066${(Math.round(bps) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}%\u2069`

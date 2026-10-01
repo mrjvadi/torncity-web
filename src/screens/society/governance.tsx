@@ -142,7 +142,7 @@ const LeverEdit = screen<LeverEditView>(({ view: v, ctx }) => {
       <Panel tone="gold">
         <Facts rows={[
           { label: t('soc.edit.now'), value: leverNow(ctx.names, l), gold: true },
-          ...(choices.length === 0 ? [{ label: t('soc.edit.bounds'), value: `${fmt(l.min)} – ${fmt(l.max)}` }] : []),
+          ...(choices.length === 0 ? [{ label: t('soc.edit.bounds'), value: t('soc.edit.range', { min: fmt(l.min), max: fmt(l.max) }) }] : []),
           { label: t('soc.edit.default_label'), value: fmt(l.default) },
           { label: t('soc.edit.notice'), value: span(l.notice_seconds) },
           { label: t('soc.edit.cooldown'), value: span(l.cooldown_seconds) },
