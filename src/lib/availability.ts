@@ -29,6 +29,9 @@ export function loadAvailability(): Promise<AvailabilityTag[]> {
 
 /** True when a settlement of this tier has reached the stage. */
 export function reached(tier: string, stage: string): boolean {
+  // a city belongs to a country (governance: city -> country), so a city player already has the national
+  // level around them: parliament, ministries, foreign policy, war. Below a city there is none yet.
+  if (tier === 'city' && stage === 'country') return true
   const have = ORDER.indexOf(tier), need = ORDER.indexOf(stage)
   return need >= 0 && have >= need
 }
