@@ -133,6 +133,7 @@ hub.faction | جناح | Faction
 hub.friends | دوستان | Friends
 hub.elections | انتخابات | Elections
 hub.government | دولت شهر | City government
+hub.government_village | دهیاری | Village council
 hub.war | ارتش و جنگ | Army and war
 hub.family | خانواده | Family
 hub.village | روستای من | My village
@@ -1493,3 +1494,525 @@ storage.need.space_d | {free} جا خالی است، لازم است {need} | {f
 storage.need.space_short | انبار جای کافی ندارد. اول جا باز کن. | The storage is too full. Free some space first.
 storage.cost.line | {qty} واحد {name} × {unit} | {qty} x {name} at {unit}
 citizen.buy.need_d | داری {have}، لازم است {need} | You have {have}, need {need}
+# -- society: offices, elections, factions, diplomacy, laws, friends, boards (ADR 0039) ----------------------
+soc.loading | در حال بارگذاری… | Loading…
+soc.unknown.title | صفحهٔ ناشناخته | Unknown page
+soc.unknown.body | این صفحه هنوز در برنامه نیست. | This page is not in the app yet.
+soc.player | {name} ({code}) | {name} ({code})
+soc.unknown_player | بازیکن ناشناس | Unknown player
+soc.you | (تو) | (you)
+soc.unnamed_office | یک منصب | an office
+soc.unnamed_lever | یک سیاست | a policy
+soc.page | صفحهٔ {a} از {b} | Page {a} of {b}
+soc.span_dh | {d} روز و {h} ساعت | {d} d {h} h
+soc.refused.title | انجام نشد | Not done
+soc.refusal.unknown | این کار الان شدنی نیست. | This cannot be done right now.
+soc.ask.send | بفرست | Send
+soc.ask.text_hint | نام کاربری یا کد بازیکن را بنویس. | Type the player's username or code.
+soc.ask.amount_hint | مبلغ را به عدد بنویس. | Type the amount as a number.
+# actions (by the id the server sends)
+soc.act.fallback | ادامه | Continue
+soc.act.cancel | انصراف | Cancel
+soc.act.map | نقشه | Map
+soc.act.bank | بانک | Bank
+soc.act.page.prev | قبلی | Previous
+soc.act.page.next | بعدی | Next
+soc.act.gov.my_office | منصب من | My office
+soc.act.gov.history | تاریخچهٔ تغییرها | Change history
+soc.act.gov.elections | انتخابات | Elections
+soc.act.gov.budget | بودجه | Budget
+soc.act.gov.laws | طرح‌ها و رأی‌گیری‌ها | Laws and votes
+soc.act.military.ministry | وزارت دفاع {name} | {name}'s ministry of defence
+soc.act.gov.lever.change | تغییر «{name}» | Change “{name}”
+soc.act.gov.lever.propose | پیشنهاد تغییر «{name}» | Propose a change to “{name}”
+soc.act.gov.appoint | انتصاب {name} | Appoint {name}
+soc.act.gov.dismiss | برکناری {name} | Dismiss {name}
+soc.act.gov.review | بازبینی تغییر | Review the change
+soc.act.gov.confirm | بله، اعلام شود | Yes, announce it
+soc.act.gov.appoint.confirm | بله، منصوب شود | Yes, appoint
+soc.act.gov.dismiss.confirm | بله، برکنار شود | Yes, dismiss
+soc.act.election.stand | نامزد می‌شوم | I will stand
+soc.act.faction.mine | جناح من | My faction
+soc.act.faction.list | فهرست جناح‌ها | Factions
+soc.act.faction.found | تأسیس جناح | Found a faction
+soc.act.faction.found.pay | تأسیس جناح | Found a faction
+soc.act.faction.link | وصل کردن به این گروه | Link to this group
+soc.act.faction.apply | درخواست عضویت | Ask to join
+soc.act.faction.members | اعضا | Members
+soc.act.faction.bank | صندوق جناح | Faction bank
+soc.act.faction.crime | کار گروهی | Group job
+soc.act.faction.invite | دعوت عضو تازه | Invite a member
+soc.act.faction.leave | خروج از جناح | Leave the faction
+soc.act.faction.promote | ارتقا به افسر | Make officer
+soc.act.faction.demote | برگرداندن به عضو | Back to member
+soc.act.faction.kick | اخراج | Remove
+soc.act.faction.lead | سپردن رهبری | Hand over leadership
+soc.act.faction.accept | پذیرفتن | Accept
+soc.act.faction.decline | رد کردن | Decline
+soc.act.faction.confirm.kick | بله، اخراج شود | Yes, remove them
+soc.act.faction.confirm.lead | بله، رهبری سپرده شود | Yes, hand over
+soc.act.faction.confirm.leave | بله، خارج می‌شوم | Yes, I leave
+soc.act.faction.confirm.disband | بله، جناح منحل شود | Yes, disband
+soc.act.faction.deposit.cash | واریز نقد | Deposit cash
+soc.act.faction.deposit.card | واریز از کارت | Deposit from card
+soc.act.faction.withdraw | برداشت | Withdraw
+soc.act.faction.join | پیوستن به گروه | Join the group
+soc.act.faction.launch | شروع کار | Start the job
+soc.act.faction.calloff | لغو نقشه | Call it off
+soc.act.faction.plan | نقشه‌کشی: {name} | Plan: {name}
+soc.act.diplomacy.lift | لغو این تحریم | Lift this sanction
+soc.act.diplomacy.impose | وضع تحریم تازه | Impose a sanction
+soc.act.diplomacy.treaties | پیمان‌ها | Treaties
+soc.act.diplomacy.sanctions | تحریم‌ها | Sanctions
+soc.act.diplomacy.history | کارنامه | Record
+soc.act.diplomacy.accept | پذیرفتن پیشنهاد | Accept the offer
+soc.act.diplomacy.decline | رد کردن پیشنهاد | Decline the offer
+soc.act.diplomacy.withdraw | پس گرفتن پیشنهاد | Withdraw the offer
+soc.act.diplomacy.terminate | پایان دادن به پیمان | End the treaty
+soc.act.diplomacy.propose | پیشنهاد پیمان | Propose a treaty
+soc.act.diplomacy.next | ادامه | Next
+soc.act.diplomacy.impose.confirm | بله، تحریم اعلام شود | Yes, impose it
+soc.act.diplomacy.lift.confirm | بله، لغو شود | Yes, lift it
+soc.act.diplomacy.propose.confirm | بله، پیشنهاد فرستاده شود | Yes, send the offer
+soc.act.diplomacy.withdraw.confirm | بله، پس گرفته شود | Yes, withdraw it
+soc.act.diplomacy.terminate.confirm | بله، پیمان پایان یابد | Yes, end the treaty
+soc.act.law.vote.for | موافقم | In favour
+soc.act.law.vote.against | مخالفم | Against
+soc.act.law.list | همهٔ طرح‌ها | All proposals
+soc.act.social.add_friend | افزودن به دوستان | Add as a friend
+soc.act.social.pay | پرداخت به او | Pay them
+soc.act.social.accept | پذیرفتن {name} | Accept {name}
+# governance
+soc.gov.title | دولت شهر {place} | {place} government
+soc.gov.title_village | دهیاری {place} | {place} village council
+soc.gov.title_plain | دولت شهر | City government
+soc.gov.no_city | هنوز در شهری نیستی؛ دولت همان جایی است که در آن زندگی می‌کنی. | You are not in a city yet; government belongs to the place you live in.
+soc.gov.no_offices | منصبی اینجا تعریف نشده است. | No offices are set up here.
+soc.gov.vacant | خالی | Vacant
+soc.gov.seats | {held} از {seats}: {players} | {held} of {seats}: {players}
+soc.gov.acting | جانشین ({deputy}): {players} | Acting ({deputy}): {players}
+soc.gov.policies | سیاست‌های جاری | Policies in force
+soc.gov.default | مقدار پیش‌فرض | The default
+soc.gov.set_by | تعیین‌شده به دست {player} | Set by {player}
+soc.gov.pending | تغییر اعلام‌شده: {value}، {when} دیگر اجرا می‌شود | Announced: {value}, in force in {when}
+soc.office.title | منصب من | My office
+soc.office.none | الان هیچ منصبی نداری. | You hold no office right now.
+soc.office.seat | {office} {place} | {office}, {place}
+soc.office.acting_for | به‌جای {office} که خالی است عمل می‌کنی. | You are acting for the vacant {office}.
+soc.office.no_levers | الان چیزی نیست که بتوانی تغییرش بدهی. | There is nothing you can change right now.
+soc.office.confirmed_by | تغییرهای بزرگ را {office} تأیید می‌کند. | Larger changes are confirmed by {office}.
+soc.office.by_vote | با رأی {office} تعیین می‌شود؛ تو می‌توانی تغییر را پیشنهاد بدهی. | Decided by a vote of {office}; you may propose a change.
+soc.office.appoints | منصب‌هایی که تو منصوب می‌کنی | Offices you appoint
+soc.edit.now | مقدار فعلی | In force now
+soc.edit.bounds | محدودهٔ مجاز | Allowed range
+soc.edit.default_label | پیش‌فرض | Default
+soc.edit.notice | اجرا پس از اعلام | Takes effect after
+soc.edit.cooldown | فاصله میان دو تغییر | Between two changes
+soc.edit.wait | {wait} دیگر می‌توانی دوباره تغییرش بدهی. | You can change it again in {wait}.
+soc.edit.draft | مقدار پیشنهادی | Proposed value
+soc.edit.min | کمترین ({value}) | Lowest ({value})
+soc.edit.default | پیش‌فرض ({value}) | Default ({value})
+soc.edit.max | بیشترین ({value}) | Highest ({value})
+soc.confirm.title | تأیید تغییر | Confirm the change
+soc.confirm.change | «{lever}» در {place}: از {old} به {now} | “{lever}” in {place}: from {old} to {now}
+soc.confirm.notice | این تغییر همین حالا اعلام می‌شود و {notice} بعد اجرا خواهد شد. | It is announced now and takes effect {notice} later.
+soc.confirm.cooldown | بعد از آن تا {cooldown} نمی‌توانی دوباره تغییرش بدهی. | After that you cannot change it again for {cooldown}.
+soc.confirm.vote | این تغییر اول به رأی {office} می‌رود و فقط اگر تصویب شود اجرا می‌شود. | This change goes to a vote of {office} first and only takes effect if it passes.
+soc.announced.title | تغییر اعلام شد | Change announced
+soc.announced.body | «{lever}» در {place} تغییر می‌کند. این تغییر در تاریخچهٔ عمومی ثبت شد. | “{lever}” in {place} will change. It is on the public record.
+soc.announced.old | قبل | Before
+soc.announced.new | بعد | After
+soc.announced.when | اجرا | In force in
+soc.alloc.share | {line}: {share} | {line}: {share}
+soc.alloc.nothing | چیزی تقسیم نشده | Nothing allocated
+soc.alloc.draft | تقسیم پیشنهادی | Proposed split
+soc.alloc.spend | سهم خرج از خزانه در هر دوره | Share of the treasury spent each period
+soc.alloc.total | جمع | Total
+soc.alloc.left | باقی | Left
+soc.alloc.down | کم کردن {line} | Lower {line}
+soc.alloc.up | زیاد کردن {line} | Raise {line}
+soc.history.title | تاریخچهٔ سیاست‌های {city} | Policy history of {city}
+soc.history.empty | هنوز هیچ سیاستی اینجا تغییر نکرده است. | No policy has been changed here yet.
+soc.history.by | {office} {player}، {ago} پیش | {office} {player}, {ago} ago
+soc.history.in | {when} دیگر اجرا می‌شود | in force in {when}
+soc.history.since | از {when} پیش اجرا شده | in force for {when}
+soc.refusal.gov.not_holder | فقط {office} می‌تواند این کار را بکند. اگر این منصب را داشتی، شاید جایگزین شده باشی. | Only {office} can do this. If you held the office, you may have been replaced.
+soc.refusal.gov.requires_vote | این سیاست با رأی {office} تعیین می‌شود و فقط اعضایش می‌توانند تغییرش را پیشنهاد بدهند. | This policy is decided by a vote of {office}; only its members can propose a change.
+soc.refusal.gov.requires_confirmation | تغییر به این بزرگی را {office} باید تأیید کند؛ آن را از مسیر پیشنهاد بفرست. | A change this large must be confirmed by {office}; send it through a proposal.
+soc.refusal.gov.out_of_range | مقدار باید بین {min} و {max} باشد. | The value must be between {min} and {max}.
+soc.refusal.gov.out_of_range_plain | این مقدار از محدودهٔ مجاز بیرون است. | That value is outside the allowed range.
+soc.refusal.gov.cooldown | {wait} دیگر می‌توانی این سیاست را دوباره تغییر بدهی. | You can change this policy again in {wait}.
+soc.refusal.gov.cooldown_later | هنوز زود است؛ کمی بعد دوباره امتحان کن. | It is too soon; try again a little later.
+soc.refusal.gov.unknown_lever | چنین سیاستی وجود ندارد. | There is no such policy.
+soc.refusal.gov.unknown_place | چنین جایی پیدا نشد. | That place was not found.
+soc.refusal.gov.wrong_place | این منصب یا سیاست مال آن جا نیست. | That office or policy does not belong to this place.
+soc.refusal.gov.city_only | این کار فقط در شهر شدنی است، نه در روستا یا شهرک. | This can only be done in a city, not in a village or town.
+soc.refusal.gov.unsupported | این نوع سیاست هنوز قابل تغییر نیست. | This kind of policy cannot be changed yet.
+soc.refusal.gov.invalid_allocation | جمع سهم‌ها باید از کل بیشتر نشود. | The shares must not add up to more than the whole.
+soc.refusal.gov.office_not_found | چنین منصبی وجود ندارد. | There is no such office.
+soc.refusal.gov.office_occupied | این صندلی خالی نیست. | This seat is not vacant.
+soc.refusal.gov.office_vacant | این صندلی همین حالا خالی است. | This seat is vacant.
+soc.refusal.gov.already_holds | او همین حالا یکی از صندلی‌های این نهاد را دارد. | They already hold a seat of this body.
+soc.refusal.gov.incompatible | منصبی دارد که با این منصب جمع نمی‌شود. | They hold an office that cannot be combined with this one.
+soc.appoint.title | انتصاب | Appointment
+soc.appoint.confirm | {player} را به‌عنوان {office} {place} منصوب می‌کنی؟ همین حالا می‌نشیند. | Appoint {player} as {office} of {place}? They take the seat right away.
+soc.appoint.done_title | منصوب شد | Appointed
+soc.appoint.done | {player} حالا {office} {place} است. | {player} is now {office} of {place}.
+soc.appoint.term | دورهٔ این منصب {term} است. | The term of this office is {term}.
+soc.dismiss.title | برکناری | Dismissal
+soc.dismiss.confirm | {player} را از منصب {office} {place} برکنار می‌کنی؟ | Dismiss {player} from {office} of {place}?
+soc.dismiss.note | صندلی همین حالا خالی می‌شود. | The seat becomes vacant at once.
+soc.dismiss.done_title | برکنار شد | Dismissed
+soc.dismiss.done | {player} دیگر {office} {place} نیست. | {player} is no longer {office} of {place}.
+soc.refusal.appoint.not_appointer | فقط {office} می‌تواند این کار را بکند. | Only {office} can do this.
+soc.refusal.appoint.no_player | بازیکنی با این کد یا نام کاربری پیدا نشد؛ دوباره بررسی کن. | No player with that code or username was found; check it again.
+soc.refusal.appoint.no_seat | این صندلی دیگر خالی نیست. | This seat is no longer vacant.
+# elections
+soc.election.title | انتخابات {place} | Elections in {place}
+soc.election.title_plain | انتخابات | Elections
+soc.election.no_city | هنوز در شهری نیستی. هر کس در انتخابات جایی رأی می‌دهد که در آن زندگی می‌کند. | You are not in a city yet. People vote where they live.
+soc.election.none | الان انتخاباتی در جریان نیست. | No election is running right now.
+soc.election.hint | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at city hall and each resident votes once, in secret.
+soc.election.of | انتخابات {office} {place} | {office} election in {place}
+soc.election.this | این انتخابات | this election
+soc.election.name.mayor | انتخابات شهرداری {place} | Mayoral election in {place}
+soc.election.name.city_council | انتخابات شورای شهر {place} | City council election in {place}
+soc.election.name.president | انتخابات ریاست‌جمهوری {place} | Presidential election in {place}
+soc.phase.candidacy | ثبت‌نام نامزدها | Candidacy
+soc.phase.voting | رأی‌گیری | Voting
+soc.phase.counting | در انتظار شمارش | Awaiting the count
+soc.phase.counted | پایان‌یافته | Finished
+soc.election.winner | برگزیده: {names} | Elected: {names}
+soc.election.unfilled | کسی برگزیده نشد | Nobody was elected
+soc.election.line.candidacy | ثبت‌نام باز است، {remaining} مانده · {count} نامزد | Registration open, {remaining} left · {count} candidates
+soc.election.line.voting | رأی‌گیری، {remaining} مانده · {count} نامزد | Voting, {remaining} left · {count} candidates
+soc.election.line.counting | در انتظار شمارش آرا | Waiting for the count
+soc.election.seats | کرسی‌ها | Seats
+soc.election.phase | مرحله | Stage
+soc.election.voting_in | شروع رأی‌گیری | Voting opens in
+soc.election.count_in | شمارش آرا | The count in
+soc.election.cast | کل آرا | Votes cast
+soc.election.deposit | ودیعهٔ نامزدی | Candidacy deposit
+soc.election.deposit_note | اگر دست‌کم {share} آرا را بیاوری، ودیعه بعد از شمارش به تو برمی‌گردد. | If you win at least {share} of the votes, the deposit is returned after the count.
+soc.election.candidates | نامزدها | Candidates
+soc.election.no_candidates | هنوز کسی نامزد نشده است. | Nobody has stood yet.
+soc.election.elected | برگزیده | Elected
+soc.election.votes | {n} رأی | {n} votes
+soc.election.vote_for | رأی به {player} | Vote for {player}
+soc.election.you_stand | تو نامزد این انتخابات هستی. | You are a candidate in this election.
+soc.election.stand_how | برای نامزد شدن باید ودیعهٔ {deposit} را بپردازی. | To stand you pay a deposit of {deposit}.
+soc.election.balances | نقد: {cash} · کارت: {bank} | Cash: {cash} · Card: {bank}
+soc.election.cannot_afford | پولت برای ودیعه کافی نیست. | You cannot afford the deposit.
+soc.election.pay.cash | ثبت‌نام با پول نقد ({amount}) | Register with cash ({amount})
+soc.election.pay.card | ثبت‌نام با کارت ({amount}) | Register with your card ({amount})
+soc.election.you_voted | رأی‌ات را داده‌ای؛ رأی تو مخفی است. | You have voted; your vote is secret.
+soc.election.vote_how | نامزد دلخواهت را انتخاب کن. فقط یک بار می‌توانی رأی بدهی و رأی تو مخفی می‌ماند. | Pick your candidate. You can vote only once and your vote stays secret.
+soc.election.cannot_stand.not_resident | فقط ساکنان همین‌جا می‌توانند نامزد شوند. | Only residents can stand here.
+soc.election.cannot_stand.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که نامزد شوی. | You have not lived here long enough to stand.
+soc.election.cannot_stand.level | برای نامزد شدن باید دست‌کم سطح {level} باشی. | You need at least level {level} to stand.
+soc.election.cannot_stand.record | به قربانیان یا شهر بدهی داری؛ اول آن را تسویه کن. | You owe victims or the city; settle it first.
+soc.election.cannot_stand.jailed | در زندان نمی‌توانی نامزد شوی. | You cannot stand while in jail.
+soc.election.cannot_stand.other | الان نمی‌توانی نامزد شوی. | You cannot stand right now.
+soc.election.cannot_vote.not_resident | فقط ساکنان همین‌جا رأی می‌دهند. | Only residents vote here.
+soc.election.cannot_vote.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که رأی بدهی. | You have not lived here long enough to vote.
+soc.election.cannot_vote.other | الان نمی‌توانی رأی بدهی. | You cannot vote right now.
+soc.election.stood_title | نامزدی ثبت شد | Candidacy registered
+soc.election.stood | نامزدی‌ات در {election} ثبت شد. | Your candidacy in {election} is registered.
+soc.election.stood_deposit | ودیعهٔ {deposit} تا شمارش آرا امانت می‌ماند. {method} | The deposit of {deposit} is held until the count. {method}
+soc.election.voting_starts | رأی‌گیری {span} دیگر شروع می‌شود. | Voting opens in {span}.
+soc.paid.cash | با پول نقد پرداخت شد. | Paid in cash.
+soc.paid.card | با کارت پرداخت شد. | Paid by card.
+soc.election.voted_title | رأی ثبت شد | Vote cast
+soc.election.voted | رأی تو در {election} به نام {player} ثبت شد. | Your vote in {election} was cast for {player}.
+soc.election.secret | هیچ‌کس نمی‌فهمد به چه کسی رأی داده‌ای. | Nobody can tell whom you voted for.
+soc.election.count_starts | آرا {span} دیگر شمرده می‌شود. | The votes are counted in {span}.
+soc.refusal.election.none | چنین انتخاباتی پیدا نشد. | No such election was found.
+soc.refusal.election.not_candidacy | الان ثبت‌نام نامزدهای {election} باز نیست. | Registration for {election} is not open now.
+soc.refusal.election.not_voting | الان رأی‌گیری {election} باز نیست. | Voting in {election} is not open now.
+soc.refusal.election.away | نامزدی را باید در شهرداریِ همان شهری ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city hall of the city the election is for.
+soc.refusal.election.no_candidate | این نامزد در فهرست نیست. | That candidate is not on the list.
+soc.refusal.election.not_resident | در {election} فقط ساکنان همان‌جا شرکت می‌کنند. | Only residents take part in {election}.
+soc.refusal.election.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که در {election} شرکت کنی. | You have not lived here long enough to take part in {election}.
+soc.refusal.election.level | سطحت برای نامزد شدن در {election} کافی نیست. | Your level is too low to stand in {election}.
+soc.refusal.election.record | به قربانیان یا شهر بدهی داری؛ پیش از نامزد شدن آن را تسویه کن. | You owe victims or the city; settle it before standing.
+soc.refusal.election.jailed | در زندان نمی‌توانی نامزد شوی. | You cannot stand while in jail.
+soc.refusal.election.standing | تو همین حالا نامزد {election} هستی. | You already stand in {election}.
+soc.refusal.election.voted | در {election} رأی داده‌ای و هر نفر فقط یک بار رأی می‌دهد. | You already voted in {election}; everyone votes once.
+soc.refusal.election.incompatible | منصبی داری که با این منصب جمع نمی‌شود. | You hold an office that cannot be combined with this one.
+# factions
+soc.faction.list | جناح‌ها | Factions
+soc.faction.list_city | جناح‌های {city} | Factions of {city}
+soc.faction.none_here | هنوز جناحی در این شهر نیست. | There is no faction in this city yet.
+soc.faction.member_count | {n} عضو | {n} members
+soc.faction.list_mine | جناح تو: {name} | Your faction: {name}
+soc.faction.list_found | جناح خودت را تأسیس کن؛ هزینهٔ ثبت {fee} است. | Found your own faction; registration costs {fee}.
+soc.faction.code | کد | Code
+soc.faction.city | شهر | City
+soc.faction.members | اعضا | Members
+soc.faction.linked_chip | به گروه وصل است | Linked to a group
+soc.faction.rank.leader | رهبر | Leader
+soc.faction.rank.officer | افسر | Officer
+soc.faction.rank.member | عضو | Member
+soc.faction.found_title | تأسیس جناح | Found a faction
+soc.faction.fee | هزینهٔ ثبت | Registration fee
+soc.faction.name_rule | نام جناح | Faction name
+soc.faction.name_range | {min} تا {max} حرف | {min} to {max} letters
+soc.faction.found_rules | نام باید با حرف یا عدد شروع شود و نام نهادهای شهر را نداشته باشد. | The name must start with a letter or digit and must not copy the name of a city institution.
+soc.faction.balances | نقد: {cash} · کارت: {bank} | Cash: {cash} · Card: {bank}
+soc.faction.found_how | روش پرداخت را انتخاب کن، بعد نام جناح را بنویس. | Pick how to pay, then type the faction's name.
+soc.faction.cannot_afford | پولت برای ثبت کافی نیست. | You cannot afford the fee.
+soc.faction.pay.cash | پرداخت نقد ({amount}) | Pay in cash ({amount})
+soc.faction.pay.card | پرداخت با کارت ({amount}) | Pay by card ({amount})
+soc.faction.founded_title | جناح تأسیس شد | Faction founded
+soc.faction.founded | {name} در {city} تأسیس شد و تو رهبرش هستی. | {name} was founded in {city} and you lead it.
+soc.faction.founded_fee | هزینهٔ ثبت: {fee}. {method} | Registration: {fee}. {method}
+soc.faction.founded_next | حالا اعضا را دعوت کن و گروه جناح را وصل کن: در آن گروه «جناح {code}» را بفرست. | Now invite members and link the faction's group: send “faction {code}” in that group.
+soc.faction.your_rank | رتبهٔ تو | Your rank
+soc.faction.members_of | {a} از {b} | {a} of {b}
+soc.faction.bank | صندوق | Bank
+soc.faction.applications | درخواست‌های عضویت | Membership requests
+soc.faction.unlinked | هنوز به گروهی وصل نیست. در گروه جناح «جناح {code}» را بفرست. | Not linked to a group yet. Send “faction {code}” in the faction's group.
+soc.faction.op.title | کار گروهی | Group job
+soc.faction.op.crime | کار | Job
+soc.faction.op.place | جا | Place
+soc.faction.op.status | وضعیت | Status
+soc.faction.op.gathering | گروه در حال جمع شدن | The crew is gathering
+soc.faction.op.running | در جریان | Under way
+soc.faction.op.gather_left | مهلت جمع شدن | Time to gather
+soc.faction.op.end_left | تا پایان کار | Until it ends
+soc.faction.op.crew | گروه | Crew
+soc.faction.op.crew_of | {n} نفر (حداقل {min}، حداکثر {max}) | {n} (at least {min}, at most {max})
+soc.faction.op.chance | شانس موفقیت | Chance of success
+soc.faction.op.nerve | جسارت هر نفر | Nerve per person
+soc.faction.op.crew_list | گروه: {crew} | Crew: {crew}
+soc.faction.members_title | اعضای {faction} | Members of {faction}
+soc.faction.members_count | {n} عضو از حداکثر {max} | {n} members of at most {max}
+soc.faction.requests | در انتظار پاسخ | Waiting for an answer
+soc.faction.request.invite | دعوت از {player} | Invitation to {player}
+soc.faction.request.apply | درخواست عضویت {player} | {player} asks to join
+soc.faction.invited_title | دعوت فرستاده شد | Invitation sent
+soc.faction.invited | دعوت برای {player} فرستاده شد. | The invitation to {player} was sent.
+soc.faction.applied_title | درخواست فرستاده شد | Request sent
+soc.faction.applied | درخواست عضویتت برای {name} فرستاده شد؛ پاسخ را در پیام خصوصی می‌گیری. | Your request to join {name} was sent; the answer comes in a private message.
+soc.faction.answered_title | پاسخ ثبت شد | Answer recorded
+soc.faction.answered.invite_accepted | به {faction} پیوستی. | You joined {faction}.
+soc.faction.answered.invite_declined | دعوت {faction} را نپذیرفتی. | You declined the invitation from {faction}.
+soc.faction.answered.apply_accepted | {player} به {faction} پیوست. | {player} joined {faction}.
+soc.faction.answered.apply_declined | درخواست {player} رد شد. | {player}'s request was declined.
+soc.faction.confirm_title | مطمئنی؟ | Are you sure?
+soc.faction.confirm.kick | {player} از {faction} اخراج شود؟ | Remove {player} from {faction}?
+soc.faction.confirm.lead | رهبری {faction} به {player} سپرده شود؟ تو افسر می‌شوی و فقط اگر او دوباره رهبری را به تو بسپارد برمی‌گردد. | Hand the leadership of {faction} to {player}? You become an officer and only get it back if they hand it to you.
+soc.faction.confirm.leave | از {faction} خارج می‌شوی؟ | Leave {faction}?
+soc.faction.confirm.disband | تو تنها عضو {faction} هستی. با خروج جناح منحل می‌شود و ماندهٔ صندوقش به حساب بانکی‌ات می‌آید. ادامه می‌دهی؟ | You are the only member of {faction}. Leaving disbands it and its funds go to your bank account. Continue?
+soc.faction.left_title | از جناح خارج شدی | You left the faction
+soc.faction.left | از {name} خارج شدی. | You left {name}.
+soc.faction.disbanded_title | جناح منحل شد | Faction disbanded
+soc.faction.disbanded | {name} منحل شد. | {name} was disbanded.
+soc.faction.disbanded_paid | ماندهٔ صندوق ({amount}) به حساب بانکی‌ات آمد. | The remaining funds ({amount}) went to your bank account.
+soc.faction.linked_title | جناح وصل شد | Faction linked
+soc.faction.linked | {name} به همین گروه وصل شد. | {name} is now linked to this group.
+soc.faction.bank_title | صندوق {faction} | Bank of {faction}
+soc.faction.bank.deposited | {amount} به صندوق جناح واریز شد. | {amount} was paid into the faction bank.
+soc.faction.bank.withdrawn | {amount} از صندوق جناح به حساب بانکی‌ات آمد. | {amount} came from the faction bank to your bank account.
+soc.faction.bank.balance | موجودی صندوق | Faction bank balance
+soc.faction.bank.cash | پول نقد تو | Your cash
+soc.faction.bank.card | حساب بانکی تو | Your bank account
+soc.faction.bank.limits | هر واریز یا برداشت | Each deposit or withdrawal
+soc.faction.bank.rules | واریز با اعضایی است که رتبه‌شان اجازه می‌دهد؛ برداشت فقط با رتبه‌های مجاز و به حساب بانکی خودشان. | Members whose rank allows it can deposit; only permitted ranks can withdraw, to their own bank account.
+soc.faction.crime_title | کار گروهی {faction} | Group jobs of {faction}
+soc.faction.crime_none | کاری در جریان نیست. کارهای ممکن: | No job is under way. Possible jobs:
+soc.faction.crime_crew | {min} تا {max} نفر | {min} to {max} people
+soc.faction.crime_line | هر نفر {nerve} جسارت · حداقل سطح {level} · {duration} | {nerve} nerve each · level {level}+ · {duration}
+soc.faction.crime_rules | کسی که نقشه می‌کشد باید همان‌جایی باشد که کار انجام می‌شود؛ اعضا هم همان‌جا به گروه می‌پیوندند. سهم صندوق جناح {cut} است و باقی به نسبت رتبه تقسیم می‌شود. اگر پلیس برسد، همهٔ گروه زندانی و جریمه می‌شوند. | Whoever plans must be where the job happens, and members join there. The faction bank takes {cut} and the rest is split by rank. If the police arrive, the whole crew is jailed and fined.
+soc.faction.crime_notice.planned | نقشه کشیده شد. اعضا باید همان‌جا جمع شوند و به گروه بپیوندند. | The plan is made. Members must gather there and join.
+soc.faction.crime_notice.joined | به گروه پیوستی؛ تا شروع کار همین‌جا بمان. | You joined the crew; stay here until the job starts.
+soc.faction.crime_notice.launched | کار شروع شد. نتیجه بعد از پایان در پیام خصوصی می‌رسد. | The job has started. The result comes in a private message when it ends.
+soc.faction.crime_notice.called_off | نقشه لغو شد. کسی چیزی نپرداخته بود. | The plan was called off. Nobody had paid anything.
+soc.refusal.faction.none | این دنیا هنوز جناح ندارد. | There are no factions in this world yet.
+soc.refusal.faction.not_member | عضو هیچ جناحی نیستی. | You are not in any faction.
+soc.refusal.faction.rank | رتبه‌ات اجازهٔ این کار را نمی‌دهد. | Your rank does not allow this.
+soc.refusal.faction.not_found | چنین جناحی پیدا نشد. | No such faction was found.
+soc.refusal.faction.already_member | تو همین حالا عضو یک جناح هستی. | You are already in a faction.
+soc.refusal.faction.name | نام جناح باید {min} تا {max} حرف باشد، با حرف یا عدد شروع شود و نام نهادهای شهر را نداشته باشد. | A faction name has {min} to {max} letters, starts with a letter or digit and does not copy a city institution.
+soc.refusal.faction.name_taken | این نام را جناح دیگری دارد. | Another faction has this name.
+soc.refusal.faction.not_group | این کار فقط در گروه خود جناح شدنی است. | This can only be done in the faction's own group chat.
+soc.refusal.faction.group_taken | این گروه به جناح دیگری وصل است. | This group is linked to another faction.
+soc.refusal.faction.bank_short | صندوق جناح {balance} دارد و تو {amount} خواستی. | The faction bank holds {balance} and you asked for {amount}.
+soc.refusal.faction.no_player | چنین بازیکنی پیدا نشد؛ کد یا نام کاربری را درست بنویس. | No such player; check the code or username.
+soc.refusal.faction.theirs | این بازیکن عضو یک جناح است. | This player is in a faction.
+soc.refusal.faction.full | جناح پر است؛ حداکثر {max} عضو. | The faction is full: at most {max} members.
+soc.refusal.faction.pending_full | درخواست‌های در انتظار این جناح زیاد است؛ کمی بعد دوباره امتحان کن. | This faction has many requests waiting; try again a little later.
+soc.refusal.faction.pending | یک دعوت یا درخواست از قبل در انتظار پاسخ است. | An invitation or request is already waiting for an answer.
+soc.refusal.faction.request_gone | این دعوت یا درخواست دیگر در انتظار نیست. | This invitation or request is no longer waiting.
+soc.refusal.faction.not_yours | پاسخ این درخواست با تو نیست. | This request is not yours to answer.
+soc.refusal.faction.not_in_it | این بازیکن عضو جناح تو نیست. | This player is not in your faction.
+soc.refusal.faction.on_a_job | گروه در حال کار است؛ تا پایانش نمی‌شود جناح را ترک کرد. | The crew is on a job; you cannot leave until it ends.
+soc.refusal.faction.leader_leaving | رهبر پیش از خروج باید رهبری را به عضو دیگری بسپارد. | The leader must hand over leadership before leaving.
+soc.refusal.faction.no_such_crime | چنین کار گروهی‌ای وجود ندارد. | There is no such group job.
+soc.refusal.faction.operation_open | جناح همین حالا یک کار گروهی در جریان دارد. | The faction already has a job under way.
+soc.refusal.faction.level | برای کشیدن این نقشه دست‌کم سطح {level} لازم است. | You need at least level {level} to plan this.
+soc.refusal.faction.no_place_here | این کار در این شهر شدنی نیست. | This job cannot be done in this city.
+soc.refusal.faction.no_operation | کار گروهی‌ای در حال جمع شدن نیست. | No job is gathering a crew.
+soc.refusal.faction.crew_full | گروه پر است. | The crew is full.
+soc.refusal.faction.elsewhere | گروه در شهر یا جای دیگری جمع می‌شود. | The crew is gathering in another city or place.
+soc.refusal.faction.crew_short | برای شروع دست‌کم {need} نفر در محل، با جسارت کافی لازم است و {have} نفر آماده‌اند. | You need at least {need} people on the spot with enough nerve to start; {have} are ready.
+# diplomacy
+soc.dip.sanctions_title | تحریم‌های {country} | Sanctions of {country}
+soc.dip.imposed | تحریم‌هایی که ما وضع کرده‌ایم | Sanctions we imposed
+soc.dip.suffered | تحریم‌هایی که بر ما وضع شده | Sanctions imposed on us
+soc.dip.none | موردی نیست. | None.
+soc.dip.line_on | شمارهٔ {no}: بر {country} | No. {no}: on {country}
+soc.dip.line_by | شمارهٔ {no}: از سوی {country} | No. {no}: by {country}
+soc.dip.ground | دلیل: {ground} | Ground: {ground}
+soc.dip.pending | {in} دیگر اجرا می‌شود | in force in {in}
+soc.dip.since | {since} است که برقرار است | in force for {since}
+soc.dip.by | {office} {player} | {office} {player}
+soc.dip.liftable_in | {in} دیگر می‌توان لغوش کرد | can be lifted in {in}
+soc.dip.sanctions_footer | تحریم‌ها کار رئیس‌جمهور است و همه می‌توانند آن‌ها را ببینند. | Sanctions are the president's decision and anyone can read them.
+soc.dip.impose_title | وضع تحریم ({country}) | New sanction ({country})
+soc.dip.choose_target | تحریم بر کدام کشور؟ | Sanction which country?
+soc.dip.no_targets | کشوری برای انتخاب نیست. | There is no country to choose.
+soc.dip.choose_measures | چه تحریم‌هایی بر {target} وضع شود؟ | Which measures against {target}?
+soc.dip.choose_ground | به چه دلیلی؟ ({target}: {measures}) | On what ground? ({target}: {measures})
+soc.dip.impose_confirm | تحریم بر {target} وضع شود؟ | Impose the sanction on {target}?
+soc.dip.measures | تحریم‌ها | Measures
+soc.dip.ground_label | دلیل | Ground
+soc.dip.binds_in | اجرا پس از | In force after
+soc.dip.min_stands | دست‌کم مدت ماندن | Stands at least
+soc.dip.lift_title | لغو تحریم | Lift a sanction
+soc.dip.lift_confirm | تحریم شمارهٔ {no} بر {target} ({measures}) لغو شود؟ از همین لحظه اجرا نمی‌شود. | Lift sanction no. {no} on {target} ({measures})? It stops at once.
+soc.dip.treaties_title | پیمان‌های {country} | Treaties of {country}
+soc.dip.treaties_none | هنوز پیمانی در کار نیست. | There is no treaty yet.
+soc.dip.treaty.incoming | شمارهٔ {no}: {country} پیشنهاد «{kind}» داده؛ تا {in} دیگر پاسخ بده. | No. {no}: {country} offers “{kind}”; answer within {in}.
+soc.dip.treaty.outgoing | شمارهٔ {no}: ما به {country} پیشنهاد «{kind}» داده‌ایم؛ {in} تا پایان مهلت. | No. {no}: we offered “{kind}” to {country}; {in} left to answer.
+soc.dip.treaty.active | شمارهٔ {no}: «{kind}» با {country} برقرار است. | No. {no}: “{kind}” with {country} is in force.
+soc.dip.treaty.ended_declined | شمارهٔ {no}: «{kind}» با {country} رد شد. | No. {no}: “{kind}” with {country} was declined.
+soc.dip.treaty.ended_withdrawn | شمارهٔ {no}: پیشنهاد «{kind}» به {country} پس گرفته شد. | No. {no}: the offer of “{kind}” to {country} was withdrawn.
+soc.dip.treaty.ended_expired | شمارهٔ {no}: پیشنهاد «{kind}» به {country} بی‌پاسخ ماند. | No. {no}: the offer of “{kind}” to {country} lapsed unanswered.
+soc.dip.treaty.ended_terminated | شمارهٔ {no}: «{kind}» با {country} پایان یافت. | No. {no}: “{kind}” with {country} ended.
+soc.dip.treaties_footer | پیمان وقتی برقرار می‌شود که وزیر امور خارجهٔ کشور دیگر آن را بپذیرد. | A treaty takes effect when the other country's foreign minister accepts it.
+soc.dip.propose_title | پیشنهاد پیمان ({country}) | Treaty offer ({country})
+soc.dip.choose_partner | به کدام کشور پیشنهاد بدهیم؟ | Offer a treaty to which country?
+soc.dip.choose_kind | چه پیمانی با {partner}؟ | Which treaty with {partner}?
+soc.dip.propose_confirm | به {partner} پیشنهاد «{kind}» داده شود؟ آن کشور {ttl} برای پاسخ فرصت دارد. | Offer “{kind}” to {partner}? They have {ttl} to answer.
+soc.dip.withdraw_title | پس گرفتن پیشنهاد | Withdraw the offer
+soc.dip.withdraw_confirm | پیشنهاد شمارهٔ {no} («{kind}» به {country}) پس گرفته شود؟ | Withdraw offer no. {no} (“{kind}” to {country})?
+soc.dip.terminate_title | پایان پیمان | End the treaty
+soc.dip.terminate_confirm | پیمان شمارهٔ {no} («{kind}» با {country}) پایان یابد؟ از همین لحظه اجرا نمی‌شود. | End treaty no. {no} (“{kind}” with {country})? It stops at once.
+soc.dip.history_title | کارنامهٔ دیپلماتیک {country} | Diplomatic record of {country}
+soc.dip.history_empty | هنوز میان کشورها اتفاقی نیفتاده است. | Nothing has happened between countries yet.
+soc.dip.history_by | به دست {office} {player}، {ago} پیش | by {office} {player}, {ago} ago
+soc.dip.history.sanction_imposed | {country} {measures} را به دلیل {ground} بر {other} وضع کرد (شمارهٔ {no}). | {country} imposed {measures} on {other} for {ground} (no. {no}).
+soc.dip.history.sanction_lifted | {country} تحریم شمارهٔ {no} بر {other} را لغو کرد. | {country} lifted sanction no. {no} on {other}.
+soc.dip.history.treaty_proposed | {country} به {other} پیشنهاد «{kind}» داد (شمارهٔ {no}). | {country} offered “{kind}” to {other} (no. {no}).
+soc.dip.history.treaty_signed | {country} و {other} «{kind}» امضا کردند (شمارهٔ {no}). | {country} and {other} signed “{kind}” (no. {no}).
+soc.dip.history.treaty_declined | {country} «{kind}» با {other} را رد کرد (شمارهٔ {no}). | {country} declined “{kind}” with {other} (no. {no}).
+soc.dip.history.treaty_withdrawn | {country} پیشنهاد «{kind}» به {other} را پس گرفت (شمارهٔ {no}). | {country} withdrew its offer of “{kind}” to {other} (no. {no}).
+soc.dip.history.treaty_terminated | {country} به «{kind}» با {other} پایان داد (شمارهٔ {no}). | {country} ended “{kind}” with {other} (no. {no}).
+soc.dip.notice.impose.done | تحریم بر {target} اعلام شد و {in} دیگر اجرا می‌شود. | The sanction on {target} was announced and takes effect in {in}.
+soc.dip.notice.lift.done | تحریم بر {target} لغو شد. | The sanction on {target} was lifted.
+soc.dip.notice.propose.done | پیشنهاد «{kind}» به {partner} فرستاده شد؛ پاسخش همین‌جا نشان داده می‌شود. | The offer of “{kind}” was sent to {partner}; the answer will show here.
+soc.dip.notice.answer.active | پیمان امضا شد و از همین حالا برقرار است. | The treaty is signed and in force.
+soc.dip.notice.answer.declined | پیشنهاد رد شد. | The offer was declined.
+soc.dip.notice.end.done_withdrawn | پیشنهاد پس گرفته شد. | The offer was withdrawn.
+soc.dip.notice.end.done_terminated | پیمان پایان یافت. | The treaty has ended.
+soc.refusal.diplomacy.not_found | چنین تحریم یا پیمانی وجود ندارد. | There is no such sanction or treaty.
+soc.refusal.diplomacy.not_holder | فقط {office} {country} می‌تواند این کار را بکند. | Only {office} of {country} can do this.
+soc.refusal.diplomacy.self | یک کشور نمی‌تواند این کار را با خودش بکند. | A country cannot do this with itself.
+soc.refusal.diplomacy.standing | ما از قبل بر این کشور تحریمی داریم؛ اول آن را لغو کن. | We already have a sanction on this country; lift it first.
+soc.refusal.diplomacy.too_soon | هر تحریم مدتی باید بماند تا بشود لغوش کرد: {in} دیگر. | A sanction must stand for a while before it can be lifted: {in} more.
+soc.refusal.diplomacy.open | پیمانی از همین نوع با این کشور الان باز است. | A treaty of this kind with this country is already open.
+soc.refusal.diplomacy.state | این پیمان قبلاً پاسخ گرفته، پس گرفته شده، پایان یافته یا منقضی شده است. | This treaty was already answered, withdrawn, ended or has lapsed.
+soc.refusal.diplomacy.no_country | هنوز در هیچ کشوری ساکن نیستی؛ اول در شهری مستقر شو. | You do not live in a country yet; settle in a city first.
+soc.dip.blocked_title | به‌خاطر تحریم نشد | Blocked by a sanction
+soc.dip.blocked.trade | تحریم تجاری میان {imposer} و {target} این معامله را ممنوع می‌کند. | The trade sanction between {imposer} and {target} forbids this deal.
+soc.dip.blocked.arms | تحریم تسلیحاتی میان {imposer} و {target} این فروش را ممنوع می‌کند. | The arms sanction between {imposer} and {target} forbids this sale.
+soc.dip.blocked.technology | تحریم فناوری میان {imposer} و {target} فروش این مجوز را ممنوع می‌کند. | The technology sanction between {imposer} and {target} forbids selling this licence.
+soc.dip.blocked.travel | ممنوعیت سفر میان {imposer} و {target} این مسیر را بسته است. | The travel ban between {imposer} and {target} closes this route.
+soc.dip.blocked.financial | تحریم مالی میان {imposer} و {target} پرداخت کارتی میان مردم دو کشور را ممنوع می‌کند. | The financial sanction between {imposer} and {target} forbids card payments between their people.
+soc.dip.blocked.any | یک تحریم این کار را ممنوع کرده است. | A sanction forbids this.
+# laws
+soc.law.list_title | طرح‌ها و رأی‌گیری‌ها | Proposals and votes
+soc.law.list_empty | الان هیچ طرحی در شهر یا کشور تو در دست بررسی نیست. | No proposal is under review in your city or country right now.
+soc.law.no | طرح {no} | Proposal {no}
+soc.law.title | طرح {no} — {place} | Proposal {no} — {place}
+soc.law.chip.open | در رأی‌گیری | Voting
+soc.law.chip.passed | تصویب شد | Passed
+soc.law.chip.failed | رد شد | Rejected
+soc.law.chip.lapsed | اجرا نشد | Not applied
+soc.law.subject_lever | تغییر «{lever}» به {value} | Change “{lever}” to {value}
+soc.law.subject_allocation | تقسیم تازهٔ «{lever}»: {shares} | New split of “{lever}”: {shares}
+soc.law.action.country.war | اعلان جنگ | Declare war
+soc.law.action_target | علیه {target} | against {target}
+soc.law.action_unnamed | یک اقدام | an action
+soc.law.proposed_by | پیشنهاد {office} {player} | Proposed by {office} {player}
+soc.law.body | رأی‌دهندگان | Voters
+soc.law.body_seats | {body}: {held} کرسی پر از {seats} | {body}: {held} of {seats} seats filled
+soc.law.rule | شرط تصویب | To pass
+soc.law.rule.majority | بیشتر آرا موافق باشد | A majority in favour
+soc.law.rule.supermajority | دست‌کم {threshold} آرا موافق باشد | At least {threshold} in favour
+soc.law.rule.unanimous | همهٔ اعضا موافق باشند | Everyone in favour
+soc.law.fraction | {num} از {den} | {num}/{den}
+soc.law.quorum | حد نصاب | Quorum
+soc.law.status | وضع | Status
+soc.law.status.open | در رأی‌گیری؛ {remaining} مانده · {yes} موافق، {no} مخالف | Voting; {remaining} left · {yes} for, {no} against
+soc.law.status.passed | تصویب شد · {yes} موافق، {no} مخالف | Passed · {yes} for, {no} against
+soc.law.status.failed | رد شد · {yes} موافق، {no} مخالف | Rejected · {yes} for, {no} against
+soc.law.status.lapsed | تصویب شد اما اجرا نشد: {why} | Passed but not applied: {why}
+soc.law.lapse.cooldown | این سیاست در این فاصله تغییر کرده بود | the policy had changed in the meantime
+soc.law.lapse.bounds | مرزهای مجاز این سیاست عوض شده بود | the allowed bounds had changed
+soc.law.lapse.gone | این موضوع دیگر وجود ندارد | the matter no longer exists
+soc.law.lapse.changed | اوضاع در این فاصله عوض شده بود | things had changed in the meantime
+soc.law.needs | رأی لازم | Votes needed
+soc.law.needs_of | {needs} موافق از {held} عضو | {needs} in favour out of {held} members
+soc.law.votes | رأی اعضا | Members' votes
+soc.law.vote_yes | موافق | For
+soc.law.vote_no | مخالف | Against
+soc.law.notice.submitted | طرح به رأی {body} {place} گذاشته شد؛ نتیجه بعد از رأی‌گیری اعلام می‌شود. | The proposal went to a vote of {body} of {place}; the result is announced after the vote.
+soc.law.notice.voted | رأی‌ات ثبت شد. | Your vote is recorded.
+soc.law.notice.already_voted | قبلاً به این طرح رأی داده‌ای. | You already voted on this proposal.
+soc.law.notice.closed | رأی‌گیری این طرح تمام شده است. | Voting on this proposal has ended.
+soc.refusal.bill.not_found | چنین طرحی پیدا نشد؛ فهرست طرح‌ها را باز کن. | No such proposal was found; open the list.
+soc.refusal.bill.not_member | فقط اعضای {body} به این طرح رأی می‌دهند. | Only members of {body} vote on this proposal.
+soc.refusal.bill.under_way | همین حالا طرحی دربارهٔ همین موضوع در {body} در دست رأی‌گیری است؛ بعد از نتیجه‌اش دوباره امتحان کن. | A proposal on the same matter is already being voted on in {body}; try again after it is decided.
+# friends and search
+soc.friends.title | دوستان | Friends
+soc.friends.empty | هنوز دوستی نداری. با کد یا نام کاربری دنبال کسی بگرد. | You have no friends yet. Look someone up by code or username.
+soc.friends.incoming | می‌خواهد دوستت باشد | wants to be your friend
+soc.friends.pending | منتظر پاسخ او | waiting for their answer
+soc.friends.blocked | مسدود | blocked
+soc.friends.requested_title | درخواست فرستاده شد | Request sent
+soc.friends.requested | درخواست دوستی برای {player} فرستاده شد. | A friend request was sent to {player}.
+soc.friends.requested_anon | درخواست دوستی فرستاده شد. | The friend request was sent.
+soc.friends.accepted_title | دوست شدید | You are friends
+soc.friends.accepted | حالا با {player} دوست هستی. | You are now friends with {player}.
+soc.friends.accepted_anon | درخواست دوستی پذیرفته شد. | The friend request was accepted.
+soc.search.title | جست‌وجوی بازیکن | Find a player
+soc.search.help | کد بازیکن یا نام کاربری او را با @ بنویس. | Type the player's code or their @username.
+soc.search.not_found.username | بازیکنی با نام کاربری {query} پیدا نشد. شاید نامش را عوض کرده یا هنوز بازی را شروع نکرده؛ کدش را از خودش بپرس. | No player with the username {query}. They may have changed it or not started yet; ask them for their code.
+soc.search.not_found.code | بازیکنی با کد {query} پیدا نشد. کد را دوباره بررسی کن. | No player with the code {query}. Check the code again.
+soc.search.not_found.telegram_id | بازیکنی با این شناسه پیدا نشد. شاید هنوز بازی را شروع نکرده است. | No player with that id. They may not have started yet.
+soc.search.player | بازیکن | Player
+soc.search.code | کد | Code
+soc.search.self | این خود تو هستی. | That is you.
+# boards
+soc.board.richest | ثروتمندترین‌ها | The richest
+soc.board.companies | شرکت‌ها | Companies
+soc.board.cities | شهرها | Cities
+soc.board.workers | کارگران | Workers
+soc.board.investors | سرمایه‌گذاران | Investors
+soc.board.tab.richest | ثروتمندان | Richest
+soc.board.tab.companies | شرکت‌ها | Companies
+soc.board.tab.cities | شهرها | Cities
+soc.board.tab.workers | کارگران | Workers
+soc.board.tab.investors | سرمایه‌گذاران | Investors
+soc.board.empty | هنوز کسی در این فهرست نیست. | Nobody is on this list yet.
+soc.board.no_job | بی‌کار | No job
+soc.board.hint.richest | ثروت هر نفر از پول نقد، بانک، دارایی و سهام‌اش حساب می‌شود. | Wealth counts cash, bank, property and shares.
+soc.board.hint.companies | شرکت‌ها بر پایهٔ ارزش‌شان. | Companies by value.
+soc.board.hint.cities | شهرها بر پایهٔ خزانه و جمعیت. | Cities by treasury and population.
+soc.board.hint.workers | کارگران بر پایهٔ درآمد کار. | Workers by earnings from work.
+soc.board.hint.investors | سرمایه‌گذارها بر پایهٔ سود سهام. | Investors by profit from shares.
+soc.lv.country.arms_exports.0 | فقط دولت خودی | Only the home state
+soc.lv.country.arms_exports.1 | دولت خودی و شریکان پیمانی | The home state and treaty partners
+soc.lv.country.arms_exports.2 | هر دولتی که زیر تحریم تسلیحاتی نیست | Any state not under an arms sanction

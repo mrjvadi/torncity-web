@@ -15,12 +15,8 @@ import Education from './Education'
 import Life from './Life'
 import { PropertyMarket, PropertyMine } from './Property'
 import { Exchange, Portfolio } from './Stocks'
-import { FactionHome, FactionList } from './Factions'
-import { Elections, Election } from './Elections'
-import Governance from './Governance'
 import { TravelOptions, TravelStatus } from './Travel'
 import Missions from './Missions'
-import Leaderboard from './Leaderboard'
 import Hospital from './Hospital'
 import { InboxHub, InboxCategory } from './Inbox'
 
@@ -43,15 +39,9 @@ const screens: ScreenSet = {
     property_mine: PropertyMine,
     exchange: Exchange,
     portfolio: Portfolio,
-    faction_home: FactionHome,
-    faction_list: FactionList,
-    elections: Elections,
-    election: Election,
-    city_governance: Governance,
     travel_options: TravelOptions,
     travel_status: TravelStatus,
     mission_board: Missions,
-    leaderboard: Leaderboard,
     hospital: Hospital,
     inbox_hub: InboxHub,
     inbox_category: InboxCategory,

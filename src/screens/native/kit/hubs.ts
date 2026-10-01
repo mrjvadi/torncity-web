@@ -14,6 +14,8 @@ export interface HubTile {
   sub?: Key
   command?: string
   local?: string
+  /** The data tag that says the tile exists for the player (availability.yml): the tile is listed only once it does. */
+  needs?: { kind: string; code: string }
 }
 
 export const ACTIVITY_TILES: HubTile[] = [
@@ -38,11 +40,11 @@ export const ECONOMY_TILES: HubTile[] = [
 
 export const SOCIETY_TILES: HubTile[] = [
   { key: 'inbox', icon: 'inbox', palette: 'sapphire', title: 'hub.inbox', command: 'inbox.show' },
-  { key: 'faction', icon: 'lion', palette: 'gold', title: 'hub.faction', command: 'faction.mine' },
+  { key: 'faction', icon: 'lion', palette: 'gold', title: 'hub.faction', command: 'faction.mine', needs: { kind: 'faction', code: 'faction' } },
   { key: 'friends', icon: 'society', palette: 'emerald', title: 'hub.friends', command: 'social.friend.list' },
   { key: 'elections', icon: 'vote', palette: 'violet', title: 'hub.elections', command: 'election.list' },
   { key: 'government', icon: 'gavel', palette: 'gold', title: 'hub.government', command: 'gov.city' },
-  { key: 'war', icon: 'swords', palette: 'ruby', title: 'hub.war', local: 'war' },
+  { key: 'war', icon: 'swords', palette: 'ruby', title: 'hub.war', local: 'war', needs: { kind: 'government_action', code: 'country.war' } },
   { key: 'family', icon: 'f_hearts', palette: 'ruby', title: 'hub.family', local: 'family' },
   { key: 'village', icon: 'house', palette: 'emerald', title: 'hub.village', local: 'village_home' },
 ]

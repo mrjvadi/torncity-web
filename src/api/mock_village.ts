@@ -4,6 +4,7 @@
 // 5.5). Everything here is a stand-in for the server: shapes follow the
 // contract, values are plausible Persian sample data.
 
+import { SOCIETY_CONTENT } from './mock_society'
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
@@ -1127,7 +1128,9 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
   if (path === '/api/v1/content') {
     return json({
       version: 'v1', langs: ['en', 'fa'],
+      availability: SOCIETY_CONTENT.availability,
       entries: {
+        ...SOCIETY_CONTENT.entries,
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Support', fa: 'ساپورت' } }],

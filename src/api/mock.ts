@@ -10,6 +10,7 @@ import { mockFoundingCommand } from './mock_founding'
 import { mockBasicCommand } from './mock_basic'
 import { mockLocation, mockSupportCommand } from '../support/mock'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
+import { mockSocietyCommand } from './mock_society'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -107,6 +108,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   // the features area's own mock data (src/api/mock_features.ts).
   const founding = mockFoundingCommand(command, args)
   if (founding) return json(founding)
+  const society = mockSocietyCommand(command, args)
+  if (society) return json(society)
   const village = mockVillageCommand(command, args)
   if (village) return json(village)
   const feature = mockFeatureCommand(command, args)
