@@ -3,7 +3,7 @@
 // answer (docs/adr/0039-presentation-split.md); a city without an exchange arrives as `unavailable`.
 
 import type {
-  BookLevel, DividendView, ExchangeView, ListingView, PortfolioView, StockOrderView, StockView, TradeLine,
+  BookLevel, DividendView, ExchangeView, ListingView, PortfolioView, StockOrderView, StockPageView, TradeLine,
 } from '../../api/views.gen'
 import { Card, ListRow, Notice, Stat, StatPair } from '../native/kit/Parts'
 import { formatNumber, money, pct } from '../native/kit/format'
@@ -91,7 +91,7 @@ const Exchange = flow<ExchangeView>(({ view: v, ctx }) => {
 
 // -- one company ----------------------------------------------------------------------------------
 
-const Stock = flow<StockView>(({ view: v, ctx }) => {
+const Stock = flow<StockPageView>(({ view: v, ctx }) => {
   if (v.unavailable) return <NotHere u={v.unavailable} ctx={ctx} title={t('stocks.title')} tone="emerald" />
   const notice = noticeLine('stock', v.notice, v.notice_args)
   const city = ctx.names.name(['city'], v.city.code, v.city.name)

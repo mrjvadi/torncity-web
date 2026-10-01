@@ -3,7 +3,7 @@
 // a city without an auction house arrives as `unavailable`.
 
 import type {
-  AuctionLine, AuctionNewView, AuctionOpenedView, AuctionRefusalView, AuctionView, AuctionsView, BidPlacedView, MyAuctionsView, Way,
+  AuctionLine, AuctionNewView, AuctionOpenedView, AuctionRefusalView, AuctionDetailView, AuctionsView, BidPlacedView, MyAuctionsView, Way,
 } from '../../api/views.gen'
 import { ListRow, Notice } from '../native/kit/Parts'
 import { formatNumber, hms, money } from '../native/kit/format'
@@ -60,7 +60,7 @@ const Auctions = flow<AuctionsView>(({ view: v, ctx }) => {
   )
 })
 
-const Auction = flow<AuctionView>(({ view: v, ctx }) => {
+const Auction = flow<AuctionDetailView>(({ view: v, ctx }) => {
   const a = v.line
   const open = a.status === 'open'
   const pays = byId(ctx, 'payment.cash', 'payment.card')

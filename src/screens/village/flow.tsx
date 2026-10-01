@@ -175,14 +175,14 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
     setBusy(true)
     try {
       const r = await api.runCommand(a.command, a.args ?? {}, `web-v-${Date.now().toString(36)}-${++keySeq}`)
-      if (r.ok === false && !FLOW[r.screen]) toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args))
+      if (r.ok === false && !FLOW[r.screen]) toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args), { kind: 'error' })
       else {
         setRes(r)
         const note = r.notice ? noticeText(r.notice) : ''
-        if (note) toast.push(note, { kind: r.notice?.alert ? 'warning' : undefined, user: true })
+        if (note) toast.push(note, { kind: r.notice?.alert ? 'warning' : 'success', user: true })
       }
     } catch (e) {
-      toast.push(refusalText((e as { code?: string })?.code ?? 'network'))
+      toast.push(refusalText((e as { code?: string })?.code ?? 'network'), { kind: 'error' })
     } finally {
       setBusy(false)
     }

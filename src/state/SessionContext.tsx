@@ -3,11 +3,13 @@ import { adoptServerLanguage } from '../i18n/sync'
 import { noticeText, refusalText } from '../i18n'
 import * as api from '../api/client'
 import type { Bootstrap, CommandResponse, ProfileView, RealtimeVitals } from '../api/types'
-import type { RealtimeHandle } from '../api/realtime'
+import type { RealtimeHandle, RealtimeNotice } from '../api/realtime'
+import { genericLine, noticeLine, type Namer } from '../notices/wording'
+import { contentName, loadContent } from '../village/useVillage'
 import { report } from '../lib/reporter'
 import { friendlyError } from '../lib/errors'
 import { initTelegram, telegramInitData } from '../lib/telegram'
-import { useToast } from './ToastContext'
+import { useToast, type ToastApi } from './ToastContext'
 import { setServerTime } from '../village/clock'
 
 type Status = 'checking' | 'signed_out' | 'signing_in' | 'signed_in'
@@ -61,6 +63,22 @@ export function useSession(): SessionApi {
   return v
 }
 
+/** A notice pushed by the server, shown as a toast: worded by this client from the notice's code and
+ * facts, its colour from the code, and a tap opens where the notice points. */
+async function showNoticeWith(n: RealtimeNotice, push: ToastApi['push']): Promise<void> {
+  const entries = await loadContent().catch(() => ({} as Awaited<ReturnType<typeof loadContent>>))
+  const names: Namer = (tables, code, authored) => contentName(entries, tables, code, authored)
+  const line = (n.screen && n.view ? noticeLine(n.screen, n.view, names) : null) ?? genericLine()
+  const go = n.actions?.[0]
+  const args = go?.args ? Object.fromEntries(Object.entries(go.args).map(([k, v]) => [k, String(v)])) : undefined
+  push(line.text, {
+    kind: line.tone,
+    key: `notice|${n.kind}|${n.screen ?? ''}|${JSON.stringify(n.view ?? null)}`,
+    command: go?.command ?? (n.screen ? undefined : 'inbox.show'),
+    args,
+  })
+}
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<Status>('checking')
   const [bootstrap, setBootstrap] = useState<Bootstrap | null>(null)
@@ -74,6 +92,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [live, setLive] = useState(false)
   const realtimeRef = useRef<RealtimeHandle | null>(null)
   const toast = useToast()
+  const showNotice = useCallback((n: RealtimeNotice) => showNoticeWith(n, toast.push), [toast.push])
+  // mock mode only: lets the checks and screenshots push any notice the server could (window.__notice('payment_notice'))
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('mock') !== '1') return
+    ;(window as unknown as { __notice?: unknown }).__notice = (screen: string) => {
+      void import('../api/mock_notices').then((m) => {
+        const x = m.mockNotice(screen)
+        if (x) void showNotice({ kind: x.kind, screen: x.screen, view: x.view, actions: [] })
+      })
+    }
+  }, [showNotice])
   const inTelegram = useRef(!!telegramInitData()).current
 
   const afterSignedIn = useCallback(async () => {
@@ -186,6 +215,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         },
         (u: number) => setUnread(u),
         (isLive: boolean) => setLive(isLive),
+        (n) => { void showNotice(n) },
       )
       if (cancelled) {
         handle?.disconnect()
@@ -274,7 +304,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         toast.push(refusalText(res.error.code, res.error.message, res.error.args), { kind: 'error', user: true })
       } else if (res.notice) {
         const text = noticeText(res.notice)
-        if (text) toast.push(text, { kind: res.notice.alert ? 'warning' : undefined, user: true })
+        if (text) toast.push(text, { kind: res.notice.alert ? 'warning' : 'success', user: true })
       }
       void refreshProfile()
       return res

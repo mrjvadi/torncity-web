@@ -19,10 +19,15 @@ html.pp-lock, html.pp-lock body { overflow: hidden; overscroll-behavior: none; }
 .pp-gold   { --pp-face-t: rgba(58, 40, 14, 0.98); --pp-face-b: rgba(22, 13, 6, 0.98); --pp-accent: #d99a1f; --pp-rib-t: #c98a1a; --pp-rib-b: #6a3f08; }
 .pp-violet { --pp-face-t: rgba(38, 20, 66, 0.98); --pp-face-b: rgba(14, 8, 28, 0.98); --pp-accent: #8e6cf0; --pp-rib-t: #7a55d8; --pp-rib-b: #3a1f80; }
 
+/* The owner asked for a smaller popup (2026-10-01): the whole design is
+   scaled uniformly, never redesigned. zoom (not transform) keeps layout,
+   scrolling and hit areas exact; the max-height divides it back out. */
 .pp-panel {
+  --pp-zoom: 0.82;
+  zoom: var(--pp-zoom);
   position: relative; display: flex; flex-direction: column;
-  width: min(420px, 100%);
-  max-height: 100%;
+  width: min(420px, calc(100% / var(--pp-zoom)));
+  max-height: calc(100% / var(--pp-zoom));
   min-height: 0;
   border-radius: 22px;
   background: linear-gradient(180deg, var(--pp-face-t), var(--pp-face-b));
