@@ -18,7 +18,6 @@ import { Exchange, Portfolio } from './Stocks'
 import { FactionHome, FactionList } from './Factions'
 import { Elections, Election } from './Elections'
 import Governance from './Governance'
-import { TravelOptions, TravelStatus } from './Travel'
 import Missions from './Missions'
 import Leaderboard from './Leaderboard'
 import Hospital from './Hospital'
@@ -48,8 +47,6 @@ const screens: ScreenSet = {
     elections: Elections,
     election: Election,
     city_governance: Governance,
-    travel_options: TravelOptions,
-    travel_status: TravelStatus,
     mission_board: Missions,
     leaderboard: Leaderboard,
     hospital: Hospital,

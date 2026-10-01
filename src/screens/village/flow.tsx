@@ -13,10 +13,13 @@ import type { Action, CommandResponse } from '../../api/types'
 import type { ScreenComponent, ScreenProps } from '../types'
 import { Card, Header, ScreenScroll, type Tone } from '../native/kit/Parts'
 import { Slab } from '../../kit'
+import Popup, { ActionButton } from '../../ui/Popup'
+import { toWesternDigits } from '../../lib/persian'
 import Skeleton from '../../ui/Skeleton'
 import { noticeText, refusalText, t } from '../../i18n'
 import { useNav } from '../../state/NavContext'
 import { useToast } from '../../state/ToastContext'
+import { useSession } from '../../state/SessionContext'
 import { buildingName, useBuildingCatalogue, useContentNames, type ContentNames } from '../../village/useVillage'
 import type { CatalogueBuilding } from '../../api/types'
 import { actionLabel } from './wording'
@@ -48,13 +51,26 @@ export function flow<V>(fn: (p: { view: V; ctx: FlowCtx }) => ReactNode): FlowSc
   return fn as unknown as FlowScreen
 }
 
-const WRITE_COMMANDS = new Set(['settlement.home.rest', 'settlement.tax.pay', 'settlement.work', 'settlement.terms'])
+/** Commands that change the world: the host runs them itself, with an idempotency key, and shows their answer.
+ * An area adds its own (registerWrites); `when` narrows it to the calls that really write (a departure is a read
+ * until a way to pay is chosen). */
+const WRITES = new Map<string, ((a: Action) => boolean) | undefined>([
+  ['settlement.home.rest', undefined], ['settlement.tax.pay', undefined], ['settlement.terms', undefined],
+  ['settlement.work', (a) => !!a.args?.id],
+])
+
+export function registerWrites(commands: string[], when?: (a: Action) => boolean): void {
+  for (const c of commands) WRITES.set(c, when)
+}
+
 let keySeq = 0
 
 /** A write changes the world: it asks for the screen's answer itself (never twice). */
 export function isWrite(a: Action): boolean {
   if (a.kind === 'confirm' || a.id === 'confirm' || a.args?.confirm) return true
-  return !!a.command && WRITE_COMMANDS.has(a.command) && (a.command !== 'settlement.work' || !!a.args?.id)
+  if (!a.command || !WRITES.has(a.command)) return false
+  const when = WRITES.get(a.command)
+  return !when || when(a)
 }
 
 export const isBack = (a: Action) => a.kind === 'back' || a.id === 'back'
@@ -150,20 +166,26 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
   const { response, loading, run, openLocal } = props
   const nav = useNav()
   const toast = useToast()
+  const { refreshProfile } = useSession()
   const [res, setRes] = useState<CommandResponse | null>(response)
   const [busy, setBusy] = useState(false)
+  // an action that asks the player to type a value (a price, a few words)
+  const [asking, setAsking] = useState<Action | null>(null)
+  const [typed, setTyped] = useState('')
   useEffect(() => setRes(response), [response])
 
   const go = useCallback(async (a: Action) => {
     if (a.url) { window.open(a.url, '_blank', 'noopener'); return }
     if (a.id === 'village.found') { openLocal('founding_form'); return }
     if (!a.command) return
+    if (a.input) { setTyped(''); setAsking(a); return }
     if (isBack(a)) { if (nav?.back) nav.back(); else run(a.command, a.args); return }
     if (!isWrite(a)) { run(a.command, a.args); return }
     setBusy(true)
     try {
       const r = await api.runCommand(a.command, a.args ?? {}, `web-v-${Date.now().toString(36)}-${++keySeq}`)
-      if (r.ok === false && r.screen !== 'village_refusal') toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args))
+      // a refusal that has a screen of its own (what is missing, the way on) is shown; any other is a toast
+      if (r.ok === false && !FLOW[r.screen] && !NATIVE[r.screen]) toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args))
       else {
         setRes(r)
         const note = r.notice ? noticeText(r.notice) : ''
@@ -173,8 +195,9 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
       toast.push(refusalText((e as { code?: string })?.code ?? 'network'))
     } finally {
       setBusy(false)
+      void refreshProfile()
     }
-  }, [nav, run, openLocal, toast])
+  }, [nav, run, openLocal, toast, refreshProfile])
 
   const safe: CommandResponse = res ?? { ok: true, screen: '' }
   const ctx = useFlowCtx(safe, go, busy, { run, openLocal })
@@ -191,5 +214,25 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
       </Page>
     )
   }
-  return <Screen key={res.screen} view={res.view} ctx={ctx} />
+  const ask = asking
+  const submit = () => {
+    const value = (ask?.input?.text ? typed : toWesternDigits(typed)).trim()
+    if (!ask || !value) return
+    setAsking(null)
+    void go({ ...ask, input: undefined, args: { ...(ask.args ?? {}), [ask.input!.field]: value } })
+  }
+  return (
+    <>
+      <Screen key={res.screen} view={res.view} ctx={ctx} />
+      <Popup
+        open={!!ask} onClose={() => setAsking(null)} tone="navy" title={ask ? ctx.label(ask) : undefined}
+        footer={<ActionButton tone="green" onClick={submit}>{t('common.confirm')}</ActionButton>}
+      >
+        <input
+          className="vd-input" value={typed} autoFocus onChange={(e) => setTyped(e.target.value)}
+          inputMode={ask?.input?.text ? 'text' : 'numeric'} dir={ask?.input?.text ? 'auto' : 'ltr'}
+        />
+      </Popup>
+    </>
+  )
 }

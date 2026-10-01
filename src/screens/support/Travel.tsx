@@ -22,6 +22,7 @@ import { useToast } from '../../state/ToastContext'
 import { serverNow } from '../../village/clock'
 import { refusalText, t, type Key } from '../../i18n'
 import { homeScreen, locationOf, type Destination, type TravelDestination } from '../../support/location'
+import { useContentNames } from '../../village/useVillage'
 import VillageHome from '../village/VillageHome'
 import './support.css'
 
@@ -54,6 +55,8 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
   const loc = locationOf(bootstrap)
   const here = loc?.code ?? (loc ? '' : 'support')
   const hint = localArgs?.mode
+  const service = localArgs?.service
+  const names = useContentNames()
 
   const load = useCallback(() => {
     setFailed(false)
@@ -68,10 +71,10 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
 
   const list = useMemo(() => {
     const l = [...(data?.list ?? [])]
-    if (!l.some((d) => d.code === 'support')) l.push({ kind: 'city', code: 'support', name: bootstrap?.cities.find((c) => c.code === 'support')?.name ?? t('sc.title'), distance_km: 0 })
+    if (!l.some((d) => d.code === 'support')) l.push({ kind: 'city', code: 'support', name: names.name('city', 'support', bootstrap?.cities.find((c) => c.code === 'support')?.name), distance_km: 0 })
     // Support first, then the villages by distance
     return l.sort((a, b) => (a.code === 'support' ? -1 : b.code === 'support' ? 1 : a.distance_km - b.distance_km))
-  }, [data, bootstrap])
+  }, [data, bootstrap, names])
 
   const back = () => { const h = homeScreen(bootstrap); openLocal(h.local, h.args) }
 
@@ -101,7 +104,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
             <button key={d.code} className={`nx-row nx-row-tap${isHere ? ' nx-row-teal' : ''}`} disabled={isHere} onClick={() => setSel(d)} style={{ opacity: isHere ? 0.7 : 1 }}>
               <span className="sc-emb"><DestEmblem d={d} size={34} /></span>
               <span className="nx-row-text">
-                <span className="nx-row-title">{d.name}</span>
+                <span className="nx-row-title">{d.kind === 'city' ? names.name('city', d.code, d.name) : d.name}</span>
                 <span className="nx-row-sub">
                   {isHere ? t('sc.dest.here') : isHome ? `${t('sc.dest.home')} · ` + `${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}` : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} · ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` · ${hms(d.duration_seconds)}` : ''}`}
                 </span>
@@ -112,7 +115,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
         })}
       </div>
       {data?.mock && <p className="sc-mock">{t('sc.dest.mock')}</p>}
-      <ConfirmSheet dest={sel} hint={hint} onClose={() => setSel(null)} onGo={go} />
+      <ConfirmSheet dest={sel} hint={hint} service={service} onClose={() => setSel(null)} onGo={go} />
     </ScreenScroll>
   )
 }
@@ -122,10 +125,11 @@ function DestEmblem({ d, size }: { d: Destination; size: number }) {
   return <Emboss name={d.kind === 'city' ? 'city' : 'house'} palette={d.kind === 'city' ? 'gold' : 'emerald'} size={size * 0.8} />
 }
 
-function ConfirmSheet({ dest, hint, onClose, onGo }: { dest: TravelDestination | null; hint?: string; onClose: () => void; onGo: (d: TravelDestination, mode: string, fare: number) => Promise<void> }) {
+function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDestination | null; hint?: string; service?: string; onClose: () => void; onGo: (d: TravelDestination, mode: string, fare: number) => Promise<void> }) {
   const [options, setOptions] = useState<ModeOption[] | null>(null)
   const [mode, setMode] = useState('')
   const [busy, setBusy] = useState(false)
+  const names = useContentNames()
 
   useEffect(() => {
     setOptions(null); setMode('')
@@ -145,7 +149,8 @@ function ConfirmSheet({ dest, hint, onClose, onGo }: { dest: TravelDestination |
   const chosen = options?.find((o) => o.mode_code === mode)
   return (
     <Popup
-      open onClose={onClose} title={t('sc.confirm.title', { name: dest.name })} tone="navy" dismissible={!busy}
+      open onClose={onClose} tone="navy" dismissible={!busy}
+      title={service ? t('lf.menu.service_to', { city: dest.kind === 'city' ? names.name('city', dest.code, dest.name) : dest.name, service: t(`lf.menu.service.${service}` as Key) }) : t('sc.confirm.title', { name: dest.kind === 'city' ? names.name('city', dest.code, dest.name) : dest.name })}
       footer={(
         <ActionButton
           tone="gold" cost={chosen ? (chosen.fare > 0 ? money(chosen.fare) : t('common.free')) : undefined} costIcon="coins" costPalette="gold"

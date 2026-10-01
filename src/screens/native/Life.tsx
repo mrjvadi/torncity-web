@@ -2,7 +2,7 @@ import type { ScreenProps } from '../types'
 import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair } from './kit/Parts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms, money } from './kit/format'
-import { t } from '../../i18n'
+import { hasKey, t, type Key } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
 
 interface Named { code?: string; name?: string; emoji?: string }
@@ -14,7 +14,7 @@ interface LifeView {
   rank?: Named | null; next?: Named | null; next_need?: number
   worth?: Worth
   spots?: SleepSpot[] | null; sleep_in_seconds?: number; home?: boolean
-  notice?: string
+  notice?: string; notice_args?: Record<string, unknown> | null
 }
 
 export default function Life({ response, loading, onAction, run }: ScreenProps) {
@@ -34,7 +34,9 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
     <ScreenScroll>
       <Header title={t('life.title')} tone="violet" onRefresh={() => run('life.me')} />
 
-      {v.notice && <Notice>{v.notice}</Notice>}
+      {v.notice && hasKey(`lf.life.notice.${v.notice}`) && (
+        <Notice>{t(`lf.life.notice.${v.notice}` as Key, { spot: names.name('sleep_spot', String(v.notice_args?.spot ?? ''), String(v.notice_args?.spot ?? '')), rest: formatNumber(Number(v.notice_args?.rest ?? 0)) })}</Notice>
+      )}
 
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -69,16 +71,21 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
         <Card>
           <div className="nx-sec" style={{ marginBottom: 8 }}>{t('life.sleep_spots')}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {v.spots!.map((s, i) => (
-              <ListRow key={i} icon="bed" palette="violet" title={s.spot?.name ? names.name('sleep_spot', s.spot.code ?? '', s.spot.name) : '—'}
-                sub={`${t('life.spot_sub', { place: s.place?.name ? names.name('place', s.place.code ?? '', s.place.name) : '', rest: formatNumber(s.rest ?? 0) })}${s.price ? ` · ${money(s.price)}` : ''}`} />
-            ))}
+            {v.spots!.map((s, i) => {
+              // the server lists what may be done by meaning: sleep here, or walk there and sleep
+              const act = (response?.actions ?? []).find((a) => (a.id === 'life.sleep' || a.id === 'life.sleep_walk') && a.subject === s.spot?.code)
+              return (
+                <ListRow key={i} icon="bed" palette="violet" title={s.spot?.name ? names.name('sleep_spot', s.spot.code ?? '', s.spot.name) : '—'}
+                  sub={`${t('life.spot_sub', { place: s.place?.name ? names.name('place', s.place.code ?? '', s.place.name) : '', rest: formatNumber(s.rest ?? 0) })}${s.price ? ` · ${money(s.price)}` : ''}`}
+                  onClick={act && !v.sleep_in_seconds ? () => onAction(act) : undefined} />
+              )
+            })}
           </div>
           {!!v.sleep_in_seconds && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('life.sleep_again', { t: hms(v.sleep_in_seconds) })}</div>}
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} refreshCommand="life.me" />
+      <Actions response={response} onAction={onAction} only={(a) => a.id !== 'life.sleep' && a.id !== 'life.sleep_walk'} refreshCommand="life.me" />
     </ScreenScroll>
   )
 }

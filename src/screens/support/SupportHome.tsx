@@ -8,6 +8,7 @@ import type { ScreenProps } from '../types'
 import { Emboss, Slab } from '../../kit'
 import * as api from '../../api/client'
 import { report } from '../../lib/reporter'
+import { useContentNames } from '../../village/useVillage'
 import { t } from '../../i18n'
 import { SERVICE_BY_ID } from '../../support/services'
 import type { CityPlan, Placed } from '../../support/cityPlan'
@@ -95,7 +96,8 @@ export default function SupportHome({ run, openLocal }: ScreenProps) {
 
   const byKey = useMemo(() => new Map((plan?.placed ?? []).map((p) => [p.key, p])), [plan])
   const home = bootstrap?.settlement ? { code: bootstrap.settlement.code, name: bootstrap.settlement.name } : null
-  const cityName = bootstrap?.cities.find((c) => c.code === 'support')?.name ?? t('sc.title')
+  const names = useContentNames()
+  const cityName = names.name('city', 'support', bootstrap?.cities.find((c) => c.code === 'support')?.name ?? t('sc.title'))
 
   function setFrame(m: 'aerial' | 'street') {
     setMode(m)

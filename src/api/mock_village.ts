@@ -7,6 +7,7 @@
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
+import { LIFE_CONTENT } from './mock_life'
 import { publishSettlement } from './settlementBus'
 import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
@@ -39,22 +40,24 @@ const CAT: CatEntry[] = [
   { code: 'road', fa: 'جاده', en: 'Road', fp: [1, 1], cost: 50, time: 600, role: '', capExempt: true },
   { code: 'civic_hall', fa: 'خانهٔ دهیاری', en: 'Civic hall', fp: [2, 2], cost: 1000, time: 7200, role: '', materials: [['timber', 'چوب', 5]] },
   { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 700, time: 2700, role: '', materials: [['timber', 'چوب', 2]] },
-  { code: 'housing_block', fa: 'بلوک مسکونی', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 40]] },
+  { code: 'housing_block', fa: 'آپارتمان', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 40]] },
   { code: 'park', fa: 'پارک', en: 'Park', fp: [2, 2], cost: 800, time: 3600, role: '' },
-  { code: 'watch_hut', fa: 'برج نگهبانی', en: 'Watch hut', fp: [1, 1], cost: 400, time: 1800, role: 'security' },
-  { code: 'militia_camp', fa: 'اردوگاه میلیشیا', en: 'Militia camp', fp: [2, 1], cost: 500, time: 2700, role: 'security' },
+  { code: 'watch_hut', fa: 'نگهبانی محله', en: 'Watch hut', fp: [1, 1], cost: 400, time: 1800, role: 'security' },
+  { code: 'militia_camp', fa: 'اردوگاه سواران محلی', en: 'Militia camp', fp: [2, 1], cost: 500, time: 2700, role: 'security' },
   { code: 'carpentry_workshop', fa: 'کارگاه نجاری', en: 'Carpentry workshop', fp: [2, 2], cost: 1500, time: 5400, role: 'craft', materials: [['timber', 'چوب', 4]] },
   { code: 'smithy', fa: 'آهنگری', en: 'Smithy', fp: [2, 2], cost: 1800, time: 6000, role: 'craft', needs: ['metallurgy'] },
-  { code: 'shaft_well', fa: 'چاه قنات', en: 'Shaft well', fp: [1, 1], cost: 300, time: 1200, role: 'water_infra' },
-  { code: 'farm_canal', fa: 'مزرعهٔ کانالی', en: 'Canal farm', fp: [3, 3], cost: 2200, time: 7200, role: 'food' },
+  { code: 'shaft_well', fa: 'چاه قنات', en: 'Qanat well', fp: [1, 1], cost: 300, time: 1200, role: 'water_infra' },
+  { code: 'farm_canal', fa: 'مزرعهٔ نهری', en: 'Canal farm', fp: [3, 3], cost: 2200, time: 7200, role: 'food' },
   { code: 'health_house', fa: 'خانهٔ بهداشت', en: 'Health house', fp: [2, 2], cost: 1200, time: 4800, role: 'health' },
-  { code: 'teaching_circle', fa: 'حلقهٔ آموزش', en: 'Teaching circle', fp: [1, 1], cost: 200, time: 1500, role: 'education' },
-  { code: 'barter_post', fa: 'پایگاه تهاتر', en: 'Barter post', fp: [1, 1], cost: 250, time: 1200, role: 'market' },
-  { code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: 'Woodcutter camp', fp: [2, 2], cost: 900, time: 3600, role: 'craft' },
+  { code: 'teaching_circle', fa: 'کلاس درس', en: 'Village classroom', fp: [1, 1], cost: 200, time: 1500, role: 'education' },
+  { code: 'barter_post', fa: 'بازارچه', en: 'Village market', fp: [1, 1], cost: 250, time: 1200, role: 'market' },
+  { code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: "Woodcutter's camp", fp: [2, 2], cost: 900, time: 3600, role: 'craft' },
   { code: 'granary', fa: 'انبار غله', en: 'Granary', fp: [1, 1], cost: 700, time: 3000, role: 'storage' },
   { code: 'bank', fa: 'بانک', en: 'Bank', fp: [3, 3], cost: 50000, time: 36000, role: '', needs: ['writing'] },
   { code: 'school', fa: 'مدرسه', en: 'School', fp: [3, 3], cost: 9000, time: 14400, role: 'education', needs: ['writing'] },
 ]
+/** The services of the central city and the village building role that gives the village that service itself. */
+const SUPPORT_SERVICES = [{ service: 'bank', role: '' }, { service: 'market', role: 'market' }, { service: 'knowledge', role: 'education' }, { service: 'hospital', role: 'health' }]
 const KNOW_EN: Record<string, string> = {
   fire_making: 'Fire making', masonry: 'Masonry', irrigation: 'Irrigation', writing: 'Writing', metallurgy: 'Metallurgy', geometry: 'Geometry', archery: 'Archery', carpentry: 'Carpentry',
 }
@@ -412,7 +415,7 @@ function overviewView() {
   const view: VillageOverviewView = {
     name: 'آمل', tier: 'village', population: 2, population_cap: 8,
     food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
-    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support' }, promotion: promo,
+    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) }, promotion: promo,
     buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
   }
   const acts: MockAct[] = [
@@ -1135,6 +1138,8 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
         item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }],
         knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
+        // what the life area names: cities, places, ways to travel, ranks, goods, property...
+        ...LIFE_CONTENT,
       },
     })
   }

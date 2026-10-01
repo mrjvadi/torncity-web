@@ -6,6 +6,7 @@ import { Bar, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
 import Actions from '../native/kit/Actions'
 import { clamp01, formatNumber, money } from '../native/kit/format'
 import { t } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface Named { code?: string; name?: string }
 interface AchievementLine { achievement?: Named; count?: number; done?: number; reward?: number; earned?: boolean; cash?: number }
@@ -13,6 +14,8 @@ interface AchievementsView { lines?: AchievementLine[] | null }
 
 export default function Achievements({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as AchievementsView
+  const names = useContentNames()
+  const nameOf = (a?: Named) => (a?.code ? names.name('achievement', a.code, a.name) : a?.name ?? '—')
   const lines = v.lines ?? []
   const earned = lines.filter((l) => l.earned)
   const open = lines.filter((l) => !l.earned)
@@ -27,7 +30,7 @@ export default function Achievements({ response, loading, onAction, run }: Scree
       {!!earned.length && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {earned.map((l, i) => (
-            <ListRow key={i} icon="trophy" palette="gold" tone="gold" title={l.achievement?.name ?? '—'}
+            <ListRow key={i} icon="trophy" palette="gold" tone="gold" title={nameOf(l.achievement)}
               sub={l.cash ? t('achievements.rewarded', { n: money(l.cash) }) : undefined} />
           ))}
         </div>
@@ -38,7 +41,7 @@ export default function Achievements({ response, loading, onAction, run }: Scree
           {open.map((l, i) => (
             <div key={i} className="nx-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span className="display" style={{ fontSize: 14, color: '#fff' }}>{l.achievement?.name ?? '—'}</span>
+                <span className="display" style={{ fontSize: 14, color: '#fff' }}>{nameOf(l.achievement)}</span>
                 {!!l.reward && <span className="nx-chip nx-chip-gold">{money(l.reward)}</span>}
               </div>
               <Bar frac={clamp01((l.done ?? 0) / Math.max(1, l.count ?? 1))} color="var(--gold)"

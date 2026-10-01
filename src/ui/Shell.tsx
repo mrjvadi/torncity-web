@@ -7,7 +7,7 @@ import GenericScreen from './GenericScreen'
 import { Screen } from '../kit'
 import MenuSheet from './MenuSheet'
 import { useSession } from '../state/SessionContext'
-import { useScreen } from '../state/useScreen'
+import { seedScreen, useScreen } from '../state/useScreen'
 import type { Action } from '../api/types'
 import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 import { foundingDraftFromLaunch } from '../lib/telegram'
@@ -145,14 +145,21 @@ export default function Shell() {
     navigate({ command: '', local: name, args })
   }
 
+  // bumped when an action's answer is for the screen already open
+  const [again, setAgain] = useState(0)
   async function onAction(a: Action) {
     if (!a.command) return
     const res = await exec(a.command, a.args ?? {})
-    if (res) navigate({ command: a.command, args: a.args })
+    if (!res) return
+    // the answer is shown as it is: the command is not run a second time to draw its screen
+    seedScreen(a.command, a.args, res)
+    const next = { command: a.command, args: a.args }
+    if (sameKey(next, screenKey)) setAgain((n) => n + 1)
+    else navigate(next)
   }
 
   const isLocal = !!screenKey.local
-  const { response, loading } = useScreen(isLocal ? null : screenKey.command, screenKey.args)
+  const { response, loading } = useScreen(isLocal ? null : screenKey.command, screenKey.args, again)
   const Local = isLocal ? LOCAL_SCREENS[screenKey.local!] : undefined
   const Native = !isLocal && response?.screen ? SERVER_SCREENS[response.screen] : undefined
   const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: screenKey.args }
@@ -188,7 +195,7 @@ export default function Shell() {
         village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, resident: bootstrap.settlement.resident, support: supportCity(bootstrap) } : undefined}
         onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
         onCommand={(command, args) => { setTab('city'); run(command, args) }}
-        onTravel={() => { setTab('city'); openLocal('support_travel') }}
+        onTravel={(code, service) => { setTab('city'); openLocal('support_travel', { to: code, service }) }}
       />
       <style>{`
         .shell { display: flex; flex-direction: column; height: 100%; }

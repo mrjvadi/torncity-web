@@ -10,6 +10,7 @@ import Actions from './kit/Actions'
 import { formatNumber } from './kit/format'
 import Icon from '../../ui/Icon'
 import { t, type Key } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface InventoryLine {
   item?: { code?: string; name?: string }
@@ -17,6 +18,7 @@ interface InventoryLine {
   qty?: number
   quality?: number
   uses_left?: number
+  serial?: string
   durability?: number
 }
 interface InventoryView { lines?: InventoryLine[] | null; page?: number; pages?: number; total?: number; in_escrow?: number }
@@ -33,6 +35,7 @@ const catLabel = (c: string) => (KNOWN_CATEGORIES.includes(c) ? t(`inventory.cat
 
 export default function Inventory({ response, loading, onAction, run }: ScreenProps) {
   const [cat, setCat] = useState('')
+  const names = useContentNames()
   const v = (response?.view ?? {}) as InventoryView
   if (loading && !response) return <ScreenScroll><Header title={t('inventory.title')} tone="gold" /></ScreenScroll>
 
@@ -66,11 +69,11 @@ export default function Inventory({ response, loading, onAction, run }: ScreenPr
           <button
             key={i}
             className="nx-tile"
-            onClick={() => l.item?.code && run('inventory.item', { item: l.item.code })}
+            onClick={() => l.item?.code && run('inventory.item', { item: l.serial || l.item.code })}
           >
             {!!(l.qty && l.qty > 1) && <span className="nx-tile-badge inv-badge">{formatNumber(l.qty)}×</span>}
             <Icon name={itemIcon(l)} palette="gold" size={34} />
-            <span className="nx-tile-title display">{l.item?.name ?? l.item?.code ?? '—'}</span>
+            <span className="nx-tile-title display">{l.item?.code ? names.name('item', l.item.code, l.item.name) : '—'}</span>
             {(l.durability || l.uses_left) ? (
               <span className="nx-tile-sub">
                 {l.durability ? t('inventory.durability', { n: formatNumber(l.durability) }) : t('inventory.uses', { n: formatNumber(l.uses_left ?? 0) })}

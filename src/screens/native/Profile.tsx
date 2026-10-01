@@ -9,7 +9,6 @@ import { useContentNames } from '../../village/useVillage'
 import type { CSSProperties } from 'react'
 import type { ScreenProps } from '../types'
 import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair, Tile, TileGrid } from './kit/Parts'
-import Actions from './kit/Actions'
 import LangSwitch from './kit/LangSwitch'
 import { useView } from './kit/useView'
 import { clamp01, formatNumber, hms, money } from './kit/format'
@@ -20,32 +19,30 @@ import './profile.css'
 
 interface Named { code?: string; name?: string; emoji?: string }
 interface ProfileView {
-  name?: string; code?: string; avatar?: string; city?: string
-  place?: { name?: string }
+  name?: string; code?: string; avatar?: string; city_code?: string; city?: string
+  place?: { code?: string; name?: string }
   walk?: { to?: Named; remaining_seconds?: number } | null
   level?: number; xp?: number; next_level_xp?: number
   energy?: number; max_energy?: number; health?: number; max_health?: number
   cash?: number; bank?: number
-  travelling?: boolean; travel_to?: string; travel_remaining_seconds?: number
+  travelling?: boolean; travel_to_code?: string; travel_to?: string; travel_remaining_seconds?: number
   rank?: Named | null
   age?: number; stage?: Named
   achievements?: number
   needs?: { hunger?: number; sleep?: number; stress?: number; happiness?: number } | null
   work?: {
-    job?: { job?: { title?: string }; pay?: number; shift_ends_in_seconds?: number } | null
+    job?: { job?: { career_code?: string; rank?: string; title?: string }; pay?: number; shift_ends_in_seconds?: number } | null
     course?: { course?: Named; remaining_seconds?: number; paused?: boolean } | null
     certificates?: number
   } | null
-  jail?: { city?: string; remaining_seconds?: number } | null
-  hospital?: { city?: string; remaining_seconds?: number } | null
+  jail?: { city_code?: string; city?: string; remaining_seconds?: number } | null
+  hospital?: { city_code?: string; city?: string; remaining_seconds?: number } | null
 }
 interface LifeView { worth?: { total?: number } }
 interface AchievementsView { lines?: { achievement?: Named; earned?: boolean }[] | null }
 
-/** commands the profile draws itself, so the server's copies are not repeated */
-const OWN = new Set(['skills.list', 'achievement.list', 'life.me', 'life.card', 'player.settings', 'device.list', 'life.avatar', 'player.profile.get'])
 
-export default function Profile({ response, loading, onAction, run }: ScreenProps) {
+export default function Profile({ response, loading, run }: ScreenProps) {
   const v = (response?.view ?? {}) as ProfileView
   const names = useContentNames()
   const life = useView<LifeView>('life.me')
@@ -57,8 +54,10 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
   const lines = ach?.lines ?? []
   const medals = [...lines].sort((a, b) => Number(!!b.earned) - Number(!!a.earned)).slice(0, 8)
   const earned = lines.filter((l) => l.earned).length
-  const rankName = v.rank?.name ? names.name('rank', v.rank.code ?? '', v.rank.name) : ''
-  const subline = [rankName, v.stage?.name && v.age ? t('common.years_old', { n: v.age }) : null].filter(Boolean).join(' · ')
+  const rankName = v.rank?.name ? names.name('life_rank', v.rank.code ?? '', v.rank.name) : ''
+  const stageName = v.stage?.name ? names.name('life_stage', v.stage.code ?? '', v.stage.name) : ''
+  const subline = [rankName, stageName && v.age ? `${stageName} · ${t('common.years_old', { n: v.age })}` : null].filter(Boolean).join(' · ')
+  const city = (code?: string, name?: string) => (name || code ? names.name('city', code ?? '', name) : '')
 
   return (
     <ScreenScroll>
@@ -92,10 +91,10 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
         <LangSwitch compact />
       </Card>
 
-      {v.jail && <Notice alert>{t('dashboard.jail', { city: v.jail.city ?? '', t: hms(v.jail.remaining_seconds) })}</Notice>}
-      {v.hospital && <Notice alert>{t('dashboard.hospital', { city: v.hospital.city ?? '', t: hms(v.hospital.remaining_seconds) })}</Notice>}
-      {v.travelling && <Notice>{t('profile.travelling', { city: v.travel_to ?? '', t: hms(v.travel_remaining_seconds) })}</Notice>}
-      {v.walk && <Notice>{t('profile.walking', { place: v.walk.to?.name ?? '', t: hms(v.walk.remaining_seconds) })}</Notice>}
+      {v.jail && <Notice alert>{t('dashboard.jail', { city: city(v.jail.city_code, v.jail.city), t: hms(v.jail.remaining_seconds) })}</Notice>}
+      {v.hospital && <Notice alert>{t('dashboard.hospital', { city: city(v.hospital.city_code, v.hospital.city), t: hms(v.hospital.remaining_seconds) })}</Notice>}
+      {v.travelling && <Notice>{t('profile.travelling', { city: city(v.travel_to_code, v.travel_to), t: hms(v.travel_remaining_seconds) })}</Notice>}
+      {v.walk && <Notice>{t('profile.walking', { place: names.name('place', v.walk.to?.code ?? '', v.walk.to?.name), t: hms(v.walk.remaining_seconds) })}</Notice>}
 
       <StatPair
         left={<Stat icon="coins" palette="gold" label={t('profile.cash')} value={money(v.cash)} />}
@@ -106,8 +105,8 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
         right={<Stat icon="rank" palette="gold" label={t('profile.wealth_rank')} value={rankName || '—'} />}
       />
       <StatPair
-        left={<Stat icon="city" palette="steel" label={t('profile.city')} value={v.city || '—'} />}
-        right={<Stat icon="x_map" palette="steel" label={t('profile.place')} value={v.place?.name || '—'} />}
+        left={<Stat icon="city" palette="steel" label={t('profile.city')} value={city(v.city_code, v.city) || '—'} />}
+        right={<Stat icon="x_map" palette="steel" label={t('profile.place')} value={v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : '—'} />}
       />
 
       <div className="pf-sec display">{t('profile.needs')}</div>
@@ -127,12 +126,12 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
       {(v.work?.job || v.work?.course) && (
         <div className="pf-list">
           {v.work?.job && (
-            <ListRow icon="work" palette="emerald" title={v.work.job.job?.title ?? t('profile.work')}
+            <ListRow icon="work" palette="emerald" title={v.work.job.job?.title ? names.name('career_tier', `${v.work.job.job.career_code ?? ''}.${v.work.job.job.rank ?? ''}`, v.work.job.job.title) : t('profile.work')}
               sub={v.work.job.shift_ends_in_seconds ? t('profile.shift_ends', { t: hms(v.work.job.shift_ends_in_seconds) }) : t('profile.per_shift', { pay: money(v.work.job.pay) })}
               onClick={() => run('job.status')} />
           )}
           {v.work?.course && (
-            <ListRow icon="study" palette="violet" title={v.work.course.course?.name ?? t('profile.study')}
+            <ListRow icon="study" palette="violet" title={v.work.course.course?.name ? names.name('course', v.work.course.course.code ?? '', v.work.course.course.name) : t('profile.study')}
               sub={v.work.course.paused ? t('education.paused') : t('profile.course_left', { t: hms(v.work.course.remaining_seconds) })}
               onClick={() => run('education.list')} />
           )}
@@ -146,7 +145,7 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
       {medals.length > 0 ? (
         <div className="pf-medals">
           {medals.map((m, i) => (
-            <button key={i} className={`pf-medal${m.earned ? '' : ' pf-medal-off'}`} title={m.achievement?.name} onClick={() => run('achievement.list')}>
+            <button key={i} className={`pf-medal${m.earned ? '' : ' pf-medal-off'}`} title={m.achievement?.name ? names.name('achievement', m.achievement.code ?? '', m.achievement.name) : undefined} onClick={() => run('achievement.list')}>
               <Icon name={['trophy', 'medal', 'ribbon', 'x_star', 'x_laurel', 'x_crown', 'x_gem', 'shield'][i % 8]} palette={m.earned ? 'gold' : 'steel'} size={30} />
             </button>
           ))}
@@ -163,7 +162,6 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
         <Tile icon="phone" palette="sapphire" title={t('profile.devices')} onClick={() => run('device.list')} />
       </TileGrid>
 
-      <Actions response={response} onAction={onAction} only={(a) => !OWN.has(a.command ?? '')} refreshCommand="player.profile.get" />
     </ScreenScroll>
   )
 }

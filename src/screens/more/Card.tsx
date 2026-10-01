@@ -5,7 +5,8 @@ import type { ScreenProps } from '../types'
 import { Card as Panel, Header, Notice, ScreenScroll, Stat, StatPair } from '../native/kit/Parts'
 import Actions from '../native/kit/Actions'
 import { ago, formatNumber } from '../native/kit/format'
-import { t } from '../../i18n'
+import { hasKey, t, type Key } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface Named { code?: string; name?: string; emoji?: string }
 
@@ -33,6 +34,9 @@ function joinedAgo(iso?: string | null): string | undefined {
 
 export default function PlayerCard({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as CardView
+  const names = useContentNames()
+  const stage = v.stage?.name ? names.name('life_stage', v.stage.code ?? '', v.stage.name) : undefined
+  const rank = v.rank?.name ? names.name('life_rank', v.rank.code ?? '', v.rank.name) : undefined
   if (loading && !response) return <ScreenScroll><Header title={t('card.title')} tone="violet" /></ScreenScroll>
 
   return (
@@ -40,7 +44,7 @@ export default function PlayerCard({ response, loading, onAction, run }: ScreenP
       <Header title={v.self ? t('card.mine') : (v.name ?? t('card.title'))} tone="violet"
         onBack={() => run('player.profile.get')} onRefresh={() => run('life.card', v.code ? { code: v.code } : undefined)} />
 
-      {v.notice && <Notice>{v.notice}</Notice>}
+      {v.notice && hasKey(`lf.life.notice.${v.notice}`) && <Notice>{t(`lf.life.notice.${v.notice}` as Key)}</Notice>}
 
       <Panel tone="violet">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -48,9 +52,9 @@ export default function PlayerCard({ response, loading, onAction, run }: ScreenP
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="display" style={{ fontSize: 18, color: '#fff' }}>{v.name ?? '—'}</div>
             <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-              {[v.stage?.name, v.age ? t('common.years_old', { n: formatNumber(v.age) }) : undefined, v.code ? t('card.code', { code: v.code }) : undefined].filter(Boolean).join(' · ')}
+              {[stage, v.age ? t('common.years_old', { n: formatNumber(v.age) }) : undefined, v.code ? t('card.code', { code: v.code }) : undefined].filter(Boolean).join(' · ')}
             </div>
-            {v.rank?.name && <span className="nx-chip nx-chip-gold" style={{ marginTop: 6, display: 'inline-block' }}>{v.rank.emoji} {v.rank.name}</span>}
+            {rank && <span className="nx-chip nx-chip-gold" style={{ marginTop: 6, display: 'inline-block' }}>{v.rank?.emoji} {rank}</span>}
           </div>
         </div>
         {v.self && v.bio && <div className="mx-bio" style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 10 }}>{v.bio}</div>}

@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import * as api from '../api/client'
 import Popup from './Popup'
 import Icon from './Icon'
 import { t, type Key } from '../i18n'
@@ -41,14 +43,30 @@ const THE_VILLAGE: VillageItem[] = [
   { key: 'leave', icon: 'walk', palette: 'amber', label: 'menu.leave', command: 'settlement.leave', resident: true, notHead: true },
 ]
 
+/** The services of the central city a village may lack: each is shown only while the village lacks it (the server says
+ * which, in the village overview), and opens the journey to that city with the service named. The village's own «کار»
+ * is in the menu already and the jail is never a shortcut. */
 const SUPPORT_ITEMS: { key: string; icon: string; label: Key }[] = [
   { key: 'bank', icon: 'bank', label: 'village.menu.support_bank' },
   { key: 'market', icon: 'market', label: 'village.menu.support_market' },
-  { key: 'jobs', icon: 'work', label: 'village.menu.support_jobs' },
   { key: 'knowledge', icon: 'book', label: 'village.menu.support_knowledge' },
   { key: 'hospital', icon: 'hospital', label: 'village.menu.support_hospital' },
-  { key: 'jail', icon: 'crime', label: 'village.menu.support_jail' },
 ]
+
+/** The services of the central city this village does not have, read from the village overview when the menu opens. */
+function useLackedServices(open: boolean, enabled: boolean): string[] {
+  const [lacked, setLacked] = useState<string[]>([])
+  useEffect(() => {
+    if (!open || !enabled) return
+    let cancelled = false
+    api.runCommand('settlement.overview', {}).then((r) => {
+      const services = (r.view as { support?: { services?: string[] | null } | null } | undefined)?.support?.services
+      if (!cancelled) setLacked(services ?? [])
+    }).catch(() => undefined)
+    return () => { cancelled = true }
+  }, [open, enabled])
+  return lacked
+}
 
 interface MenuSheetProps {
   open: boolean
@@ -57,11 +75,14 @@ interface MenuSheetProps {
   onVillage?: (local: string, args?: Record<string, string>) => void
   /** Opens the screen a server command answers with. */
   onCommand?: (command: string, args?: Record<string, string>) => void
-  onTravel?: (cityCode: string) => void
+  /** Opens the journey to the central city, with the service the player wants named. */
+  onTravel?: (cityCode: string, service: string) => void
 }
 
 export default function MenuSheet({ open, onClose, village, onVillage, onCommand, onTravel }: MenuSheetProps) {
   const names = useContentNames()
+  const lacked = useLackedServices(open, !!village)
+  const shortcuts = SUPPORT_ITEMS.filter((i) => lacked.includes(i.key))
   return (
     <Popup open={open} onClose={onClose} title={village ? village.name : t('village.menu.title')} tone="navy">
       {village && (
@@ -86,15 +107,19 @@ export default function MenuSheet({ open, onClose, village, onVillage, onCommand
               </div>
             )
           })}
-          <div className="menu-sec">{t('village.menu.support', { city: names.name('city', village.support.code, village.support.name) })}</div>
-          <div className="menu-grid">
-            {SUPPORT_ITEMS.map((i) => (
-              <button key={i.key} className="menu-item" onClick={() => { onTravel?.(village.support.code); onClose() }}>
-                <Icon name={i.icon} palette="steel" size={22} />
-                <span>{t(i.label)}</span>
-              </button>
-            ))}
-          </div>
+          {shortcuts.length > 0 && (
+            <>
+              <div className="menu-sec">{t('village.menu.support', { city: names.name('city', village.support.code, village.support.name) })}</div>
+              <div className="menu-grid">
+                {shortcuts.map((i) => (
+                  <button key={i.key} className="menu-item" onClick={() => { onTravel?.(village.support.code, i.key); onClose() }}>
+                    <Icon name={i.icon} palette="steel" size={22} />
+                    <span>{t(i.label)}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
       <style>{`

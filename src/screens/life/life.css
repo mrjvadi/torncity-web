@@ -1,0 +1,12 @@
+/* the life area's screens (docs/adr/0039-presentation-split.md) */
+
+/* the choice of an avatar: a grid of emoji tiles */
+.lf-avatars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+.lf-avatar {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px;
+  background: var(--panel-2); border: 1.5px solid rgba(242, 194, 85, 0.18); border-radius: 14px; color: var(--text-dim);
+}
+.lf-avatar.on { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(242, 194, 85, 0.25) inset; }
+.lf-avatar:disabled { opacity: 0.6; }
+.lf-avatar-emoji { font-size: 30px; line-height: 1; }
+.lf-avatar-name { font-size: 12px; }
