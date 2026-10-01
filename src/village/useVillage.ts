@@ -97,8 +97,15 @@ export interface ContentNames {
   loaded: boolean
 }
 
+/** The catalogue tables a name may live in: the tables the server has, then the ones it is asked to add (a
+ * content gap until it does: settlement knowledge, life ranks, stages and sleep spots are not served yet). */
+const ALIAS: Record<string, string[]> = {
+  knowledge: ['settlement_knowledge', 'knowledge'], rank: ['life_rank', 'rank'], life_stage: ['life_stage', 'stage'], sleep_spot: ['sleep_spot', 'spot'],
+}
+
 export function contentName(entries: Entries, tables: string | string[], code: string, authored?: string): string {
-  for (const table of Array.isArray(tables) ? tables : [tables]) {
+  const list = (Array.isArray(tables) ? tables : [tables]).flatMap((t) => ALIAS[t] ?? [t])
+  for (const table of list) {
     const n = entries[table]?.find((e) => e.code === code)?.name
     const v = n && (getLang() === 'en' ? n.en || n.fa : n.fa || n.en)
     if (v) return v
