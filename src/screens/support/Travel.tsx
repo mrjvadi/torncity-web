@@ -81,12 +81,12 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
   async function go(d: TravelDestination, mode: string, fare: number) {
     try {
       const r = await api.runCommand('travel.start', { city: d.code, mode, max: fare }, `web-tr-${Date.now().toString(36)}`)
-      if (r.ok === false) { toast.push(refusalText(r.error?.code, r.error?.message)); return }
+      if (r.ok === false) { toast.push(refusalText(r.error?.code, r.error?.message), { kind: 'error' }); return }
       setSel(null)
       await refreshBootstrap()
       openLocal('support_journey')
     } catch (e) {
-      toast.push(refusalText((e as { code?: string })?.code, t('sc.travel.failed')))
+      toast.push(refusalText((e as { code?: string })?.code, t('sc.travel.failed')), { kind: 'error' })
     }
   }
 

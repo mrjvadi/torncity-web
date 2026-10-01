@@ -78,7 +78,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
     const r = await cmd(kindOf === 'cancel' ? 'settlement.build.cancel' : 'settlement.build.demolish', { id: b.id }, { write: true })
     setBusy(false)
     if (r.ok) {
-      toast.push(t(kindOf === 'cancel' ? 'building.cancelled' : 'building.demolished'))
+      toast.push(t(kindOf === 'cancel' ? 'building.cancelled' : 'building.demolished'), { kind: 'success' })
       void store?.refetchLayout()
       setAsk(null)
       onClose()

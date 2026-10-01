@@ -1937,3 +1937,158 @@ act.property.leave_confirm | بله، می‌روم | Yes, I am leaving
 act.page.prev | قبلی | Previous
 act.page.next | بعدی | Next
 # -- end of the life area ------------------------------------------------------------
+# -- notices pushed by the server (worded here from the notice's code and facts) ----
+pn.generic | پیام تازه‌ای داری. | You have a new message.
+pn.someone | یک بازیکن | A player
+pn.payment.cash | {player} {amount} نقد به تو داد. | {player} handed you {amount} in cash.
+pn.payment.card | {player} {amount} برایت فرستاد؛ پول به حساب بانکی‌ات رفت. | {player} sent you {amount}; it went into your bank account.
+pn.achievement | دستاورد «{name}» را گرفتی. | You earned the “{name}” achievement.
+pn.achievement.cash | {cash} جایزه گرفتی. | It paid {cash}.
+pn.achievement.withheld | سقف روزانهٔ جایزه‌ها {amount} از آن را نگه داشت. | The daily reward cap held back {amount}.
+pn.office.appointed | {by} تو را به‌عنوان {office} {place} منصوب کرد. | {by} appointed you {office} of {place}.
+pn.office.dismissed | {by} تو را از {office} {place} برکنار کرد. | {by} removed you from the post of {office} of {place}.
+pn.auction.outbid | در حراج {no} ({item}) کسی پیشنهاد بالاتری داد؛ {amount} به تو برگشت. | Someone outbid you at auction {no} ({item}); {amount} came back to you.
+pn.auction.won | حراج {no} را بردی: {item} به {amount}. | You won auction {no}: {item} for {amount}.
+pn.auction.sold | {item} در حراج {no} به {amount} فروخته شد؛ کارمزد {fee}. | {item} sold at auction {no} for {amount}; the fee was {fee}.
+pn.auction.unsold | حراج {no} بدون خریدار تمام شد و {item} برگشت. | Auction {no} ended with no buyer and {item} came back to you.
+pn.victim | در {city} از تو دزدی شد ({crime}) و {amount} از دست دادی. | You were robbed in {city} ({crime}) and lost {amount}.
+pn.victim.item | {item} را هم بردند. | They took {item} too.
+pn.victim.seen | شاهدی می‌گوید کار {thief} بوده. | A witness says it was {thief}.
+pn.case.closed | پروندهٔ دزدی‌ات در {city} بسته شد؛ پلیس کسی را پیدا نکرد. | Your theft case in {city} was closed; the police found nobody.
+pn.case.solved | پلیس {thief} را به‌خاطر دزدی در {city} گرفت و {restored} به تو برگشت. | The police caught {thief} for the theft in {city}; {restored} was returned to you.
+pn.case.shortfall | {amount} قابل بازگرداندن نبود. | {amount} could not be recovered.
+pn.convicted | محکوم شدی: دزدی‌ات در {city} ({crime}) رو شد. {restored} را پس دادی، {fine} جریمه پرداختی و {term} زندان گرفتی. | You were convicted: your theft in {city} ({crime}) came out. You paid back {restored}, paid {fine} in fines and got {term} in jail.
+pn.convicted.unpaid | {debt} هنوز پرداخت نشده و در سابقه‌ات می‌ماند. | {debt} is still unpaid and stays on your record.
+pn.treaty | {country} پیشنهاد {kind} داده (شمارهٔ {no}). {time} وقت داری جواب بدهی. | {country} proposed a {kind} (no. {no}). You have {time} to answer.
+pn.election.won | در انتخابات {election} برگزیده شدی: {votes} رأی از {cast} رأی. | You won the {election} election: {votes} of {cast} votes.
+pn.election.lost | در انتخابات {election} برگزیده نشدی: {votes} رأی از {cast} رأی گرفتی. | You did not win the {election} election: you got {votes} of {cast} votes.
+pn.election.deposit_back | ودیعهٔ {deposit} به تو برگشت. | Your {deposit} deposit was returned.
+pn.election.deposit_kept | رأی‌هایت به حد لازم نرسید و ودیعهٔ {deposit} به خزانهٔ شهر رفت. | Your votes fell short and the {deposit} deposit went to the city treasury.
+pn.faction.invite | {player} تو را به {faction} دعوت کرد. | {player} invited you to {faction}.
+pn.faction.apply | {player} می‌خواهد به {faction} بپیوندد. | {player} wants to join {faction}.
+pn.faction.answer_invite_accepted | {player} دعوتت را پذیرفت و به {faction} پیوست. | {player} accepted your invitation and joined {faction}.
+pn.faction.answer_invite_declined | {player} دعوت {faction} را قبول نکرد. | {player} turned down the invitation to {faction}.
+pn.faction.answer_apply_accepted | درخواستت پذیرفته شد؛ حالا عضو {faction} هستی. | Your request was accepted; you are now a member of {faction}.
+pn.faction.answer_apply_declined | درخواست عضویتت در {faction} قبول نشد. | Your request to join {faction} was turned down.
+pn.faction_crime.succeeded | {crime} با {faction} موفق بود. | {crime} with {faction} succeeded.
+pn.faction_crime.escaped | {crime} با {faction} خراب شد، ولی گروه فرار کرد. | {crime} with {faction} went wrong, but the crew got away.
+pn.faction_crime.caught | {crime} با {faction} خراب شد و پلیس گروه را گرفت. | {crime} with {faction} went wrong and the police caught the crew.
+pn.faction_crime.split | درآمد کل {take}، سهم بانک جناح {cut}، سهم تو {share}. | Total take {take}, faction bank {cut}, your share {share}.
+pn.faction_crime.jail | {term} زندان گرفتی. | You got {term} in jail.
+pn.faction_crime.fine | جریمه {fine}؛ {paid} پرداخت شد. | Fine {fine}; {paid} paid.
+pn.injury | {damage} از سلامتت کم شد. | You lost {damage} health.
+pn.finance.due | قسط وام شمارهٔ {no} ({product}) {amount} است و به‌زودی برداشت می‌شود، اما نقد و حساب بانکی‌ات روی هم {other} است. | Instalment of loan {no} ({product}) is {amount} and will be taken soon, but your cash and bank add up to {other}.
+pn.finance.missed | قسط وام شمارهٔ {no} ({product}) پرداخت نشد؛ {other} جریمهٔ دیرکرد اضافه شد. {count} قسط عقب افتاده است. | Instalment of loan {no} ({product}) was missed; {other} late fee added. {count} instalments are behind.
+pn.finance.defaulted | وام شمارهٔ {no} ({product}) نکول شد؛ {amount} از بدهی سوخت. | Loan {no} ({product}) defaulted; {amount} of the debt was written off.
+pn.finance.repaid | وام شمارهٔ {no} ({product}) کامل تسویه شد. | Loan {no} ({product}) is fully repaid.
+pn.finance.claimed | {product}: {amount} خسارت به حساب بانکی‌ات واریز شد. | {product}: {amount} in claims was paid into your bank account.
+pn.finance.lapsed | حق بیمهٔ {product}، {amount}، پرداخت نشد و بیمه‌نامه باطل شد. | The {product} premium of {amount} was not paid and the policy lapsed.
+pn.finance.gone | ملکی که {product} برایش بود دیگر مال تو نیست و بیمه‌نامه تمام شد. | The property {product} covered is no longer yours and the policy ended.
+pn.hospitalised | {damage} از سلامتت کم شد و در {city} بستری شدی. سلامت: {health} از {max}. | You lost {damage} health and were admitted in {city}. Health: {health} of {max}.
+pn.clinic | درمانگاه {name}، {patient} را درمان کرد و {price} گرفت. | Clinic {name} treated {patient} and earned {price}.
+pn.bill.passed | طرح شمارهٔ {no} در {place} تصویب شد؛ {yes} موافق، {nay} مخالف. | Bill {no} passed in {place}; {yes} for, {nay} against.
+pn.bill.failed | طرح شمارهٔ {no} در {place} رد شد؛ {yes} موافق، {nay} مخالف. | Bill {no} was rejected in {place}; {yes} for, {nay} against.
+pn.bill.lapsed | طرح شمارهٔ {no} در {place} تصویب شد اما اجرا نشد. | Bill {no} passed in {place} but could not be carried out.
+pn.rank.up | تبریک! رتبه‌ات از {from} به {rank} رسید. دارایی خالصت {worth} است. | Congratulations! You moved up from {from} to {rank}. Your net worth is {worth}.
+pn.rank.down | رتبه‌ات از {from} به {rank} آمد. دارایی خالصت {worth} است. | You dropped from {from} to {rank}. Your net worth is {worth}.
+pn.hunger | گرسنه‌ای! یک لقمه بخور تا دوباره سرحال شوی. | You are hungry! Eat something to get your strength back.
+pn.market.bought | سفارشت در {city} انجام شد: {qty} عدد {item} خریدی، هر عدد {price}، روی هم {amount}. | Your order in {city} filled: you bought {qty} × {item} at {price} each, {amount} in all.
+pn.market.sold | سفارشت در {city} انجام شد: {qty} عدد {item} فروختی، هر عدد {price}، روی هم {amount}؛ کارمزد {fee}. | Your order in {city} filled: you sold {qty} × {item} at {price} each, {amount} in all; fee {fee}.
+pn.mission | مأموریت «{mission}» انجام شد! | Mission “{mission}” is done!
+pn.mission.paid | {cash} به پول نقدت اضافه شد. | {cash} was added to your cash.
+pn.mission.withheld | {amount} از پاداش به‌خاطر سقف روزانه پرداخت نشد. | {amount} of the reward was not paid because of the daily cap.
+pn.mission.item | {qty} عدد {item} گرفتی. | You got {qty} × {item}.
+pn.property.sold | ملک شمارهٔ {no} ({type} در {city}) را {player} خرید؛ {amount} به حسابت رفت. | {player} bought property {no} ({type} in {city}); {amount} went to your account.
+pn.property.let | {player} ملک شمارهٔ {no} ({type} در {city}) را اجاره کرد؛ اجارهٔ اول، {amount}، به حسابت رفت. | {player} rented property {no} ({type} in {city}); the first rent, {amount}, went to your account.
+pn.property.tenant_left | {player} از ملک شمارهٔ {no} ({type} در {city}) رفت. | {player} moved out of property {no} ({type} in {city}).
+pn.property.foreclosed | ملک شمارهٔ {no} ({type} در {city}) به‌خاطر بدهی پرداخت‌نشده به شهر برگشت. | Property {no} ({type} in {city}) went back to the city over unpaid debt.
+pn.property.evicted | چند دوره اجارهٔ {type} در {city} را ندادی و قرارداد تمام شد. | You missed several rents on the {type} in {city} and the lease ended.
+pn.property.evicted_tenant | مستأجر ملک شمارهٔ {no} ({type} در {city}) چند دوره اجاره نداد و قرارداد تمام شد. | The tenant of property {no} ({type} in {city}) missed several rents and the lease ended.
+pn.recruit.what | {skill} سطح {level} | {skill}, level {level}
+pn.recruit.applied | {company}، کارزار شمارهٔ {no}: {count} متخصص درخواست دادند. | {company}, campaign {no}: {count} specialists applied.
+pn.recruit.hired | یک متخصص {what} خودکار به {company} پیوست. | A {what} specialist joined {company} automatically.
+pn.recruit.ended | {company}، کارزار شمارهٔ {no}: بررسی‌ها تمام شد. | {company}, campaign {no}: the review is over.
+pn.recruit.filled | {company}، کارزار شمارهٔ {no}: همهٔ نفرات استخدام شدند. | {company}, campaign {no}: every position is filled.
+pn.recruit.completed | قرارداد یک متخصص {what} در {company} تمام شد؛ تا تسویهٔ بعد تمدیدش کن، وگرنه می‌رود. | A {what} specialist's contract at {company} ended; renew it before the next settlement or they leave.
+pn.recruit.equity | سهم مجازی‌اش {amount} نقد پرداخت شد. | Their virtual equity was paid out: {amount}.
+pn.recruit.left | یک متخصص {what} از {company} رفت: {reason}. | A {what} specialist left {company}: {reason}.
+pn.recruit.unpaid | حقوق یک متخصص {what} در {company} پرداخت نشد؛ پول آزاد شرکت کافی نبود. | A {what} specialist at {company} was not paid; the company's free cash was not enough.
+pn.recruit.leave.unpaid | چند دوره حقوق نگرفت | they went several periods unpaid
+pn.recruit.leave.poached | حقوقش کمتر از بازار بود و پیشنهاد بهتری گرفت | they were paid below market and got a better offer
+pn.recruit.leave.contract_end | قراردادش تمام شد و تمدید نشد | their contract ended and was not renewed
+pn.recruit.leave.dismissed | شرکت همکاری را تمام کرد | the company ended the arrangement
+pn.recruit.leave.company_closed | شرکت بسته شد | the company closed
+pn.stock.filled_buy | سفارش خریدت پر شد: {qty} سهم «{company}» به {price}، جمعاً {amount}. | Your buy order filled: {qty} shares of {company} at {price}, {amount} in all.
+pn.stock.filled_sell | سفارش فروشت پر شد: {qty} سهم «{company}» به {price}؛ {amount} به حسابت آمد. | Your sell order filled: {qty} shares of {company} at {price}; {amount} came to your account.
+pn.stock.dividend | «{company}» سود داد: {qty} سهم تو، هر سهم {price}، جمعاً {amount} به حسابت آمد. | {company} paid a dividend: {qty} shares at {price} each, {amount} to your account.
+pn.stock.takeover | حالا {qty} سهم «{company}» مال توست و اختیار شرکت با توست. | You now hold {qty} shares of {company} and control it.
+pn.stock.takeover_lost | کسی بیش از نیمی از سهام «{company}» را خرید و اختیار شرکت با اوست. | Someone bought more than half of {company} and now controls it.
+pn.news.built | در {village}، {building} ساخته شد. | {building} was built in {village}.
+pn.news.build_started | در {village} ساخت {building} شروع شد. | Work on {building} started in {village}.
+pn.news.researched | {village} دانش «{knowledge}» را یاد گرفت. | {village} learned {knowledge}.
+pn.news.bought | {village} دانش «{knowledge}» را خرید. | {village} bought {knowledge}.
+pn.news.taught | سواد {village} به {percent}٪ رسید. | Literacy in {village} reached {percent}%.
+pn.news.resident_joined | {player} ساکن {village} شد. | {player} became a resident of {village}.
+pn.news.donated | {player} به خزانهٔ {village} کمک کرد. | {player} gave to the treasury of {village}.
+pn.news.promoted | {village} رشد کرد و ارتقا گرفت. | {village} has grown to the next tier.
+pn.news.more | و {n} مورد دیگر. | and {n} more.
+# -- inbox categories the server uses ---------------------------------------------
+inbox.cat.companies | شرکت‌ها | Companies
+inbox.cat.jobs | شغل | Jobs
+inbox.cat.market | بازار | Market
+inbox.cat.government | حکومت | Government
+inbox.cat.war | جنگ | War
+inbox.cat.health | سلامت | Health
+inbox.cat.travel | سفر | Travel
+inbox.cat.education | آموزش | Education
+inbox.cat.achievements | دستاوردها | Achievements
+inbox.cat.missions | مأموریت‌ها | Missions
+inbox.cat.life | زندگی | Life
+inbox.item_link | باز کردن | Open
+inbox.legacy_text | پیام تازه | New message
+# -- founding choices (the server sends codes) --------------------------------------
+founding.shape.shield | سپر | Shield
+founding.shape.circle | دایره | Circle
+founding.shape.banner | پرچم | Banner
+founding.shape.diamond | لوزی | Diamond
+founding.shape.hexagon | شش‌ضلعی | Hexagon
+founding.color.crimson | سرخ | Crimson
+founding.color.orange | نارنجی | Orange
+founding.color.gold | طلایی | Gold
+founding.color.green | سبز | Green
+founding.color.azure | آبی | Azure
+founding.color.violet | بنفش | Violet
+founding.color.brown | قهوه‌ای | Brown
+founding.color.ivory | عاجی | Ivory
+founding.color.slate | خاکستری تیره | Slate
+founding.icon.wheat | خوشهٔ گندم | Wheat
+founding.icon.tree | درخت | Tree
+founding.icon.mountain | کوه | Mountain
+founding.icon.wave | موج | Wave
+founding.icon.sun | خورشید | Sun
+founding.icon.moon | ماه | Moon
+founding.icon.star | ستاره | Star
+founding.icon.tower | برج | Tower
+founding.icon.anchor | لنگر | Anchor
+founding.icon.hammer | چکش | Hammer
+founding.icon.flame | شعله | Flame
+founding.icon.crown | تاج | Crown
+founding.icon.key | کلید | Key
+founding.icon.book | کتاب | Book
+founding.icon.horse | اسب | Horse
+founding.icon.fish | ماهی | Fish
+founding.draft.title | ساخت روستا | Found a village
+founding.draft.body | فرم تأسیس روستا باز است. مشخصات را کامل کن تا روستا ساخته شود. | The founding form is open. Fill it in to create the village.
+founding.draft.pending | {founder} در حال تکمیل فرم این روستاست. | {founder} is filling in this village's form.
+founding.draft.open | تکمیل اطلاعات روستا | Fill in the village form
+founding.checked.body | فرم درست است؛ می‌توانی روستای «{name}» را بسازی. | The form is fine; you can found “{name}”.
+founding.refusal.title | تأسیس روستا نشد | The village was not founded
+refusal.settlement_group_only | تأسیس روستا فقط در گروه بازی ممکن است. | A village can only be founded from a game group.
+refusal.settlement_no_world | نقشهٔ جهان هنوز آماده نیست؛ کمی بعد دوباره امتحان کن. | The world map is not ready yet; try again shortly.
+refusal.settlement_already | این گروه پیش‌تر روستای «{name}» را ساخته است. | This group has already founded “{name}”.
+founded.title | روستای «{name}» ساخته شد | “{name}” is founded
+founded.body | شما دهیار این روستا هستید. | You are the head of this village.
+act.inbox.open | دیدن پیام‌ها | See messages
+act.inbox.read_all | خواندن همه | Mark all read
+act.inbox.open_item | باز کردن | Open
+act.founding.open_form | تکمیل اطلاعات روستا | Fill in the village form

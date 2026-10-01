@@ -29,7 +29,7 @@ interface ToastItem { id: number; text: string; kind: ToastKind; command?: strin
 
 type Opener = (command: string, args?: Record<string, string>) => void
 
-interface ToastApi {
+export interface ToastApi {
   push: (text: string, opts?: ToastOptions) => void
   /** the shell says how to open a screen from a toast */
   bindOpener: (fn: Opener | null) => void
@@ -61,18 +61,6 @@ function seenBefore(key: string): boolean {
 }
 
 const LEAD = /^[\s\p{Extended_Pictographic}️‍]+/u
-const GOOD = /^[\s]*(✅|✔|🎉|🛬)|تمام شد|انجام شد|شروع شد|وارد شد|آمد\.?$|تأسیس شد|ممنون|خریداری شد|finished|is finished|done|joined|founded|thank|was bought|started/i
-const WARN = /^[\s]*(⚠|🔔)|لغو شد|ترک کرد|تخریب شد|left the village|cancel|demolish/i
-const BAD = /^[\s]*(⛔|❌|🚫)|نشد\b|ناموفق|کافی نیست|not enough|cannot|failed|refus/i
-
-/** The kind a plain message most likely is, from its own words. */
-export function inferKind(text: string): ToastKind {
-  if (BAD.test(text)) return 'error'
-  if (WARN.test(text)) return 'warning'
-  if (GOOD.test(text)) return 'success'
-  return 'info'
-}
-
 /** Raw codes in quotes (a catalogue name that was not found) are not for players. */
 function scrub(text: string): string {
   return text.replace(/[«"“]([a-z][a-z0-9]*(?:[_.][a-z0-9]+)+|[a-z]{1,24}\d*)[»"”]/g, t('toast.unnamed')).replace(LEAD, '').trim()
@@ -94,7 +82,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const drop = useCallback((id: number) => setItems((cur) => cur.filter((x) => x.id !== id)), [])
 
   const push = useCallback((raw: string, opts: ToastOptions = {}) => {
-    const kind = opts.kind ?? inferKind(raw)
+    // The colour comes from what the message is (a notice's code, a refusal), never from its words.
+    const kind = opts.kind ?? 'info'
     const text = scrub(raw)
     if (!text) return
     if (opts.user) {

@@ -206,7 +206,8 @@ export interface EmblemCodes {
   icon: string
 }
 
-export interface FoundingChoice { code: string; name: string; emoji: string; hex?: string }
+/** A shape, colour or icon of the emblem: the server sends its code (and a colour's hex); the client names it. */
+export interface FoundingChoice { code: string; hex?: string }
 
 export interface FoundingLimits {
   name_min: number
@@ -262,7 +263,6 @@ export interface SettlementFoundedView {
   name: string
   settlement_id: string
   emblem: EmblemCodes
-  emblem_text?: string
   motto?: string
   currency_name?: string
   currency_code?: string

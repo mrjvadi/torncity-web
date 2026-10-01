@@ -56,7 +56,7 @@ export function BuyLotSheet({ lot, price, onClose, store }: { lot: Lot | null; p
     if (r.ok) {
       if (r.res?.view) setView(r.res.view as unknown as LotBuyView)
       setDone(true)
-      toast.push(t('citizen.buy.done'))
+      toast.push(t('citizen.buy.done'), { kind: 'success' })
       void store?.refetchLayout()
     }
   }
@@ -149,7 +149,7 @@ export function HouseSheet({ lot, cat, onClose, store }: { lot: Lot | null; cat:
     const r = await cmd('settlement.private.place', { code: bill.building.code, x: lot.x, y: lot.y, confirm: 'confirm' }, { write: true })
     setBusy(false)
     if (r.ok) {
-      toast.push(t('citizen.build.started'))
+      toast.push(t('citizen.build.started'), { kind: 'success' })
       void store?.refetchLayout()
       onClose()
     }

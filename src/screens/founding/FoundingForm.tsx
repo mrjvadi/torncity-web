@@ -14,10 +14,10 @@ import type {
 import { Card, Chip, Empty, Header, PrimaryButton, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import Emblem, { Glyph } from '../../lib/emblem'
 import Popup, { ActionButton, Note } from '../../ui/Popup'
-import { t, type Key } from '../../i18n'
+import { t, hasKey, refusalText, type Key } from '../../i18n'
 import { friendlyError } from '../../lib/errors'
 import { useSession } from '../../state/SessionContext'
-import { useToast } from '../../state/ToastContext'
+import { useToast, type ToastOptions } from '../../state/ToastContext'
 import { useNow } from '../../village/useVillage'
 import { shade } from '../../kit/color'
 import './founding.css'
@@ -42,6 +42,12 @@ function timeLeft(expiresAt: string, now: number): string {
 /** The sentence for a coded problem: the client's own text with the limits filled in. */
 export function problemText(p: FoundingProblem, limits: FoundingLimits): string {
   return t(`founding.problem.${p.code}` as Key, limits as unknown as Record<string, number>)
+}
+
+/** A shape, colour or icon by its code, in the player's language (the server sends no names). */
+function choiceName(kind: 'shape' | 'color' | 'icon', code: string): string {
+  const key = `founding.${kind}.${code}`
+  return hasKey(key) ? t(key as Key) : code
 }
 
 function hexOf(list: FoundingChoice[], code: string): string {
@@ -139,7 +145,7 @@ export default function FoundingForm({ localArgs, openLocal }: ScreenProps) {
           {view.state === 'other' && (
             <>
               <Emblem {...emblemProps(view, view.default_emblem)} size={96} />
-              <div className="ff-msg-title">{t('founding.other.title', { founder: view.founder })}</div>
+              <div className="ff-msg-title">{t('founding.other.title', { founder: view.founder || t('pn.someone') })}</div>
               <div className="ff-msg-body">{t('founding.other.body')}</div>
               <Chip tone="gold">{t('founding.time_left', { time: timeLeft(view.expires_at, Date.now()) })}</Chip>
             </>
@@ -177,7 +183,7 @@ function Editor({ view, onDone, onBack, toast }: {
   view: FoundingFormView
   onDone: () => Promise<void>
   onBack: () => void
-  toast: (text: string) => void
+  toast: (text: string, opts?: ToastOptions) => void
 }) {
   const lim = view.limits
   const [f, setF] = useState<FormState>({
@@ -206,10 +212,10 @@ function Editor({ view, onDone, onBack, toast }: {
       if (mine !== seq.current) return []
       const list = r.ok ? [] : ((r.view as { problems?: FoundingProblem[] } | undefined)?.problems ?? [])
       setProblems(list)
-      if (!r.ok && !list.length) toast(r.error?.message ?? t('refusal.unknown'))
+      if (!r.ok && !list.length) toast(refusalText(r.error?.code, r.error?.message, r.error?.args), { kind: 'error', user: true })
       return list
     } catch (e) {
-      if (mine === seq.current) toast(friendlyError(e))
+      if (mine === seq.current) toast(friendlyError(e), { kind: 'error', user: true })
       return []
     } finally {
       if (mine === seq.current) setChecking(false)
@@ -233,7 +239,7 @@ function Editor({ view, onDone, onBack, toast }: {
     if (list.length) {
       const first = FIELDS.find((k) => list.some((p) => p.field === k))
       if (first) fieldRefs.current[first]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      toast(t('founding.fix_first'))
+      toast(t('founding.fix_first'), { kind: 'warning', user: true })
       return
     }
     setConfirm(true)
@@ -244,7 +250,7 @@ function Editor({ view, onDone, onBack, toast }: {
     try {
       const r = await api.runCommand('settlement.found.submit', toArgs(view.draft, f, false) as unknown as Record<string, string>, `found-${view.draft}`)
       if (r.ok) {
-        toast(t('founding.done_toast'))
+        toast(t('founding.done_toast'), { kind: 'success', user: true })
         setConfirm(false)
         await onDone()
         return
@@ -257,10 +263,10 @@ function Editor({ view, onDone, onBack, toast }: {
         for (const k of FIELDS) all[k] = true
         setTouched(all)
       } else {
-        toast(r.error?.message ?? t('refusal.unknown'))
+        toast(refusalText(r.error?.code, r.error?.message, r.error?.args), { kind: 'error', user: true })
       }
     } catch (e) {
-      toast(friendlyError(e))
+      toast(friendlyError(e), { kind: 'error', user: true })
     } finally {
       setBusy(false)
     }
@@ -324,9 +330,9 @@ function Editor({ view, onDone, onBack, toast }: {
           <div className="ff-lab">{t('founding.emblem.shape')}</div>
           <div className="ff-shapes">
             {view.shapes.map((s) => (
-              <button key={s.code} className={`ff-shape${f.emblem.shape === s.code ? ' on' : ''}`} onClick={() => setEmblem({ shape: s.code })} aria-label={s.name} aria-pressed={f.emblem.shape === s.code}>
+              <button key={s.code} className={`ff-shape${f.emblem.shape === s.code ? ' on' : ''}`} onClick={() => setEmblem({ shape: s.code })} aria-label={choiceName('shape', s.code)} aria-pressed={f.emblem.shape === s.code}>
                 <Emblem shape={s.code} colorA={colorA} colorB={colorB} icon={f.emblem.icon} size={36} bare />
-                <span>{s.name}</span>
+                <span>{choiceName('shape', s.code)}</span>
               </button>
             ))}
           </div>
@@ -334,7 +340,7 @@ function Editor({ view, onDone, onBack, toast }: {
           <div className="ff-lab">{t('founding.emblem.icon')}</div>
           <div className="ff-icons">
             {view.icons.map((ic) => (
-              <button key={ic.code} className={`ff-icon${f.emblem.icon === ic.code ? ' on' : ''}`} onClick={() => setEmblem({ icon: ic.code })} aria-label={ic.name} aria-pressed={f.emblem.icon === ic.code}>
+              <button key={ic.code} className={`ff-icon${f.emblem.icon === ic.code ? ' on' : ''}`} onClick={() => setEmblem({ icon: ic.code })} aria-label={choiceName('icon', ic.code)} aria-pressed={f.emblem.icon === ic.code}>
                 <svg viewBox="0 0 24 24" width="24" height="24"><Glyph icon={ic.code} fill={f.emblem.icon === ic.code ? '#ffe9a8' : '#c5cbe6'} line="rgba(0,0,0,0.55)" /></svg>
               </button>
             ))}
@@ -348,7 +354,7 @@ function Editor({ view, onDone, onBack, toast }: {
                   <button
                     key={c.code} className={`ff-color${f.emblem[which] === c.code ? ' on' : ''}${f.emblem[which === 'color_a' ? 'color_b' : 'color_a'] === c.code ? ' used' : ''}`}
                     style={{ background: `linear-gradient(180deg, ${shade(c.hex ?? '#888', 0.25)}, ${c.hex})` }}
-                    onClick={() => pickColor(which, c.code)} aria-label={c.name} aria-pressed={f.emblem[which] === c.code}
+                    onClick={() => pickColor(which, c.code)} aria-label={choiceName('color', c.code)} aria-pressed={f.emblem[which] === c.code}
                   />
                 ))}
               </div>

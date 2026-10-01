@@ -177,8 +177,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     if (!ev || ev.seq === lastEventSeq.current) return
     lastEventSeq.current = ev.seq
     const name = ev.type_code ? buildingName(cat, ev.type_code) : (ev.code ?? ev.player_name ?? '')
-    if (ev.type === 'build_finished' || ev.type === 'build_cancelled' || ev.type === 'build_salvaged') toast.push(t(`event.${ev.type}`, { name }))
-    else if (ev.type === 'member_joined' || ev.type === 'member_left') toast.push(t(`event.${ev.type}`, { name: ev.player_name ?? '' }))
+    if (ev.type === 'build_finished' || ev.type === 'build_cancelled' || ev.type === 'build_salvaged') toast.push(t(`event.${ev.type}`, { name }), { kind: ev.type === 'build_finished' ? 'success' : 'warning' })
+    else if (ev.type === 'member_joined' || ev.type === 'member_left') toast.push(t(`event.${ev.type}`, { name: ev.player_name ?? '' }), { kind: ev.type === 'member_joined' ? 'success' : 'info' })
   }, [v.lastEvent, cat, toast])
 
   // -- render -----------------------------------------------------------------------------

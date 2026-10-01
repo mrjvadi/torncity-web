@@ -5,7 +5,7 @@
 
 import type {
   ErrorView, ItemDetailView, ItemDroppedView, ItemGivenView, ItemRefusalView, ItemUsedView, PropertyLeaveView, PropertyOfferView, PropertyRefusalView,
-  PropertyTypeView, PropertyView, RefusalView, Requirement,
+  PropertyTypeView, PropertyDetailView, RefusalView, Requirement,
 } from '../../api/views.gen'
 import { Bar, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
@@ -226,7 +226,7 @@ export const PropertyOffer = flow<PropertyOfferView>(({ view: v, ctx }) => {
   )
 })
 
-export const Property = flow<PropertyView>(({ view: v, ctx }) => {
+export const Property = flow<PropertyDetailView>(({ view: v, ctx }) => {
   const p = v.property
   const name = nameOf(ctx, 'property_type', p.type)
   return (
