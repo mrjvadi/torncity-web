@@ -8,7 +8,7 @@
 // the HUD, the profile, the bank and the village visibly follow without a
 // refresh.
 //
-// Handles for screenshots and checks: window.__sync.tick('income' | 'energy'
+// Handles for screenshots and checks: window.__sync.tick('income' | 'energy' | 'item'
 // | 'village' | 'inbox' | 'skill'), .drop(), .reorder(), .chaos(on),
 // .stats().
 
@@ -213,7 +213,7 @@ function publish(records: SyncRecord[]): void {
   }
 }
 
-type Tick = 'income' | 'energy' | 'village' | 'inbox' | 'skill'
+type Tick = 'income' | 'energy' | 'village' | 'inbox' | 'skill' | 'item'
 const TICKS: Tick[] = ['income', 'energy', 'village', 'inbox', 'skill']
 let nextTick = 0
 
@@ -253,6 +253,12 @@ export function mockTick(kind?: Tick): void {
       add(patch('skill', 'trading', (s: { xp: number; level: number }) => ({ ...s, xp: s.xp + 25 })))
       add(patch('player', PLAYER, (p: { xp: number }) => ({ ...p, xp: p.xp + 60 })))
       break
+    case 'item': {
+      // bread bought at the bazaar from Telegram, and a new item given by a friend
+      add(patch<Inv>('inventory', 'bread', (i) => ({ ...i, qty: i.qty + 3, holdings: { ...i.holdings, carried: i.qty + 3 } })))
+      if (!byKind('inventory').has('bandage')) add(put('inventory', 'bandage', { item: 'bandage', qty: 2, holdings: { carried: 2 }, pieces: [] } as Inv))
+      break
+    }
   }
   if (chaos && Math.random() < 0.15) dropNext = 1
   if (chaos && Math.random() < 0.15) reorderNext = true
