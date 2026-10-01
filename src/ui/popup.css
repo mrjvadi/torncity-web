@@ -245,3 +245,4 @@ html.pp-lock, html.pp-lock body { overflow: hidden; overscroll-behavior: none; }
 .pp-cost-line { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: #d6c9d6; }
 .pp-cost-line b { font-weight: 400; color: #fff; white-space: nowrap; }
 .pp-cost-total { display: flex; justify-content: space-between; gap: 10px; font-size: 16px; color: #ffd66b; padding-top: 4px; margin-top: 2px; border-top: 1px dashed rgba(242, 194, 85, 0.4); }
+.pp-covered { visibility: hidden; }

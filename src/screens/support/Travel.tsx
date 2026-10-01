@@ -148,7 +148,7 @@ function ConfirmSheet({ dest, hint, onClose, onGo }: { dest: TravelDestination |
       open onClose={onClose} title={t('sc.confirm.title', { name: dest.name })} tone="navy" dismissible={!busy}
       footer={(
         <ActionButton
-          tone="gold" cost={chosen ? money(chosen.fare) : undefined} costIcon="coins" costPalette="gold"
+          tone="gold" cost={chosen ? (chosen.fare > 0 ? money(chosen.fare) : t('common.free')) : undefined} costIcon="coins" costPalette="gold"
           disabled={!chosen} busy={busy}
           onClick={() => { if (!chosen) return; setBusy(true); void onGo(dest, chosen.mode_code, chosen.fare).finally(() => setBusy(false)) }}
         >

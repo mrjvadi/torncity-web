@@ -10,7 +10,7 @@
 // Building blocks for the inside: Hero, Gauge, Medallion, StatGrid/StatCard,
 // EffectRow/EffectChip, ProgressRow, ActionButton (with a cost badge), Note,
 // Section. See popup.css.
-import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Icon, { type IconPalette } from './Icon'
 import { GLabel } from '../kit'
@@ -34,6 +34,8 @@ export interface PopupProps {
 
 // -- stack: only the top popup answers Escape / Back ---------------------------
 const stack: symbol[] = []
+const listeners = new Set<() => void>()
+const changed = () => listeners.forEach((f) => f())
 let locks = 0
 function lockScroll(on: boolean) {
   locks += on ? 1 : -1
@@ -52,14 +54,19 @@ function PopupInner({ onClose, title, children, footer, tone, dismissible }: Omi
   const can = useRef(dismissible !== false)
   can.current = dismissible !== false
   const titleId = useId()
+  // a popup opened over another hides the one below (it stays mounted, so its state survives)
+  const [covered, setCovered] = useState(false)
 
   useEffect(() => {
     const me = Symbol('popup')
     stack.push(me)
+    const sync = () => setCovered(stack.length > 0 && stack[stack.length - 1] !== me)
+    listeners.add(sync)
+    changed()
     lockScroll(true)
     const opener = document.activeElement as HTMLElement | null
     const el = panel.current
-    el?.focus({ preventScroll: true })
+    if (el && !el.contains(document.activeElement)) el.focus({ preventScroll: true })
     const top = () => stack[stack.length - 1] === me
     const dismiss = () => { if (top() && can.current) close.current() }
 
@@ -86,6 +93,8 @@ function PopupInner({ onClose, title, children, footer, tone, dismissible }: Omi
       document.removeEventListener('keydown', onKey, true)
       const i = stack.indexOf(me)
       if (i >= 0) stack.splice(i, 1)
+      listeners.delete(sync)
+      changed()
       lockScroll(false)
       if (bb) { try { bb.offClick(onBack); if (stack.length === 0) bb.hide() } catch { /* best effort */ } }
       if (opener && document.contains(opener)) opener.focus({ preventScroll: true })
@@ -96,7 +105,7 @@ function PopupInner({ onClose, title, children, footer, tone, dismissible }: Omi
   // opened from a screen with its own stacking context (the village's 3D view,
   // a scroller) would otherwise sit under the dock and the menus.
   return createPortal(
-    <div className={`pp-overlay sheet-backdrop pp-${tone}`} dir={isRtl() ? 'rtl' : 'ltr'} onMouseDown={(e) => { if (e.target === e.currentTarget && can.current) close.current() }}>
+    <div className={`pp-overlay sheet-backdrop pp-${tone}${covered ? ' pp-covered' : ''}`} dir={isRtl() ? 'rtl' : 'ltr'} onMouseDown={(e) => { if (e.target === e.currentTarget && can.current) close.current() }}>
       <div
         className="pp-panel sheet-panel"
         ref={panel}
