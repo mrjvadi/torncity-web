@@ -15,7 +15,8 @@ import type { BuildingPanelView, CatalogueBuilding, LayoutBuilding } from '../..
 import { t, type Key } from '../../i18n'
 import { Bar } from '../native/kit/Parts'
 import { formatNumber, money } from '../native/kit/format'
-import { buildingName, useNow, useVillageCommand } from '../../village/useVillage'
+import { buildingName, useContentNames, useNow, useVillageCommand, type ContentNames } from '../../village/useVillage'
+import { buildingBlurb } from './wording'
 import { constructionProgress } from '../../village/progress'
 import { serverNow } from '../../village/clock'
 import { countdown, durationText, iconForRole } from './common'
@@ -41,6 +42,7 @@ const EFFECT_KEYS = ['local_security_bps', 'food_coverage_bps', 'job_coverage_bp
 
 export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine }: Props) {
   const now = useNow(1000)
+  const names = useContentNames()
   const cmd = useVillageCommand()
   const toast = useToast()
   const [ask, setAsk] = useState<'cancel' | 'demolish' | null>(null)
@@ -103,14 +105,14 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
         </div>
       </div>
 
-      {panel?.description && <p className="vh-desc">{panel.description}</p>}
+      {panel && <p className="vh-desc">{buildingBlurb(panel)}</p>}
 
       {going ? (
         b.finish_at
           ? <Bar frac={p} color="#f5a11f" label={`${countdown(b.finish_at, now)}  ·  ${t('progress.percent', { p: Math.round(p * 100) })}`} />
           : <p className="vh-desc">{t('labor.by_work_hint')}</p>
       ) : (
-        <TypePanel kind={kind} panel={panel} onOpen={onOpen} onClose={onClose} />
+        <TypePanel kind={kind} panel={panel} names={names} onOpen={onOpen} onClose={onClose} />
       )}
       {/* A building raised by work, a citizen's private one too, is worked
           and hired for at its site. */}
@@ -133,7 +135,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
           <Slab tone="steel" radius={14} lip={4} onClick={() => void reveal()}>⬆ {t('building.upgrade')}</Slab>
         </div>
       )}
-      {upgrade && <UpgradeList panel={panel} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
+      {upgrade && <UpgradeList panel={panel} cat={cat} names={names} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
 
       {going && canAct && ask === null && (
         <div className="vh-quiet">
@@ -159,9 +161,10 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
   )
 }
 
-function TypePanel({ kind, panel, onOpen, onClose }: {
+function TypePanel({ kind, panel, names, onOpen, onClose }: {
   kind: string
   panel: BuildingPanelView | null
+  names: ContentNames
   onOpen?: Props['onOpen']
   onClose: () => void
 }) {
@@ -175,7 +178,7 @@ function TypePanel({ kind, panel, onOpen, onClose }: {
           {(panel.stock ?? []).length === 0
             ? <div className="vh-hint">{t('building.storage.empty')}</div>
             : (panel.stock ?? []).map((s) => (
-              <div key={s.item.code} className="vh-stockrow"><span>{s.item.name}</span><b>{formatNumber(s.qty)}</b></div>
+              <div key={s.item.code} className="vh-stockrow"><span>{names.name(['component', 'item'], s.item.code, s.item.name)}</span><b>{formatNumber(s.qty)}</b></div>
             ))}
           {onOpen && (
             <Slab tone="steel" radius={12} lip={3} onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</Slab>
@@ -195,7 +198,7 @@ function TypePanel({ kind, panel, onOpen, onClose }: {
             <div className="vh-tile"><span>{t('building.civic.treasury')}</span><b>{money(panel.treasury ?? 0)}</b></div>
           </div>
           <div className="vh-hint">
-            {panel.research ? t('building.civic.research', { name: panel.research.knowledge.name, t: durationText(panel.research.left_seconds) }) : t('building.civic.no_research')}
+            {panel.research ? t('building.civic.research', { name: names.name('knowledge', panel.research.knowledge.code, panel.research.knowledge.name), t: durationText(panel.research.left_seconds) }) : t('building.civic.no_research')}
           </div>
           {onOpen && (
             <div className="vh-doors">
@@ -219,7 +222,7 @@ function TypePanel({ kind, panel, onOpen, onClose }: {
   )
 }
 
-function UpgradeList({ panel, onBuild }: { panel: BuildingPanelView | null; onBuild: (code: string) => void }) {
+function UpgradeList({ panel, cat, names, onBuild }: { panel: BuildingPanelView | null; cat: Map<string, CatalogueBuilding>; names: ContentNames; onBuild: (code: string) => void }) {
   const ups = panel?.upgrades ?? null
   if (!panel || panel.mode !== 'up') return <div className="vh-hint">…</div>
   if (!ups || ups.length === 0) return <div className="vh-hint">{t('building.upgrade.none')}</div>
@@ -228,11 +231,11 @@ function UpgradeList({ panel, onBuild }: { panel: BuildingPanelView | null; onBu
       <div className="vh-sub">{t('building.upgrade.intro')}</div>
       {ups.map((u) => (
         <div key={u.building.code} className={`vh-upgrade${u.available ? '' : ' locked'}`}>
-          <div className="vh-upgrade-name">{u.building.name}</div>
+          <div className="vh-upgrade-name">{buildingName(cat, u.building.code, u.building.name)}</div>
           <div className="vh-hint">{money(u.cost_money)} · {durationText(u.build_time_seconds)}</div>
           {u.available
             ? <Slab tone="gold" radius={12} lip={3} onClick={() => onBuild(u.building.code)}>{t('building.upgrade.build')}</Slab>
-            : <div className="vh-hint bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => m.name).join('، ') }) : t('building.upgrade.locked')}</div>}
+            : <div className="vh-hint bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') }) : t('building.upgrade.locked')}</div>}
         </div>
       ))}
     </div>

@@ -3,6 +3,7 @@ import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair } from './k
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms, money } from './kit/format'
 import { t } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface Named { code?: string; name?: string; emoji?: string }
 interface Needs { hunger?: number; sleep?: number; stress?: number; happiness?: number }
@@ -18,6 +19,7 @@ interface LifeView {
 
 export default function Life({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as LifeView
+  const names = useContentNames()
   if (loading && !response) return <ScreenScroll><Header title={t('life.title')} tone="violet" /></ScreenScroll>
 
   const needs = v.needs
@@ -36,8 +38,8 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
 
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-          <span className="nx-chip nx-chip-gold">{t('life.stage_age', { stage: v.stage?.name ?? '—', age: formatNumber(v.age ?? 0) })}</span>
-          {v.rank?.name && <span className="nx-chip">{v.rank.emoji} {v.rank.name}</span>}
+          <span className="nx-chip nx-chip-gold">{t('life.stage_age', { stage: names.name('life_stage', v.stage?.code ?? '', v.stage?.name) || '—', age: formatNumber(v.age ?? 0) })}</span>
+          {v.rank?.name && <span className="nx-chip">{v.rank.emoji} {names.name('rank', v.rank.code ?? '', v.rank.name)}</span>}
         </div>
         {needs && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -68,8 +70,8 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
           <div className="nx-sec" style={{ marginBottom: 8 }}>{t('life.sleep_spots')}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {v.spots!.map((s, i) => (
-              <ListRow key={i} icon="bed" palette="violet" title={s.spot?.name ?? '—'}
-                sub={`${t('life.spot_sub', { place: s.place?.name ?? '', rest: formatNumber(s.rest ?? 0) })}${s.price ? ` · ${money(s.price)}` : ''}`} />
+              <ListRow key={i} icon="bed" palette="violet" title={s.spot?.name ? names.name('sleep_spot', s.spot.code ?? '', s.spot.name) : '—'}
+                sub={`${t('life.spot_sub', { place: s.place?.name ? names.name('place', s.place.code ?? '', s.place.name) : '', rest: formatNumber(s.rest ?? 0) })}${s.price ? ` · ${money(s.price)}` : ''}`} />
             ))}
           </div>
           {!!v.sleep_in_seconds && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('life.sleep_again', { t: hms(v.sleep_in_seconds) })}</div>}

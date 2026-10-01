@@ -1,5 +1,6 @@
-// The citizen loop's sheets (contract 1.4): buying a free lot, building a
-// private house on one's own lot, and one's own property. They speak the
+// The citizen loop's sheets (contract 1.4): buying a free lot and building a
+// private house on one's own lot (one's own property and work are sections of
+// the village menu: settlement_mine, labor_board). They speak the
 // server's own two-step commands (settlement.lot.buy, settlement.private.place
 // each answer a bill first and only pay when sent `confirm`), so nothing is
 // spent by opening a sheet. All render at the document body (BottomSheet).
@@ -10,10 +11,10 @@ import { Emboss, Plate, Slab } from '../../kit'
 import { t } from '../../i18n'
 import { money } from '../native/kit/format'
 import { useToast } from '../../state/ToastContext'
-import { buildingName, useVillageCommand } from '../../village/useVillage'
+import { buildingName, useContentNames, useVillageCommand, type ContentNames } from '../../village/useVillage'
 import type { VillageStore } from '../../village/villageStore'
 import type {
-  CatalogueBuilding, LotBuyView, MineView, PrivateConfirmView, PrivateMenuView, PrivateMaterialView, PrivateLineView,
+  CatalogueBuilding, LotBuyView, PrivateConfirmView, PrivateMenuView, PrivateMaterialView, PrivateLineView,
 } from '../../api/types'
 import { durationText } from './common'
 import './village.css'
@@ -24,9 +25,8 @@ function Fact({ label, value, gold }: { label: string; value: string; gold?: boo
   return <div className="vh-info-row"><span>{label}</span><b style={gold ? { color: 'var(--gold)' } : undefined}>{value}</b></div>
 }
 
-function materialLine(m: PrivateMaterialView, cat: Map<string, CatalogueBuilding>): string {
-  void cat
-  return t('citizen.build.material', { name: m.component.name, need: m.need, have: m.have, buy: m.buy })
+function materialLine(m: PrivateMaterialView, names: ContentNames): string {
+  return t('citizen.build.material', { name: names.name(['component', 'item'], m.component.code, m.component.name), need: m.need, have: m.have, buy: m.buy })
 }
 
 // -- buy a free lot ---------------------------------------------------------------------
@@ -123,6 +123,7 @@ export function TakenLotSheet({ lot, owner, onClose }: { lot: Lot | null; owner?
 // -- build a private house on one's own lot ------------------------------------------------
 
 export function HouseSheet({ lot, cat, onClose, store }: { lot: Lot | null; cat: Map<string, CatalogueBuilding>; onClose: () => void; store: VillageStore | null }) {
+  const names = useContentNames()
   const cmd = useVillageCommand()
   const toast = useToast()
   const [menu, setMenu] = useState<PrivateMenuView | null>(null)
@@ -201,103 +202,13 @@ export function HouseSheet({ lot, cat, onClose, store }: { lot: Lot | null; cat:
             <Fact label={t('citizen.build.total')} value={money(bill.total)} gold />
             <Fact label={t('citizen.build.time')} value={durationText(bill.build_time_seconds)} />
           </div>
-          {(bill.materials ?? []).map((m) => <div key={m.component.code} className="vh-hint">{materialLine(m, cat)}</div>)}
+          {(bill.materials ?? []).map((m) => <div key={m.component.code} className="vh-hint">{materialLine(m, names)}</div>)}
           <div className="vh-sheet-actions">
             <Slab tone="steel" radius={14} lip={4} onClick={() => setBill(null)} disabled={busy}>{t('citizen.build.back')}</Slab>
             <Slab tone="green" radius={14} lip={4} onClick={() => void build()} disabled={busy || bill.cash < bill.total}>{t('citizen.build.start', { p: money(bill.total) })}</Slab>
           </div>
         </>
       )}
-    </BottomSheet>
-  )
-}
-
-// -- one's own property --------------------------------------------------------------------
-
-export function MineSheet({ open, cat, onClose, store }: { open: boolean; cat: Map<string, CatalogueBuilding>; onClose: () => void; store: VillageStore | null }) {
-  const cmd = useVillageCommand()
-  const toast = useToast()
-  const [view, setView] = useState<MineView | null>(null)
-  const [busy, setBusy] = useState(false)
-
-  useEffect(() => {
-    if (!open) { setView(null); return }
-    let cancelled = false
-    void cmd('settlement.mine', {}, { silent: true }).then((r) => {
-      if (cancelled) return
-      if (r.ok && r.res?.view) setView(r.res.view as unknown as MineView)
-      else onClose()
-    })
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
-
-  async function act(command: 'settlement.home.rest' | 'settlement.tax.pay') {
-    setBusy(true)
-    const r = await cmd(command, {}, { write: true })
-    setBusy(false)
-    if (r.ok && r.res?.view) {
-      const v = r.res.view as unknown as MineView
-      setView(v)
-      if (v.notice) toast.push(t(v.notice === 'rested' ? 'citizen.mine.rested' : v.notice === 'tax_paid' ? 'citizen.mine.paid' : 'citizen.mine.nothing_paid'))
-      void store?.refetchLayout()
-    }
-  }
-
-  const lots = view?.lots ?? []
-  return (
-    <BottomSheet open={open} onClose={onClose} title={t('citizen.mine.title')}>
-      {view && (
-        <>
-          <div className="vh-sheet-row">
-            <Plate size={52} square><Emboss name="house" palette={view.home ? 'gold' : 'steel'} size={32} /></Plate>
-            <div>
-              <div className="vh-sheet-meta" style={{ color: 'var(--text)' }}>
-                {view.home ? `${t('citizen.mine.home')}: ${buildingName(cat, view.home.code, view.home.name)}` : t('citizen.mine.no_home')}
-              </div>
-              <div className="vh-sheet-meta">{t('citizen.mine.cash')}: <b style={{ color: 'var(--gold)' }}>{money(view.cash)}</b></div>
-            </div>
-          </div>
-          <div className="vh-info">
-            <div className="vh-sheet-meta" style={{ padding: '0 4px' }}>{t('citizen.mine.lots')}</div>
-            {lots.length === 0 && <div className="vh-hint">{t('citizen.mine.no_lots')}</div>}
-            {lots.map((l) => (
-              <Fact key={`${l.x}-${l.y}`}
-                label={t('citizen.buy.lot', { x: l.x + 1, y: l.y + 1 })}
-                value={l.building ? buildingName(cat, l.building) : t('citizen.mine.lot_bare')} />
-            ))}
-            <Fact label={t('citizen.mine.assessed')} value={money(view.assessed)} />
-            <Fact label={t('citizen.mine.tax')} value={`${money(view.tax_per_period)} (${t('citizen.pct', { p: view.tax_bps / 100 })})`} />
-            {view.debt > 0 && <Fact label={t('citizen.mine.debt')} value={money(view.debt)} gold />}
-          </div>
-          <div className="vh-sheet-actions">
-            {view.home && (
-              <Slab tone="green" radius={14} lip={4} disabled={busy || !view.can_rest} onClick={() => void act('settlement.home.rest')}>
-                {view.can_rest ? t('citizen.mine.rest') : t('citizen.mine.rest_wait', { t: durationText(view.rest_wait_seconds) })}
-              </Slab>
-            )}
-            {view.debt > 0 && (
-              <Slab tone="gold" radius={14} lip={4} disabled={busy} onClick={() => void act('settlement.tax.pay')}>{t('citizen.mine.pay', { p: money(view.debt) })}</Slab>
-            )}
-            {!view.home && view.debt <= 0 && <Slab tone="steel" radius={14} lip={4} onClick={onClose}>{t('common.close')}</Slab>}
-          </div>
-        </>
-      )}
-      {!view && <div className="vh-hint">…</div>}
-    </BottomSheet>
-  )
-}
-
-// -- work ---------------------------------------------------------------------------------
-
-export function WorkSheet({ open, city, onClose }: { open: boolean; city: string; onClose: () => void }) {
-  return (
-    <BottomSheet open={open} onClose={onClose} title={t('citizen.work.title')}>
-      <div className="vh-sheet-row">
-        <Plate size={52} square><Emboss name="gears" palette="amber" size={32} /></Plate>
-        <div className="vh-sheet-meta" style={{ lineHeight: 1.8 }}>{t('citizen.work.body', { city })}</div>
-      </div>
-      <div className="vh-sheet-actions"><Slab tone="steel" radius={14} lip={4} onClick={onClose}>{t('common.close')}</Slab></div>
     </BottomSheet>
   )
 }

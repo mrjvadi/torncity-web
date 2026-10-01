@@ -14,11 +14,13 @@ import { formatNumber } from '../../lib/persian'
 import { t } from '../../i18n'
 import type { ScreenProps } from '../types'
 import type { MaterialBuyConfirmView, MaterialMarketLineView, VillageMaterialsView } from '../../api/types'
-import { useVillageCommand } from '../../village/useVillage'
+import { useContentNames, useVillageCommand } from '../../village/useVillage'
 import { useVillageView } from './common'
 import './village.css'
 
 export default function Storage({ response, openLocal }: ScreenProps) {
+  const names = useContentNames()
+  const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
   const cmd = useVillageCommand()
   const { view: fetched, loading, refresh } = useVillageView<VillageMaterialsView>('settlement.materials', response?.screen === 'village_materials' ? response : null)
   const [local, setLocal] = useState<{ view: VillageMaterialsView; base: VillageMaterialsView | null } | null>(null)
@@ -56,7 +58,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
       {v && (
         <>
           {v.bought && (
-            <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: v.bought.item.name, total: money(v.bought.total) })}</Notice>
+            <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: goods(v.bought.item), total: money(v.bought.total) })}</Notice>
           )}
           <Card tone="sapphire">
             <div className="vs-grid">
@@ -79,7 +81,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
             : (
               <div className="vh-stock">
                 {stock.map((s) => (
-                  <div key={s.item.code} className="vh-stockrow"><span>{s.item.name}</span><b>{formatNumber(s.qty)}</b></div>
+                  <div key={s.item.code} className="vh-stockrow"><span>{goods(s.item)}</span><b>{formatNumber(s.qty)}</b></div>
                 ))}
               </div>
             )}
@@ -90,7 +92,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {market.map((m) => (
               <Card key={m.item.code}>
-                <ListRow icon="box" palette="steel" title={m.item.name} sub={t('storage.unit_price', { p: money(m.price) })} right={<Chip>{t('storage.source')}</Chip>} />
+                <ListRow icon="box" palette="steel" title={goods(m.item)} sub={t('storage.unit_price', { p: money(m.price) })} right={<Chip>{t('storage.source')}</Chip>} />
                 {v.can_buy && (
                   <div className="vd-presets">
                     {(v.presets ?? []).map((q) => (
@@ -108,7 +110,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
       <BottomSheet open={!!ask} onClose={() => setAsk(null)} title={t('storage.confirm.title')}>
         {ask && (
           <>
-            <div className="vh-confirm">{t('storage.confirm.body', { qty: formatNumber(ask.qty), name: ask.item.name, unit: money(ask.unit), total: money(ask.total) })}</div>
+            <div className="vh-confirm">{t('storage.confirm.body', { qty: formatNumber(ask.qty), name: goods(ask.item), unit: money(ask.unit), total: money(ask.total) })}</div>
             <div className="vh-hint">{t('storage.confirm.hint', { treasury: money(ask.treasury), free: formatNumber(ask.free) })}</div>
             <div className="vh-sheet-actions">
               <Slab tone="steel" radius={14} lip={4} onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</Slab>

@@ -1,0 +1,57 @@
+/* The village's view-driven screens (flow.tsx, screens.tsx). Class prefix `vf-`; the kit's cards,
+   rows and slabs do the rest. */
+
+.vf-panel { display: flex; flex-direction: column; gap: 10px; }
+.vf-stack { display: flex; flex-direction: column; gap: 8px; }
+.vf-lead { margin: 0; font-size: 14.5px; line-height: 1.85; color: var(--text); text-align: start; }
+.vf-lead.good { color: #8fe0ac; }
+.vf-lead.bad { color: #ffb4b7; }
+.vf-panel .vh-hint { text-align: start; line-height: 1.7; }
+
+.vf-btns { display: flex; flex-direction: column; gap: 8px; }
+.vf-btns.row { flex-direction: row; flex-wrap: wrap; }
+.vf-btns .k-slab { padding: 11px 14px; font-size: 15px; }
+.vf-btns.row .k-slab { flex: 1 1 40%; }
+.vf-cancel {
+  align-self: center; background: none; border: 0; padding: 8px 18px; font-size: 14px; color: var(--text-dim);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+
+.vf-facts { display: flex; flex-direction: column; gap: 6px; }
+.vf-fact { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--panel-2); font-size: 14px; color: var(--text-dim); }
+.vf-fact b { color: var(--text); font-weight: 400; text-align: end; font-variant-numeric: tabular-nums; }
+.vf-fact b.gold { color: var(--gold); }
+
+.vf-list { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
+.vf-line { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; flex-wrap: wrap; }
+.vf-line b { color: var(--gold); font-weight: 400; font-variant-numeric: tabular-nums; }
+
+.vf-need { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.26); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px; line-height: 1.7; }
+.vf-src { margin: 0; padding-inline-start: 18px; font-size: 13px; line-height: 1.8; color: var(--text-dim); }
+
+.vf-goals { display: flex; flex-direction: column; gap: 8px; }
+.vf-goal { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+.vf-goal-mark { flex: none; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; background: rgba(255, 255, 255, 0.08); color: var(--text-dim); }
+.vf-goal.met .vf-goal-mark { background: rgba(70, 210, 122, 0.25); color: #8fe0ac; }
+.vf-goal-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+
+.vf-lever { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.vf-lever:last-of-type { border-bottom: 0; }
+.vf-lever-head { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; }
+.vf-lever-head .gold { color: var(--gold); }
+
+/* the lot maps: a square of buttons, coloured by what the lot is */
+.vf-map { display: grid; gap: 3px; direction: ltr; max-width: 420px; width: 100%; margin-inline: auto; }
+.vf-cell { aspect-ratio: 1; border-radius: 5px; border: 1.5px solid rgba(0, 0, 0, 0.35); padding: 0; background: #2c3442; opacity: 0.8; }
+.vf-cell.can { opacity: 1; box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.85) inset; cursor: pointer; }
+.vf-cell.can:active { transform: scale(0.94); }
+.vf-cell.mark { outline: 3px solid var(--gold); }
+.vf-cell.s-free, .vf-dot.s-free { background: #2f9e5a; }
+.vf-cell.s-mine, .vf-dot.s-mine { background: #e3b023; }
+.vf-cell.s-taken, .vf-dot.s-taken { background: #7f88a8; }
+.vf-cell.s-building, .vf-cell.s-occupied, .vf-dot.s-building, .vf-dot.s-occupied { background: #8a5a3a; }
+.vf-cell.s-road, .vf-dot.s-road { background: #b9a27a; }
+.vf-cell.s-water, .vf-dot.s-water { background: #2f6fbf; }
+.vf-cell.s-steep, .vf-dot.s-steep { background: #5b6068; }
+.vf-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--text-dim); }
+.vf-dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-inline-end: 5px; vertical-align: -1px; }

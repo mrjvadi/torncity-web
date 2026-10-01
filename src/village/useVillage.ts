@@ -1,7 +1,7 @@
 // React bindings for the village store, the once-a-second clock the countdowns
 // run on, the village commands and the settlement building catalogue.
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import * as api from '../api/client'
 import type { CatalogueBuilding, CommandResponse } from '../api/types'
 import { useSession } from '../state/SessionContext'
@@ -56,7 +56,7 @@ export function useVillageCommand() {
       const key = opts.write ? `web-v-${Date.now().toString(36)}-${++keySeq}` : undefined
       const res = await api.runCommand(command, args, key)
       if (res.ok === false) {
-        const message = refusalText(res.error?.code, res.error?.message)
+        const message = refusalText(res.error?.code, res.error?.message, res.error?.args)
         if (!opts.silent) toast.push(message, res.error?.code === 'village_materials' ? { command: 'settlement.materials' } : undefined)
         return { ok: false, res, message, code: res.error?.code }
       }
@@ -69,19 +69,66 @@ export function useVillageCommand() {
   }, [toast])
 }
 
+// -- the content catalogue (GET /api/v1/content): names of content by code ------------
+
+type Entries = Record<string, { code: string; name?: Record<string, string> }[]>
+let content: Promise<Entries> | null = null
+
+/** The catalogue's tables, read once. Names of buildings, components, items, cities,
+ * courses... come from here in the player's language; the client holds none. */
+export function loadContent(): Promise<Entries> {
+  if (!content) {
+    content = api.getContent().then((c) => (c as { entries?: Entries } | null)?.entries ?? {}).catch(() => {
+      content = null
+      return {} as Entries
+    })
+  }
+  return content
+}
+
+/** Codes the catalogue had no name for (a content gap to fix server-side; readable in dev and mock). */
+const gaps = new Set<string>()
+if (typeof window !== 'undefined') (window as unknown as { __nameGaps?: Set<string> }).__nameGaps = gaps
+
+export interface ContentNames {
+  /** The name of a content code in the player's language, from the first of `tables` that has it.
+   * The authored name the view carries is only the last resort (a content gap), then the code. */
+  name(tables: string | string[], code: string, authored?: string): string
+  loaded: boolean
+}
+
+export function contentName(entries: Entries, tables: string | string[], code: string, authored?: string): string {
+  for (const table of Array.isArray(tables) ? tables : [tables]) {
+    const n = entries[table]?.find((e) => e.code === code)?.name
+    const v = n && (getLang() === 'en' ? n.en || n.fa : n.fa || n.en)
+    if (v) return v
+  }
+  if (Object.keys(entries).length) gaps.add(`${Array.isArray(tables) ? tables.join('|') : tables}:${code}`)
+  return authored || code
+}
+
+export function useContentNames(): ContentNames {
+  const [entries, setEntries] = useState<Entries | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    void loadContent().then((e) => { if (!cancelled) setEntries(e) })
+    return () => { cancelled = true }
+  }, [])
+  const lang = getLang()
+  return useMemo(() => ({
+    loaded: !!entries,
+    name: (tables, code, authored) => (entries ? contentName(entries, tables, code, authored) : authored || code),
+  }), // eslint-disable-next-line react-hooks/exhaustive-deps
+  [entries, lang])
+}
+
 // -- settlement building catalogue (footprints, names by language) ----------------------
 
 let catalogue: Promise<Map<string, CatalogueBuilding>> | null = null
 
 export function loadBuildingCatalogue(): Promise<Map<string, CatalogueBuilding>> {
   if (!catalogue) {
-    catalogue = api.getContent().then((c) => {
-      const entries = (c as { entries?: Record<string, CatalogueBuilding[]> } | null)?.entries?.settlement_building ?? []
-      return new Map(entries.map((e) => [e.code, e]))
-    }).catch(() => {
-      catalogue = null
-      return new Map<string, CatalogueBuilding>()
-    })
+    catalogue = loadContent().then((entries) => new Map(((entries.settlement_building ?? []) as unknown as CatalogueBuilding[]).map((e) => [e.code, e])))
   }
   return catalogue
 }
@@ -96,7 +143,7 @@ export function useBuildingCatalogue(): Map<string, CatalogueBuilding> {
   return map
 }
 
-/** A building's Persian name: the catalogue's `fa` entry, else the authored one. */
+/** A building's name: the catalogue's entry in the player's language; the authored one only when the catalogue has none. */
 export function buildingName(cat: Map<string, CatalogueBuilding>, code: string, authored?: string): string {
   const n = cat.get(code)?.name
   return (n && (getLang() === 'en' ? n.en || n.fa : n.fa || n.en)) || authored || code

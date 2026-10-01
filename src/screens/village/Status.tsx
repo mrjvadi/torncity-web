@@ -12,11 +12,11 @@ import { Slab } from '../../kit'
 import BottomSheet from '../../ui/BottomSheet'
 import { hms, money } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
-import { t, type Key } from '../../i18n'
+import { hasKey, t, type Key } from '../../i18n'
 import type {
   ConstructionProgressView, KnowledgeLineView, KnowledgeListView, VillageOverviewView,
 } from '../../api/types'
-import { buildingName, useBuildingCatalogue, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
+import { buildingName, useBuildingCatalogue, useContentNames, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
 import { constructionProgress } from '../../village/progress'
 import { countdown, durationText, iconForRole, RowCard, ROLE_TONE, useVillageView } from './common'
 import { useToast } from '../../state/ToastContext'
@@ -26,10 +26,13 @@ const back = (openLocal: ScreenProps['openLocal']) => () => openLocal('village_h
 
 // -- overview ----------------------------------------------------------------------------------
 
-export function Overview({ response, openLocal, localArgs }: ScreenProps) {
+export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
   const cat = useBuildingCatalogue()
-  const { view: v, loading, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
+  const id = useSettlementId()
+  const { players, store, status } = useVillage(id)
+  const { res, view: v, loading, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
   const [donate, setDonate] = useState(!!localArgs?.donate)
+  useEffect(() => { void store?.refetchPlayers() }, [store, status])
   if (loading && !v) return <ScreenScroll><Header title={t('overview.title')} tone="emerald" onBack={back(openLocal)} /></ScreenScroll>
   const bars: { key: Key; frac: number; color: string }[] = v ? [
     { key: 'overview.food', frac: v.food_percent / 100, color: '#4cc47e' },
@@ -39,6 +42,11 @@ export function Overview({ response, openLocal, localArgs }: ScreenProps) {
     { key: 'overview.security', frac: v.security_percent / 100, color: '#e5484d' },
     { key: 'overview.literacy', frac: v.literacy_percent / 100, color: '#8e6cf0' },
   ] : []
+  const promo = v?.promotion ?? null
+  const done = promo ? (promo.criteria ?? []).filter((c) => c.met).length : 0
+  const promoteAct = (res?.actions ?? []).find((a) => a.id === 'village.promote')
+  const detailAct = (res?.actions ?? []).find((a) => a.id === 'village.promotion')
+  const role = v?.is_head ? t('village.head') : v?.resident ? t('village.member') : t('village.visitor')
   return (
     <ScreenScroll>
       <Header title={v?.name ?? t('overview.title')} tone="emerald" onBack={back(openLocal)} onRefresh={() => void refresh()} />
@@ -46,24 +54,19 @@ export function Overview({ response, openLocal, localArgs }: ScreenProps) {
         <>
           <Card tone="emerald">
             <div className="vs-grid">
-              <div><div className="nx-stat-label">{t('overview.population')}</div><div className="display" style={{ fontSize: 20 }}><span className="vs-ltr">{formatNumber(v.population)} / {formatNumber(v.population_cap)}</span></div></div>
+              <div>
+                <div className="nx-stat-label">{t('overview.population')}</div>
+                <div className="display" style={{ fontSize: 20 }}>{t('vx.ov.people', { n: formatNumber(v.population) })}</div>
+                {v.population_cap > 0 && <div className="nx-bar-sub">{t('vx.ov.cap', { n: formatNumber(v.population_cap) })}</div>}
+              </div>
               <div><div className="nx-stat-label">{t('overview.treasury')}</div><div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
             </div>
+            <div className="vs-grid" style={{ marginTop: 10 }}>
+              <div><div className="nx-stat-label">{t('village.sheet.tier')}</div><div>{tierText(v.tier)}</div></div>
+              <div><div className="nx-stat-label">{t('village.sheet.role')}</div><div>{role}</div></div>
+              {players && !players.hidden && <div><div className="nx-stat-label">{t('village.sheet.online')}</div><div>{formatNumber(players.online)}</div></div>}
+            </div>
           </Card>
-          {v.resident !== false && (
-            <Card tone="gold">
-              <SectionTitle>{t('citizen.hub.title')}</SectionTitle>
-              <div className="vh-hint" style={{ textAlign: 'start' }}>{t('citizen.hub.hint')}</div>
-              <div className="vc-hub">
-                <Slab tone="gold" radius={14} lip={4} onClick={() => openLocal('village_home', { land: '1' })}>{t('citizen.bar.land')}</Slab>
-                <Slab tone="green" radius={14} lip={4} onClick={() => openLocal('village_home', { house: '1' })}>{t('citizen.bar.build')}</Slab>
-                <Slab tone="blue" radius={14} lip={4} onClick={() => openLocal('village_home', { work: '1' })}>{t('citizen.bar.work')}</Slab>
-                <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('village_home', { mine: '1' })}>{t('citizen.bar.mine')}</Slab>
-                <Slab tone="gold" radius={14} lip={4} onClick={() => setDonate(true)}>{t('citizen.hub.donate')}</Slab>
-                <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('village_who')}>{t('citizen.hub.who')}</Slab>
-              </div>
-            </Card>
-          )}
           <Card>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {bars.map((b) => (
@@ -74,6 +77,16 @@ export function Overview({ response, openLocal, localArgs }: ScreenProps) {
               ))}
             </div>
           </Card>
+          {promo && (
+            <Card tone="violet">
+              <SectionTitle>{t('vx.promo.title', { tier: tierText(promo.to) })}</SectionTitle>
+              <div className="vh-hint" style={{ textAlign: 'start' }}>{t('vx.ov.steps', { done, total: (promo.criteria ?? []).length })}</div>
+              <div className="vs-btns">
+                {detailAct?.command && <Slab tone="steel" radius={12} lip={3} onClick={() => run(detailAct.command!, detailAct.args)}>{t('vx.ov.steps_open')}</Slab>}
+                {promoteAct?.command && <Slab tone="gold" radius={12} lip={3} onClick={() => run(promoteAct.command!, promoteAct.args)}>{t('vx.ov.promote', { tier: tierText(promo.to) })}</Slab>}
+              </div>
+            </Card>
+          )}
           <SectionTitle>{t('overview.buildings')}</SectionTitle>
           {(v.buildings ?? []).length === 0 && <Empty>{t('overview.no_buildings')}</Empty>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -89,16 +102,18 @@ export function Overview({ response, openLocal, localArgs }: ScreenProps) {
   )
 }
 
+const tierText = (tier: string) => t(`village.tier.${tier}` as Key)
+
 // -- construction progress -------------------------------------------------------------------------
 
-export function Progress({ response, openLocal }: ScreenProps) {
+export function Progress({ response, openLocal, run }: ScreenProps) {
   const id = useSettlementId()
   const { layout, store } = useVillage(id)
   const cat = useBuildingCatalogue()
   const now = useNow(1000)
   const cmd = useVillageCommand()
   const toast = useToast()
-  const { view: v, loading, refresh } = useVillageView<ConstructionProgressView>('settlement.build.progress', response)
+  const { res, view: v, loading, refresh } = useVillageView<ConstructionProgressView>('settlement.build.progress', response)
   const [ask, setAsk] = useState<string | null>(null)
   // a finished build drops out of the list the moment its timer ends and the
   // server confirms (channel event -> re-read); until then it shows "finishing"
@@ -129,6 +144,24 @@ export function Progress({ response, openLocal }: ScreenProps) {
           const leftS = finish ? (Date.parse(finish) - now) / 1000 : l.left_seconds
           const catRole = cat.get(l.building.code)?.category
           const { icon, palette } = iconForRole(catRole)
+          if (l.by_work) {
+            // raised by work: no timer, it moves only as workers put hours in
+            const siteAct = (res?.actions ?? []).find((a) => a.id === 'construction.site' && a.args?.id === l.id)
+            const hours = (m: number) => (Math.max(0, m) / 60).toFixed(1)
+            return (
+              <RowCard
+                key={`${l.lot_x}-${l.lot_y}-${i}`} icon={icon} palette={palette}
+                title={buildingName(cat, l.building.code, l.building.name)}
+                sub={`${t('building.at', { x: l.lot_x + 1, y: l.lot_y + 1 })} · ${t('vx.prog.by_work')}`}
+                right={<span className="vs-timer">{t('progress.percent', { p: Math.floor(l.progress_bps / 100) })}</span>}
+              >
+                <Bar frac={l.progress_bps / 10000} color="#f5a11f" label={t('vx.prog.hours', { done: hours(l.done_minutes), total: hours(l.required_minutes) })} />
+                <div className="vs-btns">
+                  <Slab tone="gold" radius={12} lip={3} onClick={() => run(siteAct?.command ?? 'settlement.labor.site', siteAct?.args ?? { id: l.id })}>{t('act.construction.site')}</Slab>
+                </div>
+              </RowCard>
+            )
+          }
           return (
             <RowCard
               key={`${l.lot_x}-${l.lot_y}-${i}`}
@@ -172,6 +205,8 @@ function runFrac(v: KnowledgeListView, now: number): number {
 const STATE_TONE: Record<string, 'emerald' | 'gold' | 'ruby' | undefined> = { held: 'emerald', researching: 'gold', locked: undefined, available: undefined }
 
 export function Knowledge({ response, openLocal }: ScreenProps) {
+  const names = useContentNames()
+  const kname = (n: { code: string; name: string }) => names.name('knowledge', n.code, n.name)
   const id = useSettlementId()
   const { layout } = useVillage(id)
   const now = useNow(1000)
@@ -213,7 +248,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
             </div>
             {v.running && (
               <div style={{ marginTop: 10 }}>
-                <div className="nx-stat-label">{t('know.running')}: {v.running.knowledge.name}</div>
+                <div className="nx-stat-label">{t('know.running')}: {kname(v.running.knowledge)}</div>
                 <Bar frac={runFrac(v, now)} color="#8e6cf0" label={countdown(v.running.finish_at, now)} />
               </div>
             )}
@@ -224,7 +259,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
             {(v.lines ?? []).map((l) => {
               const held = l.state === 'held'
               const locked = l.state === 'locked'
-              const missing = (l.missing ?? []).map((m) => m.name).join('، ')
+              const missing = (l.missing ?? []).map(kname).join('، ')
               const sub = held ? t('know.state.held')
                 : locked ? (!l.terrain_ok ? t('know.terrain') : missing ? t('know.missing', { list: missing }) : t('know.state.locked'))
                   : `${t('know.cost', { n: formatNumber(l.research_cost) })} · ${t('know.time', { t: durationText(l.research_time_seconds) })}`
@@ -233,7 +268,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
                   key={l.knowledge.code} tone={STATE_TONE[l.state]}
                   icon={held ? 'check' : locked ? 'm_lock' : l.state === 'researching' ? 'clock' : 'book'}
                   palette={held ? 'emerald' : locked ? 'steel' : l.state === 'researching' ? 'gold' : 'violet'}
-                  title={l.knowledge.name} sub={sub}
+                  title={kname(l.knowledge)} sub={sub}
                   right={<Chip tone={held ? 'emerald' : l.state === 'researching' ? 'gold' : undefined}>{t(`know.state.${l.state}` as Key)}</Chip>}
                 >
                   {canAct && l.state === 'available' && (
@@ -249,13 +284,13 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
           {v.hidden > 0 && <div className="nx-bar-sub" style={{ textAlign: 'center' }}>{t('know.hidden', { n: formatNumber(v.hidden) })}</div>}
         </>
       )}
-      <BottomSheet open={!!ask} onClose={() => setAsk(null)} title={ask?.line.knowledge.name}>
+      <BottomSheet open={!!ask} onClose={() => setAsk(null)} title={ask ? kname(ask.line.knowledge) : undefined}>
         {ask && (
           <>
             <div className="vh-confirm">
               {ask.kind === 'buy'
-                ? t('know.confirm_buy', { name: ask.line.knowledge.name, price: money(ask.line.buy_price) })
-                : t('know.confirm_research', { name: ask.line.knowledge.name, cost: money(ask.line.research_cost) })}
+                ? t('know.confirm_buy', { name: kname(ask.line.knowledge), price: money(ask.line.buy_price) })
+                : t('know.confirm_research', { name: kname(ask.line.knowledge), cost: money(ask.line.research_cost) })}
             </div>
             <div className="vh-sheet-actions">
               <Slab tone="steel" radius={14} lip={4} onClick={() => setAsk(null)} disabled={busy}>{t('building.no')}</Slab>
@@ -285,7 +320,7 @@ export function Who({ openLocal }: ScreenProps) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {list.map((p) => {
           const known = p.visible && !players?.hidden
-          const label = p.activity_label || (p.activity ? t(`activity.${p.activity}` as Key) : '')
+          const label = p.activity && hasKey(`activity.${p.activity}`) ? t(`activity.${p.activity}` as Key) : (p.activity_label ?? '')
           return (
             <ListRow
               key={p.id}

@@ -5,6 +5,7 @@
 // Facts come from the `profile` view; the net worth (life.me) and the medals
 // (achievement.list) are read from their own views.
 
+import { useContentNames } from '../../village/useVillage'
 import type { CSSProperties } from 'react'
 import type { ScreenProps } from '../types'
 import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair, Tile, TileGrid } from './kit/Parts'
@@ -46,6 +47,7 @@ const OWN = new Set(['skills.list', 'achievement.list', 'life.me', 'life.card', 
 
 export default function Profile({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as ProfileView
+  const names = useContentNames()
   const life = useView<LifeView>('life.me')
   const ach = useView<AchievementsView>('achievement.list')
   if (loading && !response) return <ScreenScroll><Header title={t('profile.title')} tone="teal" /></ScreenScroll>
@@ -55,7 +57,8 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
   const lines = ach?.lines ?? []
   const medals = [...lines].sort((a, b) => Number(!!b.earned) - Number(!!a.earned)).slice(0, 8)
   const earned = lines.filter((l) => l.earned).length
-  const subline = [v.rank?.name, v.stage?.name && v.age ? t('common.years_old', { n: v.age }) : null].filter(Boolean).join(' · ')
+  const rankName = v.rank?.name ? names.name('rank', v.rank.code ?? '', v.rank.name) : ''
+  const subline = [rankName, v.stage?.name && v.age ? t('common.years_old', { n: v.age }) : null].filter(Boolean).join(' · ')
 
   return (
     <ScreenScroll>
@@ -100,7 +103,7 @@ export default function Profile({ response, loading, onAction, run }: ScreenProp
       />
       <StatPair
         left={<Stat icon="crowncoin" palette="emerald" label={t('profile.net_worth')} value={life?.worth?.total !== undefined ? money(life.worth.total) : '—'} />}
-        right={<Stat icon="rank" palette="gold" label={t('profile.wealth_rank')} value={v.rank?.name ?? '—'} />}
+        right={<Stat icon="rank" palette="gold" label={t('profile.wealth_rank')} value={rankName || '—'} />}
       />
       <StatPair
         left={<Stat icon="city" palette="steel" label={t('profile.city')} value={v.city || '—'} />}
