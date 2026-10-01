@@ -146,7 +146,7 @@ export function installMockApi(): void {
         player: MOCK_PLAYER,
         content_version: 1,
         languages: [{ code: 'fa', name: 'فارسی' }],
-        cities: [{ code: 'calderis', name: 'کالدریس' }],
+        cities: [{ code: 'calderis', name: 'کالدریس' }, { code: 'support', name: 'ساپورت' }],
         places: [{ code: 'old_town', name: 'مرکز شهر' }],
         server_time: new Date().toISOString(),
         realtime: false,

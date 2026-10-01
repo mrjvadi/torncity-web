@@ -12,7 +12,13 @@ import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
 
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
-import { mockLaborCommand } from './mock_labor'
+import { mockLaborCommand, laborProgressLines } from './mock_labor'
+import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
+import type {
+  BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, GridGrowView, KnowledgeListView, LandCell, LandView, LotBatchConfirmView,
+  LotBuyView, LotConfirmView, LotGridView, MaterialBuyView, MaterialsView, MineView, Named, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView,
+  ResidenceView, SettlementWhoView, TermsView, VillageNeed, VillageOverviewView, WorkView,
+} from './views.gen'
 const OWN_ID = MOCK_VILLAGE_IDS.own
 const OTHER_ID = MOCK_VILLAGE_IDS.other
 const GRID = 5
@@ -44,11 +50,16 @@ const CAT: CatEntry[] = [
   { code: 'health_house', fa: 'خانهٔ بهداشت', en: 'Health house', fp: [2, 2], cost: 1200, time: 4800, role: 'health' },
   { code: 'teaching_circle', fa: 'حلقهٔ آموزش', en: 'Teaching circle', fp: [1, 1], cost: 200, time: 1500, role: 'education' },
   { code: 'barter_post', fa: 'پایگاه تهاتر', en: 'Barter post', fp: [1, 1], cost: 250, time: 1200, role: 'market' },
+  { code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: 'Woodcutter camp', fp: [2, 2], cost: 900, time: 3600, role: 'craft' },
   { code: 'granary', fa: 'انبار غله', en: 'Granary', fp: [1, 1], cost: 700, time: 3000, role: 'storage' },
   { code: 'bank', fa: 'بانک', en: 'Bank', fp: [3, 3], cost: 50000, time: 36000, role: '', needs: ['writing'] },
   { code: 'school', fa: 'مدرسه', en: 'School', fp: [3, 3], cost: 9000, time: 14400, role: 'education', needs: ['writing'] },
 ]
-const KNOW_NAMES: Record<string, string> = {
+const KNOW_EN: Record<string, string> = {
+  fire_making: 'Fire making', masonry: 'Masonry', irrigation: 'Irrigation', writing: 'Writing', metallurgy: 'Metallurgy', geometry: 'Geometry', archery: 'Archery', carpentry: 'Carpentry',
+}
+export const KNOW_NAMES: Record<string, string> = {
+  carpentry: 'نجاری',
   fire_making: 'آتش‌افروزی', masonry: 'سنگ‌تراشی', irrigation: 'آبیاری', writing: 'خط و نوشتن', metallurgy: 'فلزکاری', geometry: 'هندسه', archery: 'کمانداری',
 }
 const CONCURRENT_CAP = 3
@@ -248,18 +259,47 @@ function roster(): SettlementPlayers {
 
 // -- views ---------------------------------------------------------------------------------------
 
-function nameOf(code: string) { const e = CAT.find((c) => c.code === code) ?? citizenEntry(code); return { code, name: e?.fa ?? code } }
-function kn(code: string) { return { code, name: KNOW_NAMES[code] ?? code } }
-const back = (command: string) => ({ label: 'بازگشت', command, row: 9, kind: 'back', icon: 'action:player' })
+/** What the real server sends as the authored name of content: English. The web must not show it
+ * (it resolves names from the catalogue), so the mock sends English on purpose. */
+function nameOf(code: string): Named { const e = CAT.find((c) => c.code === code) ?? citizenEntry(code); return { code, name: e?.en ?? code } }
+function kn(code: string): Named { return { code, name: KNOW_EN[code] ?? code } }
+const GOODS_EN: Record<string, string> = { timber: 'Timber', stone: 'Stone', iron_bar: 'Iron bar', wheat: 'Wheat' }
+const goods = (code: string): Named => ({ code, name: GOODS_EN[code] ?? code })
 
-function refusal(kind: string, text: string) {
-  return {
-    ok: false, screen: 'village_refusal', text,
-    view: { kind, back: '' },
-    error: { code: `village_${kind}`, message: text },
-    actions: [back('settlement.overview')],
-  }
+function refusal(kind: string, o: Parameters<typeof mockRefusal>[1] = {}) {
+  return mockRefusal(kind, { back: { command: 'settlement.overview', args: null }, ...o })
 }
+
+/** A lot named by the number pair or by the token the server's own buttons carry ("3-1", "3-1-r"). */
+function lotArg(args: Record<string, unknown>): { x: number; y: number; rotated: boolean } | null {
+  if (typeof args.lot === 'string') {
+    const m = /^(\d+)-(\d+)(-r)?$/.exec(args.lot.trim())
+    return m ? { x: +m[1], y: +m[2], rotated: !!m[3] } : null
+  }
+  const x = Number(args.x), y = Number(args.y)
+  if (!Number.isInteger(x) || !Number.isInteger(y)) return null
+  return { x, y, rotated: args.rotated === true || args.rotated === 'true' || args.rotated === '1' || args.rotated === 1 }
+}
+const token = (x: number, y: number, rotated = false) => `${x}-${y}${rotated ? '-r' : ''}`
+
+const MAKERS: Record<string, string[]> = { timber: ['woodcutter_camp', 'carpentry_workshop'] }
+const MARKET_PRICE: Record<string, number> = { timber: 22, stone: 30, iron_bar: 64 }
+
+/** The materials a building needs that the village store lacks, as the refusal names them. */
+function materialNeeds(e: CatEntry): VillageNeed[] {
+  const out: VillageNeed[] = []
+  for (const [code, , qty] of e.materials ?? []) {
+    const have = MAT_STOCK[code] ?? 0
+    if (have >= qty) continue
+    out.push({
+      kind: 'material', item: goods(code), options: null, have, need: qty,
+      makers: (MAKERS[code] ?? []).map((b) => ({ building: nameOf(b), built: st.buildings.some((x) => x.type === b && x.state === 'built') })),
+      price: MARKET_PRICE[code] ?? 0,
+    })
+  }
+  return out
+}
+const matLines = (e: CatEntry) => (e.materials ? e.materials.map(([c, , q]) => ({ component: goods(c), quantity: q })) : null)
 
 function running() { return st.buildings.filter((b) => b.type !== 'road' && (b.state === 'under_construction' || b.state === 'planned')).length }
 function unmet(e: CatEntry): string[] { return (e.needs ?? []).filter((n) => st.know.find((k) => k.code === n)?.state !== 'held') }
@@ -271,9 +311,17 @@ function occupiedMap(): boolean[][] {
   return m
 }
 
-function lotsView(code: string, rotate: boolean) {
+function lotsView(code: string, rotate: boolean, from = '') {
   const e = CAT.find((c) => c.code === code)
-  if (!e) return refusal('not_found', 'این ساختمان شناخته نشد.')
+  if (!e) return refusal('not_found')
+  const miss = unmet(e)
+  const short = materialNeeds(e)
+  if (miss.length || short.length) {
+    return refusal(miss.length ? 'prerequisite' : 'materials', {
+      action: 'build', subject: nameOf(code),
+      needs: [...miss.map((m): VillageNeed => ({ kind: 'knowledge', item: kn(m), options: null, have: 0, need: 0, makers: null, price: 0 })), ...short],
+    })
+  }
   const w = rotate ? e.fp[1] : e.fp[0], h = rotate ? e.fp[0] : e.fp[1]
   const occ = occupiedMap()
   const roads = new Set(st.roads.map((r) => `${r.x},${r.y}`))
@@ -291,92 +339,147 @@ function lotsView(code: string, rotate: boolean) {
     return true
   }
   const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: cellState(x, y), fits: fits(x, y) })))
-  return {
-    ok: true, screen: 'settlement_build_lots', text: 'قطعه را انتخاب کن',
-    view: { settlement_name: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated: rotate, grid_lots: size(), rows },
-    actions: [back('settlement.build')],
+  const multi = !!e.capExempt && e.fp[0] === 1 && e.fp[1] === 1
+  const m = /^(\d+)-(\d+)/.exec(from)
+  const line = !multi ? '' : from === 'line' ? 'line' : m ? 'end' : ''
+  const view: LotGridView = {
+    settlement_name: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated: rotate, grid_lots: size(), rows, multi, line,
+    from: m ? { x: +m[1], y: +m[2] } : { x: 0, y: 0 }, win_x: 0, win_y: 0,
   }
+  const acts: MockAct[] = []
+  if (multi && !line) acts.push(A('lots.line', 'settlement.build.lots', { code, rotate: '0', from: 'line' }))
+  if (view.can_rotate) acts.push(A('lots.rotate', 'settlement.build.lots', { code, rotate: rotate ? '0' : '1' }))
+  return mockOk('settlement_build_lots', view, [...acts, back('settlement.build'), refreshA('settlement.build.lots', { code })])
 }
 
 function progressView() {
-  const lines = st.buildings.filter((b) => b.state === 'under_construction' || b.state === 'planned')
-    .sort((a, b) => (a.finish ?? 0) - (b.finish ?? 0))
-    .map((b) => ({ building: nameOf(b.type), lot_x: b.x, lot_y: b.y, state: b.state === 'planned' ? 'queued' : 'building', finish_at: b.finish ? new Date(b.finish).toISOString() : null, left_seconds: Math.max(0, Math.round(((b.finish ?? Date.now()) - Date.now()) / 1000)) }))
-  return { ok: true, screen: 'settlement_construction_progress', text: 'ساخت‌وساز', view: { name: 'آمل', lines: lines.length ? lines : null }, actions: [back('settlement.overview')] }
+  const going = st.buildings.filter((b) => b.state === 'under_construction' || b.state === 'planned').sort((a, b) => (a.finish ?? 0) - (b.finish ?? 0))
+  const lines: ConstructionProgressView['lines'] = [
+    ...going.map((b) => ({
+      id: b.id, building: nameOf(b.type), lot_x: b.x, lot_y: b.y, state: b.state === 'planned' ? 'queued' : 'building', finish_at: b.finish ? new Date(b.finish).toISOString() : null,
+      left_seconds: Math.max(0, Math.round(((b.finish ?? Date.now()) - Date.now()) / 1000)), by_work: false, progress_bps: 0, done_minutes: 0, required_minutes: 0, left_minutes: 0,
+    })),
+    // buildings raised by work: no timer, only hours of workers (the labour mock keeps them)
+    ...laborProgressLines().map((l) => ({
+      id: l.id, building: nameOf(l.code), lot_x: l.x, lot_y: l.y, state: 'building', finish_at: null, left_seconds: 0, by_work: true,
+      progress_bps: Math.floor((l.done * 10000) / l.required), done_minutes: l.done, required_minutes: l.required, left_minutes: l.required - l.done,
+    })),
+  ]
+  const standing = st.buildings.filter((b) => b.state === 'built' && b.type !== 'road' && !b.priv).map((b) => ({ id: b.id, building: nameOf(b.type), lot_x: b.x, lot_y: b.y }))
+  const view: ConstructionProgressView = { name: 'آمل', lines: lines.length ? lines : null, standing: standing.length ? standing : null }
+  const acts: MockAct[] = []
+  for (const l of lines ?? []) {
+    if (l.by_work) acts.push(A('construction.site', 'settlement.labor.site', { id: l.id }, { subject: l.building.code }))
+    else if (l.building.code !== 'road') acts.push(A('construction.open', 'settlement.building.view', { building_id: l.id }, { subject: l.building.code }))
+  }
+  for (const b of standing) acts.push(A('construction.standing', 'settlement.building.view', { building_id: b.id }, { subject: b.building.code }))
+  return mockOk('settlement_construction_progress', view, [...acts, back('settlement.overview'), refreshA('settlement.build.progress')])
 }
 
 function knowledgeView() {
   const now = Date.now()
   const run = st.know.find((k) => k.state === 'researching')
-  return {
-    ok: true, screen: 'settlement_knowledge_list', text: 'دانش',
-    view: {
-      name: 'آمل', treasury: st.treasury, literacy_percent: st.literacy,
-      running: run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? now).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? now) - now) / 1000)) } : null,
-      lines: st.know.map((k) => ({ knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy, missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain })),
-      hidden: 3,
-    },
-    actions: [back('settlement.overview')],
+  const view: KnowledgeListView = {
+    name: 'آمل', treasury: st.treasury, literacy_percent: st.literacy,
+    running: run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? now).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? now) - now) / 1000)) } : null,
+    lines: st.know.map((k) => ({ knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy, missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain })),
+    hidden: 3,
   }
+  const acts: MockAct[] = []
+  for (const k of st.know.filter((x) => x.state === 'available')) {
+    acts.push(A('', 'settlement.knowledge.research', { code: k.code }, { subject: k.code }))
+    if (k.buy > 0) acts.push(A('', 'settlement.knowledge.buy', { code: k.code }, { subject: k.code }))
+  }
+  return mockOk('settlement_knowledge_list', view, [...acts, back('settlement.overview'), refreshA('settlement.knowledge')])
+}
+
+/** `?promo=met` shows a village that has taken every step to the next tier. */
+const PROMO_MET = (() => { try { return new URLSearchParams(location.search).get('promo') === 'met' } catch { return false } })()
+
+function promotionView(): PromotionView {
+  const met = PROMO_MET
+  const crit = (kind: string, current: number, required: number, role = '') => ({ kind, role, current: met ? required : current, required, met: met || current >= required })
+  const criteria = [
+    crit('residents', 2, 12), crit('literacy', st.literacy * 100, 5000), crit('buildings', st.buildings.filter((b) => b.state === 'built' && b.type !== 'road').length, 6),
+    crit('knowledge', 2, 4), crit('role', 1, 1, 'education'), crit('role', 0, 1, 'health'), crit('treasury', st.treasury, 20000),
+  ]
+  return { village: 'آمل', from: 'village', to: 'town', criteria, met: criteria.every((c) => c.met), can_promote: IS_HEAD, office: '', settlement_id: OWN_ID }
 }
 
 function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
-  return {
-    ok: true, screen: 'village_overview', text: 'آمل',
-    view: {
-      name: 'آمل', tier: 'village', population: 34, population_cap: 60,
-      food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
-      treasury: st.treasury, resident: true, support: { code: 'support', name: 'ساپورت' },
-      buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
-    },
-    actions: [back('player.profile.get')],
+  const promo = promotionView()
+  const view: VillageOverviewView = {
+    name: 'آمل', tier: 'village', population: 2, population_cap: 8,
+    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
+    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support' }, promotion: promo,
+    buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
   }
+  const acts: MockAct[] = [
+    A('citizen.land', 'settlement.land'), A('citizen.build_house', 'settlement.private'), A('citizen.mine', 'settlement.mine'), A('village.work', 'settlement.work'),
+    A('village.donate', 'settlement.donate'), A('village.who', 'settlement.who'),
+    A('village.knowledge', 'settlement.knowledge'), A('village.progress', 'settlement.build.progress'), A('village.materials', 'settlement.materials'),
+    ...(IS_HEAD ? [A('village.build', 'settlement.build'), A('village.terms', 'settlement.terms')] : []),
+    promo.met && promo.can_promote ? A('village.promote', 'settlement.promote') : A('village.promotion', 'settlement.promotion.view'),
+    A('village.leave', 'settlement.leave', undefined, { kind: 'danger' }),
+    ...['bank', 'market', 'jobs', 'knowledge', 'hospital', 'jail'].map((c) => A(`support.${c}`, 'travel.options', { city: 'support' }, { subject: 'support' })),
+  ]
+  return mockOk('village_overview', view, [...acts, back('player.profile.get'), refreshA('settlement.overview')])
 }
 
 function menuView() {
-  const lines = CAT.filter((e) => e.code !== 'road' || true).map((e) => {
+  const lines = CAT.map((e) => {
     const miss = unmet(e)
-    return { building: nameOf(e.code), role: e.role, state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time, missing: miss.length ? miss.map(kn) : null }
+    const short = materialNeeds(e)
+    return {
+      building: nameOf(e.code), role: e.role, state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time,
+      missing: miss.length ? miss.map(kn) : null, missing_buildings: null, materials: matLines(e),
+      short: short.length ? short.map((n) => ({ component: n.item, quantity: n.need - n.have })) : null,
+    }
   })
-  return { ok: true, screen: 'settlement_build_menu', text: 'ساخت', view: { name: 'آمل', treasury: st.treasury, running_builds: running(), concurrent_cap: CONCURRENT_CAP, lines }, actions: [back('settlement.overview')] }
+  const view: BuildMenuView = { name: 'آمل', treasury: st.treasury, running_builds: running(), concurrent_cap: CONCURRENT_CAP, lines }
+  const acts = lines.filter((l) => l.state === 'available').map((l) => A('build.place', 'settlement.build.lots', { code: l.building.code }, { subject: l.building.code }))
+  return mockOk('settlement_build_menu', view, [...acts, A('build.grow', 'settlement.grid.grow'), back('settlement.overview'), refreshA('settlement.build')])
 }
 
 function place(args: Record<string, unknown>) {
   const code = String(args.code ?? '')
   const e = CAT.find((c) => c.code === code)
-  if (!e) return refusal('not_found', 'این ساختمان شناخته نشد.')
-  const x = Number(args.x), y = Number(args.y)
-  const rotated = args.rotated === true || args.rotated === 'true' || args.rotated === '1' || args.rotated === 1
-  if (!Number.isInteger(x) || !Number.isInteger(y)) return refusal('not_found', 'قطعه‌ی نامعتبر.')
+  if (!e) return refusal('not_found')
+  const at = lotArg(args)
+  if (!at) return refusal('not_found')
+  const { x, y, rotated } = at
   const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
-  if (x < 0 || y < 0 || x + w > size() || y + h > size()) return refusal('out_of_bounds', 'ساختمان از محدوده‌ی روستا بیرون می‌زند.')
+  if (x < 0 || y < 0 || x + w > size() || y + h > size()) return refusal('out_of_bounds')
   const occ = occupiedMap()
   for (let yy = y; yy < y + h; yy++) {
     for (let xx = x; xx < x + w; xx++) {
-      if (!st.lots[yy][xx].buildable) return refusal('unbuildable', '🌊 روی این قطعه نمی‌توان ساخت.')
-      if (occ[yy][xx]) return refusal('occupied', 'این قطعه پیش‌تر ساخته شده است.')
+      if (!st.lots[yy][xx].buildable) return refusal('unbuildable')
+      if (occ[yy][xx]) return refusal('occupied')
     }
   }
   const miss = unmet(e)
-  if (miss.length) return refusal('prerequisite', `پیش‌نیاز ناقص است: ${miss.map((m) => KNOW_NAMES[m] ?? m).join('، ')}`)
-  if (code !== 'road' && running() >= CONCURRENT_CAP) return refusal('concurrent_cap', 'همزمان بیش از این نمی‌توان ساخت.')
+  const short = materialNeeds(e)
+  if (miss.length || short.length) {
+    return refusal(miss.length ? 'prerequisite' : 'materials', {
+      action: 'build', subject: nameOf(code),
+      needs: [...miss.map((m): VillageNeed => ({ kind: 'knowledge', item: kn(m), options: null, have: 0, need: 0, makers: null, price: 0 })), ...short],
+    })
+  }
+  if (code !== 'road' && running() >= CONCURRENT_CAP) return refusal('concurrent_cap')
   const street = code === 'road' ? [] : planAutoRoads(x, y, w, h)
-  if (street === 'none') return refusal('no_road', 'به این بنا هیچ راهی نمی‌رسد؛ اطرافش جای آزادِ قابل‌ساخت برای جاده نیست.')
+  if (street === 'none') return refusal('no_road')
   const fee = street.length * AUTO_ROAD_FEE
-  if (st.treasury < e.cost + fee) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این ساخت کافی نیست.')
+  if (st.treasury < e.cost + fee) return refusal('insufficient_funds')
   if (args.confirm !== 'confirm') {
-    return {
-      ok: true, screen: 'settlement_build_confirm', text: 'تأیید ساخت',
-      view: {
-        settlement_name: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost + fee, auto_roads: street.length,
-        materials: e.materials ? e.materials.map(([c, n, q]) => ({ component: { code: c, name: n }, quantity: q })) : null,
-        build_time_seconds: e.time,
-      },
-      actions: [back('settlement.build')],
+    const view: LotConfirmView = {
+      settlement_name: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost + fee, auto_roads: street.length,
+      materials: matLines(e), build_time_seconds: e.time,
     }
+    return mockOk('settlement_build_confirm', view, [confirmA('settlement.build.place', { code, lot: token(x, y, rotated) }), back('settlement.build.lots', { code })])
   }
   st.treasury -= e.cost + fee
+  for (const [c, , q] of e.materials ?? []) MAT_STOCK[c] = Math.max(0, (MAT_STOCK[c] ?? 0) - q)
   // the game lays the connecting street at once
   const laid = street.map((q) => { const r = mkRoad(q.x, q.y, 'built'); st.buildings.push(r); return { building_id: r.id, lot_x: q.x, lot_y: q.y } })
   // the mock builds faster than the real duration so a demo sees it finish
@@ -392,9 +495,9 @@ function place(args: Record<string, unknown>) {
 
 function cancelOrDemolish(args: Record<string, unknown>, demolish: boolean) {
   const b = st.buildings.find((x) => x.id === String(args.id ?? ''))
-  if (!b) return refusal('not_found', 'ساختمان پیدا نشد.')
-  if (demolish && b.state !== 'built') return refusal('not_demolishable', 'فقط ساختمان تمام‌شده را می‌توان تخریب کرد.')
-  if (!demolish && b.state !== 'under_construction' && b.state !== 'planned') return refusal('not_cancellable', 'فقط ساختمانِ درحال‌ساخت را می‌توان لغو کرد.')
+  if (!b) return refusal('not_found')
+  if (demolish && b.state !== 'built') return refusal('not_demolishable')
+  if (!demolish && b.state !== 'under_construction' && b.state !== 'planned') return refusal('not_cancellable')
   const e = CAT.find((c) => c.code === b.type)
   st.buildings = st.buildings.filter((x) => x.id !== b.id)
   const t = st.timers.get(b.id)
@@ -407,12 +510,12 @@ function cancelOrDemolish(args: Record<string, unknown>, demolish: boolean) {
 
 function knowledgeAct(args: Record<string, unknown>, buy: boolean) {
   const k = st.know.find((x) => x.code === String(args.code ?? ''))
-  if (!k) return refusal('not_found', 'این دانش شناخته نشد.')
-  if (k.state === 'held') return refusal('already_owned', 'روستا از پیش این دانش را دارد.')
-  if (k.state === 'researching' || (!buy && st.know.some((x) => x.state === 'researching'))) return refusal('busy', 'روستا همین حالا در حال پژوهش است.')
-  if (k.state === 'locked' || (buy && !k.buy)) return refusal('not_available', 'این دانش هنوز در دسترس نیست.')
+  if (!k) return refusal('not_found')
+  if (k.state === 'held') return refusal('already_owned')
+  if (k.state === 'researching' || (!buy && st.know.some((x) => x.state === 'researching'))) return refusal('busy')
+  if (k.state === 'locked' || (buy && !k.buy)) return refusal('not_available')
   const price = buy ? k.buy : k.cost
-  if (st.treasury < price) return refusal('insufficient_funds', 'خزانه‌ی روستا کافی نیست.')
+  if (st.treasury < price) return refusal('insufficient_funds')
   st.treasury -= price
   if (buy) {
     k.state = 'held'
@@ -445,19 +548,19 @@ function unlock() {
 
 let cash = 12450
 function donate(args: Record<string, unknown>) {
-  const view = (amount: number) => ({ village: 'آمل', amount, presets: [250, 1000, 5000], min: 100, max: 100000, treasury: st.treasury, cash, settlement_id: OWN_ID })
+  const view = (amount: number): DonateView => ({ village: 'آمل', amount, presets: [250, 1000, 5000], min: 100, max: 100000, treasury: st.treasury, cash, settlement_id: OWN_ID })
   const raw = String(args.amount ?? '')
-  if (!raw) return { ok: true, screen: 'village_donate_menu', text: 'کمک به خزانه', view: view(0), actions: [back('settlement.overview')] }
+  if (!raw) return mockOk('village_donate_menu', view(0), [250, 1000, 5000].map((p) => A('donate.amount', 'settlement.donate', { amount: String(p) })).concat([back('settlement.overview')]))
   const amount = Number(raw)
-  if (!(amount >= 100 && amount <= 100000)) return refusal('donate_range', 'مبلغ کمک باید بین ۱۰۰ و ۱۰۰٬۰۰۰ باشد.')
+  if (!(amount >= 100 && amount <= 100000)) return refusal('donate_range', { min: 100, max: 100000, back: { command: 'settlement.donate', args: null } })
   if (args.confirm !== 'confirm') {
-    if (cash < amount) return refusal('donate_no_cash', 'پول نقد شما کافی نیست.')
-    return { ok: true, screen: 'village_donate_confirm', text: 'تأیید', view: view(amount), actions: [back('settlement.donate')] }
+    if (cash < amount) return refusal('donate_no_cash', { back: { command: 'settlement.donate', args: null } })
+    return mockOk('village_donate_confirm', view(amount), [confirmA('settlement.donate', { amount: String(amount) }), back('settlement.donate')])
   }
-  if (cash < amount) return refusal('donate_no_cash', 'پول نقد شما کافی نیست.')
+  if (cash < amount) return refusal('donate_no_cash')
   cash -= amount
   st.treasury += amount
-  return { ok: true, screen: 'village_donate_done', text: 'ممنون', view: view(amount), actions: [back('settlement.overview')] }
+  return mockOk('village_donate_done', view(amount), [A('village.overview', 'settlement.overview')])
 }
 
 // -- the citizen loop (contract 1.4): land, a private house, one's own property ----------
@@ -465,10 +568,11 @@ function donate(args: Record<string, unknown>) {
 // player this feature is for; without it the viewer is the head, who lives
 // here too. Prices follow configs/config.yml (settlement.citizen_*).
 
-const LOT_PRICE = 400, PERMIT_FEE = 100, TAX_BPS = 200, MAX_LOTS = 3, TIMBER_UNIT = 18
+let LOT_PRICE = 400, PERMIT_FEE = 100, TAX_BPS = 200
+const MAX_LOTS = 3, TIMBER_UNIT = 18
 
 interface MLot { x: number; y: number; owner: string; mine: boolean }
-const cz = { tenure: [] as MLot[], cash: 12450, lastRest: 0, seeded: false }
+const cz = { tenure: [] as MLot[], cash: 12450, lastRest: 0, seeded: false, debt: 340, debtPeriods: 2 }
 
 const CITIZEN_CAT: CatEntry[] = [
   { code: 'cottage', fa: 'کلبهٔ روستایی', en: 'Cottage', fp: [1, 1], cost: 800, time: 7200, role: '', materials: [['timber', 'الوار', 3]] },
@@ -507,21 +611,40 @@ function citizenUnmet(e: CatEntry): boolean { return unmet(e).length > 0 }
 
 function lotBuy(args: Record<string, unknown>) {
   seedCitizen()
-  const x = Number(args.x), y = Number(args.y)
-  if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= size() || y >= size()) return refusal('not_found', 'قطعهٔ نامعتبر.')
-  if (tenureAt(x, y)) return refusal('citizen_lot_taken', 'این زمین را همین حالا کس دیگری خرید. زمین دیگری انتخاب کن.')
-  if (!st.lots[y][x].buildable) return refusal('unbuildable', '🌊 روی این قطعه نمی‌توان ساخت.')
-  if (occupiedMap()[y][x]) return refusal('occupied', 'این قطعه پیش‌تر ساخته شده است.')
-  if (cz.tenure.filter((l) => l.mine).length >= MAX_LOTS) return refusal('citizen_lot_limit', 'به سقف زمین‌های شخصی رسیده‌ای؛ اول روی زمین‌هایت بساز.')
-  if (cz.cash < LOT_PRICE) return refusal('citizen_no_cash', 'پولت برای این کار کافی نیست.')
-  const view = (cash: number, treasury: number) => ({ village: 'آمل', settlement_id: OWN_ID, x, y, price: LOT_PRICE, cash, treasury })
-  if (args.confirm !== 'confirm') return { ok: true, screen: 'settlement_lot_buy_confirm', text: 'خرید زمین', view: view(cz.cash, st.treasury), actions: [back('settlement.land')] }
+  const at = lotArg(args)
+  if (!at) return refusal('not_found')
+  const { x, y } = at
+  if (x < 0 || y < 0 || x >= size() || y >= size()) return refusal('not_found')
+  if (tenureAt(x, y)) return refusal('citizen_lot_taken', { back: { command: 'settlement.land', args: null } })
+  if (!st.lots[y][x].buildable) return refusal('unbuildable')
+  if (occupiedMap()[y][x]) return refusal('occupied')
+  if (cz.tenure.filter((l) => l.mine).length >= MAX_LOTS) return refusal('citizen_lot_limit', { back: { command: 'settlement.land', args: null } })
+  if (cz.cash < LOT_PRICE) return refusal('citizen_no_cash', { back: { command: 'settlement.land', args: null } })
+  const view = (cashNow: number, treasury: number): LotBuyView => ({ village: 'آمل', settlement_id: OWN_ID, x, y, price: LOT_PRICE, cash: cashNow, treasury })
+  if (args.confirm !== 'confirm') return mockOk('settlement_lot_buy_confirm', view(cz.cash, st.treasury), [confirmA('settlement.lot.buy', { lot: token(x, y) }), back('settlement.land')])
   cz.cash -= LOT_PRICE
   st.treasury += LOT_PRICE
   cz.tenure.push({ x, y, owner: 'تو', mine: true })
   st.ver++
   emit({ type: 'lot_bought', lot_x: x, lot_y: y, layout_version: versions() })
-  return { ok: true, screen: 'settlement_lot_buy_done', text: 'زمین مال توست', view: view(cz.cash, st.treasury), actions: [back('settlement.land')] }
+  return mockOk('settlement_lot_buy_done', view(cz.cash, st.treasury), [A('citizen.build_house', 'settlement.private'), A('citizen.more_land', 'settlement.land'), back('settlement.land')])
+}
+
+/** The land as a resident sees it: every lot by what it is, the viewer's own marked. */
+function landView() {
+  seedCitizen()
+  const occ = occupiedMap()
+  const roads = new Set(st.roads.map((r) => `${r.x},${r.y}`))
+  const rows: LandCell[][] = st.lots.map((row, y) => row.map((l, x) => {
+    const own = tenureAt(x, y)
+    const b = st.buildings.find((q) => q.type !== 'road' && x >= q.x && x < q.x + q.w && y >= q.y && y < q.y + q.h)
+    const state = roads.has(`${x},${y}`) ? 'road' : own ? (own.mine ? 'mine' : 'taken') : b ? 'building' : l.water ? 'water' : !l.buildable ? 'steep' : occ[y][x] ? 'building' : 'free'
+    return { x, y, state, owner: own && !own.mine ? own.owner : '', building: b ? b.type : '' }
+  }))
+  const owned = cz.tenure.filter((l) => l.mine).length
+  const free = rows.flat().filter((c) => c.state === 'free').length
+  const view: LandView = { village: 'آمل', settlement_id: OWN_ID, grid_lots: size(), rows, price: LOT_PRICE, cash: cz.cash, owned, max: MAX_LOTS, can_buy: owned < MAX_LOTS && cz.cash >= LOT_PRICE, free_lots: free }
+  return mockOk('settlement_land', view, [...(owned > 0 ? [A('citizen.build_house', 'settlement.private')] : []), back('settlement.overview'), refreshA('settlement.land')])
 }
 
 function privateMenu() {
@@ -536,43 +659,68 @@ function privateMenu() {
       materials: b.mats, build_time_seconds: e.time, footprint_w: e.fp[0], footprint_h: e.fp[1], total: b.total, affordable: cz.cash >= b.total,
     }
   })
-  return { ok: true, screen: 'settlement_private_menu', text: 'ساخت‌وساز شخصی', view: { village: 'آمل', cash: cz.cash, owned_lots: owned.length, free_lots: freeOwn, lines }, actions: [back('settlement.overview')] }
+  const view: PrivateMenuView = { village: 'آمل', settlement_id: OWN_ID, cash: cz.cash, owned_lots: owned.length, free_lots: freeOwn, lines }
+  const acts: MockAct[] = []
+  if (owned.length === 0) return mockOk('settlement_private_menu', view, [A('citizen.land', 'settlement.land'), back('settlement.overview')])
+  for (const l of lines) if (freeOwn > 0 && l.affordable) acts.push(A('citizen.place', 'settlement.private.lots', { code: l.building.code }, { subject: l.building.code }))
+  if (freeOwn === 0) acts.push(A('citizen.more_land', 'settlement.land'))
+  return mockOk('settlement_private_menu', view, [...acts, back('settlement.overview'), refreshA('settlement.private')])
+}
+
+function privateLots(args: Record<string, unknown>) {
+  seedCitizen()
+  const code = String(args.code ?? '')
+  const e = citizenEntry(code)
+  if (!e) return refusal('not_found')
+  const rotated = args.rotate === '1' || args.rotate === 1 || args.rotate === true
+  const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
+  const occ = occupiedMap()
+  const roads = new Set(st.roads.map((r) => `${r.x},${r.y}`))
+  const stateOf = (x: number, y: number) => (roads.has(`${x},${y}`) ? 'road' : occ[y][x] ? 'occupied' : st.lots[y][x].water ? 'water' : !st.lots[y][x].buildable ? 'steep' : 'free')
+  const fits = (x: number, y: number) => {
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+      if (xx >= size() || yy >= size() || occ[yy][xx] || !tenureAt(xx, yy)?.mine) return false
+    }
+    return true
+  }
+  const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: stateOf(x, y), fits: fits(x, y) })))
+  const view: PrivateLotsView = { village: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated, grid_lots: size(), rows }
+  return mockOk('settlement_private_lots', view, [...(view.can_rotate ? [A('lots.rotate', 'settlement.private.lots', { code, rotate: rotated ? '0' : '1' })] : []), back('settlement.private'), refreshA('settlement.private.lots', { code })])
 }
 
 function privatePlace(args: Record<string, unknown>) {
   seedCitizen()
   const code = String(args.code ?? '')
   const e = citizenEntry(code)
-  if (!e) return refusal('not_found', 'این ساختمان شناخته نشد.')
-  const x = Number(args.x), y = Number(args.y)
-  if (!Number.isInteger(x) || !Number.isInteger(y)) return refusal('not_found', 'قطعهٔ نامعتبر.')
+  if (!e) return refusal('not_found')
+  const at = lotArg(args)
+  if (!at) return refusal('not_found')
+  const { x, y, rotated } = at
+  const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
   const occ = occupiedMap()
-  for (let yy = y; yy < y + e.fp[1]; yy++) {
-    for (let xx = x; xx < x + e.fp[0]; xx++) {
-      if (xx >= size() || yy >= size()) return refusal('out_of_bounds', 'ساختمان از محدودهٔ روستا بیرون می‌زند.')
-      if (occ[yy][xx]) return refusal('occupied', 'این قطعه پیش‌تر ساخته شده است.')
-      if (!tenureAt(xx, yy)?.mine) return refusal('citizen_not_owner', 'این زمین مال تو نیست؛ فقط روی زمین خودت می‌توانی بسازی.')
+  for (let yy = y; yy < y + h; yy++) {
+    for (let xx = x; xx < x + w; xx++) {
+      if (xx >= size() || yy >= size()) return refusal('out_of_bounds')
+      if (occ[yy][xx]) return refusal('occupied')
+      if (!tenureAt(xx, yy)?.mine) return refusal('citizen_not_owner', { back: { command: 'settlement.private', args: null } })
     }
   }
-  if (citizenUnmet(e)) return refusal('prerequisite', 'دانش یا ساختمانِ پیش‌نیاز کامل نیست.')
+  if (citizenUnmet(e)) return refusal('prerequisite')
   const b = bill(e)
-  if (cz.cash < b.total) return refusal('citizen_no_cash', 'پولت برای این کار کافی نیست.')
+  if (cz.cash < b.total) return refusal('citizen_no_cash', { back: { command: 'settlement.private', args: null } })
   if (args.confirm !== 'confirm') {
-    return {
-      ok: true, screen: 'settlement_private_confirm', text: 'تأیید ساخت',
-      view: { village: 'آمل', building: nameOf(code), x, y, rotated: false, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time },
-      actions: [back('settlement.private.lots')],
-    }
+    const view: PrivateConfirmView = { village: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time }
+    return mockOk('settlement_private_confirm', view, [confirmA('settlement.private.place', { code, lot: token(x, y, rotated) }), back('settlement.private.lots', { code })])
   }
   cz.cash -= b.total
   st.treasury += PERMIT_FEE
   const sec = 40
   const started = Date.now()
-  const nb: MBuilding = { id: `b-${st.nextId++}`, type: code, x, y, w: e.fp[0], h: e.fp[1], rotated: false, state: 'under_construction', started, finish: started + sec * 1000, seed: 77021 + st.nextId * 17, priv: true, owner: 'تو', mine: true }
+  const nb: MBuilding = { id: `b-${st.nextId++}`, type: code, x, y, w, h, rotated, state: 'under_construction', started, finish: started + sec * 1000, seed: 77021 + st.nextId * 17, priv: true, owner: 'تو', mine: true }
   st.buildings.push(nb)
   st.ver++
   schedule(nb)
-  emit({ type: 'build_started', building_id: nb.id, type_code: code, lot_x: x, lot_y: y, rotated: false, finish_at: new Date(nb.finish!).toISOString(), layout_version: versions() })
+  emit({ type: 'build_started', building_id: nb.id, type_code: code, lot_x: x, lot_y: y, rotated, finish_at: new Date(nb.finish!).toISOString(), layout_version: versions() })
   return mineView('')
 }
 
@@ -582,28 +730,120 @@ function mineView(notice: string) {
   const mineB = st.buildings.filter((b) => b.priv && b.mine)
   const lots = cz.tenure.filter((l) => l.mine).map((l) => {
     const b = mineB.find((x) => l.x >= x.x && l.x < x.x + x.w && l.y >= x.y && l.y < x.y + x.h)
-    return { x: l.x, y: l.y, ...(b ? { building: b.type, state: b.state, left_seconds: b.finish ? Math.max(0, Math.round((b.finish - now) / 1000)) : 0 } : {}) }
+    return { x: l.x, y: l.y, building: b ? b.type : '', state: b ? (b.state === 'built' ? 'built' : 'building') : '', finish_at: b?.finish ? new Date(b.finish).toISOString() : null, left_seconds: b?.finish ? Math.max(0, Math.round((b.finish - now) / 1000)) : 0 }
   })
   const home = mineB.find((b) => b.state === 'built' && HOMES.has(b.type))
-  const assessed = cz.tenure.filter((l) => l.mine).length * LOT_PRICE + mineB.reduce((s, b) => s + (citizenEntry(b.type)?.cost ?? 0) + (citizenEntry(b.type)?.materials ?? []).reduce((m, [, , n]) => m + n * 15, 0), 0)
+  const assessed = cz.tenure.filter((l) => l.mine).length * LOT_PRICE + mineB.reduce((q, b) => q + (citizenEntry(b.type)?.cost ?? 0) + (citizenEntry(b.type)?.materials ?? []).reduce((m, [, , n]) => m + n * 15, 0), 0)
   const wait = Math.max(0, Math.round((cz.lastRest + 6 * 3600_000 - now) / 1000))
-  return {
-    ok: true, screen: 'settlement_mine', text: 'دارایی من',
-    view: {
-      village: 'آمل', settlement_id: OWN_ID, cash: cz.cash, lots, home: home ? nameOf(home.type) : null, can_rest: !!home && wait === 0, rest_wait_seconds: wait,
-      assessed, tax_per_period: Math.floor(assessed * TAX_BPS / 10000), tax_bps: TAX_BPS, debt: 0, debt_periods: 0, ...(notice ? { notice } : {}),
-    },
-    actions: [back('settlement.overview')],
+  const view: MineView = {
+    village: 'آمل', settlement_id: OWN_ID, cash: cz.cash, lots: lots.length ? lots : null, home: home ? nameOf(home.type) : null, can_rest: !!home && wait === 0, rest_wait_seconds: wait,
+    assessed, tax_per_period: Math.floor(assessed * TAX_BPS / 10000), tax_bps: TAX_BPS, debt: cz.debt, debt_periods: cz.debtPeriods, notice,
   }
+  const acts: MockAct[] = [A('citizen.land', 'settlement.land'), A('citizen.build_house', 'settlement.private')]
+  if (home) acts.push(A('citizen.rest', 'settlement.home.rest'))
+  if (cz.debt > 0) acts.push(A('citizen.pay_tax', 'settlement.tax.pay'))
+  return mockOk('settlement_mine', view, [...acts, back('settlement.overview'), refreshA('settlement.mine')])
 }
 
 function homeRest() {
   const v = mineView('') as { view: { home: unknown; can_rest: boolean } }
-  if (!v.view.home) return refusal('citizen_no_house', 'برای استراحت اول باید خانه‌ات ساخته شود.')
-  if (!v.view.can_rest) return refusal('citizen_rest_wait', 'هنوز سرحال هستی؛ کمی بعد دوباره استراحت کن.')
+  if (!v.view.home) return refusal('citizen_no_house', { back: { command: 'settlement.mine', args: null } })
+  if (!v.view.can_rest) return refusal('citizen_rest_wait', { remaining: Math.max(1, Math.round((cz.lastRest + 6 * 3600_000 - Date.now()) / 1000)), back: { command: 'settlement.mine', args: null } })
   cz.lastRest = Date.now()
   return mineView('rested')
 }
+
+function taxPay() {
+  if (cz.debt <= 0) return refusal('citizen_no_debt', { back: { command: 'settlement.mine', args: null } })
+  if (cz.cash < cz.debt) return mineView('tax_none')
+  cz.cash -= cz.debt
+  st.treasury += cz.debt
+  cz.debt = 0
+  cz.debtPeriods = 0
+  return mineView('tax_paid')
+}
+
+// -- the head's terms ------------------------------------------------------------------------------------------
+function termsView(args: Record<string, unknown>) {
+  if (!IS_HEAD) return refusal('not_office_holder')
+  const lot = args.lot_price !== undefined ? Number(args.lot_price) : undefined
+  const permit = args.permit_fee !== undefined ? Number(args.permit_fee) : undefined
+  const tax = args.tax_bps !== undefined ? Number(args.tax_bps) : undefined
+  if (lot !== undefined) { if (!(lot >= 100 && lot <= 5000)) return refusal('citizen_terms_range'); LOT_PRICE = lot }
+  if (permit !== undefined) { if (!(permit >= 0 && permit <= 1000)) return refusal('citizen_terms_range'); PERMIT_FEE = permit }
+  if (tax !== undefined) { if (!(tax >= 0 && tax <= 1000)) return refusal('citizen_terms_range'); TAX_BPS = tax; st.ver++ }
+  if (lot !== undefined) st.ver++
+  const view: TermsView = {
+    village: 'آمل', settlement_id: OWN_ID, lot_price: LOT_PRICE, lot_price_min: 100, lot_price_max: 5000, permit_fee: PERMIT_FEE, permit_fee_max: 1000, tax_bps: TAX_BPS, tax_bps_max: 1000,
+    lot_presets: [200, 400, 800, 1500], permit_presets: [0, 100, 250, 500], tax_presets: [0, 100, 200, 400], default_lot_price: 400, default_permit: 100, default_tax_bps: 200,
+  }
+  // the real server names the levers by position (a known mismatch with the routing's argument names, reported to the Go side)
+  const lever = (id: string, key: string, p: number) => A(id, 'settlement.terms', { [key]: String(p) })
+  return mockOk('settlement_terms', view, [
+    ...view.lot_presets!.map((p) => lever('terms.lot_price', 'lot_price', p)), ...view.permit_presets!.map((p) => lever('terms.permit_fee', 'permit_fee', p)),
+    ...view.tax_presets!.map((p) => lever('terms.tax_bps', 'tax_bps', p)), back('settlement.overview'), refreshA('settlement.terms'),
+  ])
+}
+
+// -- promotion, residence ---------------------------------------------------------------------------------------
+function promotionScreen(kind: 'view' | 'ask' | 'done') {
+  const v = promotionView()
+  if (kind === 'view') return mockOk('village_promotion', v, [...(v.met && v.can_promote ? [A('village.promote', 'settlement.promote')] : []), back('settlement.overview'), refreshA('settlement.promotion.view')])
+  if (!v.met) return refusal('not_available')
+  if (!v.can_promote) return refusal('not_office_holder')
+  if (kind === 'ask') return mockOk('village_promote_confirm', v, [confirmA('settlement.promote'), back('settlement.overview')])
+  return mockOk('village_promoted', { ...v, from: 'town', to: 'town' }, [A('village.build', 'settlement.build'), A('village.knowledge', 'settlement.knowledge'), back('settlement.overview'), refreshA('settlement.overview')])
+}
+
+function residence(leaving: boolean, args: Record<string, unknown>) {
+  const view: ResidenceView = { leaving, village: 'آمل', home: 'calderis', cooldown_seconds: 86400, population: 3, settlement_id: OWN_ID }
+  const cmd = leaving ? 'settlement.leave' : 'settlement.join'
+  if (leaving && IS_HEAD) return refusal('holds_office')
+  if (args.confirm !== 'confirm') return mockOk('village_residence_confirm', view, [confirmA(cmd), back('settlement.overview')])
+  return mockOk('village_residence_done', view, [A('village.overview', 'settlement.overview')])
+}
+
+// -- work: the village's workplaces and the viewer's own shift ----------------------------------------------------------
+const WORKPLACES = [
+  { id: 'wp-1', code: 'woodcutter_camp', produces: [['timber', 3]] as [string, number][], consumes: [] as [string, number][], wage: 30, shift: 3600, workers: 3 },
+  { id: 'wp-2', code: 'farm_canal', produces: [['wheat', 12]] as [string, number][], consumes: [] as [string, number][], wage: 24, shift: 5400, workers: 4 },
+  { id: 'wp-3', code: 'carpentry_workshop', produces: [['timber', 2]] as [string, number][], consumes: [['wheat', 1]] as [string, number][], wage: 36, shift: 3600, workers: 2 },
+]
+const wk = { shift: null as null | { id: string; finish: number } }
+
+function workView(args: Record<string, unknown>) {
+  const place = WORKPLACES.find((p) => p.id === String(args.id ?? ''))
+  if (args.id && !place) return refusal('not_workplace')
+  if (place) {
+    if (wk.shift && wk.shift.finish > Date.now()) return refusal('already_working')
+    wk.shift = { id: place.id, finish: Date.now() + 3600_000 }
+  }
+  const mine = wk.shift && wk.shift.finish > Date.now() ? WORKPLACES.find((p) => p.id === wk.shift!.id)! : null
+  const lines = (l: [string, number][]) => (l.length ? l.map(([c, q]) => ({ component: goods(c), quantity: q })) : null)
+  const view: WorkView = {
+    village: 'آمل', resident: true,
+    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true })),
+    mine: mine ? { building: nameOf(mine.code), finish_at: new Date(wk.shift!.finish).toISOString(), left_seconds: Math.round((wk.shift!.finish - Date.now()) / 1000), wage: mine.wage, produces: lines(mine.produces) } : null,
+    suggest: null, started: !!place, used: Object.values(MAT_STOCK).reduce((a, b) => a + b, 0), capacity: MAT_BASE_CAP,
+  }
+  const acts: MockAct[] = []
+  if (!mine) for (const p of WORKPLACES) acts.push(A('work.start', 'settlement.work', { id: p.id }, { subject: p.code }))
+  acts.push(A('village.materials', 'settlement.materials'), A('village.build', 'settlement.build'), back('settlement.overview'), refreshA('settlement.work'))
+  return mockOk(place ? 'village_work_started' : 'village_work', view, acts)
+}
+
+function whoView() {
+  const r = roster()
+  const view: SettlementWhoView = {
+    name: 'آمل', online: r.players.filter((p) => p.online).map((p) => ({ name: p.name ?? '', activity: String(p.activity ?? 'idle'), place: p.place === 'city_centre' ? '' : p.place ?? '' })),
+    offline: r.players.filter((p) => !p.online).length,
+  }
+  return mockOk('settlement_who', view, [back('settlement.overview'), refreshA('settlement.who')])
+}
+
+const homeCall = () => mockOk('village_home_call', {}, [A('village.found', 'settlement.found.draft'), back('player.profile.get')])
+const homeNone = () => mockOk('village_home_none', {}, [back('player.profile.get')])
+
 
 // -- roads: automatic and in batches (contract 1.4) ------------------------------------------
 
@@ -662,38 +902,39 @@ function mkRoad(x: number, y: number, state: BuildingState, finishIn?: number): 
 function placeMany(args: Record<string, unknown>) {
   const code = String(args.code ?? '')
   const e = CAT.find((c) => c.code === code)
-  if (!e) return refusal('not_found', 'این ساختمان شناخته نشد.')
-  const raw = Array.isArray(args.lots) ? args.lots : []
+  if (!e) return refusal('not_found')
   const lots: { x: number; y: number }[] = []
-  for (const l of raw) {
-    const tok = typeof l === 'string' ? l.split('-').map(Number) : [Number((l as { x: number }).x), Number((l as { y: number }).y)]
-    if (!Number.isInteger(tok[0]) || !Number.isInteger(tok[1])) return refusal('not_found', 'قطعهٔ نامعتبر.')
-    if (!lots.some((q) => q.x === tok[0] && q.y === tok[1])) lots.push({ x: tok[0], y: tok[1] })
+  const tok = (v: unknown) => { const m = /^(\d+)-(\d+)/.exec(String(v ?? '')); return m ? { x: +m[1], y: +m[2] } : null }
+  const f = tok(args.from), t2 = tok(args.to)
+  if (f && t2) {
+    // the two ends of a straight line (the web draws a row: horizontal or vertical)
+    const dx = Math.sign(t2.x - f.x), dy = Math.sign(t2.y - f.y)
+    if (dx !== 0 && dy !== 0) return refusal('not_found')
+    for (let x = f.x, y = f.y; ; x += dx, y += dy) { lots.push({ x, y }); if (x === t2.x && y === t2.y) break }
+  } else {
+    const raw = Array.isArray(args.lots) ? args.lots : []
+    for (const l of raw) {
+      const tk = typeof l === 'string' ? l.split('-').map(Number) : [Number((l as { x: number }).x), Number((l as { y: number }).y)]
+      if (!Number.isInteger(tk[0]) || !Number.isInteger(tk[1])) return refusal('not_found')
+      if (!lots.some((q) => q.x === tk[0] && q.y === tk[1])) lots.push({ x: tk[0], y: tk[1] })
+    }
   }
-  if (!lots.length) return refusal('not_found', 'قطعه‌ای انتخاب نشده است.')
-  if (e.fp[0] !== 1 || e.fp[1] !== 1 || !e.capExempt) return refusal('not_available', 'این بنا را نمی‌شود گروهی ساخت.')
+  if (!lots.length) return refusal('not_found')
+  if (e.fp[0] !== 1 || e.fp[1] !== 1 || !e.capExempt) return refusal('not_available')
   const occ = occupiedMap()
-  const bad: { x: number; y: number; kind: string }[] = []
+  const bad: BatchLotFailure[] = []
   for (const l of lots) {
     if (l.x < 0 || l.y < 0 || l.x >= size() || l.y >= size()) bad.push({ ...l, kind: 'out_of_bounds' })
     else if (occ[l.y][l.x]) bad.push({ ...l, kind: 'occupied' })
     else if (!st.lots[l.y][l.x].buildable) bad.push({ ...l, kind: 'unbuildable' })
   }
-  if (bad.length) {
-    return {
-      ok: false, screen: 'village_refusal', text: 'ساخت گروهی انجام نشد و چیزی پرداخت نشد.',
-      view: { kind: 'batch', back: '', lots: bad },
-      error: { code: 'village_batch', message: 'ساخت گروهی انجام نشد و چیزی پرداخت نشد.' }, actions: [back('settlement.overview')],
-    }
-  }
+  if (bad.length) return refusal('batch', { lots: bad })
   const total = e.cost * lots.length
-  if (st.treasury < total) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این ساخت کافی نیست.')
+  if (st.treasury < total) return refusal('insufficient_funds')
   if (args.confirm !== 'confirm') {
-    return {
-      ok: true, screen: 'settlement_build_batch_confirm', text: 'تأیید',
-      view: { settlement_name: 'آمل', building: nameOf(code), lots, count: lots.length, cost_money: total, materials: null, build_time_seconds: e.time },
-      actions: [back('settlement.build')],
-    }
+    const view: LotBatchConfirmView = { settlement_name: 'آمل', building: nameOf(code), lots, count: lots.length, cost_money: total, materials: null, build_time_seconds: e.time }
+    const a = lots[0], z = lots[lots.length - 1]
+    return mockOk('settlement_build_batch_confirm', view, [confirmA('settlement.build.place_many', { code, from: token(a.x, a.y), to: token(z.x, z.y) }), back('settlement.build')])
   }
   st.treasury -= total
   const made = lots.map((l) => { const b = mkRoad(l.x, l.y, 'under_construction', 25_000); st.buildings.push(b); schedule(b); return b })
@@ -707,20 +948,6 @@ function placeMany(args: Record<string, unknown>) {
 
 // -- the building panel ----------------------------------------------------------------------
 
-const DESC: Record<string, string> = {
-  road: 'جادهٔ روستا؛ قطعه‌ها را به هم می‌رساند و راه رفت‌وآمد اهالی است. کار دیگری ندارد.',
-  civic_hall: 'دل اداریِ روستا؛ دهیار از اینجا روستا را اداره می‌کند. خزانه، دانش و ساخت‌وساز روستا از همین‌جا در دسترس است.',
-  security: 'پاسداری از روستا؛ امنیت محلی را بالا می‌برد.',
-  craft: 'کارگاه ساخت‌وساز و صنعت؛ پایهٔ تولید کالا در روستاست.',
-  food: 'تولید خوراک روستا؛ پوشش خوراک اهالی را بالا می‌برد.',
-  health: 'مراقبت از سلامت و درمان اهالی.',
-  education: 'آموزش اهالی؛ تا وقتی این بنا سر پاست، سواد میان اهالی کم‌کم پخش می‌شود.',
-  market: 'جای دادوستد اهالی؛ کالا اینجا دست‌به‌دست می‌شود.',
-  storage: 'انبار روستا؛ مواد و کالای مشترک روستا اینجا نگهداری می‌شود و ساخت‌وساز از همین موجودی برمی‌دارد.',
-  water_infra: 'مهار و رساندن آب برای زندگی و کشاورزی روستا.',
-  house: 'خانه‌ای یک‌قطعه‌ای برای چند نفر؛ ظرفیت جمعیت روستا را کمی بالا می‌برد.',
-  generic: 'بنایی از روستا.',
-}
 const EFFECTS: Record<string, { target: string; value: number }[]> = {
   watch_hut: [{ target: 'local_security_bps', value: 300 }],
   militia_camp: [{ target: 'local_security_bps', value: 350 }],
@@ -729,7 +956,7 @@ const EFFECTS: Record<string, { target: string; value: number }[]> = {
   park: [{ target: 'happiness_bps', value: 150 }],
   farm_canal: [{ target: 'food_coverage_bps', value: 700 }],
 }
-const STOCK = [{ item: { code: 'timber', name: 'چوب' }, kind: 'component', qty: 15 }, { item: { code: 'stone', name: 'سنگ' }, kind: 'component', qty: 8 }, { item: { code: 'wheat', name: 'گندم' }, kind: 'item', qty: 120 }]
+const STOCK = [{ item: goods('timber'), kind: 'component', qty: 15 }, { item: goods('stone'), kind: 'component', qty: 8 }, { item: goods('wheat'), kind: 'item', qty: 120 }]
 
 function panelKind(type: string, role: string): string {
   if (type === 'road') return 'road'
@@ -746,17 +973,16 @@ function buildingView(args: Record<string, unknown>) {
     const m = id.match(/^road-(\d+)-(\d+)$/)
     return m ? ({ id, type: 'road', x: +m[1], y: +m[2], w: 1, h: 1, rotated: false, state: 'built', seed: 7 } as MBuilding) : undefined
   })()
-  if (!b) return refusal('not_found', 'ساختمان پیدا نشد.')
-  const e = CAT.find((c) => c.code === b.type)
+  if (!b) return refusal('not_found')
+  const e = CAT.find((c) => c.code === b.type) ?? citizenEntry(b.type)
   const role = e?.role ?? ''
   const kind = panelKind(b.type, role)
   const going = b.state === 'under_construction' || b.state === 'planned'
-  const mode = args.mode === 'up' ? 'up' : ''
-  const view: Record<string, unknown> = {
-    id: b.id, building: nameOf(b.type), role, tier: 1, kind, state: going ? 'building' : 'complete', mode,
-    x: b.x, y: b.y, w: b.w, h: b.h, rotated: b.rotated, upkeep: b.type === 'road' ? 2 : 20, can_manage: true,
-    description: DESC[b.type] ?? DESC[role] ?? (b.type === 'village_house' ? DESC.house : DESC.generic),
-    effects: EFFECTS[b.type] ?? null,
+  const mode = args.mode === 'up' ? 'up' : args.mode === 'dm' ? 'dm' : args.mode === 'cx' ? 'cx' : ''
+  const view: BuildingView = {
+    id: b.id, building: nameOf(b.type), role, tier: 1, kind, state: going ? 'building' : 'complete', mode, x: b.x, y: b.y, w: b.w, h: b.h, rotated: b.rotated,
+    upkeep: b.type === 'road' ? 2 : 20, effects: EFFECTS[b.type] ?? null, can_manage: !b.priv || !!b.mine, started_at: null, finish_at: null, left_seconds: 0, progress_percent: 0,
+    stock: null, stock_used: 0, stock_capacity: 0, literacy_percent: 0, teaching: false, treasury: 0, population: 0, research: null, has_upgrade: false, upgrades: null,
   }
   if (going) {
     const started = b.started ?? Date.now(), finish = b.finish ?? Date.now()
@@ -765,10 +991,10 @@ function buildingView(args: Record<string, unknown>) {
     view.left_seconds = Math.max(0, Math.round((finish - Date.now()) / 1000))
     view.progress_percent = Math.max(0, Math.min(100, Math.round(((Date.now() - started) / Math.max(1, finish - started)) * 100)))
   } else {
-    if (kind === 'storage') view.stock = STOCK
+    if (kind === 'storage') { view.stock = STOCK; view.stock_used = Object.values(MAT_STOCK).reduce((a, q) => a + q, 0); view.stock_capacity = MAT_BASE_CAP }
     if (kind === 'school') { view.literacy_percent = st.literacy; view.teaching = true }
     if (kind === 'civic_hall') {
-      view.treasury = st.treasury; view.population = 34
+      view.treasury = st.treasury; view.population = 2
       const run = st.know.find((k) => k.state === 'researching')
       view.research = run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? Date.now()).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? Date.now()) - Date.now()) / 1000)) } : null
     }
@@ -777,28 +1003,40 @@ function buildingView(args: Record<string, unknown>) {
       if (mode === 'up') {
         const sc = CAT.find((c) => c.code === 'school')!
         const miss = unmet(sc)
-        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, available: miss.length === 0, missing: miss.length ? miss.map(kn) : null }]
+        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, available: miss.length === 0, missing: miss.length ? miss.map(kn) : null, needs_tier: '' }]
       }
     }
   }
-  return { ok: true, screen: 'settlement_building_view', text: '', view, actions: [back('settlement.build.progress')] }
+  const acts: MockAct[] = []
+  if (mode === 'dm') acts.push(A('building.demolish_yes', 'settlement.build.demolish', { id: b.id }, { kind: 'danger' }), back('settlement.building.view', { building_id: b.id }))
+  else if (mode === 'cx') acts.push(A('building.cancel_yes', 'settlement.build.cancel', { id: b.id }, { kind: 'danger' }), back('settlement.building.view', { building_id: b.id }))
+  else if (mode === 'up') {
+    for (const u of view.upgrades ?? []) if (u.available) acts.push(A('build.place', 'settlement.build.lots', { code: u.building.code }, { subject: u.building.code }))
+    acts.push(back('settlement.building.view', { building_id: b.id }))
+  } else {
+    if (!going && kind === 'civic_hall') acts.push(A('village.overview', 'settlement.overview'), A('village.knowledge', 'settlement.knowledge'), A('village.build', 'settlement.build'), A('village.progress', 'settlement.build.progress'))
+    if (view.can_manage) {
+      if (going) acts.push(A('building.cancel', 'settlement.building.view', { building_id: b.id, mode: 'cx' }, { kind: 'danger' }))
+      else if (view.has_upgrade) acts.push(A('building.upgrade', 'settlement.building.view', { building_id: b.id, mode: 'up' }))
+      if (!going) acts.push(A('building.demolish', 'settlement.building.view', { building_id: b.id, mode: 'dm' }, { kind: 'danger' }))
+    }
+    acts.push(back('settlement.build.progress'), refreshA('settlement.building.view', { building_id: b.id }))
+  }
+  return mockOk('settlement_building_view', view, acts)
 }
 
 // -- land -------------------------------------------------------------------------------------------
 
 function growView(args: Record<string, unknown>) {
   const side = size()
-  if (side + 1 > GROW_MAX) return refusal('grid_max', 'زمین روستا به بیشینهٔ فنیِ اندازهٔ نقشه رسیده است.')
+  if (side + 1 > GROW_MAX) return refusal('grid_max')
   const lotsGained = 2 * side + 1
   const price = Math.floor((lotsGained * GROW_LOT_PRICE * (10_000 + GROW_STEP_BPS * st.growth)) / 10_000)
   if (args.confirm !== 'confirm') {
-    return {
-      ok: true, screen: 'settlement_grid_grow', text: 'گسترش زمین',
-      view: { settlement_name: 'آمل', side, new_side: side + 1, lots_gained: lotsGained, buildable_gained: Math.round(lotsGained * 0.82), price, treasury: st.treasury },
-      actions: [back('settlement.build')],
-    }
+    const view: GridGrowView = { settlement_name: 'آمل', side, new_side: side + 1, lots_gained: lotsGained, buildable_gained: Math.round(lotsGained * 0.82), price, treasury: st.treasury }
+    return mockOk('settlement_grid_grow', view, [confirmA('settlement.grid.grow'), back('settlement.build')])
   }
-  if (st.treasury < price) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این کار کافی نیست.')
+  if (st.treasury < price) return refusal('insufficient_funds')
   st.treasury -= price
   st.growth++
   const place = mockVillagePlace(GRID)
@@ -810,29 +1048,32 @@ function growView(args: Record<string, unknown>) {
 
 // -- storage and market (settlement.materials, .buy) ---------------------------------------------
 const MARKET = [
-  { item: { code: 'timber', name: 'چوب' }, price: 22 },
-  { item: { code: 'stone', name: 'سنگ' }, price: 30 },
-  { item: { code: 'iron_bar', name: 'شمش آهن' }, price: 64 },
+  { item: goods('timber'), price: 22 },
+  { item: goods('stone'), price: 30 },
+  { item: goods('iron_bar'), price: 64 },
 ]
 const MAT_STOCK: Record<string, number> = { timber: 15, stone: 8 }
 const MAT_BASE_CAP = 100
-function materialsView(bought?: { item: { code: string; name: string }; qty: number; total: number }) {
-  const cap = MAT_BASE_CAP
+function materialsView(bought?: { item: Named; qty: number; total: number }) {
   const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
-  const stock = Object.keys(MAT_STOCK).sort().map((c) => ({ item: { code: c, name: MARKET.find((m) => m.item.code === c)?.item.name ?? c }, qty: MAT_STOCK[c] }))
-  return { ok: true, screen: 'village_materials', text: 'انبار و بازار', view: { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: cap, market: MARKET, can_buy: true, presets: [5, 10, 25], ...(bought ? { bought } : {}) }, actions: [back('settlement.overview')] }
+  const stock = Object.keys(MAT_STOCK).sort().map((c) => ({ item: goods(c), qty: MAT_STOCK[c] }))
+  const view: MaterialsView = { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: MAT_BASE_CAP, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
+  const acts: MockAct[] = []
+  if (IS_HEAD) for (const l of MARKET) for (const q of [5, 10, 25]) acts.push(A('materials.buy', 'settlement.materials.buy', { item: l.item.code, qty: String(q) }, { subject: l.item.code }))
+  return mockOk('village_materials', view, [...acts, A('village.work', 'settlement.work'), A('village.build', 'settlement.build'), back('settlement.overview'), refreshA('settlement.materials')])
 }
 function materialsBuy(args: Record<string, unknown>) {
   const line = MARKET.find((m) => m.item.code === String(args.item ?? ''))
   const qty = Number(args.qty)
-  if (!line || !(qty >= 1)) return refusal('not_found', 'این کالا در بازار نیست.')
+  if (!line || !(qty >= 1)) return refusal('not_found')
   const total = line.price * qty
   const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
-  if (used + qty > MAT_BASE_CAP) return refusal('storage_full', 'انبار روستا جا ندارد؛ انبار غله بسازید.')
+  if (used + qty > MAT_BASE_CAP) return refusal('storage_full', { back: { command: 'settlement.materials', args: null } })
   if (args.confirm !== 'confirm') {
-    return { ok: true, screen: 'village_materials_buy_confirm', text: 'تأیید خرید', view: { village: 'آمل', item: line.item, qty, unit: line.price, total, treasury: st.treasury, free: MAT_BASE_CAP - used }, actions: [back('settlement.materials')] }
+    const view: MaterialBuyView = { village: 'آمل', item: line.item, qty, unit: line.price, total, treasury: st.treasury, free: MAT_BASE_CAP - used }
+    return mockOk('village_materials_buy_confirm', view, [confirmA('settlement.materials.buy', { item: line.item.code, qty: String(qty) }), back('settlement.materials')])
   }
-  if (st.treasury < total) return refusal('insufficient_funds', 'خزانه‌ی روستا برای این کار کافی نیست.')
+  if (st.treasury < total) return refusal('insufficient_funds', { back: { command: 'settlement.materials', args: null } })
   st.treasury -= total
   MAT_STOCK[line.item.code] = (MAT_STOCK[line.item.code] ?? 0) + qty
   return materialsView({ item: line.item, qty, total })
@@ -847,7 +1088,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.materials': return materialsView()
     case 'settlement.materials.buy': return materialsBuy(args)
     case 'settlement.build': return menuView()
-    case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true)
+    case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true, String(args.from ?? ''))
     case 'settlement.build.place': return place(args)
     case 'settlement.build.place_many': return placeMany(args)
     case 'settlement.building.view': return buildingView(args)
@@ -864,7 +1105,18 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.private.place': return privatePlace(args)
     case 'settlement.mine': return mineView('')
     case 'settlement.home.rest': return homeRest()
-    case 'settlement.who': return { ok: true, screen: 'settlement_who', text: 'ساکنان', actions: [back('settlement.overview')] }
+    case 'settlement.who': return whoView()
+    case 'settlement.land': return landView()
+    case 'settlement.private.lots': return privateLots(args)
+    case 'settlement.tax.pay': return taxPay()
+    case 'settlement.terms': return termsView(args)
+    case 'settlement.promotion.view': return promotionScreen('view')
+    case 'settlement.promote': return promotionScreen(args.confirm === 'confirm' ? 'done' : 'ask')
+    case 'settlement.join': return residence(false, args)
+    case 'settlement.leave': return residence(true, args)
+    case 'settlement.work': return workView(args)
+    case 'settlement.home': return homeCall()
+    case 'settlement.home.none': return homeNone()
     default: return null
   }
 }
@@ -875,7 +1127,15 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
   if (path === '/api/v1/content') {
     return json({
       version: 'v1', langs: ['en', 'fa'],
-      entries: { settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })) },
+      entries: {
+        settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
+        // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
+        city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Support', fa: 'ساپورت' } }],
+        place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }],
+        component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
+        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }],
+        knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
+      },
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)

@@ -3,7 +3,8 @@
 // wage curve of internal/domain/labor. Shifts are shortened so a demo sees them
 // end. Shapes follow the contract; values are plausible sample data.
 
-import type { LaborBoardView, LaborJobView, LaborMarketView, LaborShiftView, LaborSiteView } from './laborTypes'
+import type { LaborBoardView, LaborJobView, LaborMarketView, LaborMineView, LaborShiftView, LaborSiteView } from './laborTypes'
+import { A, back, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 
 const SHIFT_MS = 9000
 const NPC_BPS = 8500
@@ -11,7 +12,7 @@ const CURVE: [number, number][] = [[0, 7000], [5000, 10000], [10000, 15000], [20
 const BASE_WAGE = 30
 const MIN_WAGE = 10
 
-interface Site { id: string; code: string; fa: string; required: number; done: number; jobId: string; left: number; total: number; crew: number; wage: number; status: 'building' | 'complete'; employer: string }
+interface Site { id: string; code: string; fa: string; en: string; x: number; y: number; required: number; done: number; jobId: string; left: number; total: number; crew: number; wage: number; status: 'building' | 'complete'; employer: string }
 interface Shift { id: string; siteId: string; npc: boolean; name: string; level: string; finish: number; wage: number; points: number }
 
 const S = {
@@ -30,8 +31,8 @@ function init() {
   if (S.ready) return
   S.ready = true
   S.sites = [
-    { id: 'lb-site-1', code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', required: 120, done: 42, jobId: 'lb-job-1', left: 3, total: 4, crew: 0, wage: 30, status: 'building', employer: '' },
-    { id: 'lb-site-2', code: 'cottage', fa: 'خانهٔ روستایی', required: 240, done: 0, jobId: 'lb-job-2', left: 6, total: 6, crew: 0, wage: 45, status: 'building', employer: 'سارا' },
+    { id: 'lb-site-1', code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: 'Woodcutter camp', x: 1, y: 0, required: 120, done: 42, jobId: 'lb-job-1', left: 3, total: 4, crew: 0, wage: 30, status: 'building', employer: '' },
+    { id: 'lb-site-2', code: 'cottage', fa: 'خانهٔ روستایی', en: 'Cottage', x: 3, y: 1, required: 240, done: 0, jobId: 'lb-job-2', left: 6, total: 6, crew: 0, wage: 45, status: 'building', employer: 'سارا' },
   ]
   S.shifts = [{ id: 'lb-shift-0', siteId: 'lb-site-1', npc: false, name: 'سارا', level: 'journeyman', finish: Date.now() + 5 * 60_000, wage: 30, points: 60 }]
 }
@@ -74,7 +75,8 @@ function market(): LaborMarketView {
   }
 }
 
-const named = (s: Site) => ({ code: s.code, name: s.fa })
+/** The authored name is English, as on the real server; the web resolves names from the catalogue. */
+const named = (s: Site) => ({ code: s.code, name: s.en })
 const shiftView = (sh: Shift): LaborShiftView => ({
   id: sh.id, building: { code: '', name: '' }, kind: 'construction', worker: sh.name, worker_npc: sh.npc, level: sh.level,
   finish_at: new Date(sh.finish).toISOString(), left_seconds: Math.max(0, Math.round((sh.finish - Date.now()) / 1000)), wage: sh.wage, points: sh.points,
@@ -119,7 +121,30 @@ function fillCrew(s: Site) {
   }
 }
 
-const refusal = (text: string) => ({ ok: false, screen: 'village_refusal', text, error: { code: 'refused', message: text } })
+const refusal = (kind: string) => mockRefusal(kind, { back: { command: 'settlement.labor.board', args: null } })
+
+/** The sites raised by work, for the village's construction queue (settlement.build.progress). */
+export function laborProgressLines() {
+  init()
+  tick()
+  return S.sites.filter((x) => x.status === 'building').map((x) => ({ id: x.id, code: x.code, x: x.x, y: x.y, done: x.done, required: x.required }))
+}
+
+/** A site's screen with the actions of internal/presentation/village/screens.go LaborSite. */
+function siteScreen(s: Site, just = '') {
+  const v = siteView(s, just)
+  const acts: MockAct[] = []
+  const jobId = v.job?.id ?? ''
+  if (v.can_work && jobId) acts.push(A('labor.take', 'settlement.labor.take', { id: jobId }))
+  if (v.can_employ && jobId) {
+    for (const n of v.hire_presets ?? []) acts.push(A('labor.hire', 'settlement.labor.hire', { id: jobId, n: String(n) }))
+    for (const p of v.wage_presets ?? []) acts.push(A('labor.wage', 'settlement.labor.wage', { id: jobId, n: String(p.percent) }))
+    acts.push(A('labor.close', 'settlement.labor.close', { id: jobId }, { kind: 'danger' }))
+  }
+  if (v.can_post) acts.push(A('labor.post', 'settlement.labor.post', { id: v.id }))
+  acts.push(A('labor.board', 'settlement.labor.board'), A('labor.mine', 'settlement.labor.mine'), back('settlement.labor.board'), refreshA('settlement.labor.site', { id: v.id }))
+  return mockOk('labor_site', v, acts)
+}
 
 export function mockLaborCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.labor.')) return null
@@ -134,54 +159,57 @@ export function mockLaborCommand(command: string, args: Record<string, unknown> 
         village: 'آمل', jobs: jobs.length ? jobs : null, market: market(), working: my ? shiftView(my) : null, resident: true,
         sites: S.sites.filter((s) => s.status === 'building' && !s.jobId).map((s) => ({ id: s.id, building: named(s), progress_bps: Math.floor((s.done * 10000) / s.required) })),
       }
-      return { ok: true, screen: 'labor_board', text: 'تابلوی استخدام', view }
+      const acts: MockAct[] = [
+        ...jobs.map((j) => A('labor.job', 'settlement.labor.site', { id: j.building_id }, { subject: j.building.code })),
+        ...(view.sites ?? []).map((x) => A('labor.post', 'settlement.labor.post', { id: x.id }, { subject: x.building.code })),
+        A('labor.mine', 'settlement.labor.mine'), A('village.build', 'settlement.build'), back('settlement.overview'), refreshA('settlement.labor.board'),
+      ]
+      return mockOk('labor_board', view, acts)
     }
     case 'settlement.labor.site':
-      return site ? { ok: true, screen: 'labor_site', text: 'کارگاه', view: siteView(site) } : refusal('چنین کارگاهی پیدا نشد.')
+      return site ? siteScreen(site) : refusal('labor_no_site')
     case 'settlement.labor.take': {
-      if (!site || !site.jobId) return refusal('این کار دیگر روی تابلو نیست.')
-      if (mine()) return refusal('شما همین حالا در یک شیفت کار می‌کنید.')
+      if (!site || !site.jobId) return refusal('labor_no_job')
+      if (mine()) return refusal('already_working')
       site.left--
       S.shifts.push({ id: `lb-shift-${S.seq++}`, siteId: site.id, npc: false, name: 'شما', level: 'journeyman', finish: Date.now() + SHIFT_MS, wage: site.wage, points: 60 })
-      return { ok: true, screen: 'labor_site', text: 'کارگاه', view: siteView(site, 'worked') }
+      return siteScreen(site, 'worked')
     }
     case 'settlement.labor.hire': {
-      if (!site) return refusal('چنین کارگاهی پیدا نشد.')
+      if (!site) return refusal('labor_no_site')
       site.crew = Math.max(0, Number(args.n ?? 0))
       const before = S.shifts.length
       fillCrew(site)
-      if (site.crew > 0 && S.shifts.length === before) return refusal('امروز کارگر آزاد در روستا نیست. با ساختن خانهٔ بیشتر، ساکنان و کارگران بیشتر می‌شوند.')
-      return { ok: true, screen: 'labor_site', text: 'کارگاه', view: siteView(site, 'hired') }
+      if (site.crew > 0 && S.shifts.length === before) return refusal('labor_no_npc')
+      return siteScreen(site, 'hired')
     }
     case 'settlement.labor.wage': {
-      if (!site) return refusal('چنین کارگاهی پیدا نشد.')
+      if (!site) return refusal('labor_no_site')
       site.wage = Math.floor((market().npc_wage * Number(args.n ?? 100)) / 100)
-      return { ok: true, screen: 'labor_site', text: 'کارگاه', view: siteView(site, 'wage') }
+      return siteScreen(site, 'wage')
     }
     case 'settlement.labor.close': {
-      if (!site) return refusal('چنین کارگاهی پیدا نشد.')
+      if (!site) return refusal('labor_no_site')
       site.jobId = ''
-      return { ok: true, screen: 'labor_site', text: 'کارگاه', view: siteView(site, 'closed') }
+      return siteScreen(site, 'closed')
     }
     case 'settlement.labor.post': {
-      if (!site) return refusal('چنین کارگاهی پیدا نشد.')
+      if (!site) return refusal('labor_no_site')
       site.jobId = `lb-job-${S.seq++}`
       site.left = Math.ceil((site.required - site.done) / 60) * 2
       site.total = site.left
       site.wage = market().npc_wage
-      return { ok: true, screen: 'labor_site', text: 'کارگاه', view: siteView(site, 'posted') }
+      return siteScreen(site, 'posted')
     }
     case 'settlement.labor.mine': {
       const my = mine()
       const lv = S.shiftsWorked >= 30 ? 'master' : S.shiftsWorked >= 6 ? 'journeyman' : 'apprentice'
-      return {
-        ok: true, screen: 'labor_mine', text: 'کار من',
-        view: {
-          village: 'آمل', shifts: S.shiftsWorked, earned: S.earned, level: lv, productivity_bps: lv === 'master' ? 13000 : lv === 'journeyman' ? 10000 : 7000,
-          next_level: lv === 'master' ? '' : lv === 'journeyman' ? 'master' : 'journeyman', next_shifts: lv === 'master' ? 0 : lv === 'journeyman' ? 30 - S.shiftsWorked : 6 - S.shiftsWorked,
-          working: my ? shiftView(my) : null, market: market(),
-        },
+      const view: LaborMineView = {
+        village: 'آمل', shifts: S.shiftsWorked, earned: S.earned, level: lv, productivity_bps: lv === 'master' ? 13000 : lv === 'journeyman' ? 10000 : 7000,
+        next_level: lv === 'master' ? '' : lv === 'journeyman' ? 'master' : 'journeyman', next_shifts: lv === 'master' ? 0 : lv === 'journeyman' ? 30 - S.shiftsWorked : 6 - S.shiftsWorked,
+        working: my ? shiftView(my) : null, market: market(),
       }
+      return mockOk('labor_mine', view, [A('labor.board', 'settlement.labor.board'), A('village.work', 'settlement.work'), back('settlement.labor.board'), refreshA('settlement.labor.mine')])
     }
     default: return null
   }
