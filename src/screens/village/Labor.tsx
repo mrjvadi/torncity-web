@@ -82,7 +82,7 @@ export function useSite(id: string, initial: LaborSiteView | null) {
     const v = r.res?.view as unknown as LaborSiteView | undefined
     if (v && v.building) {
       setView(v)
-      if (v.just) toast.push(t(`labor.just.${v.just}` as Key))
+      if (v.just) toast.push(t(`labor.just.${v.just}` as Key), { kind: 'success' })
     } else {
       void refresh()
     }
@@ -258,13 +258,13 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
     const r = await cmd('settlement.labor.take', { id: j.id }, { write: true })
     setBusy(false)
     if (r.ok) {
-      toast.push(t('labor.just.worked'))
+      toast.push(t('labor.just.worked'), { kind: 'success' })
       void refresh()
     }
   }
   async function post(id: string) {
     const r = await cmd('settlement.labor.post', { id }, { write: true })
-    if (r.ok) { toast.push(t('labor.just.posted')); void refresh() }
+    if (r.ok) { toast.push(t('labor.just.posted'), { kind: 'success' }); void refresh() }
   }
 
   const jobs = v?.jobs ?? []

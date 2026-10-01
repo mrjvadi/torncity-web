@@ -3,7 +3,7 @@
 // Everything private to a member is the member's own page; nothing here shows another's money.
 
 import type {
-  FactionAnsweredView, FactionAppliedView, FactionBankView, FactionConfirmView, FactionCrimeView, FactionFoundedView, FactionFoundView,
+  FactionAnsweredView, FactionAppliedView, FactionBankView, FactionConfirmView, FactionCrimeBoardView, FactionFoundedView, FactionFoundView,
   FactionHomeView, FactionInvitedView, FactionLeftView, FactionLinkedView, FactionListView, FactionMembersView, FactionOperationLine,
   FactionPageView, FactionRefusalView,
 } from '../../api/views.gen'
@@ -253,7 +253,7 @@ const FactionBank = screen<FactionBankView>(({ view: v, ctx }) => (
 
 // -- organised crime ---------------------------------------------------------------------------
 
-const FactionCrime = screen<FactionCrimeView>(({ view: v, ctx }) => {
+const FactionCrime = screen<FactionCrimeBoardView>(({ view: v, ctx }) => {
   const plans = ctx.acts.filter((a) => a.id === 'faction.plan')
   return (
     <Page title={t('soc.faction.crime_title', { faction: v.ref.name })} tone="ruby">
