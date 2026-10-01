@@ -6,6 +6,7 @@
 
 import { SOCIETY_CONTENT, mergeTables } from './mock_society'
 import { ECONOMY_CONTENT } from './mock_economy'
+import { COMPANIES_CONTENT } from './mock_companies'
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
@@ -1133,7 +1134,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     return json({
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
-      entries: mergeTables(SOCIETY_CONTENT.entries, {
+      entries: mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), {
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],

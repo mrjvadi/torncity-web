@@ -1,0 +1,6 @@
+/* The companies screens (src/screens/companies). The flow kit's classes (vf-, vh-) and the bank's (bk-) do
+   most of the work; this file holds only what is new here. */
+
+.co-stars { color: var(--gold); letter-spacing: 1px; font-size: 13px; white-space: nowrap; }
+.co-stars i { font-style: normal; color: var(--text-dim); opacity: 0.4; }
+.co-stars.dim { color: var(--text-dim); font-size: 12px; letter-spacing: 0; }
