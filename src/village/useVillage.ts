@@ -57,13 +57,13 @@ export function useVillageCommand() {
       const res = await api.runCommand(command, args, key)
       if (res.ok === false) {
         const message = refusalText(res.error?.code, res.error?.message, res.error?.args)
-        if (!opts.silent) toast.push(message, res.error?.code === 'village_materials' ? { command: 'settlement.materials' } : undefined)
+        if (!opts.silent) toast.push(message, res.error?.code === 'village_materials' ? { kind: 'error', command: 'settlement.materials' } : { kind: 'error' })
         return { ok: false, res, message, code: res.error?.code }
       }
       return { ok: true, res, message: '' }
     } catch (e) {
       const message = refusalText((e as { code?: string })?.code ?? 'network', undefined)
-      if (!opts.silent) toast.push(message)
+      if (!opts.silent) toast.push(message, { kind: 'error' })
       return { ok: false, res: null, message }
     }
   }, [toast])
