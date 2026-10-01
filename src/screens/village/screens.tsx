@@ -48,7 +48,7 @@ function mats(ctx: FlowCtx, list: { component: { code: string; name: string }; q
 // -- refusal, with what is missing ---------------------------------------------------------
 
 function needsTitleName(ctx: FlowCtx, v: VillageRefusalView): string {
-  if (!v.subject.code) return ''
+  if (!v.subject?.code) return ''
   return v.action === 'research'
     ? ctx.names.name(['knowledge'], v.subject.code, v.subject.name)
     : ctx.bname(v.subject.code, v.subject.name)
@@ -446,7 +446,7 @@ const Mine = flow<MineView>(({ view: v, ctx }) => {
         }))} />
         <Facts rows={[
           { label: t('citizen.mine.assessed'), value: money(v.assessed) },
-          { label: t('citizen.mine.tax'), value: `${money(v.tax_per_period)} · ${t('citizen.pct', { p: v.tax_bps / 100 })}` },
+          { label: t('citizen.mine.tax'), value: `${money(v.tax_per_period)} · ${formatNumber(v.tax_bps / 100)}%` },
           ...(v.debt > 0 ? [{ label: t('citizen.mine.debt'), value: t('vx.mine.debt', { amount: money(v.debt), n: v.debt_periods }), gold: true }] : []),
         ]} />
         {v.home && !v.can_rest && <Hint>{t('citizen.mine.rest_wait', { t: durationText(v.rest_wait_seconds) })}</Hint>}
@@ -471,7 +471,7 @@ const Terms = flow<TermsView>(({ view: v, ctx }) => {
       </div>
     </div>
   )
-  const pct = (bps: number) => `${formatNumber(bps / 100)}٪`
+  const pct = (bps: number) => `${formatNumber(bps / 100)}%`
   return (
     <Page title={t('vx.terms.title', { village: v.village })} tone="gold">
       <Panel tone="gold">
@@ -553,7 +553,7 @@ const HomeCall = flow<Record<string, never>>(({ ctx }) => (
   <Page title={t('village.title')} tone="emerald">
     <Panel tone="emerald">
       <div className="vc-title display">{t('village.call.title')}</div>
-      <div className="vc-body">{t('village.call.body')}</div>
+      <div className="vc-body">{t('vx.call.body')}</div>
     </Panel>
     <Rest ctx={ctx} />
   </Page>

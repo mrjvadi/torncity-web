@@ -39,7 +39,7 @@ const CAT: CatEntry[] = [
   { code: 'road', fa: 'جاده', en: 'Road', fp: [1, 1], cost: 50, time: 600, role: '', capExempt: true },
   { code: 'civic_hall', fa: 'خانهٔ دهیاری', en: 'Civic hall', fp: [2, 2], cost: 1000, time: 7200, role: '', materials: [['timber', 'چوب', 5]] },
   { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 700, time: 2700, role: '', materials: [['timber', 'چوب', 2]] },
-  { code: 'housing_block', fa: 'بلوک مسکونی', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 10]] },
+  { code: 'housing_block', fa: 'بلوک مسکونی', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 40]] },
   { code: 'park', fa: 'پارک', en: 'Park', fp: [2, 2], cost: 800, time: 3600, role: '' },
   { code: 'watch_hut', fa: 'برج نگهبانی', en: 'Watch hut', fp: [1, 1], cost: 400, time: 1800, role: 'security' },
   { code: 'militia_camp', fa: 'اردوگاه میلیشیا', en: 'Militia camp', fp: [2, 1], cost: 500, time: 2700, role: 'security' },

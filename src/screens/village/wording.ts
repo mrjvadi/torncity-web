@@ -28,8 +28,8 @@ function amountOf(a: Action): string {
     if (raw === undefined || raw === '') continue
     const n = Number(raw)
     if (!Number.isFinite(n)) continue
-    if (a.id === 'terms.tax_bps') return `${formatNumber(n / 100)}٪`
-    if (a.id === 'labor.wage') return `${formatNumber(n)}٪`
+    if (a.id === 'terms.tax_bps') return `${formatNumber(n / 100)}%`
+    if (a.id === 'labor.wage') return `${formatNumber(n)}%`
     if (MONEY_IDS.has(a.id ?? '')) return money(n)
     return formatNumber(n)
   }

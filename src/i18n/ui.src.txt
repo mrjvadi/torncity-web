@@ -1232,7 +1232,7 @@ vx.need.building | یکی از این ساختمان‌ها باید باشد: {
 vx.donate.cash_after | پولت بعد از کمک | Your cash afterwards
 vx.donate.treasury_after | خزانه بعد از کمک | Treasury afterwards
 vx.goal.residents | ساکنان: {cur} از {req} | Residents: {cur} of {req}
-vx.goal.literacy | سواد روستا: {cur}٪ از {req}٪ | Literacy: {cur}% of {req}%
+vx.goal.literacy | سواد روستا: {cur}% از {req}% | Literacy: {cur}% of {req}%
 vx.goal.buildings | ساختمان‌های ساخته‌شده (بی‌جاده): {cur} از {req} | Buildings built (no roads): {cur} of {req}
 vx.goal.knowledge | دانشی که روستا خودش یاد گرفته: {cur} از {req} | Knowledge the village learned itself: {cur} of {req}
 vx.goal.treasury | خزانه: {cur} از {req} | Treasury: {cur} of {req}
@@ -1462,3 +1462,5 @@ menu.work | کار | Work
 menu.status | وضعیت روستا | Village status
 menu.terms | شرایط زمین | Land terms
 menu.leave | ترک روستا | Leave the village
+vx.work.open | کارگاه‌های روستا | Village workshops
+vx.call.body | روستا خانهٔ گروه شماست: خزانه، ساخت‌وساز و دانش مشترک دارد و همهٔ اهالی در آن سهیم‌اند. فرم ساخت روستا را باز کن و روستای خودت را بساز. | A village is your group's home: it has a shared treasury, building and knowledge, and all its villagers share in it. Open the founding form to found yours.

@@ -307,6 +307,7 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
           <MarketCard m={v.market} />
           <div className="lb-btns">
             <Slab tone="steel" radius={14} lip={4} onClick={() => run('settlement.labor.mine')}>{t('labor.btn.mine')}</Slab>
+            <Slab tone="steel" radius={14} lip={4} onClick={() => run('settlement.work')}>{t('vx.work.open')}</Slab>
           </div>
         </>
       )}

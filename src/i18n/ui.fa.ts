@@ -1203,7 +1203,7 @@ export const uiFa = {
   'vx.donate.cash_after': 'پولت بعد از کمک',
   'vx.donate.treasury_after': 'خزانه بعد از کمک',
   'vx.goal.residents': 'ساکنان: {cur} از {req}',
-  'vx.goal.literacy': 'سواد روستا: {cur}٪ از {req}٪',
+  'vx.goal.literacy': 'سواد روستا: {cur}% از {req}%',
   'vx.goal.buildings': 'ساختمان‌های ساخته‌شده (بی‌جاده): {cur} از {req}',
   'vx.goal.knowledge': 'دانشی که روستا خودش یاد گرفته: {cur} از {req}',
   'vx.goal.treasury': 'خزانه: {cur} از {req}',
@@ -1430,6 +1430,8 @@ export const uiFa = {
   'menu.status': 'وضعیت روستا',
   'menu.terms': 'شرایط زمین',
   'menu.leave': 'ترک روستا',
+  'vx.work.open': 'کارگاه‌های روستا',
+  'vx.call.body': 'روستا خانهٔ گروه شماست: خزانه، ساخت‌وساز و دانش مشترک دارد و همهٔ اهالی در آن سهیم‌اند. فرم ساخت روستا را باز کن و روستای خودت را بساز.',
 } as const
 
 export type UiKey = keyof typeof uiFa

@@ -1432,4 +1432,6 @@ export const uiEn: Record<UiKey, string> = {
   'menu.status': 'Village status',
   'menu.terms': 'Land terms',
   'menu.leave': 'Leave the village',
+  'vx.work.open': 'Village workshops',
+  'vx.call.body': 'A village is your group\'s home: it has a shared treasury, building and knowledge, and all its villagers share in it. Open the founding form to found yours.',
 }
