@@ -4,7 +4,7 @@
 // in; the default is a draft the player may complete. The rules here mirror
 // internal/domain/settlement (lengths, letters, reserved words, taken names).
 
-import type { FoundingFormView, FoundingProblem } from './types'
+import type { FoundDraftView, FoundingFormView, FoundingProblem, SettlementFoundedView } from './views.gen'
 
 const LIMITS = { name_min: 3, name_max: 24, motto_max: 60, currency_name_min: 3, currency_name_max: 24, currency_code_len: 3, currency_symbol_max: 3 }
 const DRAFT = '5b1c1d0e7a3f4e599c110d2f6a8b4c21'
@@ -42,18 +42,19 @@ function formView(): FoundingFormView {
     suggested_name: 'کورندال',
     default_emblem: { shape: 'shield', color_a: 'azure', color_b: 'gold', icon: 'wheat' },
     limits: LIMITS,
-    shapes: SHAPES.map(([code, name, emoji]) => ({ code, name, emoji })),
-    palette: PALETTE.map(([code, name, emoji, hex]) => ({ code, name, emoji, hex })),
-    icons: ICONS.map(([code, name, emoji]) => ({ code, name, emoji })),
+    shapes: SHAPES.map(([code]) => ({ code, hex: '' })),
+    palette: PALETTE.map(([code, , , hex]) => ({ code, hex })),
+    icons: ICONS.map(([code]) => ({ code, hex: '' })),
     neutral_currency: 'SUP',
-    ...(founded ? { settlement_id: founded.id, settlement_name: founded.name } : {}),
+    settlement_id: founded?.id ?? '',
+    settlement_name: founded?.name ?? '',
   }
 }
 
 function refuse(kind: string, problems: FoundingProblem[] = []) {
   return {
     ok: false, screen: 'founding_refusal', text: '', actions: [],
-    view: { kind, problems, limits: LIMITS }, error: { code: `founding_${kind}`, message: kind },
+    view: { kind, problems, limits: LIMITS }, error: { code: `founding_${kind}`, args: kind === 'already' ? { name: 'کورندال' } : {} },
   }
 }
 
@@ -100,11 +101,31 @@ export function mockFoundingCommand(command: string, args?: Record<string, unkno
     const a = args ?? {}
     const problems = check(a)
     if (problems.length) return refuse('invalid', problems)
-    if (a.check) return { ok: true, screen: 'founding_checked', text: '', actions: [], view: { name: a.name } }
+    if (a.check) return { ok: true, screen: 'founding_checked', text: '', actions: [], view: { name: a.name, currency_code: String(a.currency_code ?? '').toUpperCase() } }
     founded = { id: 'v-own', name: String(a.name).trim() }
     return {
       ok: true, screen: 'settlement_founded', text: '', actions: [],
-      view: { name: founded.name, settlement_id: founded.id, emblem: { shape: a.shape, color_a: a.color_a, color_b: a.color_b, icon: a.icon }, currency_code: String(a.currency_code).toUpperCase() },
+      view: {
+        name: founded.name, settlement_id: founded.id, biome_code: 'plain', nearby_feature: 'رود آرام', buildings: ['granary', 'village_market'],
+        protected_until: new Date(Date.now() + 7 * 86400_000).toISOString(), founder: 'سارا',
+        emblem: { shape: String(a.shape), color_a: String(a.color_a), color_b: String(a.color_b), icon: String(a.icon) },
+        motto: String(a.motto ?? ''), currency_name: String(a.currency_name ?? ''), currency_code: String(a.currency_code ?? '').toUpperCase(),
+        currency_symbol: String(a.currency_symbol ?? ''),
+      } satisfies SettlementFoundedView,
+    }
+  }
+  // a group's founding request (the web does not send it itself; the mock shows the screens it would get)
+  if (command === 'settlement.found') {
+    const mode = String(args?.mock ?? '')
+    if (mode === 'group_only' || mode === 'no_world' || mode === 'already') {
+      return {
+        ok: false, screen: 'settlement_refusal', actions: [], view: { kind: mode, name: mode === 'already' ? 'کورندال' : '' },
+        error: { code: `settlement_${mode}`, args: mode === 'already' ? { name: 'کورندال' } : {} },
+      }
+    }
+    return {
+      ok: true, screen: 'settlement_found_draft', actions: [{ id: 'founding.open_form', command: 'settlement.found.draft', args: { draft: DRAFT }, kind: 'primary', icon: 'action:default' }],
+      view: { founder: mode === 'pending' ? 'رضا' : 'سارا', pending: mode === 'pending', minutes: 24, draft_id: '5b1c1d0e-7a3f-4e59-9c11-0d2f6a8b4c21' } satisfies FoundDraftView,
     }
   }
   return null

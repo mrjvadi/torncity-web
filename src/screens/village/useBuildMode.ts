@@ -153,7 +153,7 @@ export function useBuildMode(
     setS((p) => ({ ...p, busy: true }))
     const r = await cmd('settlement.grid.grow', { confirm: 'confirm' }, { write: true })
     if (r.ok) {
-      toast.push(t('grow.done'))
+      toast.push(t('grow.done'), { kind: 'success' })
       void store?.refetchLayout()
       const menu = r.res?.screen === 'settlement_build_menu' ? (r.res.view as unknown as BuildMenuView) : null
       setS((p) => ({ ...p, step: 'menu', grow: null, busy: false, menu: menu ?? p.menu }))
@@ -224,7 +224,7 @@ export function useBuildMode(
         setS((p) => ({ ...p, step: 'confirm', batch: r.res!.view as unknown as BatchConfirmView, busy: false }))
       } else {
         const bad = (r.res?.view as { lots?: { x: number; y: number; kind: string }[] } | undefined)?.lots ?? []
-        toast.push(r.res?.error?.code === 'village_batch' ? t('build.batch.refused', { n: bad.length }) : r.message)
+        toast.push(r.res?.error?.code === 'village_batch' ? t('build.batch.refused', { n: bad.length }) : r.message, { kind: 'error' })
         setS((p) => ({ ...p, busy: false, badLots: bad }))
         if (bad.length && s.code) void loadLots(s.code, false).then((lots) => lots && setS((p) => ({ ...p, lots })))
       }
@@ -243,12 +243,12 @@ export function useBuildMode(
       setS((p) => ({ ...p, busy: true }))
       const r = await cmd('settlement.build.place_many', { code: s.code, lots: s.picks.map((q) => ({ x: q.x, y: q.y })), confirm: 'confirm' }, { write: true, silent: true })
       if (r.ok) {
-        toast.push(t('build.batch.started', { n: s.picks.length }))
+        toast.push(t('build.batch.started', { n: s.picks.length }), { kind: 'success' })
         void store?.refetchLayout()
         setS(OFF)
       } else {
         const bad = (r.res?.view as { lots?: { x: number; y: number; kind: string }[] } | undefined)?.lots ?? []
-        toast.push(r.res?.error?.code === 'village_batch' ? t('build.batch.refused', { n: bad.length }) : r.message)
+        toast.push(r.res?.error?.code === 'village_batch' ? t('build.batch.refused', { n: bad.length }) : r.message, { kind: 'error' })
         setS((p) => ({ ...p, busy: false, step: 'lot', batch: null, badLots: bad }))
         if (s.code) void loadLots(s.code, false).then((lots) => lots && setS((p) => ({ ...p, lots })))
       }
@@ -258,7 +258,7 @@ export function useBuildMode(
     setS((p) => ({ ...p, busy: true }))
     const r = await cmd('settlement.build.place', { code: s.code, x: s.anchor.x, y: s.anchor.y, rotated: s.rotated, confirm: 'confirm' }, { write: true })
     if (r.ok) {
-      toast.push(t('build.started'))
+      toast.push(t('build.started'), { kind: 'success' })
       void store?.refetchLayout()
       setS(OFF)
     } else {

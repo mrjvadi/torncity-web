@@ -20,6 +20,14 @@ import type { SettlementEvent } from './types'
 
 export type VitalsListener = (v: RealtimeVitals) => void
 export type InboxListener = (unread: number) => void
+/** A notice pushed to the player: data, never a sentence (api/client-api.md section 5.3). */
+export interface RealtimeNotice {
+  kind: string
+  screen?: string
+  view?: unknown
+  actions?: { id?: string; command: string; args?: Record<string, unknown> }[]
+}
+export type NoticeListener = (n: RealtimeNotice) => void
 /** Told true once the socket is actually connected, false on every drop —
  * so the caller can slow its HTTP poll down while the socket is doing the
  * job, and speed it back up the moment it isn't. */
@@ -39,6 +47,7 @@ export async function connectRealtime(
   onVitals: VitalsListener,
   onInbox: InboxListener,
   onLive?: LiveListener,
+  onNotice?: NoticeListener,
 ): Promise<RealtimeHandle | null> {
   let first: Awaited<ReturnType<typeof getRealtimeToken>>
   try {
@@ -79,12 +88,14 @@ export async function connectRealtime(
       }
       return
     }
-    const data = ctx.data as { type?: string; unread?: number } | null | undefined
+    const data = ctx.data as { type?: string; unread?: number; kind?: string } | null | undefined
     if (!data || typeof data !== 'object') return
     if (data.type === 'vitals') {
       onVitals(data as unknown as RealtimeVitals)
     } else if (data.type === 'inbox' && typeof data.unread === 'number') {
       onInbox(data.unread)
+    } else if (data.type === 'notice' && typeof data.kind === 'string') {
+      onNotice?.(data as unknown as RealtimeNotice)
     }
   })
   client.on('error', (ctx) => {

@@ -3,6 +3,8 @@
 // internal/telegram/screens/testdata/view-snapshots/fa/*.json, translated
 // to plausible Persian sample data. Wired into src/api/mock.ts.
 
+import { MOCK_NOTICES, mockInboxCategories, mockInboxItems } from './mock_notices'
+
 function back(command: string): Record<string, unknown> {
   return { label: 'بازگشت', command, row: 9, kind: 'back', icon: 'action:player' }
 }
@@ -224,18 +226,15 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
   }),
 
   'inbox.show': () => ({
-    screen: 'inbox_hub', text: 'پیام‌ها',
-    view: { total: 6, categories: [{ category: 'finance', count: 3 }, { category: 'faction', count: 1 }, { category: 'work', count: 2 }] },
+    screen: 'inbox_hub', text: '',
+    view: { total: MOCK_NOTICES.length, categories: mockInboxCategories() },
     actions: [refresh('inbox.show'), back('society_hub')],
   }),
   'inbox.category': (ctx) => ({
-    screen: 'inbox_category', text: 'پیام‌ها',
+    screen: 'inbox_category', text: '',
     view: {
       category: (ctx.args?.category as string) ?? 'finance',
-      items: [
-        { ago_seconds: 300, link_addr: '', text: 'حقوق شما به مبلغ ۱,۲۰۰ پرداخت شد.' },
-        { ago_seconds: 10800, link_addr: 'loan:hub', text: 'قسط وام شما فردا سررسید می‌شود.' },
-      ],
+      items: mockInboxItems((ctx.args?.category as string) ?? 'finance'),
       page: 1, total_pages: 1,
     },
     actions: [back('inbox.show')],
