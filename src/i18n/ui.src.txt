@@ -1045,7 +1045,7 @@ refusal.village_citizen_off | خرید زمین هنوز در این روستا 
 refusal.village_citizen_no_lots | زمینی نداری؛ اول یک زمین بخر. | You own no lots; buy one first.
 citizen.pct | {p}٪ | {p}%
 # -- support city ------------------------------------------------------------
-sc.title | ساپورت | Support
+sc.title | شهر مرکزی | Central City
 sc.loading | در حال ساختن شهر… | Building the city…
 sc.failed | نمایش سه‌بعدی شهر روی این دستگاه ممکن نیست. | The 3D city cannot be shown on this device.
 sc.view.aerial | نمای هوایی | Aerial view
@@ -1075,7 +1075,7 @@ sc.svc.train | ایستگاه قطار | Train station
 sc.svc.airport | فرودگاه | Airport
 sc.svc.barracks | پادگان | Barracks
 sc.soon.title | به‌زودی | Coming soon
-sc.soon.reserve | بانک مرکزی ساپورت به‌زودی باز می‌شود؛ ساپ را همین‌جا منتشر و نگهداری خواهد کرد. | The Reserve Bank of Support opens soon; it will issue and hold the SUP here.
+sc.soon.reserve | بانک مرکزی به‌زودی در شهر مرکزی باز می‌شود؛ ساپ همین‌جا چاپ و نگهداری می‌شود. | The Central Bank opens soon in the Central City; SUP will be issued and kept here.
 sc.dest.title | مقصد سفر | Where to
 sc.dest.here | اینجا هستید | You are here
 sc.dest.km | {n} کیلومتر | {n} km
@@ -1105,8 +1105,8 @@ sc.journey.arrived | رسیدی! | You have arrived!
 sc.journey.enter | ورود | Enter
 sc.journey.from | از {name} | From {name}
 sc.visit.travel | سفر | Travel
-sc.visitor | مهمان ساپورت | Visiting Support
-sc.visitor_hint | ساپورت شهر همه است؛ کسی در آن ساکن نمی‌شود. | Support is everyone's city; nobody lives here.
+sc.visitor | مهمان شهر مرکزی | Visiting the Central City
+sc.visitor_hint | شهر مرکزی مال همه است؛ کسی اینجا ساکن نمی‌شود. | The Central City belongs to everyone; nobody lives here.
 sc.return | بازگشت به {name} | Back to {name}
 sc.return_generic | سفر به جای دیگر | Travel elsewhere
 sc.dest.home | خانه‌ی شما | Your home
@@ -1187,10 +1187,10 @@ storage.full | انبار پر است؛ برای جا باز کردن، انبا
 storage.stock | موجودی انبار | In stock
 storage.stock_empty | انبار فعلاً خالی است. | The store is empty for now.
 storage.market | بازار مصالح | Materials market
-storage.market_hint | مصالحی که روستا می‌تواند از بازار پشتیبان بخرد؛ پولش از خزانه برداشته می‌شود و کالا به انبار می‌رود. | Materials the village can buy from the Support market: paid from the treasury, delivered to the store.
+storage.market_hint | مصالحی که دهیار می‌تواند با پول خزانه از بازار شهر مرکزی بخرد؛ جنس به انبار روستا می‌رسد. | Materials the head can buy with treasury money from the Central City market; the goods arrive in the village store.
 storage.market_empty | فعلاً چیزی برای خرید نیست. | Nothing to buy right now.
 storage.unit_price | هر واحد {p} | {p} each
-storage.source | بازار پشتیبان | Support market
+storage.source | بازار شهر مرکزی | Central City market
 storage.buy_qty | خرید {q} | Buy {q}
 storage.head_only | خرید از خزانه فقط با کسی است که مسئول روستاست. | Only the village head can spend the treasury on purchases.
 storage.confirm.title | تأیید خرید | Confirm purchase
