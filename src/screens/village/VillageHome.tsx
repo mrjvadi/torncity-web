@@ -11,7 +11,7 @@ import { money } from '../native/kit/format'
 import { t } from '../../i18n'
 import { useSession } from '../../state/SessionContext'
 import { useToast } from '../../state/ToastContext'
-import { buildingName, useBuildingCatalogue, useNow, useSettlementId, useVillage } from '../../village/useVillage'
+import { buildingName, useBuildingCatalogue, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
 import { constructionProgress } from '../../village/progress'
 import type { VillageScene, ScreenLabel } from '../../village/villageScene'
 import { clockSkewMs } from '../../village/clock'
@@ -20,8 +20,9 @@ import { countdown } from './common'
 import { useBuildMode } from './useBuildMode'
 import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
-import { BuyLotSheet, HouseSheet, TakenLotSheet } from './LandSheets'
-import { classifyLot, tonesForLand } from './citizen'
+import { BuyLotSheet, HouseSheet, LotAccessSheet, TakenLotSheet } from './LandSheets'
+import { classifyLot, tonesForLand, type LotAccessMap } from './citizen'
+import type { LandView, LotAccessView } from '../../api/types'
 import './village.css'
 
 export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) {
@@ -53,10 +54,29 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
   const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
   const resident = !!layout?.viewer.resident && own
+  // Lot access (docs/adr/0043): how each free lot and each of the viewer's bare lots is served by road,
+  // read from the land screen's own answer whenever the land map is on or the layout changed.
+  const cmd = useVillageCommand()
+  const [access, setAccess] = useState<LotAccessMap | undefined>(undefined)
+  const [fixLot, setFixLot] = useState<{ x: number; y: number } | null>(null)
+  const [fixView, setFixView] = useState<LotAccessView | null>(null)
+  const layoutVersion = layout?.version
+  useEffect(() => {
+    if (!landOn || !resident) return
+    let cancelled = false
+    void cmd('settlement.land', {}, { silent: true }).then((r) => {
+      if (cancelled || !r.ok || !r.res?.view) return
+      const m = new Map<string, string>()
+      for (const row of (r.res.view as unknown as LandView).rows ?? []) for (const c of row ?? []) if (c.access) m.set(`${c.x},${c.y}`, c.access)
+      setAccess(m)
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [landOn, resident, layoutVersion])
   useEffect(() => {
     if (!sceneReady) return
-    sceneRef.current?.setOverlayTones(landOn && layout && build.state.step === 'off' ? tonesForLand(layout) : null)
-  }, [landOn, layout, sceneReady, build.state.step])
+    sceneRef.current?.setOverlayTones(landOn && layout && build.state.step === 'off' ? tonesForLand(layout, access) : null)
+  }, [landOn, layout, sceneReady, build.state.step, access])
   // the menu's «زمین و قطعه‌ها» opens the village straight on the land map (the page may already be showing:
   // the arguments are new each time the entry is pressed)
   const handledLand = useRef<unknown>(null)
@@ -154,7 +174,13 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     if (landOn && layout && lot && resident) {
       const k = classifyLot(layout, lot.x, lot.y)
       if (k.kind === 'free') { setSelectedId(null); setBuyLot(lot); return }
-      if (k.kind === 'mine') { setSelectedId(null); setHouseLot(lot); return }
+      if (k.kind === 'mine') {
+        setSelectedId(null)
+        // a bare lot of one's own that no road touches opens its fixes, not the house catalogue
+        const a = access?.get(`${lot.x},${lot.y}`)
+        if (a && a !== 'road') { setFixView(null); setFixLot(lot) } else setHouseLot(lot)
+        return
+      }
       if (k.kind === 'taken') { setSelectedId(null); setTakenLot({ ...lot, owner: k.owner }); return }
     }
     setSelectedId(bid)
@@ -256,7 +282,11 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
               </div>
               <div className="vh-legend">
                 <span><i className="vh-dot" style={{ background: '#40d96b' }} />{t('citizen.legend.free')}{layout?.terms ? ` · ${money(layout.terms.lot_price)}` : ''}</span>
+                <span><i className="vh-dot" style={{ background: '#fbf24d' }} />{t('citizen.legend.needs')}</span>
+                <span><i className="vh-dot" style={{ background: '#4d9ef2' }} />{t('citizen.legend.bridge')}</span>
+                <span><i className="vh-dot" style={{ background: '#eb332e' }} />{t('citizen.legend.locked')}</span>
                 <span><i className="vh-dot" style={{ background: '#ffcc33' }} />{t('citizen.legend.mine')}</span>
+                <span><i className="vh-dot" style={{ background: '#ff6b0d' }} />{t('citizen.legend.mine_locked')}</span>
                 <span><i className="vh-dot" style={{ background: '#9aa0b4' }} />{t('citizen.legend.taken')}</span>
               </div>
               <div className="vh-hint">{t('citizen.land.hint')}</div>
@@ -274,8 +304,10 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)}
         onOpen={(screen) => openLocal(screen)} onBuild={(code) => { void build.enter().then(() => build.choose(code)) }}
         onMine={() => { setSelectedId(null); run('settlement.mine') }} />
-      <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} />
-      <HouseSheet lot={houseLot} cat={cat} onClose={() => setHouseLot(null)} store={store} />
+      <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} onOther={(l) => setBuyLot(l)} />
+      <HouseSheet lot={houseLot} cat={cat} onClose={() => setHouseLot(null)} store={store}
+        onNoRoad={(view) => { setHouseLot(null); setFixView(view); setFixLot({ x: view.x, y: view.y }) }} />
+      <LotAccessSheet lot={fixLot} initial={fixView} onClose={() => { setFixLot(null); setFixView(null) }} store={store} />
       <TakenLotSheet lot={takenLot} owner={takenLot?.owner} onClose={() => setTakenLot(null)} />
 
       {(v.status === 'loading' || (v.status === 'ready' && !sceneReady && !sceneError)) && <div className="vh-msg" style={{ background: 'linear-gradient(180deg,#dcebf3,#eaf3ee)' }}><span>{t('village.loading')}</span></div>}

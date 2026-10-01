@@ -18,7 +18,7 @@ import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
-  BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, GridGrowView, KnowledgeListView, LandCell, LandView, LotBatchConfirmView,
+  BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, GridGrowView, KnowledgeListView, LandCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
   LotBuyView, LotConfirmView, LotGridView, MaterialBuyView, MaterialsView, MineView, Named, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView,
   ResidenceView, SettlementWhoView, TermsView, VillageNeed, VillageOverviewView, WorkView,
 } from './views.gen'
@@ -143,7 +143,9 @@ function init() {
   if (st.ready) return
   st.ready = true
   const place = mockVillagePlace(GRID)
-  st.lots = makeLots(place.origin, [[4, 0, 11]])
+  // ?grow=N opens the mock with N extra rows and columns of bought land (the land screens' demo)
+  try { st.growth = Math.max(0, Math.min(6, Number(new URLSearchParams(location.search).get('grow') ?? 0) || 0)) } catch { /* no window */ }
+  st.lots = makeLots(place.origin, [[4, 0, 11]], GRID + st.growth)
   const lot = MOCK_WORLD.lot_m
   const shifted = offsetLatLon(place.origin.lat, place.origin.lon, 9 * lot, 5 * lot, MOCK_WORLD.planet_radius_km)
   st.otherLots = makeLots(shifted, [], GRID)
@@ -595,8 +597,22 @@ function seedCitizen() {
   const occ = occupiedMap()
   const free: [number, number][] = []
   for (let y = 0; y < size(); y++) for (let x = 0; x < size(); x++) if (st.lots[y][x].buildable && !occ[y][x]) free.push([x, y])
+  // a lot the viewer bought before the rule, no road touching it (?legacy=1): the fixes' demo
+  if (new URLSearchParams(location.search).get('legacy') === '1') {
+    let worst: [number, number] | null = null, cost = -1
+    for (const [x, y] of free) {
+      const a = mockAccess(x, y)
+      if (a.kind !== 'road' && a.kind !== 'none' && a.cost > cost) { cost = a.cost; worst = [x, y] }
+    }
+    if (worst) cz.tenure.push({ x: worst[0], y: worst[1], owner: 'تو', mine: true })
+  }
+  // ?enclose=1 (with ?grow=3): the corner lot (7,0) is closed in by Sara's lot below it and the viewer's own lot
+  // beside it, so no public road reaches it, and the viewer's own lot is the only way in (the carve demo)
+  if (new URLSearchParams(location.search).get('enclose') === '1' && size() >= 8) {
+    cz.tenure.push({ x: 6, y: 0, owner: 'تو', mine: true }, { x: 7, y: 1, owner: 'سارا', mine: false })
+  }
   // a neighbour, Sara, already owns two lots and lives in one
-  const picks = free.slice(-2)
+  const picks = free.filter(([x, y]) => !tenureAt(x, y)).slice(-2)
   picks.forEach(([x, y], i) => {
     cz.tenure.push({ x, y, owner: 'سارا', mine: false })
     if (i === 0) {
@@ -614,6 +630,168 @@ function bill(e: CatEntry) {
 }
 function citizenUnmet(e: CatEntry): boolean { return unmet(e).length > 0 }
 
+// -- lot access (docs/adr/0043): a lot is sold only when a road can reach it ---------------------------
+// The mock follows the server's rules in small: the road is laid over public lots at AUTO_ROAD_FEE a lot,
+// water costs CROSS_FEE a lot (at most MAX_CROSS in one road), another resident's lot or a building is
+// never crossed, and the buyer's own lots only with their consent (carve). The server plans by cost;
+// this only has to look the same.
+
+const CROSS_FEE = 60
+const MAX_CROSS = 2
+const DIRS4: [number, number][] = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+
+interface MAcc { kind: 'road' | 'needs_road' | 'needs_bridge' | 'none'; roads: number; crossings: number; cost: number; path: { x: number; y: number }[]; carved: { x: number; y: number }[] }
+
+function netCells(): Set<string> {
+  const net = new Set<string>(st.roads.map((r) => `${r.x},${r.y}`))
+  for (const b of st.buildings) {
+    if (b.type === 'road') net.add(`${b.x},${b.y}`)
+    if (b.type === 'civic_hall') for (let yy = b.y; yy < b.y + b.h; yy++) for (let xx = b.x; xx < b.x + b.w; xx++) net.add(`${xx},${yy}`)
+  }
+  return net
+}
+
+function mockAccess(x: number, y: number, carve = false): MAcc {
+  const n = size()
+  const occ = occupiedMap()
+  const net = netCells()
+  const touches = (a: number, b: number) => DIRS4.some(([dx, dy]) => net.has(`${a + dx},${b + dy}`))
+  if (touches(x, y)) return { kind: 'road', roads: 0, crossings: 0, cost: 0, path: [], carved: [] }
+  // 0 no, 1 public, 2 water, 3 own (carve)
+  const enter = (a: number, b: number): number => {
+    if (a < 0 || b < 0 || a >= n || b >= n || (a === x && b === y) || occ[b][a] || net.has(`${a},${b}`)) return 0
+    const t = tenureAt(a, b)
+    if (t) return carve && t.mine && st.lots[b][a].buildable ? 3 : 0
+    if (st.lots[b][a].buildable) return 1
+    return st.lots[b][a].water ? 2 : 0
+  }
+  const weight = (k: number) => (k === 2 ? 60 : k === 3 ? 500 : 10)
+  const dist = new Map<string, number>(), prev = new Map<string, string>()
+  const open: { k: string; c: number; a: number; b: number; w: number }[] = []
+  const push = (a: number, b: number, w: number, c: number, from?: string) => {
+    const k = `${a},${b},${w}`
+    if ((dist.get(k) ?? Infinity) <= c) return
+    dist.set(k, c); if (from) prev.set(k, from)
+    open.push({ k, c, a, b, w })
+  }
+  for (const [dx, dy] of DIRS4) {
+    const kind = enter(x + dx, y + dy)
+    if (kind && (kind !== 2 || MAX_CROSS >= 1)) push(x + dx, y + dy, kind === 2 ? 1 : 0, weight(kind))
+  }
+  while (open.length) {
+    open.sort((p, q) => p.c - q.c || p.b - q.b || p.a - q.a)
+    const it = open.shift()!
+    if (it.c > (dist.get(it.k) ?? Infinity)) continue
+    if (touches(it.a, it.b)) {
+      const path: { x: number; y: number }[] = []
+      let k: string | undefined = it.k
+      while (k) { const [pa, pb] = k.split(',').map(Number); path.push({ x: pa, y: pb }); k = prev.get(k) }
+      path.reverse()
+      const crossings = path.filter((p) => !st.lots[p.y][p.x].buildable).length
+      const carved = path.filter((p) => !!tenureAt(p.x, p.y))
+      const cost = (path.length - crossings) * AUTO_ROAD_FEE + crossings * CROSS_FEE
+      return { kind: crossings > 0 ? 'needs_bridge' : 'needs_road', roads: path.length - crossings, crossings, cost, path, carved }
+    }
+    for (const [dx, dy] of DIRS4) {
+      const a = it.a + dx, b = it.b + dy
+      const kind = enter(a, b)
+      if (!kind) continue
+      const w = it.w + (kind === 2 ? 1 : 0)
+      if (w > MAX_CROSS) continue
+      push(a, b, w, it.c + weight(kind), it.k)
+    }
+  }
+  return { kind: 'none', roads: 0, crossings: 0, cost: 0, path: [], carved: [] }
+}
+
+const accessOf = (a: MAcc) => ({
+  kind: a.kind, roads: a.roads + a.carved.length, crossings: a.crossings, cost: a.cost,
+  carved: a.carved.length ? a.carved : null, path: a.path.length ? a.path : null,
+})
+
+function onOffer(x: number, y: number): boolean {
+  return x >= 0 && y >= 0 && x < size() && y < size() && st.lots[y][x].buildable && !occupiedMap()[y][x] && !tenureAt(x, y)
+}
+
+function nearbyLots(x: number, y: number) {
+  const out: { x: number; y: number; distance: number; access: ReturnType<typeof accessOf> }[] = []
+  for (let yy = 0; yy < size(); yy++) for (let xx = 0; xx < size(); xx++) {
+    if (!onOffer(xx, yy) || (xx === x && yy === y)) continue
+    const a = mockAccess(xx, yy)
+    if (a.kind !== 'none') out.push({ x: xx, y: yy, distance: Math.abs(xx - x) + Math.abs(yy - y), access: accessOf(a) })
+  }
+  out.sort((p, q) => (p.access.kind === 'road' ? 0 : 1) - (q.access.kind === 'road' ? 0 : 1) || p.distance - q.distance || p.y - q.y || p.x - q.x)
+  return out.slice(0, 3)
+}
+
+/** The road of a connection: the carved lots go back to the village, the path is laid as finished road. */
+function layAccess(a: MAcc) {
+  for (const p of a.carved) cz.tenure = cz.tenure.filter((l) => !(l.x === p.x && l.y === p.y))
+  for (const p of a.path) st.buildings.push(mkRoad(p.x, p.y, 'built'))
+}
+
+function lotAccessView(x: number, y: number): LotAccessView {
+  const base = mockAccess(x, y)
+  const carve = base.kind === 'none' ? mockAccess(x, y, true) : null
+  const mineLot = tenureAt(x, y)?.mine
+  return {
+    village: 'آمل', settlement_id: OWN_ID, x, y, own: !!mineLot, price: mineLot ? LOT_PRICE : 0, refund: mineLot ? LOT_PRICE : 0, cash: cz.cash,
+    access: accessOf(base), carve: carve && carve.kind !== 'none' && carve.carved.length ? accessOf(carve) : null,
+    nearby: !mineLot && base.kind !== 'road' && base.kind !== 'needs_road' ? nearbyLots(x, y) : null, building: { code: '', name: '' },
+  }
+}
+
+function lotAccessActions(v: LotAccessView): MockAct[] {
+  const tok = token(v.x, v.y)
+  const a: MockAct[] = []
+  if (v.own && v.access.kind !== 'road') {
+    if (v.access.kind === 'needs_road' || v.access.kind === 'needs_bridge') a.push({ ...confirmA('settlement.lot.repair', { lot: tok, option: 'connect' }), id: 'lot.connect' })
+    if (v.carve) a.push({ ...confirmA('settlement.lot.repair', { lot: tok, option: 'carve' }), id: 'lot.carve' })
+    if (v.refund > 0) a.push({ ...confirmA('settlement.lot.repair', { lot: tok, option: 'refund' }), id: 'lot.refund', kind: 'danger' })
+  }
+  a.push(back('settlement.land'))
+  return a
+}
+
+function lotAccess(args: Record<string, unknown>) {
+  seedCitizen()
+  const at = lotArg(args)
+  if (!at || at.x >= size() || at.y >= size()) return refusal('not_found')
+  const v = lotAccessView(at.x, at.y)
+  return mockOk('settlement_lot_access', v, lotAccessActions(v))
+}
+
+function lotRepair(args: Record<string, unknown>) {
+  seedCitizen()
+  const at = lotArg(args)
+  if (!at) return refusal('not_found')
+  const { x, y } = at
+  const mine = tenureAt(x, y)?.mine
+  if (!mine) return refusal('citizen_not_owner', { back: { command: 'settlement.mine', args: null } })
+  if (args.confirm !== 'confirm') return lotAccess(args)
+  const option = String(args.option ?? '')
+  let paid = 0, refund = 0, acc: MAcc | null = null
+  if (option === 'connect' || option === 'carve') {
+    acc = mockAccess(x, y, option === 'carve')
+    if (acc.kind === 'road' || acc.kind === 'none' || (option === 'carve' && !acc.carved.length)) return refusal('citizen_no_option', { back: { command: 'settlement.mine', args: null } })
+    if (cz.cash < acc.cost) return refusal('citizen_no_cash', { back: { command: 'settlement.mine', args: null } })
+    cz.cash -= acc.cost; paid = acc.cost
+    layAccess(acc)
+  } else if (option === 'refund') {
+    if (mockAccess(x, y).kind === 'road') return refusal('citizen_no_option', { back: { command: 'settlement.mine', args: null } })
+    if (st.treasury < LOT_PRICE) return refusal('citizen_refund_treasury', { back: { command: 'settlement.mine', args: null } })
+    cz.cash += LOT_PRICE; st.treasury -= LOT_PRICE; refund = LOT_PRICE
+    cz.tenure = cz.tenure.filter((l) => !(l.x === x && l.y === y))
+  } else return refusal('citizen_no_option', { back: { command: 'settlement.mine', args: null } })
+  st.ver++
+  emit({ type: 'lot_repaired', lot_x: x, lot_y: y, layout_version: versions() })
+  const view: LotRepairView = {
+    village: 'آمل', settlement_id: OWN_ID, x, y, option, paid, refund, cash: cz.cash,
+    roads: acc ? acc.path.length - acc.crossings : 0, crossings: acc?.crossings ?? 0, carved: acc?.carved.length ?? 0,
+  }
+  return mockOk('settlement_lot_repair_done', view, [A('citizen.build_house', 'settlement.private'), A('citizen.mine', 'settlement.mine'), back('settlement.land')])
+}
+
 function lotBuy(args: Record<string, unknown>) {
   seedCitizen()
   const at = lotArg(args)
@@ -625,10 +803,30 @@ function lotBuy(args: Record<string, unknown>) {
   if (occupiedMap()[y][x]) return refusal('occupied')
   if (cz.tenure.filter((l) => l.mine).length >= MAX_LOTS) return refusal('citizen_lot_limit', { back: { command: 'settlement.land', args: null } })
   if (cz.cash < LOT_PRICE) return refusal('citizen_no_cash', { back: { command: 'settlement.land', args: null } })
-  const view = (cashNow: number, treasury: number): LotBuyView => ({ village: 'آمل', settlement_id: OWN_ID, x, y, price: LOT_PRICE, cash: cashNow, treasury })
-  if (args.confirm !== 'confirm') return mockOk('settlement_lot_buy_confirm', view(cz.cash, st.treasury), [confirmA('settlement.lot.buy', { lot: token(x, y) }), back('settlement.land')])
-  cz.cash -= LOT_PRICE
+  if (tenureAt(x, y)) return refusal('citizen_lot_taken')
+  const carveAsked = args.road === 'carve' || args.confirm === 'carve'
+  const confirmed = args.confirm === 'confirm'
+  const base = mockAccess(x, y)
+  const carveAcc = base.kind === 'none' ? mockAccess(x, y, true) : null
+  const carveOk = !!carveAcc && carveAcc.kind !== 'none' && carveAcc.carved.length > 0
+  const chosen = carveAsked && carveOk ? carveAcc! : base
+  const total = LOT_PRICE + chosen.cost
+  const view = (cashNow: number, treasury: number): LotBuyView => ({
+    village: 'آمل', settlement_id: OWN_ID, x, y, price: LOT_PRICE, cash: cashNow, treasury,
+    access: accessOf(chosen), carve: carveOk ? accessOf(carveAcc!) : null, nearby: chosen.kind === 'none' ? nearbyLots(x, y) : null,
+    road: carveAsked && carveOk ? 'carve' : '', total,
+  })
+  if (chosen.kind === 'none') {
+    if (confirmed) return refusal('citizen_no_access', { back: { command: 'settlement.land', args: null } })
+    const acts: MockAct[] = []
+    if (carveOk) acts.push({ ...A('lot.carve', 'settlement.lot.buy', { lot: token(x, y), confirm: 'carve' }) })
+    return mockOk('settlement_lot_buy_confirm', view(cz.cash, st.treasury), [...acts, back('settlement.land')])
+  }
+  if (cz.cash < total) return refusal('citizen_no_cash', { back: { command: 'settlement.land', args: null } })
+  if (!confirmed) return mockOk('settlement_lot_buy_confirm', view(cz.cash, st.treasury), [confirmA('settlement.lot.buy', { lot: token(x, y), ...(carveAsked && carveOk ? { road: 'carve' } : {}) }), back('settlement.land')])
+  cz.cash -= total
   st.treasury += LOT_PRICE
+  layAccess(chosen)
   cz.tenure.push({ x, y, owner: 'تو', mine: true })
   st.ver++
   emit({ type: 'lot_bought', lot_x: x, lot_y: y, layout_version: versions() })
@@ -643,12 +841,18 @@ function landView() {
   const rows: LandCell[][] = st.lots.map((row, y) => row.map((l, x) => {
     const own = tenureAt(x, y)
     const b = st.buildings.find((q) => q.type !== 'road' && x >= q.x && x < q.x + q.w && y >= q.y && y < q.y + q.h)
-    const state = roads.has(`${x},${y}`) ? 'road' : own ? (own.mine ? 'mine' : 'taken') : b ? 'building' : l.water ? 'water' : !l.buildable ? 'steep' : occ[y][x] ? 'building' : 'free'
-    return { x, y, state, owner: own && !own.mine ? own.owner : '', building: b ? b.type : '' }
+    const state = roads.has(`${x},${y}`) || st.buildings.some((q) => q.type === 'road' && q.x === x && q.y === y) ? 'road' : own ? (own.mine ? 'mine' : 'taken') : b ? 'building' : l.water ? 'water' : !l.buildable ? 'steep' : occ[y][x] ? 'building' : 'free'
+    const cell: LandCell = { x, y, state, owner: own && !own.mine ? own.owner : '', building: b ? b.type : '', access: '', roads: 0, crossings: 0, cost: 0 }
+    if (state === 'free' || (state === 'mine' && !b)) {
+      const a = mockAccess(x, y)
+      cell.access = a.kind; cell.roads = a.roads; cell.crossings = a.crossings; cell.cost = a.cost
+    }
+    return cell
   }))
   const owned = cz.tenure.filter((l) => l.mine).length
   const free = rows.flat().filter((c) => c.state === 'free').length
-  const view: LandView = { village: 'آمل', settlement_id: OWN_ID, grid_lots: size(), rows, price: LOT_PRICE, cash: cz.cash, owned, max: MAX_LOTS, can_buy: owned < MAX_LOTS && cz.cash >= LOT_PRICE, free_lots: free }
+  const served = rows.flat().filter((c) => c.state === 'free' && c.access !== 'none').length
+  const view: LandView = { village: 'آمل', settlement_id: OWN_ID, grid_lots: size(), rows, price: LOT_PRICE, cash: cz.cash, owned, max: MAX_LOTS, can_buy: owned < MAX_LOTS && cz.cash >= LOT_PRICE && served > 0, free_lots: free, served_lots: served }
   return mockOk('settlement_land', view, [...(owned > 0 ? [A('citizen.build_house', 'settlement.private')] : []), back('settlement.overview'), refreshA('settlement.land')])
 }
 
@@ -711,6 +915,12 @@ function privatePlace(args: Record<string, unknown>) {
     }
   }
   if (citizenUnmet(e)) return refusal('prerequisite')
+  // no road can be laid to the lot: the answer is the lot's own fixes, never a dead end
+  if (planAutoRoads(x, y, w, h) === 'none') {
+    const v = lotAccessView(x, y)
+    v.building = nameOf(code)
+    return mockOk('settlement_lot_access', v, lotAccessActions(v))
+  }
   const b = bill(e)
   if (cz.cash < b.total) return refusal('citizen_no_cash', { back: { command: 'settlement.private', args: null } })
   if (args.confirm !== 'confirm') {
@@ -735,7 +945,8 @@ function mineView(notice: string) {
   const mineB = st.buildings.filter((b) => b.priv && b.mine)
   const lots = cz.tenure.filter((l) => l.mine).map((l) => {
     const b = mineB.find((x) => l.x >= x.x && l.x < x.x + x.w && l.y >= x.y && l.y < x.y + x.h)
-    return { x: l.x, y: l.y, building: b ? b.type : '', state: b ? (b.state === 'built' ? 'built' : 'building') : '', finish_at: b?.finish ? new Date(b.finish).toISOString() : null, left_seconds: b?.finish ? Math.max(0, Math.round((b.finish - now) / 1000)) : 0 }
+    const acc = b ? null : mockAccess(l.x, l.y)
+    return { x: l.x, y: l.y, access: acc ? acc.kind : '', cost: acc ? acc.cost : 0, building: b ? b.type : '', state: b ? (b.state === 'built' ? 'built' : 'building') : '', finish_at: b?.finish ? new Date(b.finish).toISOString() : null, left_seconds: b?.finish ? Math.max(0, Math.round((b.finish - now) / 1000)) : 0 }
   })
   const home = mineB.find((b) => b.state === 'built' && HOMES.has(b.type))
   const assessed = cz.tenure.filter((l) => l.mine).length * LOT_PRICE + mineB.reduce((q, b) => q + (citizenEntry(b.type)?.cost ?? 0) + (citizenEntry(b.type)?.materials ?? []).reduce((m, [, , n]) => m + n * 15, 0), 0)
@@ -1106,6 +1317,8 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.knowledge.buy': return knowledgeAct(args, true)
     case 'settlement.donate': return donate(args)
     case 'settlement.lot.buy': return lotBuy(args)
+    case 'settlement.lot.access': return lotAccess(args)
+    case 'settlement.lot.repair': return lotRepair(args)
     case 'settlement.private': return privateMenu()
     case 'settlement.private.place': return privatePlace(args)
     case 'settlement.mine': return mineView('')

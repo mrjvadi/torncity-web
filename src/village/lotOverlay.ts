@@ -14,6 +14,12 @@ export const TONE_TAKEN = 3
 export const TONE_OWN = 5
 /** A lot picked in a multi-select (roads). */
 export const TONE_PICK = 4
+/** Land mode, lot access (docs/adr/0043): a free lot that needs a road, one whose road crosses
+ * water, one no road can reach, and one of the viewer's own that no road touches. */
+export const TONE_NEEDS = 6
+export const TONE_BRIDGE = 7
+export const TONE_LOCKED = 8
+export const TONE_OWN_LOCKED = 9
 
 const SUB = 4
 const LIFT = 0.28
@@ -24,6 +30,10 @@ const TONES: Record<number, [number, number, number, number]> = {
   [TONE_TAKEN]: [0.62, 0.66, 0.85, 0.28],
   [TONE_OWN]: [1, 0.8, 0.2, 0.55],
   [TONE_PICK]: [1, 0.78, 0.18, 0.7],
+  [TONE_NEEDS]: [0.98, 0.95, 0.3, 0.68],
+  [TONE_BRIDGE]: [0.2, 0.55, 1, 0.62],
+  [TONE_LOCKED]: [0.92, 0.1, 0.1, 0.66],
+  [TONE_OWN_LOCKED]: [1, 0.42, 0.05, 0.72],
 }
 
 export class LotOverlay {

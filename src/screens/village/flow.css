@@ -53,5 +53,11 @@
 .vf-cell.s-road, .vf-dot.s-road { background: #b9a27a; }
 .vf-cell.s-water, .vf-dot.s-water { background: #2f6fbf; }
 .vf-cell.s-steep, .vf-dot.s-steep { background: #5b6068; }
+/* lot access (docs/adr/0043): how a free lot, or a bare lot of one's own, is served by road */
+.vf-cell.s-free.a-needs_road, .vf-dot.s-needs { background: #d9b92b; }
+.vf-cell.s-free.a-needs_bridge, .vf-dot.s-bridge { background: #3f8fe0; }
+.vf-cell.s-free.a-none, .vf-dot.s-locked { background: #c4372f; }
+.vf-cell.s-mine.a-needs_road, .vf-cell.s-mine.a-needs_bridge, .vf-cell.s-mine.a-none, .vf-dot.s-mine-locked { background: #e8741a; }
+.vf-cell.s-reserved, .vf-dot.s-reserved { background: repeating-linear-gradient(45deg, #b9a27a, #b9a27a 4px, #6f6149 4px, #6f6149 8px); }
 .vf-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12px; color: var(--text-dim); }
 .vf-dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-inline-end: 5px; vertical-align: -1px; }

@@ -377,7 +377,7 @@ export interface SettlementEvent {
   type:
     | 'build_started' | 'build_finished' | 'build_cancelled' | 'build_salvaged' | 'build_batch_started' | 'grid_grown'
     | 'research_started' | 'research_finished' | 'knowledge_bought' | 'literacy_changed'
-    | 'head_changed' | 'member_joined' | 'member_left' | 'lot_bought'
+    | 'head_changed' | 'member_joined' | 'member_left' | 'lot_bought' | 'lot_repaired'
   settlement_id: string
   seq: number
   at: string
@@ -410,7 +410,7 @@ export interface SettlementEvent {
 
 export type {
   Named, VillageOverviewView, DonateView, BuildMenuView, LotGridView, LotConfirmView, GridGrowView,
-  ConstructionProgressView, KnowledgeListView, LotBuyView, PrivateMenuView, PrivateConfirmView, MineView,
+  ConstructionProgressView, KnowledgeListView, LotBuyView, LotAccessView, LotRepairView, PrivateMenuView, PrivateConfirmView, MineView,
   MaterialBuyView as MaterialBuyConfirmView, MaterialsView as VillageMaterialsView, BuildingView as BuildingPanelView,
   LotBatchConfirmView as BatchConfirmView, VillageRefusalView, PromotionView, ResidenceView, WorkView, TermsView,
   LandView, SettlementWhoView, PrivateLotsView, VillageNeed, ScreenViews,

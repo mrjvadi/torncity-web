@@ -1501,7 +1501,7 @@ citizen.hub.title | کارهای تو در روستا | What you can do here
 citizen.hub.hint | اینجا خانهٔ توست؛ زمین بخر، خانه بساز و روستا را آباد کن. | This is your home: buy land, build a house and help the village grow.
 citizen.hub.donate | کمک به خزانه | Help the treasury
 citizen.hub.who | ساکنان | Residents
-citizen.legend.free | زمین آزاد | Free lot
+citizen.legend.free | آزاد، کنار جاده | Free, on the road
 citizen.legend.mine | زمین تو | Yours
 citizen.legend.taken | زمین دیگران | Others'
 citizen.land.exit | بستن نقشهٔ زمین‌ها | Close the land map
@@ -1557,6 +1557,7 @@ citizen.work.title | کار در روستا | Work in the village
 citizen.work.body | کارگاه‌ها و مزرعه‌های روستا با ساخته‌شدن باز می‌شوند. تا آن روز کار و شغل در «{city}» است. | The village's workshops and farms open as they are built. Until then, jobs are in {city}.
 citizen.work.go | رفتن به {city} | Go to {city}
 event.lot_bought | زمینی خریداری شد | A lot was bought
+event.lot_repaired | راه یا فروش یک زمین درست شد | A lot's road or sale was put right
 refusal.village_citizen_lot_taken | این زمین را همین حالا کس دیگری خرید. | Someone bought this lot just now.
 refusal.village_citizen_lot_limit | به سقف زمین‌های شخصی رسیده‌ای؛ اول روی زمین‌هایت بساز. | You have reached the personal lot limit; build on your lots first.
 refusal.village_citizen_zoning | سهم زمین‌های شخصی این روستا پر شده است. | The share of private lots in this village is full.
@@ -1571,6 +1572,47 @@ refusal.village_citizen_no_debt | بدهی مالیاتی‌ای نداری. | Y
 refusal.village_citizen_off | خرید زمین هنوز در این روستا باز نشده است. | Buying land is not open in this village yet.
 refusal.village_citizen_no_lots | زمینی نداری؛ اول یک زمین بخر. | You own no lots; buy one first.
 citizen.pct | {p}٪ | {p}%
+citizen.legend.needs | آزاد، باید راهش را کشید | Free, a road must be laid
+citizen.legend.bridge | آزاد، راهش از روی آب می‌گذرد | Free, the road crosses water
+citizen.legend.locked | آزاد ولی راه ندارد | Free but no road can reach it
+citizen.legend.mine_locked | زمین تو، بدون راه | Yours, no road
+citizen.legend.reserved | حریم جاده، فروشی نیست | Road reserve, not for sale
+citizen.access.req | راه به این زمین | Road to this lot
+citizen.access.road | کنار جاده است | On the road
+citizen.access.needs_road | {n} قطعه جاده کشیده می‌شود | A road of {n} lots is laid
+citizen.access.needs_bridge | {n} قطعه جاده و {c} قطعه آب‌رو یا پل کوچک | A road of {n} lots and {c} lots of culvert or footbridge
+citizen.access.none | هیچ راهی نمی‌رسد | No road can reach it
+citizen.access.cost | خرج راه | Road cost
+citizen.access.total | جمع پرداختی | You pay in all
+citizen.access.road_note | جاده را تو می‌دهی و همیشه عمومی می‌ماند؛ همه می‌توانند از آن رد شوند. | You pay for the road and it stays public for good; everyone can use it.
+citizen.access.none_note | این زمین فروخته نمی‌شود: دورش را زمین دیگران، ساختمان، شیب یا آبِ پهن بسته است. | This lot is not for sale: other people's lots, buildings, slopes or wide water close it in.
+citizen.access.carve_note | می‌توانی راه را از زمین‌های خودت بکشی: {n} قطعه از زمین‌هایت جاده می‌شود و پولی برنمی‌گردد. | You can cut the road through your own land: {n} of your lots become road and nothing is refunded.
+citizen.access.carve_btn | راه را از زمین خودم بکش - {p} | Cut the road through my land - {p}
+citizen.access.nearby | زمین‌های نزدیک که راه دارند | Nearby lots that have a road
+citizen.access.nearby_none | فعلاً زمین آزادی که راه داشته باشد پیدا نشد. | No free lot with a road was found for now.
+citizen.access.refused | برای ساختن «{name}» به این زمین راهی نمی‌رسد. | No road reaches this lot, so «{name}» cannot be built on it.
+citizen.buy.confirm_road | بخر با راه - {p} | Buy with the road - {p}
+citizen.fix.title | راه زمین | Road to your lot
+citizen.fix.ok | این زمین کنار جاده است؛ می‌توانی رویش بسازی. | This lot is on the road; you can build on it.
+citizen.fix.none | هیچ راهی به این زمین نمی‌رسد؛ فقط می‌توانی فروش را لغو کنی. | No road can reach this lot; you can only cancel the sale.
+citizen.fix.connect | راه را بکش - {p} | Lay the road - {p}
+citizen.fix.carve | راه را از زمین خودم بکش ({n} قطعه) - {p} | Cut the road through my land ({n} lots) - {p}
+citizen.fix.refund | فروش را لغو کن، {p} پس بگیر | Cancel the sale, get {p} back
+citizen.fix.refund_note | فروش لغو می‌شود، پولت از خزانهٔ روستا برمی‌گردد و زمین دوباره مال روستا می‌شود. | The sale is cancelled, the village treasury returns your money and the lot goes back to the village.
+citizen.fix.refund_total | پولی که برمی‌گردد | Money returned
+citizen.fix.sure | مطمئنی؟ انجام بده | Sure? Do it
+citizen.fix.done_connect | راه کشیده شد. | The road is laid.
+citizen.fix.done_carve | راه از زمین خودت کشیده شد. | The road was cut through your land.
+citizen.fix.done_refund | فروش لغو شد و پولت برگشت. | The sale is cancelled and your money is back.
+citizen.mine.lot_no_road | زمین خالی، راه ندارد | Empty lot, no road
+citizen.mine.fix | راه زمین ردیف {y}، ستون {x} | Road to the lot at row {y}, column {x}
+refusal.village_citizen_lot_reserved | این قطعه حریم جاده است و فروشی نیست. | This lot is road reserve and not for sale.
+refusal.village_citizen_no_access | به این زمین هیچ راهی نمی‌رسد و فروخته نمی‌شود. | No road can reach this lot, so it is not sold.
+refusal.village_citizen_no_option | این کار برای این زمین ممکن نیست. | That cannot be done for this lot.
+refusal.village_citizen_refund_treasury | خزانهٔ روستا الان پول کافی برای برگرداندن پولت ندارد. | The village treasury cannot cover the refund right now.
+refusal.village_road_reserved | این جاده راه یک زمین است و حریم جاده می‌ماند؛ خراب نمی‌شود. | This road is someone's way in and stays road reserve; it cannot be torn down.
+refusal.village_reserved | این قطعه حریم جاده است؛ فقط جاده رویش ساخته می‌شود. | This lot is road reserve; only a road can be built on it.
+refusal.village_no_road | به این ساختمان راهی نمی‌رسد. زمین دیگری را امتحان کن. | No road can reach this building. Try another lot.
 # -- support city ------------------------------------------------------------
 sc.title | شهر مرکزی | Central City
 sc.loading | در حال ساختن شهر… | Building the city…
