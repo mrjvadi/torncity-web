@@ -3,10 +3,12 @@
 // backend. Never enabled unless the query string asks for it.
 
 import { API_BASE } from './client'
+import { mockEconomyCommand } from './mock_economy'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
 import { mockFoundingCommand } from './mock_founding'
+import { mockLifeCommand } from './mock_life'
 import { mockBasicCommand } from './mock_basic'
 import { mockLocation, mockSupportCommand } from '../support/mock'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
@@ -90,18 +92,15 @@ const MOCK_PROFILE_ACTIONS = [
 ]
 
 function mockCommand(command: string, args?: Record<string, unknown>) {
-  if (command === 'player.language.set') {
-    mockLang = args?.lang === 'en' ? 'en' : 'fa'
-    return json({ ok: true, screen: 'settings', text: 'settings', view: { language: mockLang, languages: ['en', 'fa'], language_changed: true }, actions: [] })
-  }
-  if (command === 'player.profile.get') {
-    const view = mockLang === 'en'
-      ? { ...MOCK_PROFILE_VIEW, name: 'Sara', city: 'Calderis', place: { code: 'old_town', name: 'Old Town' }, rank: { code: 'citizen', name: 'Citizen', emoji: '🎖' }, stage: { code: 'adult', name: 'Adult' }, age: 27, needs: { hunger: 34, sleep: 52, stress: 22, happiness: 71 }, achievements: 4 }
-      : { ...MOCK_PROFILE_VIEW, stage: { code: 'adult', name: 'بزرگسال' }, age: 27, needs: { hunger: 34, sleep: 52, stress: 22, happiness: 71 }, achievements: 4 }
-    return json({ ok: true, screen: 'profile', text: 'سارا - شهروند', view, actions: MOCK_PROFILE_ACTIONS })
-  }
+  if (command === 'player.language.set') mockLang = args?.lang === 'en' ? 'en' : 'fa'
+  // the economy and finance area: neutral answers of every screen of it (src/api/mock_economy.ts)
+  const economy = mockEconomyCommand(command, args ?? {})
+  if (economy) return json(economy)
   const support = mockSupportCommand(command, args)
   if (support) return json(support)
+  // the life area answers in the neutral contract (src/api/mock_life.ts)
+  const lifeArea = mockLifeCommand(command, args)
+  if (lifeArea) return json(lifeArea)
   const basic = mockBasicCommand(command, args)
   if (basic) return json({ ok: true, ...basic })
   // war/military (no structured view yet) and friends/search (structured):
@@ -149,7 +148,7 @@ export function installMockApi(): void {
         player: MOCK_PLAYER,
         content_version: 1,
         languages: [{ code: 'fa', name: 'فارسی' }],
-        cities: [{ code: 'calderis', name: 'کالدریس' }, { code: 'support', name: 'ساپورت' }],
+        cities: [{ code: 'calderis', name: 'کالدریس' }, { code: 'support', name: 'شهر مرکزی' }],
         places: [{ code: 'old_town', name: 'مرکز شهر' }],
         server_time: new Date().toISOString(),
         realtime: false,

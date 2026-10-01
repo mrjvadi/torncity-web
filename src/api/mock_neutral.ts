@@ -13,6 +13,8 @@ export interface MockAct {
   kind: string
   icon: string
   subject?: string
+  /** An action the player types the last value of (an amount, a name). */
+  input?: { field: string; text?: boolean }
 }
 
 /** An action. An empty `id` is left out, as the server leaves it out for a command without a name. */

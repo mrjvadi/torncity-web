@@ -29,6 +29,8 @@ const PAGE_ARROW = /^[\s\p{Extended_Pictographic}️]*[‹›«»◀▶⬅➡←
 
 /** A "previous page" / "next page" button of the server's keyboard. */
 export function pagerDir(a: Action): 'prev' | 'next' | null {
+  if (a.id === 'page.prev') return 'prev'
+  if (a.id === 'page.next') return 'next'
   if (a.kind === 'primary' || a.kind === 'danger' || a.kind === 'confirm') return null
   const paged = a.args && a.args.page !== undefined
   if (!paged && !PAGE_ARROW.test(L(a))) return null

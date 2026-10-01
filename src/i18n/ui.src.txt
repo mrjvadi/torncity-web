@@ -23,6 +23,532 @@ bank.cash | نقد | Cash
 bank.balance | موجودی بانک | Bank balance
 bank.branch | شعبه‌ی {city} | {city} branch
 bank.fee | کارمزد برداشت: {p} | Withdrawal fee: {p}
+# -- economy and finance (docs/adr/0039): the web's own words for the neutral contract ---------------------------
+# actions, by the id the server sends ({n} an amount, grams or a count, {name} a content name)
+eco.act.bank.deposit | واریز {n} | Deposit {n}
+eco.act.bank.deposit_all | واریز همه ({n}) | Deposit all ({n})
+eco.act.bank.deposit_custom | واریز مبلغ دلخواه | Deposit another amount
+eco.act.bank.withdraw | برداشت {n} | Withdraw {n}
+eco.act.bank.withdraw_all | برداشت همه ({n}) | Withdraw all ({n})
+eco.act.bank.withdraw_custom | برداشت مبلغ دلخواه | Withdraw another amount
+eco.act.bank.pay | پرداخت به بازیکن | Pay a player
+eco.act.bank.finance | بانک ملی | The national bank
+eco.act.bank.show | بانک | Bank
+eco.act.pay.cash | نقد {n} | Cash {n}
+eco.act.pay.cash_all | نقد، همه ({n}) | Cash, all ({n})
+eco.act.pay.cash_custom | نقد، مبلغ دلخواه | Cash, another amount
+eco.act.pay.card | کارت {n} | Card {n}
+eco.act.pay.card_all | کارت، همه ({n}) | Card, all ({n})
+eco.act.pay.card_custom | کارت، مبلغ دلخواه | Card, another amount
+eco.act.pay.confirm | تأیید و پرداخت | Confirm and pay
+eco.act.pay.cancel | انصراف | Cancel
+eco.act.pay.again | پرداخت دوباره | Pay again
+eco.act.payment.cash | پرداخت نقد | Pay in cash
+eco.act.payment.card | پرداخت با کارت | Pay by card
+eco.act.payment.back | برگشت | Back
+eco.act.social.search | پیدا کردن بازیکن | Find a player
+eco.act.budget.change | پیشنهاد تقسیم تازه | Propose a new split
+eco.act.budget.bills | لایحه‌ها | Bills
+eco.act.gold.buy | خرید {n} گرم | Buy {n} g
+eco.act.gold.sell | فروش {n} گرم | Sell {n} g
+eco.act.gold.sell_yes | بله، بفروش | Yes, sell
+eco.act.finance.portfolio | سبد دارایی من | My portfolio
+eco.act.finance.exchange | بورس | The exchange
+eco.act.finance.gold | طلافروشی | The gold dealer
+eco.act.finance.savings | پس‌انداز | Savings
+eco.act.finance.insurance | بیمه | Insurance
+eco.act.finance.product | {name} | {name}
+eco.act.finance.loan | وام من | My loan
+eco.act.finance.pledge | این وثیقه | This pledge
+eco.act.finance.option | {n} | {n}
+eco.act.finance.take | گرفتن وام | Take the loan
+eco.act.finance.payoff | تسویهٔ کامل | Pay it all off
+eco.act.finance.payoff_yes | بله، تسویه شود | Yes, pay it off
+eco.act.savings.deposit | گذاشتن {n} | Put in {n}
+eco.act.savings.withdraw | برداشتن {n} | Take out {n}
+eco.act.savings.deposit_custom | گذاشتن مبلغ دلخواه | Put in another amount
+eco.act.savings.withdraw_custom | برداشتن مبلغ دلخواه | Take out another amount
+eco.act.insurance.insure | بیمه کردن | Insure
+eco.act.insurance.insure_property | بیمهٔ ملک | Insure a property
+eco.act.insurance.cancel | لغو بیمه | Cancel the policy
+eco.act.insurance.cancel_yes | بله، لغو شود | Yes, cancel it
+eco.act.stock.open | باز کردن | Open
+eco.act.stock.buy | خرید سهم | Buy shares
+eco.act.stock.sell | فروش سهم | Sell shares
+eco.act.stock.ipo | عرضه در بورس | List on the exchange
+eco.act.stock.dividend | تقسیم سود | Pay a dividend
+eco.act.stock.confirm_buy | ثبت خرید | Place the buy
+eco.act.stock.confirm_sell | ثبت فروش | Place the sell
+eco.act.stock.cancel | لغو سفارش | Cancel the order
+eco.act.stock.ipo_yes | بله، عرضه شود | Yes, list it
+eco.act.stock.ipo_option | عرضه {qty} سهم | List {qty} shares
+eco.act.stock.dividend_yes | بله، سود پرداخت شود | Yes, pay it
+eco.act.stock.dividend_option | تقسیم {n} | Pay out {n}
+eco.act.market.book | دفتر سفارش | Order book
+eco.act.market.mine | سفارش‌های من | My orders
+eco.act.market.auctions | حراجی | The auction house
+eco.act.market.goods | کالاهای شرکت‌های من | My companies' goods
+eco.act.market.buy_at | خرید یک عدد | Buy one
+eco.act.market.bid_at | پیشنهاد خرید | Place a bid
+eco.act.market.sell_at | فروش یک عدد | Sell one
+eco.act.market.ask_at | فروش | Sell
+eco.act.market.ask_all | فروش همه | Sell all
+eco.act.market.cancel | لغو سفارش | Cancel the order
+eco.act.market.list | بازار | The market
+eco.act.place.walk | رفتن به آنجا | Go there
+eco.act.support.travel | سفر به {name} | Travel to {name}
+eco.act.shop.open | باز کردن مغازه | Open the shop
+eco.act.shop.all | همهٔ مغازه‌های شهر | All shops of the city
+eco.act.shop.buy | خرید | Buy
+eco.act.shop.qty | خرید {n} عدد | Buy {n}
+eco.act.shop.sell_to | فروش به این مغازه | Sell to this shop
+eco.act.shop.list | مغازه‌ها | Shops
+eco.act.item.bag | کوله‌پشتی | Backpack
+eco.act.auction.open | دیدن حراج | See the auction
+eco.act.auction.mine | حراج‌های من | My auctions
+eco.act.auction.terms | شروع حراج | Start the auction
+eco.act.auction.house | حراجی | The auction house
+# a service that is not offered here
+eco.na.from | {service} از «{stage}» به بالا هست؛ اینجا هنوز {here} است. | {service} starts at the {stage} stage; this is still a {here}.
+eco.na.only_support | {service} فقط در {place} هست. | {service} is only in {place}.
+eco.na.somewhere | شهر مرکزی | the central city
+eco.na.hint | ساختمان لازم: {buildings}. دهیار می‌تواند آن را بسازد. | Building needed: {buildings}. The village head can build it.
+eco.na.go | سفر به {city} | Travel to {city}
+eco.service.bank | بانک | The bank
+eco.service.credit | امتیاز اعتبار | The credit score
+eco.service.loans | وام بانکی | Bank loans
+eco.service.savings | پس‌انداز | Savings
+eco.service.insurance | بیمه | Insurance
+eco.service.stocks | بورس | The stock exchange
+eco.service.gold | خرید و فروش طلا | The gold dealer
+eco.service.auction_house | حراج | The auction house
+eco.service.unknown | این خدمت | This service
+eco.stage.village | روستا | village
+eco.stage.town | شهرک | town
+eco.stage.city | شهر | city
+eco.stage.country | کشور | country
+eco.stage.support | شهر مرکزی | central city
+eco.stage.unknown | جای دیگر | somewhere else
+eco.someone | یک بازیکن | a player
+eco.walk_there | رفتن به {place} ({t}) | Walk to {place} ({t})
+eco.trade_line | {qty} عدد به {price} | {qty} at {price}
+eco.refused.title | نشد | Not possible
+# notices a screen carries: the bank, paying, finance, gold, the exchange
+eco.notice.bank.deposited | {amount} به حساب بانکی‌ات واریز شد. | {amount} was put into your bank account.
+eco.notice.bank.withdrew | {amount} نقد برداشتی. | You withdrew {amount} in cash.
+eco.notice.bank.withdrew_fee | {amount} نقد برداشتی و کارمزد {fee} هم از بانک کم شد. | You withdrew {amount} in cash and a fee of {fee} was taken from the bank.
+eco.notice.pay.not_together | پول نقد را فقط به کسی می‌توانی بدهی که با تو در یک شهر باشد. با کارت پرداخت کن؛ پرداخت با کارت از همه‌جا ممکن است. | You can only hand cash to someone in the same city. Pay by card instead; it works from anywhere.
+eco.notice.pay.short_cash | پول نقدت کافی نیست. نقد همراهت: {available}. | You do not have enough cash. Cash on you: {available}.
+eco.notice.pay.short_bank | موجودی بانک با کارمزد کافی نیست. لازم است {needed} و داری {available}. | Your bank balance does not cover it with the fee. Needed {needed}, you have {available}.
+eco.notice.finance.taken | وام گرفته شد و پولش به حسابت آمد. | The loan was taken and the money is in your account.
+eco.notice.finance.paid_off | وام کامل تسویه شد. آفرین! | The loan is fully paid off. Well done!
+eco.notice.finance.deposited | {amount} به پس‌انداز رفت. | {amount} went into your savings.
+eco.notice.finance.withdrawn | {amount} از پس‌انداز به حساب بانکی برگشت. | {amount} came back from savings to your bank account.
+eco.notice.finance.insured | بیمه‌نامه صادر شد. | The policy was issued.
+eco.notice.finance.cancelled | بیمه‌نامه لغو شد. | The policy was cancelled.
+eco.notice.gold.buy_done | {grams} گرم طلا خریدی و {total} پرداختی. | You bought {grams} g of gold and paid {total}.
+eco.notice.gold.sell_done | {grams} گرم طلا فروختی و {total} به حساب بانکی‌ات آمد. | You sold {grams} g of gold and {total} came to your bank account.
+eco.notice.stock.listed | شرکت در بورس عرضه شد و سهم‌های عرضه‌شده در دفتر سفارش است. | The company is listed and its shares are in the order book.
+eco.notice.stock.cancelled | سفارش شمارهٔ {no} لغو شد و پول یا سهمش برگشت. | Order {no} was cancelled and its money or shares came back.
+# the bank
+eco.bank.no_city | هنوز در هیچ شهری مستقر نیستی؛ واریز و برداشت پس از رسیدن به شهر ممکن است. | You are not settled in any city yet; deposits and withdrawals work once you are in one.
+eco.bank.pay_sub | به بازیکن دیگر پول بده | Send money to another player
+eco.bank.finance_sub | وام، پس‌انداز و بیمه | Loans, savings and insurance
+# paying a player
+eco.pay.title | پرداخت به {player} | Pay {player}
+eco.pay.title_plain | پرداخت به بازیکن | Pay a player
+eco.pay.help | برای پول دادن به یک بازیکن، نام کاربری یا کد او را بفرست؛ مثلاً «پرداخت» و نام او. | To pay a player, send their username or code.
+eco.pay.help_cash | پول نقد فقط وقتی دست‌به‌دست می‌شود که هر دو در یک شهر باشید؛ پرداخت با کارت از همه‌جا ممکن است. | Cash only changes hands when you are both in the same city; card payments work from anywhere.
+eco.pay.code | کد بازیکن | Player code
+eco.pay.cash | نقد | Cash
+eco.pay.bank | موجودی بانک | Bank balance
+eco.pay.together | هر دو در {city} هستید؛ نقد هم می‌شود داد. | You are both in {city}, so cash works too.
+eco.pay.apart | با هم در یک شهر نیستید؛ فقط با کارت. | You are not in the same city; card only.
+eco.pay.card_fee | کارمزد کارت در {city} {p} است. | The card fee in {city} is {p}.
+eco.pay.card_free | پرداخت با کارت در {city} کارمزد ندارد. | Card payments in {city} have no fee.
+eco.pay.by_cash | پرداخت نقد | In cash
+eco.pay.by_card | پرداخت با کارت | By card
+eco.pay.hint | مبلغ را از دکمه‌ها انتخاب کن یا مبلغ دلخواه را بنویس. | Pick an amount or type your own.
+eco.pay.cannot_afford | با موجودی فعلی نمی‌توانی چیزی بپردازی. | You cannot pay anything with what you hold.
+eco.pay.confirm_title | تأیید پرداخت به {player} | Confirm paying {player}
+eco.pay.method_cash | از پول نقدت پرداخت می‌شود. | It is paid from your cash.
+eco.pay.method_card | با کارت از حساب بانکی‌ات پرداخت می‌شود. | It is paid by card from your bank account.
+eco.pay.amount | مبلغ | Amount
+eco.pay.fee | کارمزد | Fee
+eco.pay.after_cash | بعد از پرداخت {n} نقد برایت می‌ماند. | You will have {n} in cash left.
+eco.pay.after_bank | بعد از پرداخت {n} در بانک برایت می‌ماند. | You will have {n} left in the bank.
+eco.pay.sent_title | پرداخت شد | Paid
+eco.pay.sent_cash | {amount} نقد به {player} دادی. | You gave {player} {amount} in cash.
+eco.pay.sent_card | {amount} با کارت به {player} پرداختی. | You paid {player} {amount} by card.
+eco.pay.sent_fee | کارمزد کارت {fee} بود. | The card fee was {fee}.
+eco.pay.held | پرداخت {amount} به {player} برای بررسی نگه داشته شد؛ پولش از تو رفته و در امانت می‌ماند تا بررسی تمام شود. | The payment of {amount} to {player} was held for review; the money has left you and waits in escrow.
+eco.pay.declined_title | پول کافی نداری | Not enough money
+eco.pay.declined | قیمت {amount} است و با پول نقد و بانکت نمی‌شود پرداخت. | The price is {amount}, which your cash and bank cannot cover.
+eco.pay.cash_only | این‌جا فقط نقد پذیرفته می‌شود. | Only cash is taken here.
+eco.pay.card_only | این‌جا فقط کارت پذیرفته می‌شود. | Only card is taken here.
+eco.pay.only_card | نقدت کافی نیست؛ فقط با کارت می‌شود. | You do not have the cash; only card works.
+eco.pay.only_cash | موجودی بانکت کافی نیست؛ فقط نقد می‌شود. | Your bank balance is short; only cash works.
+eco.pay.cannot | برای {amount} پول کافی نداری. | You do not have enough for {amount}.
+eco.pay.paid_cash | از پول نقدت پرداخت شد. | Paid from your cash.
+eco.pay.paid_card | با کارت از بانکت پرداخت شد. | Paid by card from your bank.
+# the city budget
+eco.budget.title | بودجهٔ {city} | Budget of {city}
+eco.budget.title_plain | بودجهٔ شهر | The city budget
+eco.budget.no_city | هنوز در هیچ شهری مستقر نیستی. بعد از استقرار، بودجهٔ شهرت همین‌جا دیده می‌شود. | You are not settled in any city yet. Once you are, your city's budget shows here.
+eco.budget.treasury | موجودی خزانه | Treasury
+eco.budget.spend_share | سقف خرج هر دوره | Most spent per period
+eco.budget.allocation | تقسیم فعلی: {shares} | Current split: {shares}
+eco.budget.nothing | هیچ خطی سهمی ندارد و چیزی خرج نمی‌شود | no line has a share, so nothing is spent
+eco.budget.share | {line} {share} | {line} {share}
+eco.budget.pending | تقسیم تازه {when} دیگر اجرا می‌شود: {shares} | A new split starts in {when}: {shares}
+eco.budget.last | دورهٔ گذشته {spent} خرج شد: | Last period spent {spent}:
+eco.budget.no_period | هنوز هیچ دورهٔ بودجه‌ای تمام نشده است. | No budget period has ended yet.
+eco.budget.next | دورهٔ بعد: {in} دیگر | Next period in {in}
+eco.budget.effect.investigation | پیگیری پرونده‌ها {share} جدی‌تر | Case work {share} more serious
+eco.budget.effect.hospital_price | بیمارستان شهر {share} ارزان‌تر | The city hospital {share} cheaper
+eco.budget.effect.transit_fare | حمل‌ونقل عمومی {share} ارزان‌تر | Public transport {share} cheaper
+eco.budget.effect.course_fee | آموزش {share} ارزان‌تر | Courses {share} cheaper
+eco.budget.effect.war_repair | {share} از خرابی جنگ بازسازی شد | {share} of the war damage was repaired
+eco.budget.effect.npc_demand | خرید مردم از شرکت‌ها {share} بیشتر | People buy {share} more from companies
+eco.budget.effect.defence_fund | به صندوق دفاع کشور رفت | Went to the national defence fund
+# gold
+eco.gold.title | طلافروشی | The gold dealer
+eco.gold.buy_price | خرید از ما | Buy from us
+eco.gold.sell_price | فروش به ما | Sell to us
+eco.gold.up | قیمت {p} بالا رفته | Price up {p}
+eco.gold.down | قیمت {p} پایین آمده | Price down {p}
+eco.gold.flat | قیمت تغییری نکرده | Price unchanged
+eco.gold.stock | طلای موجود: {n} گرم | In stock: {n} g
+eco.gold.next | قیمت بعدی ساعت {t} | Next price at {t}
+eco.gold.holding | طلای تو | Your gold
+eco.gold.grams | {n} گرم | {n} g
+eco.gold.value | ارزش امروز | Worth today
+eco.gold.cost | بهای خرید | What it cost you
+eco.gold.buy | خرید | Buy
+eco.gold.sell | فروش | Sell
+eco.gold.option | {n} گرم ({price}) | {n} g ({price})
+eco.gold.history | قیمت‌های اخیر | Recent prices
+eco.gold.confirm_buy | خرید {n} گرم طلا | Buying {n} g of gold
+eco.gold.confirm_sell | فروش {n} گرم طلا | Selling {n} g of gold
+eco.gold.amount | مقدار | Amount
+eco.gold.price_each | قیمت هر گرم | Price per gram
+# loans
+eco.loan.products | وام‌هایی که می‌دهیم | Loans on offer
+eco.loan.title_plain | وام | Loan
+eco.loan.status.active | در جریان | Running
+eco.loan.status.repaid | تسویه شده | Paid off
+eco.loan.status.defaulted | نکول شده | In default
+eco.loan.line | قسط بعدی {next} - {left} قسط مانده - بدهی {owed} | Next {next} - {left} left - owed {owed}
+eco.loan.line_arrears | قسط بعدی {next} - {arrears} قسط عقب‌افتاده - بدهی {owed} | Next {next} - {arrears} overdue - owed {owed}
+eco.loan.next_due | قسط‌ها ساعت {t} سررسید می‌شوند. | Instalments fall due at {t}.
+eco.loan.kind.player | وام بدون وثیقه، به خود تو. | An unsecured loan to you.
+eco.loan.kind.mortgage | وام با وثیقهٔ ملک: تا وام تسویه نشود ملک فروخته نمی‌شود و اگر نکول کنی، شهر آن را پس می‌گیرد. | A loan secured by a property: you cannot sell it until the loan is paid, and if you default the city takes it back.
+eco.loan.kind.company | وام برای شرکتی که در اختیار توست. | A loan for a company you control.
+eco.loan.choose_pledge.mortgage | کدام ملک وثیقهٔ این وام باشد؟ | Which property secures this loan?
+eco.loan.choose_pledge.company | کدام شرکت وام را بگیرد؟ | Which company takes the loan?
+eco.loan.choose_pledge.player | چه چیزی وثیقه باشد؟ | What secures it?
+eco.loan.rate | سود سالانه | Yearly rate
+eco.loan.late_fee | جریمهٔ دیرکرد | Late fee
+eco.loan.default_after | نکول بعد از | Default after
+eco.loan.instalments | {n} قسط عقب‌افتاده | {n} missed instalments
+eco.loan.pledged | وثیقه: {pledge} | Pledge: {pledge}
+eco.loan.secures | تا {n} وام می‌دهد | Secures up to {n}
+eco.loan.nothing | با امتیاز و وثیقهٔ فعلی‌ات مبلغی برای این وام نمی‌ماند. | With your score and pledge there is nothing to lend you on this.
+eco.loan.limit | بیشترین وام: {n} | Most you can borrow: {n}
+eco.loan.option_sub | {term} قسط، هر قسط {instalment} | {term} instalments of {instalment}
+eco.loan.confirm_title | شرایط {product} | Terms of {product}
+eco.loan.amount | مبلغ وام | Loan amount
+eco.loan.interest | سود ({p} در سال) | Interest ({p} a year)
+eco.loan.instalment | هر قسط ({n} قسط) | Each instalment ({n})
+eco.loan.total | جمع بازپرداخت | Total to repay
+eco.loan.first | اولین قسط: {t} | First instalment: {t}
+eco.loan.warning | اگر قسط‌ها عقب بیفتد جریمه می‌شوی و امتیاز اعتباری‌ات کم می‌شود. | If instalments fall behind you pay a fee and your credit score drops.
+eco.loan.take | گرفتن وام {n} | Take the loan of {n}
+eco.loan.detail_title | وام شمارهٔ {no} - {product} | Loan {no} - {product}
+eco.loan.principal | مبلغ وام | Principal
+eco.loan.opened | تاریخ گرفتن | Taken on
+eco.loan.progress | قسط‌ها | Instalments
+eco.loan.progress_of | {paid} از {n} پرداخت شده، {missed} عقب‌افتاده | {paid} of {n} paid, {missed} missed
+eco.loan.owed | بدهی فعلی | Owed now
+eco.loan.next | قسط بعدی | Next instalment
+eco.loan.arrears | {n} قسط عقب‌افتاده و {fees} جریمه | {n} overdue instalments and {fees} in fees
+eco.loan.defaulted | این وام نکول شد. بانک {recovered} از وثیقه برگرداند و {lost} سوخت شد. | This loan defaulted. The bank recovered {recovered} from the pledge and {lost} was lost.
+eco.loan.repaid | این وام تسویه شده است. | This loan is paid off.
+eco.loan.payoff_confirm | با {n} همهٔ وام تسویه می‌شود. مطمئنی؟ | {n} pays the whole loan off. Are you sure?
+eco.loan.payoff | تسویهٔ کامل ({n}) | Pay it all off ({n})
+eco.loan.payoff_yes | بله، تسویه شود ({n}) | Yes, pay it off ({n})
+eco.credit.band.poor | امتیاز اعتباری: ضعیف | Credit score: poor
+eco.credit.band.fair | امتیاز اعتباری: متوسط | Credit score: fair
+eco.credit.band.good | امتیاز اعتباری: خوب | Credit score: good
+eco.credit.band.very_good | امتیاز اعتباری: خیلی خوب | Credit score: very good
+eco.credit.band.excellent | امتیاز اعتباری: عالی | Credit score: excellent
+eco.pledge.company | شرکت «{company}» | The company "{company}"
+eco.pledge.property | ملک شمارهٔ {no}: {type} در {city} - ارزش {value} | Property {no}: {type} in {city} - worth {value}
+eco.pledge.property_short | ملک شمارهٔ {no}: {type} در {city} | Property {no}: {type} in {city}
+eco.pledge.worth | ارزش {n} | Worth {n}
+# savings
+eco.savings.title | پس‌انداز | Savings
+eco.savings.balance | پس‌انداز | Saved
+eco.savings.bank | موجودی بانک | Bank balance
+eco.savings.rate | سود سالانه | Yearly rate
+eco.savings.earned | تا حالا سود گرفته‌ای | Interest earned so far
+eco.savings.next | سود دورهٔ بعد | Interest next period
+eco.savings.hint | پولی که پس‌انداز می‌کنی سود می‌گیرد؛ هر وقت خواستی به حساب بانکی برمی‌گردد. | Money you save earns interest, and comes back to your bank account whenever you like.
+eco.savings.next_at | سود ساعت {t} حساب می‌شود. | Interest is paid at {t}.
+eco.savings.put | گذاشتن در پس‌انداز | Put in savings
+eco.savings.take | برداشتن از پس‌انداز | Take from savings
+# insurance
+eco.insurance.title | صندوق بیمهٔ {country} | Insurance fund of {country}
+eco.insurance.title_plain | بیمه | Insurance
+eco.insurance.fund | موجودی صندوق | Fund balance
+eco.insurance.covers.health | هزینهٔ درمان را پوشش می‌دهد | Covers treatment costs
+eco.insurance.covers.war_damage | خسارت جنگ به یک ملک را پوشش می‌دهد | Covers war damage to one property
+eco.insurance.covers.theft | دزدی را پوشش می‌دهد | Covers theft
+eco.insurance.premium | حق بیمه (هر دورهٔ بازی) | Premium (each game period)
+eco.insurance.premium_valued | {fixed} و {p} از ارزش ملک | {fixed} plus {p} of the property's value
+eco.insurance.cover | پوشش | Covers
+eco.insurance.max | بیشترین خسارت | Most it pays
+eco.insurance.wait | زمان انتظار تا اولین خسارت | Waiting time before a claim
+eco.insurance.insure | گرفتن این بیمه | Take this policy
+eco.insurance.insure_for | بیمه کردن: {pledge} | Insure: {pledge}
+eco.insurance.held | همین بیمه را داری. | You already have this policy.
+eco.insurance.mine | بیمه‌نامه‌های من | My policies
+eco.insurance.policy | شمارهٔ {no} - {product} | No. {no} - {product}
+eco.insurance.policy_sub | حق بیمه {premium} - خسارت گرفته‌ای: {paid} | Premium {premium} - claimed so far: {paid}
+eco.insurance.active | فعال | Active
+eco.insurance.waiting | از ساعت {t} پوشش می‌دهد | Covers from {t}
+eco.insurance.ended.cancelled | لغو شد | Cancelled
+eco.insurance.ended.lapsed | حق بیمه پرداخت نشد؛ از کار افتاد | Lapsed: the premium was not paid
+eco.insurance.ended.gone | ملک دیگر مال تو نیست | The property is no longer yours
+eco.insurance.cancel_confirm | بیمه‌نامهٔ {no} ({product}) لغو شود؟ | Cancel policy {no} ({product})?
+eco.insurance.confirm_title | {product} | {product}
+eco.insurance.for | برای: {pledge} | For: {pledge}
+eco.insurance.every_period | حق بیمه هر دورهٔ بازی از بانک کم می‌شود. | The premium is taken from your bank every game period.
+eco.insurance.hint | هر وقت بخواهی بیمه را لغو می‌کنی؛ خسارت فقط بعد از زمان انتظار داده می‌شود. | You can cancel any time; claims are paid only after the waiting time.
+# the finance refusals
+eco.finance.refused.no_bank | هنوز ساکن هیچ کشوری نیستی و بانک ملی نداری. | You do not live in any country yet, so you have no national bank.
+eco.finance.refused.score | امتیاز اعتباری‌ات برای این وام کافی نیست؛ دست‌کم {score} لازم است. قسط‌ها را به‌موقع بده و بدهی‌ات را کم کن. | Your credit score is too low for this loan; at least {score} is needed. Pay instalments on time and lower your debt.
+eco.finance.refused.too_many | بیش از {count} وام هم‌زمان نمی‌شود داشت. اول یکی را تسویه کن. | You cannot have more than {count} loans at once. Pay one off first.
+eco.finance.refused.bank_dry | بانک ملی الان پول کافی برای این وام ندارد. بعداً دوباره سر بزن. | The national bank does not have the money for this loan right now. Try again later.
+eco.finance.refused.amount | این مبلغ پذیرفته نیست. بیشترین یا کمترین مبلغ مجاز: {amount}. | That amount is not accepted. The most or least allowed: {amount}.
+eco.finance.refused.pledge | وثیقهٔ مناسبی برای این وام نداری. | You have no suitable pledge for this loan.
+eco.finance.refused.not_owner | فقط کسی که شرکت را در اختیار دارد این کار را می‌کند. | Only whoever controls the company can do this.
+eco.finance.refused.short | موجودی‌ات کافی نیست. لازم است: {amount}. | You do not have enough. Needed: {amount}.
+eco.finance.refused.savings_cap | موجودی پس‌انداز نمی‌تواند از {amount} بیشتر شود. | Savings cannot go above {amount}.
+eco.finance.refused.no_product | این محصول دیگر عرضه نمی‌شود. | This product is no longer offered.
+eco.finance.refused.held | همین بیمه را همین حالا داری. | You already hold this policy.
+eco.finance.refused.pledged | این ملک وثیقهٔ یک وام است. | This property secures a loan.
+eco.finance.refused.not_listed | این شرکت در بورس نیست. | This company is not on the exchange.
+eco.finance.refused.listed | این شرکت همین حالا در بورس است. | This company is already on the exchange.
+eco.finance.refused.too_young | این شرکت هنوز جوان‌تر از آن است که عرضه شود. | This company is too young to be listed.
+eco.finance.refused.too_small | درآمد این شرکت هنوز برای عرضه کافی نیست. | This company's income is not enough to be listed yet.
+eco.finance.refused.in_debt | شرکتی که بدهی دارد عرضه نمی‌شود و سود نمی‌دهد. | A company in debt cannot be listed or pay a dividend.
+eco.finance.refused.bad_float | این مقدار سهم یا این قیمت برای عرضه پذیرفته نیست. | This number of shares or this price is not accepted for a listing.
+eco.finance.refused.no_shares | سهم آزاد کافی نداری. سهم آزاد تو: {count}. | You do not have enough free shares. Your free shares: {count}.
+eco.finance.refused.no_money | پول آزاد شرکت کافی نیست. لازم است: {amount}. | The company does not have enough free money. Needed: {amount}.
+eco.finance.refused.too_many_orders | بیش از {count} سفارش باز نمی‌شود داشت. یکی را لغو کن. | You cannot have more than {count} open orders. Cancel one.
+eco.finance.refused.order | این سفارش پذیرفته نیست. | This order is not accepted.
+eco.finance.refused.gold_stock | طلافروش فقط {count} گرم طلا دارد. | The dealer only has {count} g of gold.
+eco.finance.refused.gold_held | این‌قدر طلا نداری. | You do not have that much gold.
+eco.finance.refused.not_yours | این مال تو نیست. | This is not yours.
+eco.finance.refused.own_company | با سهم شرکت خودت نمی‌شود این کار را کرد. | You cannot do this with your own company's shares.
+eco.finance.refused.fund_closed | صندوق بیمه الان بسته است. | The insurance fund is closed right now.
+eco.finance.refused.no_player | بازیکنی با این مشخصات پیدا نشد. | No player was found like that.
+# the stock exchange
+eco.stock.empty | هنوز هیچ شرکتی در بورس عرضه نشده است. صاحب شرکت می‌تواند از صفحهٔ شرکتش آن را عرضه کند. | No company is listed yet. A company's owner can list it from the company's page.
+eco.stock.hint | قیمت هر سهم فقط از خرید و فروش بازیکنان درمی‌آید. سود سهام را صاحب شرکت از پول آزاد شرکت می‌دهد. | A share's price comes only from players buying and selling. The owner pays dividends from the company's free money.
+eco.stock.sub | {type} در {city} | {type} in {city}
+eco.stock.price | قیمت هر سهم | Price per share
+eco.stock.ipo_price | قیمت عرضهٔ اولیه | Listing price
+eco.stock.not_listed | این شرکت در بورس عرضه نشده است. | This company is not on the exchange.
+eco.stock.book | ارزش دفتری هر سهم | Book value per share
+eco.stock.total | کل سهم‌ها | All shares
+eco.stock.cap | ارزش بازار | Market value
+eco.stock.controller | اختیار شرکت با | Controlled by
+eco.stock.last_div | آخرین سود هر سهم | Last dividend per share
+eco.stock.holding | سهم تو: {shares} ({locked} در سفارش فروش) - بهای خرید {cost} | Your shares: {shares} ({locked} in sell orders) - cost {cost}
+eco.stock.bids | خریداران | Buyers
+eco.stock.asks | فروشندگان | Sellers
+eco.stock.trades | آخرین معامله‌ها | Latest trades
+eco.stock.buy | خرید | Buy
+eco.stock.sell | فروش | Sell
+eco.stock.option | {qty} سهم، {price} | {qty} shares, {price}
+eco.stock.fee | کارمزد بازار شهر شرکت، {p}، از پول فروشنده کم می‌شود. | The market fee of the company's city, {p}, is taken from the seller.
+eco.stock.order_buy_title | خرید سهم {company} | Buying shares of {company}
+eco.stock.order_sell_title | فروش سهم {company} | Selling shares of {company}
+eco.stock.confirm_buy | ثبت خرید | Place the buy
+eco.stock.confirm_sell | ثبت فروش | Place the sell
+eco.stock.qty | تعداد سهم | Shares
+eco.stock.up_to | تا قیمت | Up to
+eco.stock.from | دست‌کم به قیمت | At least
+eco.stock.reserve | کنار گذاشته می‌شود | Set aside
+eco.stock.locked | قفل می‌شود | Locked
+eco.stock.shares | {n} سهم | {n} shares
+eco.stock.reserve_note | از حساب بانکی‌ات کنار گذاشته می‌شود (موجودی: {bank})؛ اگر ارزان‌تر بخری، باقی برمی‌گردد. | Taken from your bank account (balance: {bank}); if you buy cheaper the rest comes back.
+eco.stock.placed_title | سفارش شمارهٔ {no} | Order {no}
+eco.stock.placed_buy | سفارش خرید {qty} سهم «{company}» تا {price} ثبت شد. | Order placed to buy {qty} shares of "{company}" up to {price}.
+eco.stock.placed_sell | سفارش فروش {qty} سهم «{company}» از {price} ثبت شد. | Order placed to sell {qty} shares of "{company}" from {price}.
+eco.stock.filled_buy | {filled} سهم خریدی و {spent} پرداختی. | You bought {filled} shares and paid {spent}.
+eco.stock.filled_sell | {filled} سهم فروختی و {got} به حساب بانکی‌ات آمد. | You sold {filled} shares and {got} came to your bank account.
+eco.stock.rests | باقی سفارش در دفتر می‌ماند تا ساعت {t}. | The rest of the order stays in the book until {t}.
+eco.stock.loss | زیان نسبت به پولی که گذاشته‌ای | Loss against what you put in
+eco.stock.no_shares | هنوز سهمی نداری. | You hold no shares yet.
+eco.stock.holding_line | {shares} سهم به قیمت {price} - بهای خرید {cost} | {shares} shares at {price} - cost {cost}
+eco.stock.holding_private | عرضه‌نشده: {shares} سهم - بهای خرید {cost} | Not listed: {shares} shares - cost {cost}
+eco.stock.order_line_buy | شمارهٔ {no}: خرید {qty} سهم تا {price} | No. {no}: buy {qty} shares up to {price}
+eco.stock.order_line_sell | شمارهٔ {no}: فروش {qty} سهم از {price} | No. {no}: sell {qty} shares from {price}
+eco.stock.cancel | لغو سفارش {no} | Cancel order {no}
+eco.ipo.title | عرضهٔ اولیهٔ {company} | Listing {company}
+eco.ipo.rules | شرط‌ها: دست‌کم {age} عمر، {revenue} درآمد و بی‌بدهی. هزینهٔ عرضه {fee} از حساب شرکت به شهر می‌رسد. | Conditions: at least {age} old, {revenue} in income and no debt. The listing fee of {fee} goes from the company's account to the city.
+eco.ipo.book | ارزش دفتری هر سهم {book} - کل سهم‌ها {total} | Book value per share {book} - all shares {total}
+eco.ipo.refused.too_young | شرکت هنوز جوان است؛ {wait} دیگر صبر کن. | The company is still young; wait {wait} more.
+eco.ipo.refused.too_small | درآمد شرکت تا امروز {revenue} است و هنوز کافی نیست. | The company's income so far is {revenue}, which is not enough yet.
+eco.ipo.refused.in_debt | اول بدهی نگهداری شرکت را بپرداز. | Pay the company's upkeep debt first.
+eco.ipo.refused.bad_float | سهم آزاد کافی برای عرضه نداری. | You do not have enough free shares to list.
+eco.ipo.choose | چند سهم و به چه قیمتی عرضه شود؟ اختیار شرکت با تو می‌ماند، مگر کسی بیش از نیمی از سهم‌ها را بخرد. | How many shares at what price? You keep control unless someone buys more than half.
+eco.ipo.option | {shares} سهم، هر سهم {price} | {shares} shares at {price} each
+eco.ipo.confirm_title | عرضهٔ {company} | Listing {company}
+eco.ipo.shares | تعداد سهم | Shares
+eco.ipo.price_each | قیمت هر سهم | Price per share
+eco.ipo.fee | هزینهٔ عرضه | Listing fee
+eco.ipo.yes | بله، عرضه شود | Yes, list it
+eco.dividend.title | سود سهام {company} | Dividend of {company}
+eco.dividend.free | پول آزاد شرکت | The company's free money
+eco.dividend.tax | مالیات شرکت | Company tax
+eco.dividend.shares | کل سهم‌ها | All shares
+eco.dividend.refused.in_debt | شرکتی که بدهی دارد سود نمی‌دهد. | A company in debt pays no dividend.
+eco.dividend.refused.no_money | پول آزاد شرکت برای سود دادن کافی نیست. | The company's free money is not enough for a dividend.
+eco.dividend.paid | سود پرداخت شد: هر سهم {per} و روی هم {paid} به {holders} سهامدار. | Dividend paid: {per} a share, {paid} in all to {holders} shareholders.
+eco.dividend.option | {amount} (هر سهم {per}) | {amount} ({per} a share)
+eco.dividend.confirm_title | سود سهام {company} | Dividend of {company}
+eco.dividend.per_share | به هر سهم | Per share
+eco.dividend.taken | برداشت از پول آزاد شرکت | Taken from the company's free money
+eco.dividend.tax_note | مالیات به شهر می‌رود. | The tax goes to the city.
+eco.dividend.yes | بله، سود پرداخت شود | Yes, pay it
+# the item market
+eco.market.away | خرید و فروش در بازار انجام می‌شود. برای معامله به آنجا برو. | Trading happens at the market. Go there to trade.
+eco.market.empty | الان کسی در اینجا نمی‌خرد و نمی‌فروشد. | Nobody is buying or selling here right now.
+eco.market.buy | خرید | Buy
+eco.market.sell | فروش | Sell
+eco.market.buy_at | خرید یک عدد به {price} | Buy one at {price}
+eco.market.bid_at | پیشنهاد خرید {price} | Bid {price}
+eco.market.sell_at | فروش یک عدد به {price} | Sell one at {price}
+eco.market.ask_at | فروش به {price} | Sell at {price}
+eco.market.ask_all | فروش همهٔ {qty} عدد به {price} | Sell all {qty} at {price}
+eco.market.fee_note | کارمزد بازار را فروشنده می‌دهد و نرخش را شهر تعیین می‌کند. | The seller pays the market fee, and the city sets its rate.
+eco.market.checkout_title | خرید {item} | Buying {item}
+eco.market.qty | تعداد | Quantity
+eco.market.price_each | قیمت هر عدد | Price each
+eco.market.reserve | کنار گذاشته می‌شود | Set aside
+eco.market.escrow_how | این مبلغ تا انجام سفارش یا لغو آن کنار گذاشته می‌شود. | This sum is set aside until the order is filled or cancelled.
+eco.market.placed_title | سفارش شمارهٔ {no} | Order {no}
+eco.market.placed_buy | سفارش خرید {item} ثبت شد: {qty} عدد به {price}. | Buy order placed for {item}: {qty} at {price}.
+eco.market.placed_sell | سفارش فروش {item} ثبت شد: {qty} عدد به {price}. | Sell order placed for {item}: {qty} at {price}.
+eco.market.filled_buy | همان لحظه خریدی: {filled} عدد به {spent}. | Bought right away: {filled} for {spent}.
+eco.market.filled_sell | همان لحظه فروختی: {filled} عدد به {got}. | Sold right away: {filled} for {got}.
+eco.market.rests | {left} عدد در دفتر سفارش منتظر طرف مقابل می‌ماند؛ سفارش تا ساعت {t} باز است. | {left} stay in the order book waiting for the other side; the order is open until {t}.
+eco.market.embargoed | از {count} پیشنهاد کشوری که با کشور ما زیر تحریم تجاری است صرف‌نظر شد. | {count} offers from a country under a trade embargo with ours were skipped.
+eco.market.cancelled_title | سفارش شمارهٔ {no} لغو شد | Order {no} cancelled
+eco.market.cancelled_buy | سفارش {no} لغو شد و {refund} به تو برگشت. | Order {no} was cancelled and {refund} came back to you.
+eco.market.cancelled_sell | سفارش {no} لغو شد و {left} عدد {item} به کوله‌پشتی‌ات برگشت. | Order {no} was cancelled and {left} of {item} went back to your backpack.
+eco.market.mine_title | سفارش‌های من | My orders
+eco.market.mine_none | هیچ سفارشی نداری. | You have no orders.
+eco.market.order_buy | سفارش {no}: خرید {item} | Order {no}: buy {item}
+eco.market.order_sell | سفارش {no}: فروش {item} | Order {no}: sell {item}
+eco.market.order_sub | {filled} از {qty} به {price} - {city} | {filled} of {qty} at {price} - {city}
+eco.market.status.open | باز | Open
+eco.market.status.filled | انجام‌شده | Filled
+eco.market.status.cancelled | لغوشده | Cancelled
+eco.market.status.expired | پایان‌یافته | Expired
+eco.market.cancel | لغو سفارش {no} | Cancel order {no}
+eco.market.refused.not_traded | {item} در بازار معامله نمی‌شود. | {item} is not traded on the market.
+eco.market.refused.too_big | این سفارش از سقف مجاز بازار بزرگ‌تر است. | This order is above the market's limit.
+eco.market.refused.too_many | همین حالا {count} سفارش باز داری. یکی را لغو کن یا صبر کن تا انجام شود. | You already have {count} open orders. Cancel one or wait for one to fill.
+eco.market.refused.not_enough | این‌قدر {item} همراهت نیست. | You do not have that much {item} on you.
+eco.market.refused.no_order | چنین سفارشی از تو وجود ندارد. | You have no such order.
+eco.market.refused.closed | این سفارش دیگر باز نیست. | This order is no longer open.
+# the shops
+eco.shops.in_city | مغازه‌های {city} | Shops of {city}
+eco.shops.none_at | در {place} مغازه‌ای نیست. | There are no shops at {place}.
+eco.shops.away | این مغازه در {place} است. برای خرید به آنجا برو. | This shop is at {place}. Go there to buy.
+eco.shops.at_counter | پای پیشخوان هستی. | You are at the counter.
+eco.shops.empty | تمام شده | Sold out
+eco.shops.stock | {n} عدد موجود | {n} in stock
+eco.shops.busy | پرطرفدار | in demand
+eco.shops.buys | می‌خرد به {n} | buys at {n}
+eco.shops.no_shelves | قفسه‌ها خالی است. | The shelves are empty.
+eco.shops.tax_note | مالیات فروش در اینجا: {p} | Sales tax here: {p}
+eco.shops.checkout_title | {shop} | {shop}
+eco.shops.checkout_item | {item} - {qty} عدد، هر عدد {unit} | {item} - {qty}, {unit} each
+eco.shops.price | قیمت | Price
+eco.shops.tax | مالیات فروش ({p}) | Sales tax ({p})
+eco.shops.due | مبلغ پرداختی | To pay
+eco.shops.qty | خرید {n} عدد | Buy {n}
+eco.shops.bought_title | خرید انجام شد | Bought
+eco.shops.bought | {item} خریدی: {qty} عدد به {total}. | You bought {item}: {qty} for {total}.
+eco.shops.bought_tax | {tax} از این مبلغ مالیات فروش است و به شهر می‌رسد. | {tax} of this is sales tax and goes to the city.
+eco.shops.offers_title | چه کسی {item} می‌خرد | Who buys {item}
+eco.shops.offers_none | هیچ مغازه‌ای در این شهر این را نمی‌خرد. | No shop in this city buys this.
+eco.shops.sold_title | فروش انجام شد | Sold
+eco.shops.sold | {item} را به {shop} به {price} فروختی. | You sold {item} to {shop} for {price}.
+eco.shops.left | {n} عدد برایت مانده. | You have {n} left.
+eco.shops.restock | بار بعدی می‌رسد | Next delivery
+eco.shops.refused.no_shop | این مغازه در این شهر نیست. | This shop is not in this city.
+eco.shops.refused.not_sold | {shop} این را نمی‌فروشد. | {shop} does not sell this.
+eco.shops.refused.sold_out | {item} در {shop} تمام شده است. منتظر بار بعدی بمان. | {item} is sold out at {shop}. Wait for the next delivery.
+eco.shops.refused.not_held | {item} همراهت نیست. | You do not have {item} on you.
+eco.shops.refused.no_buyback | {shop} {item} نمی‌خرد. | {shop} does not buy {item}.
+# the auction house
+eco.auction.title | حراجی {city} | Auction house of {city}
+eco.auction.title_plain | حراجی | The auction house
+eco.auction.away | پیشنهاد دادن در حراجی انجام می‌شود. برای شرکت به آنجا برو. | Bids are placed at the auction house. Go there to take part.
+eco.auction.none | الان چیزی در اینجا حراج نمی‌شود. | Nothing is up for auction here right now.
+eco.auction.line | حراج {no}: {item} (کیفیت {quality}) | Auction {no}: {item} (quality {quality})
+eco.auction.high_bid | بالاترین پیشنهاد {n} | highest bid {n}
+eco.auction.from | از {n} | from {n}
+eco.auction.remaining | {t} مانده | {t} left
+eco.auction.status.open | باز | Open
+eco.auction.status.sold | فروخته شد | Sold
+eco.auction.status.unsold | فروخته نشد | Unsold
+eco.auction.role_seller | مال تو | Yours
+eco.auction.role_leading | بالاترین پیشنهاد | Leading
+eco.auction.detail_title | حراج {no} | Auction {no}
+eco.auction.item | {item} - کیفیت {quality} | {item} - quality {quality}
+eco.auction.seller | فروشنده | Seller
+eco.auction.reserve | حداقل قیمت | Lowest price
+eco.auction.high_bid_label | بالاترین پیشنهاد | Highest bid
+eco.auction.high_bid_of | {n} ({bids} پیشنهاد) | {n} ({bids} bids)
+eco.auction.ends | پایان | Ends
+eco.auction.no_bids | هنوز پیشنهادی نرسیده است. | No bid yet.
+eco.auction.yours | این حراج مال توست. | This auction is yours.
+eco.auction.leading | بالاترین پیشنهاد مال توست. | The highest bid is yours.
+eco.auction.bid_how | پیشنهاد {n} تا وقتی کسی بالاتر ندهد یا حراج را ببری کنار گذاشته می‌شود. پرداخت کن: | A bid of {n} is set aside until someone outbids you or you win. Pay with:
+eco.auction.new_title | حراج {item} (کیفیت {quality}) | Auction {item} (quality {quality})
+eco.auction.new_hint | کمترین قیمتی را که می‌پذیری و مدت حراج را انتخاب کن. | Pick the lowest price you accept and how long it runs.
+eco.auction.duration | مدت: {t} | Length: {t}
+eco.auction.reserve_option | از {n} | from {n}
+eco.auction.opened_title | حراج {no} باز شد | Auction {no} opened
+eco.auction.opened | حراج {no}: {item} از {reserve} به مدت {duration} باز شد. | Auction {no}: {item} from {reserve}, for {duration}.
+eco.auction.ends_at | پایان در ساعت {t} | Ends at {t}
+eco.auction.bid_title | پیشنهاد برای حراج {no} | Bid on auction {no}
+eco.auction.bid_placed | برای حراج {no} ({item}) {amount} پیشنهاد دادی. | You bid {amount} on auction {no} ({item}).
+eco.auction.bid_escrow | مبلغ پیشنهادت کنار گذاشته شد. اگر کسی بالاتر بدهد، به تو برمی‌گردد. | Your bid is set aside. If someone bids higher it comes back to you.
+eco.auction.mine_title | حراج‌های من | My auctions
+eco.auction.mine_none | نه چیزی حراج گذاشته‌ای و نه برای چیزی پیشنهاد داده‌ای. | You have not put anything up and have not bid on anything.
+eco.auction.refused.none | چنین حراجی وجود ندارد. | There is no such auction.
+eco.auction.refused.closed | این حراج تمام شده است. | This auction is over.
+eco.auction.refused.too_low | پیشنهاد باید دست‌کم {min} باشد. | The bid must be at least {min}.
+eco.auction.refused.own | برای حراج خودت نمی‌توانی پیشنهاد بدهی. | You cannot bid on your own auction.
+eco.auction.refused.leading | بالاترین پیشنهاد همین حالا مال توست. | You already hold the highest bid.
+eco.auction.refused.not_held | این شیء همراهت نیست. | You do not have this item on you.
+eco.auction.refused.too_many | همین حالا {count} حراج باز داری. | You already have {count} open auctions.
+eco.auction.refused.not_sellable | این را نمی‌شود حراج گذاشت. فقط اشیای یکتا به حراج می‌روند. | This cannot be auctioned. Only one-of-a-kind items go to auction.
+# the extra refusal codes' toasts (the server's error.code)
+refusal.finance_score | امتیاز اعتباری‌ات برای این وام کافی نیست. | Your credit score is too low for this loan.
+refusal.finance_short | موجودی‌ات کافی نیست. | You do not have enough.
+refusal.market_too_many | سفارش باز زیادی داری. | You have too many open orders.
+refusal.shop_sold_out | این کالا تمام شده است. | This item is sold out.
+refusal.auction_too_low | پیشنهادت کمتر از حد لازم است. | Your bid is below the minimum.
 # -- inventory ---------------------------------------------------------------
 inventory.title | کوله‌پشتی | Backpack
 inventory.empty | کوله‌پشتی‌ات خالی است. | Your backpack is empty.
@@ -1080,7 +1606,7 @@ sc.soon.reserve | بانک مرکزی به‌زودی در شهر مرکزی ب�
 sc.dest.title | مقصد سفر | Where to
 sc.dest.here | اینجا هستید | You are here
 sc.dest.km | {n} کیلومتر | {n} km
-sc.dest.city | شهر خدمات | Service city
+sc.dest.city | شهر مرکزی | Central city
 sc.dest.village | روستا | Village
 sc.dest.empty | مقصدی برای سفر نیست. | No destination to travel to.
 sc.dest.mock | داده‌ی آزمایشی: فهرست مقصدها هنوز از سرور نمی‌آید. | Sample data: the server does not send destinations yet.
@@ -1239,7 +1765,7 @@ vx.goal.knowledge | دانشی که روستا خودش یاد گرفته: {cur}
 vx.goal.treasury | خزانه: {cur} از {req} | Treasury: {cur} of {req}
 vx.goal.role_any | یک ساختمان از نوع «{role}» | A building of the kind "{role}"
 vx.goal.role.food.1 | یک ساختمان تأمین خوراک (مزرعه یا دامداری) | A food building (a farm or a stockyard)
-vx.goal.role.education.1 | یک ساختمان آموزشی (حلقهٔ آموزش) | A teaching building (a teaching circle)
+vx.goal.role.education.1 | یک ساختمان آموزشی (کلاس درس) | A teaching building (a village classroom)
 vx.goal.role.education.2 | مدرسه | A school
 vx.goal.role.health.1 | یک ساختمان درمانی (خانهٔ بهداشت) | A health building (a health house)
 vx.goal.role.health.2 | درمانگاه | A clinic
@@ -2017,6 +2543,450 @@ soc.board.hint.investors | سرمایه‌گذارها بر پایهٔ سود س
 soc.lv.country.arms_exports.0 | فقط دولت خودی | Only the home state
 soc.lv.country.arms_exports.1 | دولت خودی و شریکان پیمانی | The home state and treaty partners
 soc.lv.country.arms_exports.2 | هر دولتی که زیر تحریم تسلیحاتی نیست | Any state not under an arms sanction
+# -- life area: the neutral screens (presentation split) ---------------------------------
+lf.fare | کرایه | Fare
+lf.time | زمان | Time
+lf.energy | انرژی | Energy
+lf.arrives_at | ساعت رسیدن | Arrival
+lf.page | صفحهٔ {page} از {pages} | Page {page} of {pages}
+lf.pay.cash | پرداخت نقدی | Pay with cash
+lf.pay.card | پرداخت با کارت | Pay by card
+lf.pay.balances | نقد: {cash} · بانک: {bank} | Cash: {cash} · Bank: {bank}
+lf.pay.cannot | پولت کافی نیست. نقد: {cash} · بانک: {bank} | You cannot afford it. Cash: {cash} · Bank: {bank}
+lf.map.departures | از اینجا با {modes} می‌شود رفت | You can leave from here by {modes}
+lf.map.shops_at | مغازه‌های {place} | Shops at {place}
+lf.map.you_here | اینجا هستی | You are here
+lf.map.walk | {t} پیاده‌روی | {t} on foot
+lf.map.village_empty | هنوز ساختمانی اینجا نیست. | There are no buildings here yet.
+lf.map.mine | مال تو | Yours
+lf.map.going_up | در حال ساخت | Going up
+lf.map.village_standing | ساختمان‌های اینجا | Buildings here
+lf.map.village_going | در حال ساخت | Being built
+lf.map.travelling | در سفر به {city} هستی؛ نقشه تا رسیدن بسته است. | You are travelling to {city}; the map is closed until you arrive.
+lf.map.no_city | هنوز در هیچ شهر یا روستایی نیستی. | You are not in any city or village yet.
+lf.map.village_title | جاهای اینجا | Places here
+lf.map.city_title | جاهای {city} | Places in {city}
+lf.map.walking | در راه {place} هستی؛ {t} مانده، ساعت {at} می‌رسی. | You are walking to {place}; {t} left, you arrive at {at}.
+lf.map.here | اینجا: {place} | You are at {place}
+lf.map.others | {n} نفر دیگر هم اینجا هستند | {n} others are here too
+lf.map.no_places | این شهر جای جداگانه‌ای ندارد. | This city has no separate places.
+lf.service.bank | بانک | Bank
+lf.service.police | پلیس | Police
+lf.service.city_hall | شهرداری | City hall
+lf.service.market | بازار معاملات | Trading market
+lf.service.auction_house | حراجی | Auction house
+lf.service.university | دانشگاه | University
+lf.service.training_center | آموزشگاه | Training centre
+lf.cities.origin | از {city} به کجا می‌روی؟ | Where to from {city}?
+lf.cities.none | از اینجا مسیری به جای دیگر نیست. | There is no route from here.
+lf.options.requoted | کرایه بالا رفته بود؛ قیمت‌های تازه را ببین. | The fare had gone up; here are the current prices.
+lf.options.lead | از {from} به {to}؛ با چه وسیله‌ای می‌روی؟ | From {from} to {to}: how do you want to go?
+lf.options.none | با هیچ وسیله‌ای نمی‌شود به آنجا رفت. | There is no way to get there.
+lf.options.energy | {n} انرژی | {n} energy
+lf.options.condition | وضعیت {n} | condition {n}
+lf.options.fuel | سوخت {n} | fuel {n}
+lf.options.cash | پول نقدت: {cash} | Your cash: {cash}
+lf.checkout.title | سفر به {to} | Travel to {to}
+lf.checkout.bank | برو بانک | Go to the bank
+lf.checkout.other_mode | وسیلهٔ دیگر | Another way
+lf.checkout.by | وسیله | Vehicle
+lf.checkout.route | از {from} به {to} | From {from} to {to}
+lf.checkout.route_label | مسیر | Route
+lf.checkout.busy | شلوغ است؛ کرایه بالاتر | busy, so the fare is higher
+lf.started.lead | راه افتادی؛ با {mode} به {to} می‌روی. | You are on your way to {to} by {mode}.
+lf.status.lead | از {from} به {to} در راهی | On the road from {from} to {to}
+lf.status.arriving | همین الان می‌رسی | Arriving any moment
+lf.arrived.title | رسیدی | Arrived
+lf.arrived.lead | به {city} رسیدی. | You have arrived in {city}.
+lf.arrived.xp | +{n} امتیاز تجربه | +{n} XP
+lf.here.no_village | این گروه هنوز روستایی ندارد، پس مقصدی برای سفر نیست. | This group has no village yet, so there is nowhere to go.
+lf.here.already_there | همین حالا در {village} هستی و سفری لازم نیست. | You are already in {village}; no trip is needed.
+lf.here.group_only | «سفر به این روستا» را در گروه خودِ روستا بزن؛ برای جاهای دیگر شهرها را ببین. | Use “travel to this village” in the village’s own group; for anywhere else see the cities.
+lf.walk.title | پیاده‌روی | Walk
+lf.walk.lead | به {place} راه افتادی. | You set off for {place}.
+lf.walk.go | برو آنجا | Go there
+lf.walk.then.work | به‌محض رسیدن شیفت کارت شروع می‌شود. | Your shift starts as soon as you arrive.
+lf.walk.then.open | به‌محض رسیدن، صفحه‌ای که خواستی باز می‌شود. | The page you asked for opens when you arrive.
+lf.nothere.title | اینجا نیست | Not here
+lf.nothere.walking | داری به {place} می‌روی؛ {t} مانده. | You are walking to {place}; {t} left.
+lf.nothere.you_at | الان در {place} هستی. | You are at {place} now.
+lf.nothere.then_hint | یک بار بزن تا به {place} بروی ({walk}) و کارت همان‌جا انجام شود. | One tap walks you to {place} ({walk}) and carries on there.
+lf.need.bank | بانک در {place} است. | The bank is at {place}.
+lf.need.police | پلیس در {place} است. | The police are at {place}.
+lf.need.city_hall | شهرداری در {place} است. | The city hall is at {place}.
+lf.need.market | بازار معاملات در {place} است. | The trading market is at {place}.
+lf.need.auction_house | حراجی در {place} است. | The auction house is at {place}.
+lf.need.university | این دوره در {place} برگزار می‌شود. | This course is held at {place}.
+lf.need.training_center | این دوره در {place} برگزار می‌شود. | This course is held at {place}.
+lf.need.departure | {mode} از {place} حرکت می‌کند. | {mode} leaves from {place}.
+lf.need.shop | {shop} در {place} است. | {shop} is at {place}.
+lf.need.crime | {crime} اینجا شدنی نیست؛ برای انجامش به {place} برو. | {crime} cannot be done here; go to {place} for it.
+lf.need.heist | {crime} اینجا شدنی نیست؛ گروه باید در {place} جمع شود. | {crime} cannot be done here; the crew has to meet at {place}.
+lf.need.board | مأموریت را از تابلوی {board} در {place} می‌گیری و همان‌جا تحویل می‌دهی. | You take and hand in the mission at the {board} board at {place}.
+lf.need.home | خانهٔ تو در {place} است. | Your home is at {place}.
+lf.need.sleep | این جای خواب در {place} است. | This place to sleep is at {place}.
+lf.history.mine | سرگذشت من | My story
+lf.history.of | سرگذشت {name} | {name}'s story
+lf.history.empty | هنوز چیزی ثبت نشده. | Nothing is recorded yet.
+lf.history.old | از پرونده‌های قدیمی | from old records
+lf.history.private | فقط برای خودت | only for you
+lf.history.hint | سرگذشتت خودکار و از کارهایی که در بازی می‌کنی نوشته می‌شود. | Your story is written by itself from what you do in the game.
+lf.history.other | رویدادی ثبت شد | Something happened
+lf.history.joined | آغاز زندگی در بازی | Began life in the game
+lf.history.first_job | نخستین شغل: {what} در {place} | First job: {what} in {place}
+lf.history.first_job_nowhere | نخستین شغل: {what} | First job: {what}
+lf.history.hired | استخدام: {what} در {place} | Hired: {what} in {place}
+lf.history.hired_nowhere | استخدام: {what} | Hired: {what}
+lf.history.promoted | ارتقا به {what} | Promoted to {what}
+lf.history.course | پایان دورهٔ {what} | Finished the {what} course
+lf.history.certificate | گرفتن مدرک {what} | Earned the {what} certificate
+lf.history.company_founded | تأسیس شرکت «{what}» در {place} | Founded {what} in {place}
+lf.history.company_founded_nowhere | تأسیس شرکت «{what}» | Founded {what}
+lf.history.company_closed | تعطیلی شرکت «{what}» در {place} | Closed {what} in {place}
+lf.history.company_closed_nowhere | تعطیلی شرکت «{what}» | Closed {what}
+lf.history.property_bought | خرید {what} در {place} به {amount} | Bought {what} in {place} for {amount}
+lf.history.property_bought_nowhere | خرید {what} به {amount} | Bought {what} for {amount}
+lf.history.property_sold | فروش {what} در {place} به {amount} | Sold {what} in {place} for {amount}
+lf.history.property_sold_nowhere | فروش {what} به {amount} | Sold {what} for {amount}
+lf.history.election_won | پیروزی در انتخابات {what} {place} با {number} رأی | Won the {what} election {place} with {number} votes
+lf.history.election_lost | شکست در انتخابات {what} {place} با {number} رأی | Lost the {what} election {place} with {number} votes
+lf.history.office_taken | رسیدن به منصب {what} {place} | Took the office of {what} {place}
+lf.history.office_lost | کنار رفتن از منصب {what} {place} | Left the office of {what} {place}
+lf.history.jailed | زندان در {place} | Jailed in {place}
+lf.history.jailed_nowhere | زندان | Jailed
+lf.history.convicted | محکومیت در دادگاه | Convicted in court
+lf.history.hospitalised | بستری در {place} | In hospital in {place}
+lf.history.hospitalised_nowhere | بستری در بیمارستان | In hospital
+lf.history.war_command | فرماندهی عملیات علیه {place} | Commanded an operation against {place}
+lf.history.achievement | دستاورد «{what}» | Achievement: {what}
+lf.history.rank_up | رسیدن به رتبهٔ {what} | Reached the rank of {what}
+lf.history.rank_down | افت به رتبهٔ {what} | Fell to the rank of {what}
+lf.history.big_trade | معاملهٔ بزرگ {what} در {place} به ارزش {amount} | A big trade of {what} in {place} worth {amount}
+lf.history.big_trade_nowhere | معاملهٔ بزرگ {what} به ارزش {amount} | A big trade of {what} worth {amount}
+lf.avatar.current | آواتار فعلی: {avatar} | Current avatar: {avatar}
+lf.avatar.photo | عکس پروفایل | Profile photo
+lf.avatar.none | بدون آواتار | No avatar
+lf.avatar.hint | یکی از آواتارها را بردار، یا عکس پروفایلت را بگذار. | Pick one of the avatars, or use your profile photo.
+lf.sleep.title | خواب در {spot} | Sleep at {spot}
+lf.sleep.rest | کم شدن خستگی | Less tiredness
+lf.sleep.relief | کم شدن استرس | Less stress
+lf.devices.empty | دستگاه متصلی نیست. | No devices are linked.
+lf.devices.notice.revoked | دستگاه از حساب خارج شد. | The device was signed out.
+lf.devices.notice.gone | این دستگاه از قبل خارج شده بود. | That device was already signed out.
+lf.devices.via.link | با کد اتصال | with a link code
+lf.devices.via.telegram | ورود خودکار | automatic sign-in
+lf.devices.since | از {date} | since {date}
+lf.devices.seen | آخرین حضور {date} | last seen {date}
+lf.devices.revoke | خروج | Sign out
+lf.link.lead | این کد را در دستگاه دیگر وارد کن: | Enter this code on the other device:
+lf.link.valid | مدت اعتبار | Valid for
+lf.link.until | تا ساعت | Until
+lf.link.help | کد یک‌بار مصرف است و فقط یک دستگاه را وارد حسابت می‌کند. | The code works once and signs in a single device.
+refusal.life_bio_length | بیوگرافی باید بین {min_chars} تا {max_chars} حرف باشد. | A bio must be between {min_chars} and {max_chars} characters.
+refusal.life_bio_link | بیوگرافی نمی‌تواند لینک، نشانی سایت یا نام کاربری داشته باشد. | A bio cannot hold a link, a web address or a username.
+refusal.life_bio_blocked | این متن کلمه‌ای دارد که در بیوگرافی مجاز نیست؛ مؤدبانه بنویس. | This text has a word that is not allowed in a bio; please write politely.
+refusal.life_bio_chars | بیوگرافی نویسه‌هایی دارد که نمی‌شود نشان داد؛ ساده‌تر بنویس. | The bio has characters that cannot be shown; write it simpler.
+refusal.life_too_soon | تازه خوابیده‌ای؛ تا خواب بعدی {time} مانده. | You just slept; {time} until the next sleep.
+refusal.life_no_spot | این جای خواب در این شهر نیست. | That place to sleep is not in this city.
+refusal.life_no_avatar | این آواتار در فهرست نیست؛ یکی از فهرست را بردار. | That avatar is not on the list; pick one from it.
+refusal.life_no_player | بازیکنی با این کد یا نام کاربری پیدا نشد. | No player was found with that code or username.
+refusal.life_no_city | برای خوابیدن باید در یک شهر یا روستا باشی، نه در راه. | To sleep you must be in a city or village, not on the road.
+refusal.life_rested | تازه استراحت کرده‌ای؛ کمی بعد دوباره امتحان کن. | You have just rested; try again a little later.
+lf.life.notice.slept | خوب خوابیدی ({spot}) و {rest} واحد از خستگی‌ات کم شد. | You slept well ({spot}) and {rest} points of tiredness went.
+lf.life.notice.bio | بیوگرافیت ذخیره شد. | Your bio is saved.
+lf.life.notice.bio_gone | بیوگرافیت پاک شد. | Your bio was cleared.
+lf.life.notice.avatar | آواتارت عوض شد. | Your avatar was changed.
+lf.item.category | دسته | Category
+lf.item.quality | کیفیت | Quality
+lf.item.durability | دوام | Durability
+lf.item.uses | بار مصرف مانده | Uses left
+lf.item.qty | تعداد | Quantity
+lf.item.worth | ارزش تقریبی | Approximate worth
+lf.item.effects | با مصرفش | What using it does
+lf.item.cap | دست‌کم {n} | at least {n}
+lf.item.times | {n}٪ مقدار فعلی | {n}% of the current value
+lf.item.cooldown | بعد از هر بار مصرف {t} صبر کن | Wait {t} after each use
+lf.item.gear | به کار می‌آید برای: {for} | Useful for: {for}
+lf.item.cooling | تا {t} دیگر نمی‌توانی دوباره مصرفش کنی. | You cannot use it again for {t}.
+lf.item.ready_at | ساعت {at} آماده می‌شود | Ready at {at}
+lf.item.give | به یک دوست بده | Give it to a friend
+lf.item.give_nobody | دوستی همین‌جا نیست که چیزی به او بدهی. | No friend is here to give anything to.
+lf.item.used_title | مصرف شد | Used
+lf.item.used | {item} را مصرف کردی. | You used {item}.
+lf.item.left | مانده در کوله‌پشتی | Left in the backpack
+lf.item.next_use | مصرف بعدی تا | Next use in
+lf.item.given_title | داده شد | Given
+lf.item.given | {item} را به {player} دادی. | You gave {item} to {player}.
+lf.item.drop_title | دور انداختن | Throw away
+lf.item.drop_yes | دور بینداز | Throw it away
+lf.item.drop_ask | {item} را دور بیندازی؟ برای همیشه از دست می‌رود. | Throw away {item}? It is gone for good.
+lf.item.dropped_title | دور انداخته شد | Thrown away
+lf.item.dropped | {item} را دور انداختی. | You threw away {item}.
+lf.gear.success | شانس موفقیت | Chance of success
+lf.gear.catch | احتمال دستگیری | Chance of being caught
+lf.gear.witness | احتمال دیده شدن | Chance of being seen
+lf.gear.solve | احتمال حل شدن پرونده | Chance the case is solved
+lf.gear.reward | غنیمت | Loot
+lf.gear.nerve | جسارت لازم | Nerve needed
+lf.gear.evidence | اگر دستگیر شوی، پلیس آن را به‌عنوان مدرک نگه می‌دارد. | If you are caught, the police keep it as evidence.
+lf.vital.energy | انرژی | Energy
+lf.vital.health | سلامت | Health
+lf.vital.happiness | شادی | Happiness
+lf.vital.nerve | جسارت | Nerve
+lf.vital.hunger | گرسنگی | Hunger
+lf.vital.sleep | خستگی | Tiredness
+lf.vital.stress | استرس | Stress
+lf.item.refused.not_held | {item} همراهت نیست. | You are not carrying {item}.
+refusal.item_not_held | این کالا همراهت نیست. | You are not carrying this item.
+lf.item.refused.not_usable | {item} مصرفی نیست؛ فقط همراهت می‌ماند. | {item} cannot be used; you just keep it.
+refusal.item_not_usable | این کالا مصرفی نیست؛ فقط همراهت می‌ماند. | this item cannot be used; you just keep it.
+lf.item.refused.cooling | تا {t} دیگر می‌توانی دوباره {item} مصرف کنی. | You can use {item} again in {t}.
+refusal.item_cooling | تا کمی دیگر می‌توانی دوباره این کالا مصرف کنی. | You can use this item again in a while.
+lf.item.refused.no_effect | الان مصرف {item} فایده‌ای ندارد؛ همین حالا پری. | Using {item} does nothing now; you are already full.
+refusal.item_no_effect | الان مصرف این کالا فایده‌ای ندارد؛ همین حالا پری. | Using this item does nothing now; you are already full.
+lf.item.refused.not_tradeable | {item} قابل واگذاری نیست. | {item} cannot be handed over.
+refusal.item_not_tradeable | این کالا قابل واگذاری نیست. | this item cannot be handed over.
+lf.item.refused.not_together | فقط به دوستی می‌توانی چیزی بدهی که همان‌جا باشد که تو هستی. | You can only give to a friend who is where you are.
+refusal.item_not_together | فقط به دوستی می‌توانی چیزی بدهی که همان‌جا باشد که تو هستی. | You can only give to a friend who is where you are.
+lf.property.kind.house | خانه | House
+lf.property.kind.apartment | آپارتمان | Apartment
+lf.property.kind.shop | مغازه | Shop
+lf.property.kind.land | زمین | Land
+lf.property.size | متراژ | Size
+lf.property.quality | کیفیت | Quality
+lf.property.upkeep | نگهداری هر دوره | Upkeep per period
+lf.property.tax | مالیات هر دوره | Tax per period
+lf.property.rent | اجاره هر دوره | Rent per period
+lf.property.value | ارزش | Value
+lf.property.city | شهر | City
+lf.property.where_label | جا | Place
+lf.property.type_title | {type} · {city} | {type} · {city}
+lf.property.offer_title | ملک #{no}، {type} | Property #{no}, {type}
+lf.property.mine_title | ملک #{no}، {type} | Property #{no}, {type}
+lf.property.where | در {place} | At {place}
+lf.property.left | {n} واحد مانده | {n} left
+lf.property.home_note | خانه است: خرید یا اجاره‌اش تو را مقیم همین‌جا می‌کند و در آن {n} انرژی استراحت می‌کنی. | It is a home: buying or renting it makes you a resident here, and resting in it gives {n} energy.
+lf.property.home_residence | خانه است: خرید یا اجاره‌اش تو را مقیم همین‌جا می‌کند. | It is a home: buying or renting it makes you a resident here.
+lf.property.at_registry | سند در ثبت اسناد {place} امضا می‌شود. | The deed is signed at the land registry in {place}.
+lf.property.bought | ملک #{no} ({type}) حالا به نام توست. | Property #{no} ({type}) is now yours.
+lf.property.seller | آگهی‌دهنده: {name} | Listed by {name}
+lf.property.lived_in | خانهٔ توست. | It is your home.
+lf.property.let_to | اجاره داده‌ای به {tenant}، {rent} هر دوره | Let to {tenant} for {rent} a period
+lf.property.offered_rent | آگهی اجاره: {price} هر دوره | Listed to let: {price} a period
+lf.property.offered_sale | آگهی فروش: {price} | Listed for sale: {price}
+lf.property.debt | بدهی: {debt} ({n} دورهٔ پیاپی) | Debt: {debt} ({n} periods in a row)
+lf.property.debt_blocks | تا بدهی پرداخت نشود نمی‌توانی آگهی بدهی. | You cannot list it until the debt is paid.
+lf.property.offer_limits | آگهی فروش تا {price} و اجاره تا {rent} هر دوره. | Sale listings up to {price}, rentals up to {rent} a period.
+lf.property.leave_title | ترک خانهٔ اجاره‌ای | Leave the rented home
+lf.property.leave_ask | از {type} در {city} می‌روی؟ اجارهٔ این دوره برنمی‌گردد. | Leave {type} in {city}? This period’s rent is not refunded.
+lf.property.leave_yes | بله، می‌روم | Yes, I am leaving
+lf.property.notice.listed | آگهی ثبت شد. | The listing is posted.
+lf.property.notice.cancelled | آگهی برداشته شد. | The listing was withdrawn.
+lf.property.notice.rented | اجاره امضا شد و اجارهٔ دورهٔ اول پرداخت شد. | The lease is signed and the first period’s rent is paid.
+lf.property.notice.left | از خانهٔ اجاره‌ای رفتی. | You left the rented home.
+lf.property.notice.rested | در خانه خوابیدی؛ {energy} انرژی گرفتی و {rest} واحد از خستگی‌ات کم شد. | You slept at home; you gained {energy} energy and {rest} points of tiredness went.
+lf.property.notice.bought_offer | ملک #{no} حالا به نام توست. | Property #{no} is now yours.
+lf.property.refused.not_found | این ملک پیدا نشد. | That property was not found.
+refusal.property_not_found | این ملک پیدا نشد. | That property was not found.
+lf.property.refused.not_yours | این ملک یا اجاره مال تو نیست. | That property or lease is not yours.
+refusal.property_not_yours | این ملک یا اجاره مال تو نیست. | That property or lease is not yours.
+lf.property.refused.sold_out | ثبت اسناد این شهر دیگر از این نوع ملک ندارد. | The land registry has no more of this kind.
+refusal.property_sold_out | ثبت اسناد این شهر دیگر از این نوع ملک ندارد. | The land registry has no more of this kind.
+lf.property.refused.too_many | همین حالا بیشترین تعداد مجاز ملک را داری. | You already hold the most properties allowed.
+refusal.property_too_many | همین حالا بیشترین تعداد مجاز ملک را داری. | You already hold the most properties allowed.
+lf.property.refused.taken | این آگهی دیگر برقرار نیست. | This listing is no longer open.
+refusal.property_taken | این آگهی دیگر برقرار نیست. | This listing is no longer open.
+lf.property.refused.own | این آگهی خودت است. | This is your own listing.
+refusal.property_own | این آگهی خودت است. | This is your own listing.
+lf.property.refused.renting | همین حالا خانه‌ای اجاره کرده‌ای؛ اول از آن برو. | You already rent a home; leave it first.
+refusal.property_renting | همین حالا خانه‌ای اجاره کرده‌ای؛ اول از آن برو. | You already rent a home; leave it first.
+lf.property.refused.let | این ملک اجاره داده شده و تا پایان اجاره آگهی نمی‌شود. | This property is let and cannot be listed until the lease ends.
+refusal.property_let | این ملک اجاره داده شده و تا پایان اجاره آگهی نمی‌شود. | This property is let and cannot be listed until the lease ends.
+lf.property.refused.offered | این ملک همین حالا آگهی شده است. | This property is already listed.
+refusal.property_offered | این ملک همین حالا آگهی شده است. | This property is already listed.
+lf.property.refused.pledged | این ملک وثیقهٔ یک وام مسکن است و تا تسویهٔ وام فروخته نمی‌شود. | This property secures a mortgage and cannot be sold until it is paid off.
+refusal.property_pledged | این ملک وثیقهٔ یک وام مسکن است و تا تسویهٔ وام فروخته نمی‌شود. | This property secures a mortgage and cannot be sold until it is paid off.
+lf.property.refused.in_debt | تا بدهی این ملک پرداخت نشود نمی‌شود آگهی‌اش کرد یا فروخت. | It cannot be listed or sold until its debt is paid.
+refusal.property_in_debt | تا بدهی این ملک پرداخت نشود نمی‌شود آگهی‌اش کرد یا فروخت. | It cannot be listed or sold until its debt is paid.
+lf.property.refused.price | این قیمت از سقف مجاز {max} بیشتر است. | This price is above the allowed ceiling of {max}.
+refusal.property_price | این قیمت از سقف مجاز {max} بیشتر است. | This price is above the allowed ceiling of {max}.
+lf.property.refused.no_home | در این شهر خانه‌ای نداری که در آن استراحت کنی. | You have no home in this city to rest in.
+refusal.property_no_home | در این شهر خانه‌ای نداری که در آن استراحت کنی. | You have no home in this city to rest in.
+lf.property.refused.too_soon | {time} دیگر می‌توانی دوباره در خانه استراحت کنی. | You can rest at home again in {time}.
+refusal.property_too_soon | {time} دیگر می‌توانی دوباره در خانه استراحت کنی. | You can rest at home again in {time}.
+lf.property.refused.not_in_city | برای این کار باید در همان شهر باشی. | You must be in that city to do this.
+refusal.property_not_in_city | برای این کار باید در همان شهر باشی. | You must be in that city to do this.
+lf.req.shift_until | شیفتت تا {t} دیگر تمام می‌شود (ساعت {at}). | Your shift ends in {t} (at {at}).
+lf.req.level_met | سطح {need} | Level {need}
+lf.req.skill_met | {skill} در سطح {need} | {skill} at level {need}
+lf.req.certificate_met | مدرک {course} | The {course} certificate
+lf.req.residence_met | اقامت در {city} | Living in {city}
+lf.req.performance | عملکرد {need} (عملکرد تو: {have}) | Performance {need} (yours: {have})
+lf.req.time | {t} کار بیشتر در این جایگاه | {t} more work in this position
+lf.req.shifts | {need} شیفت در این جایگاه (شیفت‌های تو: {have}) | {need} shifts in this position (yours: {have})
+lf.req.top | در بالاترین جایگاه این رشته هستی. | You are at the top of this career.
+lf.req.course_city | این دوره در {city} برگزار می‌شود. | This course is held in {city}.
+lf.req.course_full | ظرفیت این دوره پر شده است. | This course is full.
+lf.req.already_certified | این مدرک را از قبل داری. | You already have this certificate.
+lf.req.already_enrolled | همین حالا دورهٔ {course} را می‌گذرانی؛ هر بار یک دوره. | You are already taking {course}; one course at a time.
+lf.req.level | سطح {need} (سطح تو: {have}) | Level {need} (yours: {have})
+lf.req.skill | {skill} در سطح {need} (سطح تو: {have}) | {skill} at level {need} (yours: {have})
+lf.req.certificate | مدرک {course} | The {course} certificate
+lf.req.residence | اقامت در {city} | Living in {city}
+refusal.refusal_job_requirements | شرایط این شغل را هنوز نداری. | You do not meet this job’s requirements yet.
+refusal.refusal_promotion | هنوز شرایط ارتقا را نداری. | You do not meet the requirements for a promotion yet.
+refusal.refusal_not_employed | شغلی نداری. | You do not have a job.
+refusal.refusal_already_employed | همین حالا شغل داری؛ اول از آن استعفا بده. | You already have a job; resign from it first.
+refusal.refusal_job_not_offered | این شغل دیگر آگهی نیست. | This job is no longer on offer.
+refusal.refusal_not_at_workplace | برای این کار باید در {city} باشی. | You have to be in {city} for this.
+refusal.refusal_course_requirements | شرایط این دوره را هنوز نداری. | You do not meet this course’s requirements yet.
+refusal.refusal_course_not_found | این دوره پیدا نشد. | That course was not found.
+refusal.refusal_cannot_afford | پولت برای هزینهٔ دوره ({fee}) کافی نیست؛ نقد: {cash}. | You cannot afford the course fee ({fee}); cash: {cash}.
+refusal.refusal_shift_in_progress | همین حالا سر شیفتی؛ صبر کن تمام شود. | You are on a shift right now; wait for it to finish.
+refusal.refusal_army_cannot_pay | صندوق دفاع کشور پول یک شیفت را ندارد. | The country’s defence fund cannot pay for a shift.
+lf.presence.title | چه کسانی ببینند آنلاین هستم | Who can see that I am online
+lf.presence.everyone | همه | Everyone
+lf.presence.contacts | دوستان و هم‌جناحی‌ها | Friends and faction mates
+lf.presence.nobody | هیچ‌کس | Nobody
+lf.presence.hint | کسانی که انتخاب کرده‌ای می‌بینند کِی آنلاینی و مشغول چه کاری هستی. | The people you pick see when you are online and what you are doing.
+lf.presence.nobody_hint | کسی نمی‌بیند آنلاین هستی؛ تو هم وضعیت دیگران را نمی‌بینی. | Nobody sees that you are online; you do not see others either.
+lf.presence.saved | تنظیم ذخیره شد. | The setting is saved.
+lf.err.error.city_not_found | این شهر پیدا نشد؛ یکی از مقصدهای نقشه را انتخاب کن. | That city was not found; pick one of the destinations on the map.
+lf.err.travel.none | الان در سفر نیستی؛ برای سفر نقشه را باز کن. | You are not travelling; open the map to go somewhere.
+lf.err.error.already_travelling | همین حالا در سفری؛ وضعیت سفرت را ببین. | You are already travelling; see your journey.
+lf.err.error.at_work | الان سر کاری؛ بعد از پایان شیفت می‌توانی راه بیفتی. | You are at work; you can set off when the shift ends.
+lf.err.error.skill_not_found | این مهارت پیدا نشد؛ مهارت‌هایت را در بخش مهارت‌ها ببین. | That skill was not found; see yours under Skills.
+lf.err.error.not_friends | با این بازیکن دوست نیستی و درخواستی از او هم در انتظارت نیست. | You are not friends with this player and there is no request from them waiting.
+lf.err.error.already_friends | از قبل با این بازیکن دوستی؛ او را در بخش دوستان پیدا می‌کنی. | You are already friends with this player; find them under Friends.
+lf.err.error.player_not_found | بازیکن پیدا نشد. | The player was not found.
+lf.err.error.unsupported_language | این زبان در بازی نیست؛ یکی از زبان‌های موجود را در تنظیمات بردار. | That language is not in the game; pick one of the available ones in Settings.
+lf.err.payment.not_accepted | این روش پرداخت اینجا پذیرفته نمی‌شود؛ قیمت را دوباره باز کن و از دکمه‌های همان صفحه بپرداز. | That way of paying is not accepted here; open the price again and pay with the buttons on that page.
+lf.err.error.not_enough_energy_later | انرژی کافی نداری؛ انرژی کم‌کم پر می‌شود، کمی بعد دوباره امتحان کن. | You do not have enough energy; it refills slowly, try again a little later.
+lf.err.error.not_enough_energy | این کار {needed} انرژی می‌خواهد و تو {current} داری؛ انرژی کم‌کم پر می‌شود، کمی صبر کن. | This takes {needed} energy and you have {current}; it refills slowly, wait a little.
+lf.err.travel.same_city | همین حالا در این شهری؛ مقصد دیگری از نقشه انتخاب کن. | You are already in this city; pick another destination on the map.
+lf.err.travel.no_route | از اینجا راهی به آنجا نیست؛ یکی از مقصدهای نقشه را انتخاب کن. | There is no way there from here; pick one of the destinations on the map.
+lf.err.travel.mode_unavailable | این وسیله در این مسیر رفت‌وآمد نمی‌کند؛ مقصد را دوباره باز کن تا وسیله‌های همین مسیر را ببینی. | This vehicle does not run on this route; open the destination again to see the ones that do.
+lf.err.error.not_found | چیزی که دنبالش بودی پیدا نشد. | What you were looking for was not found.
+lf.err.error.invalid_input | این درخواست را متوجه نشدم؛ از دکمه‌ها استفاده کن. | I did not understand that request; use the buttons.
+lf.err.error.conflict | این کار همین حالا ممکن نیست؛ چند لحظهٔ دیگر دوباره امتحان کن. | That cannot be done right now; try again in a moment.
+lf.err.error.rate_limited | در زمان کوتاهی درخواست‌های زیادی فرستادی؛ چند ثانیه صبر کن و دوباره امتحان کن. | You sent too many requests in a short time; wait a few seconds and try again.
+lf.err.error.cooldown | کمی صبر کن؛ {time} دیگر می‌توانی دوباره این کار را بکنی. | Wait a little; you can do this again in {time}.
+lf.err.error.unauthorized | اجازهٔ این کار را نداری. | You are not allowed to do this.
+lf.err.error.internal | مشکلی پیش آمد؛ چند لحظهٔ دیگر دوباره امتحان کن. | Something went wrong; try again in a moment.
+lf.err.bank.error.not_in_city | بانک فقط در شهر باز است؛ بعد از رسیدن می‌توانی واریز و برداشت کنی. پرداخت کارتی از همه‌جا ممکن است. | The bank is open only in a city; deposit and withdraw once you arrive. Paying by card works from anywhere.
+lf.err.bank.error.not_together | پول نقد را فقط به بازیکنی می‌توانی بدهی که با تو یک‌جاست؛ به‌جایش با کارت پرداخت کن. | You can hand cash only to a player who is where you are; pay by card instead.
+lf.err.bank.error.self_payment | نمی‌توانی به خودت پرداخت کنی. | You cannot pay yourself.
+lf.err.bank.error.payee_not_found | بازیکنی برای پرداخت پیدا نشد؛ کد یا نام کاربری را بررسی کن. | No player to pay was found; check the code or username.
+lf.err.bank.error.invalid_amount | مبلغ را فقط به عدد بنویس. | Write the amount as a number only.
+lf.err.bank.error.below_minimum | کمترین مبلغ مجاز {min} است. | The smallest amount allowed is {min}.
+lf.err.bank.error.above_maximum | بیشترین مبلغ مجاز در هر بار {max} است. | The most allowed at a time is {max}.
+lf.err.bank.error.not_enough_cash | پول نقد کافی نداری؛ نقد همراهت: {available} | You do not have enough cash; you carry {available}.
+lf.err.bank.error.not_enough_in_bank | موجودی بانک کافی نیست؛ این کار با کارمزد {needed} لازم دارد و موجودی تو {available} است. | The bank balance is not enough; this needs {needed} with the fee and you have {available}.
+lf.err.bank.error.insufficient | پول کافی برای این کار نداری؛ موجودی‌هایت را در بانک ببین. | You do not have enough money for this; see your balances at the bank.
+lf.err.bank.error.unavailable | بانک الان در دسترس نیست؛ چند لحظهٔ دیگر دوباره امتحان کن. | The bank is not available now; try again in a moment.
+lf.err.crime.error.in_jail | تا {time} دیگر در زندانی؛ وثیقه بپرداز یا صبر کن. | You are in jail for another {time}; pay bail or wait.
+lf.err.crime.error.in_jail_later | در زندانی؛ وثیقه بپرداز یا صبر کن. | You are in jail; pay bail or wait.
+lf.err.crime.error.in_progress | مشغول کاری هستی؛ صبر کن تمام شود. | You are busy with something; wait for it to finish.
+lf.err.health.error.hospitalised | تا {time} دیگر در بیمارستان بستری هستی؛ درمان، بستری را کوتاه می‌کند. | You are in hospital for another {time}; treatment shortens the stay.
+lf.err.health.error.hospitalised_later | در بیمارستان بستری هستی؛ درمان بگیر یا صبر کن. | You are in hospital; get treated or wait.
+lf.err.gov.refusal.not_holder | فقط {office} می‌تواند این سیاست را عوض کند. | Only {office} can change this policy.
+lf.err.gov.refusal.requires_confirmation | این تغییر پیش از اجرا باید به تأیید {office} برسد. | This change needs the approval of {office} before it takes effect.
+lf.err.gov.refusal.requires_vote | این سیاست با رأی {office} تعیین می‌شود و فقط اعضایش می‌توانند تغییرش را پیشنهاد بدهند. | This policy is set by the vote of {office}; only its members can propose a change.
+lf.err.gov.refusal.out_of_range_plain | این مقدار بیرون از بازهٔ مجاز است. | This value is outside the allowed range.
+lf.err.gov.refusal.cooldown_later | این سیاست تازه تغییر کرده؛ کمی بعد دوباره امتحان کن. | This policy was changed recently; try again a little later.
+lf.err.gov.refusal.unknown_lever | این سیاست دیگر وجود ندارد. | This policy no longer exists.
+lf.err.gov.refusal.unknown_place | این جا پیدا نشد؛ نقشه را باز کن و دوباره امتحان کن. | That place was not found; open the map and try again.
+lf.err.gov.refusal.wrong_place | این سیاست در اینجا کاربردی ندارد. | This policy does not apply here.
+lf.err.gov.refusal.city_only | این بخش مخصوص شهرهاست؛ روستا هنوز بودجه و شورای شهر ندارد. وقتی روستا رشد کند این‌ها هم باز می‌شوند. | This is for cities; a village has no budget or city council yet. They open when the village grows.
+lf.err.gov.refusal.unsupported | این نوع سیاست هنوز قابل تغییر نیست. | This kind of policy cannot be changed yet.
+lf.err.gov.refusal.invalid_allocation | این تقسیم مجاز نیست؛ فقط ردیف‌های همین بودجه سهم می‌گیرند و جمع سهم‌ها حداکثر ۱۰۰٪ است. | That split is not allowed; only this budget’s lines get a share and the shares add up to at most 100%.
+lf.err.gov.refusal.office_not_found | چنین منصبی اینجا نیست. | There is no such office here.
+lf.err.gov.refusal.office_occupied | این منصب دست کس دیگری است. | This office is held by someone else.
+lf.err.gov.refusal.office_vacant | این منصب از قبل خالی است. | This office is already empty.
+lf.err.gov.refusal.already_holds | همین حالا این منصب را داری. | You already hold this office.
+lf.err.gov.refusal.incompatible | این منصب را نمی‌شود هم‌زمان با منصب فعلی‌ات داشت. | You cannot hold this office together with the one you have now.
+lf.err.title | انجام نشد | It did not work
+lf.err.office_any | مقام مربوط | the office concerned
+lf.menu.service.bank | بانک | Bank
+lf.menu.service.market | بازار | Market
+lf.menu.service.knowledge | دانش‌آموزی | Learning
+lf.menu.service.hospital | بیمارستان | Hospital
+lf.menu.service_to | سفر به {city} برای {service} | Travel to {city} for {service}
+act.profile.jail | زندان | Jail
+act.profile.journey | سفر من | My journey
+act.profile.map | نقشه | Map
+act.profile.hospital | بیمارستان | Hospital
+act.job.openings | فرصت‌های شغلی | Job openings
+act.job.mine | شغل من | My job
+act.crime.hub | دنیای زیرزمینی | The underworld
+act.education | آموزش | Learning
+act.bank | بانک | Bank
+act.property.mine | ملک من | My property
+act.shops | مغازه‌ها | Shops
+act.village.home | روستای من | My village
+act.city.gov | مناصب و سیاست‌ها | Offices and policies
+act.companies | شرکت‌ها | Companies
+act.faction.mine | جناح من | My faction
+act.missions | مأموریت‌ها | Missions
+act.social | دوستان | Friends
+act.skills | مهارت‌ها | Skills
+act.life | زندگی | Life
+act.achievements | دستاوردها | Achievements
+act.life.top | رتبه‌ها | Rankings
+act.settings | تنظیمات | Settings
+act.map.journey | سفر من | My journey
+act.map.cities | سفر به شهرهای دیگر | Travel to other cities
+act.shops.here | مغازه‌های اینجا | Shops here
+act.shops.at | رفتن به مغازه | Go to the shop
+act.walk | برو آنجا | Go there
+act.travel.to | سفر | Travel
+act.travel.go | برو | Go
+act.travel.options | وسیلهٔ دیگر | Another way
+act.travel.elsewhere | سفر به جای دیگر | Travel elsewhere
+act.journey | ببین کجای راهی | See your journey
+act.pay.cash | پرداخت نقدی | Pay with cash
+act.pay.card | پرداخت با کارت | Pay by card
+act.life.sleep | بخواب | Sleep
+act.life.sleep_walk | برو و بخواب | Walk there and sleep
+act.life.home_rest | استراحت در خانه | Rest at home
+act.life.history | سرگذشت | Story
+act.life.card | کارت من | My card
+act.life.bio | بیوگرافی | Bio
+act.life.bio_clear | پاک کردن بیوگرافی | Clear the bio
+act.life.bio_again | دوباره بنویس | Write it again
+act.life.avatar | آواتار | Avatar
+act.life.their_history | سرگذشت او | Their story
+act.avatar.photo | عکس پروفایل | Profile photo
+act.avatar.none | بدون آواتار | No avatar
+act.find_player | جست‌وجوی بازیکن | Find a player
+act.settings.language | زبان: {name} | Language: {name}
+act.settings.presence | آخرین حضور: {name} | Last seen: {name}
+act.devices | دستگاه‌های متصل | Linked devices
+act.device.revoke | خروج | Sign out
+act.device.link | اتصال دستگاه تازه | Link a new device
+act.item.open | باز کن | Open
+act.market | بازار | Market
+act.item.use | مصرف کن | Use
+act.item.auction | در حراج بگذار | Put up for auction
+act.item.sell_market | در بازار بفروش | Sell on the market
+act.item.sell_shop | به مغازه بفروش | Sell to a shop
+act.item.give | بده | Give
+act.item.drop | دور بینداز | Throw away
+act.item.bag | کوله‌پشتی | Backpack
+act.item.drop_confirm | دور بینداز | Throw it away
+act.property.type | ببین | Look
+act.property.offer | ببین | Look
+act.property.market | بازار ملک | Property market
+act.property.manage | مدیریت | Manage
+act.property.leave | ترک خانهٔ اجاره‌ای | Leave the rented home
+act.property.rest | استراحت در خانه | Rest at home
+act.property.cancel | برداشتن آگهی | Withdraw the listing
+act.property.sell | آگهی فروش | List for sale
+act.property.let | آگهی اجاره | List to let
+act.property.leave_confirm | بله، می‌روم | Yes, I am leaving
+act.page.prev | قبلی | Previous
+act.page.next | بعدی | Next
+# -- end of the life area ------------------------------------------------------------
 # -- notices pushed by the server (worded here from the notice's code and facts) ----
 pn.generic | پیام تازه‌ای داری. | You have a new message.
 pn.someone | یک بازیکن | A player

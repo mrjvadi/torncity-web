@@ -4,6 +4,7 @@ import { formatNumber } from '../lib/persian'
 import { GLabel, Emboss } from '../kit'
 import type { IconPalette } from '../kit'
 import { t } from '../i18n'
+import { useContentNames } from '../village/useVillage'
 
 interface HudProps {
   profile: ProfileView | null
@@ -18,6 +19,7 @@ interface HudProps {
  * bar at all — game_hud.gd draws them as plates at the stat row's far end
  * (`_plate_button`), which is where they live below. */
 export default function Hud({ profile, onBank, onAvatar }: HudProps) {
+  const names = useContentNames()
   const xpFrac = useMemo(() => {
     if (!profile || !profile.next_level_xp) return 0
     return Math.min(1, profile.xp / profile.next_level_xp)
@@ -55,7 +57,7 @@ export default function Hud({ profile, onBank, onAvatar }: HudProps) {
 
           <div className="hud-id">
             <div className="hud-name"><GLabel top="#ffffff" bottom="#bfefff" stroke={1.2}>{profile?.name ?? '…'}</GLabel></div>
-            <div className="hud-rank">{profile?.rank?.name ?? ''}</div>
+            <div className="hud-rank">{profile?.rank ? names.name('life_rank', profile.rank.code, profile.rank.name) : ''}</div>
             <div className="hud-vitals">
               <VBar icon="health" palette="emerald" color="#4cc47e" value={profile?.health ?? 0} max={profile?.max_health ?? 100} frac={healthFrac} />
               <VBar icon="energy" palette="amber" color="#f5a623" value={profile?.energy ?? 0} max={profile?.max_energy ?? 100} frac={energyFrac} />

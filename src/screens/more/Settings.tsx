@@ -4,20 +4,23 @@
 // is the client's own: linked devices, sign out, the build.
 
 import type { ScreenProps } from '../types'
-import { Card, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
-import Actions from '../native/kit/Actions'
+import { Card, Header, ListRow, Notice, ScreenScroll, Segmented } from '../native/kit/Parts'
 import LangSwitch from '../native/kit/LangSwitch'
 import { useSession } from '../../state/SessionContext'
 import { APP_VERSION, BUILD_ID } from '../../lib/freshness'
-import { t } from '../../i18n'
+import { t, type Key } from '../../i18n'
 
 interface SettingsView {
   language?: string
   languages?: string[] | null
   language_changed?: boolean
+  presence_visibility?: string
+  presence_changed?: boolean
 }
 
-export default function Settings({ response, loading, onAction, run }: ScreenProps) {
+const VISIBILITY = ['everyone', 'contacts', 'nobody'] as const
+
+export default function Settings({ response, loading, run }: ScreenProps) {
   const { signOut } = useSession()
   const v = (response?.view ?? {}) as SettingsView
   if (loading && !response) return <ScreenScroll><Header title={t('settings.title')} tone="teal" /></ScreenScroll>
@@ -34,6 +37,19 @@ export default function Settings({ response, loading, onAction, run }: ScreenPro
         <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 10 }}>{t('settings.language_hint')}</div>
       </Card>
 
+      {v.presence_changed && <Notice>{t('lf.presence.saved')}</Notice>}
+      {v.presence_visibility && (
+        <Card>
+          <div className="nx-sec" style={{ marginBottom: 10 }}>{t('lf.presence.title')}</div>
+          <Segmented
+            value={v.presence_visibility}
+            options={VISIBILITY.map((k) => ({ key: k, label: t(`lf.presence.${k}` as Key) }))}
+            onChange={(k) => k !== v.presence_visibility && run('player.presence.set', { visibility: k })}
+          />
+          <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 10 }}>{t(v.presence_visibility === 'nobody' ? 'lf.presence.nobody_hint' : 'lf.presence.hint')}</div>
+        </Card>
+      )}
+
       <div className="nx-sec">{t('settings.account')}</div>
       <ListRow icon="phone" palette="sapphire" title={t('settings.devices')} onClick={() => run('device.list')} />
       <ListRow icon="close" palette="ruby" tone="ruby" title={t('settings.sign_out')} onClick={signOut} />
@@ -43,8 +59,6 @@ export default function Settings({ response, loading, onAction, run }: ScreenPro
         <div>{t('settings.credits')}</div>
       </div>
 
-      {/* the server's own language buttons are replaced by the switch above */}
-      <Actions response={response} onAction={onAction} only={(a) => a.command !== 'player.language.set' && a.kind !== 'back'} refreshCommand="player.settings" />
     </ScreenScroll>
   )
 }

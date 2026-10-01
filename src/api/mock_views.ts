@@ -136,42 +136,7 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
     actions: [refresh('inventory.show'), back('economy_hub')],
   }),
 
-  'market.list': () => ({
-    screen: 'market', text: 'بازار',
-    view: {
-      city: 'کالدریس', at_market: false,
-      books: [
-        { item: { code: 'bread', name: 'نان' }, best_bid: 18, best_ask: 22, last: 20 },
-        { item: { code: 'pill', name: 'دارو' }, best_bid: 150, best_ask: 170, last: 160 },
-      ],
-      yours: null,
-      way: { place: { name: 'بازار فنویک' }, walk_seconds: 15 },
-    },
-    actions: [refresh('market.list'), back('economy_hub')],
-  }),
-  'market.book': (ctx) => ({
-    screen: 'book', text: 'دفتر بازار',
-    view: {
-      item: { code: (ctx.args?.item as string) ?? 'bread', name: 'نان' }, city: 'کالدریس',
-      bids: [{ price: 35, qty: 6 }, { price: 30, qty: 12 }], asks: [{ price: 42, qty: 10 }, { price: 45, qty: 4 }],
-      trades: [{ at: new Date().toISOString(), price: 40, qty: 2 }],
-      reference: 40, holding: 3, at_market: true, way: null,
-    },
-    actions: [refresh('market.list'), back('market.list')],
-  }),
 
-  'bank.show': () => ({
-    screen: 'bank', text: 'بانک',
-    view: { city: 'کالدریس', cash: 12450, bank: 86300, withdrawal_fee_bps: 150, no_city: false, travelling: false, jailed: false, notice: '' },
-    actions: [
-      { label: 'واریز 10,000', command: 'bank.deposit', args: { amount: '10000', nonce: 'n1' }, row: 0, kind: 'primary', icon: 'action:deposit' },
-      { label: 'واریز مبلغ دلخواه', command: 'bank.deposit', input: { field: 'amount' }, row: 1, kind: 'primary', icon: 'action:deposit' },
-      { label: 'برداشت مبلغ دلخواه', command: 'bank.withdraw', input: { field: 'amount' }, row: 2, kind: 'primary', icon: 'action:withdraw' },
-      { label: 'پرداخت به بازیکن', command: 'bank.pay', row: 3, kind: 'navigation', icon: 'action:pay' },
-      { label: 'بانک ملی', command: 'loan.hub', row: 4, kind: 'navigation', icon: 'bank' },
-      back('player.profile.get'), refresh('bank.show'),
-    ],
-  }),
 
   'company.mine': () => ({
     screen: 'company_mine', text: '<b>شرکت‌های من</b>\nهنوز شرکتی ثبت نکرده‌ای.',
@@ -205,25 +170,6 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
     actions: [refresh('property.list'), back('economy_hub')],
   }),
 
-  'stock.list': () => ({
-    screen: 'exchange', text: 'بورس',
-    view: {
-      lines: [
-        { company: { code: 'Q7M2K9B', name: 'نان و شیرینی کاوه' }, type: { name: 'نانوایی' }, city: { name: 'برن‌هاون' }, price: 132, prev: 120, cap: 132000, volume: 240 },
-        { company: { code: 'H4T8W2C', name: 'تعمیرگاه نیلوفر' }, type: { name: 'تعمیرگاه' }, city: { name: 'کالدریس' }, price: 88, prev: 95, cap: 88000, volume: 0 },
-      ],
-    },
-    actions: [refresh('stock.list'), { label: 'سبد دارایی', command: 'stock.mine', row: 1, kind: 'navigation', icon: 'action:default' }, back('economy_hub')],
-  }),
-  'stock.mine': () => ({
-    screen: 'portfolio', text: 'سبد دارایی',
-    view: {
-      holdings: [{ company: { code: 'Q7M2K9B', name: 'نان و شیرینی کاوه' }, shares: 60, cost: 7200, value: 7920, price: 132 }],
-      orders: [{ company: { name: 'نان و شیرینی کاوه' }, side: 'buy', qty: 50, price: 132, filled: 40, no: 31 }],
-      gold: 25, gold_val: 19500, savings: 15000, value: 54420, gain: 2120, notice: '',
-    },
-    actions: [refresh('stock.mine'), back('economy_hub')],
-  }),
 
   'inbox.show': () => ({
     screen: 'inbox_hub', text: '',

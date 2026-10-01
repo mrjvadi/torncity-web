@@ -6,16 +6,12 @@ import SocietyHub from './SocietyHub'
 
 import Profile from './Profile'
 import Dashboard from './Dashboard'
-import Bank from './Bank'
 import Inventory from './Inventory'
-import { Market, Book } from './Market'
 import JobStatus from './JobStatus'
 import CrimeHub, { CrimeList } from './CrimeHub'
 import Education from './Education'
 import Life from './Life'
 import { PropertyMarket, PropertyMine } from './Property'
-import { Exchange, Portfolio } from './Stocks'
-import { TravelOptions, TravelStatus } from './Travel'
 import Missions from './Missions'
 import Hospital from './Hospital'
 import { InboxHub, InboxCategory } from './Inbox'
@@ -26,10 +22,7 @@ const screens: ScreenSet = {
   SERVER: {
     profile: Profile,
     dashboard: Dashboard,
-    bank: Bank,
     inventory: Inventory,
-    market: Market,
-    book: Book,
     job_status: JobStatus,
     crime_hub: CrimeHub,
     crime_list: CrimeList,
@@ -37,10 +30,6 @@ const screens: ScreenSet = {
     life: Life,
     property_market: PropertyMarket,
     property_mine: PropertyMine,
-    exchange: Exchange,
-    portfolio: Portfolio,
-    travel_options: TravelOptions,
-    travel_status: TravelStatus,
     mission_board: Missions,
     hospital: Hospital,
     inbox_hub: InboxHub,

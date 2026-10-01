@@ -522,3 +522,13 @@ export function mockSocietyCommand(command: string, args: Record<string, unknown
   }
 }
 
+
+/** The area's names under the other areas' tables: a table both name holds every code, the other area's entry first. */
+export function mergeTables<T extends { code: string }>(mine: Record<string, T[]>, theirs: Record<string, T[]>): Record<string, T[]> {
+  const out: Record<string, T[]> = { ...mine }
+  for (const [table, list] of Object.entries(theirs)) {
+    const have = new Set(list.map((e) => e.code))
+    out[table] = [...list, ...(mine[table] ?? []).filter((e) => !have.has(e.code))]
+  }
+  return out
+}
