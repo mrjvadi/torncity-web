@@ -1505,7 +1505,7 @@ citizen.legend.free | آزاد، کنار جاده | Free, on the road
 citizen.legend.mine | زمین تو | Yours
 citizen.legend.taken | زمین دیگران | Others'
 citizen.land.exit | بستن نقشهٔ زمین‌ها | Close the land map
-citizen.land.hint | روی یک زمین آزاد بزن تا بخری، یا روی زمین خودت (طلایی) تا بسازی. | Tap a free lot to buy it, or one of yours (gold) to build.
+citizen.land.hint | روی یک زمین آزاد بزن تا بخری، یا روی زمین خودت (بنفش) تا بسازی. | Tap a free lot to buy it, or one of yours (purple) to build.
 citizen.land.build_hint | روی زمین خودت (طلایی) بزن تا {name} آنجا ساخته شود. | Tap one of your own lots (gold) to build {name} there.
 citizen.buy.title | خرید زمین | Buy a lot
 citizen.buy.lot | ردیف {y}، ستون {x} | Row {y}, column {x}

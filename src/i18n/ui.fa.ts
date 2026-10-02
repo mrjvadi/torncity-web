@@ -1463,7 +1463,7 @@ export const uiFa = {
   'citizen.legend.mine': 'زمین تو',
   'citizen.legend.taken': 'زمین دیگران',
   'citizen.land.exit': 'بستن نقشهٔ زمین‌ها',
-  'citizen.land.hint': 'روی یک زمین آزاد بزن تا بخری، یا روی زمین خودت (طلایی) تا بسازی.',
+  'citizen.land.hint': 'روی یک زمین آزاد بزن تا بخری، یا روی زمین خودت (بنفش) تا بسازی.',
   'citizen.land.build_hint': 'روی زمین خودت (طلایی) بزن تا {name} آنجا ساخته شود.',
   'citizen.buy.title': 'خرید زمین',
   'citizen.buy.lot': 'ردیف {y}، ستون {x}',

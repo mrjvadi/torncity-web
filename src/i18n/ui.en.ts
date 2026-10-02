@@ -1465,7 +1465,7 @@ export const uiEn: Record<UiKey, string> = {
   'citizen.legend.mine': 'Yours',
   'citizen.legend.taken': 'Others\'',
   'citizen.land.exit': 'Close the land map',
-  'citizen.land.hint': 'Tap a free lot to buy it, or one of yours (gold) to build.',
+  'citizen.land.hint': 'Tap a free lot to buy it, or one of yours (purple) to build.',
   'citizen.land.build_hint': 'Tap one of your own lots (gold) to build {name} there.',
   'citizen.buy.title': 'Buy a lot',
   'citizen.buy.lot': 'Row {y}, column {x}',
