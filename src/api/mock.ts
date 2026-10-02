@@ -11,6 +11,9 @@ import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
 import { mockFoundingCommand } from './mock_founding'
 import { mockLifeCommand } from './mock_life'
+import { mockCrimeCommand } from './mock_act_crime'
+import { mockWorkCommand } from './mock_act_work'
+import { mockHealthCommand } from './mock_act_health'
 import { mockBasicCommand } from './mock_basic'
 import { mockLocation, mockSupportCommand } from '../support/mock'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
@@ -104,6 +107,15 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   const military = mockMilitaryCommand(command, args ?? {})
   if (military) return json(military)
   // the economy and finance area: neutral answers of every screen of it (src/api/mock_economy.ts)
+  // health and missions answer first: the older boards of the P0 mock carry no actions
+  const healthArea = mockHealthCommand(command, args)
+  if (healthArea) return json(healthArea)
+  // work and study answer first too: the P0 education board carries no actions
+  const workArea = mockWorkCommand(command, args)
+  if (workArea) return json(workArea)
+  // crime answers first too: the P0 crime hub carries no actions
+  const crimeArea = mockCrimeCommand(command, args)
+  if (crimeArea) return json(crimeArea)
   const p0 = mockP0Command(command, args)
   if (p0) return json(p0)
   const economy = mockEconomyCommand(command, args ?? {})
@@ -113,6 +125,9 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   // the life area answers in the neutral contract (src/api/mock_life.ts)
   const lifeArea = mockLifeCommand(command, args)
   if (lifeArea) return json(lifeArea)
+  // the activities (crime, work, study, skills, health, missions): neutral answers of every screen of them
+  const activities = mockCrimeCommand(command, args) ?? mockWorkCommand(command, args)
+  if (activities) return json(activities)
   const basic = mockBasicCommand(command, args)
   if (basic) return json({ ok: true, ...basic })
   // war/military (no structured view yet) and friends/search (structured):

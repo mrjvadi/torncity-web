@@ -4348,3 +4348,360 @@ know.afford | می‌توانی بپردازی | Affordable
 soc.board.tab.village | روستا | Village
 soc.board.village | ثروتمندترین‌های {place} | The richest in {place}
 soc.board.hint.village | هم‌روستایی‌ها بر پایهٔ دارایی‌شان. | Your neighbours by what they own.
+
+# -- activities: health and missions (docs/adr/0039) ---
+ac.health.clinic_name | درمانگاه {name} | The {name} clinic
+ac.health.city_hospital | بیمارستان شهر | The city hospital
+ac.health.village_title | خانهٔ بهداشت | Health house
+ac.health.treat_title | درمان | Treatment
+ac.health.confirm_title | درمان در {who} | Treatment at {who}
+ac.health.confirm_free | قبول است، درمانم کن | Yes, treat me
+ac.health.price | هزینهٔ درمان | Treatment cost
+ac.health.saves | از بستری کم می‌شود | Shortens the stay
+ac.health.remaining | بستری باقی‌مانده | Stay left
+ac.health.new_end | با این درمان ساعت {at} مرخص می‌شوی. | With this treatment you leave at {at}.
+ac.health.treated_title | درمان شد | Treated
+ac.health.treated_lead | در {who} درمانت کردند و {saved} از مدت بستری‌ات کم شد. | You were treated at {who}, and your stay is {saved} shorter.
+ac.health.paid | پرداختی | Paid
+ac.health.paid_by | روش پرداخت | Paid by
+ac.health.none_left | دیگر بستری نیستی | You are no longer admitted
+ac.health.ends_at | ساعت مرخصی | Leaves at
+ac.health.desk_title | درمانگاه {name} | The {name} clinic
+ac.health.desk_open | درمانگاه باز است و بیمار می‌پذیرد. | The clinic is open and takes patients.
+ac.health.desk_closed | درمانگاه بسته است و بیمار نمی‌پذیرد. | The clinic is closed and takes no patients.
+ac.health.desk_price | هزینهٔ هر درمان | Price of a treatment
+ac.health.desk_stock | داروی انبار | Medicine in stock
+ac.health.desk_stock_v | {n} واحد (هر درمان {per} واحد) | {n} units ({per} per treatment)
+ac.health.desk_doctor | سطح پزشک | Doctor level
+ac.health.desk_reduction | کم‌شدن بستری با این پزشک | Stay taken off by this doctor
+ac.health.desk_treated | بیمارهای درمان‌شده | Patients treated
+ac.health.desk_earned | درآمد درمان | Earned from treatments
+ac.health.desk_no_stock | دارو به اندازهٔ یک درمان نیست؛ تا انبار پر نشود، هیچ بیماری درمان نمی‌شود. | There is not enough medicine for a treatment; no patient is treated until the store is filled.
+ac.health.desk_help | قیمت صفر یعنی درمان رایگان. هر درمان از داروی انبار خرج می‌کند و پزشک ماهرتر بیشتر از بستری کم می‌کند. | A price of zero means free care. Each treatment uses medicine from the store, and a more skilled doctor shortens the stay more.
+ac.health.refused.no_hospitals | اینجا بیمارستان یا درمانگاهی نیست. | There is no hospital or clinic here.
+ac.health.refused_hint.no_hospitals | برای درمان باید به شهری بروی که بیمارستان دارد، مثل شهر مرکزی. | To be treated, go to a city that has a hospital, such as the central city.
+ac.health.refused.not_hospitalised | الان بستری نیستی. | You are not admitted right now.
+ac.health.refused_hint.not_hospitalised | درمان فقط برای کسی است که در بیمارستان بستری است. | Treatment is only for someone who is admitted.
+ac.health.refused.treated | این بستری قبلاً درمان شده است. | This stay has already been treated.
+ac.health.refused_hint.treated | هر بستری فقط یک بار درمان می‌شود. | A stay is treated only once.
+ac.health.refused.no_clinic | چنین درمانگاهی پیدا نشد. | No such clinic was found.
+ac.health.refused_hint.no_clinic | شاید بسته یا واگذار شده باشد. یکی دیگر را انتخاب کن. | It may be closed or handed over. Pick another.
+ac.health.refused.elsewhere | این درمانگاه در شهر دیگری است. | This clinic is in another city.
+ac.health.refused_hint.elsewhere | برای درمان باید در همان شهری باشی که بستری شده‌ای. | You have to be in the city where you were admitted.
+ac.health.refused.closed | این درمانگاه الان بسته است. | This clinic is closed right now.
+ac.health.refused_hint.closed | درمانگاه دیگری را امتحان کن یا بعداً بیا. | Try another clinic, or come back later.
+ac.health.refused.no_medicine | این درمانگاه دارو ندارد. | This clinic has no medicine.
+ac.health.refused_hint.no_medicine | درمانگاه دیگری را امتحان کن یا به بیمارستان شهر برو. | Try another clinic, or go to the city hospital.
+ac.health.refused.not_yours | این درمانگاه مال تو نیست. | This clinic is not yours.
+ac.health.refused_hint.not_yours | فقط صاحب یا مدیر درمانگاه می‌تواند آن را اداره کند. | Only the owner or manager can run a clinic.
+ac.mission.progress | {done} از {count} | {done} of {count}
+ac.mission.reward_cash | پول | Cash
+ac.mission.reward_xp | امتیاز تجربه | Experience points
+ac.mission.reward_item | کالا | Goods
+ac.mission.blocked.active | این مأموریت را همین حالا در دست داری. | You already have this mission.
+ac.mission.blocked.level | برای این مأموریت دست‌کم سطح {level} لازم است. | This mission needs at least level {level}.
+ac.mission.blocked.requires | اول باید مأموریت‌های پیش‌نیازش را انجام بدهی. | First finish the missions it follows from.
+ac.mission.blocked.done | این مأموریت را قبلاً انجام داده‌ای. | You have already done this mission.
+ac.mission.blocked.cooldown | تا {t} دیگر می‌توانی دوباره این مأموریت را بگیری. | You can take this mission again in {t}.
+ac.mission.blocked.too_many | همین حالا {max} مأموریت در دست داری؛ اول یکی را تمام کن. | You already have {max} missions running; finish one first.
+ac.mission.abandon_title | رها کردن مأموریت | Give up the mission
+ac.mission.abandon_yes | رها کن | Give up
+ac.mission.abandon_ask | مأموریت «{mission}» را رها می‌کنی؟ هرچه پیش رفته‌ای از بین می‌رود. | Give up «{mission}»? Whatever you have done on it is lost.
+ac.mission.min_level | حداقل سطح | Minimum level
+ac.mission.requires | پیش‌نیاز | Needs first
+ac.mission.time_limit | مهلت انجام | Time to finish
+ac.mission.repeatable | تکرار | Repeats
+ac.mission.repeat_after | {t} بعد از هر بار | {t} after each time
+ac.mission.repeat_any | هر وقت خواستی | Any time
+ac.mission.at_most | بیشترین مأموریت هم‌زمان | Most missions at once
+ac.mission.where | مأموریت را از «{board}» می‌گیری و همان‌جا تحویل می‌دهی. | You take this mission at «{board}» and hand it in there.
+ac.mission.goals | کارهایی که باید بکنی | What you have to do
+ac.mission.reward | پاداش | Reward
+ac.mission.notice.accepted | مأموریت «{mission}» را گرفتی. از همین حالا هر کاری بکنی به حسابش می‌آید. | You took «{mission}». From now on what you do counts towards it.
+ac.mission.notice.delivered | {qty} واحد برای «{mission}» تحویل دادی. | You handed in {qty} for «{mission}».
+ac.mission.notice.completed | مأموریت «{mission}» انجام شد. | You finished «{mission}».
+ac.mission.notice.abandoned | مأموریت «{mission}» را رها کردی. | You gave up «{mission}».
+ac.mission.paid | پولی که گرفتی | Cash received
+ac.mission.withheld | به‌خاطر سقف دریافت پاداش، {n} از آن داده نشد. | Because of the reward cap, {n} of it was not paid.
+ac.mission.withheld_short | بخشی پرداخت نشد | Part not paid
+ac.mission.recent.completed | «{mission}» انجام شد · {cash} | «{mission}» finished · {cash}
+ac.mission.recent.abandoned | «{mission}» رها شد | «{mission}» given up
+ac.mission.recent.expired | مهلت «{mission}» تمام شد | «{mission}» ran out of time
+ac.mission.recent.active | «{mission}» در دست است | «{mission}» is running
+ac.mission.mine_title | مأموریت‌های من | My missions
+ac.mission.mine_count | {n} مأموریت از {max} در دست توست. | You have {n} of {max} missions running.
+ac.mission.mine_none | مأموریتی در دست نداری؛ از تابلوی مأموریت‌ها یکی بگیر. | You have no mission; take one from a mission board.
+ac.mission.left | {t} مهلت مانده | {t} left
+ac.mission.deliver | تحویل بده | Hand in
+ac.mission.abandon | رها کن | Give up
+ac.mission.recent_title | اخیراً | Lately
+ac.mission.refused.not_found | چنین مأموریتی پیدا نشد. | No such mission was found.
+ac.mission.refused.not_here | این مأموریت اینجا نیست. | This mission is not here.
+ac.mission.refused.blocked | الان نمی‌توانی این مأموریت را بگیری. | You cannot take this mission right now.
+ac.mission.refused.not_active | این مأموریت دیگر در دست تو نیست. | You no longer have this mission.
+ac.mission.refused.expired | مهلت این مأموریت تمام شده است. | This mission has run out of time.
+ac.mission.refused.nothing_to_deliver | چیزی که این مأموریت می‌خواهد همراهت نیست. | You are not carrying what this mission wants.
+missions.blocked.level | سطحت کم است | Level too low
+missions.blocked.done | قبلاً انجامش داده‌ای | Already done
+missions.blocked.too_many | مأموریت‌هایت پر است | Too many missions running
+act.health.treat | درمان | Treatment
+act.health.confirm_free | درمان رایگان | Free treatment
+act.health.hospital | وضع درمان من | My treatment
+act.health.open | باز کردن درمانگاه | Open the clinic
+act.health.close | بستن درمانگاه | Close the clinic
+act.health.price | قیمت درمان | Treatment price
+act.mission.board | {name} | {name}
+act.mission.boards | تابلوهای مأموریت | Mission boards
+act.mission.view | {name} | {name}
+act.mission.accept | مأموریت را بگیر | Take the mission
+act.mission.mine | مأموریت‌های من | My missions
+act.mission.deliver | تحویل بده | Hand in
+act.mission.abandon | رها کن | Give up
+act.mission.abandon_confirm | رها کن | Give up
+act.production.warehouse | انبار و تولید | Warehouse and production
+# -- activities: crime (docs/adr/0039) ---
+act.crime.category | {name} | {name}
+act.crime.view | {name} | {name}
+act.crime.again | دوباره {name} | Again: {name}
+act.crime.record | سوابق من | My record
+act.crime.cases | شکایت‌های من | My reports
+act.crime.jail | زندان | Jail
+act.crime.commit | انجامش بده | Do it
+act.crime.report_confirm | ثبت شکایت | File the report
+act.map | نقشه | Map
+ac.crime.range | {a} تا {b} | {a} to {b}
+ac.crime.list.locked | شرط‌هایش را کامل نداری | You do not meet its requirements yet
+ac.crime.req.title | شرط‌ها | Requirements
+ac.crime.req.met | داری | Met
+ac.crime.req.miss | نداری | Not met
+ac.crime.req.venue_miss | جای کار: {names} (الان در {here} هستی) | Place: {names} (you are at {here} now)
+ac.crime.req.other | شرط دیگری هم هست | There is another condition
+ac.crime.d.chance | شانس موفقیت: {p} | Chance of success: {p}
+ac.crime.d.category | دسته: {name} | Category: {name}
+ac.crime.d.nerve | جسارت لازم | Nerve needed
+ac.crime.d.duration | مدت | Duration
+ac.crime.d.instant | همان لحظه | Instant
+ac.crime.d.take | غنیمت از مردم | Take from the locals
+ac.crime.d.victims | قربانی | Victim
+ac.crime.d.hits_npcs | مردم همین‌جا | the locals
+ac.crime.d.hits_players | بازیکن‌های اینجا | players here
+ac.crime.d.jail | اگر دستگیر شوی، حبس | If you are caught, jail
+ac.crime.d.fine | جریمه | Fine
+ac.crime.d.cooldown | استراحت بعد از هر بار | Rest after each try
+ac.crime.d.missing | هنوز همهٔ شرط‌ها را نداری؛ اول شرط‌های خالی را کامل کن. | You do not meet every requirement yet; finish the empty ones first.
+ac.crime.d.blocked_nerve | جسارتت کم است: {need} لازم داری و {have} داری. | Not enough nerve: you need {need} and have {have}.
+ac.crime.d.blocked_cooldown | هنوز خسته‌ای؛ {t} دیگر صبر کن. | You are still tired; wait {t} more.
+ac.crime.odds.title | شانس تو از چه درمی‌آید | What makes up your chance
+ac.crime.odds.base | پایهٔ کار | The job itself
+ac.crime.odds.skill | مهارتت | Your skill
+ac.crime.odds.awareness | هوشیاری مردم اینجا | How alert people are here
+ac.crime.odds.heat | داغی‌ات (پلیس می‌شناسدت) | Your heat (the police know you)
+ac.crime.odds.gear | وسیله‌ای که همراه داری | The gear you carry
+ac.crime.gear.title | وسیله‌ات چه فرقی می‌کند | What your gear changes
+ac.crime.res.lead.succeeded | «{crime}» درست انجام شد. | “{crime}” went well.
+ac.crime.res.lead.escaped | «{crime}» نشد، ولی بی‌دردسر فرار کردی. | “{crime}” failed, but you got away clean.
+ac.crime.res.lead.caught | «{crime}» لو رفت و دستگیر شدی. | “{crime}” went wrong and you were caught.
+ac.crime.res.where | جای کار: {place} | Where: {place}
+ac.crime.res.victim_player | این بار قربانی یکی از بازیکن‌ها بود. | This time the victim was a player.
+ac.crime.res.take | پولی که برداشتی | Money you took
+ac.crime.res.xp | تجربه | Experience
+ac.crime.res.criminal_xp | تجربهٔ جرم | Crime experience
+ac.crime.res.level | رسیدی به سطح | You reached level
+ac.crime.res.skill_xp | {n} تجربه | {n} experience
+ac.crime.res.skill_up | {n} تجربه، رسید به سطح {level} | {n} experience, reached level {level}
+ac.crime.res.loot | غنیمت | Loot
+ac.crime.res.times | {n} عدد | × {n}
+ac.crime.res.stolen | از بازیکن برداشتی | Taken from the player
+ac.crime.res.arrest | دستگیری | The arrest
+ac.crime.res.jail | مدت حبس | Time in jail
+ac.crime.res.fine | جریمه | Fine
+ac.crime.res.fine_paid | پرداخت‌شده | Paid
+ac.crime.res.confiscated | پلیس این‌ها را از تو گرفت: | The police took these from you:
+ac.crime.res.injury | آسیب | Injury
+ac.crime.res.injury_text | در این ماجرا {n} از سلامتی‌ات کم شد. | You lost {n} health in this.
+ac.crime.res.admitted | حالت بد است و باید بستری شوی. | You are badly hurt and must be admitted.
+ac.crime.res.admitted_until | حالت بد است و تا ساعت {at} بستری هستی. | You are badly hurt and stay admitted until {at}.
+ac.crime.started.lead | «{crime}» در {place} شروع شد. | “{crime}” has started at {place}.
+ac.crime.started.ends | تمام می‌شود ساعت | Ends at
+ac.crime.rec.tier | رتبه‌ات: {name} | Your tier: {name}
+ac.crime.rec.attempts | تعداد تلاش‌ها | Attempts
+ac.crime.rec.successes | موفق | Successful
+ac.crime.rec.of | {n} بار ({p} درصد) | {n} times ({p} percent)
+ac.crime.rec.arrests | بار دستگیری | Arrests
+ac.crime.rec.convictions | حکم دادگاه | Convictions
+ac.crime.rec.unpaid | هنوز این‌ها را نپرداخته‌ای: | You still owe:
+ac.crime.rec.restitution | غرامت | Restitution
+ac.crime.rec.fines | جریمه‌ها | Fines
+ac.crime.rec.recent | آخرین کارها | Latest tries
+ac.crime.rec.none | هنوز کاری نکرده‌ای. | You have not tried anything yet.
+ac.crime.jail.free | زندانی نیستی؛ آزادی. | You are not in jail; you are free.
+ac.crime.jail.lead | در زندان {city} هستی. | You are in jail in {city}.
+ac.crime.jail.arrest | به‌خاطر دستگیری هنگام جرم. | You were arrested during a crime.
+ac.crime.jail.conviction | به حکم دادگاه. | By a court ruling.
+ac.crime.jail.left | مانده تا آزادی | Time left
+ac.crime.jail.ends | آزاد می‌شوی ساعت | You are out at
+ac.crime.jail.bail | وثیقه | Bail
+ac.crime.jail.bail_title | آزادی با وثیقه | Leave on bail
+ac.crime.jail.bail_hint | اگر وثیقه را بدهی، همین حالا آزاد می‌شوی. | Pay the bail and you walk out right now.
+ac.crime.jail.cannot | وثیقه {amount} است؛ نقدی {cash} و در بانک {bank} داری. پولت کم است. | Bail is {amount}; you have {cash} in cash and {bank} in the bank. It is not enough.
+ac.crime.pay.cash | پول نقدت | Your cash
+ac.crime.pay.bank | موجودی بانک | Your bank balance
+ac.crime.bailed.title | آزاد شدی | You are out
+ac.crime.bailed.lead | وثیقهٔ {amount} ({method}) پرداخت شد و آزاد شدی. | Bail of {amount} paid ({method}); you are out.
+ac.crime.bailed.hint | داغی‌ات هنوز سر جایش است؛ مراقب باش. | Your heat is still there; be careful.
+ac.crime.method.cash | نقدی | in cash
+ac.crime.method.card | با کارت | by card
+ac.crime.method.other | پرداخت شد | paid
+ac.crime.report.title | شکایت از دزد | Report the theft
+ac.crime.report.ask | در {city} از تو «{crime}» شده و {amount} از دستت رفته. شکایت می‌کنی؟ | In {city} you were a victim of “{crime}” and lost {amount}. File a report?
+ac.crime.report.fee | هزینهٔ شکایت | Cost of the report
+ac.crime.report.investigation | بررسی پلیس | Police investigation
+ac.crime.report.within | مهلت شکایت | Time left to report
+ac.crime.report.hint | اگر پلیس دزد را پیدا کند، تا جایی که دزد دارد پولت برمی‌گردد. | If the police find the thief, you get back what the thief still has.
+ac.crime.report.cannot | هزینه {amount} است؛ نقدی {cash} و در بانک {bank} داری. اول پول بگیر. | The cost is {amount}; you have {cash} in cash and {bank} in the bank. Get some money first.
+ac.crime.filed.title | شکایت ثبت شد | Report filed
+ac.crime.filed.lead | شکایتت ثبت شد؛ پلیس {t} وقت می‌گذارد. | Your report is filed; the police take {t}.
+ac.crime.filed.ends | نتیجه ساعت | Result at
+ac.crime.filed.hint | نتیجه را در شکایت‌هایت می‌بینی. | You will see the result in your reports.
+ac.crime.cases.empty | شکایتی ثبت نکرده‌ای. | You have filed no reports.
+ac.crime.cases.empty_hint | وقتی از تو دزدی شود خبرش می‌رسد و می‌توانی شکایت کنی. | When you are robbed you get word, and you can report it.
+ac.crime.cases.line | {crime} در {city} | {crime} in {city}
+ac.crime.cases.amount | پولی که رفت | Money lost
+ac.crime.cases.status | وضعیت | Status
+ac.crime.cases.investigating | در حال بررسی | Being investigated
+ac.crime.cases.solved | دزد پیدا شد | The thief was found
+ac.crime.cases.unsolved | دزد پیدا نشد | The thief was not found
+ac.crime.cases.left | مانده تا نتیجه | Time to result
+ac.crime.cases.thief | دزد | Thief
+ac.crime.cases.restored | پس گرفتی | You got back
+ac.crime.refusal.title | نشد | Not possible
+ac.crime.refusal.for | برای «{crime}» | For “{crime}”
+ac.crime.refused.unknown | این کار الان شدنی نیست. | This cannot be done right now.
+ac.crime.refused.requirements | شرط‌های این کار را کامل نداری. | You do not meet the requirements for this.
+ac.crime.refused.not_found | همچین کاری اینجا پیدا نشد. | There is no such crime here.
+ac.crime.refused.jail | زندانی هستی؛ {time} دیگر تا آزادی مانده. | You are in jail; {time} until you are out.
+ac.crime.refused.hospital | بستری هستی و نمی‌توانی این کار را بکنی. | You are admitted and cannot do this.
+ac.crime.refused.busy | هنوز سرگرم کار قبلی هستی؛ {time} دیگر تمام می‌شود. | You are still on your last job; it ends in {time}.
+ac.crime.refused.work | الان سر کار هستی؛ اول شیفتت تمام شود. | You are at work; finish your shift first.
+ac.crime.refused.travelling | در راه سفری؛ تا نرسیده نمی‌شود. | You are on a journey; wait until you arrive.
+ac.crime.refused.walking | هنوز در راهی؛ اول برس. | You are still walking; arrive first.
+ac.crime.refused.nowhere | برای این کار باید در یک روستا یا شهر باشی. | You must be in a village or a city for this.
+ac.crime.refused.nerve | جسارتت کم است: {need} لازم داری و {have} داری. {time} دیگر پر می‌شود. | Not enough nerve: you need {need} and have {have}. It refills in {time}.
+ac.crime.refused.nerve_now | جسارتت کم است: {need} لازم داری و {have} داری. | Not enough nerve: you need {need} and have {have}.
+ac.crime.refused.no_victim | الان کسی نیست که چیزی ازش برداری. | There is nobody to take from right now.
+ac.crime.refused.not_yours | این پرونده مال تو نیست. | This case is not yours.
+ac.crime.refused.expired | مهلت شکایت از این دزدی گذشته. | The time to report this theft has passed.
+ac.crime.refused.cannot_afford | پولت نمی‌رسد: {amount} لازم است و نقدی {cash} داری. | You cannot afford it: {amount} is needed and you have {cash} in cash.
+ac.crime.refused.not_jailed | زندانی نیستی که وثیقه بدهی. | You are not in jail, so there is no bail to pay.
+ac.crime.refused.nothing_stolen | چیزی از تو دزدیده نشده که شکایت کنی. | Nothing was stolen from you to report.
+ac.crime.refused.cooldown | هنوز خسته‌ای؛ {time} دیگر صبر کن. | You are still tired; wait {time} more.
+
+# -- activities: work and study (docs/adr/0039) ---
+act.job.work | شروع شیفت | Start a shift
+act.job.work_again | یک شیفت دیگر | Another shift
+act.job.promote | گرفتن ارتقا | Take the promotion
+act.job.quit | استعفا | Resign
+act.job.quit_confirm | بله، استعفا می‌دهم | Yes, I resign
+act.job.opening | {name} | {name}
+act.company.opening | {name} | {name}
+act.job.apply | درخواست استخدام | Apply for the job
+act.education.open | درس‌ها | The courses
+act.education.course | {name} | {name}
+act.education.enrol | ثبت‌نام در {name} | Enrol in {name}
+ac.work.pay_shift | {pay} هر شیفت | {pay} per shift
+ac.work.energy | انرژی | Energy
+ac.work.fatigue_ok | با تمام توان کار می‌کنی. | You are working at full strength.
+ac.work.fatigue_tired | خسته‌ای و با {p} توانت کار می‌کنی. | You are tired and work at {p} of your strength.
+ac.work.skill_gain | {xp} تجربه برای {skill} | {xp} experience for {skill}
+ac.work.skill_level | {xp} تجربه برای {skill}؛ به سطح {n} رسید | {xp} experience for {skill}; it reached level {n}
+ac.work.req.other | یک شرط دیگر هم هست. | There is one more condition.
+ac.work.req.time_met | زمان لازم را در این جایگاه گذرانده‌ای. | You have spent the time needed in this position.
+ac.work.req.shifts_met | شیفت‌های لازم را کار کرده‌ای. | You have worked the shifts needed.
+ac.work.req.performance_met | عملکرد {need} یا بیشتر | Performance of {need} or more
+ac.work.openings.title | فرصت‌های شغلی | Job openings
+ac.work.openings.city | آگهی‌های استخدام در {city} | Job openings in {city}
+ac.work.openings.base | کار در خود {city} | Work in {city} itself
+ac.work.openings.companies | آگهی شرکت‌ها | Company openings
+ac.work.openings.travelling | در راهی و تا به مقصد نرسیده‌ای آگهی‌ای نمی‌بینی. | You are on the road, so no openings show until you arrive.
+ac.work.openings.current | الان «{title}» هستی؛ برای شغل تازه اول باید استعفا بدهی. | You are working as “{title}”; resign first to take another job.
+ac.work.openings.empty | فعلاً در {city} آگهی استخدامی نیست. | There are no job openings in {city} for now.
+ac.work.openings.empty_hint | چند وقت دیگر سر بزن، یا برو شهر دیگری. | Check back later, or go to another city.
+ac.work.openings.open | واجد شرایط | Qualified
+ac.work.openings.locked | شرط کم داری | Missing a requirement
+ac.work.openings.page | صفحهٔ {a} از {b} | Page {a} of {b}
+ac.work.detail.career | رشته | Career
+ac.work.detail.city | شهر | City
+ac.work.detail.pay | مزد هر شیفت | Pay per shift
+ac.work.detail.energy | انرژی هر شیفت | Energy per shift
+ac.work.detail.reqs | شرط‌ها | Requirements
+ac.work.detail.no_reqs | برای این کار شرط خاصی لازم نیست. | This job has no special requirements.
+ac.work.detail.employed | همین حالا شغل داری؛ برای این کار اول باید استعفا بدهی. | You already have a job; resign before taking this one.
+ac.work.detail.locked | هنوز همهٔ شرط‌ها را نداری؛ با کار و درس خواندن به آن‌ها می‌رسی. | You do not meet every requirement yet; work and study will get you there.
+ac.work.hired.title | استخدام شدی | You are hired
+ac.work.hired.lead | استخدام شدی؛ از حالا «{title}» هستی. | You are hired; from now on you are “{title}”.
+ac.work.hired.where | محل کار | Workplace
+ac.work.started.title | شیفت شروع شد | Shift started
+ac.work.started.lead | سر کار «{title}» رفتی. | You started work as “{title}”.
+ac.work.started.duration | مدت شیفت | Shift length
+ac.work.started.ends | تمام شدن شیفت، ساعت | The shift ends at
+ac.work.worked.title | شیفت تمام شد | Shift finished
+ac.work.worked.lead | شیفتت تمام شد و مزدت را گرفتی. | Your shift is over and you were paid.
+ac.work.worked.net | مزد خالص | Net pay
+ac.work.worked.gross | مزد کل | Gross pay
+ac.work.worked.tax | مالیات | Tax
+ac.work.worked.xp | تجربه | Experience
+ac.work.worked.performance | عملکرد | Performance
+ac.work.worked.perf_up | عملکرد {n} بالا رفت | Performance up by {n}
+ac.work.worked.perf_down | عملکرد {n} پایین آمد | Performance down by {n}
+ac.work.worked.perf_same | عملکرد همان ماند | Performance unchanged
+ac.work.worked.level_up | به سطح {n} رسیدی | You reached level {n}
+ac.work.injury.title | سر کار آسیب دیدی. | You were hurt at work.
+ac.work.injury.damage | آسیب | Damage
+ac.work.injury.health | سلامتی | Health
+ac.work.injury.hospital | حالت بد است و باید بستری شوی. | You are in a bad way and must be admitted.
+ac.work.injury.until | بستری تا ساعت | Admitted until
+ac.work.promoted.title | ارتقا گرفتی | Promoted
+ac.work.promoted.lead | به «{title}» ارتقا گرفتی. | You were promoted to “{title}”.
+ac.work.quit.title | استعفا | Resign
+ac.work.quit.ask | از «{title}» استعفا بدهی؟ این کار برگشت ندارد و برای کار تازه باید دوباره آگهی بگیری. | Resign from “{title}”? It cannot be undone, and you will have to apply for work again.
+ac.work.quit.yes | بله، استعفا می‌دهم | Yes, resign
+ac.work.quit.done_title | استعفا دادی | You resigned
+ac.work.quit.done | از «{title}» استعفا دادی. | You resigned from “{title}”.
+ac.work.inst.training_center | آموزشگاه | Training centre
+ac.work.inst.university | دانشگاه | University
+ac.work.inst.company | شرکت | Company
+ac.work.course.fee | شهریه | Fee
+ac.work.course.duration | مدت | Duration
+ac.work.course.seats | جای خالی | Seats left
+ac.work.course.certificate | مدرک | Certificate
+ac.work.course.yes | می‌دهد | Given
+ac.work.course.no | ندارد | None
+ac.work.course.where | این درس در {city} برگزار می‌شود. | This course is held in {city}.
+ac.work.course.rewards | چه یاد می‌گیری | What you learn
+ac.work.course.reward | {xp} تجربه برای {skill} | {xp} experience for {skill}
+ac.work.course.not_here | این درس اینجا برگزار نمی‌شود. | This course is not held here.
+ac.work.course.taught_in | در {place} درس داده می‌شود. | It is taught in {place}.
+ac.work.course.go | سفر به آنجا | Travel there
+ac.work.course.enrol | ثبت‌نام | Enrol
+ac.work.method.cash | نقدی | Cash
+ac.work.method.card | با کارت | By card
+ac.work.enrolled.title | ثبت‌نام شد | Enrolled
+ac.work.enrolled.lead | برای «{course}» ثبت‌نام کردی. | You enrolled in “{course}”.
+ac.work.enrolled.ends | تمام شدن درس، ساعت | The course ends at
+ac.work.enrolled.method | پرداخت | Paid
+ac.work.completed.title | درس تمام شد | Course finished
+ac.work.completed.lead | درس «{course}» را تمام کردی. | You finished the course “{course}”.
+ac.work.completed.certified | مدرک «{course}» را گرفتی. | You earned the “{course}” certificate.
+ac.work.skills.title | مهارت‌ها | Skills
+ac.work.skills.none | هنوز مهارتی نداری. | You have no skills yet.
+ac.work.skills.how | با کار کردن و درس خواندن مهارت‌هایت بیشتر می‌شود. | Working and studying build your skills.
+ac.work.skills.level | سطح {n} | Level {n}
+ac.work.skills.max | به بالاترین سطح رسیده‌ای. | You have reached the top level.
+ac.work.skills.untrained | هنوز تمرین نکرده‌ای | Not trained yet
+ac.work.of | {a} از {b} | {a} of {b}
+ac.work.status.elsewhere | برای کار باید در {city} باشی. | You have to be in {city} to work.
+# -- activities: health and missions, addition ---
+ac.health.out_hint | بستری نیستی، پس درمانی هم لازم نیست. اگر آسیب ببینی و بستری شوی، راه درمان همین‌جاست. | You are not admitted, so you need no treatment. If you are hurt and admitted, the ways to be treated show up here.
+ac.crime.rec.next | رتبهٔ بعدی: {name} | Next tier: {name}
+ac.crime.rec.xp | تجربهٔ جرم {a} از {b} | Crime experience {a} of {b}
+ac.crime.cases.title | شکایت‌های من | My reports

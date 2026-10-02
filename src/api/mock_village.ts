@@ -13,6 +13,7 @@ import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
 import { LIFE_CONTENT } from './mock_life'
+import { ACTIVITIES_CONTENT } from './mock_act_content'
 import { publishSettlement } from './settlementBus'
 import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
@@ -1365,7 +1366,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     return json({
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
-      entries: mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), {
+      entries: mergeTables(ACTIVITIES_CONTENT, mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), {
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
@@ -1387,7 +1388,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
         // what the life area names: cities, places, ways to travel, ranks, goods, property...
         ...LIFE_CONTENT,
-      }))),
+      })))),
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)

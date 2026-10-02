@@ -1,0 +1,18 @@
+/* the activities area (crime, work, study, health, missions): small additions to the village flow kit */
+
+/* crime: the conditions of a crime, met or not, and the meters of a result */
+.ac-crime-meters { display: flex; flex-direction: column; gap: 10px; }
+.ac-crime-reqs { display: flex; flex-direction: column; gap: 6px; }
+.ac-crime-req { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.6; }
+.ac-crime-req.miss { color: var(--text); }
+.ac-crime-req.met { color: var(--text-dim); }
+.ac-crime-dot { flex: none; width: 12px; height: 12px; margin-top: 7px; border-radius: 50%; background: var(--leaf, #5fbf6a); }
+.ac-crime-req.miss .ac-crime-dot { background: transparent; border: 2px solid var(--anar, #e0566a); }
+.ac-crime-out.succeeded { color: var(--leaf, #5fbf6a); }
+.ac-crime-out.caught { color: var(--anar, #e0566a); }
+
+/* work and study: the page count of the openings, a small heading inside a popup, the skill rows */
+.ac-work-page { text-align: center; font-size: 12px; color: var(--text-dim); }
+.ac-work-sub { font-size: 12px; color: var(--text-dim); margin: 6px 0 2px; }
+.ac-work-skill { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.ac-work-chips { display: flex; flex-wrap: wrap; gap: 6px; }

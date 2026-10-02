@@ -3,12 +3,13 @@ import { Card, Header, ListRow, Notice, Ring, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms, money } from './kit/format'
 import { t } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
-interface JobRef { career_name?: string; title?: string }
+interface JobRef { career_code?: string; career_name?: string; rank?: string; title?: string }
 interface Requirement { kind?: string; have?: number; need?: number; met?: boolean }
 interface JobStatusView {
   employed?: boolean
-  job?: JobRef; employer?: string; city?: string
+  job?: JobRef; employer?: string; city?: string; city_code?: string
   pay?: number; energy_cost?: number; energy?: number; max_energy?: number
   performance?: number; shifts_in_tier?: number; total_earned?: number
   at_workplace?: boolean; top_tier?: boolean
@@ -20,6 +21,10 @@ interface JobStatusView {
 
 export default function JobStatus({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as JobStatusView
+  const names = useContentNames()
+  // a position and its career are worded from the catalogue; the authored name is the last resort
+  const tier = (j?: JobRef) => (j?.career_code ? names.name('career_tier', `${j.career_code}.${j.rank ?? ''}`, j.title) : j?.title ?? '—')
+  const career = (j?: JobRef) => (j?.career_code ? names.name('career', j.career_code, j.career_name) : j?.career_name ?? '')
   if (loading && !response) return <ScreenScroll><Header title={t('job.title')} tone="gold" /></ScreenScroll>
 
   if (!v.employed) {
@@ -43,9 +48,9 @@ export default function JobStatus({ response, loading, onAction, run }: ScreenPr
             <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>{t('job.performance')}</span>
           </Ring>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="display" style={{ fontSize: 18, color: '#fff' }}>{v.job?.title ?? '—'}</div>
+            <div className="display" style={{ fontSize: 18, color: '#fff' }}>{tier(v.job)}</div>
             <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 6 }}>
-              {[v.job?.career_name, v.employer || v.city].filter(Boolean).join(' · ')}
+              {[career(v.job), v.employer || (v.city_code ? names.name('city', v.city_code, v.city) : v.city)].filter(Boolean).join(' · ')}
             </div>
             <span className="nx-chip nx-chip-gold">{t('job.per_shift', { pay: money(v.pay) })}</span>{' '}
             <span className="nx-chip">{t('job.shifts', { n: formatNumber(v.shifts_in_tier ?? 0) })}</span>
@@ -55,17 +60,19 @@ export default function JobStatus({ response, loading, onAction, run }: ScreenPr
 
       {v.shift ? (
         <Notice>{t('job.shift_running', { t: hms(v.shift.remaining_seconds) })}</Notice>
-      ) : !v.at_workplace && v.workplace ? (
+      ) : !v.at_workplace ? (
+        <Notice alert>{t('ac.work.status.elsewhere', { city: v.city_code ? names.name('city', v.city_code, v.city) : v.city ?? '' })}</Notice>
+      ) : (v.walk_to_work_seconds ?? 0) > 0 && v.workplace ? (
         <Notice>{t('job.walk_to', { t: hms(v.walk_to_work_seconds), place: v.workplace.name ?? '' })}</Notice>
       ) : null}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <ListRow icon="check" palette="emerald" tone="emerald" title={v.job?.title ?? '—'} sub={t('job.current_rank')} />
+        <ListRow icon="check" palette="emerald" tone="emerald" title={tier(v.job)} sub={t('job.current_rank')} />
         {!v.top_tier && v.next && (
           <ListRow
             icon={v.promotion_ready ? 'check' : 'clock'}
             palette={v.promotion_ready ? 'emerald' : 'steel'}
-            title={v.next.title ?? '—'}
+            title={tier(v.next)}
             sub={v.promotion_ready ? t('job.promo_ready') : t('job.next_rank')}
           />
         )}

@@ -1,16 +1,17 @@
 import type { ScreenProps } from '../types'
-import { Header, ListRow, Notice, Ring, ScreenScroll } from './kit/Parts'
+import { Empty, Header, ListRow, Notice, Ring, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
-import { clamp01, formatNumber, hms, money } from './kit/format'
+import { clamp01, formatNumber, hms, money, roughDuration } from './kit/format'
 import Icon from '../../ui/Icon'
 import { t, type Key } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface Named { code?: string; name?: string }
-interface Clinic { clinic?: Named; price?: number; doctor?: number; open?: boolean; stock?: number; saves_seconds?: number; can_treat?: boolean }
+interface Clinic { provider?: string; clinic?: Named; price?: number; doctor?: number; open?: boolean; stock?: number; saves_seconds?: number; can_treat?: boolean }
 interface HospitalView {
   health?: number; max?: number; full_in_seconds?: number; city?: string
-  in_hospital?: boolean; cause?: string; remaining_seconds?: number
-  treated?: boolean; clinics?: Clinic[] | null
+  city_code?: string; in_hospital?: boolean; cause?: string; remaining_seconds?: number
+  treated?: boolean; treated_by?: Clinic | null; city_hospital?: Clinic | null; clinics?: Clinic[] | null
 }
 
 const CAUSES = ['crime', 'mugged', 'shift', 'fight']
@@ -18,13 +19,18 @@ const causeText = (c: string) => (CAUSES.includes(c) ? t(`hospital.cause.${c}` a
 
 export default function Hospital({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as HospitalView
-  if (loading && !response) return <ScreenScroll><Header title={t('hospital.title')} tone="ruby" /></ScreenScroll>
+  const names = useContentNames()
+  // «بیمارستان» is the name only in a city or the central city; a founded village's care place is «خانهٔ بهداشت»
+  const inCity = !!v.city_code && names.name('city', v.city_code, '') !== ''
+  const title = inCity || !v.city_code ? t('hospital.title') : t('ac.health.village_title')
+  if (loading && !response) return <ScreenScroll><Header title={title} tone="ruby" /></ScreenScroll>
+  const treat = (code: string) => (response?.actions ?? []).find((a) => a.id === 'health.treat' && a.args?.provider === code)
 
   const frac = v.max ? clamp01((v.health ?? 0) / v.max) : 1
 
   return (
     <ScreenScroll>
-      <Header title={t('hospital.title')} tone="ruby" onRefresh={() => run('health.hospital')} />
+      <Header title={title} tone="ruby" onRefresh={() => run('health.hospital')} />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '8px 0' }}>
         {v.in_hospital && v.cause && <span className="nx-chip nx-chip-ruby">{causeText(v.cause)}</span>}
@@ -44,7 +50,18 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
         )}
       </div>
 
+      {!v.in_hospital && !(v.clinics ?? []).length && <Empty>{t('ac.health.out_hint')}</Empty>}
       {v.treated && <Notice>{t('hospital.treated')}</Notice>}
+
+      {v.city_hospital && treat('city') && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="nx-sec">{t('ac.health.treat_title')}</div>
+          <ListRow icon="hospital" palette="ruby" title={t('ac.health.city_hospital')}
+            sub={v.city_hospital.saves_seconds ? t('hospital.saves', { t: roughDuration(v.city_hospital.saves_seconds) }) : undefined}
+            right={v.city_hospital.price ? money(v.city_hospital.price) : t('common.free')}
+            onClick={() => onAction(treat('city')!)} />
+        </div>
+      )}
 
       {!!(v.clinics && v.clinics.length) && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -52,13 +69,14 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
           {v.clinics!.map((c, i) => (
             <ListRow key={i} icon="stetho" palette={c.can_treat ? 'emerald' : 'steel'}
               title={c.clinic?.name ?? '—'}
-              sub={c.open ? `${t('hospital.doctor', { n: formatNumber(c.doctor ?? 0) })}${c.saves_seconds ? ` · ${t('hospital.saves', { t: hms(c.saves_seconds) })}` : ''}` : t('hospital.closed')}
-              right={c.price ? money(c.price) : undefined} />
+              sub={c.open ? `${t('hospital.doctor', { n: formatNumber(c.doctor ?? 0) })}${c.saves_seconds ? ` · ${t('hospital.saves', { t: roughDuration(c.saves_seconds) })}` : ''}` : t('hospital.closed')}
+              right={c.price ? money(c.price) : undefined}
+              onClick={c.clinic?.code && treat(c.clinic.code) ? () => onAction(treat(c.clinic!.code!)!) : undefined} />
           ))}
         </div>
       )}
 
-      <Actions response={response} onAction={onAction} refreshCommand="health.hospital" />
+      <Actions response={response} onAction={onAction} only={(a) => a.id !== 'health.treat'} refreshCommand="health.hospital" />
     </ScreenScroll>
   )
 }
