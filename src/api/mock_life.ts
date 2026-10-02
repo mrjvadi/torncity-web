@@ -5,6 +5,7 @@
 
 import type { ScreenViews } from './views.gen'
 import { A, back, confirmA, mockOk, refreshA, type MockAct } from './mock_neutral'
+import { mockStandsIn } from '../support/mock'
 
 type Args = Record<string, unknown> | undefined
 
@@ -148,10 +149,11 @@ function life(notice: string) {
   return mockOk('life', {
     needs: NEEDS, age: 27, stage: N('adult', 'Adult'), intelligence: 62, intelligence_max: 100, course_bps: 300, skill_bps: 200, rank: RANK, next: { code: 'trader', name: 'Trader', emoji: '📦' }, next_need: 250000,
     worth: { cash: 12450, bank: 86300, escrow: 0, equity: 0, property: 120000, goods: 4300, debts: 0, savings: 0, gold: 0, loans: 0, total: 223050 },
-    spots: [
+    // a village has no hostel or park bench: sleeping is in the player's own house
+    spots: mockStandsIn() === 'village' ? null : [
       { spot: N('bench', 'Park bench'), place: N('old_town', 'Old Town'), price: 0, rest: 30, relief: 5, way: null },
       { spot: N('hostel', 'Hostel bed'), place: N('hostel_row', 'Hostel Row'), price: 800, rest: 60, relief: 12, way: { place: N('hostel_row', 'Hostel Row'), walk_seconds: 180 } },
-    ], sleep_in_seconds: 0, home: true, notice, notice_args: notice === 'slept' ? { spot: 'bench', rest: 30 } : null,
+    ], village_home: mockStandsIn() === 'village' ? { building: N('cottage', 'Cottage'), can_rest: false, rest_in_seconds: 16440 } : null, sleep_in_seconds: 0, home: true, notice, notice_args: notice === 'slept' ? { spot: 'bench', rest: 30 } : null,
   }, [
     A('life.sleep', 'life.sleep', { spot: 'bench' }, { subject: 'bench' }), A('life.sleep_walk', 'place.go', { place: 'hostel_row', then: 'life.me' }, { subject: 'hostel' }),
     A('life.home_rest', 'property.rest'), A('life.history', 'life.history'), A('life.card', 'life.card'), A('life.top', 'life.top'), back('player.profile.get'), refreshA('life.me'),
@@ -286,7 +288,8 @@ const propertyOffer = () => mockOk('property_offer', { offer: OFFER, city: CITY,
 
 const OWNED = { no: 41, type: N('small_house', 'Small house'), kind: 'house', size: 60, quality: 40, city: CITY, value: 120000, debt: 0, unpaid_periods: 0, home: true, offer: null, tenant: null, rent: 0, arrears: 0 }
 
-const propertyMine = (notice = '') => mockOk('property_mine', { owned: [OWNED, { ...OWNED, no: 44, type: N('corner_shop', 'Corner shop'), kind: 'shop', home: false, value: 160000, offer: { ...OFFER, kind: 'rent', price: 2800, type: N('corner_shop', 'Corner shop'), property_no: 44, mine: true } }], rented: null, residence: CITY, grace: 3, can_rest: true, rest_in_seconds: 0, rest_energy: 30, notice, notice_args: notice === 'rested' ? { energy: 30, rest: 20 } : null }, [
+const VILLAGE_HELD = [{ settlement: N('v-k3x9', 'آمل'), lots: 6, value: 40000, can_rest: false, rest_in_seconds: 16440, buildings: [{ building: N('cottage', 'Cottage'), state: 'complete', home: true, value: 30000 }, { building: N('stall', 'Stall'), state: 'complete', home: false, value: 9000 }] }]
+const propertyMine = (notice = '') => mockOk('property_mine', { village: mockStandsIn() === 'village' ? VILLAGE_HELD : null, owned: mockStandsIn() === 'village' ? [] : [OWNED, { ...OWNED, no: 44, type: N('corner_shop', 'Corner shop'), kind: 'shop', home: false, value: 160000, offer: { ...OFFER, kind: 'rent', price: 2800, type: N('corner_shop', 'Corner shop'), property_no: 44, mine: true } }], rented: null, residence: CITY, grace: 3, can_rest: true, rest_in_seconds: 0, rest_energy: 30, notice, notice_args: notice === 'rested' ? { energy: 30, rest: 20 } : null }, [
   A('property.manage', 'property.view', { no: '41' }), A('property.manage', 'property.view', { no: '44' }), A('property.rest', 'property.rest'), A('property.market', 'property.list'), back('player.profile.get'), refreshA('property.mine'),
 ])
 

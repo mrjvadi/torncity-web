@@ -13,6 +13,7 @@ interface LifeView {
   needs?: Needs; age?: number; stage?: Named
   rank?: Named | null; next?: Named | null; next_need?: number
   worth?: Worth
+  village_home?: { building?: Named; can_rest?: boolean; rest_in_seconds?: number } | null
   spots?: SleepSpot[] | null; sleep_in_seconds?: number; home?: boolean
   notice?: string; notice_args?: Record<string, unknown> | null
 }
@@ -67,6 +68,15 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
         </>
       )}
 
+      {v.village_home && (
+        <Card>
+          <div className="nx-sec" style={{ marginBottom: 8 }}>{t('life.home_bed')}</div>
+          <ListRow icon="bed" palette="emerald" title={t('life.home_bed_in', { name: names.name('settlement_building', v.village_home.building?.code ?? '', v.village_home.building?.name) })}
+            sub={v.village_home.can_rest ? t('life.home_bed_ready') : t('life.home_bed_wait', { t: hms(v.village_home.rest_in_seconds) })}
+            onClick={v.village_home.can_rest ? () => run('settlement.home.rest') : undefined} />
+        </Card>
+      )}
+
       {!!(v.spots && v.spots.length) && (
         <Card>
           <div className="nx-sec" style={{ marginBottom: 8 }}>{t('life.sleep_spots')}</div>
@@ -85,7 +95,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} only={(a) => a.id !== 'life.sleep' && a.id !== 'life.sleep_walk'} refreshCommand="life.me" />
+      <Actions response={response} onAction={onAction} only={(a) => a.id !== 'life.sleep' && a.id !== 'life.sleep_walk' && a.id !== 'life.village_rest'} refreshCommand="life.me" />
     </ScreenScroll>
   )
 }

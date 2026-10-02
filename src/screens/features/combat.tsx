@@ -32,7 +32,6 @@ const Gym: ScreenComponent = () => (
         </div>
       ))}
     </TileGrid>
-    <Card><div className="screen-text">{t('f.combat.77')}</div></Card>
   </Scroll>
 )
 

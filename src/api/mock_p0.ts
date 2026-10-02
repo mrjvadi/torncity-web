@@ -2,6 +2,8 @@
 // crime hub's empty reason, and what a settlement teaches and posts. The mock player is a village resident whose
 // village has a market, so crime is listed; `?as=city` makes them a player standing in the central city instead.
 
+import { mockStandsIn } from '../support/mock'
+
 type Args = Record<string, unknown> | undefined
 
 const ok = (screen: string, view: unknown) => ({ ok: true, screen, view, actions: [] })
@@ -84,6 +86,29 @@ export function mockP0Command(command: string, args?: Args) {
       entries: [
         { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' }, ...(AS_CITY ? [] : [{ code: 'crime', command: 'crime.hub' }]),
         { code: 'missions', command: 'mission.board' }, { code: 'rankings', command: 'life.top' },
+      ],
+    })
+  }
+  if (command === 'economy.hub' || command === 'society.hub') {
+    // what exists where the mock player stands: a village (no bank, no exchange, no property market, a smallholding
+    // possible) or the central city (everything the city has)
+    const city = mockStandsIn() === 'city'
+    const place = city ? { code: 'support', name: 'شهر مرکزی', tier: 'city', neutral: true } : { code: 'v-k3x9', name: 'آمل', tier: 'village', neutral: false }
+    const e = (code: string, cmd: string) => ({ code, command: cmd })
+    if (command === 'economy.hub') {
+      return ok('economy_hub', {
+        place,
+        entries: [
+          e('inventory', 'inventory.show'), e('market', city ? 'market.list' : 'settlement.materials'), e('bank', 'bank.show'),
+          ...(city ? [e('companies', 'company.mine'), e('property', 'property.mine'), e('stocks', 'stock.list')] : [e('companies', 'company.mine')]),
+        ],
+      })
+    }
+    return ok('society_hub', {
+      place,
+      entries: [
+        e('inbox', 'inbox.show'), ...(city ? [e('faction', 'faction.mine')] : []), e('friends', 'social.friend.list'), e('elections', 'election.list'),
+        e('government', 'gov.city'), ...(city ? [e('war', 'military.ministry')] : []),
       ],
     })
   }
