@@ -20,3 +20,8 @@
 ## Checked
 Mock mode, 390x844 and 1440x900: each tab, economy -> bank, HUD cash chip from the profile tab (now lights economy), back to
 home. Shots in `torncity-lab/tools/pwn/shots/dockfix/` (script `tools/pwn/dockfix.js`).
+
+## Follow-up: stale look on the previous tab
+In a shot the gold bar and plate appeared on the previous tab as well as the active one. The state was right (`aria-current` on one tab only); the
+cause was the .15-.18s CSS transitions on the dock tabs, caught frozen mid-way when the page renders slowly (software 3D). The transitions are removed,
+so the dock is always drawn in its final state, and `:focus:not(:focus-visible)` clears any tap outline. Reshot all phone shots; each shows exactly one lit tab with its bar above it.
