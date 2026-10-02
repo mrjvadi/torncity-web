@@ -13,6 +13,7 @@ import { mockBasicCommand } from './mock_basic'
 import { mockLocation, mockSupportCommand } from '../support/mock'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 import { mockSocietyCommand } from './mock_society'
+import { mockP0Command } from './mock_p0'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -94,6 +95,8 @@ const MOCK_PROFILE_ACTIONS = [
 function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.language.set') mockLang = args?.lang === 'en' ? 'en' : 'fa'
   // the economy and finance area: neutral answers of every screen of it (src/api/mock_economy.ts)
+  const p0 = mockP0Command(command, args)
+  if (p0) return json(p0)
   const economy = mockEconomyCommand(command, args ?? {})
   if (economy) return json(economy)
   const support = mockSupportCommand(command, args)

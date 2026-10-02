@@ -642,8 +642,9 @@ hub.economy | اقتصاد | Economy
 hub.society | جامعه | Society
 hub.crime | جرم | Crime
 hub.job | کار | Work
-hub.education | تحصیل | Education
+hub.education | آموزش | Learning
 hub.hospital | بیمارستان | Hospital
+hub.health | سلامت | Health
 hub.missions | مأموریت‌ها | Missions
 hub.leaderboard | رتبه‌ها | Rankings
 hub.gym | باشگاه | Gym
@@ -746,12 +747,12 @@ crime.busy | جرم در حال انجام · {t} مانده | Crime in progress
 crime.travelling | در سفر هستی؛ نمی‌توانی جرم انجام بدهی. | You are travelling; you cannot commit crimes.
 crime.heat | داغی {n} | Heat {n}
 crime.wanted | {n} تحت تعقیب | {n} wanted
-crime.nerve | عصب {a}/{b} | Nerve {a}/{b}
+crime.nerve | جسارت {a}/{b} | Nerve {a}/{b}
 crime.full_in | پر در {t} | Full in {t}
 crime.venue | مکان: {name} | Place: {name}
 crime.tier | رتبه: {name} | Tier: {name}
 crime.tier_next | بعدی: {name} ({a}/{b}) | next: {name} ({a}/{b})
-crime.nerve_cost | {n} عصب | {n} nerve
+crime.nerve_cost | {n} جسارت | {n} nerve
 common.sep | ، | ,
 # -- jobs (board and detail) --------------------------------------------------------
 jobs.board | فرصت‌های شغلی | Job openings
@@ -821,11 +822,11 @@ crime.blocked.work | سر کار هستی | You are at work
 crime.blocked.travelling | در سفر هستی | You are travelling
 crime.blocked.walking | در حال پیاده‌روی هستی | You are walking
 crime.blocked.cooldown | هنوز باید استراحت کنی | You still need to rest
-crime.blocked.nerve | عصب کافی نداری | Not enough nerve
+crime.blocked.nerve | جسارت کافی نداری | Not enough nerve
 crime.blocked.nowhere | اول باید در یک شهر باشی | You must be in a city first
 crime.blocked.default | در حال حاضر ممکن نیست | Not possible right now
 crime.chance | شانس موفقیت {p} | Success chance {p}
-crime.chip_nerve | عصب {n} | Nerve {n}
+crime.chip_nerve | جسارت {n} | Nerve {n}
 crime.chip_duration | مدت {t} | Duration {t}
 crime.chip_take | غنیمت {a} تا {b} | Loot {a} to {b}
 crime.if_caught | در صورت دستگیری: {a}–{b} زندان | If caught: {a}–{b} in jail
@@ -848,7 +849,7 @@ crime.skill_xp | {n} تجربه | {n} XP
 crime.skill_level | رسید به سطح {n} | reached level {n}
 crime.started | جرم آغاز شد | Crime started
 crime.until_end | {t} تا پایان | {t} to go
-crime.nerve_left | عصب باقی‌مانده: {a}/{b} | Nerve left: {a}/{b}
+crime.nerve_left | جسارت باقی‌مانده: {a}/{b} | Nerve left: {a}/{b}
 crime.result_later | نتیجه وقتی جرم تمام شد، در همین‌جا اعلام می‌شود. | The result will appear here when the crime ends.
 # -- profile -------------------------------------------------------------------------
 profile.title | پروفایل | Profile
@@ -3142,3 +3143,50 @@ act.inbox.open | دیدن پیام‌ها | See messages
 act.inbox.read_all | خواندن همه | Mark all read
 act.inbox.open_item | باز کردن | Open
 act.founding.open_form | تکمیل اطلاعات روستا | Fill in the village form
+
+# -- P0: activities, work, health, crime empty, travel, friends -------------------
+common.loading | در حال بارگذاری… | Loading…
+crime.empty.level_too_low | از سطح {n} به بالا می‌توانی سراغ این کار بروی. با کار کردن تجربه بگیر. | Crime opens at level {n}. Earn experience by working.
+crime.empty.no_venue | اینجا جایی برای این کار نیست. | There is no place for this here.
+crime.empty.no_targets | فعلاً کاری نیست که از دستت بربیاید. | There is nothing you can attempt right now.
+crime.empty.go_work | رفتن به کار | Go to work
+crime.empty.go_back | بازگشت به فعالیت‌ها | Back to activities
+work.now | اکنون | Now
+work.idle | الان شیفتی نداری. | You are not on a shift.
+work.energy | انرژی {a} از {b} | Energy {a} of {b}
+work.jobs | کارها | Jobs
+work.workplaces | کارگاه‌ها | Workplaces
+work.start | شروع شیفت (+{w}) | Start shift (+{w})
+work.shift_len | هر شیفت {t} | {t} a shift
+work.needs_inputs | مواد این کارگاه کم است. | This workplace is short of materials.
+work.full | همه‌ی جاهای کار پر است. | Every place is taken.
+work.makes | می‌سازد: {list} | Makes: {list}
+work.empty.no_jobs | فعلاً آگهی کاری نیست و کارگاهی هم برای کار کردن نیست. | No job is posted and there is no workplace to work at yet.
+work.empty.not_resident | برای کار کردن باید ساکن این روستا باشی. | You have to live in this village to work here.
+work.empty.no_settlement | اینجا کار همان شغل‌های شهر است. | Here, work means the careers of the city.
+work.next.build | رفتن به روستا و ساختن کارگاه | Go to the village and build a workplace
+work.next.ask_head | از دهیار بخواه کارگاه بسازد یا آگهی کار بگذارد. | Ask the village head to build a workplace or post a job.
+work.next.join | اول باید به این روستا نقل‌مکان کنی. | Move to this village first.
+work.career | شغل من | My career
+work.not_here | برای شروع باید همین‌جا در روستا باشی. | You have to be in the village to start.
+health.of | {a} از {b} | {a} of {b}
+health.admitted | بستری هستی · {t} تا ترخیص | You are admitted · {t} until discharge
+health.rest | استراحت | Rest
+health.rest_home | استراحت در خانه | Rest at home
+health.rest_wait | {t} دیگر می‌توانی دوباره استراحت کنی. | You can rest again in {t}.
+health.no_home | خانه نداری. با ساختن خانه می‌توانی در آن استراحت کنی. | You have no house to rest in. Build one to rest there.
+health.sleep | خواب | Sleep
+health.sleep_open | جای خواب و نیازهای من | Where to sleep, and my needs
+health.care | درمان | Care
+health.facility.health_house | خانه‌ی بهداشت | Health house
+health.facility.clinic | درمانگاه | Clinic
+health.facility.sub | اینجا به بیمارها رسیدگی می‌کنند. | Patients are looked after here.
+health.empty.no_facility | اینجا خانه‌ی بهداشت یا درمانگاهی نیست. | There is no health house or clinic here.
+health.refer | برای درمان جدی باید به {city} بروی. | For serious treatment you have to go to {city}.
+health.refer_go | سفر به {city} | Travel to {city}
+health.hospital_open | رفتن به بیمارستان | Go to the hospital
+sc.confirm.short | برای این وسیله {n} کم داری. | You are {n} short for this vehicle.
+sc.confirm.short_btn | پول کافی نداری | Not enough money
+friends.search.placeholder | کد یا نام کاربری | Code or username
+friends.search.go | جستجو | Search
+friends.search.title | پیدا کردن دوست | Find a friend

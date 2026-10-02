@@ -62,4 +62,4 @@ const Daily: ScreenComponent = () => (
   </Scroll>
 )
 
-export default { SERVER: {}, LOCAL: { tutorial: Tutorial, daily: Daily } as Record<string, ScreenComponent> }
+export default { SERVER: {}, LOCAL: { tutorial: Tutorial } as Record<string, ScreenComponent> }

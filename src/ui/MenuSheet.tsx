@@ -29,7 +29,7 @@ const MY_LIFE: VillageItem[] = [
   { key: 'land', icon: 'x_field', palette: 'emerald', label: 'menu.land', local: 'village_home', args: { land: '1' }, resident: true },
   { key: 'house', icon: 'house', palette: 'gold', label: 'menu.house', command: 'settlement.private', resident: true },
   { key: 'mine', icon: 'box', palette: 'amber', label: 'menu.mine', command: 'settlement.mine', resident: true },
-  { key: 'work', icon: 'gears', palette: 'sapphire', label: 'menu.work', local: 'village_labor', resident: true },
+  { key: 'work', icon: 'gears', palette: 'sapphire', label: 'menu.work', command: 'work.home', resident: true },
 ]
 
 const THE_VILLAGE: VillageItem[] = [

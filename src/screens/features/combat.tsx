@@ -133,5 +133,5 @@ const Bounty: ScreenComponent = () => (
 
 export default {
   SERVER: {},
-  LOCAL: { gym: Gym, attack: Attack, fight: Fight, bounty: Bounty } as Record<string, ScreenComponent>,
+  LOCAL: { attack: Attack, fight: Fight, bounty: Bounty } as Record<string, ScreenComponent>,
 }

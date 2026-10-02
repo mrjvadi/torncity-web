@@ -14,6 +14,8 @@ import Life from './Life'
 import { PropertyMarket, PropertyMine } from './Property'
 import Missions from './Missions'
 import Hospital from './Hospital'
+import WorkHome from './WorkHome'
+import HealthHome from './HealthHome'
 import { InboxHub, InboxCategory } from './Inbox'
 
 // Native layouts for server screens, by the server's `screen` name, and the
@@ -32,6 +34,8 @@ const screens: ScreenSet = {
     property_mine: PropertyMine,
     mission_board: Missions,
     hospital: Hospital,
+    work_home: WorkHome,
+    health_home: HealthHome,
     inbox_hub: InboxHub,
     inbox_category: InboxCategory,
   },

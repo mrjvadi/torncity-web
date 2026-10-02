@@ -18,16 +18,16 @@ export interface HubTile {
   needs?: { kind: string; code: string }
 }
 
-export const ACTIVITY_TILES: HubTile[] = [
-  { key: 'crime', icon: 'crime', palette: 'ruby', title: 'hub.crime', command: 'crime.hub' },
-  { key: 'job', icon: 'work', palette: 'emerald', title: 'hub.job', command: 'job.status' },
-  { key: 'education', icon: 'study', palette: 'violet', title: 'hub.education', command: 'education.list' },
-  { key: 'hospital', icon: 'hospital', palette: 'ruby', title: 'hub.hospital', command: 'health.hospital' },
-  { key: 'missions', icon: 'missions', palette: 'violet', title: 'hub.missions', command: 'mission.board' },
-  { key: 'leaderboard', icon: 'podium', palette: 'gold', title: 'hub.leaderboard', command: 'life.top' },
-  { key: 'gym', icon: 'x_muscle', palette: 'amber', title: 'hub.gym', local: 'gym' },
-  { key: 'daily', icon: 'gift', palette: 'ruby', title: 'hub.daily', local: 'daily' },
-]
+/** How each activity the server lists (`activities.hub`, ADR 0038 3.3) looks: icon and name. The server decides which
+ * entries a player has; this only dresses them. Gym and daily reward are not here: no server system exists for them. */
+export const ACTIVITY_ENTRIES: Record<string, { icon: string; palette: IconPalette; title: Key }> = {
+  work: { icon: 'work', palette: 'emerald', title: 'hub.job' },
+  learn: { icon: 'study', palette: 'violet', title: 'hub.education' },
+  health: { icon: 'hospital', palette: 'ruby', title: 'hub.health' },
+  crime: { icon: 'crime', palette: 'ruby', title: 'hub.crime' },
+  missions: { icon: 'missions', palette: 'violet', title: 'hub.missions' },
+  rankings: { icon: 'podium', palette: 'gold', title: 'hub.leaderboard' },
+}
 
 export const ECONOMY_TILES: HubTile[] = [
   { key: 'inventory', icon: 'm_backpack', palette: 'gold', title: 'hub.inventory', command: 'inventory.show' },
@@ -45,6 +45,5 @@ export const SOCIETY_TILES: HubTile[] = [
   { key: 'elections', icon: 'vote', palette: 'violet', title: 'hub.elections', command: 'election.list' },
   { key: 'government', icon: 'gavel', palette: 'gold', title: 'hub.government', command: 'gov.city' },
   { key: 'war', icon: 'swords', palette: 'ruby', title: 'hub.war', local: 'war', needs: { kind: 'government_action', code: 'country.war' } },
-  { key: 'family', icon: 'f_hearts', palette: 'ruby', title: 'hub.family', local: 'family' },
   { key: 'village', icon: 'house', palette: 'emerald', title: 'hub.village', local: 'village_home' },
 ]

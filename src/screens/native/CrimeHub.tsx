@@ -2,7 +2,8 @@ import type { ScreenProps } from '../types'
 import { Bar, Card, Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms } from './kit/format'
-import { t } from '../../i18n'
+import { Slab } from '../../kit'
+import { t, type Key } from '../../i18n'
 
 interface Named { code?: string; name?: string }
 interface CrimeHubView {
@@ -14,9 +15,12 @@ interface CrimeHubView {
   jail?: { remaining_seconds?: number } | null
   busy?: { remaining_seconds?: number } | null
   categories?: Named[] | null
+  /** why crime has nothing to offer now: level_too_low, no_venue or no_targets (ADR 0038 4.4) */
+  empty?: string
+  min_level?: number
 }
 
-export default function CrimeHub({ response, loading, onAction, run }: ScreenProps) {
+export default function CrimeHub({ response, loading, onAction, run, openLocal }: ScreenProps) {
   const v = (response?.view ?? {}) as CrimeHubView
   if (loading && !response) return <ScreenScroll><Header title={t('crime.title')} tone="ruby" /></ScreenScroll>
 
@@ -49,8 +53,17 @@ export default function CrimeHub({ response, loading, onAction, run }: ScreenPro
         )}
       </Card>
 
+      {v.empty && (
+        <Card>
+          <div style={{ fontSize: 14, marginBottom: 10 }}>{t(`crime.empty.${v.empty}` as Key, { n: v.min_level ?? 0 })}</div>
+          {v.empty === 'level_too_low'
+            ? <Slab tone="gold" radius={14} lip={4} onClick={() => run('work.home')}>{t('crime.empty.go_work')}</Slab>
+            : <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('activity_hub')}>{t('crime.empty.go_back')}</Slab>}
+        </Card>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {(v.categories ?? []).map((c) => (
+        {(v.empty === 'level_too_low' || v.empty === 'no_venue' ? [] : v.categories ?? []).map((c) => (
           <ListRow key={c.code} icon="crime" palette="ruby" title={c.name ?? c.code ?? '—'}
             onClick={() => c.code && run('crime.list', { category: c.code })} />
         ))}

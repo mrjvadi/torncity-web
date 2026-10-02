@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ScreenProps } from '../types'
 import { Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
-import { hms, money } from '../native/kit/format'
+import { hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import { Emboss, Slab } from '../../kit'
 import Emblem from '../../lib/emblem'
@@ -106,7 +106,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
               <span className="nx-row-text">
                 <span className="nx-row-title">{d.kind === 'city' ? names.name('city', d.code, d.name) : d.name}</span>
                 <span className="nx-row-sub">
-                  {isHere ? t('sc.dest.here') : isHome ? `${t('sc.dest.home')} · ` + `${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}` : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} · ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` · ${hms(d.duration_seconds)}` : ''}`}
+                  {isHere ? t('sc.dest.here') : isHome ? `${t('sc.dest.home')} · ` + `${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}` : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} · ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` · ${roughDuration(d.duration_seconds)}` : ''}`}
                 </span>
               </span>
               {!isHere && d.fare !== undefined && <span className="nx-row-right">{money(d.fare)}</span>}
@@ -130,6 +130,8 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
   const [mode, setMode] = useState('')
   const [busy, setBusy] = useState(false)
   const names = useContentNames()
+  const { profile } = useSession()
+  const cash = profile?.cash
 
   useEffect(() => {
     setOptions(null); setMode('')
@@ -147,17 +149,20 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
 
   if (!dest) return null
   const chosen = options?.find((o) => o.mode_code === mode)
+  // the fare is the player's own cash to pay: show the shortfall and stop the button instead of letting the server refuse
+  const short = chosen && typeof cash === 'number' && chosen.fare > cash ? chosen.fare - cash : 0
+  const modeLabel = (o: ModeOption) => names.name('mode', o.mode_code, o.mode_name ?? modeName(o.mode_code))
   return (
     <Popup
       open onClose={onClose} tone="navy" dismissible={!busy}
       title={service ? t('lf.menu.service_to', { city: dest.kind === 'city' ? names.name('city', dest.code, dest.name) : dest.name, service: t(`lf.menu.service.${service}` as Key) }) : t('sc.confirm.title', { name: dest.kind === 'city' ? names.name('city', dest.code, dest.name) : dest.name })}
       footer={(
         <ActionButton
-          tone="gold" cost={chosen ? (chosen.fare > 0 ? money(chosen.fare) : t('common.free')) : undefined} costIcon="coins" costPalette="gold"
-          disabled={!chosen} busy={busy}
+          tone="gold"
+          disabled={!chosen || short > 0} busy={busy}
           onClick={() => { if (!chosen) return; setBusy(true); void onGo(dest, chosen.mode_code, chosen.fare).finally(() => setBusy(false)) }}
         >
-          {t('sc.confirm.go')}
+          {short > 0 ? t('sc.confirm.short_btn') : t('sc.confirm.go')}
         </ActionButton>
       )}
     >
@@ -169,19 +174,20 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
       </Hero>
       <StatGrid>
         <StatCard icon="x_map" palette="sapphire" label={t('sc.confirm.distance')} value={t('sc.dest.km', { n: formatNumber(Math.round(dest.distance_km)) })} />
-        {dest.duration_seconds ? <StatCard icon="stopwatch" palette="amber" label={t('sc.confirm.time')} value={hms(dest.duration_seconds)} /> : null}
+        {dest.duration_seconds ? <StatCard icon="stopwatch" palette="amber" label={t('sc.confirm.time')} value={roughDuration(dest.duration_seconds)} /> : null}
       </StatGrid>
       <div className="sc-modes">
         {options === null && <Note>{t('sc.confirm.loading')}</Note>}
         {options?.length === 0 && <Note tone="bad">{t('sc.confirm.no_mode')}</Note>}
+        {short > 0 && <Note tone="bad">{t('sc.confirm.short', { n: money(short) })}</Note>}
         {options?.map((o) => (
           <ListRow
             key={o.mode_code}
             icon={MODE_ICON[o.mode_code] ?? 'plane'}
             palette={o.mode_code === mode ? 'gold' : 'teal'}
             tone={o.mode_code === mode ? 'gold' : undefined}
-            title={o.mode_name ?? modeName(o.mode_code)}
-            sub={`${hms(o.wait_seconds)}${o.busy ? ` · ${t('sc.confirm.busy')}` : ''}`}
+            title={modeLabel(o)}
+            sub={`${roughDuration(o.wait_seconds)}${o.busy ? ` · ${t('sc.confirm.busy')}` : ''}`}
             right={money(o.fare)}
             onClick={o.busy ? undefined : () => setMode(o.mode_code)}
           />

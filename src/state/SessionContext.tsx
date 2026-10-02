@@ -186,6 +186,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (!keys) return
       const patch: Record<string, unknown> = {}
       for (const k of keys) if (view[k] !== undefined && view[k] !== null) patch[k] = view[k]
+      // a screen that carries no energy (an unemployed job status) sends 0 of 0: that is not the player's energy
+      if (patch.max_energy === 0) { delete patch.max_energy; delete patch.energy; delete patch.energy_full_in_seconds }
       if (Object.keys(patch).length > 0) {
         setProfile((p) => (p ? ({ ...p, ...patch } as ProfileView) : p))
       }

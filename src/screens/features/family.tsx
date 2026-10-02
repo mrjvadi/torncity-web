@@ -145,5 +145,5 @@ const Wedding: ScreenComponent = () => (
 
 export default {
   SERVER: {},
-  LOCAL: { family: Family, proposal: Proposal, child: Child, divorce: Divorce, wedding: Wedding } as Record<string, ScreenComponent>,
+  LOCAL: {} as Record<string, ScreenComponent>,
 }

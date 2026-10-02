@@ -106,7 +106,7 @@ function cities(page: number) {
 }
 
 const MODES = [
-  { mode_code: 'bus', mode_name: 'Bus', fare: 6300, wait_seconds: 900, energy: 4, busy: false, vehicle: null, condition: 0 },
+  { mode_code: 'bus', mode_name: 'Bus', fare: 31785, wait_seconds: 900, energy: 4, busy: false, vehicle: null, condition: 0 },
   { mode_code: 'train', mode_name: 'Train', fare: 9800, wait_seconds: 600, energy: 3, busy: true, vehicle: null, condition: 0 },
   { mode_code: 'bicycle', mode_name: 'Bicycle', fare: 0, wait_seconds: 3000, energy: 12, busy: false, vehicle: N('bicycle', 'Bicycle'), condition: 8200 },
 ]

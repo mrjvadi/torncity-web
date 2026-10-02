@@ -1,25 +1,47 @@
+import { useCallback, useEffect, useState } from 'react'
 import type { ScreenProps } from '../types'
-import { Header, ScreenScroll, Tile, TileGrid } from './kit/Parts'
-import { ACTIVITY_TILES } from './kit/hubs'
+import { Empty, Header, PrimaryButton, ScreenScroll, Tile, TileGrid } from './kit/Parts'
+import { ACTIVITY_ENTRIES } from './kit/hubs'
+import * as api from '../../api/client'
+import type { ActivitiesHubView } from '../../api/views.gen'
 import { t } from '../../i18n'
 
-export default function ActivityHub({ run, openLocal }: ScreenProps) {
+type Load = { state: 'loading' } | { state: 'failed' } | { state: 'ready'; view: ActivitiesHubView }
+
+/** The Activities hub: the entries the server lists for where the player stands (`activities.hub`, ADR 0038 3.3).
+ * An activity that is not listed is not mentioned; the client holds no rule about which are. */
+export default function ActivityHub({ run }: ScreenProps) {
+  const [load, setLoad] = useState<Load>({ state: 'loading' })
+  const fetchHub = useCallback(() => {
+    setLoad({ state: 'loading' })
+    api.runCommand('activities.hub', {})
+      .then((r) => setLoad(r.ok !== false && r.view ? { state: 'ready', view: r.view as unknown as ActivitiesHubView } : { state: 'failed' }))
+      .catch(() => setLoad({ state: 'failed' }))
+  }, [])
+  useEffect(fetchHub, [fetchHub])
+
   return (
     <ScreenScroll>
       <Header title={t('hub.activity')} tone="violet" />
       <div className="nx-hub-body">
-        <TileGrid>
-        {ACTIVITY_TILES.map((tile) => (
-          <Tile
-            key={tile.key}
-            icon={tile.icon}
-            palette={tile.palette}
-            title={t(tile.title)}
-            sub={tile.sub ? t(tile.sub) : undefined}
-            onClick={() => (tile.command ? run(tile.command) : openLocal(tile.local!))}
-          />
-        ))}
-        </TileGrid>
+        {load.state === 'loading' && <Empty>{t('common.loading')}</Empty>}
+        {load.state === 'failed' && (
+          <>
+            <Empty>{t('common.load_failed')}</Empty>
+            <PrimaryButton onClick={fetchHub}>{t('common.refresh')}</PrimaryButton>
+          </>
+        )}
+        {load.state === 'ready' && (
+          <TileGrid>
+            {(load.view.entries ?? []).map((e) => {
+              const look = ACTIVITY_ENTRIES[e.code]
+              if (!look) return null
+              // «بیمارستان» is the name of a city's (and the central city's) place of care; in a village or a town it is «سلامت»
+              const title = e.code === 'health' && load.view.place.tier === 'city' ? t('hub.hospital') : t(look.title)
+              return <Tile key={e.code} icon={look.icon} palette={look.palette} title={title} onClick={() => run(e.command)} />
+            })}
+          </TileGrid>
+        )}
       </div>
     </ScreenScroll>
   )

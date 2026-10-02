@@ -1,6 +1,8 @@
 // People and boards: the friend list, a search for one player, and the leaderboards. A search names
 // exactly one player by an exact identifier and never shows an account's Telegram id.
 
+import { useState } from 'react'
+import type { FlowCtx } from '../village/flow'
 import type { BoardView, FriendAcceptedView, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
 import { Chip, ListRow, Segmented } from '../native/kit/Parts'
 import { Slab } from '../../kit'
@@ -12,6 +14,18 @@ import { screen } from './host'
 import { Pager } from './governance'
 import { key, word } from './common'
 
+/** The search the empty friend list promises: a code or a username, answered by one player (`social.search`). */
+function SearchBox({ ctx }: { ctx: FlowCtx }) {
+  const [q, setQ] = useState('')
+  const go = () => { const query = q.trim(); if (query) ctx.go({ kind: 'navigation', command: 'social.search', args: { query } }) }
+  return (
+    <form className="vf-stack" onSubmit={(e) => { e.preventDefault(); go() }}>
+      <input className="sc-input" dir="ltr" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('friends.search.placeholder')} aria-label={t('friends.search.title')} />
+      <Slab tone="gold" radius={12} lip={3} disabled={ctx.busy || !q.trim()} onClick={go}>{t('friends.search.go')}</Slab>
+    </form>
+  )
+}
+
 const name = (n: string) => n || t('soc.unknown_player')
 
 const Friends = screen<FriendsView>(({ view: v, ctx }) => {
@@ -20,6 +34,7 @@ const Friends = screen<FriendsView>(({ view: v, ctx }) => {
   return (
     <Page title={t('soc.friends.title')} tone="emerald">
       {friends.length === 0 && <Panel tone="emerald"><Lead>{t('soc.friends.empty')}</Lead></Panel>}
+      <SearchBox ctx={ctx} />
       <div className="vf-stack">
         {friends.map((f) => {
           const act = accept.find((a) => a.args?.player === f.id)
@@ -41,6 +56,7 @@ const Search = screen<SearchView>(({ view: v, ctx }) => {
   const f = v.found
   return (
     <Page title={t('soc.search.title')} tone="sapphire">
+      <SearchBox ctx={ctx} />
       <Panel tone="sapphire">
         {v.help && <Lead>{t('soc.search.help')}</Lead>}
         {!v.help && !f && <Lead>{word(`soc.search.not_found.${v.by}`, t('soc.search.help'), { query: v.query })}</Lead>}
