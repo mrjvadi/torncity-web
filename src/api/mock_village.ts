@@ -1231,6 +1231,9 @@ function buildingView(args: Record<string, unknown>) {
     if (kind === 'school') { view.literacy_percent = st.literacy; view.teaching = true }
     if (kind === 'civic_hall') {
       view.treasury = st.treasury; view.population = 2
+      // the hall can be upgraded once the village knows irrigation (a requirement left unmet, for the confirm popup)
+      view.tier = 2; view.has_upgrade = true
+      if (mode === 'up') view.upgrades = [{ building: nameOf('civic_hall'), tier: 3, cost_money: 480, build_time_seconds: 3600, available: false, missing: [kn('irrigation')], needs_tier: '' }]
       const run = st.know.find((k) => k.state === 'researching')
       view.research = run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? Date.now()).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? Date.now()) - Date.now()) / 1000)) } : null
     }

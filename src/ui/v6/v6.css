@@ -346,3 +346,5 @@
    the build button is gone (building starts from «ساخت من», the rail's «ساخت» and the B key) */
 .v6 .vh-side { top: 50%; margin-top: -48px; right: 10px; }
 @media (min-width: 900px) { .v6 .vh-side { top: 14px; margin-top: 0; right: 14px; } }
+/* build mode and the land map bring their own panel at the bottom: the quest strip steps aside */
+.v6-app:has(.vh-panel) .v6-info { display: none; }

@@ -309,10 +309,13 @@ export function TipHost() {
       if (el && el === at) { at = null; setTip(null) }
     }
     const hide = () => { at = null; setTip(null) }
+    // a tooltip whose element left the page (a ring closed under the pointer) goes with it
+    const move = () => { if (at && !at.isConnected) hide() }
+    document.addEventListener('mousemove', move)
     document.addEventListener('mouseover', over)
     document.addEventListener('mouseout', out)
     document.addEventListener('mousedown', hide)
-    return () => { document.removeEventListener('mouseover', over); document.removeEventListener('mouseout', out); document.removeEventListener('mousedown', hide) }
+    return () => { document.removeEventListener('mouseover', over); document.removeEventListener('mouseout', out); document.removeEventListener('mousedown', hide); document.removeEventListener('mousemove', move) }
   }, [])
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
   useEffect(() => {
