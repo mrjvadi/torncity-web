@@ -51,7 +51,6 @@ const Ministry = flow<MinistryView>(({ view: v, ctx }) => {
   if (v.unavailable) return <NotHere u={v.unavailable} ctx={ctx} title={t('mil.title')} tone="ruby" />
   const exports = `soc.lv.country.arms_exports.${v.arms_exports}`
   const navs = NAV.map((n) => ({ n, a: find(ctx, n.id) })).filter((x) => x.a)
-  const drawn = new Set(navs.map((x) => x.a))
   return (
     <Page title={t('mil.ministry.title', { country: place(ctx, v.country) })} tone="ruby">
       <NoticeCard ctx={ctx} n={v.notice} />
@@ -108,7 +107,7 @@ const Ministry = flow<MinistryView>(({ view: v, ctx }) => {
           ]} />
         ) : <Hint>{t('mil.forces.bands_only')}</Hint>}
       </Panel>
-      <Btns ctx={ctx} list={rest(ctx, (a) => drawn.has(a)).filter(isBack)} />
+      <Tail ctx={ctx} />
     </Page>
   )
 })
@@ -243,7 +242,7 @@ const Station = flow<StationView>(({ view: v, ctx }) => {
           </>
         )}
       </Panel>
-      <Btns ctx={ctx} list={rest(ctx, (a) => [...cities, ...qty, ...custom].includes(a)).filter(isBack)} />
+      <Tail ctx={ctx} />
     </Page>
   )
 })

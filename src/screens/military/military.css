@@ -15,3 +15,6 @@
 .mil-list { display: flex; flex-direction: column; gap: 8px; }
 .mil-bad { color: #ffb4b7; }
 .mil-good { color: #8fe0ac; }
+
+.mil-block .vh-hint { margin: 0; padding: 0; }
+.mil-block .sc-title, .mil-block > :first-child { margin-top: 0; }

@@ -59,10 +59,7 @@ function WarBlock({ ctx, w }: { ctx: FlowCtx; w: WarLine }) {
 
 function Occupied({ ctx, o }: { ctx: FlowCtx; o: OccupationLine }) {
   return (
-    <div className="mil-line">
-      <span>{t('mil.war.occupied', { city: cityName(ctx, o.city_code, o.city), controller: place(ctx, o.controller), owner: place(ctx, o.de_jure) })}</span>
-      <b>{durationText(o.since_seconds)}</b>
-    </div>
+    <Hint>{t('mil.war.occupied', { city: cityName(ctx, o.city_code, o.city), controller: place(ctx, o.controller), owner: place(ctx, o.de_jure) })} · {durationText(o.since_seconds)}</Hint>
   )
 }
 
@@ -72,7 +69,7 @@ export function OperationBlock({ ctx, o }: { ctx: FlowCtx; o: OperationLine }) {
     <div className="mil-block">
       <div className="mil-head">
         <span>{t('mil.op.title', { kind: operationName(ctx, o.kind), objective: objectiveName(ctx, o.objective), city: cityName(ctx, o.city_code, o.city) })}</span>
-        <span>{t('mil.war.no', { no: formatNumber(o.no) })}</span>
+        <span>{t('mil.op.no', { no: formatNumber(o.no) })}</span>
       </div>
       <Hint>{t('mil.op.sides', { country: place(ctx, o.country), target: place(ctx, o.target) })}</Hint>
       {o.called_off && <Hint>{t('mil.op.called_off')}</Hint>}
@@ -127,10 +124,7 @@ const WarBoard = flow<WarBoardView>(({ view: v, ctx }) => {
           <SectionTitle>{t('mil.war.cities')}</SectionTitle>
           {(v.occupied ?? []).map((o) => <Occupied key={o.city_code} ctx={ctx} o={o} />)}
           {(v.damaged ?? []).map((d) => (
-            <div key={d.city_code} className="mil-line">
-              <span>{t('mil.war.damaged', { city: cityName(ctx, d.city_code, d.city), band: damageName(ctx, d.band) })}</span>
-              <b>{d.closed_in_seconds > 0 ? t('mil.war.closed_for', { in: durationText(d.closed_in_seconds) }) : ''}</b>
-            </div>
+            <Hint key={d.city_code}>{t('mil.war.damaged', { city: cityName(ctx, d.city_code, d.city), band: damageName(ctx, d.band) })}{d.closed_in_seconds > 0 ? ` · ${t('mil.war.closed_for', { in: durationText(d.closed_in_seconds) })}` : ''}</Hint>
           ))}
         </Panel>
       )}

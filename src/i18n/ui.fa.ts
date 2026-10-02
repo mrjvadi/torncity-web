@@ -3231,6 +3231,7 @@ export const uiFa = {
   'mil.war.room_sub': 'شهرهای دشمن و عملیات‌های در جریان',
   'mil.war.declare_sub': 'اعلان جنگ به یک کشور',
   'mil.op.title': '{kind} · {objective} · {city}',
+  'mil.op.no': 'عملیات شمارهٔ {no}',
   'mil.op.sides': '{country} علیه {target}',
   'mil.op.called_off': 'عملیات لغو شد.',
   'mil.op.pending': '{in} دیگر انجام می‌شود.',

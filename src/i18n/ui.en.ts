@@ -3233,6 +3233,7 @@ export const uiEn: Record<UiKey, string> = {
   'mil.war.room_sub': 'Enemy cities and the operations under way',
   'mil.war.declare_sub': 'Declare war on a country',
   'mil.op.title': '{kind} · {objective} · {city}',
+  'mil.op.no': 'Operation no. {no}',
   'mil.op.sides': '{country} against {target}',
   'mil.op.called_off': 'The operation was called off.',
   'mil.op.pending': 'It strikes in {in}.',
