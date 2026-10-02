@@ -1,21 +1,29 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { takeResume, saveResume } from '../i18n/resume'
-import Hud from './Hud'
-import { Emboss } from '../kit'
-import Dock, { type TabKey } from './Dock'
-import GenericScreen from './GenericScreen'
 import { Screen } from '../kit'
-import MenuSheet from './MenuSheet'
+import GenericScreen from './GenericScreen'
+import MenuSheet, { MY_LIFE, THE_VILLAGE } from './MenuSheet'
 import { useSession } from '../state/SessionContext'
 import { seedScreen, useScreen } from '../state/useScreen'
 import type { Action } from '../api/types'
 import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 import { foundingDraftFromLaunch } from '../lib/telegram'
 import * as api from '../api/client'
-import { t } from '../i18n'
+import { t, type Key } from '../i18n'
 import { HOME_SCREENS, homeScreen, locationKey } from '../support/location'
 import { useToast } from '../state/ToastContext'
 import { NavCtx } from '../state/NavContext'
+import { useVillage } from '../village/useVillage'
+import { useCare, careWord } from '../support/care'
+import { ACTIVITY_ENTRIES, ECONOMY_ENTRIES, SOCIETY_ENTRIES } from '../screens/native/kit/hubs'
+import type { HubView, ActivitiesHubView } from '../api/views.gen'
+import { HudBar, WipColumn, EventsColumn, QuestStrip, PhoneDock, NavRail, DockedPanel, TipHost, type DockTab, type RailSection } from './v6/parts'
+import { useDesktop, useHud, usePortrait, useWip, useEvents, useQuest, useTicker } from './v6/hooks'
+import { ChromeCtx, type Chrome } from './v6/chrome'
+import './v6/v6.css'
+
+export type TabKey = 'profile' | 'activity' | 'city' | 'market' | 'society'
+const TAB_ORDER: TabKey[] = ['profile', 'activity', 'city', 'market', 'society']
 
 /** The village tab: the player's village, or the call to found one. Support
  * is a journey away, never a tab. */
@@ -36,6 +44,10 @@ const TAB_HUB: Partial<Record<TabKey, string>> = {
   society: 'society_hub',
 }
 
+const TAB_ICON: Record<TabKey, string> = { profile: 'user', activity: 'tool', city: 'house', market: 'bag', society: 'banner' }
+const TAB_LABEL: Record<TabKey, Key> = { profile: 'shell.tab.profile', activity: 'shell.tab.activity', city: 'shell.tab.city', market: 'shell.tab.market', society: 'shell.tab.society' }
+const PLACE_LABEL: Record<string, Key> = { village: 'shell.tab.village', town: 'shell.tab.town', city: 'shell.tab.city' }
+
 /** The starter city, whose services are a journey from a village. */
 function supportCity(b: { cities: { code: string; name: string }[] } | null | undefined) {
   const c = b?.cities.find((x) => x.code === 'support')
@@ -55,8 +67,30 @@ function placeTier(b: unknown): string | undefined {
 
 type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
 
+/** The entries the server lists in a hub for where the player stands, for the desktop rail's sub-items. One read
+ * per hub, again when the place changes. The client holds no rule about which exist. */
+function useHubEntries(enabled: boolean, placeKey: string) {
+  const [hubs, setHubs] = useState<Record<string, { code: string; command: string }[]>>({})
+  const [tier, setTier] = useState('')
+  useEffect(() => {
+    if (!enabled) return
+    let cancelled = false
+    const one = async (name: string, command: string) => {
+      const r = await api.runCommand(command, {}).catch(() => null)
+      const v = r && r.ok !== false ? (r.view as unknown as HubView | ActivitiesHubView | undefined) : undefined
+      if (cancelled || !v) return
+      setHubs((h) => ({ ...h, [name]: (v.entries ?? []).map((e) => ({ code: e.code, command: e.command })) }))
+      if (name === 'society') setTier(v.place?.tier ?? '')
+    }
+    void one('activity', 'activities.hub'); void one('market', 'economy.hub'); void one('society', 'society.hub')
+    return () => { cancelled = true }
+  }, [enabled, placeKey])
+  return { hubs, tier }
+}
+
 export default function Shell() {
-  const { profile, unread, exec, signOut, bootstrap } = useSession()
+  const { profile, unread, exec, bootstrap } = useSession()
+  const desktop = useDesktop()
   // a language switch restarts the page: come back to the same screen
   const resumed = useRef(takeResume()).current
   const [tab, setTab] = useState<TabKey>((resumed?.tab as TabKey | undefined) ?? 'city')
@@ -158,55 +192,233 @@ export default function Shell() {
     else navigate(next)
   }
 
-  const isLocal = !!screenKey.local
-  const { response, loading } = useScreen(isLocal ? null : screenKey.command, screenKey.args, again)
-  const Local = isLocal ? LOCAL_SCREENS[screenKey.local!] : undefined
-  const Native = !isLocal && response?.screen ? SERVER_SCREENS[response.screen] : undefined
-  const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: screenKey.args }
+  // -- what is on screen -------------------------------------------------------------------------------
+  // A phone shows one screen at a time. A desktop keeps the world (the village or the city) always drawn and docks
+  // every other screen beside it, so opening something never throws the world away.
+  const home = homeScreen(bootstrap)
+  const homeIsWorld = FULL_BLEED.has(home.local)
+  const screenIsWorld = !!screenKey.local && FULL_BLEED.has(screenKey.local)
+  const splitWorld = desktop && homeIsWorld
+  const worldKey: ScreenKey | null = splitWorld ? (screenIsWorld ? screenKey : { command: '', local: home.local, args: home.args }) : null
+  const contentKey: ScreenKey | null = splitWorld && screenIsWorld ? null : screenKey
+  const panelOpen = splitWorld && !screenIsWorld
+  const worldShown = worldKey ?? (screenIsWorld ? screenKey : null)
+  const ownVillageHome = !!worldShown && worldShown.local === 'village_home' && !worldShown.args?.id
+
+  const isLocal = !!contentKey?.local
+  const { response, loading } = useScreen(contentKey && !isLocal ? contentKey.command : null, contentKey?.args, again)
+  const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: contentKey?.args }
+  const Local = contentKey?.local ? LOCAL_SCREENS[contentKey.local] : undefined
+  const Native = contentKey && !isLocal && response?.screen ? SERVER_SCREENS[response.screen] : undefined
+  const content: ReactNode = !contentKey ? null
+    : contentKey.local && FULL_BLEED.has(contentKey.local) && Local ? <Local {...props} />
+      : (
+        <Screen>
+          {Local ? <Local {...props} />
+            : Native ? <Native {...props} />
+              : <GenericScreen response={response} loading={loading} onAction={onAction} />}
+        </Screen>
+      )
+  const WorldLocal = worldKey?.local ? LOCAL_SCREENS[worldKey.local] : undefined
+  const world: ReactNode = worldKey && WorldLocal ? <WorldLocal response={null} loading={false} onAction={onAction} run={run} openLocal={openLocal} localArgs={worldKey.args} /> : null
+
+  // -- the shell's own data (all from the state-sync store, the session and the village) --------------------
+  const settlementId = bootstrap?.settlement?.id
+  const village = useVillage(settlementId)
+  const layout = village.layout
+  const hud = useHud(profile)
+  const portrait = usePortrait(profile?.name ?? '')
+  const canBuild = !!layout?.viewer.can_place || !!layout?.viewer.resident
+  const wip = useWip(layout, canBuild)
+  const events = useEvents()
+  const quest = useQuest(settlementId, layout?.version)
+  const ticker = useTicker()
+  const place = placeTier(bootstrap) ?? 'village'
+
+  function openWip(s: { key: string; idle: boolean }) {
+    if (s.key === 'shift') run('job.status')
+    else if (s.key === 'study') run('education.list')
+    else if (layout?.viewer.can_place) openLocal('village_home', { build: '1' })
+    else if (s.idle) openLocal('village_home', { land: '1' })
+    else openLocal('village_progress')
+  }
+  const openEvent = (e: { open: { command?: string; local?: string } }) => (e.open.command ? run(e.open.command) : openLocal(e.open.local!))
+
+  // -- the chrome's rectangles, for the 3D view and the ring ----------------------------------------------------
+  const els = useRef<{ hud: HTMLElement | null; info: HTMLElement | null; dock: HTMLElement | null; wip: HTMLElement | null; events: HTMLElement | null }>({ hud: null, info: null, dock: null, wip: null, events: null })
+  const listeners = useRef(new Set<() => void>())
+  const chrome = useMemo<Chrome>(() => ({
+    desktop,
+    hud: () => els.current.hud?.getBoundingClientRect() ?? null,
+    bottom: () => {
+      const a = els.current.info?.getBoundingClientRect(), d = els.current.dock?.getBoundingClientRect()
+      if (a && d) return new DOMRect(d.left, Math.min(a.top, d.top), d.width, d.bottom - Math.min(a.top, d.top))
+      return a ?? d ?? null
+    },
+    sides: () => [els.current.wip, els.current.events].flatMap((e) => (e && e.getBoundingClientRect().width > 0 ? [e.getBoundingClientRect()] : [])),
+    subscribe: (cb) => { listeners.current.add(cb); return () => { listeners.current.delete(cb) } },
+  }), [desktop])
+  const wipCount = wip.length, evCount = events.length, hasQ = !!quest, hasT = !!ticker
+  useEffect(() => {
+    const fire = () => listeners.current.forEach((cb) => cb())
+    const id = requestAnimationFrame(fire)
+    window.addEventListener('resize', fire)
+    return () => { cancelAnimationFrame(id); window.removeEventListener('resize', fire) }
+  }, [wipCount, evCount, hasQ, hasT, desktop, ownVillageHome])
+
+  // -- desktop: the rail's sections, the keyboard -------------------------------------------------------------------
+  const { hubs, tier } = useHubEntries(desktop, `${locKey}|${settlementId ?? ''}`)
+  const care = useCare()
+  const placeWord = t(PLACE_LABEL[place] ?? 'shell.tab.city')
+  const tabLabel = (k: TabKey) => (k === 'city' ? placeWord : t(TAB_LABEL[k]))
+
+  const sections: RailSection[] = TAB_ORDER.map((k, i) => {
+    const items: RailSection['items'] = []
+    const hubItems = (table: Record<string, { title: Key }>, name: string, title?: (code: string) => Key | undefined) => {
+      for (const e of hubs[name] ?? []) {
+        const look = table[e.code]
+        if (!look) continue
+        items.push({ key: e.code, label: t(title?.(e.code) ?? look.title), on: contentKey?.command === e.command, onClick: () => run(e.command) })
+      }
+    }
+    if (k === 'profile') {
+      items.push({ key: 'skills', label: t('profile.skills'), on: contentKey?.command === 'skills.list', onClick: () => run('skills.list') })
+      items.push({ key: 'life', label: t('profile.life'), on: contentKey?.command === 'life.me', onClick: () => run('life.me') })
+      items.push({ key: 'card', label: t('profile.card'), on: contentKey?.command === 'life.card', onClick: () => run('life.card') })
+      items.push({ key: 'settings', label: t('settings.title'), on: contentKey?.command === 'player.settings', onClick: () => run('player.settings') })
+    } else if (k === 'activity') {
+      hubItems(ACTIVITY_ENTRIES, 'activity', (c) => (c === 'health' && careWord(care) === 'hospital' ? 'hub.hospital' : undefined))
+    } else if (k === 'market') {
+      hubItems(ECONOMY_ENTRIES, 'market')
+    } else if (k === 'society') {
+      hubItems(SOCIETY_ENTRIES, 'society', (c) => (c === 'government' && tier === 'village' ? 'hub.government_village' : undefined))
+    } else if (bootstrap?.settlement) {
+      const s = bootstrap.settlement
+      if (layout?.viewer.can_place && homeIsWorld) items.push({ key: 'build', label: t('v6.rail.build'), onClick: () => openLocal('village_home', { build: '1' }) })
+      for (const it of [...MY_LIFE, ...THE_VILLAGE]) {
+        if ((it.head && !s.is_head) || (it.notHead && s.is_head) || (it.resident && s.resident === false)) continue
+        const isCmd = !!it.command
+        items.push({
+          key: it.key, label: t(it.label),
+          on: isCmd ? contentKey?.command === it.command : contentKey?.local === it.local && JSON.stringify(contentKey?.args ?? {}) === JSON.stringify(it.args ?? {}),
+          onClick: () => (isCmd ? run(it.command!) : openLocal(it.local!, it.args)),
+        })
+      }
+    }
+    return { key: k, icon: TAB_ICON[k], label: tabLabel(k), kbd: String(i + 1), items, onSelect: () => selectTab(k) }
+  })
+
+  const stateRef = useRef({ panelOpen, canPlace: !!layout?.viewer.can_place, homeIsWorld })
+  stateRef.current = { panelOpen, canPlace: !!layout?.viewer.can_place, homeIsWorld }
+  const selectTabRef = useRef(selectTab); selectTabRef.current = selectTab
+  const openLocalRef = useRef(openLocal); openLocalRef.current = openLocal
+  useEffect(() => {
+    if (!desktop) return
+    const key = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      const tg = e.target as HTMLElement | null
+      if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT' || tg.isContentEditable)) return
+      const m = /^Digit([1-5])$/.exec(e.code)
+      if (m) { selectTabRef.current(TAB_ORDER[+m[1] - 1]); return }
+      if (e.code === 'KeyM') { selectTabRef.current('city'); return }
+      if (e.code === 'KeyB' && stateRef.current.canPlace && stateRef.current.homeIsWorld) { openLocalRef.current('village_home', { build: '1' }); return }
+      // Escape closes the popup first (it handles itself), then the ring (the village view handles that), then the panel
+      if (e.key === 'Escape' && stateRef.current.panelOpen && !document.querySelector('.v6-scrim, .v6-ring, .pp-overlay')) selectTabRef.current('city')
+    }
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  }, [desktop])
+
+  // the docked panel's breadcrumb: the section, then the open screen's own title (read from its header)
+  const panelBody = useRef<HTMLDivElement | null>(null)
+  const [screenTitle, setScreenTitle] = useState('')
+  const readTitle = useCallback(() => {
+    const el = panelBody.current?.querySelector('.cx-hdr-title, .k-ribbon-title')
+    setScreenTitle((el?.textContent ?? '').trim())
+  }, [])
+  useEffect(() => {
+    setScreenTitle('')
+    const host = panelBody.current
+    if (!host || !panelOpen) return
+    readTitle()
+    const mo = new MutationObserver(readTitle)
+    mo.observe(host, { childList: true, subtree: true, characterData: true })
+    return () => mo.disconnect()
+  }, [panelOpen, screenKey, readTitle])
+
+  const tabs: DockTab[] = TAB_ORDER.map((k) => ({ key: k, icon: TAB_ICON[k], label: tabLabel(k), dot: k === 'society' ? unread : 0 }))
+  function onDock(k: string) {
+    // pressing the place tab again, at the village page, opens the village menu (a phone has no rail)
+    if (k === 'city' && tab === 'city' && atRoot && screenKey.local === 'village_home' && bootstrap?.settlement) { setMenuOpen(true); return }
+    selectTab(k as TabKey)
+  }
+
+  const showWorldChrome = ownVillageHome
+  const kind = worldShown ? 'world' : 'screen'
+  const onBank = () => void onAction({ label: '', command: 'bank.show', row: 0, kind: 'navigation' })
 
   return (
     <NavCtx.Provider value={{ back: atRoot ? null : goBack }}>
-    <div className="shell">
-      <Hud
-        profile={profile}
-        onBank={() => onAction({ label: '', command: 'bank.show', row: 0, kind: 'navigation' })}
-        onAvatar={() => selectTab('profile')}
-      />
-      <main className="shell-main">
-        {screenKey.local === 'village_home' && bootstrap?.settlement && (
-          <button className="vm-btn" onClick={() => setMenuOpen(true)} aria-label={t('village.menu.title')}>
-            <Emboss name="menu" palette="gold" size={22} />
-          </button>
-        )}
-        {screenKey.local && FULL_BLEED.has(screenKey.local) && Local ? <Local {...props} />
-          : (
-            <Screen>
-              {Local ? <Local {...props} />
-                : Native ? <Native {...props} />
-                  : <GenericScreen response={response} loading={loading} onAction={onAction} />}
-            </Screen>
-          )}
-      </main>
-      <Dock active={tab} onSelect={selectTab} badge={{ society: unread }} place={placeTier(bootstrap)} />
+      <ChromeCtx.Provider value={chrome}>
+        <div className="v6 v6-app" data-panel={panelOpen ? 'open' : 'closed'} data-desk={desktop ? '1' : '0'}>
+          <main className="v6-main" data-kind={kind}>
+            {splitWorld ? world : content}
+          </main>
+          {kind === 'world' && !desktop && <><div className="v6-shade-top" /><div className="v6-shade-bot" /></>}
 
-      <MenuSheet
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, resident: bootstrap.settlement.resident, support: supportCity(bootstrap) } : undefined}
-        onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
-        onCommand={(command, args) => { setTab('city'); run(command, args) }}
-        onTravel={(code, service) => { setTab('city'); openLocal('support_travel', { to: code, service }) }}
-      />
-      <style>{`
-        .shell { display: flex; flex-direction: column; height: 100%; }
-        .shell-main { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        /* the village menu: one small round button on the village view */
-        .vm-btn { position: absolute; z-index: 4; right: 10px; bottom: 44px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(7,10,20,0.55); border: 1.5px solid rgba(255,214,107,0.55); backdrop-filter: blur(3px); }
-        .vm-btn:active { transform: translateY(1px); }
-        /* build mode and the land map have their own panel at the bottom: the menu button steps aside */
-        .shell-main:has(.vh-panel) .vm-btn { display: none; }
-      `}</style>
-    </div>
+          <HudBar
+            hud={hud} name={profile?.name ?? ''} portrait={portrait}
+            onAvatar={() => selectTab('profile')} onBank={onBank} innerRef={(e) => { els.current.hud = e }}
+          >
+            {desktop && showWorldChrome && <EventsColumn events={events} desktop onOpen={openEvent} />}
+          </HudBar>
+
+          {showWorldChrome && !desktop && (
+            <>
+              <WipColumn slots={wip} onOpen={openWip} ownRef={(e) => { els.current.wip = e }} />
+              <EventsColumn events={events} desktop={false} onOpen={openEvent} ownRef={(e) => { els.current.events = e }} />
+            </>
+          )}
+          {showWorldChrome && (
+            <QuestStrip
+              quest={quest} ticker={ticker}
+              onQuest={() => run('settlement.promotion.view')} onTicker={() => run('inbox.show')}
+              ownRef={(e) => { els.current.info = e }}
+            />
+          )}
+
+          {!desktop && <PhoneDock tabs={tabs} active={tab} onSelect={onDock} ownRef={(e) => { els.current.dock = e }} />}
+
+          {desktop && (
+            <NavRail sections={sections} active={tab} brand={bootstrap?.settlement?.name ?? t('v6.brand')} sub={profile?.name}>
+              {wip.length > 0 && (
+                <div className="v6-rail-wip">
+                  <h5>{t('v6.wip.title')}</h5>
+                  <WipColumn slots={wip} onOpen={openWip} />
+                </div>
+              )}
+            </NavRail>
+          )}
+          {panelOpen && (
+            <DockedPanel
+              crumbs={[{ label: tabLabel(tab), onClick: () => selectTab(tab) }, ...(screenTitle && !atRoot ? [{ label: screenTitle }] : [])]}
+              onClose={() => selectTab('city')}
+            >
+              <div ref={panelBody} style={{ display: 'contents' }}>{content}</div>
+            </DockedPanel>
+          )}
+
+          <TipHost />
+          <MenuSheet
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, resident: bootstrap.settlement.resident, support: supportCity(bootstrap) } : undefined}
+            onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
+            onCommand={(command, args) => { setTab('city'); run(command, args) }}
+            onTravel={(code, service) => { setTab('city'); openLocal('support_travel', { to: code, service }) }}
+          />
+        </div>
+      </ChromeCtx.Provider>
     </NavCtx.Provider>
   )
 }

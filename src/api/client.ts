@@ -146,6 +146,14 @@ async function errorOf(res: Response): Promise<ApiError> {
   return new ApiError(body?.error?.code ?? 'http_error', body?.error?.message ?? res.statusText, res.status)
 }
 
+/** The player's own photo, as our server keeps it (a proxy of Telegram's profile photo): an object URL, or null when
+ * there is none (404, not signed in, an older server). The caller revokes the URL. */
+export async function fetchMyPhoto(): Promise<string | null> {
+  const res = await authedResponse('/api/me/photo', { method: 'GET' })
+  if (!res.ok || !(res.headers.get('content-type') ?? '').startsWith('image/')) return null
+  return URL.createObjectURL(await res.blob())
+}
+
 export async function loginWithLinkCode(code: string, deviceName: string): Promise<AuthResponse> {
   const auth = await raw<AuthResponse>('/api/v1/auth/link', {
     method: 'POST',

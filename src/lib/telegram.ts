@@ -52,6 +52,12 @@ export function initTelegram(): void {
   }
 }
 
+/** The Telegram user the Mini App was opened by (name and the photo link Telegram hands over), when there is one. */
+export function getTelegramUser(): { first_name?: string; last_name?: string; photo_url?: string } | null {
+  const wa = getTelegramWebApp() as unknown as { initDataUnsafe?: { user?: { first_name?: string; last_name?: string; photo_url?: string } } } | null
+  return wa?.initDataUnsafe?.user ?? null
+}
+
 export function telegramInitData(): string {
   return getTelegramWebApp()?.initData ?? ''
 }

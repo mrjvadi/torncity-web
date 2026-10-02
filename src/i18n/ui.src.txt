@@ -4711,3 +4711,66 @@ ac.health.out_hint | بستری نیستی، پس درمانی هم لازم ن�
 ac.crime.rec.next | رتبهٔ بعدی: {name} | Next tier: {name}
 ac.crime.rec.xp | تجربهٔ جرم {a} از {b} | Crime experience {a} of {b}
 ac.crime.cases.title | شکایت‌های من | My reports
+# -- v6 shell (HUD, columns, quest strip, rail, ring) -------------------------------------
+v6.brand | تورن‌سیتی | Torn City
+v6.nav.title | منو | Menu
+v6.panel.title | جزئیات | Details
+v6.wip.title | کارهای من | My work
+v6.wip.shift | شیفت من | My shift
+v6.wip.study | آموزش من | My study
+v6.wip.build | ساخت من | My building
+v6.events.title | رویدادها | Events
+v6.events.fold | جمع کردن رویدادها | Fold the events
+v6.events.unfold | باز کردن رویدادها | Show the events
+v6.ev.research | پژوهش | Research
+v6.day | روز | days
+v6.unit.thousand | هزار | k
+v6.unit.million | م | M
+v6.vital.mine | وضعیت من | My status
+v6.vital.health | سلامت | Health
+v6.vital.energy | انرژی | Energy
+v6.vital.nerve | جسارت | Nerve
+v6.dur.min | {n} دقیقه | {n} min
+v6.dur.hm | {h} ساعت و {m} دقیقه | {h} h {m} min
+v6.dur.h | {h} ساعت | {h} h
+v6.tip.profile | پروفایل من | My profile
+v6.tip.health | سلامت: {v} از {max}. | Health: {v} of {max}.
+v6.tip.energy | انرژی: {v} از {max}. | Energy: {v} of {max}.
+v6.tip.nerve | جسارت: {v} از {max}. برای کارهای خطرناک است. | Nerve: {v} of {max}. It pays for risky jobs.
+v6.tip.full_in | پر شدن: {t} دیگر. | Full in {t}.
+v6.tip.cash | پول من: {v} | My cash: {v}
+v6.tip.gem | الماس ویژه: {v}. با + می‌خری. | Premium gems: {v}. Buy more with +.
+v6.gem.add | افزودن الماس | Add gems
+v6.tip.shift | شیفت من: {t} مانده | My shift: {t} left
+v6.tip.study | آموزش من: {t} مانده | My study: {t} left
+v6.tip.build | ساخت من: {t} مانده | My building: {t} left
+v6.tip.build_idle | چیزی در حال ساخت نیست. بزن تا بسازی. | Nothing is being built. Tap to build.
+v6.tip.research | پژوهش: {t} دیگر | Research: {t} left
+v6.tip.quest | برو و انجامش بده | Go and do it
+v6.tip.ticker | آخرین پیام | Latest message
+v6.q.residents | ساکن‌ها را به {req} نفر برسان | Reach {req} residents
+v6.q.literacy | سواد را به {req}٪ برسان | Raise literacy to {req}%
+v6.q.buildings | {req} ساختمان بساز | Build {req} buildings
+v6.q.knowledge | {req} دانش پژوهش کن | Research {req} kinds of knowledge
+v6.q.treasury | خزانه را پر کن | Fill the treasury
+v6.q.build_what | {what} بساز | Build: {what}
+v6.q.ready_head | ارتقا را شروع کن | Start the upgrade
+v6.q.ready_member | آمادهٔ ارتقاست | Ready to upgrade
+v6.ring.info | اطلاعات | Info
+v6.ring.up | ارتقا | Upgrade
+v6.ring.help_build | کمک به ساخت | Help build
+v6.ring.storage | انبار | Storehouse
+v6.ring.status | وضعیت | Status
+v6.ring.knowledge | پژوهش | Research
+v6.ring.learn | آموزش | Learn
+v6.ring.mine | ملک من | My property
+v6.bub.damaged | آسیب دیده | Damaged
+v6.up.title | ارتقای {name} | Upgrade {name}
+v6.up.go | ارتقا بده | Upgrade
+v6.up.cost | هزینه | Cost
+v6.up.time | زمان | Time
+v6.up.ready | همه‌چیز آماده است | Everything is ready
+v6.up.blocked | اول موارد قرمز را درست کن | Fix the red rows first
+v6.fix | برو و درستش کن | Go and fix it
+v6.have | دارد | Have it
+v6.rail.build | ساخت | Build

@@ -10,7 +10,7 @@ import { useContentNames } from '../village/useVillage'
 export interface MenuVillage { name: string; isHead: boolean; resident?: boolean; support: { code: string; name: string } }
 
 type Palette = 'gold' | 'emerald' | 'violet' | 'sapphire' | 'amber'
-interface VillageItem {
+export interface VillageItem {
   key: string; icon: string; palette: Palette; label: Key
   /** a local screen of the village... */
   local?: string
@@ -25,14 +25,14 @@ interface VillageItem {
 
 /** The village menu is sections, never actions (docs/ui/web-structure.md 5.3): «زندگی من»
  * first, then the village itself. The build button is on the village page, not here. */
-const MY_LIFE: VillageItem[] = [
+export const MY_LIFE: VillageItem[] = [
   { key: 'land', icon: 'x_field', palette: 'emerald', label: 'menu.land', local: 'village_home', args: { land: '1' }, resident: true },
   { key: 'house', icon: 'house', palette: 'gold', label: 'menu.house', command: 'settlement.private', resident: true },
   { key: 'mine', icon: 'box', palette: 'amber', label: 'menu.mine', command: 'settlement.mine', resident: true },
   { key: 'work', icon: 'gears', palette: 'sapphire', label: 'menu.work', command: 'work.home', resident: true },
 ]
 
-const THE_VILLAGE: VillageItem[] = [
+export const THE_VILLAGE: VillageItem[] = [
   { key: 'storage', icon: 'box', palette: 'sapphire', label: 'storage.open', local: 'village_storage' },
   { key: 'overview', icon: 'chart', palette: 'sapphire', label: 'menu.status', local: 'village_overview' },
   { key: 'who', icon: 'society', palette: 'emerald', label: 'village.btn.who', local: 'village_who' },

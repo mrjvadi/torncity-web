@@ -32,13 +32,15 @@ interface Props {
   /** Starts build mode on a building code (an upgrade line's button). */
   onBuild?: (code: string) => void
   onClose: () => void
+  /** The ring's verb that opened this sheet: straight to the site's labour screen. */
+  startSite?: boolean
   /** Opens the resident's own property sheet (rest at home, tax). */
   onMine?: () => void
 }
 
 const EFFECT_KEYS = ['local_security_bps', 'food_coverage_bps', 'job_coverage_bps', 'service_coverage_bps', 'happiness_bps', 'housing_capacity']
 
-export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine }: Props) {
+export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine, startSite }: Props) {
   const now = useNow(1000)
   const names = useContentNames()
   const cmd = useVillageCommand()
@@ -61,6 +63,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
     void load(false)
   }, [id, state, load])
   const [site, setSite] = useState(false)
+  useEffect(() => { if (startSite && id) setSite(true) }, [startSite, id])
   if (!b) return null
 
   const entry = cat.get(b.type)

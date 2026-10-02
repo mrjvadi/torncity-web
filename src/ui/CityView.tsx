@@ -11,7 +11,7 @@ import ReadyToast from './home/ReadyToast'
 import { sanitizeTelegramHtml } from '../lib/sanitizeHtml'
 import { report } from '../lib/reporter'
 import { formatNumber } from '../lib/persian'
-import type { TabKey } from './Dock'
+import type { TabKey } from './Shell'
 import { t } from '../i18n'
 
 interface CityViewProps {

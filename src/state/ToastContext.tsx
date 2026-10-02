@@ -9,7 +9,7 @@
 // again. Messages from the player's own commands (`user: true`) always show.
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import Icon from '../ui/Icon'
+import { Ic } from '../ui/v6/parts'
 import { t } from '../i18n'
 
 export type ToastKind = 'success' | 'info' | 'warning' | 'error'
@@ -66,12 +66,7 @@ function scrub(text: string): string {
   return text.replace(/[«"“]([a-z][a-z0-9]*(?:[_.][a-z0-9]+)+|[a-z]{1,24}\d*)[»"”]/g, t('toast.unnamed')).replace(LEAD, '').trim()
 }
 
-const ICON: Record<ToastKind, { name: string; palette: 'emerald' | 'sapphire' | 'amber' | 'ruby' }> = {
-  success: { name: 'check', palette: 'emerald' },
-  info: { name: 'inbox', palette: 'sapphire' },
-  warning: { name: 'm_hand', palette: 'amber' },
-  error: { name: 'm_stop', palette: 'ruby' },
-}
+const ICON: Record<ToastKind, string> = { success: 'check', info: 'info', warning: 'warn', error: 'cross' }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([])
@@ -112,7 +107,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={it.id} className={`toast toast-${it.kind}`}
             onClick={() => { drop(it.id); if (it.command) opener.current?.(it.command, it.args) }}
           >
-            <span className="toast-icon"><Icon name={ICON[it.kind].name} palette={ICON[it.kind].palette} size={20} /></span>
+            <span className="toast-icon"><Ic name={ICON[it.kind]} /></span>
             <span className="toast-text" dir="auto">{it.text}</span>
           </button>
         ))}

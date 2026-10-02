@@ -1437,10 +1437,12 @@ export function installVillageMockHandles(): void {
 /** The own village as the store's `settlement` entity shows it to this viewer. */
 export function mockVillageSummary(): {
   id: string; code: string; name: string; tier: string; viewer: 'head' | 'member'; grid_lots: number; layout_version: string
-  treasury: number; knowledge: number
+  treasury: number; knowledge: number; research: { code: string; finish_at: string } | null
 } {
   init()
+  const run = st.know.find((k) => k.state === 'researching' && k.finish)
   return {
+    research: run ? { code: run.code, finish_at: new Date(run.finish!).toISOString() } : null,
     id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'village', viewer: IS_HEAD ? 'head' : 'member', grid_lots: size(),
     layout_version: `${IS_HEAD ? 'h' : 'm'}${st.ver}`, treasury: st.treasury,
     knowledge: st.know.filter((k) => k.state === 'held').length,

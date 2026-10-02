@@ -98,6 +98,11 @@ function init(): void {
   put('inventory', 'pistol', { item: 'pistol', qty: 1, holdings: { carried: 1 }, pieces: [{ id: 'pc-1', holding: 'carried', quality: 72, uses_left: null }] })
   put('skill', 'trading', { skill: 'trading', level: 3, xp: 410 })
   put('skill', 'driving', { skill: 'driving', level: 1, xp: 40 })
+  // my work in progress: a shift and a course (?wip=0 turns them off, for the idle-slot shots)
+  if (new URLSearchParams(location.search).get('wip') !== '0') {
+    put('timed_action', 'ta-shift', { kind: 'work_shift', ref_type: 'job', ref_id: 'woodcutter', state: 'running', started_at: iso(now - 600000), finish_at: iso(now + 1450000) })
+    put('timed_action', 'ta-study', { kind: 'education', ref_type: 'course', ref_id: 'accounting', state: 'running', started_at: iso(now - 600000), finish_at: iso(now + 4325000) })
+  }
   put('location', 'self', { city: 'calderis', place: 'old_town', settlement: '', travel: null, walk: null })
   put('notice', 'n-1', { kind: 'bank.payment_received', category: 'finance', screen: 'payment_notice', view: { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 12500 }, created_at: iso(now - 300000), read: false, instant: false } as Notice)
   put('inbox', 'self', { unread: 1, latest: ['n-1'] } as Inbox)
@@ -110,7 +115,7 @@ function init(): void {
 function summaryData(): unknown {
   const s = mockVillageSummary()
   return { id: s.id, code: s.code, name: s.name, tier: s.tier, viewer: s.viewer, grid_lots: s.grid_lots, layout_version: s.layout_version,
-    treasury: { currency: 'SUP', balance: s.treasury }, knowledge: s.knowledge, research: null }
+    treasury: { currency: 'SUP', balance: s.treasury }, knowledge: s.knowledge, research: s.research }
 }
 
 /** GET /state */

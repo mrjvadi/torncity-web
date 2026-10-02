@@ -17,6 +17,13 @@ import type { VillageScene, ScreenLabel } from '../../village/villageScene'
 import { clockSkewMs } from '../../village/clock'
 import { report } from '../../lib/reporter'
 import { countdown } from './common'
+import { MapOverlays, type Mark, type RingModel } from '../../ui/v6/MapOverlays'
+import { ContextMenu, type CtxItem } from '../../ui/v6/parts'
+import { useChrome } from '../../ui/v6/chrome'
+import { buildPercent } from '../../ui/v6/hooks'
+import { useBuildingPanels } from './panels'
+import { ringActions } from './ring'
+import UpgradeConfirm from './UpgradeConfirm'
 import { useBuildMode } from './useBuildMode'
 import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
@@ -24,6 +31,9 @@ import { BuyLotSheet, HouseSheet, LotAccessSheet, TakenLotSheet } from './LandSh
 import { classifyLot, tonesForLand, type LotAccessMap } from './citizen'
 import type { LandView, LotAccessView } from '../../api/types'
 import './village.css'
+
+const member0 = (l: { viewer: { member: boolean } } | null | undefined) => !!l?.viewer.member
+const inBuildNow = (step: string) => step !== 'off'
 
 export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) {
   const id = useSettlementId(localArgs?.id)
@@ -39,6 +49,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [sceneError, setSceneError] = useState(false)
   const [labels, setLabels] = useState<ScreenLabel[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // the ring's verbs: «اطلاعات» opens the building's own panel, «ارتقا» the confirm, «کمک به ساخت» the site's labour sheet
+  const [infoId, setInfoId] = useState<string | null>(null)
+  const [infoSite, setInfoSite] = useState(false)
+  const [upId, setUpId] = useState<string | null>(null)
+  const [ctx, setCtx] = useState<{ x: number; y: number; id: string } | null>(null)
+  const chrome = useChrome()
   const layoutRef = useRef(layout)
   layoutRef.current = layout
 
@@ -92,12 +108,14 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     setLandOn(true)
   }, [localArgs, sceneReady, layout?.viewer.resident])
 
-  // «ساخت» in the menu opens the village straight in build mode
-  const wantBuild = useRef(!!localArgs?.build)
+  // «ساخت» in the menu (or the B key) opens the village straight in build mode; the arguments are new each time
+  const handledBuild = useRef<unknown>(null)
   useEffect(() => {
-    if (wantBuild.current && sceneReady && layout?.viewer.can_place) { wantBuild.current = false; void build.enter() }
+    if (!localArgs?.build || handledBuild.current === localArgs || !sceneReady || !layout?.viewer.can_place) return
+    handledBuild.current = localArgs
+    void build.enter()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sceneReady, layout?.viewer.can_place])
+  }, [localArgs, sceneReady, layout?.viewer.can_place])
 
   // the ground (chunks -> grids) is made on request; only this screen wants it
   useEffect(() => {
@@ -153,8 +171,14 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       const scene = sceneRef.current, cv = canvasRef.current
       if (!scene || !cv) return
       const r = cv.getBoundingClientRect()
-      const top = topRef.current ? topRef.current.getBoundingClientRect().bottom - r.top + 4 : 0
-      const bottom = bottomRef.current ? r.bottom - bottomRef.current.getBoundingClientRect().top + 4 : 0
+      let top = topRef.current ? topRef.current.getBoundingClientRect().bottom - r.top + 4 : 0
+      let bottom = bottomRef.current ? r.bottom - bottomRef.current.getBoundingClientRect().top + 4 : 0
+      // the shell's own HUD, quest strip and dock float over a phone's world: the village is framed in what is left
+      if (chrome && !chrome.desktop) {
+        const hud = chrome.hud(), bot = chrome.bottom()
+        if (hud) top = Math.max(top, hud.bottom - r.top + 4)
+        if (bot) bottom = Math.max(bottom, r.bottom - bot.top + 4)
+      }
       scene.setInsets(Math.max(0, top), Math.max(0, bottom))
       if (!framedRef.current) { framedRef.current = true; scene.frame('aerial') }
     }
@@ -162,8 +186,9 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     const ro = new ResizeObserver(sync)
     if (topRef.current) ro.observe(topRef.current)
     if (bottomRef.current) ro.observe(bottomRef.current)
-    return () => ro.disconnect()
-  }, [sceneReady, build.state.step, layout?.viewer.member, landOn, resident])
+    const off = chrome?.subscribe(sync)
+    return () => { ro.disconnect(); off?.() }
+  }, [chrome, sceneReady, build.state.step, layout?.viewer.member, landOn, resident])
 
   // layout changes -> what stands
   useEffect(() => {
@@ -202,6 +227,77 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     return idx >= 0 ? layout.buildings[idx] : null
   }, [layout, selectedId, keyOf])
 
+  // -- the ring and the map overlays (v6) ------------------------------------------------------------
+  // A member of their own village gets the ring; a visitor (coarse layout, no building ids) keeps the plain panel.
+  const useRing = own && member0(layout) && layout?.detail === 'full'
+  const { panels } = useBuildingPanels(layout, useRing)
+  useEffect(() => {
+    // a road has nothing to offer but its panel
+    if (useRing && selected && selected.type === 'road') setInfoId(selectedId)
+  }, [useRing, selected, selectedId])
+  const canPlaceNow = !!layout?.viewer.can_place
+  const labelOf = (key: string) => labels.find((l) => l.key === key)
+  const verbsFor = (b: NonNullable<typeof selected>, id: string) => ringActions(b, b.id ? panels.get(b.id) ?? null : null, {
+    info: () => setInfoId(id),
+    upgrade: () => setUpId(id),
+    site: () => { setInfoSite(true); setInfoId(id) },
+    open: (screen) => openLocal(screen),
+    mine: () => { setSelectedId(null); run('settlement.mine') },
+    run: (command) => run(command),
+  })
+  const ring: RingModel | null = useRing && !inBuildNow(build.state.step) && selected && selected.type !== 'road' && selectedId && labelOf(selectedId)
+    ? (() => {
+      const l = labelOf(selectedId)!
+      const panel = selected.id ? panels.get(selected.id) : undefined
+      return {
+        key: selectedId,
+        name: buildingName(cat, selected.type, panel?.building.name),
+        level: !selected.private || selected.mine ? panel?.tier : undefined,
+        anchor: [l.x, l.y + 22] as [number, number],
+        actions: verbsFor(selected, selectedId),
+        onInfo: () => setInfoId(selectedId),
+      }
+    })()
+    : null
+  const marks: Mark[] = useRing && !inBuildNow(build.state.step) && !landOn
+    ? labels.filter((l) => l.visible).flatMap((l): Mark[] => {
+      const b = layout?.buildings.find((x, i) => keyOf(i, x) === l.key)
+      if (!b || !b.id || b.type === 'road') return []
+      const going = b.state === 'under_construction' || b.state === 'planned'
+      if (going) return [{ key: l.key, x: l.x, y: l.y, building: buildPercent(b) }]
+      const panel = panels.get(b.id)
+      // who is shown a plaque: the head sees the village's buildings, a resident only their own (P9, the role rule)
+      const mineView = b.private ? !!b.mine : canPlaceNow
+      const m: Mark = { key: l.key, x: l.x, y: l.y }
+      if (mineView && panel) { m.level = panel.tier; m.canUpgrade = panel.can_manage && panel.has_upgrade }
+      if (mineView && (b.damage_bps ?? 0) > 0) m.bubble = { kind: 'status', icon: 'warn', text: t('v6.bub.damaged'), label: t('v6.bub.damaged'), onClick: () => { setSelectedId(l.key); setInfoId(l.key) } }
+      return m.level !== undefined || m.bubble ? [m] : []
+    })
+    : []
+  const ctxItems = (id: string): CtxItem[] => {
+    const i = layout?.buildings.findIndex((b, k) => keyOf(k, b) === id) ?? -1
+    const b = i >= 0 ? layout!.buildings[i] : null
+    return b ? verbsFor(b, id).map((a) => ({ id: a.id, label: a.label, icon: a.icon, kind: a.kind, off: a.off, onClick: a.onClick })) : []
+  }
+  // desktop: a right click on a building opens the same verbs as the ring (and the same role rules)
+  const onContext = (e: React.MouseEvent) => {
+    if (!useRing || !chrome?.desktop || !canvasRef.current) return
+    const r = canvasRef.current.getBoundingClientRect()
+    const px = e.clientX - r.left, py = e.clientY - r.top
+    let best: string | null = null, bd = 64
+    for (const l of labels) {
+      if (!l.visible) continue
+      const b = layout?.buildings.find((x, i) => keyOf(i, x) === l.key)
+      if (!b || !b.id || b.type === 'road') continue
+      const d = Math.hypot(px - l.x, py - (l.y + 22))
+      if (d < bd) { bd = d; best = l.key }
+    }
+    if (!best) return
+    e.preventDefault()
+    setSelectedId(null)
+    setCtx({ x: e.clientX, y: e.clientY, id: best })
+  }
+
   // events worth a line
   const lastEventSeq = useRef(0)
   useEffect(() => {
@@ -232,9 +328,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const inBuild = build.state.step !== 'off'
 
   return (
-    <div className="vh">
+    <div className="vh" onContextMenu={onContext}>
       <canvas ref={canvasRef} className="vh-canvas" />
 
+      {useRing ? (
+        <MapOverlays marks={marks} ring={ring} onDismiss={() => setSelectedId(null)} />
+      ) : (
       <div className="vh-labels">
         {labels.filter((l) => l.visible).map((l) => {
           const b = buildingsByKey.get(l.key)
@@ -252,6 +351,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
           )
         })}
       </div>
+      )}
 
       <div className="vh-top" ref={topRef}>
         {!own && (
@@ -300,16 +400,23 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
           </Frame>
         )}
       </div>
-      {!inBuild && canPlace && member && !landOn && (
+      {!useRing && !inBuild && canPlace && member && !landOn && (
         <button className="vh-fab" onClick={() => void build.enter()} aria-label={t('village.btn.build')}>
           <Plate size={54} rim="#ffd66b"><Emboss name="house" palette="gold" size={32} /></Plate>
           <span>{t('village.build_fab')}</span>
         </button>
       )}
 
-      <BuildingSheet building={selected} canPlace={canPlace} cat={cat} store={store} onClose={() => setSelectedId(null)}
+      <BuildingSheet building={useRing ? (layout?.buildings.find((b, i) => keyOf(i, b) === infoId) ?? null) : selected} canPlace={canPlace} cat={cat} store={store}
+        startSite={infoSite}
+        onClose={() => { setInfoId(null); setInfoSite(false); if (!useRing) setSelectedId(null) }}
         onOpen={(screen) => openLocal(screen)} onBuild={(code) => { void build.enter().then(() => build.choose(code)) }}
-        onMine={() => { setSelectedId(null); run('settlement.mine') }} />
+        onMine={() => { setSelectedId(null); setInfoId(null); run('settlement.mine') }} />
+      {upId && (() => {
+        const ub = layout?.buildings.find((b, i) => keyOf(i, b) === upId)
+        return ub ? <UpgradeConfirm building={ub} cat={cat} onClose={() => setUpId(null)} onOpen={(screen) => openLocal(screen)} onBuild={(code) => { setSelectedId(null); void build.enter().then(() => build.choose(code)) }} /> : null
+      })()}
+      {ctx && <ContextMenu at={ctx} title={(() => { const ub = layout?.buildings.find((b, i) => keyOf(i, b) === ctx.id); return ub ? buildingName(cat, ub.type, ub.id ? panels.get(ub.id)?.building.name : undefined) : '' })()} items={ctxItems(ctx.id)} onClose={() => setCtx(null)} />}
       <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} onOther={(l) => setBuyLot(l)} />
       <HouseSheet lot={houseLot} cat={cat} onClose={() => setHouseLot(null)} store={store}
         onNoRoad={(view) => { setHouseLot(null); setFixView(view); setFixLot({ x: view.x, y: view.y }) }} />
