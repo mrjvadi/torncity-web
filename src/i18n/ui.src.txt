@@ -3190,3 +3190,7 @@ sc.confirm.short_btn | پول کافی نداری | Not enough money
 friends.search.placeholder | کد یا نام کاربری | Code or username
 friends.search.go | جستجو | Search
 friends.search.title | پیدا کردن دوست | Find a friend
+crime.empty.need_building | اینجا هنوز {name} ساخته نشده است. | {name} has not been built here yet.
+crime.role.market | بازارچه | market
+crime.role.housing | خانه | housing
+crime.role.transport | ایستگاه حمل‌ونقل | transport station

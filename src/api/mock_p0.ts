@@ -1,5 +1,5 @@
 // Mock answers (?mock=1) of the screens the activities work adds: the hub, the work home, the health home and the
-// crime hub's empty reason. The mock player is a village resident, so crime is not listed.
+// crime hub's empty reason. The mock player is a village resident whose village has a market, so crime is listed.
 
 type Args = Record<string, unknown> | undefined
 
@@ -10,7 +10,7 @@ export function mockP0Command(command: string, _args?: Args) {
     return ok('activities_hub', {
       place: { code: 'v-k3x9', name: 'آمل', tier: 'village', neutral: false },
       entries: [
-        { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' },
+        { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' }, { code: 'crime', command: 'crime.hub' },
         { code: 'missions', command: 'mission.board' }, { code: 'rankings', command: 'life.top' },
       ],
     })
@@ -35,7 +35,7 @@ export function mockP0Command(command: string, _args?: Args) {
     return ok('crime_hub', {
       city: 'Amol', city_code: 'v-k3x9', venue: { code: '', name: '' }, nerve: { nerve: 20, max: 20, full_in_seconds: 0 },
       heat: { heat: 0, max: 100, wanted: 0, stars: 0 }, tier: { tier: { code: 'novice', name: 'novice' }, xp: 0, next: { code: '', name: '' }, next_xp: 0 },
-      travelling: false, jail: null, busy: null, categories: [], empty: 'no_venue', min_level: 2,
+      travelling: false, jail: null, busy: null, categories: [{ code: 'theft', name: 'دزدی' }, { code: 'fraud', name: 'کلاه‌برداری' }], empty: '', min_level: 0,
     })
   }
   return null

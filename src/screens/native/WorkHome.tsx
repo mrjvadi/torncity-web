@@ -45,7 +45,8 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
     <ScreenScroll>
       <Header title={t('job.title')} tone="gold" onRefresh={() => void reload()} />
 
-      {v.max_energy > 0 && (
+      {/* a village shift costs no energy (ADR 0038): the bar is for jobs that spend it */}
+      {v.max_energy > 0 && v.place.tier !== 'village' && v.empty !== 'no_settlement' && (
         <Card>
           <Bar frac={clamp01(v.energy / v.max_energy)} color="var(--leaf)" label={t('work.energy', { a: formatNumber(v.energy), b: formatNumber(v.max_energy) })} />
         </Card>

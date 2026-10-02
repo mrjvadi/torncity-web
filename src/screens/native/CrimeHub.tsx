@@ -3,6 +3,7 @@ import { Bar, Card, Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms } from './kit/format'
 import { Slab } from '../../kit'
+import { buildingName, useBuildingCatalogue } from '../../village/useVillage'
 import { t, type Key } from '../../i18n'
 
 interface Named { code?: string; name?: string }
@@ -18,11 +19,14 @@ interface CrimeHubView {
   /** why crime has nothing to offer now: level_too_low, no_venue or no_targets (ADR 0038 4.4) */
   empty?: string
   min_level?: number
+  need_code?: string; need_role?: string; need_tier?: number
 }
 
 export default function CrimeHub({ response, loading, onAction, run, openLocal }: ScreenProps) {
   const v = (response?.view ?? {}) as CrimeHubView
+  const cat = useBuildingCatalogue()
   if (loading && !response) return <ScreenScroll><Header title={t('crime.title')} tone="ruby" /></ScreenScroll>
+  const need = v.need_code ? buildingName(cat, v.need_code) : v.need_role ? t(`crime.role.${v.need_role}` as Key) : ''
 
   return (
     <ScreenScroll>
@@ -56,6 +60,7 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
       {v.empty && (
         <Card>
           <div style={{ fontSize: 14, marginBottom: 10 }}>{t(`crime.empty.${v.empty}` as Key, { n: v.min_level ?? 0 })}</div>
+          {v.empty === 'no_venue' && need && <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 10 }}>{t('crime.empty.need_building', { name: need })}</div>}
           {v.empty === 'level_too_low'
             ? <Slab tone="gold" radius={14} lip={4} onClick={() => run('work.home')}>{t('crime.empty.go_work')}</Slab>
             : <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('activity_hub')}>{t('crime.empty.go_back')}</Slab>}

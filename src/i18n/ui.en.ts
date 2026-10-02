@@ -3126,4 +3126,8 @@ export const uiEn: Record<UiKey, string> = {
   'friends.search.placeholder': 'Code or username',
   'friends.search.go': 'Search',
   'friends.search.title': 'Find a friend',
+  'crime.empty.need_building': '{name} has not been built here yet.',
+  'crime.role.market': 'market',
+  'crime.role.housing': 'housing',
+  'crime.role.transport': 'transport station',
 }

@@ -3124,6 +3124,10 @@ export const uiFa = {
   'friends.search.placeholder': 'کد یا نام کاربری',
   'friends.search.go': 'جستجو',
   'friends.search.title': 'پیدا کردن دوست',
+  'crime.empty.need_building': 'اینجا هنوز {name} ساخته نشده است.',
+  'crime.role.market': 'بازارچه',
+  'crime.role.housing': 'خانه',
+  'crime.role.transport': 'ایستگاه حمل‌ونقل',
 } as const
 
 export type UiKey = keyof typeof uiFa
