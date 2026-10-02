@@ -198,11 +198,11 @@ export function NavRail({ sections, active, brand, sub, children }: { sections: 
       <nav className="v6-railnav">
         {sections.map((s) => (
           <div key={s.key} className={`v6-rs${open === s.key ? ' open' : ''}${active === s.key ? ' on' : ''}`}>
-            <button className="v6-rh" onClick={() => { setOpen(open === s.key && active === s.key ? null : s.key); s.onSelect() }} data-tip={s.label} data-key={s.kbd} aria-expanded={open === s.key}>
+            <button className="v6-rh" onClick={() => { setOpen(open === s.key && active === s.key ? null : s.key); s.onSelect() }} data-tip={s.label} data-key={s.kbd} aria-expanded={open === s.key} aria-current={active === s.key ? 'page' : undefined}>
               <Ic name={s.icon} /><b>{s.label}</b><kbd>{fa(s.kbd)}</kbd><i className="v6-chev" />
             </button>
             <div className="v6-ri">
-              {s.items.map((it) => <button key={it.key} className={`v6-rit${it.on ? ' on' : ''}${it.wait ? ' wait' : ''}`} onClick={it.onClick}>{it.label}</button>)}
+              {s.items.map((it) => <button key={it.key} className={`v6-rit${it.on ? ' on' : ''}${it.wait ? ' wait' : ''}`} onClick={it.onClick} aria-current={it.on ? 'true' : undefined}>{it.label}</button>)}
             </div>
           </div>
         ))}

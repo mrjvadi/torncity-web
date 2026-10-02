@@ -67,6 +67,22 @@ function placeTier(b: unknown): string | undefined {
 
 type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
 
+const HUB_TAB: Record<string, TabKey> = { activity_hub: 'activity', economy_hub: 'market', society_hub: 'society' }
+/** Which command families belong to which tab. Commands in two places (the village's work page) are left out: they keep the tab. */
+const FAMILY_TAB: Record<string, TabKey> = {
+  player: 'profile', skills: 'profile', life: 'profile',
+  job: 'activity', education: 'activity', health: 'activity', crime: 'activity', mission: 'activity', activities: 'activity',
+  market: 'market', bank: 'market', loan: 'market', save: 'market', inventory: 'market', company: 'market', property: 'market', stock: 'market', shop: 'market', auction: 'market', economy: 'market', insure: 'market', gold: 'market',
+  faction: 'society', inbox: 'society', social: 'society', election: 'society', gov: 'society', law: 'society', war: 'society', military: 'society', diplomacy: 'society', society: 'society',
+  settlement: 'city', place: 'city', city: 'city', map: 'city', travel: 'city',
+}
+/** The tab a screen belongs to, or null when it belongs to none in particular. */
+function tabOfScreen(k: ScreenKey): TabKey | null {
+  if (k.local) return HUB_TAB[k.local] ?? 'city'
+  if (k.command === 'life.top') return 'activity'
+  return FAMILY_TAB[k.command.split('.')[0]] ?? null
+}
+
 /** The entries the server lists in a hub for where the player stands, for the desktop rail's sub-items. One read
  * per hub, again when the place changes. The client holds no rule about which exist. */
 function useHubEntries(enabled: boolean, placeKey: string) {
@@ -93,7 +109,7 @@ export default function Shell() {
   const desktop = useDesktop()
   // a language switch restarts the page: come back to the same screen
   const resumed = useRef(takeResume()).current
-  const [tab, setTab] = useState<TabKey>((resumed?.tab as TabKey | undefined) ?? 'city')
+  const [tabState, setTab] = useState<TabKey>((resumed?.tab as TabKey | undefined) ?? 'city')
   // The group's «تکمیل اطلاعات روستا» button opens the game with the draft's id
   // as the start parameter: land on the founding form.
   const [screenKey, setScreenKey] = useState<ScreenKey>(() => {
@@ -108,6 +124,10 @@ export default function Shell() {
     const h = homeScreen(bootstrap)
     return { command: '', local: h.local, args: h.args }
   })
+  // The lit tab follows the screen on show, whichever way it was reached (dock, rail, tile, menu, toast, back, deep link).
+  // A screen that belongs to no single tab keeps the last one.
+  const tab = tabOfScreen(screenKey) ?? tabState
+  useEffect(() => { if (tab !== tabState) setTab(tab) }, [tab, tabState])
   useEffect(() => { saveResume({ tab, screen: screenKey }) }, [tab, screenKey])
   const [menuOpen, setMenuOpen] = useState(false)
 
