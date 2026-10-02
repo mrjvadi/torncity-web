@@ -40,7 +40,7 @@ export const fa = {
   'village.menu.support_market': 'بازار',
   'village.menu.support_jobs': 'کار',
   'village.menu.support_knowledge': 'دانش',
-  'village.menu.support_hospital': 'بیمارستان شهر مرکزی',
+  'village.menu.support_hospital': 'درمان در شهر مرکزی',
   'village.menu.support_jail': 'زندان',
   'donate.title': 'کمک به خزانهٔ روستا',
   'donate.body': 'خزانه: {treasury} · پول نقد شما: {cash}',

@@ -5,12 +5,14 @@ import { ACTIVITY_ENTRIES } from './kit/hubs'
 import * as api from '../../api/client'
 import type { ActivitiesHubView } from '../../api/views.gen'
 import { t } from '../../i18n'
+import { careWord, useCare } from '../../support/care'
 
 type Load = { state: 'loading' } | { state: 'failed' } | { state: 'ready'; view: ActivitiesHubView }
 
 /** The Activities hub: the entries the server lists for where the player stands (`activities.hub`, ADR 0038 3.3).
  * An activity that is not listed is not mentioned; the client holds no rule about which are. */
 export default function ActivityHub({ run }: ScreenProps) {
+  const care = useCare()
   const [load, setLoad] = useState<Load>({ state: 'loading' })
   const fetchHub = useCallback(() => {
     setLoad({ state: 'loading' })
@@ -36,8 +38,8 @@ export default function ActivityHub({ run }: ScreenProps) {
             {(load.view.entries ?? []).map((e) => {
               const look = ACTIVITY_ENTRIES[e.code]
               if (!look) return null
-              // «بیمارستان» is the name of a city's (and the central city's) place of care; in a village or a town it is «سلامت»
-              const title = e.code === 'health' && load.view.place.tier === 'city' ? t('hub.hospital') : t(look.title)
+              // «بیمارستان» is the name only where the place has a hospital; otherwise it is «سلامت»
+              const title = e.code === 'health' && careWord(care) === 'hospital' ? t('hub.hospital') : t(look.title)
               return <Tile key={e.code} icon={look.icon} palette={look.palette} title={title} onClick={() => run(e.command)} />
             })}
           </TileGrid>

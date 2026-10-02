@@ -124,11 +124,12 @@ export function mockP0Command(command: string, args?: Args) {
     })
   }
   if (command === 'health.home') {
+    // a settlement's own health house, or the central city, which has its own hospital and refers nobody
     return ok('health_home', {
-      place: { code: 'v-k3x9', name: 'آمل', tier: 'village', neutral: false }, health: 88, max_health: 100, admitted: null,
+      place: PLACE, health: 88, max_health: 100, admitted: null,
       rest: { has: false, can_rest: false, wait_seconds: 0 },
-      facilities: [{ kind: 'health_house', building: { code: 'health_house', name: 'Health house' } }],
-      refer: { code: 'support', name: 'Support' }, empty: '',
+      facilities: AS_CITY ? [] : [{ kind: 'health_house', building: { code: 'health_house', name: 'Health house' } }],
+      refer: AS_CITY ? null : { code: 'support', name: 'Support' }, empty: '',
     })
   }
   if (command === 'crime.hub') {

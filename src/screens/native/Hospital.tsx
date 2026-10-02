@@ -5,6 +5,7 @@ import { clamp01, formatNumber, hms, money, roughDuration } from './kit/format'
 import Icon from '../../ui/Icon'
 import { t, type Key } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
+import { careWord, useCare } from '../../support/care'
 
 interface Named { code?: string; name?: string }
 interface Clinic { provider?: string; clinic?: Named; price?: number; doctor?: number; open?: boolean; stock?: number; saves_seconds?: number; can_treat?: boolean }
@@ -21,6 +22,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
   const v = (response?.view ?? {}) as HospitalView
   const names = useContentNames()
   // «بیمارستان» is the name only in a city or the central city; a founded village's care place is «خانهٔ بهداشت»
+  const care = useCare()
   const inCity = !!v.city_code && names.name('city', v.city_code, '') !== ''
   const title = inCity || !v.city_code ? t('hospital.title') : t('ac.health.village_title')
   if (loading && !response) return <ScreenScroll><Header title={title} tone="ruby" /></ScreenScroll>
@@ -56,7 +58,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
       {v.city_hospital && treat('city') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div className="nx-sec">{t('ac.health.treat_title')}</div>
-          <ListRow icon="hospital" palette="ruby" title={inCity || !v.city_code ? t('ac.health.city_hospital') : t('ac.health.village_house')}
+          <ListRow icon="hospital" palette="ruby" title={t(({ hospital: 'ac.health.city_hospital', house: 'ac.health.health_house', plain: 'ac.health.care_plain' } as const)[careWord(care)])}
             sub={v.city_hospital.saves_seconds ? t('hospital.saves', { t: roughDuration(v.city_hospital.saves_seconds) }) : undefined}
             right={v.city_hospital.price ? money(v.city_hospital.price) : t('common.free')}
             onClick={() => onAction(treat('city')!)} />

@@ -333,7 +333,7 @@ export const en: Partial<Record<Key, string>> = {
   'village.call.title': 'Build your own village',
   'village.menu.support': 'In {city} — travel',
   'village.menu.support_bank': 'Bank',
-  'village.menu.support_hospital': 'Central city hospital',
+  'village.menu.support_hospital': 'Treatment in the central city',
   'village.menu.support_jail': 'Jail',
   'village.menu.support_jobs': 'Work',
   'village.menu.support_knowledge': 'Knowledge',

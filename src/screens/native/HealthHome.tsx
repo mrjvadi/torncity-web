@@ -6,6 +6,7 @@ import { clamp01, formatNumber, hms } from './kit/format'
 import type { HealthHomeView } from '../../api/views.gen'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
 import { t, type Key } from '../../i18n'
+import { careOf } from '../../support/care'
 
 /** «سلامت»: health, rest and sleep, the places of care that stand here and the way to the central city
  * (ADR 0038 4.3). «بیمارستان» is the name only in a city or the central city. */
@@ -15,7 +16,8 @@ export default function HealthHome({ response, run, openLocal }: ScreenProps) {
   const names = useContentNames()
   if (!v) return <ScreenScroll><Header title={t('hub.health')} tone="ruby" /><Empty>{t('common.loading')}</Empty></ScreenScroll>
 
-  const isCity = v.place.tier === 'city'
+  // «بیمارستان» is the name only where the place has its own hospital (it refers nobody on); a health house is «خانهٔ بهداشت»
+  const isCity = careOf(v) === 'hospital'
   const title = isCity ? t('hub.hospital') : t('hub.health')
   const facilities = v.facilities ?? []
   const refer = v.refer ? names.name('city', v.refer.code, v.refer.name) : ''
