@@ -29,7 +29,7 @@ export const COMPANIES_CONTENT: Record<string, Entry[]> = {
   design_slot: [e('base', 'Base', 'پایه'), e('filling', 'Filling', 'مایه'), e('topping', 'Topping', 'روکش')],
   attribute: [e('taste', 'Taste', 'مزه'), e('shelf_life', 'Shelf life', 'ماندگاری'), e('nutrition', 'Nutrition', 'ارزش غذایی')],
   specialist_name: [e('first', 'Ali|Sara|Reza|Mina|Kian', 'علی|سارا|رضا|مینا|کیان'), e('last', 'Rad|Nouri|Azadi', 'راد|نوری|آزادی')],
-  career: [e('retail', 'Retail', 'تجارت'), e('craft', 'Craft', 'پیشه‌وری'), e('technology', 'Technology', 'فناوری')],
+  career: [e('retail', 'Retail', 'تجارت'), e('craft', 'Craft', 'پیشه‌وری'), e('technology', 'Technology', 'فناوری'), e('military', 'Military', 'ارتش')],
   career_tier: [e('retail.entry', 'Seller', 'فروشنده'), e('craft.entry', 'Baker', 'نانوا'), e('craft.senior', 'Master baker', 'استادنانوا'), e('technology.entry', 'Technician', 'تکنسین')],
   course: [e('baking101', 'Baking basics', 'مبانی نانوایی'), e('mgmt101', 'Basic management', 'مدیریت پایه')],
   skill: [e('baking', 'Baking', 'نانوایی'), e('chemistry', 'Chemistry', 'شیمی'), e('design', 'Design', 'طراحی')],

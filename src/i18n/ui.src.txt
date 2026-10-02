@@ -3423,7 +3423,7 @@ co.design.copy | کپی از «{source}» با مهندسی معکوس؛ کیف�
 co.design.version | نسخهٔ {version} | Version {version}
 co.design.slot_empty | خالی | Empty
 co.design.slot_optional | خالی (اختیاری) | Empty (optional)
-co.design.seen | قابل‌دیدن برای خریدار: | Seen by buyers:
+co.design.seen | {name} (قابل‌دیدن برای خریدار) | {name} (visible to buyers)
 co.design.cost_floor | کف هزینهٔ مواد هر واحد: {cost} | Lowest input cost per unit: {cost}
 co.design.locked | این قطعه‌ها فناوری {techs} را لازم دارند؛ تحقیقش کنید یا لایسنسش را بخرید. | These parts need {techs}; research it or buy its license.
 co.design.incomplete | جاهای لازم هنوز پر نشده‌اند. | The needed places are not filled yet.
@@ -4126,7 +4126,7 @@ mil.act.military.sanctions | تحریم‌ها | Sanctions
 mil.act.military.treaties | پیمان‌ها | Treaties
 mil.act.military.war | جنگ | War
 mil.act.military.licences | مجوزهای دفاعی | Defence licences
-mil.act.military.branch | {name} | {name}
+mil.act.military.branch | جزئیات | Details
 mil.act.military.station | استقرار {name} | Station {name}
 mil.act.military.station_city | {name} | {name}
 mil.act.military.station_qty | {qty} عدد | {qty}
