@@ -57,7 +57,16 @@ export function actionLabel(a: Action, names?: ContentNames): string {
   const keys = [...(id ? [`act.${id}`] : []), `cmd.${a.command ?? ''}`]
   for (const key of keys) if (hasKey(key)) return t(key as Key, params)
   if (id.startsWith('support.')) return t('act.support.any', { name })
+  noteLabelGap(a)
   return t('act.fallback')
+}
+
+/** Action ids the web has no word for (a gap to close with a key in ui.src.txt): readable as `window.__labelGaps` in
+ * dev and mock, so a generic «ادامه» on a button never goes unnoticed. */
+const labelGaps = new Set<string>()
+if (typeof window !== 'undefined') (window as unknown as { __labelGaps?: Set<string> }).__labelGaps = labelGaps
+export function noteLabelGap(a: Action): void {
+  labelGaps.add(a.id || a.command || '?')
 }
 
 /** The sentence under a building's name, from what it is: its kind, role and code. */

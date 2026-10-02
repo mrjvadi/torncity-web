@@ -8,6 +8,7 @@ import type {
   ScreenViews, TreatyLine,
 } from './views.gen'
 import { A, back, mockOk, refreshA, type MockAct } from './mock_neutral'
+import { AS_CITY } from './mock_p0'
 
 // -- the names of content the screens mention, as the catalogue serves them (both languages) -------------------
 
@@ -483,8 +484,13 @@ function social(command: string, args: Record<string, unknown>) {
 }
 
 function board(args: Record<string, unknown>) {
-  const b = String(args.board ?? 'richest')
+  // a player who lives in a village sees their neighbours' board first (not a player standing in a city)
+  const home = AS_CITY ? null : { code: 'v-k3x9', name: 'آمل' }
+  const b = String(args.board ?? (home ? 'village' : 'richest'))
   const lines = {
+    village: [{ position: 1, code: 'N5B1V7F', name: 'نسیم', tag: 'trader', tag_name: '', city: named('', ''), value: 184000, extra: 0, extra2: 0, mine: false },
+      { position: 2, code: ME.code, name: ME.name, tag: 'trader', tag_name: '', city: named('', ''), value: 31500, extra: 0, extra2: 0, mine: true },
+      { position: 3, code: 'D4N2A9C', name: 'دانا', tag: 'tycoon', tag_name: '', city: named('', ''), value: 12200, extra: 0, extra2: 0, mine: false }],
     richest: [{ position: 1, code: 'T1', name: KAVEH.name, tag: 'tycoon', tag_name: '', city: named('', ''), value: 12400000, extra: 0, extra2: 0, mine: false },
       { position: 2, code: 'T2', name: NILOO.name, tag: 'trader', tag_name: '', city: named('', ''), value: 95000, extra: 0, extra2: 0, mine: false },
       { position: 3, code: ME.code, name: ME.name, tag: 'trader', tag_name: '', city: named('', ''), value: 31500, extra: 0, extra2: 0, mine: true }],
@@ -494,8 +500,8 @@ function board(args: Record<string, unknown>) {
     workers: [{ position: 1, code: 'W1', name: NILOO.name, tag: '', tag_name: '', city: named('', ''), value: 5200, extra: 0, extra2: 0, mine: false }],
     investors: [{ position: 1, code: 'I1', name: KAVEH.name, tag: '', tag_name: '', city: named('', ''), value: 3100, extra: 0, extra2: 0, mine: false }],
   }[b] ?? []
-  const acts = ['richest', 'companies', 'cities', 'workers', 'investors'].filter((x) => x !== b).map((x) => act('board.tab', 'life.top', { board: x }, { subject: x }))
-  return mockOk('leaderboard', { board: b, lines, at: null, ranks: { tycoon: named('tycoon', 'Tycoon'), trader: named('trader', 'Trader') } }, [...acts, back('player.profile.get'), refreshA('life.top', { board: b })])
+  const acts = [...(home ? ['village'] : []), 'richest', 'companies', 'cities', 'workers', 'investors'].filter((x) => x !== b).map((x) => act('board.tab', 'life.top', { board: x }, { subject: x }))
+  return mockOk('leaderboard', { board: b, lines, at: null, village: home ? named(home.code, home.name) : null, ranks: { tycoon: named('tycoon', 'Tycoon'), trader: named('trader', 'Trader') } }, [...acts, back('player.profile.get'), refreshA('life.top', { board: b })])
 }
 
 /** The answer of a politics and society command in the mock; null when the command is not this area's. */

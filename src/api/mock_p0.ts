@@ -1,16 +1,88 @@
-// Mock answers (?mock=1) of the screens the activities work adds: the hub, the work home, the health home and the
-// crime hub's empty reason. The mock player is a village resident whose village has a market, so crime is listed.
+// Mock answers (?mock=1) of the screens the activities work adds: the hub, the work home, the health home, the
+// crime hub's empty reason, and what a settlement teaches and posts. The mock player is a village resident whose
+// village has a market, so crime is listed; `?as=city` makes them a player standing in the central city instead.
 
 type Args = Record<string, unknown> | undefined
 
 const ok = (screen: string, view: unknown) => ({ ok: true, screen, view, actions: [] })
 
-export function mockP0Command(command: string, _args?: Args) {
+/** The mock player stands in a city, not in their village (`?as=city`). */
+export const AS_CITY = (() => { try { return new URLSearchParams(location.search).get('as') === 'city' } catch { return false } })()
+
+const VILLAGE = { code: 'v-k3x9', name: 'آمل' }
+const PLACE = AS_CITY ? { code: 'support', name: 'شهر مرکزی', tier: 'city', neutral: true } : { ...VILLAGE, tier: 'village', neutral: false }
+const MONEY = AS_CITY ? null : { code: 'AML', name: 'سکهٔ آمل', symbol: '' }
+
+type Entry = { code: string; name: { en: string; fa: string } }
+const e = (code: string, en: string, fa: string): Entry => ({ code, name: { en, fa } })
+
+/** The catalogue names these screens mention (the mock's copy of GET /api/v1/content for them). */
+export const P1_CONTENT: Record<string, Entry[]> = {
+  course: [e('first_aid', 'First aid', 'کمک‌های اولیه'), e('driving_licence', 'Driving licence', 'گواهینامهٔ رانندگی'), e('bookkeeping', 'Bookkeeping', 'دفترداری'), e('culinary_arts', 'Culinary arts', 'هنر آشپزی')],
+  mission_board: [e('village_works', 'Village works board', 'تابلوی کارهای روستا'), e('city_hall', 'Civic noticeboard', 'تابلوی اعلانات شهرداری'), e('police', 'Police board', 'تابلوی پلیس')],
+  mission: [e('village_first_lesson', 'First lesson', 'اولین درس'), e('village_bread_run', 'Bread for the store', 'نان برای انبار'), e('village_bandage_run', 'Bandages for the health house', 'باند برای خانهٔ بهداشت'), e('first_steps', 'First steps', 'قدم‌های اول')],
+  settlement_knowledge: [e('basic_medicine', 'Basic medicine', 'پزشکی ابتدایی')],
+  building_role: [e('education', 'A class', 'کلاس'), e('health', 'A health house', 'خانهٔ بهداشت')],
+}
+
+const COURSE = (code: string, name: string, fee: number, secs: number, min = 1, eligible = true) => ({ course: { code, name }, duration_seconds: secs, eligible, fee, min_level: min })
+
+function education() {
+  if (AS_CITY) {
+    return ok('education', {
+      current: null, certificates: [{ code: 'first_aid', name: 'کمک‌های اولیه' }], place: { code: '', name: '' }, tier: '', currency: null, literacy: null,
+      courses: [COURSE('driving_licence', 'گواهینامهٔ رانندگی', 900, 10800), COURSE('bookkeeping', 'دفترداری', 1200, 14400), COURSE('culinary_arts', 'هنر آشپزی', 2400, 28800, 4, false)],
+      elsewhere: null, empty: '', build: null, page: 1, pages: 1,
+    })
+  }
+  return ok('education', {
+    current: null, certificates: null, place: VILLAGE, tier: 'village', currency: MONEY,
+    literacy: { share_bps: 1800, next_bps: 2000, next_stage: 'town' },
+    courses: [],
+    elsewhere: [{ course: { code: 'first_aid', name: 'First Aid' }, fee: 4200, duration_seconds: 7200, nearest: { code: 'support', name: 'شهر مرکزی' },
+      needs: [{ kind: 'knowledge', code: 'basic_medicine', role: '', tier: 0 }, { kind: 'building', code: 'health_house', role: 'health', tier: 1 }] }],
+    empty: 'nothing_taught', build: null, page: 1, pages: 1,
+  })
+}
+
+const OBJ = (kind: string, count: number, target?: { kind: string; code: string; name: string }) => ({ kind, target: target ?? { kind: '', code: '', name: '' }, count, done: 0 })
+
+function missions(args: Args) {
+  if (AS_CITY) {
+    const boards = [{ code: 'city_hall', name: 'تابلوی اعلانات شهرداری', place: { code: 'city_hall', name: 'مرکز شهر' }, open: 2 }, { code: 'police', name: 'تابلوی پلیس', place: { code: 'police_station', name: 'کلانتری' }, open: 1 }]
+    const code = String(args?.board ?? '')
+    if (!code) return ok('mission_board', { city: 'شهر مرکزی', city_code: 'support', tier: 'city', currency: null, boards, board: null, here: false, missions: null })
+    return ok('mission_board', {
+      city: 'شهر مرکزی', city_code: 'support', tier: 'city', currency: null, boards, board: boards.find((b) => b.code === code) ?? boards[0], here: true,
+      missions: [
+        { mission: { code: 'first_steps', name: 'قدم‌های اول' }, blocked: '', repeatable: false, wait_seconds: 0, reward: { cash: 300, xp: 40, items: [{ item: { code: 'sandwich', name: 'ساندویچ' }, qty: 2 }] },
+          objectives: [OBJ('work_shift', 2), OBJ('buy_item', 1, { kind: 'item', code: 'bandage', name: 'باند' })] },
+      ],
+    })
+  }
+  const boards = [{ code: 'village_works', name: 'تابلوی کارهای روستا', place: { code: '', name: '' }, open: 3 }]
+  const code = String(args?.board ?? '')
+  if (!code) return ok('mission_board', { city: 'آمل', city_code: VILLAGE.code, tier: 'village', currency: MONEY, boards, board: null, here: true, missions: null })
+  return ok('mission_board', {
+    city: 'آمل', city_code: VILLAGE.code, tier: 'village', currency: MONEY, boards, board: boards[0], here: true,
+    missions: [
+      { mission: { code: 'village_first_lesson', name: 'اولین درس' }, blocked: '', repeatable: false, wait_seconds: 0, reward: { cash: 200, xp: 30, items: null }, objectives: [OBJ('course', 1)] },
+      { mission: { code: 'village_bread_run', name: 'نان برای انبار' }, blocked: '', repeatable: true, wait_seconds: 0, reward: { cash: 300, xp: 25, items: null },
+        objectives: [OBJ('deliver', 3, { kind: 'item', code: 'bread', name: 'نان' })] },
+      { mission: { code: 'village_bandage_run', name: 'باند برای خانهٔ بهداشت' }, blocked: 'cooldown', repeatable: true, wait_seconds: 5400, reward: { cash: 400, xp: 30, items: null },
+        objectives: [OBJ('deliver', 3, { kind: 'item', code: 'bandage', name: 'باند' })] },
+    ],
+  })
+}
+
+export function mockP0Command(command: string, args?: Args) {
+  if (command === 'education.list') return education()
+  if (command === 'mission.board') return missions(args)
   if (command === 'activities.hub') {
     return ok('activities_hub', {
-      place: { code: 'v-k3x9', name: 'آمل', tier: 'village', neutral: false },
+      place: PLACE,
       entries: [
-        { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' }, { code: 'crime', command: 'crime.hub' },
+        { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' }, ...(AS_CITY ? [] : [{ code: 'crime', command: 'crime.hub' }]),
         { code: 'missions', command: 'mission.board' }, { code: 'rankings', command: 'life.top' },
       ],
     })

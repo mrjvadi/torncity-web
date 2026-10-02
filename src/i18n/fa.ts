@@ -216,7 +216,7 @@ export const fa = {
   'activity.idle': 'آنلاین',
   'activity.travelling': 'در سفر',
   'activity.working': 'در حال کار',
-  'activity.studying': 'در حال تحصیل',
+  'activity.studying': 'در حال آموزش',
   'activity.training': 'در حال تمرین',
   'activity.hospital': 'در بیمارستان',
   'activity.jail': 'در زندان',

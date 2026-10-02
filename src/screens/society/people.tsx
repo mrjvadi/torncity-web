@@ -96,6 +96,8 @@ const BOARDS = ['richest', 'companies', 'cities', 'workers', 'investors']
 
 const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
   const tabs = ctx.acts.filter((a) => a.id === 'board.tab')
+  // a player who lives in a settlement sees their neighbours' board first
+  const boards = v.village ? ['village', ...BOARDS] : BOARDS
   const open = (b: string) => {
     const a = tabs.find((x) => x.args?.board === b)
     if (a) ctx.go(a)
@@ -106,16 +108,17 @@ const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
   }
   const tag = (l: NonNullable<BoardView['lines']>[number]): string => {
     switch (v.board) {
+      case 'village':
       case 'richest': return v.ranks?.[l.tag] ? ctx.names.name(['rank'], l.tag, v.ranks[l.tag].name) : ''
       case 'companies': return `${ctx.names.name(['company_type'], l.tag, l.tag_name)} · ${ctx.names.name(['city'], l.city.code, l.city.name)}`
       case 'workers': return l.tag ? ctx.names.name(['career'], l.tag, l.tag_name) : t('soc.board.no_job')
       default: return l.tag_name
     }
   }
-  const value = (l: NonNullable<BoardView['lines']>[number]): string => (v.board === 'richest' || v.board === 'companies' ? money(l.value) : formatNumber(l.value))
+  const value = (l: NonNullable<BoardView['lines']>[number]): string => (v.board === 'richest' || v.board === 'village' || v.board === 'companies' ? money(l.value) : formatNumber(l.value))
   return (
-    <Page title={t(key(`soc.board.${v.board}`))} tone="gold">
-      <Segmented options={BOARDS.map((b) => ({ key: b, label: t(key(`soc.board.tab.${b}`)) }))} value={v.board} onChange={open} />
+    <Page title={v.board === 'village' ? t('soc.board.village', { place: v.village?.name ?? '' }) : t(key(`soc.board.${v.board}`))} tone="gold">
+      <Segmented wrap options={boards.map((b) => ({ key: b, label: t(key(`soc.board.tab.${b}`)) }))} value={v.board} onChange={open} />
       <div className="vf-stack">
         {(v.lines ?? []).length === 0 && <Panel><Lead>{t('soc.board.empty')}</Lead></Panel>}
         {(v.lines ?? []).map((l) => (

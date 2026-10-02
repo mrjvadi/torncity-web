@@ -13,6 +13,13 @@ export function money(n: number | undefined | null): string {
   return `${formatNumber(n)} ${t('unit.money')}`
 }
 
+/** The money a place prices things in: its own currency when it has one, else the neutral money. */
+export interface PlaceCurrency { code?: string; name?: string; symbol?: string }
+export function moneyIn(n: number | undefined | null, currency?: PlaceCurrency | null): string {
+  if (n === undefined || n === null) return '0'
+  return `${formatNumber(n)} ${currency?.name || t('unit.money')}`
+}
+
 /** A whole-second duration as "H:MM" (an hour or more) or "MM:SS" (under
  * an hour), Western digits — the prototype's own countdown format. */
 export function hms(seconds: number | undefined | null): string {

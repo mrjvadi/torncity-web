@@ -163,13 +163,15 @@ export function TileGrid({ children }: { children: ReactNode }) {
 }
 
 /** Filter chips (crime categories, inbox categories, leaderboard boards…). */
-export function Segmented({ options, value, onChange }: {
+export function Segmented({ options, value, onChange, wrap }: {
   options: { key: string; label: string }[]
   value: string
   onChange: (key: string) => void
+  /** Lay the options over as many rows as they need instead of one row that scrolls sideways (a strip of six tabs). */
+  wrap?: boolean
 }) {
   return (
-    <div className="nx-seg">
+    <div className={`nx-seg${wrap ? ' nx-seg-wrap' : ''}`}>
       {options.map((o) => (
         <button key={o.key} className={`nx-seg-opt${o.key === value ? ' active' : ''}`} onClick={() => onChange(o.key)}>
           {o.label}

@@ -556,8 +556,8 @@ inventory.escrow | {n} در امانت (سفارش‌های باز) | {n} held i
 inventory.durability | دوام {n}% | Durability {n}%
 inventory.uses | {n} بار مصرف | {n} uses left
 # -- education ---------------------------------------------------------------
-education.title | تحصیل | Education
-education.current | در حال تحصیل | Studying now
+education.title | آموزش | Education
+education.current | درسی که می‌خوانی | The course you are taking
 education.paused | متوقف (زندان) | Paused (jail)
 education.certificates | مدرک‌های تو | Your certificates
 # -- dashboard ---------------------------------------------------------------
@@ -867,7 +867,7 @@ profile.achievements | دستاوردها · {a} از {b} | Achievements · {a} 
 profile.achievements_n | دستاوردها · {a} | Achievements · {a}
 profile.no_achievements | هنوز دستاوردی نداری. | No achievements yet.
 profile.work | شغل | Job
-profile.study | تحصیل | Studying
+profile.study | آموزش | Studying
 profile.per_shift | {pay} هر شیفت | {pay} per shift
 profile.shift_ends | شیفت تا {t} دیگر | Shift ends in {t}
 profile.course_left | {t} تا پایان دوره | {t} until the course ends
@@ -1248,15 +1248,15 @@ f.family.211 | وارث اول | First heir
 f.family.212 | حال نیلا | Nila's condition
 f.family.213 | سلامت | Health
 f.family.214 | شادی | Happiness
-f.family.215 | تحصیل | Education
+f.family.215 | آموزش | Education
 f.family.216 | کارها | Activities
 f.family.217 | مدرسه | School
-f.family.218 | هر روز  ·  120 ساپ  ·  تحصیل + | Daily  ·  120 SUP  ·  Education +
+f.family.218 | هر روز  ·  120 ساپ  ·  آموزش + | Daily  ·  120 SUP  ·  Education +
 f.family.219 | ثبت‌نام شده | Enrolled
 f.family.220 | بازی در پارک | Play in the park
 f.family.221 | شادی +15  ·  1 انرژی | Happiness +15  ·  1 energy
 f.family.222 | کلاس زبان | Language class
-f.family.223 | تحصیل +10  ·  300 ساپ | Education +10  ·  300 SUP
+f.family.223 | آموزش +10  ·  300 ساپ | Education +10  ·  300 SUP
 f.family.224 | جدایی از آرش | Separating from Arash
 f.family.225 | 42 روز ازدواج  ·  صمیمیت 18% | 42 days married  ·  closeness 18%
 f.family.226 | پس از درخواست، 3 روز مهلت آشتی هست. اگر هیچ‌کدام پس نگیرید، طلاق ثبت می‌شود. | After the request there are 3 days to reconcile. If neither of you withdraws, the divorce is recorded.
@@ -4283,3 +4283,55 @@ pn.war.proposal | {other} {kind} پیشنهاد داده؛ {time} وقت دار�
 pn.war.declared | {other} به {country} اعلان جنگ داد؛ {time} دیگر می‌شود جنگید. | {other} declared war on {country}; fighting is possible in {time}.
 pn.war.hospital | به بیمارستان منتقل شدی. | You were taken to hospital.
 pn.war.report | گزارش عملیات شمارهٔ {no} دربارهٔ {city} رسید؛ خرابی {band}. | The report of operation no. {no} on {city} arrived; {band} damage.
+# -- activities P1: education, missions, knowledge, rankings (the settlement's own offer) ------------------------
+education.here_not | اینجا نیست | Not here
+education.empty.no_class | اینجا هنوز کلاسی نیست، برای همین درسی هم داده نمی‌شود. | There is no class here yet, so nothing is taught.
+education.empty.build | دهیار می‌تواند «{name}» را بسازد. | The village head can build “{name}”.
+education.empty.nothing | فعلاً درسی در {place} داده نمی‌شود. | Nothing is taught in {place} for now.
+education.empty.where | درس‌ها را می‌شود در شهر مرکزی خواند. | Courses can be taken in the central city.
+education.gap.taught_in | در {place} درس داده می‌شود | Taught in {place}
+education.gap.go | سفر به {place} | Travel to {place}
+education.gap.need.knowledge | دهیار می‌تواند «{name}» را پژوهش کند | The head can research “{name}”
+education.gap.need.building | دهیار می‌تواند «{name}» را بسازد | The head can build “{name}”
+education.gap.need.teacher | برای درس دادن «{name}» لازم است | “{name}” is needed to teach it
+education.gap.fee | {fee} · {time} | {fee} · {time}
+education.literacy.title | خواندن و نوشتن | Reading and writing
+education.literacy.first | اولین درس همه خواندن و نوشتن است. | Everyone’s first lesson is reading and writing.
+education.literacy.share | {p}% مردم {place} باسوادند | {p}% of the people of {place} can read and write
+education.literacy.next | برای {stage} شدن {p}% لازم است | {p}% is needed to become a {stage}
+education.fee | شهریه {n} | Fee {n}
+missions.xp | {n} امتیاز تجربه | {n} experience points
+missions.reward | پاداش: {r} | Reward: {r}
+missions.reward_item | {qty} {item} | {qty} {item}
+missions.open | {n} کار روی تابلو | {n} jobs on the board
+missions.empty | فعلاً کاری روی تابلو نیست. | There are no jobs on the board right now.
+missions.no_boards_village | تابلوی روستا فعلاً خالی است. | The village board is empty for now.
+missions.no_boards | اینجا فعلاً مأموریتی نیست. | There are no missions here for now.
+missions.repeat | هر روز تازه می‌شود | Comes back every day
+missions.wait | {t} دیگر | {t} more
+missions.obj.travel | سفر به {target} | Travel to {target}
+missions.obj.travel_any | سفر به شهری دیگر | Travel to another city
+missions.obj.work_shift | {count} شیفت کار | {count} work shifts
+missions.obj.work_shift_t | {count} شیفت کار در {target} | {count} shifts at {target}
+missions.obj.course | گذراندن دورهٔ {target} | Finish the course {target}
+missions.obj.course_any | گذراندن یک دوره | Finish a course
+missions.obj.buy_item | خرید {count} {target} | Buy {count} {target}
+missions.obj.buy_item_any | خرید {count} کالا | Buy {count} goods
+missions.obj.sell_item | فروش {count} {target} | Sell {count} {target}
+missions.obj.sell_item_any | فروش {count} کالا | Sell {count} goods
+missions.obj.crime | {count} بار {target} موفق | {count} successful {target}
+missions.obj.crime_any | {count} خلاف موفق | {count} successful crimes
+missions.obj.use_item | مصرف {count} {target} | Use {count} {target}
+missions.obj.use_item_any | مصرف {count} کالا | Use {count} goods
+missions.obj.deliver | تحویل {count} {target} به تابلو | Hand {count} {target} in at the board
+know.explain | پژوهش زمان می‌برد و ارزان‌تر است؛ خرید از شهر مرکزی فوری است ولی گران‌تر. | Research takes time and costs less; buying from the central city is instant but dearer.
+know.short | خزانه {n} کم دارد | The treasury is {n} short
+know.unlocks | باز می‌کند: {list} | Opens: {list}
+know.unlocks.none | چیزی را باز نمی‌کند، ولی پیش‌نیاز دانش‌های بعدی است | Opens nothing yet
+know.unlock.building | ساختمان {name} | the building {name}
+know.unlock.knowledge | دانش {name} | the knowledge {name}
+know.unlock.course | درس {name} | the course {name}
+know.afford | می‌توانی بپردازی | Affordable
+soc.board.tab.village | روستا | Village
+soc.board.village | ثروتمندترین‌های {place} | The richest in {place}
+soc.board.hint.village | هم‌روستایی‌ها بر پایهٔ دارایی‌شان. | Your neighbours by what they own.

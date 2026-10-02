@@ -11,6 +11,7 @@ import { money } from '../native/kit/format'
 import { durationText } from '../village/common'
 import type { FlowCtx } from '../village/flow'
 import type { ContentNames } from '../../village/useVillage'
+import { noteLabelGap } from '../village/wording'
 
 export const key = (k: string) => k as Key
 
@@ -89,6 +90,7 @@ export function actionLabel(a: Action, names?: ContentNames, vars: Record<string
   const name = subject && names ? names.name(tables, subject) : subject
   const params = { name, ...vars }
   for (const k of [`soc.act.${id}`, `soc.cmd.${a.command ?? ''}`]) if (hasKey(k)) return t(key(k), params)
+  noteLabelGap(a)
   return t('soc.act.fallback')
 }
 

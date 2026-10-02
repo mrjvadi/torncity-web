@@ -8,6 +8,7 @@ import { SOCIETY_CONTENT, mergeTables } from './mock_society'
 import { ECONOMY_CONTENT } from './mock_economy'
 import { COMPANIES_CONTENT } from './mock_companies'
 import { MILITARY_CONTENT } from './mock_military'
+import { P1_CONTENT } from './mock_p0'
 import type {
   BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
@@ -171,7 +172,7 @@ function init() {
     { code: 'fire_making', state: 'held', cost: 0, time: 0, buy: 0, missing: [], terrain: true },
     { code: 'archery', state: 'held', cost: 0, time: 0, buy: 0, missing: [], terrain: true },
     { code: 'irrigation', state: 'researching', cost: 3200, time: 5400, buy: 8000, missing: [], terrain: true, finish: now + 41 * 60000 },
-    { code: 'masonry', state: 'available', cost: 4000, time: 3600, buy: 9500, missing: [], terrain: true },
+    { code: 'masonry', state: 'available', cost: 28000, time: 3600, buy: 224000, missing: [], terrain: true },
     { code: 'writing', state: 'available', cost: 2600, time: 4200, buy: 7200, missing: [], terrain: true },
     { code: 'metallurgy', state: 'locked', cost: 7000, time: 9000, buy: 0, missing: ['masonry'], terrain: true },
     { code: 'geometry', state: 'locked', cost: 6000, time: 7200, buy: 0, missing: [], terrain: false },
@@ -390,13 +391,24 @@ function progressView() {
   return mockOk('settlement_construction_progress', view, [...acts, back('settlement.overview'), refreshA('settlement.build.progress')])
 }
 
+const KNOW_UNLOCKS: Record<string, { kind: string; item: Named }[]> = {
+  masonry: [{ kind: 'building', item: { code: 'masonry_workshop', name: 'کارگاه سنگ‌تراشی' } }, { kind: 'knowledge', item: kn('metallurgy') }],
+  writing: [{ kind: 'course', item: { code: 'bookkeeping', name: 'دفترداری' } }],
+  irrigation: [{ kind: 'building', item: { code: 'canal_channel', name: 'آبراههٔ آبیاری' } }],
+}
+
 function knowledgeView() {
   const now = Date.now()
   const run = st.know.find((k) => k.state === 'researching')
   const view: KnowledgeListView = {
     name: 'آمل', treasury: st.treasury, literacy_percent: st.literacy,
     running: run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? now).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? now) - now) / 1000)) } : null,
-    lines: st.know.map((k) => ({ knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy, missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain })),
+    // what this land can never allow is never listed (ADR 0033 5.2)
+    lines: st.know.filter((k) => k.terrain || k.state === 'held').map((k) => ({
+      knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy,
+      missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain, unlocks: KNOW_UNLOCKS[k.code] ?? null,
+    })),
+    currency: { code: 'AML', name: 'سکهٔ آمل', symbol: '' },
     hidden: 3,
   }
   const acts: MockAct[] = []
@@ -1353,7 +1365,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     return json({
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
-      entries: mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), {
+      entries: mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), {
         settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
@@ -1375,7 +1387,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
         // what the life area names: cities, places, ways to travel, ranks, goods, property...
         ...LIFE_CONTENT,
-      })),
+      }))),
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)
