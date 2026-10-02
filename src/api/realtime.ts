@@ -17,11 +17,15 @@ import { getRealtimeToken, WS_BASE } from './client'
 import { report } from '../lib/reporter'
 import { publishSettlement, setSettlementLive } from './settlementBus'
 import type { SettlementEvent } from './types'
+import { syncStore } from '../state/store'
+import type { SyncPublication } from '../state/syncTypes'
 
 export type VitalsListener = (v: RealtimeVitals) => void
 export type InboxListener = (unread: number) => void
 /** A notice pushed to the player: data, never a sentence (api/client-api.md section 5.3). */
 export interface RealtimeNotice {
+  /** the notice's id when it came from the state sync store: shown once per id */
+  id?: string
   kind: string
   screen?: string
   view?: unknown
@@ -90,6 +94,11 @@ export async function connectRealtime(
     }
     const data = ctx.data as { type?: string; unread?: number; kind?: string } | null | undefined
     if (!data || typeof data !== 'object') return
+    // state sync (client-api.md 5.6): the store applies them in pts order
+    if (data.type === 'updates' || data.type === 'updates_too_long') {
+      syncStore.receive(data as unknown as SyncPublication)
+      return
+    }
     if (data.type === 'vitals') {
       onVitals(data as unknown as RealtimeVitals)
     } else if (data.type === 'inbox' && typeof data.unread === 'number') {
@@ -101,8 +110,10 @@ export async function connectRealtime(
   client.on('error', (ctx) => {
     report('realtime', `centrifugo ${ctx.type}: ${ctx.error?.message ?? ''}`)
   })
-  client.on('connected', () => { onLive?.(true); setSettlementLive(true) })
-  client.on('disconnected', () => { onLive?.(false); setSettlementLive(false) })
+  // the store pulls on every (re)connect: what was published while the
+  // socket was down is in the log, never only in Centrifugo's short history
+  client.on('connected', () => { onLive?.(true); setSettlementLive(true); syncStore.setLive(true) })
+  client.on('disconnected', () => { onLive?.(false); setSettlementLive(false); syncStore.setLive(false) })
 
   client.connect()
 
@@ -110,6 +121,7 @@ export async function connectRealtime(
     disconnect: () => {
       onLive?.(false)
       setSettlementLive(false)
+      syncStore.setLive(false)
       try {
         client.disconnect()
       } catch {

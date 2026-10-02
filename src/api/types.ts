@@ -66,6 +66,8 @@ export interface CommandResponse {
   actions?: Action[]
   notice?: Notice
   error?: ApiErrorBody
+  /** (contract 1.6) the state sync records this command caused, when ready in time */
+  updates?: import('../state/syncTypes').CommandUpdates
 }
 
 export interface RealtimeToken {
@@ -74,6 +76,8 @@ export interface RealtimeToken {
   user?: string
   channels?: string[]
   channel?: string
+  /** (contract 1.6) the player's channel carries state sync publications */
+  updates?: boolean
 }
 
 /** What a player's Centrifugo channel carries for a "vitals" publication
@@ -132,6 +136,8 @@ export interface Bootstrap {
   realtime: boolean
   /** The player's own settlement (contract 1.1); absent when they belong to none. */
   settlement?: BootstrapSettlement
+  /** (contract 1.6) the optional parts this server serves; `updates` is state sync */
+  features?: { updates?: boolean }
 }
 
 export interface CityPlot {

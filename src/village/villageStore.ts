@@ -13,6 +13,12 @@
 //  * A build's progress is never in the version: it is counted from
 //    started_at/finish_at, and a fetch is made just after finish_at in case
 //    the publication never came.
+//  * State sync (client-api.md section 5.6, ADR 0034 P3): the player's own
+//    log carries this settlement's summary with the layout version for THIS
+//    viewer. When it names a version the held layout is not, the layout is
+//    fetched — so a change whose channel publication was lost still shows.
+//    The snapshot's `channels` seeds `seq`, so the first publication is
+//    compared with the server's count, not taken on trust.
 //
 // A store lives as long as the app (screens come and go, the picture stays),
 // listens to the settlement bus while at least one screen holds it, and hands
@@ -26,6 +32,7 @@ import { WorldSampler } from './worldSampler'
 import { loadVillageGround, type VillageGround } from './terrainModel'
 import { serverNow } from './clock'
 import { report } from '../lib/reporter'
+import { entityOf, syncStore } from '../state/store'
 
 export interface VillageSnapshot {
   status: 'idle' | 'loading' | 'ready' | 'error'
@@ -56,6 +63,10 @@ export class VillageStore {
   private holders = 0
   private unsubBus: (() => void) | null = null
   private unsubLive: (() => void) | null = null
+  private unsubSync: (() => void) | null = null
+  /** the summary's layout version last acted on */
+  private syncVersion = ''
+
   private lastSeq: number | null = null
   /** The roster's own seq: publications at or below it are already in it. */
   private baselineSeq = 0
@@ -67,7 +78,7 @@ export class VillageStore {
   private finishTimer = 0
   private pollTimer = 0
   /** Counters for tests and diagnostics. */
-  readonly counters = { layoutFetches: 0, layout304: 0, playersFetches: 0, gaps: 0, events: 0, versionRefetches: 0 }
+  readonly counters = { layoutFetches: 0, layout304: 0, playersFetches: 0, gaps: 0, events: 0, versionRefetches: 0, summaryRefetches: 0 }
 
   constructor(readonly id: string) {}
 
@@ -95,6 +106,8 @@ export class VillageStore {
       })
       this.set({ live: isSettlementLive() })
       this.armPoll()
+      this.seedSeq()
+      this.unsubSync = syncStore.subscribe(this.onSync)
     }
     void this.load()
     return () => {
@@ -106,7 +119,8 @@ export class VillageStore {
   private stop() {
     this.unsubBus?.()
     this.unsubLive?.()
-    this.unsubBus = this.unsubLive = null
+    this.unsubSync?.()
+    this.unsubBus = this.unsubLive = this.unsubSync = null
     clearTimeout(this.playersTimer)
     clearTimeout(this.finishTimer)
     clearInterval(this.pollTimer)
@@ -268,6 +282,29 @@ export class VillageStore {
     if (refetch) void this.refetchTo(ev.layout_version && layout ? versionFor(layout, ev.layout_version) : null)
   }
 
+  /** The snapshot's seq of this settlement's channel, when the store has one
+   * and the channel has not been counted yet. */
+  private seedSeq() {
+    const seq = syncStore.channelSeq(`settlement:${this.id}`)
+    if (typeof seq === 'number' && this.lastSeq === null) {
+      this.lastSeq = seq
+      this.baselineSeq = Math.max(this.baselineSeq, seq)
+    }
+  }
+
+  /** The player's log moved: if this settlement's summary names a layout
+   * version the held layout is not, fetch it. */
+  private onSync = () => {
+    this.seedSeq()
+    const s = entityOf(syncStore.getView(), 'settlement', this.id)
+    const layout = this.snap.layout
+    if (!s || !s.layout_version || !layout || this.snap.status !== 'ready') return
+    if (s.layout_version === layout.version || s.layout_version === this.syncVersion) return
+    this.syncVersion = s.layout_version
+    this.counters.summaryRefetches++
+    void this.refetchTo(s.layout_version)
+  }
+
   /** Fetches the layout and, when the publication named the version it will have
    * and the answer is still the older one (the change had not committed yet),
    * asks again a few times. */
@@ -287,6 +324,10 @@ export function getVillageStore(id: string): VillageStore {
   if (!s) {
     s = new VillageStore(id)
     stores.set(id, s)
+    // the checks read the counters in mock mode (?mock=1) only
+    if (new URLSearchParams(location.search).get('mock') === '1') {
+      ;(window as unknown as { __villageStores?: unknown }).__villageStores = stores
+    }
   }
   return s
 }
