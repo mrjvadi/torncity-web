@@ -3190,7 +3190,6 @@ act.inbox.open | دیدن پیام‌ها | See messages
 act.inbox.read_all | خواندن همه | Mark all read
 act.inbox.open_item | باز کردن | Open
 act.founding.open_form | تکمیل اطلاعات روستا | Fill in the village form
-<<<<<<< HEAD
 
 # -- P0: activities, work, health, crime empty, travel, friends -------------------
 common.loading | در حال بارگذاری… | Loading…
@@ -3250,7 +3249,6 @@ crime.category.street_crime | جرم خیابانی | Street crime
 crime.category.burglary | سرقت از اماکن | Burglary
 crime.category.fraud | کلاه‌برداری | Fraud
 crime.category.smuggling | قاچاق | Smuggling
-=======
 # -- companies, production and recruitment (docs/adr/0039): the web's own words for the neutral contract -------------------
 co.unknown | نامشخص | Unknown
 co.none | ندارد | None
@@ -4285,4 +4283,3 @@ pn.war.proposal | {other} {kind} پیشنهاد داده؛ {time} وقت دار�
 pn.war.declared | {other} به {country} اعلان جنگ داد؛ {time} دیگر می‌شود جنگید. | {other} declared war on {country}; fighting is possible in {time}.
 pn.war.hospital | به بیمارستان منتقل شدی. | You were taken to hospital.
 pn.war.report | گزارش عملیات شمارهٔ {no} دربارهٔ {city} رسید؛ خرابی {band}. | The report of operation no. {no} on {city} arrived; {band} damage.
->>>>>>> master

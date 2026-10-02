@@ -3126,7 +3126,6 @@ export const uiFa = {
   'act.inbox.read_all': 'خواندن همه',
   'act.inbox.open_item': 'باز کردن',
   'act.founding.open_form': 'تکمیل اطلاعات روستا',
-<<<<<<< HEAD
   'common.loading': 'در حال بارگذاری…',
   'crime.empty.level_too_low': 'از سطح {n} به بالا می‌توانی سراغ این کار بروی. با کار کردن تجربه بگیر.',
   'crime.empty.no_venue': 'اینجا جایی برای این کار نیست.',
@@ -3184,7 +3183,6 @@ export const uiFa = {
   'crime.category.burglary': 'سرقت از اماکن',
   'crime.category.fraud': 'کلاه‌برداری',
   'crime.category.smuggling': 'قاچاق',
-=======
   'co.unknown': 'نامشخص',
   'co.none': 'ندارد',
   'co.of': '{a} از {b}',
@@ -4200,7 +4198,6 @@ export const uiFa = {
   'pn.war.declared': '{other} به {country} اعلان جنگ داد؛ {time} دیگر می‌شود جنگید.',
   'pn.war.hospital': 'به بیمارستان منتقل شدی.',
   'pn.war.report': 'گزارش عملیات شمارهٔ {no} دربارهٔ {city} رسید؛ خرابی {band}.',
->>>>>>> master
 } as const
 
 export type UiKey = keyof typeof uiFa

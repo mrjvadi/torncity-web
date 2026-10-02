@@ -3128,7 +3128,6 @@ export const uiEn: Record<UiKey, string> = {
   'act.inbox.read_all': 'Mark all read',
   'act.inbox.open_item': 'Open',
   'act.founding.open_form': 'Fill in the village form',
-<<<<<<< HEAD
   'common.loading': 'Loading…',
   'crime.empty.level_too_low': 'Crime opens at level {n}. Earn experience by working.',
   'crime.empty.no_venue': 'There is no place for this here.',
@@ -3186,7 +3185,6 @@ export const uiEn: Record<UiKey, string> = {
   'crime.category.burglary': 'Burglary',
   'crime.category.fraud': 'Fraud',
   'crime.category.smuggling': 'Smuggling',
-=======
   'co.unknown': 'Unknown',
   'co.none': 'None',
   'co.of': '{a} of {b}',
@@ -4202,5 +4200,4 @@ export const uiEn: Record<UiKey, string> = {
   'pn.war.declared': '{other} declared war on {country}; fighting is possible in {time}.',
   'pn.war.hospital': 'You were taken to hospital.',
   'pn.war.report': 'The report of operation no. {no} on {city} arrived; {band} damage.',
->>>>>>> master
 }
