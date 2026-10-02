@@ -17,14 +17,14 @@ interface MissionBoardView {
   boards?: Board[] | null; board?: Board | null; here?: boolean; missions?: MissionLine[] | null
 }
 
-const BLOCKED = ['requires', 'cooldown', 'active']
+const BLOCKED = ['requires', 'cooldown', 'active', 'level', 'done', 'too_many']
 const blockedText = (b: string) => (BLOCKED.includes(b) ? t(`missions.blocked.${b}` as Key) : b)
 
 /** The catalogue table each kind of objective target is named from. */
-const TARGET_TABLE: Record<string, string> = { city: 'city', career: 'career', course: 'course', item: 'item', crime: 'crime' }
+const TARGET_TABLE: Record<string, string> = { city: 'city', career: 'career', course: 'course', item: 'item', crime: 'crime', crime_category: 'crime_category', item_category: 'item_category', career_category: 'career_category' }
 
 /** One objective in everyday words («۳ باند به تابلو تحویل بده»), the target named from the catalogue. */
-function objectiveText(o: Objective, names: ContentNames): string {
+export function objectiveText(o: Objective, names: ContentNames): string {
   const kind = o.kind ?? ''
   const table = TARGET_TABLE[o.target?.kind ?? '']
   const target = o.target?.code && table ? names.name(table, o.target.code, o.target.name) : o.target?.name ?? ''
@@ -63,7 +63,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {boards.map((b, i) => (
             <ListRow key={b.code ?? i} icon="missions" palette="violet" title={boardName(b)}
-              sub={[b.open ? t('missions.open', { n: b.open }) : '', b.place?.name ?? ''].filter(Boolean).join(' · ') || undefined}
+              sub={[b.open ? t('missions.open', { n: b.open }) : '', (b.place?.code ? names.name('place', b.place.code, b.place.name) : b.place?.name) ?? ''].filter(Boolean).join(' · ') || undefined}
               onClick={() => b.code && run('mission.board', { board: b.code })} />
           ))}
         </div>
@@ -97,7 +97,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
         })}
       </div>
 
-      <Actions response={response} onAction={onAction} refreshCommand="mission.board" />
+      <Actions response={response} onAction={onAction} only={(a) => a.id !== 'mission.board' && a.id !== 'mission.view'} refreshCommand="mission.board" />
     </ScreenScroll>
   )
 }

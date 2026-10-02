@@ -121,7 +121,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
         </Card>
       )}
 
-      <Actions response={response} onAction={onAction} refreshCommand="education.list" />
+      <Actions response={response} onAction={onAction} only={(a) => a.id !== 'education.course'} refreshCommand="education.list" />
     </ScreenScroll>
   )
 }

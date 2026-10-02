@@ -5,6 +5,7 @@ import { clamp01, formatNumber, hms } from './kit/format'
 import { Slab } from '../../kit'
 import { buildingName, useBuildingCatalogue } from '../../village/useVillage'
 import { t, type Key } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface Named { code?: string; name?: string }
 interface CrimeHubView {
@@ -31,6 +32,7 @@ const categoryName = (n: Named) => (n.code && CATEGORIES.includes(n.code) ? t(`c
 export default function CrimeHub({ response, loading, onAction, run, openLocal }: ScreenProps) {
   const v = (response?.view ?? {}) as CrimeHubView
   const cat = useBuildingCatalogue()
+  const names = useContentNames()
   if (loading && !response) return <ScreenScroll><Header title={t('crime.title')} tone="ruby" /></ScreenScroll>
   const need = v.need_code ? buildingName(cat, v.need_code) : v.need_role ? t(`crime.role.${v.need_role}` as Key) : ''
 
@@ -55,7 +57,7 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
               sub={!v.nerve.max || (v.nerve.nerve ?? 0) < v.nerve.max ? t('crime.full_in', { t: hms(v.nerve.full_in_seconds) }) : undefined} />
           )}
         </div>
-        {v.venue?.name && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('crime.venue', { name: v.venue.name })}</div>}
+        {v.venue?.code && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('crime.venue', { name: names.name('venue', v.venue.code, v.venue.name) })}</div>}
         {v.tier?.tier?.name && (
           <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>
             {t('crime.tier', { name: tierName(v.tier.tier) })} {v.tier.next?.name ? `· ${t('crime.tier_next', { name: tierName(v.tier.next), a: formatNumber(v.tier.xp ?? 0), b: formatNumber(v.tier.next_xp ?? 0) })}` : ''}
@@ -80,7 +82,7 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
         ))}
       </div>
 
-      <Actions response={response} onAction={onAction} refreshCommand="crime.hub" />
+      <Actions response={response} onAction={onAction} refreshCommand="crime.hub" only={(a) => a.id !== 'crime.category'} />
     </ScreenScroll>
   )
 }
@@ -89,6 +91,7 @@ interface CrimeLine { crime?: Named; duration_seconds?: number; eligible?: boole
 interface CrimeListView { category?: Named; crimes?: CrimeLine[] | null; page?: number; pages?: number }
 
 export function CrimeList({ response, loading, onAction, run }: ScreenProps) {
+  const names = useContentNames()
   const v = (response?.view ?? {}) as CrimeListView
   if (loading && !response) return <ScreenScroll><Header title={t('crime.title')} tone="ruby" /></ScreenScroll>
 
@@ -101,13 +104,13 @@ export function CrimeList({ response, loading, onAction, run }: ScreenProps) {
             key={i}
             icon={c.eligible ? 'crime' : 'm_lock'}
             palette={c.eligible ? 'ruby' : 'steel'}
-            title={c.crime?.name ?? c.crime?.code ?? '—'}
-            sub={`${t('crime.nerve_cost', { n: formatNumber(c.nerve ?? 0) })}${c.duration_seconds ? ` · ${hms(c.duration_seconds)}` : ''}`}
-            onClick={() => c.eligible && c.crime?.code && run('crime.view', { crime: c.crime.code })}
+            title={c.crime?.code ? names.name('crime', c.crime.code, c.crime.name) : '—'}
+            sub={`${t('crime.nerve_cost', { n: formatNumber(c.nerve ?? 0) })}${c.duration_seconds ? ` · ${hms(c.duration_seconds)}` : ''}${c.eligible ? '' : ` · ${t('ac.crime.list.locked')}`}`}
+            onClick={() => c.crime?.code && run('crime.view', { crime: c.crime.code })}
           />
         ))}
       </div>
-      <Actions response={response} onAction={onAction} refreshCommand="crime.list" />
+      <Actions response={response} onAction={onAction} refreshCommand="crime.list" only={(a) => a.id !== 'crime.view'} />
     </ScreenScroll>
   )
 }
