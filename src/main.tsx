@@ -45,6 +45,15 @@ async function boot() {
     </StrictMode>,
   )
   if (params.get('mock') !== '1') watchForNewBuild()
+
+  // The design-feedback toolbar exists only in a local dev server; the
+  // dynamic import keeps it out of every production bundle.
+  if (import.meta.env.DEV) {
+    const { Agentation } = await import('agentation')
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    createRoot(host).render(<Agentation endpoint="http://localhost:4747" />)
+  }
 }
 
 void boot()
