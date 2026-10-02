@@ -3190,6 +3190,7 @@ act.inbox.open | دیدن پیام‌ها | See messages
 act.inbox.read_all | خواندن همه | Mark all read
 act.inbox.open_item | باز کردن | Open
 act.founding.open_form | تکمیل اطلاعات روستا | Fill in the village form
+<<<<<<< HEAD
 
 # -- P0: activities, work, health, crime empty, travel, friends -------------------
 common.loading | در حال بارگذاری… | Loading…
@@ -3249,3 +3250,1039 @@ crime.category.street_crime | جرم خیابانی | Street crime
 crime.category.burglary | سرقت از اماکن | Burglary
 crime.category.fraud | کلاه‌برداری | Fraud
 crime.category.smuggling | قاچاق | Smuggling
+=======
+# -- companies, production and recruitment (docs/adr/0039): the web's own words for the neutral contract -------------------
+co.unknown | نامشخص | Unknown
+co.none | ندارد | None
+co.of | {a} از {b} | {a} of {b}
+co.available | پول آزاد شرکت | Free company money
+co.someone | یک نفر | Someone
+co.skill_level | {skill}، سطح {level} | {skill}, level {level}
+co.good_designed | {design} ({item}) | {design} ({item})
+co.rating | امتیاز {stars} از {max} | Rating {stars} of {max}
+co.unrated | هنوز امتیاز ندارد | Not rated yet
+co.walk | {t} پیاده تا {place} | {t} on foot to {place}
+co.walk_there | رفتن به {place} | Walk to {place}
+co.no_city | در سفر هستید. وقتی به شهر برسید، شرکت‌های آنجا همین‌جا پیدا می‌شوند. | You are travelling. Once you reach a city, its companies show up here.
+co.at_limit | همین حالا {max} شرکت دارید و بیشتر از این نمی‌توانید ثبت کنید. | You already have {max} companies and cannot register more.
+# kinds of business that are not reached here
+co.na.from | {type} از «{stage}» به بالا هست؛ اینجا هنوز {here} است. | {type} starts at the {stage} stage; this is still a {here}.
+co.na.only_support | {type} فقط در {place} ثبت می‌شود. | {type} can only be registered in {place}.
+co.na.role | {role} (سطح {tier}) | {role} (level {tier})
+# the registry and a company's page
+co.registry.heading | شرکت‌ها | Companies
+co.registry.title | شرکت‌های {city} | Companies of {city}
+co.registry.none | هنوز شرکتی در این شهر ثبت نشده. اولین شرکت را شما ثبت کنید. | No company is registered in this city yet. Be the first.
+co.registry.hint | شرکت را در شهرداری ثبت می‌کنید. درآمدش از خرید مردم شهر می‌آید و هر چه کارکنانش بیشتر کار کنند، مشتری بیشتری را جواب می‌دهد. | You register a company at the city hall. It earns from what the townspeople buy, and the more its staff work, the more customers it serves.
+co.line.staff | {type}، {staff} کارمند | {type}, {staff} staff
+co.line.hiring | {type}، {staff} کارمند، {openings} جای خالی | {type}, {staff} staff, {openings} openings
+co.page.type | نوع کار | Kind of business
+co.page.place | محل | Where
+co.page.owner | مالک | Owner
+co.page.manager | مدیر | Manager
+co.page.staff | کارکنان | Staff
+co.page.rating | امتیاز | Rating
+co.page.dissolved | این شرکت بسته شده است. | This company has been closed.
+co.page.hiring | استخدام می‌کند | Hiring
+co.page.products | محصولات: {list} | Products: {list}
+co.page.published | فناوری‌های منتشرشده: {list} | Published technologies: {list}
+co.opening.sub | {career}، {wage} برای هر شیفت، {free} جای خالی | {career}, {wage} per shift, {free} open
+# founding
+co.register.heading | ثبت شرکت | Register a company
+co.register.title | ثبت شرکت در {city} | Register a company in {city}
+co.register.intro | هزینهٔ ثبت به خزانهٔ شهر می‌رود و در هر دوره هزینهٔ نگهداری از حساب شرکت برداشته می‌شود. نوع کار را انتخاب کنید. | The registration fee goes to the city treasury, and each period the upkeep is taken from the company's account. Pick a kind of business.
+co.types.none | در این شهر شرکتی قابل ثبت نیست. | No company can be registered in this city.
+co.types.locked | هنوز به این‌ها نرسیده‌اید | Not reached yet
+co.type.cost | ثبت {fee}، نگهداری {upkeep} در هر دوره | Registration {fee}, upkeep {upkeep} per period
+co.type.licensed | مجوز دفاعی | Defence licence
+co.type.title | {type} در {city} | {type} in {city}
+co.type.place | محل کار | Workplace
+co.type.careers | استخدام در رشتهٔ | Hires for
+co.type.max_staff | حداکثر کارکنان | Most staff
+co.type.fee | هزینهٔ ثبت | Registration fee
+co.type.upkeep | هزینهٔ نگهداری | Upkeep
+co.type.upkeep_value | {amount} هر {period} | {amount} every {period}
+co.type.explain | درآمد شرکت از خرید مردم شهر می‌آید. هر شیفتی که کارکنان کار کنند، ظرفیت و کیفیت شرکت را بالا می‌برد و دستمزدشان از حساب شرکت پرداخت می‌شود. | The company earns from what the townspeople buy. Every shift its staff work raises its capacity and quality, and their wages come out of the company's account.
+co.type.no_place | در {city} جایی به نام {place} نیست و این نوع شرکت اینجا ثبت نمی‌شود. | There is no {place} in {city}, so this kind of company cannot be registered here.
+co.type.defence | این نوع شرکت مجوز دفاعی می‌خواهد. | This kind of company needs a defence licence.
+co.type.defence_rank | در {career} خدمت کنید و دست‌کم به درجهٔ {rank} برسید. | Serve in {career} and reach at least the rank of {rank}.
+co.type.defence_contractor | یا صاحب شرکتی باشید که مجوز پیمانکاری دفاعی دارد. | Or own a company that holds a defence contractor licence.
+co.type.found_how | روش پرداخت را بزنید و نام شرکت را بنویسید؛ نام باید {lo} تا {hi} حرف باشد. | Choose how to pay and type the company's name; it must be {lo} to {hi} letters.
+co.type.cannot_pay | پول نقد و موجودی بانک شما برای هزینهٔ ثبت کافی نیست. | Your cash and bank balance do not cover the registration fee.
+co.founded.title | شرکت ثبت شد | Company registered
+co.founded.body | شرکت {name} در {city} ثبت شد. | {name} is now registered in {city}.
+co.founded.paid_cash | هزینهٔ ثبت، {fee}، نقد پرداخت شد. | The fee, {fee}, was paid in cash.
+co.founded.paid_card | هزینهٔ ثبت، {fee}، با کارت پرداخت شد. | The fee, {fee}, was paid by card.
+co.founded.next | حالا به حساب شرکت پول بریزید و آگهی استخدام بدهید. از دورهٔ بعد مردم شهر از شرکت شما خرید می‌کنند. | Now put money into the company's account and post a job. From the next period the townspeople will buy from you.
+# the companies a player runs, openings, staff
+co.mine.title | شرکت‌های من | My companies
+co.mine.none | هنوز شرکتی ندارید و مدیر شرکتی هم نیستید. | You own no company and manage none.
+co.mine.owner | مالک | Owner
+co.mine.manager | مدیر | Manager
+co.openings.title | آگهی‌های استخدام {name} | {name}: job postings
+co.openings.none | آگهی بازی ندارید. | You have no open postings.
+co.openings.line | {wage} برای هر شیفت، {filled} از {positions} جا پر شده | {wage} per shift, {filled} of {positions} filled
+co.openings.citizens | تا وقتی بازیکنی استخدام نشده، شهروندان شهر جای خالی را پر می‌کنند؛ همان دستمزد را از حساب شرکت می‌گیرند و کمی کم‌بازده‌ترند. | Until a player is hired, townspeople fill a vacancy: they draw the same wage from the company's account and work a little less well.
+co.openings.at_max | بیشتر از این آگهی باز نمی‌توانید داشته باشید؛ یکی را ببندید. | You cannot have more open postings; close one.
+co.openings.full | همهٔ جای کارکنان شرکت پر یا آگهی شده است. | Every place on the staff is filled or already posted.
+co.openings.post | برای آگهی تازه، رشته را بزنید و دستمزد هر شیفت را بنویسید؛ دستمزد شهر دست‌کم {wage} است. | For a new posting, pick the career and type the wage per shift; the city minimum is {wage}.
+co.staff.title | کارکنان {name} | {name}: staff
+co.staff.none | هنوز کارمندی ندارید. | You have no employees yet.
+co.staff.applications | درخواست‌های استخدام | Applications
+co.staff.application | {title}، سطح {level} | {title}, level {level}
+co.staff.employee | {title}، {wage} برای هر شیفت، {shifts} شیفت | {title}, {wage} per shift, {shifts} shifts
+co.staff.employee_working | {title}، {wage} برای هر شیفت، {shifts} شیفت، الان سر شیفت | {title}, {wage} per shift, {shifts} shifts, on shift now
+co.staff.hired | {player} به‌عنوان {title} استخدام شد. | {player} was hired as {title}.
+co.staff.rejected | درخواست {player} برای {title} رد شد. | {player}'s application for {title} was turned down.
+co.staff.fire_title | اخراج | Dismiss
+co.staff.fire_confirm | {player} را از شغل {title} اخراج می‌کنید؟ پیشرفتش در این شغل از دست می‌رود و به او خبر می‌دهیم. | Dismiss {player} from {title}? Their progress in this job is lost and they will be told.
+co.citizens.working | {workers} شهروند از {vacant} جای خالی آگهی‌ها سر کارند. دستمزدشان هر دوره حدود {wages} است و در تسویهٔ دوره از حساب شرکت می‌رود. | {workers} townspeople fill {vacant} vacancies. Their wages are about {wages} a period, taken from the company's account at settlement.
+co.citizens.unpaid | {vacant} جای خالی دارید، ولی پول آزاد شرکت برای دستمزد شهروندان کافی نیست؛ به حساب شرکت پول بریزید تا سر کار بیایند. | You have {vacant} vacancies but the free money is not enough for townspeople's wages; add money so they can start.
+co.opening.employer | کارفرما | Employer
+co.opening.career | رشته | Career
+co.opening.where | محل کار | Workplace
+co.opening.free | جای خالی | Open places
+co.opening.wage | دستمزد هر شیفت | Wage per shift
+co.opening.energy | انرژی هر شیفت | Energy per shift
+co.opening.shift | هر شیفت {t} طول می‌کشد. | A shift takes {t}.
+co.opening.requirements | شرایط | Requirements
+co.opening.closed | این آگهی دیگر باز نیست. | This posting is closed.
+co.opening.applied | درخواست شما ثبت شده و منتظر پاسخ کارفرماست. | Your application is in and waits for the employer.
+co.opening.employed | شما همین حالا شغل دارید. | You already have a job.
+co.opening.auto | این شرکت درخواست‌های واجد شرایط را خودکار می‌پذیرد. | This company accepts qualified applicants right away.
+co.applied.title | درخواست فرستاده شد | Application sent
+co.applied.body | درخواست شما برای {title} در {company} فرستاده شد. پاسخ کارفرما را به شما خبر می‌دهیم. | Your application for {title} at {company} was sent. We will tell you what the employer says.
+co.close.title | بستن شرکت | Close the company
+co.close.confirm | شرکت {name} را می‌بندید؟ | Close {name}?
+co.close.money | بدهی نگهداری، {debt}، پرداخت می‌شود؛ {tax} مالیات شرکت به خزانهٔ شهر می‌رود و {net} به حساب بانکی شما می‌آید. | The upkeep debt, {debt}, is paid; {tax} company tax goes to the city treasury and {net} to your bank account.
+co.close.staff | {staff} کارمند شغلشان را از دست می‌دهند و به آن‌ها خبر می‌دهیم. | {staff} employees lose their jobs and will be told.
+co.close.final | این کار برگشت ندارد. | This cannot be undone.
+co.close.done_title | شرکت بسته شد | Company closed
+co.close.done | شرکت {name} بسته شد. | {name} is closed.
+co.close.done_money | {net} به حساب بانکی شما آمد و {tax} مالیات شرکت پرداخت شد. | {net} went to your bank account and {tax} company tax was paid.
+# management
+co.manage.title | مدیریت {name} | Manage {name}
+co.manage.balance | موجودی شرکت | Company balance
+co.manage.reserved | دستمزد رزروشدهٔ شیفت‌های در جریان | Wages held for running shifts
+co.manage.available | پول آزاد | Free money
+co.manage.upkeep | نگهداری هر دوره | Upkeep per period
+co.manage.tax | مالیات شرکت بر برداشت سود | Company tax on withdrawn profit
+co.manage.price | سطح قیمت (نسبت به قیمت مرجع) | Price level (of the reference price)
+co.manage.debt | بدهی نگهداری {amount} دارید: {arrears} دوره از {grace} دورهٔ مهلت گذشته. | Upkeep debt {amount}: {arrears} of {grace} grace periods used.
+co.manage.staff | کارکنان | Staff
+co.manage.openings | آگهی‌های باز | Open postings
+co.manage.pending | درخواست‌های منتظر | Waiting applications
+co.manage.specialists | متخصصان | Specialists
+co.manage.specialists_value | {count} نفر، {campaigns} کارزار در جریان | {count} people, {campaigns} campaigns running
+co.manage.auto_on | درخواست‌های واجد شرایط خودکار پذیرفته می‌شوند. | Qualified applications are accepted automatically.
+co.manage.auto_off | درخواست‌ها را خودتان می‌پذیرید یا رد می‌کنید. | You accept or turn down applications yourself.
+co.manage.last | دورهٔ گذشته | Last period
+co.manage.no_period | هنوز دوره‌ای تسویه نشده است. | No period has been settled yet.
+co.manage.next | تسویهٔ بعدی ساعت {time}، {duration} | Next settlement at {time}, {duration}
+co.manage.defence | مجوز دفاعی: {state} | Defence licence: {state}
+co.manage.defence_eligible | می‌توانید برای مجوز پیمانکاری دفاعی درخواست بدهید. | You can apply for a defence contractor licence.
+co.defence.pending | منتظر بررسی | awaiting review
+co.defence.active | فعال | active
+co.defence.revoking | در حال لغو | being revoked
+co.defence.revoked | لغو شده | revoked
+co.defence.rejected | رد شده | turned down
+co.notice.company.deposited | {amount} به حساب شرکت ریخته شد. | {amount} was put into the company's account.
+co.notice.company.withdrawn | {amount} برداشت شد: {tax} مالیات شرکت و {net} به حساب بانکی شما رفت. | {amount} withdrawn: {tax} company tax and {net} to your bank account.
+co.notice.company.price | سطح قیمت روی {percent} قیمت مرجع تنظیم شد. | The price level is now {percent} of the reference price.
+co.notice.company.auto_on | از این پس درخواست‌های واجد شرایط خودکار پذیرفته می‌شوند. | From now on qualified applications are accepted automatically.
+co.notice.company.auto_off | از این پس درخواست‌ها منتظر تصمیم شما می‌مانند. | From now on applications wait for your decision.
+co.notice.company.manager_set | {player} مدیر شرکت شد. | {player} is now the company's manager.
+co.notice.company.manager_removed | شرکت دیگر مدیری ندارد. | The company has no manager now.
+co.period.revenue | فروش به مردم شهر | Sales to the townspeople
+co.period.sales_tax | مالیات فروش | Sales tax
+co.period.wages | دستمزدها | Wages
+co.period.upkeep | نگهداری | Upkeep
+co.period.sold | فروخته‌شده از درخواستی | Sold of wanted
+co.period.capacity | ظرفیت | Capacity
+co.period.quality | کیفیت | Quality
+co.period.shifts | شیفت‌های کارشده | Shifts worked
+co.period.citizens | شهروندان سر کار | Townspeople at work
+co.period.citizens_value | {workers} نفر، {shifts} شیفت، دستمزد {wages} | {workers} people, {shifts} shifts, wages {wages}
+# the next step
+co.step.title | قدم بعدی | Next step
+co.step.design_first | اولین محصولتان را طراحی کنید؛ با یک کالای ساده شروع کنید. | Design your first product; start with something simple.
+co.step.design_draft | طرح «{name}» نیمه‌کاره مانده؛ کاملش کنید و نهایی‌اش کنید. | The design "{name}" is unfinished; complete it and make it final.
+co.step.sell | {good} در انبار دارید؛ عرضه‌اش کنید تا بازیکنان و شرکت‌ها بخرند. | You have {good} in stock; put it up for sale so players and companies can buy.
+co.step.produce | مواد لازم آماده است؛ {qty} {good} بسازید. | The inputs are ready; make {qty} {good}.
+co.step.producing | {qty} {good} در حال ساخت است و ساعت {time} آماده می‌شود، {duration}. | {qty} {good} is being made and will be ready at {time}, {duration}.
+co.step.supply | برای ساختن {good}، مواد اولیه را یک‌جا از تأمین‌کننده بخرید؛ جمعاً {total}. | To make {good}, buy the raw inputs from the suppliers in one go; {total} in all.
+co.step.buy_goods | برای ساختن {good} به {component} نیاز دارید که شرکت‌های دیگر می‌سازند؛ آن را از آن‌ها بخرید. | To make {good} you need {component}, which other companies make; buy it from them.
+co.step.research | برای رشد شرکت، فناوری {tech} را تحقیق کنید تا {item} باز شود. | To grow the company, research {tech} to unlock {item}.
+co.step.design_next | حالا می‌توانید {item} را طراحی کنید. | You can now design {item}.
+co.stepbtn.design_first | طراحی اولین محصول | Design the first product
+co.stepbtn.design_draft | ادامهٔ {name} | Continue {name}
+co.stepbtn.sell | فروش {good} | Sell {good}
+co.stepbtn.produce | ساخت {qty} {good} | Make {qty} {good}
+co.stepbtn.producing | دیدن خط تولید | See the production line
+co.stepbtn.supply | خرید مواد اولیه، {total} | Buy raw inputs, {total}
+co.stepbtn.buy_goods | کالای شرکت‌ها | Company goods
+co.stepbtn.research | تحقیق {tech} | Research {tech}
+co.stepbtn.design_next | طراحی {item} | Design {item}
+# warehouse, suppliers
+co.wh.title | انبار {name} | {name}: warehouse
+co.wh.running | سفارش‌های تولید در جریان | Production orders running
+co.wh.listings | عرضه‌های باز | Open listings
+co.wh.researching | یک تحقیق در آزمایشگاه در جریان است. | A research is running in the lab.
+co.wh.stock | موجودی انبار | In stock
+co.wh.empty | انبار خالی است. مواد پایه را از تأمین‌کننده‌ها بخرید یا خودتان تولید کنید. | The warehouse is empty. Buy basic inputs from the suppliers or make them yourself.
+co.wh.units | {qty} واحد | {qty} units
+co.wh.pieces | {qty} عدد، کیفیت {quality} | {qty} pieces, quality {quality}
+co.wh.listed | {qty} در عرضه | {qty} on offer
+co.wh.sell | فروش | Sell
+co.sup.title | تأمین‌کننده‌های {city} | Suppliers in {city}
+co.sup.bought | {qty} واحد {component} به انبار رسید و {total} از حساب شرکت پرداخت شد. | {qty} {component} reached the warehouse and {total} was paid from the company's account.
+co.sup.none | در این شهر تأمین‌کننده‌ای نیست. | There are no suppliers in this city.
+co.sup.line | {supplier}، {price} برای هر واحد، موجودی {stock} واحد | {supplier}, {price} each, {stock} in stock
+co.sup.buy_qty | خرید {qty} | Buy {qty}
+co.sup.buy_other | مقدار دلخواه | Another amount
+co.sup.hint | تأمین‌کننده‌ها مواد پایه‌ای را می‌فروشند که هیچ شرکتی نمی‌سازد؛ موجودی هر کدام محدود است و با گذر زمان دوباره پر می‌شود. | Suppliers sell the basic inputs no company makes; each has limited stock that fills up again over time.
+# orders and production
+co.orders.title | خط تولید {name} | {name}: production line
+co.orders.crew | نیروی کار | Crew
+co.orders.running | سفارش‌های در جریان | Orders running
+co.orders.in_progress | در جریان | In progress
+co.orders.finished | تمام‌شده | Finished
+co.orders.none | هنوز سفارش تولیدی نداده‌اید. | You have placed no production order yet.
+co.orders.new | سفارش تازه | New order
+co.orders.no_targets | هنوز چیزی برای تولید ندارید: طرحی را نهایی کنید یا فناوری ساخت یک قطعه را به دست آورید. | You have nothing to make yet: finalise a design or get the technology to make a part.
+co.orders.batch | هر نوبت {batch} واحد می‌دهد | One batch makes {batch} units
+co.orders.locked | با یک قدم باز می‌شود | Opens with one step
+co.order.running | سفارش {no}: {qty} {good} | Order {no}: {qty} {good}
+co.order.until | ساعت {time}، {duration} | at {time}, {duration}
+co.order.done | سفارش {no}: {qty} {good} | Order {no}: {qty} {good}
+co.order.quality | کیفیت {quality} | quality {quality}
+co.unlock.research | برای باز شدن، اول فناوری {techs} را تحقیق کنید. | To unlock it, first research {techs}.
+co.unlock.license | برای باز شدن، لایسنس فناوری {techs} را بخرید. | To unlock it, buy a license for {techs}.
+co.unlock.both | برای باز شدن، اول فناوری {research} را تحقیق کنید و لایسنس {license} را بخرید. | To unlock it, research {research} and buy a license for {license}.
+co.produce.title | تولید {good} | Make {good}
+co.produce.kit_title | ساخت کیت ارتقای {good} | Make an upgrade kit for {good}
+co.produce.batch | هر نوبت تولید {batch} واحد می‌دهد. | One batch makes {batch} units.
+co.produce.recipe | مواد لازم برای هر واحد | Inputs per unit
+co.produce.recipe_order | مواد لازم این سفارش | Inputs for this order
+co.produce.per | {per} واحد، در انبار {have} | {per} units, {have} in stock
+co.produce.need | {need} واحد، در انبار {have} | {need} units, {have} in stock
+co.produce.choose | چند واحد تولید شود؟ با موجودی فعلی انبار تا {max} می‌شود. | How many? With today's stock you can make up to {max}.
+co.produce.size | {qty} واحد | {qty} units
+co.produce.size_batch | {qty} نوبت | {qty} batches
+co.produce.all | همه ({qty}) | All ({qty})
+co.produce.plan | {qty} {good} با {crew} نفر نیروی کار {duration} طول می‌کشد. | {qty} {good} takes {duration} with {crew} workers.
+co.produce.consumes | همهٔ مواد بالا همین حالا از انبار برداشته می‌شود؛ اگر حتی یکی کم باشد، چیزی برداشته نمی‌شود. | All inputs above are taken from the warehouse right now; if even one is short, nothing is taken.
+co.produce.short | مواد انبار برای این مقدار کافی نیست. | The warehouse does not hold enough for this amount.
+co.produce.start | شروع تولید {qty} واحد | Start making {qty} units
+co.produce.bought | مواد کم‌وکسر از تأمین‌کننده خریده شد و {total} از حساب شرکت پرداخت شد. | The missing inputs were bought from the supplier and {total} was paid from the company's account.
+co.produce.placed_title | سفارش ثبت شد | Order placed
+co.produce.placed | سفارش {no} ثبت شد: {qty} {good}، ساعت {time} آماده می‌شود، {duration}. | Order {no} placed: {qty} {good}, ready at {time}, {duration}.
+co.produce.placed_hint | مواد از انبار برداشته شد. محصول بعد از آماده شدن به انبار می‌آید و خبرتان می‌کنیم. | The inputs were taken from the warehouse. The product arrives in the warehouse when done and you will be told.
+co.short.supplier | {component}: {qty} واحد کم است؛ تأمین‌کننده می‌فروشد | {component}: {qty} short; a supplier sells it
+co.short.made | {component}: {qty} واحد کم است؛ خودتان می‌سازید | {component}: {qty} short; you make it yourself
+co.short.companies | {component}: {qty} واحد کم است؛ از کالای شرکت‌ها بخرید | {component}: {qty} short; buy it from company goods
+# selling
+co.sell.title | فروش {good} | Sell {good}
+co.sell.have | موجود در انبار | In stock
+co.sell.reference | قیمت مرجع | Reference price
+co.sell.qty | تعداد برای عرضه | Quantity to offer
+co.sell.how_many | چند واحد عرضه شود؟ | How many to offer?
+co.sell.price_how | قیمت هر واحد از {qty} {good} را بنویسید، یا با قیمت مرجع عرضه کنید. | Type the price per unit of {qty} {good}, or offer it at the reference price.
+co.sell.at_reference | عرضه با قیمت مرجع، {price} | Offer at the reference price, {price}
+co.listings.title | عرضه‌های شرکت در {city} | Company listings in {city}
+co.listings.none | عرضهٔ بازی ندارید. | You have no open listings.
+co.listings.line | {qty} مانده، هر واحد {price} | {qty} left, {price} each
+co.listings.listed | {qty} {good} به قیمت هر واحد {price} عرضه شد. | {qty} {good} put up at {price} each.
+co.listings.withdrawn | عرضهٔ {good} پس گرفته شد و {qty} واحد به انبار برگشت. | The {good} listing was withdrawn and {qty} units went back to the warehouse.
+co.listings.hint | کالای عرضه‌شده را بازیکنان و شرکت‌های این شهر در «کالای شرکت‌ها» می‌بینند و می‌خرند. مالیات فروش شهر از درآمد کم می‌شود. | Players and companies of this city see listed goods under "Company goods" and can buy them. The city's sales tax is taken from the income.
+co.goods.heading | کالای شرکت‌ها | Company goods
+co.goods.title | کالای شرکت‌های {city} | Goods of the companies in {city}
+co.goods.none | شرکت‌های این شهر فعلاً کالایی عرضه نکرده‌اند. | The companies of this city have no goods on offer right now.
+co.goods.line | {company}، {qty} مانده | {company}, {qty} left
+co.goods.attribute | {name} {value} | {name} {value}
+co.buy.title | خرید {good} | Buy {good}
+co.buy.seller | فروشنده | Seller
+co.buy.left | مانده | Left
+co.buy.price_each | قیمت هر واحد | Price each
+co.buy.qty | تعداد | Quantity
+co.buy.total | جمعاً | Total
+co.buy.cannot_pay | پول نقد و موجودی بانک شما برای این خرید کافی نیست و شرکتی هم ندارید که برایش بخرید. | Your cash and bank balance do not cover this and you have no company to buy for.
+co.buy.for_company | خرید برای {company} | Buy for {company}
+co.buy.done_title | خرید انجام شد | Purchase done
+co.buy.bought_player | {qty} {good} از {seller} خریدید و {total} پرداخت شد. کالا در کوله‌پشتی شماست. | You bought {qty} {good} from {seller} for {total}. It is in your backpack.
+co.buy.bought_company | {qty} {good} از {seller} برای {company} خریده شد و {total} از حساب شرکت پرداخت شد. کالا در انبار شرکت است. | {qty} {good} bought from {seller} for {company}; {total} was paid from the company's account. It is in the company's warehouse.
+# design studio
+co.studio.title | طراحی محصول {name} | {name}: design studio
+co.studio.none | هنوز طرحی ندارید. | You have no designs yet.
+co.studio.new | برای طرح تازه، نوع کالا را انتخاب کنید | Pick a kind of good for a new design
+co.studio.no_kinds | این نوع شرکت هنوز کالایی برای طراحی ندارد. | This kind of company has nothing to design yet.
+co.studio.at_max | شرکت شما {max} طرح دارد و بیشتر از این نمی‌تواند داشته باشد. | Your company has {max} designs and cannot hold more.
+co.studio.none_ready | هنوز کالایی برای طراحی آماده نیست؛ این‌ها با یک قدم باز می‌شوند. | No good is ready to design yet; these open with one step.
+co.studio.next | با یک قدم باز می‌شود | Opens with one step
+co.studio.later | کالاهای پیشرفته‌تر بعد از این‌ها باز می‌شوند. | More advanced goods open after these.
+co.design.unnamed | طرح شمارهٔ {no} | Design no. {no}
+co.design.status.draft | پیش‌نویس | Draft
+co.design.status.final | نهایی | Final
+co.design.status.retired | کنار گذاشته | Retired
+co.design.state.draft | پیش‌نویس؛ جاهای لازم را پر کنید و نامی بگذارید. | A draft; fill the needed places and give it a name.
+co.design.state.final | طرح نهایی؛ آمادهٔ تولید | Final design; ready to make
+co.design.state.retired | کنار گذاشته شده | Retired
+co.design.copy_short | کپی از مهندسی معکوس | reverse-engineered copy
+co.design.copy | کپی از «{source}» با مهندسی معکوس؛ کیفیت {loss} کمتر و مصرف مواد {overhead} بیشتر | A reverse-engineered copy of "{source}"; quality {loss} lower, inputs {overhead} higher
+co.design.version | نسخهٔ {version} | Version {version}
+co.design.slot_empty | خالی | Empty
+co.design.slot_optional | خالی (اختیاری) | Empty (optional)
+co.design.seen | {name} (قابل‌دیدن برای خریدار) | {name} (visible to buyers)
+co.design.cost_floor | کف هزینهٔ مواد هر واحد: {cost} | Lowest input cost per unit: {cost}
+co.design.locked | این قطعه‌ها فناوری {techs} را لازم دارند؛ تحقیقش کنید یا لایسنسش را بخرید. | These parts need {techs}; research it or buy its license.
+co.design.incomplete | جاهای لازم هنوز پر نشده‌اند. | The needed places are not filled yet.
+co.design.ready | طرح کامل است؛ نامش را بگذارید و نهایی‌اش کنید. | The design is complete; name it and make it final.
+co.design.choose | قطعهٔ جای «{slot}» را انتخاب کنید | Pick the part for "{slot}"
+co.design.range | مقدار از {lo} تا {hi}؛ بعد از انتخاب قطعه، مقدار را بنویسید. | Amount from {lo} to {hi}; after picking the part, type the amount.
+co.design.candidate | قیمت مرجع {price}، کیفیت {quality} | reference price {price}, quality {quality}
+co.design.locked_part | فناوری‌اش را ندارید | You lack its technology
+co.design.improve | بهبود یک ویژگی | Improve an attribute
+co.design.retire_title | کنار گذاشتن طرح | Retire the design
+co.design.retire_body | این نسخه کنار گذاشته می‌شود و دیگر تولید نمی‌شود. | This version is retired and no longer made.
+co.unit.g | {qty} گرم | {qty} g
+co.unit.ml | {qty} میلی‌لیتر | {qty} ml
+co.unit.mg | {qty} میلی‌گرم | {qty} mg
+co.improve.title | بهبود {attribute} | Improve {attribute}
+co.improve.plan | پروژهٔ بهبود {attribute} روی {good} | An improvement project for {attribute} on {good}
+co.improve.started | پروژهٔ بهبود {attribute} روی {good} شروع شد؛ پایان ساعت {time} (حدود {duration}). | The {attribute} improvement on {good} has started; done at {time} (about {duration}).
+co.improve.gain | افزایش برآوردی | Estimated gain
+co.improve.cost | هزینه | Cost
+co.improve.duration | مدت | Duration
+co.retrofit.title | ارتقای {good} | Upgrade {good}
+co.retrofit.plan | ارتقای {good} از نسخهٔ {from} به نسخهٔ {to}؛ مدت {duration} | Upgrade {good} from version {from} to {to}; takes {duration}
+co.retrofit.started | ارتقای {good} از نسخهٔ {from} به نسخهٔ {to} شروع شد؛ پایان ساعت {time} (حدود {duration}). | Upgrading {good} from version {from} to {to} has started; done at {time} (about {duration}).
+co.kit.title | کیت ارتقا | Upgrade kit
+co.kit.bought | کیت ارتقا از {seller} خریده شد. | The upgrade kit was bought from {seller}.
+co.kit.plan | کیت ارتقا را از {seller} می‌خرید. | You are buying the upgrade kit from {seller}.
+# research lab
+co.lab.title | آزمایشگاه {name} | {name}: research lab
+co.lab.running | تحقیق {tech} ساعت {time} تمام می‌شود، {duration} | Researching {tech}; done at {time}, {duration}
+co.lab.none | این نوع شرکت فناوری‌ای برای تحقیق ندارد. | This kind of company has no technology to research.
+co.lab.cost | هزینهٔ تحقیق {cost} | Research cost {cost}
+co.lab.missing | اول باید {techs} را داشته باشید | You first need {techs}
+co.lab.offers | {count} شرکت لایسنسش را می‌فروشد | {count} companies sell its license
+co.lab.later | {count} فناوری پیشرفته‌تر بعد از این‌ها باز می‌شود. | {count} more advanced technologies open after these.
+co.lab.hint | هر فناوری را یک بار تحقیق می‌کنید و مال شرکت می‌شود. آن را خصوصی نگه دارید، لایسنسش را بفروشید یا برای همه منتشرش کنید. | You research each technology once and it becomes the company's. Keep it private, sell its license or publish it for everyone.
+co.lab.mode.private | مال شماست؛ خصوصی | Yours; private
+co.lab.mode.license | مال شماست؛ لایسنس به قیمت {price} | Yours; license sold at {price}
+co.lab.mode.published | مال شماست؛ برای همه منتشر شده | Yours; published for everyone
+co.tech.state.licensed | لایسنسش را دارید | You hold its license
+co.tech.state.published | شرکت دیگری برای همه منتشرش کرده | Another company published it for all
+co.tech.state.running | در حال تحقیق | Being researched
+co.tech.state.owned | مال شماست | Yours
+co.tech.state.available | قابل تحقیق | Can be researched
+co.tech.state.locked | قفل | Locked
+co.tech.is.owned | این فناوری مال شرکت شماست. | This technology is your company's.
+co.tech.is.licensed | لایسنس این فناوری را دارید؛ می‌توانید با آن طراحی و تولید کنید. | You hold this technology's license; you can design and make with it.
+co.tech.is.published | این فناوری برای همه منتشر شده و شما هم از آن استفاده می‌کنید. | This technology is published for all and you use it too.
+co.tech.is.running | این فناوری در حال تحقیق است. | This technology is being researched.
+co.tech.is.available | این فناوری را می‌توانید تحقیق کنید. | You can research this technology.
+co.tech.is.locked | هنوز پیش‌نیازهای این فناوری را ندارید. | You do not have this technology's prerequisites yet.
+co.tech.cost | هزینهٔ تحقیق | Research cost
+co.tech.time | مدت | Duration
+co.tech.skill | مهارت لازم | Skill needed
+co.tech.best | بهترین فرد شرکت | Best in the company
+co.tech.sold | لایسنس‌های فروخته‌شده | Licenses sold
+co.tech.requires | پیش‌نیاز: {tech} | Needs: {tech}
+co.tech.unlocks | ساخت و طراحی با این: {components} | Lets you make and design with: {components}
+co.tech.mode.private | خصوصی: فقط شرکت شما از آن استفاده می‌کند. | Private: only your company uses it.
+co.tech.mode.license | لایسنس به قیمت {price}: شرکت‌های دیگر لایسنس می‌خرند و پولش به حساب شرکت شما می‌آید. | License at {price}: other companies buy it and the money goes to your account.
+co.tech.mode.published | منتشرشده: همه آزادانه از آن استفاده می‌کنند و این تصمیم برگشت ندارد. | Published: everyone may use it freely, and this cannot be undone.
+co.tech.blocked.not_cleared | این فناوری نظامی است و فقط شرکتی که مجوز دفاعی دارد تحقیقش می‌کند. | This is a military technology; only a company with a defence licence can research it.
+co.tech.blocked.busy | آزمایشگاه همین حالا سرگرم تحقیق دیگری است؛ هر بار یک تحقیق. | The lab is busy with another research; one at a time.
+co.tech.blocked.wrong_type | این نوع شرکت نمی‌تواند این فناوری را تحقیق کند. | This kind of company cannot research this technology.
+co.tech.blocked.skill | کسی در شرکت {skill} ندارد. | Nobody in the company has {skill}.
+co.tech.blocked.prerequisite | اول پیش‌نیازهای بالا را تحقیق کنید، یا صبر کنید شرکتی آن‌ها را برای همه منتشر کند. | First research the prerequisites above, or wait for a company to publish them.
+co.tech.blocked.funds | پول آزاد شرکت ({money}) برای هزینهٔ تحقیق ({need}) کافی نیست. | The free money ({money}) does not cover the research cost ({need}).
+co.tech.notice.started | تحقیق شروع شد و هزینه‌اش از حساب شرکت پرداخت شد. پایانش را خبر می‌دهیم. | Research started and its cost was paid from the company's account. You will be told when it is done.
+co.tech.notice.private | این فناوری از این پس خصوصی است. | This technology is now private.
+co.tech.notice.license | لایسنس این فناوری از این پس به قیمت {price} فروخته می‌شود. | This technology's license is now sold at {price}.
+co.tech.notice.published | این فناوری برای همه منتشر شد. | This technology was published for everyone.
+co.tech.notice.bought | لایسنس از {company} خریده شد و {price} به حساب آن شرکت رفت. | The license was bought from {company} and {price} went to its account.
+co.tech.offers | شرکت‌هایی که لایسنسش را می‌فروشند | Companies that sell its license
+co.tech.license_from | خرید لایسنس از {company}، {price} | Buy the license from {company}, {price}
+co.tech.publish_title | انتشار برای همه | Publish for everyone
+co.tech.publish_yes | بله، منتشر شود | Yes, publish
+co.tech.publish_body | {tech} را برای همه منتشر می‌کنید؟ هر شرکتی بی‌هزینه از آن استفاده می‌کند و دیگر نمی‌توانید خصوصی‌اش کنید یا لایسنسش را بفروشید. | Publish {tech} for everyone? Any company uses it for free and you can no longer keep it private or sell its license.
+co.tech.license_title | خرید لایسنس | Buy the license
+co.tech.license_yes | بله، خرید به قیمت {price} | Yes, buy for {price}
+co.tech.license_body | لایسنس {tech} را از {company} به قیمت {price} می‌خرید؟ پول آزاد شرکت شما: {money} | Buy the license for {tech} from {company} for {price}? Your free money: {money}
+# reverse engineering
+co.relab.title | مهندسی معکوس {name} | {name}: reverse engineering
+co.relab.engineer | مهندس شرکت | The company's engineer
+co.relab.time | مدت هر کار | Time per job
+co.relab.samples | نمونه‌های محصولات شرکت‌های دیگر در انبار | Samples of other companies' products in the warehouse
+co.relab.no_samples | نمونه‌ای در انبار نیست. یک واحد از محصول شرکتی دیگر را از کالای شرکت‌ها بخرید. | There is no sample in the warehouse. Buy one unit of another company's product from company goods.
+co.relab.sample | ساخت {maker}، کیفیت {quality}، شانس موفقیت {chance} | made by {maker}, quality {quality}, {chance} chance
+co.relab.jobs | کارهای مهندسی معکوس | Reverse-engineering jobs
+co.relab.job_running | ساعت {time}، {duration} | at {time}, {duration}
+co.relab.job_ok | طرح «{result}» به دست آمد | Got the design "{result}"
+co.relab.job_failed | ناموفق | Failed
+co.relab.started | نمونهٔ {good} باز شد؛ نتیجه ساعت {time} معلوم می‌شود، {duration}. | The {good} sample was opened; the result comes at {time}, {duration}.
+co.relab.hint | نمونه در این کار از بین می‌رود. نتیجه، اگر موفق باشد، طرحی ناقص‌تر از اصل است و فناوری نمی‌دهد. | The sample is destroyed. If it works, the result is a poorer design than the original and gives no technology.
+co.relab.confirm_title | باز کردن نمونه | Take the sample apart
+co.relab.confirm | {good} ساخت {maker} را باز می‌کنید؟ نمونه از بین می‌رود و شانس موفقیت {chance} است. کار {duration} طول می‌کشد. | Take apart {good} made by {maker}? The sample is destroyed and the chance is {chance}. It takes {duration}.
+co.relab.confirm_yes | بله، باز شود | Yes, take it apart
+# recruitment
+co.rc.hub_title | جذب متخصص، {name} | Recruiting for {name}
+co.rc.staff | متخصصان شرکت | The company's specialists
+co.rc.running | کارزارهای در جریان | Campaigns running
+co.rc.campaigns | کارزارها | Campaigns
+co.rc.none | هنوز کارزار استخدامی ندارید. | You have no recruiting campaign yet.
+co.rc.hint | کارزار استخدام، آگهی شغلی شما در شهرهایی است که انتخاب می‌کنید. متخصصان هر شهر محدودند و پیشنهاد شما را با انتظارشان، هزینهٔ جابه‌جایی و این‌که از کجا می‌آیند می‌سنجند. | A campaign is your job advert in the cities you pick. Each city has a limited number of specialists, who weigh your offer against what they expect, the move and where they come from.
+co.rc.campaign | کارزار {no}: {what} | Campaign {no}: {what}
+co.rc.campaign_title | کارزار {no}: {what} یا بالاتر | Campaign {no}: {what} or better
+co.rc.pending | {count} متقاضی منتظر پاسخ | {count} applicants waiting
+co.rc.line.draft | پیش‌نویس | Draft
+co.rc.line.running | {cities} شهر، {hired} از {positions} نفر، بررسی بعدی ساعت {time} | {cities} cities, {hired} of {positions} hired, next check at {time}
+co.rc.line.filled | {hired} از {positions} نفر استخدام شد | {hired} of {positions} hired
+co.rc.line.ended | تمام شد، {hired} از {positions} نفر | Over, {hired} of {positions} hired
+co.rc.line.cancelled | متوقف شد | Stopped
+co.rc.status.draft | پیش‌نویس | Draft
+co.rc.status.running | در جریان؛ بررسی بعدی ساعت {time}، {checks} بررسی دیگر | Running; next check at {time}, {checks} checks left
+co.rc.status.filled | همهٔ نفرات استخدام شدند. | Every place is filled.
+co.rc.status.ended | بررسی‌های کارزار تمام شد. | The campaign's checks are over.
+co.rc.status.cancelled | کارزار متوقف شد. | The campaign was stopped.
+co.rc.cities | شهرها | Cities
+co.rc.hired | استخدام‌شده | Hired
+co.rc.candidates | متقاضیان | Applicants
+co.rc.candidates_none.draft | آگهی هنوز منتشر نشده. | The advert is not out yet.
+co.rc.candidates_none.running | هنوز کسی درخواست نداده؛ بررسی بعدی را صبر کنید. | Nobody has applied yet; wait for the next check.
+co.rc.candidates_none.filled | متقاضی دیگری نیست. | There are no more applicants.
+co.rc.candidates_none.ended | کسی به این آگهی پاسخ نداد. پیشنهاد بهتر یا شهرهای بیشتر را امتحان کنید. | Nobody answered this advert. Try a better offer or more cities.
+co.rc.candidates_none.cancelled | متقاضی‌ای نماند. | No applicants are left.
+co.rc.candidate.pending | {what}، از {city}، انتظار {expected}، تا ساعت {time} منتظر پاسخ | {what}, from {city}, expects {expected}, waits until {time}
+co.rc.candidate.hired | {what}، از {city}، استخدام شد | {what}, from {city}, hired
+co.rc.candidate.rejected | {what}، از {city}، رد شد | {what}, from {city}, turned down
+co.rc.candidate.expired | {what}، از {city}، منتظر نماند و کار دیگری گرفت | {what}, from {city}, did not wait and took another job
+co.rc.candidate.withdrawn | {what}، از {city}، انصراف داد | {what}, from {city}, withdrew
+co.rc.abroad | از کشور دیگر | From abroad
+co.rc.hire | استخدام {name}، {amount} | Hire {name}, {amount}
+co.rc.reject | رد | Turn down
+co.rc.cancel_title | توقف کارزار | Stop the campaign
+co.rc.cancel_body | کارزار متوقف شود؟ هزینهٔ آگهی برنمی‌گردد و متقاضیان منتظر کنار می‌روند. | Stop the campaign? The advert fee is not refunded and waiting applicants step aside.
+co.rc.cancel_yes | بله، متوقف شود | Yes, stop it
+co.rc.notice.hired | {name} استخدام شد و به متخصصان شرکت پیوست. | {name} was hired and joined the company's specialists.
+co.rc.notice.rejected | درخواست {name} رد شد. | {name}'s application was turned down.
+co.rc.notice.posted | آگهی منتشر شد؛ نتیجهٔ هر بررسی را خبر می‌دهیم. | The advert is out; you will be told the result of each check.
+co.rc.notice.cancelled | کارزار متوقف شد. | The campaign was stopped.
+co.offer.salary | حقوق هر دوره | Salary per period
+co.offer.housing | کمک‌هزینهٔ مسکن | Housing allowance
+co.offer.signing | پاداش امضا | Signing bonus
+co.offer.relocation | بستهٔ جابه‌جایی | Relocation package
+co.offer.term | قرارداد | Contract
+co.offer.shares | سهام مجازی | Virtual shares
+co.offer.up_to | تا {amount} | Up to {amount}
+co.offer.periods | {count} دوره | {count} periods
+co.offer.shares_value | {count} سهم | {count} shares
+co.rd.title | کارزار استخدام شمارهٔ {no}، {name} | Recruiting campaign no. {no}, {name}
+co.rd.section.main | پیش‌نویس: هر بخش را تنظیم کنید و بعد آگهی را منتشر کنید. | A draft: set each part, then publish the advert.
+co.rd.section.skill | مهارت و حداقل سطح متخصص را انتخاب کنید. | Pick the skill and the lowest level of specialist.
+co.rd.section.cities | شهرهایی که آگهی در آن‌ها منتشر می‌شود؛ هزینهٔ آگهی هر شهر جداست. | The cities where the advert runs; each city costs its own fee.
+co.rd.section.pay | حقوق هر دوره، مسکن، پاداش امضا و بستهٔ جابه‌جایی را انتخاب کنید یا بنویسید. | Pick or type the salary per period, housing, signing bonus and relocation package.
+co.rd.section.terms | مدت قرارداد، سهام مجازی، تعداد نفرات و پذیرش خودکار. | Contract length, virtual shares, headcount and automatic acceptance.
+co.rd.skill | مهارت | Skill
+co.rd.level | سطح | Level
+co.rd.cities | شهرها | Cities
+co.rd.no_cities | هنوز شهری انتخاب نشده | No city picked yet
+co.rd.abroad | کشور دیگر | Another country
+co.rd.positions | تعداد نفرات | Headcount
+co.rd.shares_value | {count} سهم، ارزش امروز {amount}؛ در پایان قرارداد نقد پرداخت می‌شود | {count} shares worth {amount} today, paid in cash when the contract ends
+co.rd.auto_on | پذیرش خودکار روشن است؛ هر متقاضی همان لحظه استخدام می‌شود. | Automatic acceptance is on; every applicant is hired at once.
+co.rd.auto_off | پذیرش خودکار خاموش است؛ هر متقاضی را خودتان می‌پذیرید. | Automatic acceptance is off; you accept each applicant yourself.
+co.rd.market | انتظار بازار در {city}: {amount} | What the market in {city} expects: {amount}
+co.rd.reach | در این شهرها {count} متخصص {what} یا بالاتر آمادهٔ کارند. | In these cities {count} specialists at {what} or better are ready to work.
+co.rd.chance | شانس تقریبی پاسخ هر متخصص: {percent} | A specialist's rough chance of answering: {percent}
+co.rd.fee | هزینهٔ آگهی: {amount} ({cities} شهر، هر کدام {fee}). پول آزاد شرکت: {money} | Advert fee: {amount} ({cities} cities at {fee} each). Free company money: {money}
+co.rd.notice.set | ذخیره شد. | Saved.
+co.rd.notice.created | پیش‌نویس کارزار آماده است؛ پیشنهاد را تنظیم و منتشر کنید. | The campaign draft is ready; set the offer and publish it.
+co.rd.confirm_title | انتشار آگهی | Publish the advert
+co.rd.confirm_yes | انتشار و پرداخت {amount} | Publish and pay {amount}
+co.rd.confirm | آگهی در {cities} شهر منتشر می‌شود و {amount} از حساب شرکت به خزانهٔ آن شهرها می‌رود. کارزار {checks} بار، هر {every} یک بار، متخصصان را می‌سنجد. | The advert runs in {cities} cities and {amount} goes from the company's account to their treasuries. The campaign checks specialists {checks} times, once every {every}.
+co.sp.title | متخصصان {name}: {count} نفر از {max} | Specialists of {name}: {count} of {max}
+co.sp.none | هنوز متخصصی استخدام نکرده‌اید. | You have hired no specialist yet.
+co.sp.pay | حقوق هر دوره | Pay per period
+co.sp.pay_housing | {salary} و مسکن {housing} | {salary} plus housing {housing}
+co.sp.contract | قرارداد | Contract
+co.sp.contract_value | دورهٔ {served} از {term} | Period {served} of {term}
+co.sp.expiring | قرارداد تمام شده؛ اگر تا تسویهٔ بعد تمدیدش نکنید می‌رود. | The contract has run out; they leave at the next settlement unless you renew.
+co.sp.underpaid | کمتر از بازار ({market}) می‌گیرد؛ {left} دورهٔ دیگر به پیشنهاد بهتری می‌رود. | Paid below the market ({market}); in {left} periods they take a better offer.
+co.sp.unpaid | حقوقش پرداخت نشده؛ اگر {unpaid} دورهٔ دیگر بی‌حقوق بماند می‌رود. | Their pay is overdue; after {unpaid} more unpaid periods they leave.
+co.sp.hint | متخصصان در آزمایشگاه، طراحی، مهندسی معکوس، درمانگاه و خط تولید مثل کارمندی با همان مهارت حساب می‌شوند. حقوقشان هر دوره از حساب شرکت می‌رود. | Specialists count as employees with their skill in the lab, the studio, reverse engineering, the clinic and the production line. Their pay comes from the company's account every period.
+co.sp.dismiss_title | پایان همکاری | End the contract
+co.sp.dismiss_yes | بله، همکاری تمام شود | Yes, end it
+co.sp.dismiss_body | همکاری با {name} تمام شود؟ پاداش‌های پرداخت‌شده برنمی‌گردد و از همین حالا برای شرکت کار نمی‌کند. | End the contract with {name}? Bonuses already paid are not refunded and they stop working for the company now.
+co.sp.notice.renewed | قرارداد {name} تمدید شد. | {name}'s contract was renewed.
+co.sp.notice.raised | حقوق {name} هم‌سطح بازار شد. | {name}'s pay now matches the market.
+co.sp.notice.dismissed | همکاری با {name} تمام شد. | The contract with {name} is over.
+co.gap.hire | می‌توانید متخصص جذب کنید یا خودتان در یک دورهٔ آموزشی آن را یاد بگیرید. | You can recruit a specialist or learn it yourself in a course.
+# refusals: the kind a refused request carries
+co.refused.title | نشد | Not possible
+co.refused.shortage_line | {component}: {need} واحد لازم است و {have} واحد دارید | {component}: {need} units needed, you have {have}
+co.refused.company.not_found | چنین شرکتی پیدا نشد. | No such company was found.
+co.refused.company.not_allowed | در {name} اجازهٔ این کار را ندارید. | You are not allowed to do this in {name}.
+co.refused.company.dissolved | شرکت {name} بسته شده است. | {name} is closed.
+co.refused.company.name_length | نام شرکت باید {lo} تا {hi} حرف باشد. دوباره بنویسید. | The company's name must be {lo} to {hi} letters. Try again.
+co.refused.company.name_charset | نام شرکت فقط از حرف، عدد، فاصله و نشانه‌های ساده ساخته می‌شود و دست‌کم دو حرف دارد. دوباره بنویسید. | The name may only hold letters, digits, spaces and simple marks, and at least two letters. Try again.
+co.refused.company.name_reserved | این نام به نهادهای شهر یا بازی شبیه است و مجاز نیست. نام دیگری بنویسید. | This name looks like a city or game institution and is not allowed. Try another.
+co.refused.company.name_taken | شرکتی با این نام در این شهر هست. نام دیگری بنویسید. | A company with this name already exists in this city. Try another.
+co.refused.company.limit | همین حالا {max} شرکت دارید و بیشتر از این نمی‌توانید ثبت کنید. | You already have {max} companies and cannot register more.
+co.refused.company.no_place | این نوع شرکت در این شهر ثبت نمی‌شود. | This kind of company cannot be registered in this city.
+co.refused.company.cannot_pay | شرکت {name} الان پول آزاد کافی برای دستمزد این شیفت ({need}) ندارد و شیفت شروع نشد. به کارفرمایتان خبر بدهید. | {name} has not enough free money for this shift's wage ({need}), so the shift did not start. Tell your employer.
+co.refused.company.in_debt | شرکت {name} بدهی نگهداری دارد؛ تا تسویه نشود، سودی برداشته نمی‌شود. | {name} owes upkeep; no profit can be withdrawn until it is settled.
+co.refused.company.not_enough | پول آزاد شرکت {name} {have} است و {need} از آن برنمی‌آید. | {name} has {have} free and cannot cover {need}.
+co.refused.company.price | این سطح قیمت برای این نوع شرکت مجاز نیست. | This price level is not allowed for this kind of company.
+co.refused.company.staff_full | جای کارکنان {name} پر است. | {name}'s staff is full.
+co.refused.company.career | این نوع شرکت در این رشته استخدام نمی‌کند. | This kind of company does not hire for this career.
+co.refused.company.below_minimum | دستمزد هر شیفت نمی‌تواند کمتر از دستمزد شهر، {wage}، باشد. | The wage per shift cannot be below the city minimum, {wage}.
+co.refused.company.openings_max | بیشتر از {max} آگهی باز نمی‌توانید داشته باشید. | You cannot have more than {max} open postings.
+co.refused.company.opening_closed | این آگهی دیگر باز نیست. | This posting is closed.
+co.refused.company.opening_full | همهٔ جاهای این آگهی پر شده است. | Every place of this posting is filled.
+co.refused.company.applied | درخواست شما برای این آگهی همین حالا منتظر پاسخ است. | Your application for this posting is already waiting.
+co.refused.company.employed | شما اکنون شغل دارید. برای گرفتن این شغل، اول از شغل فعلی کناره بگیرید. | You already have a job. Leave it first to take this one.
+co.refused.company.shifts_running | کارکنان {name} الان سر شیفت‌اند؛ بعد از پایان شیفت‌ها دوباره امتحان کنید. | {name}'s staff are on shift; try again when the shifts end.
+co.refused.company.working | این کارمند الان سر شیفت است؛ بعد از پایان شیفتش دوباره امتحان کنید. | This employee is on shift; try again when it ends.
+co.refused.company.self | مالک شرکت نمی‌تواند مدیر خودش هم باشد. | The owner cannot also be the manager.
+co.refused.company.no_player | چنین بازیکنی پیدا نشد. کد بازیکن یا نام کاربری را دوباره بنویسید. | No such player was found. Type the player code or username again.
+co.refused.company.not_employee | این بازیکن کارمند {name} نیست. | This player does not work for {name}.
+co.refused.company.application_gone | این درخواست دیگر منتظر پاسخ نیست. | This application is no longer waiting.
+co.refused.company.away | برای این کار باید در {city} باشید. | You have to be in {city} for this.
+co.refused.company.cash_away | پول نقد را فقط وقتی در {city} هستید می‌توانید به حساب شرکت بریزید؛ از هر جا می‌توانید با کارت واریز کنید. | Cash can only be paid in while you are in {city}; by card you can pay in from anywhere.
+co.refused.company.invalid_amount | مبلغ را به عدد بنویسید؛ مثلاً 5000. | Type the amount as a number, for example 5000.
+co.refused.company.defence | این کار به مجوز دفاعی نیاز دارد. | This needs a defence licence.
+co.refused.company.not_reached | این نوع شرکت هنوز در این شهر نیست. | This kind of company is not yet available in this place.
+co.refused.production.not_found | چنین چیزی پیدا نشد؛ شاید تغییر کرده باشد. | Nothing like that was found; it may have changed.
+co.refused.production.skill | کسی در {name} مهارت {skill} سطح {level} ندارد (بهترین: سطح {have}). | Nobody in {name} has {skill} at level {level} (best: level {have}).
+co.refused.production.tech_locked | {name} فناوری {techs} را ندارد؛ تحقیقش کنید یا لایسنسش را بخرید. | {name} lacks {techs}; research it or buy its license.
+co.refused.production.shortage | مواد انبار {name} برای این سفارش کافی نیست و چیزی برداشته نشد. | {name}'s warehouse does not hold enough for this order and nothing was taken.
+co.refused.production.busy | آزمایشگاه {name} سرگرم تحقیق {techs} است؛ هر بار یک تحقیق. | {name}'s lab is busy researching {techs}; one at a time.
+co.refused.production.owned | {name} این فناوری را قبلاً تحقیق کرده است. | {name} has already researched this technology.
+co.refused.production.prerequisite | اول باید {techs} را داشته باشید. | You first need {techs}.
+co.refused.production.wrong_type | این نوع شرکت این کار را نمی‌کند. | This kind of company does not do this.
+co.refused.production.funds | پول آزاد {name} {money} است و {need} از آن برنمی‌آید. | {name} has {money} free and cannot cover {need}.
+co.refused.production.incomplete | جاهای لازم طرح هنوز پر نشده‌اند. | The design's needed places are not filled yet.
+co.refused.production.no_name | اول نام طرح را بگذارید. | Name the design first.
+co.refused.production.name_length | نام طرح باید {level} تا {max} حرف باشد. دوباره بنویسید. | A design's name must be {level} to {max} letters. Try again.
+co.refused.production.name_charset | نام طرح فقط از حرف، عدد، فاصله و نشانه‌های ساده ساخته می‌شود و دست‌کم دو حرف دارد. دوباره بنویسید. | A design's name may only hold letters, digits, spaces and simple marks, and at least two letters. Try again.
+co.refused.production.name_taken | {name} طرح دیگری با همین نام دارد. نام دیگری بنویسید. | {name} already has a design with this name. Try another.
+co.refused.production.max_orders | {name} همین حالا {max} سفارش در جریان دارد؛ بعد از تمام شدن یکی دوباره امتحان کنید. | {name} already has {max} orders running; try again when one is done.
+co.refused.production.max_designs | {name} {max} طرح دارد و بیشتر از این نمی‌تواند داشته باشد. | {name} has {max} designs and cannot hold more.
+co.refused.production.max_listings | {name} {max} عرضهٔ باز دارد؛ یکی را پس بگیرید. | {name} has {max} open listings; withdraw one.
+co.refused.production.not_reversible | این کالا طرحی ندارد که بشود بازش کرد، یا این نوع شرکت چنین کالایی نمی‌سازد. | This good has no design to recover, or this kind of company does not make it.
+co.refused.production.own_design | این محصول طرح خود شرکت شماست. | This product is your own company's design.
+co.refused.production.stock | این مقدار در انبار یا در عرضه نیست؛ حداکثر {max} واحد. | You do not have that much; at most {max} units.
+co.refused.production.not_cleared | این کالا یا فناوری به شما فروخته نمی‌شود. | This good or technology is not sold to you.
+co.refused.production.supplier_empty | تأمین‌کننده الان فقط {max} واحد دارد؛ مقدار کمتری بخرید یا صبر کنید تا دوباره پر شود. | The supplier has only {max} units now; buy less or wait until it fills up.
+co.refused.production.amount | مقدار را به عدد بنویسید؛ مثلاً 25. | Type the amount as a number, for example 25.
+co.refused.production.published | این فناوری منتشر شده و منتشرشده می‌ماند. | This technology is published and stays published.
+co.refused.production.not_for_sale | صاحب این فناوری لایسنسش را نمی‌فروشد. | Its owner does not sell this technology's license.
+co.refused.production.licensed | همین حالا می‌توانید از این فناوری استفاده کنید. | You can already use this technology.
+co.refused.production.final | این طرح نهایی شده و دیگر تغییر نمی‌کند. | This design is final and no longer changes.
+co.refused.production.listed | این کالا همین حالا عرضه شده است؛ اول آن عرضه را پس بگیرید. | This good is already on offer; withdraw that listing first.
+co.refused.production.away | برای خرید این کالا باید در {city} باشید. | You have to be in {city} to buy this.
+co.refused.production.own_listing | این کالای شرکت خودتان است. | This is your own company's good.
+co.refused.production.too_long | این سفارش بیش از اندازه طول می‌کشد؛ مقدار کمتری سفارش بدهید. | This order takes too long; order less.
+co.refused.production.improvement_busy | شرکت همین حالا یک پروژهٔ بهبود در جریان دارد؛ هر بار یکی. | The company already runs an improvement project; one at a time.
+co.refused.production.improvement_capped | این ویژگی در این نسخه به سقف بهبود رسیده؛ برای ادامه باید نسخهٔ جدیدی طراحی کنید. | This attribute has reached the improvement limit for this version; design a new version to go on.
+co.refused.production.not_same_lineage | این کیت برای این محصول ساخته نشده است. | This kit was not made for this product.
+co.refused.production.retrofit_busy | این نمونه همین حالا در حال ارتقاست. | This piece is already being upgraded.
+co.refused.recruit.not_found | این کارزار، متقاضی یا متخصص پیدا نشد. | This campaign, applicant or specialist was not found.
+co.refused.recruit.funds | پول آزاد شرکت ({money}) برای این کار ({need}) کافی نیست. | The free money ({money}) does not cover this ({need}).
+co.refused.recruit.campaigns | {name} همین حالا {max} کارزار در جریان دارد؛ صبر کنید یکی تمام شود. | {name} already runs {max} campaigns; wait for one to end.
+co.refused.recruit.staff | {name} به سقف {max} متخصص رسیده است. | {name} has reached its limit of {max} specialists.
+co.refused.recruit.no_cities | اول دست‌کم یک شهر برای آگهی انتخاب کنید. | First pick at least one city for the advert.
+co.refused.recruit.no_skill | در این شهرها متخصصی با این مهارت و این سطح پیدا نمی‌شود. | No specialist with this skill and level can be found in these cities.
+co.refused.recruit.finished | این کارزار دیگر در جریان نیست. | This campaign is no longer running.
+co.refused.recruit.gone | {person} دیگر در دسترس نیست؛ منتظر نماند یا کار دیگری گرفت. | {person} is no longer available; they did not wait or took another job.
+co.refused.recruit.posted | این کارزار منتشر شده و دیگر تغییر نمی‌کند. | This campaign is out and no longer changes.
+co.refused.recruit.amount | این مبلغ پذیرفته نیست. | This amount is not accepted.
+co.refused.recruit.filled | جای این کارزار پر است. | This campaign is full.
+co.refused.recruit.not_now | این کار الان ممکن نیست. | This is not possible right now.
+# actions, by the id the server sends
+co.act.company.open | دیدن شرکت | See the company
+co.act.company.register | ثبت شرکت | Register a company
+co.act.company.mine | شرکت‌های من | My companies
+co.act.company.manage | مدیریت شرکت | Manage the company
+co.act.company.opening | دیدن آگهی | See the posting
+co.act.company.page | صفحهٔ شرکت | The company's page
+co.act.company.type | {name} | {name}
+co.act.company.found_cash | ثبت و پرداخت نقدی | Register and pay cash
+co.act.company.found_card | ثبت و پرداخت با کارت | Register and pay by card
+co.act.company.deposit_cash | واریز نقدی | Pay in cash
+co.act.company.deposit_card | واریز با کارت | Pay in by card
+co.act.company.withdraw | برداشت سود | Withdraw profit
+co.act.company.cheaper | ارزان‌تر | Cheaper
+co.act.company.dearer | گران‌تر | Dearer
+co.act.company.staff | کارکنان و درخواست‌ها | Staff and applications
+co.act.company.openings | آگهی‌های استخدام | Job postings
+co.act.company.defence | مجوز دفاعی | Defence licence
+co.act.company.auto_on | روشن کردن پذیرش خودکار | Turn automatic acceptance on
+co.act.company.auto_off | خاموش کردن پذیرش خودکار | Turn automatic acceptance off
+co.act.company.manager | تعیین مدیر | Set the manager
+co.act.company.close | بستن شرکت | Close the company
+co.act.company.close_confirm | بله، شرکت بسته شود | Yes, close the company
+co.act.company.slot_up | یک جای بیشتر | One more place
+co.act.company.slot_down | یک جای کمتر | One place fewer
+co.act.company.slot_close | بستن آگهی | Close the posting
+co.act.company.post | آگهی تازه: {name} | New posting: {name}
+co.act.company.accept | پذیرفتن | Accept
+co.act.company.reject | رد کردن | Turn down
+co.act.company.fire | اخراج | Dismiss
+co.act.company.fire_confirm | بله، اخراج شود | Yes, dismiss
+co.act.company.apply | درخواست استخدام | Apply
+co.act.company.registry | شرکت‌های شهر | The city's companies
+co.act.job.my_job | شغل من | My job
+co.act.job.work | شروع شیفت | Start a shift
+co.act.health.desk | میز درمانگاه | The clinic desk
+co.act.military.procure | خرید دفاعی | Defence procurement
+co.act.production.warehouse | انبار و تولید | Warehouse and production
+co.act.production.suppliers | تأمین‌کننده‌ها | Suppliers
+co.act.production.orders | خط تولید | Production line
+co.act.production.studio | طراحی محصول | Design studio
+co.act.production.lab | آزمایشگاه تحقیق | Research lab
+co.act.production.reverse_lab | مهندسی معکوس | Reverse engineering
+co.act.production.listings | عرضه‌های شرکت | The company's listings
+co.act.production.sell | فروش | Sell
+co.act.production.supply | {qty} {name} | {qty} {name}
+co.act.production.supply_other | مقدار دلخواه | Another amount
+co.act.production.design | دیدن طرح | See the design
+co.act.production.new_design | طرح تازه: {name} | New design: {name}
+co.act.production.slot | تغییر این جا | Change this place
+co.act.production.candidate | {name} | {name}
+co.act.production.slot_clear | خالی بماند | Leave it empty
+co.act.production.slot_qty | نوشتن مقدار | Type the amount
+co.act.production.name | نام طرح | Name the design
+co.act.production.finalize | نهایی کردن طرح | Make the design final
+co.act.production.produce_design | تولید این محصول | Make this product
+co.act.production.kit | ساخت کیت ارتقا | Make an upgrade kit
+co.act.production.revise | نسخهٔ جدید | New version
+co.act.production.improve | بهبود {name} | Improve {name}
+co.act.production.retire | کنار گذاشتن این نسخه | Retire this version
+co.act.production.improve_confirm | شروع پروژهٔ بهبود | Start the improvement
+co.act.production.tech | {name} | {name}
+co.act.production.publish_confirm | بله، منتشر شود | Yes, publish
+co.act.production.license_confirm | بله، لایسنس خریده شود | Yes, buy the license
+co.act.production.mode_private | خصوصی | Private
+co.act.production.mode_license | فروش لایسنس | Sell the license
+co.act.production.mode_publish | انتشار برای همه | Publish for everyone
+co.act.production.research | شروع تحقیق | Start the research
+co.act.production.license | خرید لایسنس | Buy the license
+co.act.production.produce | ساخت {name} | Make {name}
+co.act.production.stock_up | خرید مواد کم‌وکسر، {total} | Buy the missing inputs, {total}
+co.act.production.size | {qty} واحد | {qty} units
+co.act.production.size_max | همه | All
+co.act.production.start_order | شروع تولید | Start making
+co.act.production.reverse | باز کردن نمونه | Take the sample apart
+co.act.production.reverse_confirm | بله، باز شود | Yes, take it apart
+co.act.production.price | نوشتن قیمت | Type the price
+co.act.production.price_reference | با قیمت مرجع | At the reference price
+co.act.production.sell_all | همه | All
+co.act.production.unlist | پس گرفتن عرضه | Withdraw the listing
+co.act.production.buy | خرید | Buy
+co.act.production.pay_company | خرید برای شرکت | Buy for a company
+co.act.production.buy_qty | تعداد دلخواه | Another quantity
+co.act.production.goods | کالای شرکت‌ها | Company goods
+co.act.production.company_warehouse | انبار شرکت | The company's warehouse
+co.act.recruit.gap | جذب متخصص {name}، سطح {level} | Recruit a {name} specialist, level {level}
+co.act.recruit.course | دورهٔ آموزشی {name} | The {name} course
+co.act.recruit.hub | جذب متخصص | Recruit specialists
+co.act.recruit.new | کارزار تازه | New campaign
+co.act.recruit.specialists | متخصصان شرکت | The company's specialists
+co.act.recruit.campaign | دیدن کارزار | See the campaign
+co.act.recruit.section_skill | مهارت و سطح | Skill and level
+co.act.recruit.section_cities | انتخاب شهرها | Pick the cities
+co.act.recruit.section_pay | حقوق و مزایا | Pay and benefits
+co.act.recruit.section_terms | قرارداد و سهام | Contract and shares
+co.act.recruit.post | انتشار آگهی | Publish the advert
+co.act.recruit.post_confirm | بله، آگهی منتشر شود | Yes, publish the advert
+co.act.recruit.level_down | یک سطح پایین‌تر | One level lower
+co.act.recruit.level_up | یک سطح بالاتر | One level higher
+co.act.recruit.set_skill | {name} | {name}
+co.act.recruit.set_city | {name} | {name}
+co.act.recruit.scope_own | فقط شهر خودمان | Only our own city
+co.act.recruit.scope_nation | همهٔ شهرهای کشور | Every city of the country
+co.act.recruit.scope_all | همهٔ شهرها | Every city
+co.act.recruit.type_salary | نوشتن حقوق | Type the salary
+co.act.recruit.type_housing | نوشتن مسکن | Type the housing allowance
+co.act.recruit.type_signing | نوشتن پاداش امضا | Type the signing bonus
+co.act.recruit.type_relocation | نوشتن جابه‌جایی | Type the relocation package
+co.act.recruit.fewer | یک نفر کمتر | One person fewer
+co.act.recruit.more | یک نفر بیشتر | One person more
+co.act.recruit.auto_on | روشن کردن پذیرش خودکار | Turn automatic acceptance on
+co.act.recruit.auto_off | خاموش کردن پذیرش خودکار | Turn automatic acceptance off
+co.act.recruit.hire | استخدام | Hire
+co.act.recruit.reject | رد | Turn down
+co.act.recruit.cancel | توقف کارزار | Stop the campaign
+co.act.recruit.cancel_confirm | بله، کارزار متوقف شود | Yes, stop the campaign
+co.act.recruit.renew | تمدید قرارداد | Renew the contract
+co.act.recruit.raise | هم‌سطح بازار کردن حقوق | Match the market pay
+co.act.recruit.dismiss | پایان همکاری | End the contract
+co.act.recruit.dismiss_confirm | بله، همکاری تمام شود | Yes, end the contract
+# notices pushed by a worker (docs/adr/0039, section 8)
+pn.company.application | {player}، سطح {level}، برای {title} در {company} درخواست استخدام داد. | {player}, level {level}, applied for {title} at {company}.
+pn.company.hired | {company} شما را به‌عنوان {title} استخدام کرد؛ دستمزد هر شیفت {wage}. | {company} hired you as {title}; the wage is {wage} per shift.
+pn.company.rejected | {company} درخواست شما برای {title} را نپذیرفت. | {company} turned down your application for {title}.
+pn.company.fired | {company} شما را از شغل {title} اخراج کرد. | {company} dismissed you from {title}.
+pn.company.closed | شرکت {company} بسته شد و شغل شما به‌عنوان {title} هم تمام شد. | {company} closed and your job as {title} ended with it.
+pn.company.manager | {owner} شما را مدیر شرکت {company} کرد. | {owner} made you the manager of {company}.
+pn.company.period | گزارش دورهٔ {company}: فروش {revenue}، دستمزدها {wages}، نگهداری {upkeep}. | Period report for {company}: sales {revenue}, wages {wages}, upkeep {upkeep}.
+pn.company.period_debt | شرکت {company} {amount} بدهی نگهداری دارد. اگر تا {left} دورهٔ دیگر تسویه نشود، منحل می‌شود. | {company} owes {amount} in upkeep. If it is not settled within {left} periods it is dissolved.
+pn.company.dissolved | شرکت {company} چند دورهٔ پیاپی نتوانست هزینهٔ نگهداری را بدهد و منحل شد. | {company} could not pay its upkeep for several periods in a row and was dissolved.
+pn.production.researched | تحقیق {tech} در {company} تمام شد؛ این فناوری از این پس مال شرکت شماست. | Research on {tech} at {company} is done; the technology is now your company's.
+pn.production.produced | سفارش تولید {company} آماده شد: {qty} {good} با کیفیت {quality} به انبار رسید. | A production order of {company} is ready: {qty} {good} of quality {quality} reached the warehouse.
+pn.production.reversed_ok | مهندسی معکوس {good} در {company} موفق بود و طرح «{design}» به طرح‌های شرکت اضافه شد. | Reverse engineering {good} at {company} worked; the design "{design}" joined the company's designs.
+pn.production.reversed_failed | مهندسی معکوس {good} در {company} ناموفق بود و نمونه از بین رفت. | Reverse engineering {good} at {company} failed and the sample was lost.
+pn.production.license_sold | {buyer} لایسنس {tech} را از {company} خرید و {price} به حساب شرکت رفت. | {buyer} bought the license for {tech} from {company}; {price} went to the company's account.
+pn.production.sold | {buyer} {qty} {good} از {company} خرید و {price} به حساب شرکت رفت. | {buyer} bought {qty} {good} from {company}; {price} went to the company's account.
+
+# the military, war and defence screens (src/screens/military, keys mil.*), and their notices (pn.military.*, pn.licence.*, pn.war.*)
+mil.title | ارتش و جنگ | Army and war
+mil.service.armed_forces | نیروهای مسلح | The armed forces
+mil.service.procurement | خرید تسلیحات | Arms procurement
+mil.service.war | جنگ | War
+mil.service.defence_licence | مجوز دفاعی | Defence licences
+mil.unnamed_office | مقام مربوط | the office concerned
+mil.readiness | آمادگی | Readiness
+mil.upkeep | هزینهٔ نگه‌داری | Upkeep
+mil.moving | در راه پادگان | On the way to a garrison
+mil.ministry.title | وزارت دفاع {country} | Ministry of defence of {country}
+mil.ministry.money | پول و بودجه | Money and budget
+mil.ministry.treasury | خزانهٔ کشور | National treasury
+mil.ministry.fund | صندوق دفاع | Defence fund
+mil.ministry.share | سهم کشور از درآمد شهرها | The country's share of the cities' revenue
+mil.ministry.budget | سهم دفاع از آن | The defence share of it
+mil.ministry.exports | صادرات تسلیحات | Arms exports
+mil.ministry.last | آخرین دورهٔ تسویه | The last settled period
+mil.ministry.next | دورهٔ بعد {in} دیگر بسته می‌شود. | The next period closes in {in}.
+mil.ministry.offices | مسئولان دفاع | Defence offices
+mil.ministry.acting | جانشین: {who} | Acting: {who}
+mil.ministry.vacant | جای این مقام خالی است. | The seat is empty.
+mil.ministry.no_offices | مقامی ثبت نشده است. | No offices are recorded.
+mil.ministry.forces | نیروها | Forces
+mil.period.levy | عوارض گرفته‌شده | Levy collected
+mil.period.appropriation | اعتبار دفاع | Defence appropriation
+mil.period.upkeep_due | هزینهٔ نگه‌داری | Upkeep due
+mil.period.upkeep_paid | نگه‌داریِ پرداخت‌شده | Upkeep paid
+mil.nav.military.forces | نیروها و تجهیزات هر یگان | Forces and the equipment of each branch
+mil.nav.military.procure | خرید سلاح و تجهیزات برای کشور | Buying arms and equipment for the state
+mil.nav.military.war | جنگ‌ها، اعلان جنگ و اتاق عملیات | Wars, declarations and the war room
+mil.nav.military.licences | شرکت‌هایی که اجازهٔ ساخت سلاح دارند | Companies that may make arms
+mil.nav.military.sanctions | تحریم‌هایی که زده‌ایم یا خورده‌ایم | Sanctions we imposed or suffered
+mil.nav.military.treaties | پیمان‌های کشور با دیگران | The country's treaties
+mil.nav.pending | {n} درخواست | {n} waiting
+mil.forces.title | نیروهای مسلح | Armed forces
+mil.forces.title_of | نیروهای مسلح {country} | Armed forces of {country}
+mil.forces.none | هنوز تجهیزاتی نیست. | There is no equipment yet.
+mil.forces.bands_only | شمار دقیق نیروها را فقط وزیر و فرماندهان می‌دانند؛ بقیه اندازهٔ تقریبی را می‌بینند. | Only the minister and the commanders know the exact numbers; everyone else sees a rough size.
+mil.branch.moves | تجهیزات در راه | Equipment on the move
+mil.branch.move | {qty} × {good} به {city} | {qty} × {good} to {city}
+mil.branch.none | در این یگان هنوز تجهیزاتی نیست. | This branch has no equipment yet.
+mil.group.count | تعداد | Count
+mil.group.quality | کیفیت میانگین | Average quality
+mil.group.depot | در انبار، بدون پادگان | In the depot, no garrison yet
+mil.group.moving | در راه | On the way
+mil.group.committed | درگیر عملیات | In an operation
+mil.group.damaged | آسیب‌دیده | Damaged
+mil.group.garrisons | پادگان‌ها | Garrisons
+mil.group.seen_at | رادار مرجع این تجهیز را از {km} کیلومتری می‌بیند. | A reference radar sees it from {km} km.
+mil.station.title | استقرار {good} | Stationing {good}
+mil.station.good | تجهیز | Equipment
+mil.station.qty | تعداد | Number
+mil.station.to | مقصد | Destination
+mil.station.takes | مدت جابه‌جایی | Journey time
+mil.station.available | قابل فرستادن | Available to send
+mil.station.pick_city | به کدام شهر فرستاده شود؟ | Which city should it go to?
+mil.station.no_cities | شهری برای استقرار نیست. | There is no city to station it in.
+mil.station.pick_qty | چند عدد به {city} فرستاده شود؟ | How many go to {city}?
+mil.station.confirm_hint | تا رسیدن، این تعداد در عملیات به کار نمی‌آید. | Until they arrive, these cannot be used in an operation.
+mil.retrofit.title | نوسازی تجهیز دولتی | Retrofit of a state asset
+mil.retrofit.good | تجهیز | Equipment
+mil.retrofit.version | نسخه | Version
+mil.retrofit.versions | از {from} به {to} | {from} to {to}
+mil.retrofit.takes | مدت کار | Duration
+mil.retrofit.confirm_hint | کیت ارتقا مصرف می‌شود و تجهیز تا پایان کار از دسترس خارج است. | The upgrade kit is used up and the equipment is out of action until the job ends.
+mil.retrofit.started | نوسازی شروع شد. | The retrofit has started.
+mil.kit.title | کیت ارتقا | Upgrade kits
+mil.kit.bought | کیت ارتقا از «{seller}» خریده شد. | Upgrade kits were bought from {seller}.
+mil.kit.plan | خرید کیت ارتقا از «{seller}». | Buying upgrade kits from {seller}.
+mil.arrived.title | تجهیزات رسید | Equipment arrived
+mil.arrived.body | {qty} × {good} به پادگان {city} رسید و به {branch} پیوست. | {qty} × {good} reached the {city} garrison and joined {branch}.
+mil.procure.title | خرید تسلیحات | Arms procurement
+mil.procure.title_of | خرید تسلیحات {country} | Arms procurement of {country}
+mil.procure.fund | صندوق دفاع | Defence fund
+mil.procure.hint | کالاهای نظامیِ روی بازار که دولت اجازهٔ خریدشان را دارد. | Military goods on the market that the state may buy.
+mil.procure.offer_sub | {company} · {city} · {left} عدد | {company} · {city} · {left} left
+mil.procure.none | الان کالای نظامی برای خرید نیست. | No military goods are for sale right now.
+mil.procure.blocked.export | صادراتش آزاد نیست | Export is not allowed
+mil.procure.blocked.embargo | تحریم تسلیحاتی دارد | Under an arms embargo
+mil.procure.blocked.other | قابل خرید نیست | Cannot be bought
+mil.buy.confirm_title | تأیید خرید | Confirm the purchase
+mil.buy.good | کالا | Goods
+mil.buy.qty | تعداد | Number
+mil.buy.each | قیمت هر عدد | Price each
+mil.buy.total | جمع | Total
+mil.buy.after | صندوق دفاع بعد از خرید | Defence fund afterwards
+mil.buy.confirm_hint | پول از صندوق دفاع کشور کم می‌شود و کالا به انبار نیروها می‌رود. | The money leaves the defence fund and the goods go to the forces' depot.
+mil.buy.seller | فروشنده | Seller
+mil.buy.where | جای کالا | Where it is
+mil.buy.left | موجودی | In stock
+mil.buy.cannot | موجودی یا صندوق دفاع برای خرید کافی نیست. | There is not enough stock or defence fund to buy.
+mil.buy.pick_qty | چند عدد می‌خری؟ | How many do you buy?
+mil.refused.title | نشد | Not possible
+mil.refused.not_found | این مورد پیدا نشد. | That was not found.
+mil.refused.not_holder | این کار با {office} است. | That is for the {office}.
+mil.refused.not_arms | این کالا نظامی نیست. | That is not military goods.
+mil.refused.export | صادرات این کالا به این کشور آزاد نیست. | Export of this good to this country is not allowed.
+mil.refused.funds | صندوق دفاع کافی نیست؛ {need} لازم است و فقط {have} هست. | The defence fund is short: {need} needed, only {have} available.
+mil.refused.stock | این‌قدر موجودی نیست؛ حداکثر {max} عدد. | Not that many are available; at most {max}.
+mil.refused.city | این شهر برای استقرار درست نیست. | That city does not fit for stationing.
+mil.refused.no_country | تو ساکن هیچ کشوری نیستی. | You do not live in any country.
+mil.refused.licence_state | دربارهٔ این مجوز قبلاً تصمیم گرفته شده است. | This licence has been decided already.
+mil.war_refused.not_holder | این کار با {office} است. | That is for the {office}.
+mil.war_refused.no_country | تو ساکن هیچ کشوری نیستی. | You do not live in any country.
+mil.war_refused.not_found | این جنگ یا این هدف پیدا نشد. | That war or target was not found.
+mil.war_refused.self | به کشور خودت نمی‌شود اعلان جنگ داد. | You cannot declare war on your own country.
+mil.war_refused.at_war | همین حالا با این کشور در جنگی. | You are already at war with this country.
+mil.war_refused.state | جنگ در وضعیتی نیست که این کار شدنی باشد. | The war is not in a state where that can be done.
+mil.war_refused.not_enemy | این کشور در این جنگ دشمن تو نیست. | This country is not your enemy in this war.
+mil.war_refused.not_yet | هنوز زود است؛ {in} دیگر شدنی می‌شود. | It is too early; it becomes possible in {in}.
+mil.war_refused.no_forces | نیروی آماده برای این عملیات نداری. | You have no forces ready for this operation.
+mil.war_refused.no_munitions | مهمات کافی در پادگان نیست. | There are not enough munitions at the garrison.
+mil.war_refused.open | همین حالا پیشنهادی از همین نوع باز است. | A proposal of this kind is already open.
+mil.war_refused.no_ally | هم‌پیمانی نیست که به جنگش بپیوندی. | There is no ally whose war you may join.
+mil.war_refused.stock | موجودی کافی نیست؛ حداکثر {max} عدد. | Not enough in stock; at most {max}.
+mil.blocked.title | راه بسته است | The way is closed
+mil.blocked.border | مرز {from} و {to} بسته است، چون این دو کشور در جنگ‌اند. | The border between {from} and {to} is closed, because the two countries are at war.
+mil.blocked.city | {city} بعد از حمله بسته شده؛ تا {in} دیگر نمی‌شود واردش شد. | {city} is closed after a strike; you cannot enter for {in}.
+mil.notice.station_started | {count} × {good} به {city} فرستاده شد؛ {time} دیگر می‌رسد. | {count} × {good} were sent to {city}; they arrive in {time}.
+mil.notice.buy_done | {count} × {good} به مبلغ {total} خریده شد. | {count} × {good} were bought for {total}.
+mil.notice.declare_done | به {target} اعلان جنگ داده شد؛ {time} دیگر می‌شود جنگید. | War was declared on {target}; fighting is possible in {time}.
+mil.notice.resume_done | جنگ از سر گرفته شد؛ {time} دیگر می‌شود جنگید. | The war was resumed; fighting is possible in {time}.
+mil.notice.launch_done | عملیات «{kind}» علیه {city} فرمان داده شد؛ {time} دیگر انجام می‌شود. | The {kind} against {city} was ordered; it strikes in {time}.
+mil.notice.join_done | کشور به جنگ پیوست، کنار {target}. | The country joined the war beside {target}.
+mil.notice.propose_done | {kind} به {target} پیشنهاد شد. | A {kind} was proposed to {target}.
+mil.notice.answer_accept | پیشنهاد را پذیرفتی. | You accepted the proposal.
+mil.notice.answer_decline | پیشنهاد را رد کردی. | You declined the proposal.
+mil.war.board_title | جنگ | War
+mil.war.board_of | جنگ‌های {country} | Wars of {country}
+mil.war.wars | جنگ‌ها | Wars
+mil.war.none | الان جنگی در کار نیست. | No war is under way.
+mil.war.title | {attacker} علیه {defender} | {attacker} against {defender}
+mil.war.no | جنگ شمارهٔ {no} | War no. {no}
+mil.war.ground | دلیل: {ground} | Ground: {ground}
+mil.war.status.declared | اعلام شده؛ {in} دیگر می‌شود جنگید | Declared; fighting starts in {in}
+mil.war.status.active | در جریان، از {since} پیش | Under way for {since}
+mil.war.status.ceasefire | آتش‌بس | Ceasefire
+mil.war.status.ended | تمام شده | Ended
+mil.war.attacker_allies | هم‌پیمانان مهاجم: {list} | Allies of the attacker: {list}
+mil.war.defender_allies | هم‌پیمانان مدافع: {list} | Allies of the defender: {list}
+mil.war.broke | این اعلان جنگ، پیمانی را که میان این دو کشور بود شکست. | This declaration broke a treaty between the two.
+mil.war.proposal_in | {other} {kind} پیشنهاد داده؛ تا {in} دیگر جواب بده. | {other} proposes a {kind}; answer within {in}.
+mil.war.proposal_out | ما به {other} {kind} پیشنهاد داده‌ایم؛ {in} وقت دارند جواب بدهند. | We proposed a {kind} to {other}; they have {in} to answer.
+mil.war.joinable | جنگ‌هایی که می‌شود به آن‌ها پیوست | Wars you may join
+mil.war.join_line | {ally} با {enemy} در جنگ است؛ می‌توانی کنار {ally} بجنگی. | {ally} is at war with {enemy}; you may fight beside {ally}.
+mil.war.operations | عملیات‌ها | Operations
+mil.war.cities | شهرهای درگیر | Cities in the war
+mil.war.occupied | {city} در دست {controller} است (جزو {owner}) | {city} is held by {controller} (it belongs to {owner})
+mil.war.damaged | {city}: خرابی {band} | {city}: {band} damage
+mil.war.closed_for | تا {in} بسته است | closed for {in}
+mil.war.room_sub | شهرهای دشمن و عملیات‌های در جریان | Enemy cities and the operations under way
+mil.war.declare_sub | اعلان جنگ به یک کشور | Declare war on a country
+mil.op.title | {kind} · {objective} · {city} | {kind} · {objective} · {city}
+mil.op.no | عملیات شمارهٔ {no} | Operation no. {no}
+mil.op.sides | {country} علیه {target} | {country} against {target}
+mil.op.called_off | عملیات لغو شد. | The operation was called off.
+mil.op.pending | {in} دیگر انجام می‌شود. | It strikes in {in}.
+mil.op.damage | خرابی | Damage
+mil.op.lost | تلفات خودی | Own losses
+mil.op.enemy_lost | تلفات دشمن | Enemy losses
+mil.op.captured | شهر گرفته شد. | The city was taken.
+mil.op.ago | {ago} پیش | {ago} ago
+mil.declare.title | اعلان جنگ | Declaring war
+mil.declare.confirm_title | اعلان جنگ به {target} | Declare war on {target}
+mil.declare.target | کشور مقابل | The other country
+mil.declare.ground | دلیل جنگ | Ground for war
+mil.declare.notice | مهلت تا شروع جنگ | Notice before fighting
+mil.declare.breaks | این اعلان این پیمان‌ها را پایان می‌دهد: {list} | This ends these treaties: {list}
+mil.declare.allies | هم‌پیمانان آن کشور خبردار می‌شوند: {list} | Its allies will be told: {list}
+mil.declare.confirm_hint | اعلان جنگ پس گرفتنی نیست. | A declaration of war cannot be taken back.
+mil.declare.pick_target | به کدام کشور اعلان جنگ می‌دهی؟ | Which country do you declare war on?
+mil.declare.no_targets | کشوری برای اعلان جنگ نیست. | There is no country to declare war on.
+mil.declare.pick_ground | به {target} با چه دلیلی اعلان جنگ می‌دهی؟ | On what ground do you declare war on {target}?
+mil.decision.join.title | پیوستن به جنگ | Joining a war
+mil.decision.join.body | کنار {ally} وارد جنگ شمارهٔ {no} با {other} می‌شوی. | You enter war no. {no} beside {ally}, against {other}.
+mil.decision.ceasefire.title | پیشنهاد آتش‌بس | Proposing a ceasefire
+mil.decision.ceasefire.body | به {other} آتش‌بس پیشنهاد می‌دهی. اگر تا {ttl} جواب ندهد، پیشنهاد باطل می‌شود. | You propose a ceasefire to {other}. If it does not answer within {ttl}, the offer lapses.
+mil.decision.peace.title | پیشنهاد صلح | Proposing peace
+mil.decision.peace.body | به {other} صلح پیشنهاد می‌دهی. اگر تا {ttl} جواب ندهد، پیشنهاد باطل می‌شود. | You propose peace to {other}. If it does not answer within {ttl}, the offer lapses.
+mil.decision.resume.title | از سرگیری جنگ | Resuming the war
+mil.decision.resume.body | جنگ شمارهٔ {no} با {other} دوباره شروع می‌شود و {notice} دیگر می‌شود جنگید. | War no. {no} against {other} starts again; fighting is possible in {notice}.
+mil.room.title | اتاق عملیات | War room
+mil.room.targets | شهرهای دشمن | Enemy cities
+mil.room.no_targets | الان شهر دشمنی در دسترس نیست. | No enemy city is within reach right now.
+mil.room.distance | {km} کیلومتر | {km} km
+mil.room.running | عملیات‌های ما | Our operations
+mil.target.country | کشور | Country
+mil.target.distance | فاصله | Distance
+mil.target.damage | خرابی | Damage
+mil.target.options | عملیات ممکن | Possible operations
+mil.target.no_options | از اینجا هیچ عملیاتی شدنی نیست. | No operation is possible from here.
+mil.target.ready | آماده | Ready
+mil.target.from | از پادگان | From the garrison of
+mil.target.munitions | مهمات | Munitions
+mil.target.not_yours | فقط {office} می‌تواند این عملیات را فرمان بدهد. | Only the {office} can order this operation.
+mil.launch.title | {kind} علیه {city} | {kind} against {city}
+mil.launch.class | تجهیز | Equipment
+mil.launch.kind | عملیات | Operation
+mil.launch.objective | هدف | Objective
+mil.launch.qty | تعداد | Number
+mil.launch.prepare | آماده‌سازی | Preparation
+mil.launch.estimate | برآورد فرماندهی (تقریبی است، نه شمارش دقیق) | The command's estimate (rough, not an exact count)
+mil.launch.chance | شانس موفقیت | Chance of success
+mil.launch.loss | تلفات خودی | Own losses
+mil.launch.damage | خرابی دشمن | Damage to the enemy
+mil.launch.confirm_hint | بعد از تأیید، تجهیزات تا پایان عملیات درگیرند. | Once confirmed, the equipment is committed until the operation ends.
+mil.launch.pick_objective | هدف عملیات چیست؟ | What is the objective?
+mil.launch.pick_qty | برای «{objective}» چند عدد می‌فرستی؟ | How many do you send for {objective}?
+mil.report.title_ours | گزارش عملیات شمارهٔ {no} | Report of operation no. {no}
+mil.report.title_theirs | گزارش حمله به ما، شمارهٔ {no} | Report of the attack on us, no. {no}
+mil.report.head_ours | {kind} علیه {city} ({target}) با {class}؛ هدف: {objective}. | {kind} against {city} ({target}) with {class}; objective: {objective}.
+mil.report.head_theirs | {country} با «{kind}» به {city} حمله کرد؛ هدف: {objective}. | {country} struck {city} with a {kind}; objective: {objective}.
+mil.report.committed | فرستاده‌شده | Committed
+mil.report.lost | تلفات خودی | Own losses
+mil.report.damaged | آسیب‌دیدهٔ خودی | Own damaged
+mil.report.enemy_lost | تلفات دشمن | Enemy losses
+mil.report.enemy_dmg | آسیب‌دیدهٔ دشمن | Enemy damaged
+mil.report.fired | شلیک‌شده | Fired
+mil.report.hits | اصابت | Hits
+mil.report.seen_at | دیده‌شدن از | Seen from
+mil.report.damage | خرابی شهر | Damage to the city
+mil.report.captured | شهر گرفته شد. | The city was taken.
+mil.report.liberated | شهر آزاد شد. | The city was liberated.
+mil.notice_title.struck | شهر زیر حمله | A city under attack
+mil.notice_title.ally | هم‌پیمان زیر حمله | An ally under attack
+mil.notice_title.proposal | پیشنهاد در جنگ | A proposal in the war
+mil.notice_title.declared | اعلان جنگ | A declaration of war
+mil.war_notice.struck | {city} هدف حمله قرار گرفت؛ خرابی {band}. | {city} was struck; {band} damage.
+mil.war_notice.ally | {ally} مورد حمله قرار گرفت؛ می‌توانی کنارش وارد جنگ شوی. | {ally} was attacked; you may join the war beside it.
+mil.war_notice.proposal | {other} {kindname} پیشنهاد داده؛ تا {in} دیگر جواب بده. | {other} proposes a {kindname}; answer within {in}.
+mil.war_notice.declared | {other} به {country} اعلان جنگ داد؛ {in} دیگر می‌شود جنگید. | {other} declared war on {country}; fighting is possible in {in}.
+mil.injury.damage | آسیب | Damage
+mil.injury.health | سلامت | Health
+mil.injury.of | {health} از {max} | {health} of {max}
+mil.injury.hospital | بیمارستان | Hospital
+mil.injury.in_hospital | به بیمارستان منتقل شدی | You were taken to hospital
+mil.lic.title | مجوزهای دفاعی | Defence licences
+mil.lic.title_of | مجوزهای دفاعی {country} | Defence licences of {country}
+mil.lic.pending | درخواست‌های منتظر | Applications waiting
+mil.lic.none_pending | درخواستی منتظر نیست. | No application is waiting.
+mil.lic.in_force | مجوزهای برقرار | Licences in force
+mil.lic.none_in_force | مجوز برقراری نیست. | No licence is in force.
+mil.lic.ended | مجوزهای تمام‌شده | Ended licences
+mil.lic.no | مجوز شمارهٔ {no} | Licence no. {no}
+mil.lic.ends_in | {in} دیگر تمام می‌شود | ends in {in}
+mil.lic.kind.manufacturer | سازنده | Manufacturer
+mil.lic.kind.contractor | پیمانکار دفاعی | Defence contractor
+mil.lic.basis.rank | بر پایهٔ درجهٔ بنیان‌گذار در نیروهای مسلح | Based on the founder's armed-forces rank
+mil.lic.basis.contractor | بر پایهٔ شرکت پیمانکارِ بنیان‌گذار | Based on the founder's contractor company
+mil.lic.basis.minister | به تأیید وزیر دفاع | Approved by the defence minister
+mil.lic.basis.grandfathered | از پیش از برقراری مجوزها بوده | Existed before licences
+mil.lic.status.pending | منتظر وزیر | Waiting for the minister
+mil.lic.status.active | برقرار | In force
+mil.lic.status.revoking | در مهلت لغو، هنوز برقرار | Being revoked, still in force
+mil.lic.status.revoked | لغو شده | Revoked
+mil.lic.status.rejected | رد شده | Rejected
+mil.lic.company | شرکت | Company
+mil.lic.kind | نوع | Kind
+mil.lic.basis | پایه | Basis
+mil.lic.status | وضعیت | Status
+mil.lic.revoke_title | لغو مجوز | Revoking a licence
+mil.lic.revoke_hint | لغو یک‌دفعه اجرا نمی‌شود؛ تا {in} دیگر مجوز برقرار می‌ماند. | The revocation is not immediate; the licence stands for {in} more.
+mil.lic.public_hint | فهرست مجوزها برای همه باز است؛ تصمیم با وزیر دفاع است. | The registry is open to all; the defence minister decides.
+mil.lic.notice.approve | مجوز «{company}» تأیید شد. | The licence of {company} was approved.
+mil.lic.notice.reject | درخواست «{company}» رد شد. | The application of {company} was rejected.
+mil.lic.notice.revoke | مجوز «{company}» لغو شد و مهلت لغو شروع شد. | The licence of {company} was revoked and its notice has started.
+mil.def.title | مجوز دفاعی «{company}» | Defence licence of {company}
+mil.def.state.manufacturer | این شرکت در بخش دفاعی است و ساخت سلاح برایش آزاد است. | This company is in the defence sector and may make arms.
+mil.def.state.none | این شرکت غیرنظامی است و مجوز دفاعی ندارد. اگر فناوری کافی داشته باشد و وزیر دفاع تأیید کند، پیمانکار دفاعی می‌شود. | This is a civilian company with no defence licence. With enough technology and the defence minister's approval it becomes a defence contractor.
+mil.def.state.pending | درخواست پیمانکاری این شرکت منتظر تصمیم وزیر دفاع است. | The company's contractor application waits for the defence minister.
+mil.def.state.active | مجوز پیمانکاری این شرکت برقرار است. | The company's contractor licence is in force.
+mil.def.state.revoking | مجوز این شرکت لغو شده، ولی تا پایان مهلت برقرار است. | The licence was revoked but stands until its notice runs out.
+mil.def.state.revoked | مجوز این شرکت لغو شده است. | The company's licence was revoked.
+mil.def.state.rejected | درخواست پیمانکاری این شرکت رد شد. | The company's contractor application was rejected.
+mil.def.applied | درخواست ثبت شد. | The application was filed.
+mil.def.standing | فناوری شرکت | The company's technology
+mil.def.techs | فناوری‌های خودش | Technologies of its own
+mil.def.tier | عمیق‌ترین رده | Deepest tier
+mil.def.of | {have} از {need} | {have} of {need}
+mil.def.no_minister | الان کسی جای وزیر دفاع نیست؛ درخواست تا آمدنش می‌ماند. | Nobody holds the defence minister's seat; an application waits until someone does.
+mil.lic_notice.title_applied | درخواست مجوز تازه | A new licence application
+mil.lic_notice.title_approved | مجوز تأیید شد | Licence approved
+mil.lic_notice.title_rejected | درخواست مجوز رد شد | Licence application rejected
+mil.lic_notice.title_revoked | مجوز لغو شد | Licence revoked
+mil.lic_notice.applied | «{company}» برای مجوز پیمانکاری دفاعی {country} درخواست داده است. | {company} applied for a defence contractor licence of {country}.
+mil.lic_notice.approved | مجوز «{company}» از طرف {country} تأیید شد. | The licence of {company} was approved by {country}.
+mil.lic_notice.rejected | درخواست مجوز «{company}» از طرف {country} رد شد. | The licence application of {company} was rejected by {country}.
+mil.lic_notice.revoked | مجوز «{company}» لغو شد؛ {in} دیگر از کار می‌افتد. | The licence of {company} was revoked; it ends in {in}.
+mil.act.military.forces | نیروهای مسلح | Armed forces
+mil.act.military.procure | خرید تسلیحات | Procurement
+mil.act.military.sanctions | تحریم‌ها | Sanctions
+mil.act.military.treaties | پیمان‌ها | Treaties
+mil.act.military.war | جنگ | War
+mil.act.military.licences | مجوزهای دفاعی | Defence licences
+mil.act.military.branch | جزئیات | Details
+mil.act.military.station | استقرار {name} | Station {name}
+mil.act.military.station_city | {name} | {name}
+mil.act.military.station_qty | {qty} عدد | {qty}
+mil.act.military.station_custom | تعداد دیگر | Another number
+mil.act.military.station_confirm | تأیید و ارسال | Confirm and send
+mil.act.military.buy_open | خرید {name} | Buy {name}
+mil.act.military.buy_qty | {qty} عدد | {qty}
+mil.act.military.buy_custom | تعداد دیگر | Another number
+mil.act.military.buy_confirm | تأیید خرید | Confirm the purchase
+mil.act.military.retrofit_confirm | تأیید نوسازی | Confirm the retrofit
+mil.act.war.accept | پذیرفتن | Accept
+mil.act.war.decline | رد کردن | Decline
+mil.act.war.ceasefire | پیشنهاد آتش‌بس | Propose a ceasefire
+mil.act.war.peace | پیشنهاد صلح | Propose peace
+mil.act.war.resume | از سرگیری جنگ | Resume the war
+mil.act.war.join | پیوستن به جنگ | Join the war
+mil.act.war.room | اتاق عملیات | War room
+mil.act.war.declare | اعلان جنگ | Declare war
+mil.act.war.declare_target | {name} | {name}
+mil.act.war.declare_ground | {name} | {name}
+mil.act.war.declare_confirm | اعلان جنگ می‌دهم | Declare war
+mil.act.war.join_confirm | وارد جنگ می‌شوم | Join the war
+mil.act.war.resume_confirm | جنگ را از سر می‌گیرم | Resume the war
+mil.act.war.propose_confirm | پیشنهاد را می‌فرستم | Send the proposal
+mil.act.war.target | {name} | {name}
+mil.act.war.launch_open | {name} | {name}
+mil.act.war.launch_objective | {name} | {name}
+mil.act.war.launch_qty | {qty} عدد | {qty}
+mil.act.war.launch_confirm | فرمان عملیات | Order the operation
+mil.act.war.hospital | بیمارستان | Hospital
+mil.act.defence.apply | درخواست مجوز | Apply for a licence
+mil.act.defence.lab | آزمایشگاه شرکت | The company laboratory
+mil.act.defence.registry | فهرست مجوزها | The registry
+mil.act.defence.company | مجوز شرکت | The company's licence
+mil.act.defence.approve | تأیید | Approve
+mil.act.defence.reject | رد | Reject
+mil.act.defence.revoke | لغو | Revoke
+mil.act.defence.revoke_confirm | لغو می‌کنم | Revoke it
+pn.military.arrived | {qty} × {good} به پادگان {city} رسید و به {branch} پیوست. | {qty} × {good} reached the {city} garrison and joined {branch}.
+pn.licence.applied | «{company}» برای مجوز پیمانکاری دفاعی درخواست داده؛ منتظر تصمیم وزیر است. | {company} applied for a defence contractor licence and waits for the minister.
+pn.licence.approved | مجوز دفاعی «{company}» تأیید شد. | The defence licence of {company} was approved.
+pn.licence.rejected | درخواست مجوز دفاعی «{company}» رد شد. | The defence licence application of {company} was rejected.
+pn.licence.revoked | مجوز دفاعی «{company}» لغو شد؛ {time} دیگر از کار می‌افتد. | The defence licence of {company} was revoked; it ends in {time}.
+pn.war.struck | {city} هدف حمله قرار گرفت؛ خرابی {band}. | {city} was struck; {band} damage.
+pn.war.ally | {ally} مورد حمله قرار گرفت؛ می‌توانی کنارش وارد جنگ شوی. | {ally} was attacked; you may join the war beside it.
+pn.war.proposal | {other} {kind} پیشنهاد داده؛ {time} وقت داری جواب بدهی. | {other} proposes a {kind}; you have {time} to answer.
+pn.war.declared | {other} به {country} اعلان جنگ داد؛ {time} دیگر می‌شود جنگید. | {other} declared war on {country}; fighting is possible in {time}.
+pn.war.hospital | به بیمارستان منتقل شدی. | You were taken to hospital.
+pn.war.report | گزارش عملیات شمارهٔ {no} دربارهٔ {city} رسید؛ خرابی {band}. | The report of operation no. {no} on {city} arrived; {band} damage.
+>>>>>>> master

@@ -231,6 +231,57 @@ export function noticeLine(screen: string, view: unknown, n: Namer): NoticeLine 
       })
       return { text: items.length > 1 ? `${text} ${t('pn.news.more', { n: items.length - 1 })}` : text, tone: 'info' }
     }
+    case 'company_application_notice': {
+      const v = view as V.CompanyApplicationNoticeView
+      return line('pn.company.application', { player: person(v.player), level: num(v.level), title: n('career_tier', `${v.job.career_code}.${v.job.rank}`, v.job.title), company: v.company.name }, 'info')
+    }
+    case 'company_employee_notice': {
+      const v = view as V.CompanyEmployeeNoticeView
+      const kind = ['hired', 'rejected', 'fired', 'closed', 'manager'].includes(v.kind) ? v.kind : 'rejected'
+      const tone: NoticeTone = kind === 'hired' || kind === 'manager' ? 'success' : kind === 'rejected' ? 'info' : 'warning'
+      return line(`pn.company.${kind}`, { company: v.company.name, title: n('career_tier', `${v.job.career_code}.${v.job.rank}`, v.job.title), wage: money(v.wage), owner: person(v.owner) }, tone)
+    }
+    case 'company_period_notice': {
+      const v = view as V.CompanyPeriodNoticeView
+      if (v.dissolved) return line('pn.company.dissolved', { company: v.company.name }, 'warning')
+      const parts = [t('pn.company.period', { company: v.company.name, revenue: money(v.period.revenue), wages: money(v.period.wages), upkeep: money(v.period.upkeep) })]
+      if (v.arrears > 0) parts.push(t('pn.company.period_debt', { company: v.company.name, amount: money(v.period.debt), left: num(Math.max(0, v.grace - v.arrears)) }))
+      return { text: parts.join(' '), tone: v.arrears > 0 ? 'warning' : 'info' }
+    }
+    case 'production_notice': {
+      const v = view as V.ProductionNoticeView
+      const kind = ['researched', 'produced', 'reversed_ok', 'reversed_failed', 'license_sold', 'sold'].includes(v.kind) ? v.kind : 'produced'
+      const base = n(v.good.component ? 'component' : 'item', v.good.item.code, v.good.item.name)
+      const good = v.good.design ? t('co.good_designed', { design: v.good.design, item: base }) : base
+      const tone: NoticeTone = kind === 'reversed_failed' ? 'warning' : 'success'
+      return line(`pn.production.${kind}`, {
+        company: v.company.name, tech: n('technology', v.tech.code, v.tech.name), good, qty: num(v.qty), quality: num(v.quality),
+        design: v.design, buyer: v.buyer || t('pn.someone'), price: money(v.price),
+      }, tone)
+    }
+    case 'move_arrived_notice': {
+      const v = view as V.MilitaryNoticeView
+      return line('pn.military.arrived', { qty: num(v.qty), good: n('item', v.good.item.code, v.good.item.name), city: n('city', v.city_code, v.city), branch: n('branch', v.branch.code, v.branch.name) }, 'success')
+    }
+    case 'licence_notice': {
+      const v = view as V.LicenceNoticeView
+      const kind = ['applied', 'approved', 'rejected', 'revoked'].includes(v.kind) ? v.kind : 'applied'
+      const left = v.effective_at ? Math.max(0, Math.round((Date.parse(v.effective_at) - Date.now()) / 1000)) : 0
+      return line(`pn.licence.${kind}`, { company: v.company.name || v.company.code, country: placeName(n, v.country), time: span(left) }, kind === 'approved' ? 'success' : kind === 'applied' ? 'info' : 'warning')
+    }
+    case 'war_notice': {
+      const v = view as V.WarNoticeView
+      const kind = ['struck', 'ally', 'proposal', 'declared'].includes(v.kind) ? v.kind : 'declared'
+      const text = t(`pn.war.${kind}` as Key, {
+        city: n('city', v.city_code, v.city), band: n('war_damage', v.band, v.band), other: placeName(n, v.other), ally: placeName(n, v.ally), country: placeName(n, v.country),
+        kind: n('war_proposal', v.proposal_kind, v.proposal_kind), time: span(v.in_seconds), no: num(v.war_no),
+      })
+      return { text: v.injury?.hospital ? `${text} ${t('pn.war.hospital')}` : text, tone: kind === 'proposal' ? 'info' : 'warning' }
+    }
+    case 'strike_report': {
+      const v = view as V.StrikeReportView
+      return line('pn.war.report', { no: num(v.no), city: n('city', v.city_code, v.city), band: n('war_damage', v.damage_band, v.damage_band) }, 'info')
+    }
     default:
       return null
   }
@@ -246,4 +297,6 @@ const NOTICE_SCREENS = new Set([
   'treaty_proposed_notice', 'election_result_notice', 'faction_request_notice', 'faction_answer_notice', 'faction_crime_notice',
   'finance_notice', 'hospitalised_notice', 'clinic_treated_notice', 'bill_decided_notice', 'rank_notice', 'hunger_notice',
   'market_filled_notice', 'mission_completed_notice', 'property_notice', 'recruit_notice', 'stock_notice', 'village_news',
+  'company_application_notice', 'company_employee_notice', 'company_period_notice', 'production_notice',
+  'move_arrived_notice', 'licence_notice', 'war_notice', 'strike_report',
 ])
