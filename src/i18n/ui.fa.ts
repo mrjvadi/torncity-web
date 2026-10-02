@@ -3175,6 +3175,14 @@ export const uiFa = {
   'crime.role.market': 'بازارچه',
   'crime.role.housing': 'خانه',
   'crime.role.transport': 'ایستگاه حمل‌ونقل',
+  'crime.tier_name.novice': 'تازه‌کار',
+  'crime.tier_name.hustler': 'کارکشته',
+  'crime.tier_name.professional': 'حرفه‌ای',
+  'crime.category.petty_theft': 'دزدی خُرد',
+  'crime.category.street_crime': 'جرم خیابانی',
+  'crime.category.burglary': 'سرقت از اماکن',
+  'crime.category.fraud': 'کلاه‌برداری',
+  'crime.category.smuggling': 'قاچاق',
 } as const
 
 export type UiKey = keyof typeof uiFa

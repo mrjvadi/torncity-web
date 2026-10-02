@@ -35,7 +35,7 @@ export function mockP0Command(command: string, _args?: Args) {
     return ok('crime_hub', {
       city: 'Amol', city_code: 'v-k3x9', venue: { code: '', name: '' }, nerve: { nerve: 20, max: 20, full_in_seconds: 0 },
       heat: { heat: 0, max: 100, wanted: 0, stars: 0 }, tier: { tier: { code: 'novice', name: 'novice' }, xp: 0, next: { code: '', name: '' }, next_xp: 0 },
-      travelling: false, jail: null, busy: null, categories: [{ code: 'theft', name: 'دزدی' }, { code: 'fraud', name: 'کلاه‌برداری' }], empty: '', min_level: 0,
+      travelling: false, jail: null, busy: null, categories: [{ code: 'petty_theft', name: 'Petty theft' }], empty: '', min_level: 0,
     })
   }
   return null

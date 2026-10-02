@@ -3241,3 +3241,11 @@ crime.empty.need_building | اینجا هنوز {name} ساخته نشده اس�
 crime.role.market | بازارچه | market
 crime.role.housing | خانه | housing
 crime.role.transport | ایستگاه حمل‌ونقل | transport station
+crime.tier_name.novice | تازه‌کار | Novice
+crime.tier_name.hustler | کارکشته | Hustler
+crime.tier_name.professional | حرفه‌ای | Professional
+crime.category.petty_theft | دزدی خُرد | Petty theft
+crime.category.street_crime | جرم خیابانی | Street crime
+crime.category.burglary | سرقت از اماکن | Burglary
+crime.category.fraud | کلاه‌برداری | Fraud
+crime.category.smuggling | قاچاق | Smuggling

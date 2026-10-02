@@ -22,6 +22,12 @@ interface CrimeHubView {
   need_code?: string; need_role?: string; need_tier?: number
 }
 
+const TIERS = ['novice', 'hustler', 'professional']
+const CATEGORIES = ['petty_theft', 'street_crime', 'burglary', 'fraud', 'smuggling']
+/** The rank's and the category's Persian name by code; the server's authored (English) name only as a last resort. */
+const tierName = (n?: Named) => (n?.code && TIERS.includes(n.code) ? t(`crime.tier_name.${n.code}` as Key) : n?.name ?? '')
+const categoryName = (n: Named) => (n.code && CATEGORIES.includes(n.code) ? t(`crime.category.${n.code}` as Key) : n.name ?? n.code ?? '—')
+
 export default function CrimeHub({ response, loading, onAction, run, openLocal }: ScreenProps) {
   const v = (response?.view ?? {}) as CrimeHubView
   const cat = useBuildingCatalogue()
@@ -52,7 +58,7 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
         {v.venue?.name && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('crime.venue', { name: v.venue.name })}</div>}
         {v.tier?.tier?.name && (
           <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>
-            {t('crime.tier', { name: v.tier.tier.name })} {v.tier.next?.name ? `· ${t('crime.tier_next', { name: v.tier.next.name, a: formatNumber(v.tier.xp ?? 0), b: formatNumber(v.tier.next_xp ?? 0) })}` : ''}
+            {t('crime.tier', { name: tierName(v.tier.tier) })} {v.tier.next?.name ? `· ${t('crime.tier_next', { name: tierName(v.tier.next), a: formatNumber(v.tier.xp ?? 0), b: formatNumber(v.tier.next_xp ?? 0) })}` : ''}
           </div>
         )}
       </Card>
@@ -69,7 +75,7 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {(v.empty === 'level_too_low' || v.empty === 'no_venue' ? [] : v.categories ?? []).map((c) => (
-          <ListRow key={c.code} icon="crime" palette="ruby" title={c.name ?? c.code ?? '—'}
+          <ListRow key={c.code} icon="crime" palette="ruby" title={categoryName(c)}
             onClick={() => c.code && run('crime.list', { category: c.code })} />
         ))}
       </div>
@@ -88,7 +94,7 @@ export function CrimeList({ response, loading, onAction, run }: ScreenProps) {
 
   return (
     <ScreenScroll>
-      <Header title={v.category?.name ?? t('crime.title')} tone="ruby" onBack={() => run('crime.hub')} onRefresh={() => v.category?.code && run('crime.list', { category: v.category.code })} />
+      <Header title={v.category ? categoryName(v.category) : t('crime.title')} tone="ruby" onBack={() => run('crime.hub')} onRefresh={() => v.category?.code && run('crime.list', { category: v.category.code })} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {(v.crimes ?? []).map((c, i) => (
           <ListRow

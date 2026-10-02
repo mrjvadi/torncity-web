@@ -3177,4 +3177,12 @@ export const uiEn: Record<UiKey, string> = {
   'crime.role.market': 'market',
   'crime.role.housing': 'housing',
   'crime.role.transport': 'transport station',
+  'crime.tier_name.novice': 'Novice',
+  'crime.tier_name.hustler': 'Hustler',
+  'crime.tier_name.professional': 'Professional',
+  'crime.category.petty_theft': 'Petty theft',
+  'crime.category.street_crime': 'Street crime',
+  'crime.category.burglary': 'Burglary',
+  'crime.category.fraud': 'Fraud',
+  'crime.category.smuggling': 'Smuggling',
 }
