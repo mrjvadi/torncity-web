@@ -6,11 +6,11 @@
 
 import { useState, type ReactNode } from 'react'
 import type {
-  BatchConfirmView, BuildMenuView, BuildingPanelView, DonateView, GridGrowView, LandView, LotBuyView, LotConfirmView, LotGridView,
+  BatchConfirmView, BuildMenuView, BuildingPanelView, DonateView, GridGrowView, LandView, LotAccessView, LotBuyView, LotConfirmView, LotGridView, LotRepairView,
   MaterialBuyConfirmView, MineView, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView, ResidenceView,
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
-import type { LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
+import type { LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
 import { Bar, Chip, Empty, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { money } from '../native/kit/format'
@@ -264,7 +264,7 @@ const ResidenceDone = flow<ResidenceView>(({ view: v, ctx }) => {
 
 // -- lot grids (land, build, private) ---------------------------------------------------------
 
-type GridCell = { x: number; y: number; state: string; fits?: boolean; owner?: string; building?: string }
+type GridCell = { x: number; y: number; state: string; fits?: boolean; owner?: string; building?: string; access?: string }
 
 /** A square map of lots. `pick` decides which cells can be pressed. */
 export function LotMap({ rows, pick, onPick, mark }: { rows: (GridCell[] | null)[] | null; pick: (c: GridCell) => boolean; onPick: (c: GridCell) => void; mark?: { x: number; y: number } | null }) {
@@ -275,7 +275,7 @@ export function LotMap({ rows, pick, onPick, mark }: { rows: (GridCell[] | null)
     <div className="vf-map" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
       {grid.flat().map((c) => {
         const can = pick(c)
-        const s = `vf-cell s-${c.state}${can ? ' can' : ''}${mark && mark.x === c.x && mark.y === c.y ? ' mark' : ''}`
+        const s = `vf-cell s-${c.state}${c.access ? ` a-${c.access}` : ''}${can ? ' can' : ''}${mark && mark.x === c.x && mark.y === c.y ? ' mark' : ''}`
         return (
           <button key={`${c.x}-${c.y}`} className={s} disabled={!can} onClick={() => onPick(c)}
             aria-label={t('citizen.buy.lot', { x: c.x + 1, y: c.y + 1 })} />
@@ -290,7 +290,9 @@ function Legend({ items }: { items: { cls: string; label: string }[] }) {
 }
 
 const landItems = () => [
-  { cls: 'free', label: t('citizen.legend.free') }, { cls: 'mine', label: t('citizen.legend.mine') }, { cls: 'taken', label: t('citizen.legend.taken') },
+  { cls: 'free', label: t('citizen.legend.free') }, { cls: 'needs', label: t('citizen.legend.needs') }, { cls: 'bridge', label: t('citizen.legend.bridge') },
+  { cls: 'locked', label: t('citizen.legend.locked') }, { cls: 'mine', label: t('citizen.legend.mine') }, { cls: 'mine-locked', label: t('citizen.legend.mine_locked') },
+  { cls: 'taken', label: t('citizen.legend.taken') }, { cls: 'reserved', label: t('citizen.legend.reserved') },
   { cls: 'building', label: t('vx.legend.building') }, { cls: 'water', label: t('vx.legend.water') },
 ]
 
@@ -310,7 +312,9 @@ const Land = flow<LandView>(({ view: v, ctx }) => {
           pick={(c) => (c.state === 'free' && v.can_buy) || (c.state === 'mine' && !c.building)}
           onPick={(c) => (c.state === 'free'
             ? ctx.go({ command: 'settlement.lot.buy', args: { lot: token(c.x, c.y) }, kind: 'primary', id: 'lot.buy' })
-            : ctx.go({ command: 'settlement.private', kind: 'navigation', id: 'citizen.build_house' }))}
+            : c.access && c.access !== 'road'
+              ? ctx.go({ command: 'settlement.lot.access', args: { lot: token(c.x, c.y) }, kind: 'navigation', id: 'lot.access' })
+              : ctx.go({ command: 'settlement.private', kind: 'navigation', id: 'citizen.build_house' }))}
         />
         <Hint>{v.can_buy ? t('vx.land.hint') : v.owned >= v.max ? t('vx.land.limit') : t('vx.land.hint_none')}</Hint>
       </Panel>
@@ -319,19 +323,132 @@ const Land = flow<LandView>(({ view: v, ctx }) => {
   )
 })
 
-const LotBuyConfirm = flow<LotBuyView>(({ view: v, ctx }) => (
-  <Page title={t('citizen.buy.title')} tone="gold">
+/** One action of the screen worded with this page's own text (the label carries the price). */
+function Do({ ctx, a, label, tone, hold }: {
+  ctx: FlowCtx; a: Parameters<FlowCtx['go']>[0]; label: string; tone?: 'gold' | 'green' | 'red' | 'steel'
+  /** A press that cannot be undone asks once more: the first press only arms the button. */
+  hold?: { armed: boolean; arm: () => void; sure?: Key }
+}) {
+  return (
+    <div className="vf-btns">
+      <Slab tone={tone ?? 'steel'} radius={14} lip={4} disabled={ctx.busy}
+        onClick={() => { if (hold && !hold.armed) hold.arm(); else ctx.go(a) }}>{hold?.armed ? t(hold.sure ?? 'citizen.fix.sure') : label}</Slab>
+    </div>
+  )
+}
+
+/** How a road reaches a lot, in the web's own words: the road to lay and what it costs. */
+function accessText(a: LotAccess): string {
+  switch (a.kind) {
+    case 'road': return t('citizen.access.road')
+    case 'needs_road': return t('citizen.access.needs_road', { n: a.roads })
+    case 'needs_bridge': return t('citizen.access.needs_bridge', { n: a.roads - a.crossings, c: a.crossings })
+    default: return t('citizen.access.none')
+  }
+}
+
+/** The nearest lots that have a road: each one opens its own purchase. */
+function NearbyButtons({ ctx, lots }: { ctx: FlowCtx; lots: { x: number; y: number; access: LotAccess }[] | null }) {
+  const list = lots ?? []
+  return (
     <Panel tone="gold">
-      <Lead>{t('citizen.buy.lot', { x: v.x + 1, y: v.y + 1 })}</Lead>
-      <Facts rows={[
-        { label: t('citizen.buy.price'), value: money(v.price), gold: true },
-        { label: t('citizen.buy.cash'), value: money(v.cash) },
-        { label: t('citizen.buy.after'), value: money(v.cash - v.price) },
-      ]} />
-      <Hint>{t('citizen.buy.note')}</Hint>
+      <SectionTitle>{t('citizen.access.nearby')}</SectionTitle>
+      {list.length === 0 && <Hint>{t('citizen.access.nearby_none')}</Hint>}
+      <div className="vf-btns">
+        {list.map((n) => (
+          <Slab key={`${n.x}-${n.y}`} tone="steel" radius={14} lip={4} disabled={ctx.busy}
+            onClick={() => ctx.go({ command: 'settlement.lot.buy', args: { lot: token(n.x, n.y) }, kind: 'primary', id: 'lot.nearby' })}>
+            {t('citizen.buy.lot', { x: n.x + 1, y: n.y + 1 })}{n.access.cost > 0 ? ` · ${money(n.access.cost)}` : ''}
+          </Slab>
+        ))}
+      </div>
     </Panel>
-    <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')} yes={t('citizen.buy.confirm', { p: money(v.price) })} />
-    <Cancel ctx={ctx} />
+  )
+}
+
+const LotBuyConfirm = flow<LotBuyView>(({ view: v, ctx }) => {
+  const none = v.access.kind === 'none'
+  const carve = ctx.acts.find((a) => a.id === 'lot.carve')
+  return (
+    <Page title={t('citizen.buy.title')} tone="gold">
+      <Panel tone="gold">
+        <Lead>{t('citizen.buy.lot', { x: v.x + 1, y: v.y + 1 })}</Lead>
+        <Facts rows={[
+          { label: t('citizen.buy.price'), value: money(v.price), gold: true },
+          { label: t('citizen.access.req'), value: accessText(v.access) },
+          ...(v.access.cost > 0 ? [{ label: t('citizen.access.cost'), value: money(v.access.cost), gold: true }] : []),
+          ...(none ? [] : [{ label: t('citizen.access.total'), value: money(v.total), gold: true }]),
+          { label: t('citizen.buy.cash'), value: money(v.cash) },
+          ...(none ? [] : [{ label: t('citizen.buy.after'), value: money(v.cash - v.total) }]),
+        ]} />
+        {none
+          ? <Hint tone="bad">{t('citizen.access.none_note')}</Hint>
+          : <Hint>{v.access.cost > 0 ? (v.road === 'carve' ? t('citizen.access.carve_chosen', { n: v.access.carved?.length ?? 0 }) : t('citizen.access.road_note')) : t('citizen.buy.note')}</Hint>}
+      </Panel>
+      {none && v.carve && carve && (
+        <Panel tone="gold">
+          <Hint>{t('citizen.access.carve_note', { n: v.carve.carved?.length ?? 0 })}</Hint>
+          <Do ctx={ctx} a={carve} tone="gold" label={t('citizen.access.carve_btn', { p: money(v.carve.cost) })} />
+        </Panel>
+      )}
+      {none && <NearbyButtons ctx={ctx} lots={v.nearby} />}
+      <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')}
+        yes={v.access.cost > 0 ? t('citizen.buy.confirm_road', { p: money(v.total) }) : t('citizen.buy.confirm', { p: money(v.total) })} />
+      <Cancel ctx={ctx} />
+    </Page>
+  )
+})
+
+/** A lot of one's own that no road reaches (or a building refused for want of a road): the road at its
+ * price, the road through one's own land, or the sale rescinded. Each is one press; the page's costs
+ * are the confirmation. */
+const LotAccessPage = flow<LotAccessView>(({ view: v, ctx }) => {
+  const connect = ctx.by('lot.connect'), carve = ctx.by('lot.carve'), refund = ctx.by('lot.refund')
+  const [armed, setArmed] = useState('')
+  return (
+    <Page title={t('citizen.fix.title')} tone="gold">
+      <Panel tone="gold">
+        <Lead>{t('citizen.buy.lot', { x: v.x + 1, y: v.y + 1 })}</Lead>
+        {v.building?.code && <Hint tone="bad">{t('citizen.access.refused', { name: ctx.bname(v.building.code, v.building.name) })}</Hint>}
+        <Facts rows={[
+          { label: t('citizen.access.req'), value: accessText(v.access), gold: v.access.kind === 'road' },
+          ...(v.access.cost > 0 ? [{ label: t('citizen.access.cost'), value: money(v.access.cost), gold: true }] : []),
+          { label: t('citizen.buy.cash'), value: money(v.cash) },
+        ]} />
+        {v.access.kind === 'road' && <Hint tone="good">{t('citizen.fix.ok')}</Hint>}
+        {v.access.kind === 'none' && <Hint tone="bad">{t('citizen.fix.none')}</Hint>}
+      </Panel>
+      {connect.length > 0 && <Do ctx={ctx} a={connect[0]} tone="green" label={t('citizen.fix.connect', { p: money(v.access.cost) })} />}
+      {carve.length > 0 && v.carve && (
+        <>
+          <Hint>{t('citizen.access.carve_note', { n: v.carve.carved?.length ?? 0 })}</Hint>
+          <Do ctx={ctx} a={carve[0]} tone="gold" label={t('citizen.fix.carve', { n: v.carve.carved?.length ?? 0, p: money(v.carve.cost) })}
+            hold={{ armed: armed === 'carve', arm: () => setArmed('carve'), sure: 'citizen.fix.sure_carve' }} />
+        </>
+      )}
+      {refund.length > 0 && (
+        <>
+          <Hint>{t('citizen.fix.refund_note', { p: money(v.refund) })}</Hint>
+          <Do ctx={ctx} a={refund[0]} tone="red" label={t('citizen.fix.refund', { p: money(v.refund) })}
+            hold={{ armed: armed === 'refund', arm: () => setArmed('refund'), sure: 'citizen.fix.sure_refund' }} />
+        </>
+      )}
+      {!v.own && <NearbyButtons ctx={ctx} lots={v.nearby} />}
+      <Rest ctx={ctx} skip={(a) => !!a.id?.startsWith('lot.') || a.id === 'citizen.mine'} />
+    </Page>
+  )
+})
+
+const LotRepairDone = flow<LotRepairView>(({ view: v, ctx }) => (
+  <Page title={t('citizen.fix.title')} tone="emerald">
+    <Panel tone="emerald">
+      <Lead tone="good">{t(`citizen.fix.done_${v.option}` as Key)}</Lead>
+      <Facts rows={[
+        { label: t('citizen.buy.lot', { x: v.x + 1, y: v.y + 1 }), value: v.option === 'refund' ? money(v.refund) : money(v.paid) },
+        { label: t('citizen.buy.cash'), value: money(v.cash) },
+      ]} />
+    </Panel>
+    <Rest ctx={ctx} />
   </Page>
 ))
 
@@ -442,8 +559,12 @@ const Mine = flow<MineView>(({ view: v, ctx }) => {
         {lots.length === 0 && <Hint>{t('citizen.mine.no_lots')}</Hint>}
         <Facts rows={lots.map((l) => ({
           label: t('citizen.buy.lot', { x: l.x + 1, y: l.y + 1 }),
-          value: l.building ? `${ctx.bname(l.building)}${l.state === 'building' || l.left_seconds > 0 ? ` · ${t('vx.mine.going', { t: durationText(l.left_seconds) })}` : ''}` : t('citizen.mine.lot_bare'),
+          value: l.building ? `${ctx.bname(l.building)}${l.state === 'building' || l.left_seconds > 0 ? ` · ${t('vx.mine.going', { t: durationText(l.left_seconds) })}` : ''}` : l.access && l.access !== 'road' ? t('citizen.mine.lot_no_road') : t('citizen.mine.lot_bare'),
         }))} />
+        {lots.filter((l) => !l.building && l.access && l.access !== 'road').map((l) => (
+          <Do key={`${l.x}-${l.y}`} ctx={ctx} a={{ command: 'settlement.lot.access', args: { lot: token(l.x, l.y) }, kind: 'navigation', id: 'lot.access' }}
+            label={t('citizen.mine.fix', { x: l.x + 1, y: l.y + 1 })} />
+        ))}
         <Facts rows={[
           { label: t('citizen.mine.assessed'), value: money(v.assessed) },
           { label: t('citizen.mine.tax'), value: `${money(v.tax_per_period)} · ${formatNumber(v.tax_bps / 100)}%` },
@@ -760,6 +881,7 @@ registerFlow({
   village_promotion: Promotion, village_promote_confirm: PromoteConfirm, village_promoted: Promoted,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
+  settlement_lot_access: LotAccessPage, settlement_lot_repair_done: LotRepairDone,
   settlement_private_menu: PrivateMenu, settlement_private_lots: PrivateLots, settlement_private_confirm: PrivateConfirm,
   settlement_mine: Mine, settlement_terms: Terms, village_work: Work, village_work_started: Work,
   settlement_who: Who, village_home_call: HomeCall, village_home_none: HomeNone,
@@ -772,6 +894,7 @@ registerFlow({
 export const FLOW_SCREENS = [
   'village_refusal', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done', 'village_promotion', 'village_promote_confirm',
   'village_promoted', 'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
+  'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',
   'village_work_started', 'settlement_who', 'village_home_call', 'village_home_none', 'settlement_build_menu', 'settlement_build_lots',
   'settlement_build_confirm', 'settlement_build_batch_confirm', 'settlement_grid_grow', 'village_materials_buy_confirm', 'settlement_building_view',

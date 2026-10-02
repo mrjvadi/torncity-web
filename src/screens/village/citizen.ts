@@ -3,7 +3,9 @@
 // the land map. Pure functions over the layout the server last sent.
 
 import type { LayoutBuilding, VillageLayout } from '../../api/types'
-import { TONE_NONE, TONE_OK, TONE_OWN, TONE_TAKEN } from '../../village/lotOverlay'
+import {
+  TONE_BRIDGE, TONE_LOCKED, TONE_NEEDS, TONE_NONE, TONE_OK, TONE_OWN, TONE_OWN_LOCKED, TONE_TAKEN,
+} from '../../village/lotOverlay'
 
 export type LotKind =
   | { kind: 'free' }
@@ -31,15 +33,25 @@ export function classifyLot(layout: VillageLayout, x: number, y: number): LotKin
   return layout.lots[y][x].buildable ? { kind: 'free' } : { kind: 'blocked' }
 }
 
-/** The tint of the land map: free lots green, the viewer's own gold, others'
- * grey-blue; everything else (water, buildings) untinted. */
-export function tonesForLand(layout: VillageLayout): Uint8Array {
+/** How each lot is served by road (docs/adr/0043), by "x,y": the access kinds of settlement.land
+ * (road, needs_road, needs_bridge, none) for the free lots and the viewer's bare lots. */
+export type LotAccessMap = ReadonlyMap<string, string>
+
+/** The tint of the land map: free lots green when a road touches them, yellow when a road must be
+ * laid, blue when it crosses water, red when none can reach them; the viewer's own gold (orange
+ * when no road touches the lot), others' grey-blue; everything else (water, buildings) untinted. */
+export function tonesForLand(layout: VillageLayout, access?: LotAccessMap): Uint8Array {
   const n = layout.grid.lots
   const out = new Uint8Array(n * n)
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
       const k = classifyLot(layout, x, y)
-      out[y * n + x] = k.kind === 'free' ? TONE_OK : k.kind === 'mine' ? TONE_OWN : k.kind === 'taken' ? TONE_TAKEN : TONE_NONE
+      const a = access?.get(`${x},${y}`)
+      let tone = TONE_NONE
+      if (k.kind === 'free') tone = a === 'needs_road' ? TONE_NEEDS : a === 'needs_bridge' ? TONE_BRIDGE : a === 'none' ? TONE_LOCKED : TONE_OK
+      else if (k.kind === 'mine') tone = a && a !== 'road' ? TONE_OWN_LOCKED : TONE_OWN
+      else if (k.kind === 'taken') tone = TONE_TAKEN
+      out[y * n + x] = tone
     }
   }
   return out
