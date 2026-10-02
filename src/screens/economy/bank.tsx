@@ -3,7 +3,7 @@
 // content names come from the catalogue. The bank keeps the prototype's look: the balance banner, the
 // deposit/withdraw tabs, an amount with quick chips, one big submit.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type {
   BankView, BudgetView, PayConfirmView, PayHelpView, PaySentView, PayView, PaymentDeclinedView,
 } from '../../api/views.gen'
@@ -17,6 +17,9 @@ import { durationText } from '../village/common'
 import { ConfirmPopup, byId, find, rest } from './kit'
 import { noticeLine } from './wording'
 import '../native/bank.css'
+import { useSession } from '../../state/SessionContext'
+import { usePending, useStoreView, primaryWallet } from '../../state/useSync'
+import { setOptimisticHint } from '../../state/optimistic'
 
 const key = (k: string) => k as Key
 const MAX_DIGITS = 12
@@ -26,8 +29,14 @@ const MAX_DIGITS = 12
 const Bank = flow<BankView>(({ view: v, ctx }) => {
   const [mode, setMode] = useState<'deposit' | 'withdraw'>('deposit')
   const [digits, setDigits] = useState('')
-  const cash = v.cash
-  const bank = v.bank
+  // state sync: the balance is the store's — live, and at once after a
+  // deposit or a withdrawal (an optimistic overlay until it is confirmed)
+  const { synced } = useSession()
+  const wallet = primaryWallet(useStoreView())
+  const pending = usePending('wallet', synced ? wallet?.currency : undefined)
+  useEffect(() => { setOptimisticHint('bank.withdraw', { fee_bps: v.withdrawal_fee_bps ?? 0 }) }, [v.withdrawal_fee_bps])
+  const cash = synced && wallet ? wallet.cash : v.cash
+  const bank = synced && wallet ? wallet.bank : v.bank
   const feeBps = mode === 'withdraw' ? v.withdrawal_fee_bps : 0
   const amount = Number(digits || '0')
   const source = mode === 'deposit' ? cash : bank
@@ -57,7 +66,7 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
       {v.no_city && !v.travelling && <Notice alert>{t('eco.bank.no_city')}</Notice>}
       {v.jailed && <Notice alert>{t('bank.jailed')}</Notice>}
 
-      <Card tone="sapphire">
+      <Card tone="sapphire" className={pending ? 'sync-pending' : undefined}>
         <StatPair
           left={<Stat icon="coins" palette="gold" label={t('bank.cash')} value={money(cash)} />}
           right={<Stat icon="bank" palette="sapphire" label={t('bank.balance')} value={money(bank)} />}

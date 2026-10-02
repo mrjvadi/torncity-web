@@ -14,6 +14,7 @@ import { mockLocation, mockSupportCommand } from '../support/mock'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 import { mockSocietyCommand } from './mock_society'
 import { mockP0Command } from './mock_p0'
+import { mockState, mockSyncCommand, mockUpdates } from './mock_sync'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -135,6 +136,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   })
 }
 
+const OPTIMISTIC_WRITES = new Set(['bank.deposit', 'bank.withdraw', 'inventory.use', 'inbox.read_all'])
+
 export function installMockApi(): void {
   installVillageMockHandles()
   const realFetch = window.fetch.bind(window)
@@ -157,7 +160,14 @@ export function installMockApi(): void {
         realtime: false,
         settlement: mockBootstrapSettlement(),
         location: mockLocation(),
+        // state sync (client-api.md 5.6): the mock serves it, ?sync=0 turns it off
+        features: { updates: new URLSearchParams(location.search).get('sync') !== '0' },
       })
+    }
+    if (path === '/api/v1/state') return json(mockState())
+    if (path === '/api/v1/updates') {
+      const q = new URL(url).searchParams
+      return json(mockUpdates(Number(q.get('since') ?? 0), q.get('epoch') ?? ''))
     }
     const villageRes = mockVillageRoute(path, (init?.method ?? 'GET').toUpperCase(), new Headers(init?.headers))
     if (villageRes) return villageRes
@@ -166,7 +176,12 @@ export function installMockApi(): void {
     }
     if (path === '/api/v1/command' && init?.body) {
       const body = JSON.parse(String(init.body))
-      return mockCommand(body.command, body.args)
+      // the writes the store shows optimistically take a phone network's
+      // moment, so the overlay is seen before the answer confirms it
+      if (OPTIMISTIC_WRITES.has(body.command)) await new Promise((r) => setTimeout(r, 700))
+      const res = mockCommand(body.command, body.args)
+      // the command's effect on the player's state and its own records (state sync)
+      return json(mockSyncCommand(body.command, body.args, await res.json()), res.status)
     }
     if (path === '/api/v1/auth/logout') {
       return json({ ok: true })

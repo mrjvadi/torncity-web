@@ -66,12 +66,12 @@ export default function Hud({ profile, onBank, onAvatar }: HudProps) {
           </div>
 
           <div className="hud-money">
-            <button className="hud-pill hud-cash" onClick={onBank}>
+            <button className={`hud-pill hud-cash${profile?.pending_money ? ' sync-pending' : ''}`} onClick={onBank}>
               <Emboss name="coins" palette="gold" size="calc(90 * var(--u))" className="hud-pill-coin" />
               <span className="hud-pill-value"><GLabel top="#fff6c8" bottom="#ffb21f" stroke={1}>{profile ? formatNumber(profile.cash) : '–'}</GLabel></span>
               <span className="hud-pill-plus">+</span>
             </button>
-            <button className="hud-pill hud-bank" onClick={onBank}>
+            <button className={`hud-pill hud-bank${profile?.pending_money ? ' sync-pending' : ''}`} onClick={onBank}>
               <Emboss name="bank" palette="sapphire" size="calc(68 * var(--u))" className="hud-pill-coin hud-pill-coin-bank" />
               <span className="hud-pill-value"><GLabel top="#eaf1ff" bottom="#8fb0ff" stroke={0.8}>{profile ? formatNumber(profile.bank) : '–'}</GLabel></span>
             </button>

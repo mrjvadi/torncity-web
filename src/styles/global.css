@@ -577,3 +577,9 @@ input {
    own scoped styles (src/ui/home/*.tsx, src/ui/Dock.tsx) built on the kit —
    nothing left to override here. */
 
+/* state sync (src/state/store.ts): a number shown before the server confirmed
+   it (an optimistic deposit) breathes softly until its record arrives */
+.sync-pending { animation: sync-pending 1.1s ease-in-out infinite; }
+@keyframes sync-pending { 0%, 100% { opacity: 1; } 50% { opacity: 0.62; } }
+@media (prefers-reduced-motion: reduce) { .sync-pending { animation: none; opacity: 0.8; } }
+

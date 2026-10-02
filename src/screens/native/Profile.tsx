@@ -15,6 +15,8 @@ import { clamp01, formatNumber, hms, money } from './kit/format'
 import Icon from '../../ui/Icon'
 import { GLabel } from '../../kit'
 import { t } from '../../i18n'
+import { useSession } from '../../state/SessionContext'
+import { useEntity } from '../../state/useSync'
 import './profile.css'
 
 interface Named { code?: string; name?: string; emoji?: string }
@@ -43,7 +45,17 @@ interface AchievementsView { lines?: { achievement?: Named; earned?: boolean }[]
 
 
 export default function Profile({ response, loading, run }: ScreenProps) {
-  const v = (response?.view ?? {}) as ProfileView
+  const own = (response?.view ?? {}) as ProfileView
+  // state sync: the money, the vitals, the level and where the player is are
+  // the store's (live, no refresh); the rest is the command's view
+  const { profile: live, synced } = useSession()
+  const loc = useEntity('location', synced ? 'self' : undefined)
+  const v: ProfileView = synced && live ? {
+    ...own, name: live.name || own.name, level: live.level, xp: live.xp, next_level_xp: live.next_level_xp,
+    energy: live.energy, max_energy: live.max_energy, health: live.health, max_health: live.max_health,
+    cash: live.cash, bank: live.bank,
+    ...(loc ? { city_code: loc.city || own.city_code, place: loc.place ? { code: loc.place, name: own.place?.code === loc.place ? own.place.name : undefined } : own.place } : {}),
+  } : own
   const names = useContentNames()
   const life = useView<LifeView>('life.me')
   const ach = useView<AchievementsView>('achievement.list')

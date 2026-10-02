@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { adoptServerLanguage } from '../i18n/sync'
 import { noticeText, refusalText } from '../i18n'
 import * as api from '../api/client'
@@ -11,6 +11,9 @@ import { friendlyError } from '../lib/errors'
 import { initTelegram, telegramInitData } from '../lib/telegram'
 import { useToast, type ToastApi } from './ToastContext'
 import { setServerTime } from '../village/clock'
+import { syncStore } from './store'
+import { useStoreFigures } from './useSync'
+import { idbPersistence, persistenceEnabled } from './persist'
 
 type Status = 'checking' | 'signed_out' | 'signing_in' | 'signed_in'
 
@@ -52,6 +55,9 @@ interface SessionApi {
   refreshProfile: () => Promise<void>
   /** Reads the bootstrap again (the player's settlement appears after founding). */
   refreshBootstrap: () => Promise<void>
+  /** The store (state/store.ts) is the source of the player's numbers: the
+   * server serves state sync (bootstrap.features.updates). */
+  synced: boolean
   exec: (command: string, args?: Record<string, string>) => Promise<CommandResponse | null>
 }
 
@@ -73,7 +79,7 @@ async function showNoticeWith(n: RealtimeNotice, push: ToastApi['push']): Promis
   const args = go?.args ? Object.fromEntries(Object.entries(go.args).map(([k, v]) => [k, String(v)])) : undefined
   push(line.text, {
     kind: line.tone,
-    key: `notice|${n.kind}|${n.screen ?? ''}|${JSON.stringify(n.view ?? null)}`,
+    key: n.id ? `notice|${n.id}` : `notice|${n.kind}|${n.screen ?? ''}|${JSON.stringify(n.view ?? null)}`,
     command: go?.command ?? (n.screen ? undefined : 'inbox.show'),
     args,
   })
@@ -90,6 +96,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   // depends on (a client without it must work exactly as before this
   // feature).
   const [live, setLive] = useState(false)
+  const [synced, setSynced] = useState(false)
   const realtimeRef = useRef<RealtimeHandle | null>(null)
   const toast = useToast()
   const showNotice = useCallback((n: RealtimeNotice) => showNoticeWith(n, toast.push), [toast.push])
@@ -105,6 +112,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [showNotice])
   const inTelegram = useRef(!!telegramInitData()).current
 
+  // state sync: subscribe (the realtime effect below), read the snapshot,
+  // apply what arrived meanwhile (store.ts). In mock mode the mock server's
+  // stream stands in for the socket.
+  const startSync = useCallback((playerId: string) => {
+    setSynced(true)
+    const mock = new URLSearchParams(location.search).get('mock') === '1'
+    void syncStore.start(playerId, { getState: api.getState, getUpdates: api.getUpdates },
+      persistenceEnabled() ? idbPersistence : null).then(() => {
+      if (mock) void import('../api/mock_sync').then((m) => m.attachMockSocket())
+    }).catch((e) => report('sync', 'state sync failed to start: ' + String(e)))
+  }, [])
+
   const afterSignedIn = useCallback(async () => {
     try {
       const [b, p] = await Promise.all([
@@ -116,6 +135,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setBootstrap(b)
       setServerTime(b.server_time)
       if (p.ok && p.view) setProfile(p.view as unknown as ProfileView)
+      if (b.features?.updates && b.player?.id) startSync(b.player.id)
       setStatus('signed_in')
       report('boot', 'signed in and bootstrapped')
     } catch (e) {
@@ -123,7 +143,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setError(friendlyError(e))
       setStatus('signed_out')
     }
-  }, [])
+  }, [startSync])
 
   useEffect(() => {
     initTelegram()
@@ -167,6 +187,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [afterSignedIn])
 
   const signOut = useCallback(() => {
+    syncStore.forget()
+    setSynced(false)
     void api.logout()
     realtimeRef.current?.disconnect()
     realtimeRef.current = null
@@ -206,6 +228,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     let cancelled = false
     void (async () => {
       const { connectRealtime } = await import('../api/realtime')
+      const viaStore = !!bootstrap?.features?.updates
       const handle = await connectRealtime(
         (v: RealtimeVitals) => {
           setProfile((p) => (p ? {
@@ -217,7 +240,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         },
         (u: number) => setUnread(u),
         (isLive: boolean) => setLive(isLive),
-        (n) => { void showNotice(n) },
+        // with state sync a notice toasts from the store, once per id; the
+        // legacy publication (no id) would show it a second time
+        viaStore ? undefined : (n) => { void showNotice(n) },
       )
       if (cancelled) {
         handle?.disconnect()
@@ -231,7 +256,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       realtimeRef.current = null
       setLive(false)
     }
-  }, [status, bootstrap?.realtime])
+  }, [status, bootstrap?.realtime, bootstrap?.features?.updates])
+
+  // state sync: the store's instant notices toast here, each once
+  useEffect(() => {
+    if (!synced) return
+    return syncStore.onNotice(({ id, data }) => {
+      void showNotice({ kind: data.kind, screen: data.screen || undefined, view: data.view ?? undefined, actions: [], id })
+    })
+  }, [synced, showNotice])
 
   // Presence (client-api.md section 5.5): a player counts as online for
   // `ttl_seconds` after any signed-in call, so while the app is open but idle
@@ -317,11 +350,33 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshProfile, toast])
 
+  // With state sync the HUD's and the profile's numbers are the store's (the
+  // command's own view still carries what the store does not: the city's
+  // name, the needs, the work); the poll stays as the fallback (ADR 0034,
+  // P4 removes it).
+  const figures = useStoreFigures(synced ? bootstrap?.player?.id : undefined)
+  const shownProfile = useMemo(() => mergeFigures(profile, figures), [profile, figures])
+  const shownUnread = figures ? figures.unread : unread
+
   return (
-    <Ctx.Provider value={{ status, bootstrap, profile, unread, error, inTelegram, loginWithCode, loginWithTelegram, signOut, refreshProfile, refreshBootstrap, exec }}>
+    <Ctx.Provider value={{ status, bootstrap, profile: shownProfile, unread: shownUnread, error, inTelegram, loginWithCode, loginWithTelegram, signOut, refreshProfile, refreshBootstrap, exec, synced }}>
       {children}
     </Ctx.Provider>
   )
+}
+
+/** The command's profile view with the store's figures laid over it, key
+ * for key; the rank keeps the view's authored name when the code agrees. */
+function mergeFigures(profile: ProfileView | null, f: ReturnType<typeof useStoreFigures>): ProfileView | null {
+  if (!f) return profile
+  const base = (profile ?? { code: '', city_code: '', city: '', travelling: false }) as ProfileView
+  const rank = f.rank && base.rank?.code === f.rank.code ? base.rank : (f.rank ?? base.rank)
+  return {
+    ...base, name: f.name || base.name, level: f.level, xp: f.xp, next_level_xp: f.next_level_xp, rank,
+    energy: f.energy, max_energy: f.max_energy, energy_full_in_seconds: f.energy_full_in_seconds,
+    health: f.health, max_health: f.max_health, nerve: f.nerve, max_nerve: f.max_nerve,
+    nerve_full_in_seconds: f.nerve_full_in_seconds, cash: f.cash, bank: f.bank, pending_money: f.pending_money,
+  } as ProfileView
 }
 
 function deviceName(): string {

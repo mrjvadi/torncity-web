@@ -1,5 +1,8 @@
 import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary, RealtimeToken, WorldInfo, VillageLayout, SettlementPlayers, PlayerStatus } from './types'
 import { report } from '../lib/reporter'
+import { syncStore } from '../state/store'
+import { beforeCommand } from '../state/optimistic'
+import type { SyncDifference, SyncSnapshot } from '../state/syncTypes'
 
 // VITE_API_BASE / VITE_WS_BASE point a dev build at a local stack (never set in production builds)
 const API_BASE: string = import.meta.env.VITE_API_BASE ?? 'https://apimmo.ir404.site'
@@ -196,15 +199,42 @@ export async function runCommand(
   args: CommandArgs = {},
   idempotencyKey?: string,
 ): Promise<CommandResponse> {
-  const res = await authed<CommandResponse>('/api/v1/command', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ command, args, idempotency_key: idempotencyKey }),
-  })
+  // state sync (store.ts): a cheap, predictable write shows its effect at
+  // once; the answer's own records confirm it, or a refusal takes it away
+  beforeCommand(command, args as Record<string, unknown>, idempotencyKey)
+  let res: CommandResponse
+  try {
+    res = await authed<CommandResponse>('/api/v1/command', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command, args, idempotency_key: idempotencyKey }),
+    })
+  } catch (e) {
+    if (idempotencyKey) syncStore.dropOverlay(idempotencyKey)
+    throw e
+  }
+  if (res?.updates) syncStore.commandUpdates(res.updates)
+  if (idempotencyKey) {
+    if (res?.ok === false) syncStore.dropOverlay(idempotencyKey)
+    else syncStore.bindOverlay(idempotencyKey, res?.request_id)
+  }
   if (res && res.view && typeof res.view === 'object') {
     for (const fn of viewListeners) fn(res.view as Record<string, unknown>, res.screen ?? '')
   }
   return res
+}
+
+// -- state sync (client-api.md section 5.6) ----------------------------------
+
+/** GET /state: every entity and the pts it is current to. */
+export async function getState(): Promise<SyncSnapshot> {
+  return authed<SyncSnapshot>('/api/v1/state', { method: 'GET' })
+}
+
+/** GET /updates?since=: what came after, or a reset. */
+export async function getUpdates(since: number, epoch: string): Promise<SyncDifference> {
+  const q = `?since=${encodeURIComponent(String(since))}` + (epoch ? `&epoch=${encodeURIComponent(epoch)}` : '')
+  return authed<SyncDifference>(`/api/v1/updates${q}`, { method: 'GET' })
 }
 
 /** A Centrifugo connection token: the player's own channel is subscribed
