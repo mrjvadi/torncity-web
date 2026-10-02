@@ -6,6 +6,7 @@ import Icon from './Icon'
 import Skeleton from './Skeleton'
 import Actions from '../screens/native/kit/Actions'
 import { t } from '../i18n'
+import { useNav } from '../state/NavContext'
 
 interface GenericScreenProps {
   response: CommandResponse | null
@@ -14,6 +15,7 @@ interface GenericScreenProps {
 }
 
 export default function GenericScreen({ response, loading, onAction }: GenericScreenProps) {
+  const nav = useNav()
   const [pendingInput, setPendingInput] = useState<Action | null>(null)
   const [pendingConfirm, setPendingConfirm] = useState<Action | null>(null)
   const [inputValue, setInputValue] = useState('')
@@ -79,6 +81,14 @@ export default function GenericScreen({ response, loading, onAction }: GenericSc
       )}
 
       <Actions response={response} onAction={onAction} />
+
+      {/* a screen whose answer carries no way back still has one: the shell's history */}
+      {nav?.back && !(response?.actions ?? []).some((a) => a.kind === 'back') && (
+        <button className="action-tile action-back" onClick={nav.back}>
+          <span className="action-back-arrow" aria-hidden>›</span>
+          <span className="action-tile-label">{t('common.back')}</span>
+        </button>
+      )}
 
       <GenericStyles />
     </div>

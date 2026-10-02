@@ -69,6 +69,11 @@ export function useSession(): SessionApi {
   return v
 }
 
+/** The session when there is one (a screen drawn outside the shell has none). */
+export function useSessionOptional(): SessionApi | null {
+  return useContext(Ctx)
+}
+
 /** A notice pushed by the server, shown as a toast: worded by this client from the notice's code and
  * facts, its colour from the code, and a tap opens where the notice points. */
 async function showNoticeWith(n: RealtimeNotice, push: ToastApi['push']): Promise<void> {

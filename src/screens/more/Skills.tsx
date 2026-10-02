@@ -6,12 +6,14 @@ import { Bar, Card, Header, Notice, ScreenScroll } from '../native/kit/Parts'
 import Actions from '../native/kit/Actions'
 import { clamp01, formatNumber } from '../native/kit/format'
 import { t } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
 
 interface SkillLine { code?: string; level?: number; xp?: number; next?: number; percent?: number; max?: boolean }
 interface SkillsView { lines?: SkillLine[] | null }
 
 export default function Skills({ response, loading, onAction, run }: ScreenProps) {
   const v = (response?.view ?? {}) as SkillsView
+  const names = useContentNames()
   const trained = (v.lines ?? []).filter((l) => (l.level ?? 0) > 0 || (l.xp ?? 0) > 0)
   if (loading && !response) return <ScreenScroll><Header title={t('skills.title')} tone="violet" /></ScreenScroll>
 
@@ -25,7 +27,7 @@ export default function Skills({ response, loading, onAction, run }: ScreenProps
         {trained.map((l, i) => (
           <Card key={i}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span className="display" style={{ fontSize: 15, color: '#fff' }}>{l.code}</span>
+              <span className="display" style={{ fontSize: 15, color: '#fff' }}>{names.name('skill', l.code ?? '', '')}</span>
               <span className="nx-chip nx-chip-violet">{t('common.level', { n: formatNumber(l.level ?? 0) })}</span>
             </div>
             {l.max ? (

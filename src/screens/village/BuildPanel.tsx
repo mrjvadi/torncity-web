@@ -7,7 +7,7 @@ import type { CatalogueBuilding } from '../../api/types'
 import { t } from '../../i18n'
 import { formatNumber, money } from '../native/kit/format'
 import { blockReason, isMulti, type BuildState } from './useBuildMode'
-import { buildingName } from '../../village/useVillage'
+import { buildingName, useContentNames } from '../../village/useVillage'
 import { durationText, iconForRole } from './common'
 
 interface Props {
@@ -31,6 +31,7 @@ interface Props {
 const OK = '#40d96b', BAD = '#eb4a40', TAKEN = '#9aa0b4'
 
 export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit, onChoose, onRotate, onNext, onConfirm, onBack, onUndo, onClear, onPathMode, onGrowAsk, onGrowConfirm }: Props) {
+  const names = useContentNames()
   const name = s.code ? buildingName(cat, s.code, s.lots?.building.name ?? s.confirm?.building.name ?? s.batch?.building.name) : ''
   const multi = isMulti(cat, s.code)
   const unit = s.menu?.lines?.find((l) => l.building.code === s.code)
@@ -64,7 +65,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
                     <Plate size={38} square><Emboss name={icon} palette={locked ? 'steel' : palette} size={24} /></Plate>
                     <span className="vh-card-name">{buildingName(cat, l.building.code, l.building.name)}</span>
                     {locked
-                      ? <span className="vh-card-meta">{t('build.needs', { list: (l.missing ?? []).map((m) => m.name).join('، ') })}</span>
+                      ? <span className="vh-card-meta">{t('build.needs', { list: (l.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') })}</span>
                       : <>
                         <span className="vh-card-cost">{money(l.cost_money)}</span>
                         <span className="vh-card-meta">{durationText(l.build_time_seconds)}{fpc ? ` · ${fpc[0]}×${fpc[1]}` : ''}</span>

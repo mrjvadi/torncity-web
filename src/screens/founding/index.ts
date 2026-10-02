@@ -8,6 +8,8 @@ import { FoundDraft, Founded, FoundingChecked, FoundingRefusal } from './Foundin
 const screens: ScreenSet = {
   SERVER: {
     settlement_found_draft: FoundDraft,
+    // `settlement.found.draft` answers with the form itself
+    founding_form: FoundingForm,
     founding_checked: FoundingChecked,
     founding_refusal: FoundingRefusal,
     settlement_refusal: FoundingRefusal,

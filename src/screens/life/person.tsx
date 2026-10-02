@@ -16,7 +16,7 @@ import { cityName, clockText, dateText, nameOf, tf, tx } from './common'
 /** What an entry of the story is about: a content name by the table its kind belongs to. */
 const HISTORY_TABLE: Record<string, string | string[]> = {
   course: 'course', certificate: 'course', property_bought: 'property_type', property_sold: 'property_type', achievement: 'achievement',
-  rank_up: 'life_rank', rank_down: 'life_rank', big_trade: 'item',
+  rank_up: 'life_rank', rank_down: 'life_rank', big_trade: 'item', first_job: 'career', hired: 'career',
 }
 
 export const History = flow<HistoryView>(({ view: v, ctx }) => {
@@ -29,7 +29,9 @@ export const History = flow<HistoryView>(({ view: v, ctx }) => {
       <div className="vf-list">
         {lines.map((l, i) => {
           const table = HISTORY_TABLE[l.kind]
-          const what = table ? ctx.names.name(table, l.code, l.name) : l.name
+          // a promotion names the rank reached (the career's tier), the other job lines the career
+          const what = l.kind === 'promoted' && l.sub ? ctx.names.name('career_tier', `${l.code}.${l.sub}`, l.sub_name || l.name)
+            : table ? ctx.names.name(table, l.code, l.name) : l.name
           const where = l.place.code || l.place.name ? (l.place_kind && l.place_kind !== 'city' ? l.place.name : cityName(ctx, l.place.code, l.place.name)) : ''
           const base = `lf.history.${l.kind}`
           const text = tf(!where && hasKey(`${base}_nowhere`) ? `${base}_nowhere` : base, 'lf.history.other', { what, place: where, amount: money(l.amount), number: formatNumber(l.number) })

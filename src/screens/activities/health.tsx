@@ -13,6 +13,7 @@ import { clamp01, hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { t } from '../../i18n'
+import { hasHospital, usePlaceStage, type Stage } from '../../support/stage'
 import { Btns, Facts, Hint, Lead, Page, Panel, Rest, flow, isBack, isRefresh, registerWrites, type FlowCtx } from '../village/flow'
 import { objectiveText } from '../native/Missions'
 import { bps, clockText, nameOf, tx } from '../life/common'
@@ -26,7 +27,7 @@ registerWrites(['health.treat'], (a) => !!a.args?.method)
 registerWrites(['mission.abandon'], (a) => !!a.args?.confirm)
 
 /** Who treats: the city's hospital, or a clinic by the name its owner gave it. */
-const providerName = (o: TreatOption): string => (o.provider === 'clinic' ? t('ac.health.clinic_name', { name: o.clinic.name }) : t('ac.health.city_hospital'))
+const providerName = (o: TreatOption, stage: Stage): string => (o.provider === 'clinic' ? t('ac.health.clinic_name', { name: o.clinic.name }) : hasHospital(stage) ? t('ac.health.city_hospital') : t('ac.health.village_house'))
 
 /** The server's refresh of the hospital, worded as the way on («وضع درمان من»), for a screen whose back goes home. */
 const toHospital = (ctx: FlowCtx): Action[] => ctx.acts.filter((a) => a.id === 'health.hospital' || (isRefresh(a) && a.command === 'health.hospital')).slice(0, 1).map((a) => ({ ...a, id: 'health.hospital', kind: 'secondary' }))
@@ -34,6 +35,7 @@ const toHospital = (ctx: FlowCtx): Action[] => ctx.acts.filter((a) => a.id === '
 // -- a treatment: the price and how to pay it, then the result ---------------------------------------------------
 
 export const TreatConfirm = flow<TreatConfirmView>(({ view: v, ctx }) => {
+  const stage = usePlaceStage()
   const back = ctx.acts.find(isBack)
   const pays = ctx.acts.filter((a) => a.id?.startsWith('pay.'))
   const free = ctx.by('health.confirm_free')[0]
@@ -44,7 +46,7 @@ export const TreatConfirm = flow<TreatConfirmView>(({ view: v, ctx }) => {
     <Page title={t('ac.health.treat_title')} tone="ruby">
       <Popup
         open onClose={() => back && ctx.go(back)} tone="navy" dismissible={!ctx.busy}
-        title={t('ac.health.confirm_title', { who: providerName(v.option) })}
+        title={t('ac.health.confirm_title', { who: providerName(v.option, stage) })}
         footer={(
           <>
             <ActionRow>
@@ -71,10 +73,12 @@ export const TreatConfirm = flow<TreatConfirmView>(({ view: v, ctx }) => {
   )
 })
 
-export const Treated = flow<TreatedView>(({ view: v, ctx }) => (
+export const Treated = flow<TreatedView>(({ view: v, ctx }) => {
+  const stage = usePlaceStage()
+  return (
   <Page title={t('ac.health.treated_title')} tone="emerald">
     <Panel tone="emerald">
-      <Lead tone="good">{t('ac.health.treated_lead', { who: providerName(v.option), saved: roughDuration(v.saved_seconds) })}</Lead>
+      <Lead tone="good">{t('ac.health.treated_lead', { who: providerName(v.option, stage), saved: roughDuration(v.saved_seconds) })}</Lead>
       <Facts rows={[
         ...(v.paid > 0 ? [{ label: t('ac.health.paid'), value: money(v.paid), gold: true }, { label: t('ac.health.paid_by'), value: tx(`lf.pay.${v.method}`) }] : []),
         { label: t('ac.health.remaining'), value: v.remaining_seconds > 0 ? hms(v.remaining_seconds) : t('ac.health.none_left') },
@@ -83,7 +87,8 @@ export const Treated = flow<TreatedView>(({ view: v, ctx }) => (
     </Panel>
     <Btns ctx={ctx} list={toHospital(ctx)} />
   </Page>
-))
+  )
+})
 
 // -- a clinic's desk, for its owner and manager ------------------------------------------------------------------
 

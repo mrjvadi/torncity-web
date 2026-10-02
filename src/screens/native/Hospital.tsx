@@ -56,7 +56,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
       {v.city_hospital && treat('city') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div className="nx-sec">{t('ac.health.treat_title')}</div>
-          <ListRow icon="hospital" palette="ruby" title={t('ac.health.city_hospital')}
+          <ListRow icon="hospital" palette="ruby" title={inCity || !v.city_code ? t('ac.health.city_hospital') : t('ac.health.village_house')}
             sub={v.city_hospital.saves_seconds ? t('hospital.saves', { t: roughDuration(v.city_hospital.saves_seconds) }) : undefined}
             right={v.city_hospital.price ? money(v.city_hospital.price) : t('common.free')}
             onClick={() => onAction(treat('city')!)} />

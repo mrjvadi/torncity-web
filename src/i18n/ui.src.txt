@@ -207,6 +207,8 @@ eco.budget.no_period | هنوز هیچ دورهٔ بودجه‌ای تمام ن�
 eco.budget.next | دورهٔ بعد: {in} دیگر | Next period in {in}
 eco.budget.effect.investigation | پیگیری پرونده‌ها {share} جدی‌تر | Case work {share} more serious
 eco.budget.effect.hospital_price | بیمارستان شهر {share} ارزان‌تر | The city hospital {share} cheaper
+eco.budget.effect.hospital_price_village | خانهٔ بهداشت {share} ارزان‌تر | The health house {share} cheaper
+eco.budget.line.care_village | یارانهٔ خانهٔ بهداشت | Health house subsidy
 eco.budget.effect.transit_fare | حمل‌ونقل عمومی {share} ارزان‌تر | Public transport {share} cheaper
 eco.budget.effect.course_fee | آموزش {share} ارزان‌تر | Courses {share} cheaper
 eco.budget.effect.war_repair | {share} از خرابی جنگ بازسازی شد | {share} of the war damage was repaired
@@ -894,7 +896,7 @@ profile.walking | در راه {place} · {t} | Walking to {place} · {t}
 # -- settings -------------------------------------------------------------------------
 settings.title | تنظیمات | Settings
 settings.language | زبان بازی | Game language
-settings.language_hint | زبان بازی و ربات یکی است. | The game and the bot share one language.
+settings.language_hint | زبان بازی برای همهٔ صفحه‌ها یکی است. | The game's language is the same on every page.
 settings.saved | زبان تغییر کرد. | Language changed.
 settings.account | حساب | Account
 settings.devices | دستگاه‌های متصل | Linked devices
@@ -1790,7 +1792,7 @@ labor.by_work_hint | این ساختمان با کار کارگرها بالا �
 vx.loading | در حال بارگذاری… | Loading…
 vx.cancel | انصراف | Cancel
 vx.unknown.title | این صفحه | This page
-vx.unknown.body | این صفحه در این نسخه جور دیگری باز می‌شود؛ از دکمه‌های زیر ادامه بده. | This page opens another way in this version; carry on with the buttons below.
+vx.unknown.body | این صفحه هنوز اینجا آماده نیست. | This page is not ready here yet.
 vx.rf.title | انجام نشد | Not done
 vx.rf.batch_lot | ردیف {y}، ستون {x}: {reason} | Row {y}, column {x}: {reason}
 vx.rf.batch.occupied | قبلاً ساخته شده | Already built on
@@ -4352,6 +4354,7 @@ soc.board.hint.village | هم‌روستایی‌ها بر پایهٔ دارای
 # -- activities: health and missions (docs/adr/0039) ---
 ac.health.clinic_name | درمانگاه {name} | The {name} clinic
 ac.health.city_hospital | بیمارستان شهر | The city hospital
+ac.health.village_house | خانهٔ بهداشت | The health house
 ac.health.village_title | خانهٔ بهداشت | Health house
 ac.health.treat_title | درمان | Treatment
 ac.health.confirm_title | درمان در {who} | Treatment at {who}

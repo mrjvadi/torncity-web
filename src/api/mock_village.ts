@@ -1366,13 +1366,13 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     return json({
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
-      entries: mergeTables(ACTIVITIES_CONTENT, mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), {
-        settlement_building: [...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) })),
+      entries: mergeTables(ACTIVITIES_CONTENT, mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), mergeTables({
+        settlement_building: [{ code: 'stall', name: { en: 'Stall', fa: 'دکه' }, category: 'market', footprint: [1, 1] }, ...[...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) }))],
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
         place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
         component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
-        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
+        item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
         shop: ECONOMY_CONTENT.shop, budget_line: ECONOMY_CONTENT.budget_line, company_type: ECONOMY_CONTENT.company_type,
         // what the pushed notices name (api/client-api.md section 4.1)
         crime: [{ code: 'pickpocket', name: { en: 'Pickpocketing', fa: 'جیب‌بری' } }, { code: 'warehouse_heist', name: { en: 'Warehouse heist', fa: 'دزدی از انبار' } }],
@@ -1387,8 +1387,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         life_rank: [{ code: 'merchant', name: { en: 'Merchant', fa: 'بازرگان' } }, { code: 'citizen', name: { en: 'Citizen', fa: 'شهروند' } }],
         knowledge: Object.keys(KNOW_NAMES).map((k) => ({ code: k, name: { en: KNOW_EN[k] ?? k, fa: KNOW_NAMES[k] } })),
         // what the life area names: cities, places, ways to travel, ranks, goods, property...
-        ...LIFE_CONTENT,
-      })))),
+      } as Record<string, { code: string; name: { en: string; fa: string } }[]>, LIFE_CONTENT))))),
     })
   }
   let m = path.match(/^\/api\/v1\/world\/chunks\/(\d+)\/(\d+)\/(\d+)\/(\d+)$/)

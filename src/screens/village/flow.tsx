@@ -23,6 +23,7 @@ import { useSession } from '../../state/SessionContext'
 import { buildingName, useBuildingCatalogue, useContentNames, type ContentNames } from '../../village/useVillage'
 import type { CatalogueBuilding } from '../../api/types'
 import { actionLabel } from './wording'
+import { SERVER_SCREENS } from '../registry'
 import './flow.css'
 
 /** What every village screen gets. */
@@ -217,6 +218,10 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
       onSubmit={(value) => { const a = asking; setAsking(null); void go({ ...a, args: { ...(a.args ?? {}), [a.input!.field]: value } }) }} />
   )
   if (!Screen && Own) return <Own {...props} response={res} />
+  // a write can answer with a screen of another area (the card after an avatar, the life screen after a night's
+  // sleep, a bought property): that area's own layout draws it
+  const Other = !Screen && !Own ? SERVER_SCREENS[res.screen] : undefined
+  if (Other && Other !== FlowHost) return <Other {...props} response={res} />
   if (!Screen) {
     return (
       <Page title={t('vx.unknown.title')} tone="sapphire">

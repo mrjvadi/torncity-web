@@ -165,7 +165,7 @@ function detail(code: string, state = '') {
 
 function result(outcome: 'succeeded' | 'escaped' | 'caught', o: { injury?: boolean; extra?: boolean } = {}) {
   const base: CrimeResultView = {
-    player: 'Reza', crime: N('pickpocketing', 'Pickpocketing'), venue: VENUE, city_code: 'calderis', city: 'Calderis', result: outcome, victim_player: false,
+    player: 'رضا', crime: N('pickpocketing', 'Pickpocketing'), venue: VENUE, city_code: 'calderis', city: 'Calderis', result: outcome, victim_player: false,
     take: 0, dry_spell: false, xp: 0, criminal_xp: 0, skills: null, level: 0, heat: HEAT, nerve: { ...NERVE, nerve: 11 }, jail: null, fine: 0, fine_paid: 0,
     notice: false, loot: null, stolen: null, confiscated: null, injury: null,
   }
@@ -194,7 +194,7 @@ function result(outcome: 'succeeded' | 'escaped' | 'caught', o: { injury?: boole
 function started() {
   world.busyUntil = Date.now() + 1800000
   return mockOk('crime_started', {
-    player: 'Reza', crime: N('contraband_run', 'Contraband run'), venue: N('harbour', 'Harbour'), duration_seconds: 1800, ends_at: iso(30), nerve: { ...NERVE, nerve: 2 },
+    player: 'رضا', crime: N('contraband_run', 'Contraband run'), venue: N('harbour', 'Harbour'), duration_seconds: 1800, ends_at: iso(30), nerve: { ...NERVE, nerve: 2 },
   }, [A('crime.hub', 'crime.hub'), back('player.profile.get')])
 }
 
@@ -226,7 +226,7 @@ function jail(state = '') {
 
 function bailed(method: string) {
   world.jailedUntil = 0
-  return mockOk('bailed', { player: 'Reza', bail: 1200, method }, [A('crime.hub', 'crime.hub'), back('player.profile.get')])
+  return mockOk('bailed', { player: 'رضا', bail: 1200, method }, [A('crime.hub', 'crime.hub'), back('player.profile.get')])
 }
 
 // -- the victim's reports ----------------------------------------------------------------------------------------------------
@@ -253,7 +253,7 @@ function cases(empty = false) {
   return mockOk('cases', {
     cases: empty ? null : [
       { crime: N('pickpocketing', 'Pickpocketing'), city_code: 'calderis', city: 'Calderis', amount: 1500, status: 'investigating', remaining_seconds: 5400, thief: '', restored: 0 },
-      { crime: N('bag_snatching', 'Bag snatching'), city_code: 'calderis', city: 'Calderis', amount: 2200, status: 'solved', remaining_seconds: 0, thief: 'Reza', restored: 1700 },
+      { crime: N('bag_snatching', 'Bag snatching'), city_code: 'calderis', city: 'Calderis', amount: 2200, status: 'solved', remaining_seconds: 0, thief: 'رضا', restored: 1700 },
       { crime: N('mugging', 'Mugging'), city_code: 'support', city: 'Central City', amount: 900, status: 'unsolved', remaining_seconds: 0, thief: '', restored: 0 },
     ],
   }, [back('crime.hub'), refreshA('crime.cases')])

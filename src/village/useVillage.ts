@@ -6,7 +6,8 @@ import * as api from '../api/client'
 import type { CatalogueBuilding, CommandResponse } from '../api/types'
 import { useSession } from '../state/SessionContext'
 import { useToast } from '../state/ToastContext'
-import { getLang } from '../i18n'
+import { getLang, t } from '../i18n'
+import { usePlaceStage } from '../support/stage'
 import { refusalText } from '../i18n'
 import { getVillageStore, type VillageSnapshot, type VillageStore } from './villageStore'
 import { serverNow } from './clock'
@@ -122,11 +123,16 @@ export function useContentNames(): ContentNames {
     return () => { cancelled = true }
   }, [])
   const lang = getLang()
+  const stage = usePlaceStage()
   return useMemo(() => ({
     loaded: !!entries,
-    name: (tables, code, authored) => (entries ? contentName(entries, tables, code, authored) : authored || code),
+    name: (tables, code, authored) => {
+      // the budget's health line is the city hospital's price: in a village or a town the care place is the health house
+      if (code === 'hospital' && stage !== 'city' && (Array.isArray(tables) ? tables : [tables]).includes('budget_line')) return t('eco.budget.line.care_village')
+      return entries ? contentName(entries, tables, code, authored) : authored || code
+    },
   }), // eslint-disable-next-line react-hooks/exhaustive-deps
-  [entries, lang])
+  [entries, lang, stage])
 }
 
 // -- settlement building catalogue (footprints, names by language) ----------------------

@@ -38,6 +38,10 @@ const screens: ScreenSet = {
     health_home: HealthHome,
     inbox_hub: InboxHub,
     inbox_category: InboxCategory,
+    // the hubs also arrive as the answer of their command (a link, a back): the same layout draws them
+    activities_hub: ActivityHub,
+    economy_hub: EconomyHub,
+    society_hub: SocietyHub,
   },
   LOCAL: {
     activity_hub: ActivityHub,

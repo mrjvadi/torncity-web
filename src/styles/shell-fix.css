@@ -4,7 +4,9 @@
    the content by that band, so the bar meets the content directly. */
 .dock { margin-top: calc(-38 * var(--u)); position: relative; z-index: 6; pointer-events: none; }
 .dock .dock-tab, .dock .dock-bg { pointer-events: auto; }
-.nx-scroll, .screen-scroll, .ft-scroll { padding-bottom: calc(28px + var(--safe-b)); }
+/* the end of every scroll area clears the active tile's rise (the band the dock overlaps) with room to spare. The
+   .shell-main prefix wins over a screen's own padding rule (GenericScreen's inline style comes later in the cascade). */
+.shell-main .nx-scroll, .shell-main .screen-scroll, .shell-main .ft-scroll { padding-bottom: calc(38 * var(--u) + 10px + var(--safe-b)); }
 
 /* content scale: every direct child of a screen's scroll area is zoomed by
    --zs (lib/scale.ts), so type and cards grow with the shell canvas */

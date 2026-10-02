@@ -18,6 +18,7 @@ import { ConfirmPopup, byId, find, rest } from './kit'
 import { noticeLine, unavailableReason } from './wording'
 import '../native/bank.css'
 import { useSession } from '../../state/SessionContext'
+import { usePlaceStage, type Stage } from '../../support/stage'
 import { usePending, useStoreView, primaryWallet } from '../../state/useSync'
 import { entitiesOf } from '../../state/store'
 import { setOptimisticHint } from '../../state/optimistic'
@@ -266,7 +267,14 @@ function shares(ctx: FlowCtx, map: Record<string, number> | null, order: string[
   return codes.map((c) => t('eco.budget.share', { line: ctx.names.name(['budget_line'], c), share: pct((map?.[c] ?? 0) / 10000) })).join('، ')
 }
 
+/** What a budget line bought: the hospital's price is a health house's in a village or a town. */
+function effectText(effect: string, bps: number, stage: Stage): string {
+  const code = effect === 'hospital_price' && stage !== 'city' ? 'hospital_price_village' : effect
+  return hasKey(`eco.budget.effect.${code}`) ? t(key(`eco.budget.effect.${code}`), { share: pct(bps / 10000) }) : ''
+}
+
 const Budget = flow<BudgetView>(({ view: v, ctx }) => {
+  const stage = usePlaceStage()
   if (v.no_city) {
     return (
       <Page title={t('eco.budget.title_plain')} tone="gold">
@@ -296,7 +304,7 @@ const Budget = flow<BudgetView>(({ view: v, ctx }) => {
                 <div key={l.code} className="vf-line">
                   <span>{ctx.names.name(['budget_line'], l.code)}</span>
                   <b>{money(l.spent)}</b>
-                  <Hint>{hasKey(`eco.budget.effect.${l.effect}`) ? t(key(`eco.budget.effect.${l.effect}`), { share: pct(l.effect_bps / 10000) }) : ''}</Hint>
+                  <Hint>{effectText(l.effect, l.effect_bps, stage)}</Hint>
                 </div>
               ))}
             </div>
