@@ -231,7 +231,7 @@ export default function Shell() {
   const canBuild = !!layout?.viewer.can_place || !!layout?.viewer.resident
   const wip = useWip(layout, canBuild)
   const events = useEvents()
-  const quest = useQuest(settlementId, layout?.version)
+  const quest = useQuest()
   const ticker = useTicker()
   const place = placeTier(bootstrap) ?? 'village'
 
@@ -382,7 +382,7 @@ export default function Shell() {
           {showWorldChrome && (
             <QuestStrip
               quest={quest} ticker={ticker}
-              onQuest={() => run('settlement.promotion.view')} onTicker={() => run('inbox.show')}
+              onQuest={() => run(quest?.command ?? 'settlement.promotion.view')} onTicker={() => run('inbox.show')}
               ownRef={(e) => { els.current.info = e }}
             />
           )}

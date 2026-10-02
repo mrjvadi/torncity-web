@@ -15,6 +15,7 @@ import type {
 import { LIFE_CONTENT } from './mock_life'
 import { ACTIVITIES_CONTENT } from './mock_act_content'
 import { publishSettlement } from './settlementBus'
+import type { BuildingOverlay, ElectionData, GoalData } from '../state/syncTypes'
 import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
 
@@ -1450,6 +1451,58 @@ export function mockVillageSummary(): {
     layout_version: `${IS_HEAD ? 'h' : 'm'}${st.ver}`, treasury: st.treasury,
     knowledge: st.know.filter((k) => k.state === 'held').length,
   }
+}
+
+/** The server's per-viewer building overlay (settlement.buildings of state sync), as the mock village knows it: the head
+ * acts on the village's buildings, a resident on their own and on the shared ones they may use; a standing road has none. */
+export function mockBuildingOverlays(): BuildingOverlay[] {
+  init()
+  const out: BuildingOverlay[] = []
+  for (const b of st.buildings) {
+    if (b.type === 'road') continue
+    const e = CAT.find((c) => c.code === b.type) ?? citizenEntry(b.type)
+    const role = e?.role ?? ''
+    const manage = b.priv ? !!b.mine : IS_HEAD
+    const o: BuildingOverlay = { id: b.id, tier: b.type === 'civic_hall' ? 2 : 1, ...(role ? { role } : {}), status: 'working', reasons: [], can_upgrade: false, actions: ['info'] }
+    if (b.state === 'under_construction' || b.state === 'planned') {
+      o.status = 'building'
+      o.actions.push('help_build')
+      if (manage) o.actions.push('workers', 'cancel')
+    } else {
+      if (b.type === 'civic_hall') {
+        o.actions.push('treasury')
+        if (IS_HEAD) o.actions.push('research')
+        if (mockElection()) o.actions.push('elections')
+        if (manage) o.actions.push('upgrade') // the hall's next step waits for irrigation: the verb stays, the arrow does not
+      }
+      if (role === 'education' && manage) {
+        o.actions.push('upgrade')
+        const sc = CAT.find((c) => c.code === 'school')!
+        o.can_upgrade = unmet(sc).length === 0 && st.treasury >= sc.cost
+      }
+      if (b.type === 'woodcutter_camp') { o.staff = { have: 0, need: 3 }; o.status = 'idle'; o.reasons = ['no_staff']; o.actions.push('take_shift') }
+      if (manage && b.type !== 'civic_hall') o.actions.push('demolish')
+    }
+    out.push(o)
+  }
+  return out
+}
+
+const MOCK_T0 = Date.now()
+
+/** The open election of the village: the mock has one, ending in two hours (`?election=0` has none). */
+export function mockElection(): ElectionData | null {
+  try { if (new URLSearchParams(location.search).get('election') === '0') return null } catch { /* none */ }
+  return { office: 'village_head', opens_at: new Date(MOCK_T0 - 86_400_000).toISOString(), candidacy_ends_at: new Date(MOCK_T0 + 40 * 60_000).toISOString(), voting_ends_at: new Date(MOCK_T0 + 2 * 3_600_000).toISOString() }
+}
+
+/** The next goal the server would send: the first unmet promotion goal (a mission would come first when one is running). */
+export function mockGoal(): GoalData | null {
+  init()
+  const p = promotionView()
+  const c = (p.criteria ?? []).find((x) => !x.met)
+  if (!c) return p.can_promote ? { code: 'promotion.ready', args: { from: p.from, to: p.to }, progress: 1, target: 1, go_to: 'settlement:promotion.view' } : null
+  return { code: `promotion.${c.kind}`, args: { from: p.from, to: p.to, ...(c.role ? { role: c.role } : {}) }, progress: c.current, target: c.required, go_to: 'settlement:promotion.view' }
 }
 
 /** A change the settlement channel never announced (its publication was lost): only the

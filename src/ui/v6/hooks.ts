@@ -5,7 +5,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import * as api from '../../api/client'
 import type { ProfileView, VillageLayout } from '../../api/types'
-import type { PromotionView } from '../../api/views.gen'
 import { entitiesOf, entityOf } from '../../state/store'
 import { meterNow, useStoreView, useTick } from '../../state/useSync'
 import { useSession } from '../../state/SessionContext'
@@ -133,45 +132,56 @@ export function useWip(layout: VillageLayout | null, canBuild: boolean): WipSlot
 
 export interface EventSlot { key: string; icon: string; label: string; time: string; tip: string; open: { command?: string; local?: string } }
 
-/** The right column: time-limited events only. What the server sends today: the village's research with its end
- * time (the settlement entity). Elections and market days are not sent yet. */
+/** The right column: time-limited events only, each with the end time the server sends in the settlement entity:
+ * the village's research, and the open election (the candidacy, then the vote). Market days do not exist in the game
+ * yet, so none is shown. */
 export function useEvents(): EventSlot[] {
   const view = useStoreView()
   const now = useTick(1000)
   const out: EventSlot[] = []
-  const res = entitiesOf(view, 'settlement')[0]?.[1]?.research
+  const mine = entityOf(view, 'residence', 'self')?.settlement
+  const st = (mine ? entityOf(view, 'settlement', mine) : undefined) ?? entitiesOf(view, 'settlement').find(([, d]) => d.viewer !== 'public')?.[1]
+  const res = st?.research
   if (res?.finish_at) {
     const s = (Date.parse(res.finish_at) - now) / 1000
     if (s > 0) out.push({ key: 'research', icon: 'book', label: t('v6.ev.research'), time: waitText(s, t('v6.day')), tip: t('v6.tip.research', { t: waitText(s, t('v6.day')) }), open: { local: 'village_knowledge' } })
+  }
+  const el = st?.election
+  if (el) {
+    const cand = (Date.parse(el.candidacy_ends_at) - now) / 1000
+    const vote = (Date.parse(el.voting_ends_at) - now) / 1000
+    const phase = cand > 0 ? 'candidacy' : 'voting'
+    const s = phase === 'candidacy' ? cand : vote
+    if (s > 0) {
+      const when = waitText(s, t('v6.day'))
+      out.push({ key: 'election', icon: 'ballot', label: t('v6.ev.election'), time: when, tip: t(`v6.tip.election.${phase}` as Key, { t: when }), open: { command: 'election.list' } })
+    }
   }
   return out
 }
 
 // -- quest strip + ticker -------------------------------------------------------------------------------
 
-export interface Quest { text: string; prog: string; done: boolean }
+/** `command` is the screen the goal points at (the server's `go_to` address, ':' read as '.'). */
+export interface Quest { text: string; prog: string; done: boolean; command: string }
 
-/** The quest strip's sentence: the next unmet goal of the village's promotion (settlement.promotion.view), one
- * imperative sentence with its progress; green when every goal is met. Gone when the server has no promotion for me. */
-export function useQuest(settlementId: string | undefined, layoutVersion: string | undefined): Quest | null {
-  const [q, setQ] = useState<Quest | null>(null)
-  useEffect(() => {
-    if (!settlementId) { setQ(null); return }
-    let cancelled = false
-    void api.runCommand('settlement.promotion.view', {}).then((r) => {
-      if (cancelled) return
-      const v = r.ok !== false ? (r.view as unknown as PromotionView | undefined) : undefined
-      if (!v) { setQ(null); return }
-      const crit = (v.criteria ?? []).find((c) => !c.met)
-      if (!crit) { setQ({ text: t(v.can_promote ? 'v6.q.ready_head' : 'v6.q.ready_member'), prog: '', done: true }); return }
-      setQ(questOf(crit))
-    }).catch(() => { if (!cancelled) setQ(null) })
-    return () => { cancelled = true }
-  }, [settlementId, layoutVersion])
-  return q
+/** The quest strip's sentence: the server's next goal (the `goal` entity of state sync: a mission I took, else the
+ * village's next unmet promotion goal), one imperative sentence with its progress; green when ready. Nothing when the
+ * server sends no goal. */
+export function useQuest(): Quest | null {
+  const view = useStoreView()
+  const g = entityOf(view, 'goal', 'self')
+  if (!g) return null
+  const [source, kind = ''] = g.code.split('.')
+  const command = g.go_to.replace(':', '.')
+  if (source === 'promotion' && kind === 'ready') return { text: t('v6.q.ready_head'), prog: '', done: true, command }
+  if (source === 'promotion') return { ...questOf({ kind, role: g.args.role ?? '', current: g.progress, required: g.target }), command }
+  const k = `v6.q.mission.${kind}`
+  const text = hasKey(k) ? t(k as Key, { req: faNum(g.target) }) : t('v6.q.mission')
+  return { text, prog: `${fa(g.progress)}/${fa(g.target)}`, done: false, command }
 }
 
-function questOf(c: { kind: string; role: string; current: number; required: number }): Quest {
+function questOf(c: { kind: string; role: string; current: number; required: number }): Omit<Quest, 'command'> {
   const pct = c.required > 0 ? Math.min(100, Math.floor((c.current / c.required) * 100)) : 0
   switch (c.kind) {
     case 'residents': return { text: t('v6.q.residents', { req: faNum(c.required) }), prog: `${fa(c.current)}/${fa(c.required)}`, done: false }

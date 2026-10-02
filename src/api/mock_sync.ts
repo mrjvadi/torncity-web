@@ -14,7 +14,7 @@
 
 import { syncStore } from '../state/store'
 import type { SyncDifference, SyncKind, SyncPublication, SyncRecord, SyncSnapshot } from '../state/syncTypes'
-import { mockVillageQuietChange, mockVillageSummary } from './mock_village'
+import { mockBuildingOverlays, mockElection, mockGoal, mockVillageQuietChange, mockVillageSummary } from './mock_village'
 
 const PLAYER = 'mock-1'
 let EPOCH = '1'
@@ -110,12 +110,15 @@ function init(): void {
   put('residence', 'self', { settlement: s.id, code: s.code, name: s.name, tier: s.tier, is_head: s.viewer === 'head', resident: true })
   put('settlement', s.id, summaryData())
   put('relations', 'self', { friends: [], faction: null, presence: 'everyone' })
+  const g = mockGoal()
+  if (g) put('goal', 'self', g)
 }
 
 function summaryData(): unknown {
   const s = mockVillageSummary()
   return { id: s.id, code: s.code, name: s.name, tier: s.tier, viewer: s.viewer, grid_lots: s.grid_lots, layout_version: s.layout_version,
-    treasury: { currency: 'SUP', balance: s.treasury }, knowledge: s.knowledge, research: s.research }
+    treasury: { currency: 'SUP', balance: s.treasury }, knowledge: s.knowledge, research: s.research,
+    election: mockElection(), buildings: mockBuildingOverlays() }
 }
 
 /** GET /state */
@@ -142,9 +145,14 @@ export function mockUpdates(since: number, epoch: string): SyncDifference {
 
 function refreshSettlement(cause?: string): SyncRecord | null {
   const s = mockVillageSummary()
-  const cur = byKind('settlement').get(s.id)?.d as { layout_version?: string; treasury?: { balance: number } } | undefined
-  if (cur && cur.layout_version === s.layout_version && cur.treasury?.balance === s.treasury) return null
-  return put('settlement', s.id, summaryData(), cause)
+  const cur = byKind('settlement').get(s.id)?.d
+  const next = summaryData()
+  if (cur && JSON.stringify(cur) === JSON.stringify(next)) return null
+  // the goal follows the village (its promotion progress); its record goes out with the summary's
+  const g = mockGoal(), had = byKind('goal').get('self')
+  if (g && JSON.stringify(had?.d) !== JSON.stringify(g)) publish([put('goal', 'self', g, cause)])
+  else if (!g && had) { const r = drop('goal', 'self', cause); if (r) publish([r]) }
+  return put('settlement', s.id, next, cause)
 }
 
 /** A command's effect on the player's state, and its own records on the answer. */
