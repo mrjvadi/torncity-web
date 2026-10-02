@@ -53,7 +53,7 @@ const Studio = flow<StudioView>(({ view: v, ctx }) => {
           <div style={col}>
             {(v.kinds ?? []).map((k) => {
               const a = news.find((x) => x.args?.item === k.code)
-              return <ListRow key={k.code} icon="plus" palette="violet" title={nameOf(ctx, TABLES.item, k)} onClick={a ? () => ctx.go(a) : undefined} />
+              return <ListRow key={k.code} icon="quill" palette="gold" title={nameOf(ctx, TABLES.item, k)} onClick={a ? () => ctx.go(a) : undefined} />
             })}
           </div>
         </>
@@ -125,7 +125,7 @@ const Design = flow<DesignView>(({ view: v, ctx }) => {
     const a = ctx.acts.find((x) => x.id === 'production.slot' && x.args?.slot === s.slot)
     const filled = !!s.component.code
     return (
-      <ListRow key={s.slot} icon={filled ? 'check' : 'm_stop'} palette={filled ? 'emerald' : s.optional ? 'steel' : 'gold'} title={slotName(ctx, s.slot)}
+      <ListRow key={s.slot} icon={filled ? 'check' : 'quill'} palette={filled ? 'emerald' : s.optional ? 'steel' : 'gold'} title={slotName(ctx, s.slot)}
         sub={filled ? `${nameOf(ctx, TABLES.component, s.component)} - ${unitQty(s.unit, s.qty)}` : t(s.optional ? 'co.design.slot_optional' : 'co.design.slot_empty')}
         onClick={draft && a ? () => ctx.go(a) : undefined} />
     )
@@ -263,7 +263,7 @@ const Tech = flow<TechView>(({ view: v, ctx }) => {
         <Facts rows={[
           { label: t('co.tech.cost'), value: money(v.cost), gold: true },
           { label: t('co.tech.time'), value: roughDuration(v.time_seconds) },
-          ...(v.skill ? [{ label: t('co.tech.skill'), value: t('co.tech.skill_value', { skill: skillLevel(ctx.names, v.skill, v.level), best: formatNumber(v.best) }) }] : []),
+          ...(v.skill ? [{ label: t('co.tech.skill'), value: skillLevel(ctx.names, v.skill, v.level) }, { label: t('co.tech.best'), value: t('common.level', { n: formatNumber(v.best) }) }] : []),
           ...(v.sold > 0 ? [{ label: t('co.tech.sold'), value: formatNumber(v.sold) }] : []),
         ]} />
         {(v.requires ?? []).length > 0 && <Checks lines={(v.requires ?? []).map((r) => ({ label: t('co.tech.requires', { tech: namedOf(ctx.names, TABLES.tech, r.tech) }), met: r.met }))} />}
@@ -333,7 +333,7 @@ const ReverseLab = flow<ReverseLabView>(({ view: v, ctx }) => {
             {(v.jobs ?? []).map((j) => {
               const open = j.result_no > 0 ? ctx.acts.find((a) => a.id === 'production.design' && a.args?.no === String(j.result_no)) : undefined
               return (
-                <ListRow key={j.no} icon={j.status === 'running' ? 'clock' : j.status === 'succeeded' ? 'check' : 'm_stop'} palette={j.status === 'running' ? 'gold' : j.status === 'succeeded' ? 'emerald' : 'ruby'}
+                <ListRow key={j.no} icon={j.status === 'running' ? 'clock' : j.status === 'succeeded' ? 'check' : 'close'} palette={j.status === 'running' ? 'gold' : j.status === 'succeeded' ? 'emerald' : 'ruby'}
                   title={goodName(ctx.names, j.good)}
                   sub={j.status === 'running' ? t('co.relab.job_running', { time: clockText(j.finish_at), duration: left(j.left_seconds) })
                     : j.status === 'succeeded' ? t('co.relab.job_ok', { result: j.result }) : t('co.relab.job_failed')}

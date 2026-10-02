@@ -157,11 +157,11 @@ const Produce = flow<ProduceView>(({ view: v, ctx }) => {
       {v.bought > 0 && <Notice>{t('co.produce.bought', { total: money(v.bought) })}</Notice>}
       <Panel>
         {batch > 0 && <Hint>{t('co.produce.batch', { batch: formatNumber(batch) })}</Hint>}
-        <Lead>{t('co.produce.recipe')}</Lead>
+        <Lead>{t(v.qty > 0 ? 'co.produce.recipe_order' : 'co.produce.recipe')}</Lead>
         <div style={col}>
           {(v.recipe ?? []).map((r) => {
             const ok = r.have >= (v.qty > 0 ? r.need : r.per)
-            return <ListRow key={r.component.code} icon={ok ? 'check' : 'm_stop'} palette={ok ? 'emerald' : 'ruby'} title={nameOf(ctx, TABLES.component, r.component)}
+            return <ListRow key={r.component.code} icon={ok ? 'check' : 'close'} palette={ok ? 'emerald' : 'ruby'} title={nameOf(ctx, TABLES.component, r.component)}
               sub={v.qty > 0 ? t('co.produce.need', { need: formatNumber(r.need), have: formatNumber(r.have) }) : t('co.produce.per', { per: formatNumber(r.per), have: formatNumber(r.have) })} />
           })}
         </div>

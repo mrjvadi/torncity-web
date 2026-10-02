@@ -85,8 +85,8 @@ const ask = (a: MockAct, field: string, text = false): MockAct => ({ ...a, input
 
 const mineLines = (): CompanyLine[] => [line(OWN, true, 4, 3, 1), line(WORK, false, 3, 5, 2)]
 
-function refusal(screen: 'company_refusal' | 'production_refusal' | 'recruit_refusal', area: string, kind: string, view: Record<string, unknown>, backA: MockAct) {
-  return { ok: false, request_id: 'mock', screen, view, error: { code: `${area}_${kind}` }, actions: [backA] }
+function refusal(screen: 'company_refusal' | 'production_refusal' | 'recruit_refusal', area: string, kind: string, view: Record<string, unknown>, backA: MockAct | MockAct[]) {
+  return { ok: false, request_id: 'mock', screen, view, error: { code: `${area}_${kind}` }, actions: Array.isArray(backA) ? backA : [backA] }
 }
 
 const company = (code: string) => String(code || OWN.code)
@@ -167,7 +167,7 @@ const period: CompanyPeriodSummary = {
 function manage(code: string) {
   const ref = refOf(code)
   const owner = ref.code !== WORK.code
-  const step: NextStep = { kind: 'sell', good: bread, qty: 0, batch: 0, total: 0, component: N('', ''), item: N('', ''), tech: N('', ''), design_no: 0, design_name: '', finish_at: null, left_seconds: 0, can_research: owner }
+  const step: NextStep = { kind: 'buy_goods', good: bread, qty: 0, batch: 0, total: 0, component: N('flour', 'آرد'), item: N('', ''), tech: N('', ''), design_no: 0, design_name: '', finish_at: null, left_seconds: 0, can_research: owner }
   const v: CompanyManageView = {
     ref, clinic: false, city_code: 'calderis', city: city.name, owner, manager: owner ? null : ME, balance: co.balance, reserved: 300, available: co.balance - 300, debt: 0, upkeep: 600, arrears: 0, grace: 3,
     price_bps: co.priceBps, price_min: 8000, price_max: 13000, price_step: 500, staff: 3, max_staff: 8, openings: 2, pending: co.applications.length, auto_accept: co.auto,
@@ -176,7 +176,7 @@ function manage(code: string) {
   }
   co.notice = null
   return mockOk('company_manage', v, [
-    primary('production.step_sell', 'company.sell', { company: ref.code, target: target(bread) }, 'bread'),
+    primary('production.step_buy_goods', 'company.goods'),
     ask(A('company.deposit_cash', 'company.deposit', { company: ref.code, method: 'cash' }, { kind: 'primary' }), 'amount'),
     ask(A('company.deposit_card', 'company.deposit', { company: ref.code, method: 'card' }, { kind: 'primary' }), 'amount'),
     ...(owner ? [ask(primary('company.withdraw', 'company.withdraw', { company: ref.code }), 'amount')] : []),
@@ -247,7 +247,7 @@ function warehouse(code: string) {
     { good: flour, qty: 40, quality: 0, listed: 0, sellable: false },
     { good: dough, qty: 6, quality: 0, listed: 0, sellable: true },
   ]
-  return mockOk('warehouse', { ref, lines, running: co.ordered ? 1 : 0, researching: co.researched, listings: co.listed ? 1 : 0, can_research: true, next }, [
+  return mockOk('warehouse', { ref, lines, running: co.ordered ? 1 : 0, researching: true, listings: co.listed ? 1 : 0, can_research: true, next }, [
     primary('production.step_sell', 'company.sell', { company: ref.code, target: target(bread) }, 'bread'),
     act('production.sell', 'company.sell', { company: ref.code, target: target(bread) }, 'bread'), act('production.sell', 'company.sell', { company: ref.code, target: target(dough) }, 'dough'),
     act('production.suppliers', 'company.suppliers', { company: ref.code }), act('production.orders', 'company.orders', { company: ref.code }),
@@ -415,13 +415,14 @@ function improvement(no: number, slot: string, started: boolean) {
 
 const techs = (): TechLine[] => [
   { tech: N('fermentation', 'تخمیر'), state: 'owned', mode: co.mode, price: 500, cost: 1500, missing: null, offers: 0 },
-  { tech: N('oven_craft', 'کوره‌کاری'), state: co.researched ? 'running' : 'available', mode: '', price: 0, cost: 2200, missing: null, offers: 1 },
+  { tech: N('oven_craft', 'کوره‌کاری'), state: 'running', mode: '', price: 0, cost: 2200, missing: null, offers: 1 },
+  { tech: N('steel', 'فولادسازی'), state: 'available', mode: '', price: 0, cost: 2600, missing: null, offers: 1 },
   { tech: N('pastry', 'شیرینی‌پزی'), state: 'locked', mode: '', price: 0, cost: 3000, missing: [N('oven_craft', 'کوره‌کاری')], offers: 0 },
 ]
 
 function lab(code: string) {
   const ref = refOf(code)
-  return mockOk('lab', { ref, available: co.balance - 300, running: co.researched ? { tech: N('oven_craft', 'کوره‌کاری'), finish_at: LATER, left_seconds: 7200 } : null, techs: techs(), hidden: 2 },
+  return mockOk('lab', { ref, available: co.balance - 300, running: { tech: N('oven_craft', 'کوره‌کاری'), finish_at: LATER, left_seconds: 7200 }, techs: techs(), hidden: 2 },
     [...techs().map((x) => act('production.tech', 'company.lab', { company: ref.code, tech: x.tech.code }, x.tech.code)), back('company.warehouse', { company: ref.code }), refreshA('company.lab', { company: ref.code })])
 }
 
@@ -588,7 +589,10 @@ export function mockCompaniesCommand(command: string, args: Record<string, unkno
     case 'company.decide': co.applications = []; return staff(OWN.code, { ...args, decided: true })
     case 'company.fire': return staff(company(a('company')), args)
     case 'company.opening': return opening(num('no'))
-    case 'company.apply': return mockOk('company_applied', { company: WORK, job: num('no') === 12 ? SELLER : BAKER }, [act('job.openings', 'job.list'), act('company.page', 'company.view', { code: WORK.code }), back('player.profile.get')])
+    case 'company.apply':
+      // a player who already has a job cannot take a second one (the company refusal of the area, reached by an opening)
+      if (num('no') === 12) return refusal('company_refusal', 'company', 'employed', { kind: 'employed', ref: WORK, need: 0, have: 0, min: 0, max: 0, city_code: '', city: '' }, back('company.view', { code: WORK.code }))
+      return mockOk('company_applied', { company: WORK, job: num('no') === 12 ? SELLER : BAKER }, [act('job.openings', 'job.list'), act('company.page', 'company.view', { code: WORK.code }), back('player.profile.get')])
     case 'company.warehouse': return warehouse(company(a('company')))
     case 'company.suppliers': return suppliers(company(a('company')), false)
     case 'company.supply': {
@@ -619,7 +623,11 @@ export function mockCompaniesCommand(command: string, args: Record<string, unkno
     case 'military.kitbuy':
       return mockOk('kit_purchase', { bought: a('confirm') === 'yes', seller: 'کارگاه فولاد پارس', country: 'default_country' }, [act('military.procure', 'military.procure', { country: 'default_country' })])
     case 'company.lab': return a('tech') ? tech(company(a('company')), a('tech'), args) : lab(company(a('company')))
-    case 'company.research': co.researched = true; return lab(company(a('company')))
+    case 'company.research':
+      // the lab runs one research at a time and the engineer lacks the craft: the production refusal of the area, with the way to close the gap
+      return refusal('production_refusal', 'production', 'skill', { kind: 'skill', ref: OWN, back: { command: 'company.lab', args: [OWN.code, a('tech')] }, skill: 'chemistry', level: 4, have: 2, techs: null, shortages: null, need: 0, have_money: 0, max: 0,
+        city_code: 'calderis', city: city.name, gap: { company: OWN.code, skill: 'chemistry', level: 4, courses: [{ code: 'baking101', name: 'مبانی نانوایی' }] } },
+      [act('recruit.gap', 'company.rnew', { company: OWN.code, skill: 'chemistry', level: '4' }, 'chemistry'), act('recruit.course', 'education.view', { course: 'baking101' }, 'baking101'), back('company.lab', { company: OWN.code, tech: a('tech') })])
     case 'company.techmode': return tech(company(a('company')), a('tech'), args)
     case 'company.license': return lab(company(a('company')))
     case 'company.relab': return reverseLab(company(a('company')), {})

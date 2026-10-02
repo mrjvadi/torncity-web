@@ -3192,7 +3192,7 @@ co.type.careers | استخدام در رشتهٔ | Hires for
 co.type.max_staff | حداکثر کارکنان | Most staff
 co.type.fee | هزینهٔ ثبت | Registration fee
 co.type.upkeep | هزینهٔ نگهداری | Upkeep
-co.type.upkeep_value | {amount} در هر دوره (هر دوره {period}) | {amount} per period (a period lasts {period})
+co.type.upkeep_value | {amount} هر {period} | {amount} every {period}
 co.type.explain | درآمد شرکت از خرید مردم شهر می‌آید. هر شیفتی که کارکنان کار کنند، ظرفیت و کیفیت شرکت را بالا می‌برد و دستمزدشان از حساب شرکت پرداخت می‌شود. | The company earns from what the townspeople buy. Every shift its staff work raises its capacity and quality, and their wages come out of the company's account.
 co.type.no_place | در {city} جایی به نام {place} نیست و این نوع شرکت اینجا ثبت نمی‌شود. | There is no {place} in {city}, so this kind of company cannot be registered here.
 co.type.defence | این نوع شرکت مجوز دفاعی می‌خواهد. | This kind of company needs a defence licence.
@@ -3302,7 +3302,7 @@ co.step.sell | {good} در انبار دارید؛ عرضه‌اش کنید تا
 co.step.produce | مواد لازم آماده است؛ {qty} {good} بسازید. | The inputs are ready; make {qty} {good}.
 co.step.producing | {qty} {good} در حال ساخت است و ساعت {time} آماده می‌شود، {duration}. | {qty} {good} is being made and will be ready at {time}, {duration}.
 co.step.supply | برای ساختن {good}، مواد اولیه را یک‌جا از تأمین‌کننده بخرید؛ جمعاً {total}. | To make {good}, buy the raw inputs from the suppliers in one go; {total} in all.
-co.step.buy_goods | برای ساختن {good} به {component} نیاز دارید که شرکت‌های دیگر می‌سازند؛ از کالای شرکت‌ها بخرید. | To make {good} you need {component}, which other companies make; buy it from company goods.
+co.step.buy_goods | برای ساختن {good} به {component} نیاز دارید که شرکت‌های دیگر می‌سازند؛ آن را از آن‌ها بخرید. | To make {good} you need {component}, which other companies make; buy it from them.
 co.step.research | برای رشد شرکت، فناوری {tech} را تحقیق کنید تا {item} باز شود. | To grow the company, research {tech} to unlock {item}.
 co.step.design_next | حالا می‌توانید {item} را طراحی کنید. | You can now design {item}.
 co.stepbtn.design_first | طراحی اولین محصول | Design the first product
@@ -3354,6 +3354,7 @@ co.produce.title | تولید {good} | Make {good}
 co.produce.kit_title | ساخت کیت ارتقای {good} | Make an upgrade kit for {good}
 co.produce.batch | هر نوبت تولید {batch} واحد می‌دهد. | One batch makes {batch} units.
 co.produce.recipe | مواد لازم برای هر واحد | Inputs per unit
+co.produce.recipe_order | مواد لازم این سفارش | Inputs for this order
 co.produce.per | {per} واحد، در انبار {have} | {per} units, {have} in stock
 co.produce.need | {need} واحد، در انبار {have} | {need} units, {have} in stock
 co.produce.choose | چند واحد تولید شود؟ با موجودی فعلی انبار تا {max} می‌شود. | How many? With today's stock you can make up to {max}.
@@ -3476,7 +3477,7 @@ co.tech.is.locked | هنوز پیش‌نیازهای این فناوری را ن
 co.tech.cost | هزینهٔ تحقیق | Research cost
 co.tech.time | مدت | Duration
 co.tech.skill | مهارت لازم | Skill needed
-co.tech.skill_value | {skill}؛ بهترین فرد شرکت: سطح {best} | {skill}; best in the company: level {best}
+co.tech.best | بهترین فرد شرکت | Best in the company
 co.tech.sold | لایسنس‌های فروخته‌شده | Licenses sold
 co.tech.requires | پیش‌نیاز: {tech} | Needs: {tech}
 co.tech.unlocks | ساخت و طراحی با این: {components} | Lets you make and design with: {components}
@@ -3610,7 +3611,7 @@ co.sp.dismiss_body | همکاری با {name} تمام شود؟ پاداش‌ه�
 co.sp.notice.renewed | قرارداد {name} تمدید شد. | {name}'s contract was renewed.
 co.sp.notice.raised | حقوق {name} هم‌سطح بازار شد. | {name}'s pay now matches the market.
 co.sp.notice.dismissed | همکاری با {name} تمام شد. | The contract with {name} is over.
-co.gap.hire | کسی در شرکت {skill} ندارد. می‌توانید متخصص جذب کنید یا خودتان در یک دورهٔ آموزشی آن را یاد بگیرید. | Nobody in the company has {skill}. You can recruit a specialist or learn it yourself in a course.
+co.gap.hire | می‌توانید متخصص جذب کنید یا خودتان در یک دورهٔ آموزشی آن را یاد بگیرید. | You can recruit a specialist or learn it yourself in a course.
 # refusals: the kind a refused request carries
 co.refused.title | نشد | Not possible
 co.refused.shortage_line | {component}: {need} واحد لازم است و {have} واحد دارید | {component}: {need} units needed, you have {have}
@@ -3785,7 +3786,7 @@ co.act.recruit.new | کارزار تازه | New campaign
 co.act.recruit.specialists | متخصصان شرکت | The company's specialists
 co.act.recruit.campaign | دیدن کارزار | See the campaign
 co.act.recruit.section_skill | مهارت و سطح | Skill and level
-co.act.recruit.section_cities | شهرها | Cities
+co.act.recruit.section_cities | انتخاب شهرها | Pick the cities
 co.act.recruit.section_pay | حقوق و مزایا | Pay and benefits
 co.act.recruit.section_terms | قرارداد و سهام | Contract and shares
 co.act.recruit.post | انتشار آگهی | Publish the advert
