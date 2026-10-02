@@ -30,7 +30,7 @@ function materialLine(m: PrivateMaterialView, names: ContentNames): string {
 
 /** The line of a requirements block that says how a road reaches the lot. */
 function roadLine(a: LotAccess): RequirementLine {
-  const base = { icon: 'cart', palette: 'amber' as const, label: t('citizen.access.req') }
+  const base = { icon: 'road', palette: 'amber' as const, label: t('citizen.access.req') }
   switch (a.kind) {
     case 'road':
       return { ...base, state: 'met', detail: t('citizen.access.road') }
@@ -49,7 +49,7 @@ function NearbyLots({ lots, onPick, busy }: { lots: LotNearby[] | null; onPick: 
   return (
     <>
       <Section>{t('citizen.access.nearby')}</Section>
-      {list.length === 0 && <Note>{t('citizen.access.nearby_none')}</Note>}
+      {list.length === 0 ? <Note>{t('citizen.access.nearby_none')}</Note> : <Note>{t('citizen.access.nearby_hint')}</Note>}
       <div className="vc-list">
         {list.map((n) => (
           <button key={`${n.x}-${n.y}`} className="vc-line" disabled={busy} onClick={() => onPick({ x: n.x, y: n.y })}>
@@ -59,6 +59,7 @@ function NearbyLots({ lots, onPick, busy }: { lots: LotNearby[] | null; onPick: 
               <span className="vc-line-sub">{n.access.kind === 'road' ? t('citizen.access.road') : t('citizen.access.needs_road', { n: n.access.roads })}</span>
             </span>
             {n.access.cost > 0 && <span className="vc-line-price">{money(n.access.cost)}</span>}
+            <span className="vc-chev" aria-hidden="true">‹</span>
           </button>
         ))}
       </div>
@@ -155,7 +156,7 @@ export function BuyLotSheet({ lot, price, onClose, store, onOther }: {
               total={{ label: view && !done ? t('citizen.buy.after') : undefined, amount: view && !done ? money(view.cash - total) : money(total) }}
             />
           )}
-          {!done && access && access.cost > 0 && !none && <Note>{carve ? t('citizen.access.carve_note', { n: carved }) : t('citizen.access.road_note')}</Note>}
+          {!done && access && access.cost > 0 && !none && <Note>{carve ? t('citizen.access.carve_chosen', { n: view?.access.carved?.length ?? carved }) : t('citizen.access.road_note')}</Note>}
           {!done && !none && !(access && access.cost > 0) && <Note>{t('citizen.buy.note')}</Note>}
           {!done && none && (
             <>
@@ -226,7 +227,7 @@ export function LotAccessSheet({ lot, initial, onClose, store, onDone }: {
   if (view && a && a.kind !== 'road') {
     if (canConnect) choices.push({ id: 'connect', label: t('citizen.fix.connect', { p: money(a.cost) }), note: t('citizen.access.road_note'), tone: 'green', short: view.cash < a.cost })
     if (view.carve) choices.push({ id: 'carve', label: t('citizen.fix.carve', { n: carved, p: money(view.carve.cost) }), note: t('citizen.access.carve_note', { n: carved }), tone: 'gold', short: view.cash < view.carve.cost })
-    if (view.refund > 0) choices.push({ id: 'refund', label: t('citizen.fix.refund', { p: money(view.refund) }), note: t('citizen.fix.refund_note'), tone: 'red', short: false })
+    if (view.refund > 0) choices.push({ id: 'refund', label: t('citizen.fix.refund', { p: money(view.refund) }), note: t('citizen.fix.refund_note', { p: money(view.refund) }), tone: 'red', short: false })
   }
   const chosen = choices.find((c) => c.id === ask)
 
@@ -237,7 +238,7 @@ export function LotAccessSheet({ lot, initial, onClose, store, onDone }: {
         ? (
           <ActionRow>
             <ActionButton tone="steel" small onClick={() => setAsk(null)} disabled={busy}>{t('citizen.build.back')}</ActionButton>
-            <ActionButton tone={chosen.tone === 'red' ? 'red' : 'green'} onClick={() => void run(chosen.id)} disabled={busy || chosen.short} reason={chosen.short ? t('citizen.buy.no_cash') : undefined}>{t('citizen.fix.sure')}</ActionButton>
+            <ActionButton tone={chosen.tone === 'red' ? 'red' : 'green'} onClick={() => void run(chosen.id)} disabled={busy || chosen.short} reason={chosen.short ? t('citizen.buy.no_cash') : undefined}>{chosen.id === 'connect' ? t('citizen.fix.sure') : t(`citizen.fix.sure_${chosen.id}` as Key)}</ActionButton>
           </ActionRow>
         )
         : <ActionButton tone="steel" onClick={onClose}>{t('common.close')}</ActionButton>)}
@@ -249,14 +250,14 @@ export function LotAccessSheet({ lot, initial, onClose, store, onDone }: {
           {view && (
             <>
               {view.building?.code && <Note tone="bad">{t('citizen.access.refused', { name: view.building.name || view.building.code })}</Note>}
-              <RequirementList lines={a ? [roadLine(a)] : []} />
+              {ask !== 'refund' && <RequirementList lines={a ? [roadLine(a)] : []} />}
               {a?.kind === 'road' && <Note tone="good">{t('citizen.fix.ok')}</Note>}
               {a?.kind === 'none' && <Note tone="bad">{t('citizen.fix.none')}</Note>}
               {!chosen && choices.length > 0 && (
                 <div className="vc-list">
                   {choices.map((c) => (
                     <button key={c.id} className="vc-line" disabled={busy} onClick={() => setAsk(c.id)}>
-                      <Emboss name={c.id === 'refund' ? 'money' : 'cart'} palette={c.id === 'refund' ? 'ruby' : 'gold'} size={34} />
+                      <Emboss name={c.id === 'refund' ? 'money' : 'road'} palette={c.id === 'refund' ? 'ruby' : 'gold'} size={34} />
                       <span className="vc-line-text"><span className="vc-line-name">{c.label}</span></span>
                     </button>
                   ))}

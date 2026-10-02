@@ -14,7 +14,7 @@ export const ICON_NAMES = new Set([
   'm_brief', 'm_chat', 'm_check', 'm_coffee', 'medal', 'menu', 'm_hand', 'missile', 'missions',
   'm_lock', 'm_meal', 'money', 'mood', 'moon', 'm_popcorn', 'm_search', 'm_stop', 'nerve', 'ore',
   'person', 'phone', 'pill', 'pistol', 'plane', 'plus', 'podium', 'quill', 'radar', 'rank', 'ribbon',
-  'rifle', 'ring', 'shield', 'sleepy', 'society', 'soda', 'stetho', 'stopwatch', 'study', 'sun',
+  'rifle', 'ring', 'road', 'shield', 'sleepy', 'society', 'soda', 'stetho', 'stopwatch', 'study', 'sun',
   'swords', 'tag', 'tank', 'tent', 'toaster', 'trade', 'train', 'trophy', 'u_airforce', 'u_ammo',
   'u_antiship', 'u_artillery', 'u_ballistic', 'u_bomber', 'u_bomb', 'u_carrier', 'u_cruise',
   'u_drone', 'u_fighter', 'u_fort', 'u_frigate', 'u_helmet', 'u_ifv', 'u_radar', 'u_sam', 'u_stealth',

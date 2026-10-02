@@ -73,6 +73,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [landOn, resident, layoutVersion])
+  // a lot picked for purchase is framed and outlined on the map
+  useEffect(() => {
+    const sc = sceneRef.current
+    if (!sceneReady || !sc) return
+    if (buyLot) { sc.frame('lot', buyLot); sc.setSelection({ x: buyLot.x, y: buyLot.y, w: 1, h: 1, ok: true }) } else sc.setSelection(null)
+  }, [buyLot, sceneReady])
   useEffect(() => {
     if (!sceneReady) return
     sceneRef.current?.setOverlayTones(landOn && layout && build.state.step === 'off' ? tonesForLand(layout, access) : null)
@@ -281,12 +287,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
                 <button className="vh-x" onClick={() => setLandOn(false)} aria-label={t('citizen.land.exit')}>✕</button>
               </div>
               <div className="vh-legend">
-                <span><i className="vh-dot" style={{ background: '#40d96b' }} />{t('citizen.legend.free')}{layout?.terms ? ` · ${money(layout.terms.lot_price)}` : ''}</span>
-                <span><i className="vh-dot" style={{ background: '#fbf24d' }} />{t('citizen.legend.needs')}</span>
-                <span><i className="vh-dot" style={{ background: '#4d9ef2' }} />{t('citizen.legend.bridge')}</span>
-                <span><i className="vh-dot" style={{ background: '#eb332e' }} />{t('citizen.legend.locked')}</span>
-                <span><i className="vh-dot" style={{ background: '#ffcc33' }} />{t('citizen.legend.mine')}</span>
-                <span><i className="vh-dot" style={{ background: '#ff6b0d' }} />{t('citizen.legend.mine_locked')}</span>
+                <span><i className="vh-dot" style={{ background: '#1acc40' }} />{t('citizen.legend.free')}{layout?.terms ? ` · ${money(layout.terms.lot_price)}` : ''}</span>
+                <span><i className="vh-dot" style={{ background: '#ffe60d' }} />{t('citizen.legend.needs')}</span>
+                <span><i className="vh-dot" style={{ background: '#1a80ff' }} />{t('citizen.legend.bridge')}</span>
+                <span><i className="vh-dot" style={{ background: '#f21414' }} />{t('citizen.legend.locked')}</span>
+                <span><i className="vh-dot" style={{ background: '#a84dff' }} />{t('citizen.legend.mine')}</span>
+                <span><i className="vh-dot" style={{ background: '#ff4db3' }} />{t('citizen.legend.mine_locked')}</span>
                 <span><i className="vh-dot" style={{ background: '#9aa0b4' }} />{t('citizen.legend.taken')}</span>
               </div>
               <div className="vh-hint">{t('citizen.land.hint')}</div>

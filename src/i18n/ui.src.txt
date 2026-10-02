@@ -1589,6 +1589,9 @@ citizen.access.none_note | این زمین فروخته نمی‌شود: دور�
 citizen.access.carve_note | می‌توانی راه را از زمین‌های خودت بکشی: {n} قطعه از زمین‌هایت جاده می‌شود و پولی برنمی‌گردد. | You can cut the road through your own land: {n} of your lots become road and nothing is refunded.
 citizen.access.carve_btn | راه را از زمین خودم بکش - {p} | Cut the road through my land - {p}
 citizen.access.nearby | زمین‌های نزدیک که راه دارند | Nearby lots that have a road
+citizen.access.nearby_hint | یکی را بزن تا روی نقشه نشانش بدهم و خریدش را ببینی. | Tap one to see it on the map and open its purchase.
+citizen.access.carve_chosen | راه از زمین‌های خودت می‌گذرد: {n} قطعه از آن‌ها جاده می‌شود و پولی برنمی‌گردد. | The road runs through your own land: {n} of your lots become road and nothing is refunded.
+citizen.access.from_own | راه از زمین خودت | Road through your land
 citizen.access.nearby_none | فعلاً زمین آزادی که راه داشته باشد پیدا نشد. | No free lot with a road was found for now.
 citizen.access.refused | برای ساختن «{name}» به این زمین راهی نمی‌رسد. | No road reaches this lot, so «{name}» cannot be built on it.
 citizen.buy.confirm_road | بخر با راه - {p} | Buy with the road - {p}
@@ -1598,9 +1601,11 @@ citizen.fix.none | هیچ راهی به این زمین نمی‌رسد؛ فقط
 citizen.fix.connect | راه را بکش - {p} | Lay the road - {p}
 citizen.fix.carve | راه را از زمین خودم بکش ({n} قطعه) - {p} | Cut the road through my land ({n} lots) - {p}
 citizen.fix.refund | فروش را لغو کن، {p} پس بگیر | Cancel the sale, get {p} back
-citizen.fix.refund_note | فروش لغو می‌شود، پولت از خزانهٔ روستا برمی‌گردد و زمین دوباره مال روستا می‌شود. | The sale is cancelled, the village treasury returns your money and the lot goes back to the village.
+citizen.fix.refund_note | فروش لغو می‌شود و خزانهٔ روستا {p} به تو پس می‌دهد؛ زمین دوباره مال روستا می‌شود. | The sale is cancelled, the village treasury pays you back {p} and the lot returns to the village.
 citizen.fix.refund_total | پولی که برمی‌گردد | Money returned
-citizen.fix.sure | مطمئنی؟ انجام بده | Sure? Do it
+citizen.fix.sure | بله، انجام بده | Yes, do it
+citizen.fix.sure_refund | بله، فروش را لغو کن | Yes, cancel the sale
+citizen.fix.sure_carve | بله، راه را از زمینم بکش | Yes, cut the road through my land
 citizen.fix.done_connect | راه کشیده شد. | The road is laid.
 citizen.fix.done_carve | راه از زمین خودت کشیده شد. | The road was cut through your land.
 citizen.fix.done_refund | فروش لغو شد و پولت برگشت. | The sale is cancelled and your money is back.

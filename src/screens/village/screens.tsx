@@ -327,12 +327,12 @@ const Land = flow<LandView>(({ view: v, ctx }) => {
 function Do({ ctx, a, label, tone, hold }: {
   ctx: FlowCtx; a: Parameters<FlowCtx['go']>[0]; label: string; tone?: 'gold' | 'green' | 'red' | 'steel'
   /** A press that cannot be undone asks once more: the first press only arms the button. */
-  hold?: { armed: boolean; arm: () => void }
+  hold?: { armed: boolean; arm: () => void; sure?: Key }
 }) {
   return (
     <div className="vf-btns">
       <Slab tone={tone ?? 'steel'} radius={14} lip={4} disabled={ctx.busy}
-        onClick={() => { if (hold && !hold.armed) hold.arm(); else ctx.go(a) }}>{hold?.armed ? t('citizen.fix.sure') : label}</Slab>
+        onClick={() => { if (hold && !hold.armed) hold.arm(); else ctx.go(a) }}>{hold?.armed ? t(hold.sure ?? 'citizen.fix.sure') : label}</Slab>
     </div>
   )
 }
@@ -383,7 +383,7 @@ const LotBuyConfirm = flow<LotBuyView>(({ view: v, ctx }) => {
         ]} />
         {none
           ? <Hint tone="bad">{t('citizen.access.none_note')}</Hint>
-          : <Hint>{v.access.cost > 0 ? (v.road === 'carve' ? t('citizen.access.carve_note', { n: v.access.carved?.length ?? 0 }) : t('citizen.access.road_note')) : t('citizen.buy.note')}</Hint>}
+          : <Hint>{v.access.cost > 0 ? (v.road === 'carve' ? t('citizen.access.carve_chosen', { n: v.access.carved?.length ?? 0 }) : t('citizen.access.road_note')) : t('citizen.buy.note')}</Hint>}
       </Panel>
       {none && v.carve && carve && (
         <Panel tone="gold">
@@ -423,14 +423,14 @@ const LotAccessPage = flow<LotAccessView>(({ view: v, ctx }) => {
         <>
           <Hint>{t('citizen.access.carve_note', { n: v.carve.carved?.length ?? 0 })}</Hint>
           <Do ctx={ctx} a={carve[0]} tone="gold" label={t('citizen.fix.carve', { n: v.carve.carved?.length ?? 0, p: money(v.carve.cost) })}
-            hold={{ armed: armed === 'carve', arm: () => setArmed('carve') }} />
+            hold={{ armed: armed === 'carve', arm: () => setArmed('carve'), sure: 'citizen.fix.sure_carve' }} />
         </>
       )}
       {refund.length > 0 && (
         <>
-          <Hint>{t('citizen.fix.refund_note')}</Hint>
+          <Hint>{t('citizen.fix.refund_note', { p: money(v.refund) })}</Hint>
           <Do ctx={ctx} a={refund[0]} tone="red" label={t('citizen.fix.refund', { p: money(v.refund) })}
-            hold={{ armed: armed === 'refund', arm: () => setArmed('refund') }} />
+            hold={{ armed: armed === 'refund', arm: () => setArmed('refund'), sure: 'citizen.fix.sure_refund' }} />
         </>
       )}
       {!v.own && <NearbyButtons ctx={ctx} lots={v.nearby} />}
