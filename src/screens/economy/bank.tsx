@@ -10,15 +10,16 @@ import type {
 import { Card, ListRow, Notice, Stat, StatPair } from '../native/kit/Parts'
 import { formatNumber, money, pct } from '../native/kit/format'
 import { toWesternDigits } from '../../lib/persian'
-import { ActionButton, ActionRow, CostSummary, Note } from '../../ui/Popup'
+import { ActionButton, ActionRow, CostSummary, Note, Unavailable as UnavailableBlock } from '../../ui/Popup'
 import { hasKey, t, type Key } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, isRefresh, registerFlow, type FlowCtx } from '../village/flow'
 import { durationText } from '../village/common'
 import { ConfirmPopup, byId, find, rest } from './kit'
-import { noticeLine } from './wording'
+import { noticeLine, unavailableReason } from './wording'
 import '../native/bank.css'
 import { useSession } from '../../state/SessionContext'
 import { usePending, useStoreView, primaryWallet } from '../../state/useSync'
+import { entitiesOf } from '../../state/store'
 import { setOptimisticHint } from '../../state/optimistic'
 
 const key = (k: string) => k as Key
@@ -32,7 +33,10 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
   // state sync: the balance is the store's — live, and at once after a
   // deposit or a withdrawal (an optimistic overlay until it is confirmed)
   const { synced } = useSession()
-  const wallet = primaryWallet(useStoreView())
+  const storeView = useStoreView()
+  const wallet = primaryWallet(storeView)
+  // the village's own money the player holds, beside the game's (ADR 0033 3.4): one line per held purse
+  const purses = synced ? entitiesOf(storeView, 'wallet').filter(([, w]) => !w.primary && !w.premium && (w.cash > 0 || w.bank > 0)) : []
   const pending = usePending('wallet', synced ? wallet?.currency : undefined)
   useEffect(() => { setOptimisticHint('bank.withdraw', { fee_bps: v.withdrawal_fee_bps ?? 0 }) }, [v.withdrawal_fee_bps])
   const cash = synced && wallet ? wallet.cash : v.cash
@@ -42,7 +46,9 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
   const source = mode === 'deposit' ? cash : bank
   const fee = Math.floor((amount * feeBps) / 10000)
   const over = amount > source
-  const closed = v.travelling || v.no_city
+  // a place that keeps no bank: the wallet stays, the amounts go, the way to a bank is offered (CLAUDE.md 2)
+  const noBank = !!v.unavailable
+  const closed = v.travelling || v.no_city || noBank
   const locked = closed || (mode === 'deposit' ? !v.can_deposit : !v.can_withdraw || v.jailed)
   const ready = amount > 0 && !over && !locked
   const typed = byId(ctx, mode === 'deposit' ? 'bank.deposit_custom' : 'bank.withdraw_custom')[0]
@@ -71,8 +77,26 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
           left={<Stat icon="coins" palette="gold" label={t('bank.cash')} value={money(cash)} />}
           right={<Stat icon="bank" palette="sapphire" label={t('bank.balance')} value={money(bank)} />}
         />
+        {purses.map(([id, w]) => (
+          <div key={id} className="bk-branch">{t('bank.village_purse', { currency: ctx.names.name(['currency'], w.currency, w.currency), cash: formatNumber(w.cash), bank: formatNumber(w.bank) })}</div>
+        ))}
         {v.city && !closed && <div className="bk-branch">{t('bank.branch', { city: ctx.names.name(['city'], v.city_code, v.city) })}</div>}
       </Card>
+
+      {v.unavailable && (
+        <Panel tone="sapphire">
+          <UnavailableBlock
+            reason={unavailableReason(v.unavailable, v.unavailable.nearest ? ctx.names.name(['city'], v.unavailable.nearest.code, v.unavailable.nearest.name) : undefined)}
+            nearest={(() => {
+              const go = find(ctx, 'support.travel')
+              const near = v.unavailable.nearest
+              if (!go || !near) return undefined
+              const city = ctx.names.name(['city'], near.code, near.name)
+              return { name: city, onGo: () => ctx.go(go), label: t('eco.na.go', { city }) }
+            })()}
+          />
+        </Panel>
+      )}
 
       {!closed && (
         <>

@@ -48,7 +48,13 @@ function PlaceRow({ l, ctx, walking }: { l: NonNullable<CityMapView['places']>[n
 function VillagePlaces({ ctx, id }: { ctx: Parameters<Parameters<typeof flow>[0]>[0]['ctx']; id: string | undefined }) {
   const { layout } = useVillage(id)
   const rows = useMemo(() => {
-    const list = (layout?.buildings ?? []).filter((b) => b.type !== 'road' && b.state !== 'ruin')
+    const seen = new Set<string>()
+    const list = (layout?.buildings ?? []).filter((b) => b.type !== 'road' && b.state !== 'ruin').filter((b) => {
+      const k = b.id ?? `${b.type}@${b.x},${b.y}`
+      if (seen.has(k)) return false
+      seen.add(k)
+      return true
+    })
     const stand = list.filter((b) => b.state === 'built' || b.state === 'damaged')
     const going = list.filter((b) => b.state === 'planned' || b.state === 'under_construction')
     return { stand, going }
@@ -105,10 +111,10 @@ export const CityMap = flow<CityMapView>(({ view: v, ctx }) => {
             : places.length
               ? <div className="vf-list">{places.map((l) => <PlaceRow key={l.place.code} l={l} ctx={ctx} walking={walking} />)}</div>
               : <Empty>{t('lf.map.no_places')}</Empty>}
-          {[...ctx.by('shops.here'), ...ctx.by('shops.at')].map((a) => (
+          {!inVillage && [...ctx.by('shops.here'), ...ctx.by('shops.at')].map((a) => (
             <ListRow key={`${a.id}-${a.subject}`} icon="cart" palette="amber" title={t('lf.map.shops_at', { place: tx2(ctx, a.subject) })} onClick={() => ctx.go(a)} />
           ))}
-          <Btns ctx={ctx} list={[...ctx.by('map.cities'), ...ctx.by('city.gov')]} />
+          {!inVillage && <Btns ctx={ctx} list={[...ctx.by('map.cities'), ...ctx.by('city.gov')]} />}
         </>
       )}
     </Page>

@@ -41,6 +41,12 @@ function tick() {
 }
 let foreign: typeof OTHER | typeof FAR = OTHER
 
+/** Where the mock player stands, for the mock answers that depend on it: Support is a city, anywhere else a village. */
+export function mockStandsIn(): 'city' | 'village' {
+  tick()
+  return where === 'support' ? 'city' : 'village'
+}
+
 export function mockLocation(): PlayerLocation | undefined {
   tick()
   if (!where) return undefined

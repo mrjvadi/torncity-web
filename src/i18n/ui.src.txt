@@ -21,6 +21,7 @@ bank.title | بانک | Bank
 bank.travelling | در سفر هستید؛ به بانک دسترسی ندارید. | You are travelling; the bank is out of reach.
 bank.cash | نقد | Cash
 bank.balance | موجودی بانک | Bank balance
+bank.village_purse | پول {currency}: {cash} نقد، {bank} در بانک | {currency} money: {cash} cash, {bank} in the bank
 bank.branch | شعبه‌ی {city} | {city} branch
 bank.fee | کارمزد برداشت: {p} | Withdrawal fee: {p}
 # -- economy and finance (docs/adr/0039): the web's own words for the neutral contract ---------------------------
@@ -697,6 +698,15 @@ property.sale | فروش | Sale
 property.mine | ملک من | My property
 property.can_rest | می‌توانی استراحت کنی (+{n} انرژی) | You can rest (+{n} energy)
 property.rest_in | تا استراحت بعدی: {t} | Until the next rest: {t}
+property.village_in | ملک من در {name} | My property in {name}
+property.going_up | در حال ساخت | Under construction
+property.can_rest_village | می‌توانی در آن استراحت کنی | You can rest in it now
+property.lots | {n} قطعه زمین | {n} lots of land
+life.home_bed | جای خواب | Where I sleep
+life.home_bed_in | خانهٔ من: {name} | My house: {name}
+life.home_bed_ready | همین حالا می‌توانی در خانه استراحت کنی | You can rest at home now
+life.home_bed_wait | تا استراحت بعدی در خانه: {t} | Until you can rest at home again: {t}
+profile.village | روستا | Village
 property.none | هنوز ملکی نداری. | You do not own any property yet.
 property.home | مسکونی | Residential
 property.commercial | تجاری | Commercial
@@ -2248,9 +2258,11 @@ soc.election.title_plain | انتخابات | Elections
 soc.election.no_city | هنوز در شهری نیستی. هر کس در انتخابات جایی رأی می‌دهد که در آن زندگی می‌کند. | You are not in a city yet. People vote where they live.
 soc.election.none | الان انتخاباتی در جریان نیست. | No election is running right now.
 soc.election.hint | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at city hall and each resident votes once, in secret.
+soc.election.hint_village | نامزدها در دهیاری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at the village office and each resident votes once, in secret.
 soc.election.of | انتخابات {office} {place} | {office} election in {place}
 soc.election.this | این انتخابات | this election
 soc.election.name.mayor | انتخابات شهرداری {place} | Mayoral election in {place}
+soc.election.name.village_head | انتخابات دهیاری {place} | Village head election in {place}
 soc.election.name.city_council | انتخابات شورای شهر {place} | City council election in {place}
 soc.election.name.president | انتخابات ریاست‌جمهوری {place} | Presidential election in {place}
 soc.phase.candidacy | ثبت‌نام نامزدها | Candidacy
@@ -2305,6 +2317,7 @@ soc.refusal.election.none | چنین انتخاباتی پیدا نشد. | No su
 soc.refusal.election.not_candidacy | الان ثبت‌نام نامزدهای {election} باز نیست. | Registration for {election} is not open now.
 soc.refusal.election.not_voting | الان رأی‌گیری {election} باز نیست. | Voting in {election} is not open now.
 soc.refusal.election.away | نامزدی را باید در شهرداریِ همان شهری ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city hall of the city the election is for.
+soc.refusal.election.away_village | نامزدی را باید در دهیاریِ همان روستا ثبت کنی که انتخابات برای آن است. | You register as a candidate at the village office of the village the election is for.
 soc.refusal.election.no_candidate | این نامزد در فهرست نیست. | That candidate is not on the list.
 soc.refusal.election.not_resident | در {election} فقط ساکنان همان‌جا شرکت می‌کنند. | Only residents take part in {election}.
 soc.refusal.election.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که در {election} شرکت کنی. | You have not lived here long enough to take part in {election}.

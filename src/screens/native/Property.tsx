@@ -55,8 +55,13 @@ interface Owned {
   value?: number; rent?: number; debt?: number; unpaid_periods?: number; home?: boolean
   tenant?: Named | null; city?: Named
 }
+interface VillageHolding {
+  settlement?: Named; lots?: number; value?: number; can_rest?: boolean; rest_in_seconds?: number
+  buildings?: { building?: Named; state?: string; home?: boolean; value?: number }[] | null
+}
 interface PropertyMineView {
   owned?: Owned[] | null; rented?: unknown; residence?: Named
+  village?: VillageHolding[] | null
   grace?: number; can_rest?: boolean; rest_energy?: number; rest_in_seconds?: number; notice?: string; notice_args?: Record<string, unknown> | null
 }
 
@@ -71,13 +76,28 @@ export function PropertyMine({ response, loading, onAction, run }: ScreenProps) 
 
       {v.notice && hasKey(`lf.property.notice.${v.notice}`) && <Notice>{t(`lf.property.notice.${v.notice}` as Key, Object.fromEntries(Object.entries(v.notice_args ?? {}).map(([k, x]) => [k, typeof x === 'number' ? formatNumber(x) : String(x)])))}</Notice>}
 
-      {v.can_rest !== undefined && (
+      {/* the line is about a home in a city: with none, there is nothing to count down to */}
+      {(v.can_rest || !!v.rest_in_seconds) && (
         <Notice alert={!v.can_rest && !!v.rest_in_seconds}>
           {v.can_rest ? t('property.can_rest', { n: formatNumber(v.rest_energy ?? 0) }) : t('property.rest_in', { t: hms(v.rest_in_seconds) })}
         </Notice>
       )}
 
-      {(!v.owned || v.owned.length === 0) && <Notice>{t('property.none')}</Notice>}
+      {(!v.owned || v.owned.length === 0) && (v.village ?? []).length === 0 && <Notice>{t('property.none')}</Notice>}
+
+      {(v.village ?? []).map((h, i) => (
+        <div key={`vh${i}`} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="nx-sec">{t('property.village_in', { name: names.name('city', h.settlement?.code ?? '', h.settlement?.name) })}</div>
+          {(h.buildings ?? []).map((b, j) => (
+            <ListRow key={j} icon={b.home ? 'house' : 'factory'} palette={b.home ? 'emerald' : 'gold'}
+              title={b.building?.code ? names.name('settlement_building', b.building.code, b.building.name) : '—'}
+              sub={[b.home ? t('property.home') : t('property.commercial'), b.state === 'building' ? t('property.going_up') : null,
+                b.home && b.state === 'complete' ? (h.can_rest ? t('property.can_rest_village') : t('property.rest_in', { t: hms(h.rest_in_seconds) })) : null].filter(Boolean).join(' · ')}
+              right={money(b.value)} />
+          ))}
+          {!!h.lots && <ListRow icon="x_map" palette="teal" title={t('property.lots', { n: formatNumber(h.lots) })} />}
+        </div>
+      ))}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {(v.owned ?? []).map((o, i) => (

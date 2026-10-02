@@ -15,6 +15,7 @@ import { clamp01, formatNumber, hms, money } from './kit/format'
 import Icon from '../../ui/Icon'
 import { GLabel } from '../../kit'
 import { t } from '../../i18n'
+import { locationOf } from '../../support/location'
 import { useSession } from '../../state/SessionContext'
 import { useEntity } from '../../state/useSync'
 import './profile.css'
@@ -48,7 +49,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
   const own = (response?.view ?? {}) as ProfileView
   // state sync: the money, the vitals, the level and where the player is are
   // the store's (live, no refresh); the rest is the command's view
-  const { profile: live, synced } = useSession()
+  const { profile: live, synced, bootstrap } = useSession()
   const loc = useEntity('location', synced ? 'self' : undefined)
   const v: ProfileView = synced && live ? {
     ...own, name: live.name || own.name, level: live.level, xp: live.xp, next_level_xp: live.next_level_xp,
@@ -57,6 +58,8 @@ export default function Profile({ response, loading, run }: ScreenProps) {
     ...(loc ? { city_code: loc.city || own.city_code, place: loc.place ? { code: loc.place, name: own.place?.code === loc.place ? own.place.name : undefined } : own.place } : {}),
   } : own
   const names = useContentNames()
+  // in a village there is no «مکان» of a city to name: the village is the place
+  const inVillage = locationOf(bootstrap)?.kind === 'settlement' || !!loc?.settlement
   const life = useView<LifeView>('life.me')
   const ach = useView<AchievementsView>('achievement.list')
   if (loading && !response) return <ScreenScroll><Header title={t('profile.title')} tone="teal" /></ScreenScroll>
@@ -117,8 +120,8 @@ export default function Profile({ response, loading, run }: ScreenProps) {
         right={<Stat icon="rank" palette="gold" label={t('profile.wealth_rank')} value={rankName || '—'} />}
       />
       <StatPair
-        left={<Stat icon="city" palette="steel" label={t('profile.city')} value={city(v.city_code, v.city) || '—'} />}
-        right={<Stat icon="x_map" palette="steel" label={t('profile.place')} value={v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : '—'} />}
+        left={<Stat icon="city" palette="steel" label={t(inVillage ? 'profile.village' : 'profile.city')} value={city(v.city_code, v.city) || '—'} />}
+        right={inVillage ? <span /> : <Stat icon="x_map" palette="steel" label={t('profile.place')} value={v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : '—'} />}
       />
 
       <div className="pf-sec display">{t('profile.needs')}</div>

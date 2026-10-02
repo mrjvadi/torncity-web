@@ -4,6 +4,7 @@
 // as a village player sees it: the "not available here" state.
 
 import { A, back, mockOk, refreshA, type MockAct } from './mock_neutral'
+import { mockStandsIn } from '../support/mock'
 import type {
   AmountOption, AuctionLine, Named, PaymentChoice, PledgeLine, Ref, Unavailable,
 } from './views.gen'
@@ -60,16 +61,20 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
   const a = (k: string) => String(args[k] ?? '')
   switch (command) {
     // -- the bank and paying a player
-    case 'bank.show':
+    case 'bank.show': {
+      // a village keeps no bank: the wallet, the reason and the way to the central city, no amounts to move
+      const noBank = args.here === 'village' || args.here === 'town' || mockStandsIn() === 'village'
       return mockOk('bank', {
         city_code: 'calderis', city: city.name, travelling: false, no_city: false, jailed: false, cash: bank.cash, bank: bank.bank,
-        withdrawal_fee_bps: 150, deposits: quick('n1', 1000, 5000, 10000), withdrawals: quick('n2', 10000, 50000),
-        can_deposit: true, can_withdraw: true, notice: '', notice_args: null,
-      }, [
+        withdrawal_fee_bps: noBank ? 0 : 150, deposits: noBank ? null : quick('n1', 1000, 5000, 10000), withdrawals: noBank ? null : quick('n2', 10000, 50000),
+        can_deposit: !noBank, can_withdraw: !noBank, notice: '', notice_args: null,
+        unavailable: noBank ? unavailable('bank', 'village') : null,
+      }, noBank ? [A('bank.pay', 'bank.pay', undefined, { kind: 'navigation' }), ...nearestActs('player.profile.get')] : [
         A('bank.deposit_custom', 'bank.deposit', undefined, { kind: 'primary' }), A('bank.withdraw_custom', 'bank.withdraw', undefined, { kind: 'primary' }),
         A('bank.pay', 'bank.pay', undefined, { kind: 'navigation' }), A('bank.finance', 'loan.hub', undefined, { kind: 'navigation' }),
         back('player.profile.get'), refreshA('bank.show'),
       ].map((x) => (x.id?.endsWith('_custom') ? { ...x, input: { field: 'amount' } } : x)))
+    }
     case 'bank.deposit':
     case 'bank.withdraw': {
       const amount = Number(args.amount ?? 0)
@@ -79,7 +84,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
       return mockOk('bank', {
         city_code: 'calderis', city: city.name, travelling: false, no_city: false, jailed: false, cash: bank.cash, bank: bank.bank,
         withdrawal_fee_bps: 150, deposits: quick('n3', 1000, 5000), withdrawals: quick('n4', 10000), can_deposit: true, can_withdraw: true,
-        notice: dep ? 'deposited' : 'withdrew', notice_args: { amount },
+        notice: dep ? 'deposited' : 'withdrew', notice_args: { amount }, unavailable: null,
       }, [
         { ...A('bank.deposit_custom', 'bank.deposit', undefined, { kind: 'primary' }), input: { field: 'amount' } },
         { ...A('bank.withdraw_custom', 'bank.withdraw', undefined, { kind: 'primary' }), input: { field: 'amount' } },
