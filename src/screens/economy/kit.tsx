@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react'
 import type { Action } from '../../api/types'
 import type { PaymentChoice, Unavailable } from '../../api/views.gen'
-import { Card, Header, ScreenScroll } from '../native/kit/Parts'
+import { Card, Header, ScreenScroll, type Tone } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { money } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
@@ -45,7 +45,7 @@ export function nameOf(ctx: FlowCtx, tables: string[], n: { code: string; name: 
 
 /** The "not available here" state of a service: what is missing, from which stage it is offered, what a
  * settlement needs for it, and the nearest place that has it with the journey there. */
-export function NotHere({ u, ctx, title, tone }: { u: Unavailable; ctx: FlowCtx; title: string; tone?: 'sapphire' | 'emerald' | 'gold' }) {
+export function NotHere({ u, ctx, title, tone }: { u: Unavailable; ctx: FlowCtx; title: string; tone?: Tone }) {
   const go = find(ctx, 'support.travel')
   const city = u.nearest ? ctx.names.name(['city'], u.nearest.code, u.nearest.name) : undefined
   const needs = (u.requires ?? []).filter((b) => b.code).map((b) => ctx.bname(b.code, b.code))

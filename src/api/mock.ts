@@ -5,6 +5,7 @@
 import { API_BASE } from './client'
 import { mockEconomyCommand } from './mock_economy'
 import { mockCompaniesCommand } from './mock_companies'
+import { mockMilitaryCommand } from './mock_military'
 import { mockFeatureCommand } from './mock_features'
 import { mockNativeCommand } from './mock_views'
 import { mockMoreCommand } from './mock_more'
@@ -97,6 +98,9 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   // the companies, production and recruitment area: neutral answers of every screen of it (src/api/mock_companies.ts)
   const companies = mockCompaniesCommand(command, args ?? {})
   if (companies) return json(companies)
+  // the military, war and defence area (src/api/mock_military.ts)
+  const military = mockMilitaryCommand(command, args ?? {})
+  if (military) return json(military)
   // the economy and finance area: neutral answers of every screen of it (src/api/mock_economy.ts)
   const economy = mockEconomyCommand(command, args ?? {})
   if (economy) return json(economy)

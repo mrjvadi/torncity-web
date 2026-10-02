@@ -29,12 +29,12 @@ async function retry<T>(load: () => Promise<T>, tries = 4): Promise<T> {
 }
 
 export const screensReady: Promise<void> = Promise.all([
-  retry(() => import('./native')), retry(() => import('./features')), retry(() => import('./more')), retry(() => import('./village')), retry(() => import('./founding')), retry(() => import('./basic')), retry(() => import('./support')), retry(() => import('./life')), retry(() => import('./economy')), retry(() => import('./society')), retry(() => import('./companies')),
+  retry(() => import('./native')), retry(() => import('./features')), retry(() => import('./more')), retry(() => import('./village')), retry(() => import('./founding')), retry(() => import('./basic')), retry(() => import('./support')), retry(() => import('./life')), retry(() => import('./economy')), retry(() => import('./society')), retry(() => import('./companies')), retry(() => import('./military')),
 ]).then(
-  ([native, features, more, village, founding, basic, support, life, economy, society, companies]) => {
+  ([native, features, more, village, founding, basic, support, life, economy, society, companies, military]) => {
     // basic goes first: the bespoke screens of every other area override it
-    Object.assign(SERVER_SCREENS, basic.default.SERVER, features.default.SERVER, native.default.SERVER, more.default.SERVER, village.default.SERVER, founding.default.SERVER, support.default.SERVER, life.default.SERVER, economy.default.SERVER, society.default.SERVER, companies.default.SERVER)
-    Object.assign(LOCAL_SCREENS, basic.default.LOCAL, features.default.LOCAL, native.default.LOCAL, more.default.LOCAL, village.default.LOCAL, founding.default.LOCAL, support.default.LOCAL, life.default.LOCAL, economy.default.LOCAL, society.default.LOCAL, companies.default.LOCAL)
+    Object.assign(SERVER_SCREENS, basic.default.SERVER, features.default.SERVER, native.default.SERVER, more.default.SERVER, village.default.SERVER, founding.default.SERVER, support.default.SERVER, life.default.SERVER, economy.default.SERVER, society.default.SERVER, companies.default.SERVER, military.default.SERVER)
+    Object.assign(LOCAL_SCREENS, basic.default.LOCAL, features.default.LOCAL, native.default.LOCAL, more.default.LOCAL, village.default.LOCAL, founding.default.LOCAL, support.default.LOCAL, life.default.LOCAL, economy.default.LOCAL, society.default.LOCAL, companies.default.LOCAL, military.default.LOCAL)
   },
   () => undefined,
 )

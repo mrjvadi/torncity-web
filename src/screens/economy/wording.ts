@@ -77,7 +77,10 @@ export function isEcoWrite(a: Action): boolean {
 /** The name of a service that is not offered here. */
 export function serviceName(code: string): string {
   const k = `eco.service.${code}`
-  return hasKey(k) ? t(key(k)) : t('eco.service.unknown')
+  if (hasKey(k)) return t(key(k))
+  // the other areas name their own services under their own prefix (military: mil.service.*)
+  const other = `mil.service.${code}`
+  return hasKey(other) ? t(key(other)) : t('eco.service.unknown')
 }
 
 export function stageName(stage: string): string {
