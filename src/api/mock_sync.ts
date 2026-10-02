@@ -273,7 +273,10 @@ export function attachMockSocket(): void {
   socket = true
   syncStore.setLive(true)
   window.clearInterval(ambient)
-  ambient = window.setInterval(() => { if (document.visibilityState === 'visible') mockTick() }, 15000)
+  // ambient changes only on request (?mock=1&live=1): checks and screenshots stay deterministic
+  if (new URLSearchParams(window.location.search).has('live')) {
+    ambient = window.setInterval(() => { if (document.visibilityState === 'visible') mockTick() }, 15000)
+  }
   ;(window as unknown as { __sync?: unknown }).__sync = {
     tick: (k?: Tick) => mockTick(k),
     drop: (n = 1) => { dropNext += n },
