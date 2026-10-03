@@ -6,6 +6,8 @@
 import type { ScreenViews } from './views.gen'
 import { A, back, confirmA, mockOk, refreshA, type MockAct } from './mock_neutral'
 import { mockStandsIn } from '../support/mock'
+import { MOCK_WORLD, mockVillagePlace } from './mock_village_world'
+import { offsetLatLon } from '../village/geo'
 
 type Args = Record<string, unknown> | undefined
 
@@ -93,11 +95,19 @@ function cityMap() {
   return mockOk('city_map', { city_code: 'calderis', city: 'Calderis', no_city: false, travelling: false, travelling_to_code: '', travelling_to: '', here: N('old_town', 'Old Town'), walking: null, others: 2, places: PLACES }, acts)
 }
 
+// the mock cities sit around the mock village at their stated distances (so the world map has places to show)
+const placeAt = (km: number, bearingDeg: number) => {
+  const c = mockVillagePlace(11).centre
+  const b = (bearingDeg * Math.PI) / 180
+  return offsetLatLon(c.lat, c.lon, Math.sin(b) * km * 1000, Math.cos(b) * km * 1000, MOCK_WORLD.planet_radius_km)
+}
+
 function cities(page: number) {
+  const p1 = placeAt(42, 70), p2 = placeAt(118, 200), p3 = placeAt(460, 320)
   const dests = [
-    { code: 'support', name: 'Support', distance_km: 42, emblem: '', village: false, settlement_id: '', lat: 0, lon: 0, fare: 6300, wait_seconds: 900 },
-    { code: 'v-q7m2', name: 'سرخه', distance_km: 118, emblem: '🌳', village: true, settlement_id: 'mock-village-2', lat: 0, lon: 0, fare: 9100, wait_seconds: 1800 },
-    { code: 'v-z1p8', name: 'کوهدشت', distance_km: 460, emblem: '🌾', village: true, settlement_id: 'mock-village-3', lat: 0, lon: 0, fare: 24800, wait_seconds: 5400 },
+    { code: 'support', name: 'Support', distance_km: 42, emblem: '', village: false, settlement_id: '', lat: p1.lat, lon: p1.lon, fare: 6300, wait_seconds: 900 },
+    { code: 'v-q7m2', name: 'سرخه', distance_km: 118, emblem: '🌳', village: true, settlement_id: 'mock-village-2', lat: p2.lat, lon: p2.lon, fare: 9100, wait_seconds: 1800 },
+    { code: 'v-z1p8', name: 'کوهدشت', distance_km: 460, emblem: '🌾', village: true, settlement_id: 'mock-village-3', lat: p3.lat, lon: p3.lon, fare: 24800, wait_seconds: 5400 },
   ]
   return mockOk('cities', { destinations: dests, page, pages: 2, origin_code: 'calderis', origin: 'Calderis', travelling: false, travelling_to_code: '', travelling_to: '' }, [
     ...dests.map((d) => A('travel.to', 'travel.options', { city: d.code }, { subject: d.code })),
