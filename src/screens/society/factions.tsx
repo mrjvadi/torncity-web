@@ -17,6 +17,7 @@ import { Btns, Cancel, Facts, Hint, Lead, Page, Panel, Rest, type FlowCtx } from
 import { screen } from './host'
 import { bpsText, key, playerText, playersText, span, word } from './common'
 import { durationText } from '../village/common'
+import { CardGrid } from '../../ui/v6/panel'
 
 const rank = (r: string) => word(`soc.faction.rank.${r}`, r)
 const cityOf = (ctx: FlowCtx, code: string, name: string) => ctx.names.name(['city'], code, name)
@@ -48,13 +49,13 @@ const FactionList = screen<FactionListView>(({ view: v, ctx }) => {
   return (
     <Page title={v.city ? t('soc.faction.list_city', { city: cityOf(ctx, v.city_code, v.city) }) : t('soc.faction.list')} tone="gold">
       {(v.factions ?? []).length === 0 && <Panel tone="gold"><Lead>{t('soc.faction.none_here')}</Lead></Panel>}
-      <div className="vf-stack">
+      <CardGrid>
         {(v.factions ?? []).map((f) => {
           const act = view.find((a) => a.args?.code === f.ref.code)
           return <ListRow key={f.ref.code} icon="lion" palette="gold" title={f.ref.name} sub={`${f.ref.code} · ${t('soc.faction.member_count', { n: formatNumber(f.members) })}`}
             onClick={act ? () => ctx.go(act) : undefined} />
         })}
-      </div>
+      </CardGrid>
       <Panel tone="gold">
         {v.mine ? <Lead>{t('soc.faction.list_mine', { name: v.mine.name })}</Lead>
           : v.founding && !v.founding.open ? (
@@ -158,6 +159,7 @@ const FactionMembers = screen<FactionMembersView>(({ view: v, ctx }) => {
     <Page title={t('soc.faction.members_title', { faction: v.ref.name })} tone="gold">
       <Panel tone="gold">
         <SectionTitle>{t('soc.faction.members_count', { n: formatNumber((v.members ?? []).length), max: formatNumber(v.max) })}</SectionTitle>
+        <CardGrid>
         {(v.members ?? []).map((m, i) => {
           const code = m.player.code
           const acts = take([...mine('faction.promote', code), ...mine('faction.demote', code), ...mine('faction.lead', code), ...mine('faction.kick', code)])
@@ -168,10 +170,12 @@ const FactionMembers = screen<FactionMembersView>(({ view: v, ctx }) => {
             </div>
           )
         })}
+        </CardGrid>
       </Panel>
       {(v.requests ?? []).length > 0 && (
         <Panel>
           <SectionTitle>{t('soc.faction.requests')}</SectionTitle>
+          <CardGrid>
           {(v.requests ?? []).map((q) => {
             const acts = take(ctx.acts.filter((a) => (a.id === 'faction.accept' || a.id === 'faction.decline') && a.args?.no === String(q.no)))
             return (
@@ -181,6 +185,7 @@ const FactionMembers = screen<FactionMembersView>(({ view: v, ctx }) => {
               </div>
             )
           })}
+          </CardGrid>
         </Panel>
       )}
       <Rest ctx={ctx} skip={(a) => used.has(a)} />

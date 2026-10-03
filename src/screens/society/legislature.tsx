@@ -8,6 +8,7 @@ import { t } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, Rest, type FlowCtx } from '../village/flow'
 import { screen } from './host'
 import { allocationText, key, leverName, leverValue, officeName, placeName, playerText, span, word } from './common'
+import { CardGrid } from '../../ui/v6/panel'
 
 /** What a proposal would do, in one line. */
 function subjectText(ctx: FlowCtx, s: BillSubject): string {
@@ -42,7 +43,7 @@ const Bills = screen<BillsView>(({ view: v, ctx }) => {
   return (
     <Page title={t('soc.law.list_title')} tone="violet">
       {(v.bills ?? []).length === 0 && <Panel tone="violet"><Lead>{t('soc.law.list_empty')}</Lead></Panel>}
-      <div className="vf-stack">
+      <CardGrid>
         {(v.bills ?? []).map((b) => {
           const act = open.find((a) => a.args?.no === String(b.no))
           return (
@@ -51,7 +52,7 @@ const Bills = screen<BillsView>(({ view: v, ctx }) => {
               onClick={act ? () => ctx.go(act) : undefined} />
           )
         })}
-      </div>
+      </CardGrid>
       <Rest ctx={ctx} skip={(a) => a.id === 'law.view'} />
     </Page>
   )

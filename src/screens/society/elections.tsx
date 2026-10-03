@@ -12,6 +12,7 @@ import { t } from '../../i18n'
 import { Facts, Hint, Lead, Page, Panel, Rest } from '../village/flow'
 import { screen } from './host'
 import { bpsText, electionTitle, officeName, phaseText, placeName, playerText, playersText, span, word } from './common'
+import { CardGrid } from '../../ui/v6/panel'
 
 const lineSub = (l: ElectionLine): string => {
   switch (l.phase) {
@@ -35,7 +36,7 @@ const Elections = screen<ElectionsView>(({ view: v, ctx }) => {
   return (
     <Page title={t('soc.election.title', { place: placeName(ctx.names, v.place) })} tone="violet">
       {(v.elections ?? []).length === 0 && <Panel tone="violet"><Lead>{t('soc.election.none')}</Lead></Panel>}
-      <div className="vf-stack">
+      <CardGrid>
         {(v.elections ?? []).map((l) => {
           const act = open.find((a) => a.args?.no === String(l.no))
           return (
@@ -44,7 +45,7 @@ const Elections = screen<ElectionsView>(({ view: v, ctx }) => {
               onClick={act ? () => ctx.go(act) : undefined} />
           )
         })}
-      </div>
+      </CardGrid>
       <Hint>{t(v.place.kind === 'village' ? 'soc.election.hint_village' : 'soc.election.hint')}</Hint>
       <Rest ctx={ctx} skip={(a) => a.id === 'election.open'} />
     </Page>
@@ -79,6 +80,7 @@ const Election = screen<ElectionView>(({ view: v, ctx }) => {
       <Panel>
         <SectionTitle>{t('soc.election.candidates')}</SectionTitle>
         {cands.length === 0 && <Hint>{t('soc.election.no_candidates')}</Hint>}
+        <CardGrid>
         {cands.map((c, i) => {
           const vote = votes.find((a) => a.args?.candidate === String(i + 1))
           return (
@@ -92,6 +94,7 @@ const Election = screen<ElectionView>(({ view: v, ctx }) => {
             </div>
           )
         })}
+        </CardGrid>
       </Panel>
 
       <Panel>
