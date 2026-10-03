@@ -1619,7 +1619,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
       entries: mergeTables(ACTIVITIES_CONTENT, mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), mergeTables({
-        settlement_building: [{ code: 'stall', name: { en: 'Stall', fa: 'دکه' }, category: 'market', footprint: [1, 1] }, ...[...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) }))],
+        settlement_building: [{ code: 'storehouse', name: { en: 'Storehouse', fa: 'انبار کالا' }, category: 'storage', footprint: [2, 2] }, { code: 'stall', name: { en: 'Stall', fa: 'دکه' }, category: 'market', footprint: [1, 1] }, ...[...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) }))],
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
         place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],

@@ -2726,6 +2726,10 @@ lf.avatar.hint | یکی از آواتارها را بردار، یا عکس پر
 lf.sleep.title | خواب در {spot} | Sleep at {spot}
 lf.sleep.rest | کم شدن خستگی | Less tiredness
 lf.sleep.relief | کم شدن استرس | Less stress
+lf.devices.name.telegram | تلگرام | Telegram
+lf.devices.name.web | مرورگر وب | Web browser
+lf.devices.name.iphone | مرورگر آیفون | iPhone browser
+lf.devices.name.android | مرورگر اندروید | Android browser
 lf.devices.empty | دستگاه متصلی نیست. | No devices are linked.
 lf.devices.notice.revoked | دستگاه از حساب خارج شد. | The device was signed out.
 lf.devices.notice.gone | این دستگاه از قبل خارج شده بود. | That device was already signed out.

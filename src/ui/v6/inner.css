@@ -31,7 +31,7 @@
 .v6 .cx-hdr-title { font-size: 20px; line-height: 52px; color: #fff; opacity: 1; font-weight: 800; }
 .v6 .cx-hdr-btn { width: 44px; height: 44px; margin-inline-start: -8px; border-radius: 50%; font-size: 26px; background: none; border: 0; color: #fff; }
 .v6 .cx-hdr-btn:active { background: #ffffff14; }
-.v6 .cx-hdr:not(.has-back) { padding-inline-start: 4px; }
+.v6 .cx-hdr:not(.has-back) { padding-inline-start: 14px; }
 /* on desktop the docked panel's breadcrumbs carry the title and the way back */
 .v6-side .cx-hdr:not(.has-back) { display: none; }
 .v6-side .cx-hdr { top: 0; margin: 0 -14px; min-height: 44px; }
