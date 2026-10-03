@@ -33,7 +33,8 @@
   display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px 0 12px; border-radius: 22px; box-sizing: border-box;
   background: rgba(22, 12, 20, 0.94); border: 1.5px solid var(--gold-soft, #b58a2a); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
 }
-.wm-sfield input { flex: 1; min-width: 0; height: 40px; background: none; border: 0; outline: 0; color: #fff; font-size: 14px; }
+.wm-sfield input { flex: 1; min-width: 0; height: 40px; background: transparent; border: 0; outline: 0; box-shadow: none; -webkit-appearance: none; appearance: none; border-radius: 0; color: #fff; font-size: 14px; }
+.wm-sfield input:focus { outline: 0; box-shadow: none; }
 .wm-sfield input::-webkit-search-cancel-button { display: none; }
 .wm-sclear { flex: none; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 0; color: #fff; font-size: 13px; }
 .wm-suggest {
@@ -104,11 +105,6 @@
 .wm-rowdot.central { background: #7be3d4; border-color: #0f4f57; }
 .wm-rowdot.home { background: linear-gradient(180deg, #ffe08a, #f0a81c); border-color: #5a3b00; width: 30px; height: 30px; }
 
-.wm-list { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.wm-search {
-  width: 100%; min-height: 44px; padding: 0 14px; border-radius: 14px; font-size: 15px; color: #fff; box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.22);
-}
 .wm-rows { display: flex; flex-direction: column; gap: 6px; max-height: 52vh; overflow-y: auto; }
 .wm-row {
   display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; border-radius: 14px; text-align: start; color: #fff;
