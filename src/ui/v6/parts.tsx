@@ -191,10 +191,10 @@ export function PhoneDock({ tabs, active, onSelect, ownRef }: { tabs: DockTab[];
           <Ic key={act.key} name={act.icon} className="v6-disc-ic" />
         </span>
       )}
-      {tabs.map((tab) => {
+      {tabs.map((tab, i) => {
         const on = tab.key === active
         return (
-          <button key={tab.key} className={`v6-tab dock-tab${on ? ' on' : ''}`} onClick={() => onSelect(tab.key)} aria-current={on ? 'page' : undefined}>
+          <button key={tab.key} className={`v6-tab dock-tab${i === 2 ? ' mid' : ''}${on ? ' on' : ''}`} onClick={() => onSelect(tab.key)} aria-current={on ? 'page' : undefined}>
             <span className="v6-ico">
               <Ic name={tab.icon} />
               {tab.dot ? (tab.dot > 1 ? <i className="v6-dot n">{tab.dot > 9 ? fa('9+') : fa(tab.dot)}</i> : <i className="v6-dot" />) : null}
