@@ -581,6 +581,7 @@ life.net_worth | ارزش خالص | Net worth
 life.cash_bank | نقد + بانک | Cash + bank
 life.property | ملک | Property
 life.sleep_spots | جای خواب | Places to sleep
+life.sleep_spots_other | جاهای دیگر برای خواب | Other places to sleep
 life.spot_sub | {place} · +{rest} انرژی | {place} · +{rest} energy
 life.sleep_again | دوباره می‌توانی بخوابی: {t} دیگر | You can sleep again in {t}
 # -- job ----------------------------------------------------------------------
@@ -708,8 +709,8 @@ property.village_in | ملک من در {name} | My property in {name}
 property.going_up | در حال ساخت | Under construction
 property.can_rest_village | می‌توانی در آن استراحت کنی | You can rest in it now
 property.lots | {n} قطعه زمین | {n} lots of land
-life.home_bed | جای خواب | Where I sleep
-life.home_bed_in | خانهٔ من: {name} | My house: {name}
+life.home_bed | خانهٔ من | My home
+life.home_bed_in | {name} | {name}
 life.home_bed_ready | همین حالا می‌توانی در خانه استراحت کنی | You can rest at home now
 life.home_bed_wait | تا استراحت بعدی در خانه: {t} | Until you can rest at home again: {t}
 profile.village | شهر | City
@@ -1736,6 +1737,7 @@ labor.employer.player | {name} | {name}
 labor.per_shift | {w} / شیفت | {w} / shift
 labor.wage_per_shift | دستمزد هر شیفت: {w} | Wage per shift: {w}
 labor.shifts_left | {n} شیفت باقی | {n} shifts left
+labor.job.site | قطعهٔ {x} و {y} · {p}٪ ساخته شده | Lot {x}, {y} · {p}% built
 labor.left_hours | {left} نفر-ساعت مانده · {n} کارگر مشغول | {left} worker-hours left · {n} working
 labor.progress | {p}٪ ساخته شده | {p}% built
 labor.hours | {done} از {total} نفر-ساعت انجام شده · {left} مانده | {done} of {total} worker-hours done · {left} left
@@ -1774,7 +1776,7 @@ storage.title | انبار شهر | City storehouse
 storage.capacity | ظرفیت انبار | Storage capacity
 storage.treasury | خزانهٔ شهر | City treasury
 storage.used | {p}٪ پر است | {p}% full
-storage.full | انبار پر است؛ برای جا باز کردن، انبار غله بساز یا مصالح را مصرف کن. | The store is full; build a granary for more room, or use up some materials.
+storage.full | انبار پر است. برای جا باز کردن، مصالح را مصرف کنید یا یک انبار بسازید و انباردار بگذارید. | The store is full. Use up some materials, or build a storehouse and put a keeper in, to get more room.
 storage.stock | موجودی انبار | In stock
 storage.stock_empty | انبار فعلاً خالی است. | The store is empty for now.
 storage.market | بازار مصالح | Materials market
@@ -3202,6 +3204,7 @@ common.loading | در حال بارگذاری… | Loading…
 crime.empty.level_too_low | از سطح {n} به بالا می‌توانی سراغ این کار بروی. با کار کردن تجربه بگیر. | Crime opens at level {n}. Earn experience by working.
 crime.empty.no_venue | اینجا جایی برای این کار نیست. | There is no place for this here.
 crime.empty.no_targets | فعلاً کاری نیست که از دستت بربیاید. | There is nothing you can attempt right now.
+crime.empty.no_targets_yet | هنوز هیچ‌کدام از این کارها از دستت برنمی‌آید. هر دسته را باز کن تا ببینی چه چیزی کم داری. | None of these is within your reach yet. Open a category to see what you are missing.
 crime.empty.go_work | رفتن به کار | Go to work
 crime.empty.go_back | بازگشت به فعالیت‌ها | Back to activities
 work.now | اکنون | Now
@@ -4304,7 +4307,6 @@ education.gap.fee | {fee} · {time} | {fee} · {time}
 education.literacy.title | خواندن و نوشتن | Reading and writing
 education.literacy.first | اولین درس همه خواندن و نوشتن است. | Everyone’s first lesson is reading and writing.
 education.literacy.share | {p}% مردم {place} باسوادند | {p}% of the people of {place} can read and write
-education.literacy.next | برای قدم بعدی، سواد باید به {p}% برسد | Literacy must reach {p}% for the next step
 education.fee | شهریه {n} | Fee {n}
 missions.xp | {n} امتیاز تجربه | {n} experience points
 missions.reward | پاداش: {r} | Reward: {r}
@@ -4692,7 +4694,6 @@ ac.work.skills.none | هنوز مهارتی نداری. | You have no skills yet
 ac.work.skills.how | با کار کردن و درس خواندن مهارت‌هایت بیشتر می‌شود. | Working and studying build your skills.
 ac.work.skills.level | سطح {n} | Level {n}
 ac.work.skills.max | به بالاترین سطح رسیده‌ای. | You have reached the top level.
-ac.work.skills.untrained | هنوز تمرین نکرده‌ای | Not trained yet
 ac.work.of | {a} از {b} | {a} of {b}
 ac.work.status.elsewhere | برای کار باید در {city} باشی. | You have to be in {city} to work.
 # -- activities: health and missions, addition ---
@@ -4905,7 +4906,8 @@ sm.st.unkept | انباردار ندارد؛ جایش حساب نمی‌شود |
 sm.st.unkept_why | خزانه باید دستمزد انباردار را بدهد و یک نفر بیکار هم لازم است. | The treasury must pay a keeper and someone in the pool must be free.
 sm.st.spoil | غذای انبار هر روز {p} خراب می‌شود. | The food in the store spoils {p} a day.
 sm.st.reserved | {n} جا برای شیفت‌های در جریان کنار است | {n} space is set aside for running shifts
-sm.st.fix_full | یک انبار بسازید یا انباردار بگذارید تا جا بیشتر شود. | Build a storehouse or put a keeper in to get more room.
+sm.st.over | موجودی انبار {n} جا از گنجایشش بیشتر است. چیزی از بین نمی‌رود، ولی تا جا باز نشود چیز تازه‌ای در آن جا نمی‌گیرد. انباردار بگذارید یا مصالح را مصرف کنید. | The stock is {n} spaces over the room. Nothing is lost, but nothing new fits until room is freed. Put a keeper in or use up some materials.
+sm.st.grace | انباردار ندارد؛ تا {date} جایش را حساب می‌کنیم | No storekeeper; its room counts until {date}
 sm.st.donate | کمک به انبار | Give to the store
 sm.st.donate_hint | از آنچه همراه دارید به انبار شهر بدهید. | Give some of what you carry to the city store.
 sm.st.donate_none | چیزی همراهتان نیست که بشود داد. | You carry nothing to give.
@@ -4978,7 +4980,7 @@ sm.money.nil | نیل فقط یک مقیاس برای نمایش است؛ چیز
 sm.money.nil_unit | هر {u} ساپ ≈ {n} نیل | Every {u} money ≈ {n} Nil
 sm.money.treasury | خزانه: {a} ≈ {n} نیل | Treasury: {a} ≈ {n} Nil
 sm.money.output | تولید {d} روز اخیر: {a} ≈ {n} نیل | Output of the last {d} days: {a} ≈ {n} Nil
-sm.money.basket | سبد خرید روستا | The basket
+sm.money.basket | سبد خرید شهر | The basket
 sm.money.index | شاخص قیمت سبد: {p}٪ | Basket price index: {p}%
 sm.money.cover | پوشش سبد روی دکان: {p}٪ | Basket on the shelf: {p}%
 sm.money.examples | نمونه‌ها | Examples
@@ -5042,3 +5044,9 @@ training.xp | {n} امتیاز | {n} experience
 training.max_energy | سقف انرژی | Energy bar
 training.paid | هزینهٔ جلسه | Session fee
 training.level_up | قدرت بدنی به سطح {n} رسید. | Strength reached level {n}.
+crime.list.empty | از این دسته فعلاً چیزی اینجا نیست. | Nothing of this kind is possible here right now.
+education.here_title | دوره‌های {place} | Courses in {place}
+education.open | باز است | Open
+education.not_here_title | اینجا درس داده نمی‌شود | Elsewhere
+ac.work.openings.not_here | کارهایی که در {city} نیست | Jobs {city} does not have
+ac.work.openings.had_in | در {place} هست | Available in {place}

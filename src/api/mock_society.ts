@@ -17,12 +17,12 @@ export const SOCIETY_CONTENT = {
   entries: {
     office: [
       ['mayor', nm('Mayor', 'شهردار')], ['deputy_mayor', nm('Deputy mayor', 'معاون شهردار')], ['city_council', nm('City council', 'شورای شهر')],
-      ['village_head', nm('Village head', 'دهیار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
+      ['village_head', nm('Village head', 'شهردار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
       ['defence_minister', nm('Defence minister', 'وزیر دفاع')], ['parliament', nm('Parliament', 'مجلس')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     lever: [
       ['city.tax_rate', nm('Tax rate', 'نرخ مالیات')], ['city.minimum_wage', nm('Minimum wage', 'حداقل دستمزد')], ['city.budget', nm('City budget', 'بودجهٔ شهر')],
-      ['village.local_levy', nm('Village levy', 'عوارض محلی روستا')], ['country.arms_exports', nm('Arms export policy', 'سیاست صادرات تسلیحات')],
+      ['village.local_levy', nm('Village levy', 'عوارض محلی شهر')], ['country.arms_exports', nm('Arms export policy', 'سیاست صادرات تسلیحات')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     jurisdiction: [{ code: 'vantor_federation', name: nm('Vantor Federation', 'فدراسیون ونتور') }, { code: 'default_country', name: nm('Commonwealth', 'مشترک‌المنافع') }],
     budget_line: [

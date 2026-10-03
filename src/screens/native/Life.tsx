@@ -80,7 +80,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
 
       {!!(v.spots && v.spots.length) && (
         <Card>
-          <div className="nx-sec" style={{ marginBottom: 8 }}>{t('life.sleep_spots')}</div>
+          <div className="nx-sec" style={{ marginBottom: 8 }}>{t(v.village_home ? 'life.sleep_spots_other' : 'life.sleep_spots')}</div>
           <CardGrid>
             {v.spots!.map((s, i) => {
               // the server lists what may be done by meaning: sleep here, or walk there and sleep

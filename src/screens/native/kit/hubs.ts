@@ -42,6 +42,6 @@ export const SOCIETY_ENTRIES: Record<string, { icon: string; palette: IconPalett
 /** The v6 icon of each hub entry (ui-v6/icons): the hub cards use these, the old table above keeps the rail's words. */
 export const HUB_ICON: Record<string, string> = {
   work: 'tool', learn: 'book', health: 'health', training: 'bolt', crime: 'crime', missions: 'scroll', rankings: 'trophy',
-  inventory: 'bag', market: 'coin', storehouse: 'chest', bank: 'bank', companies: 'crate', property: 'house', stocks: 'trophy',
+  inventory: 'bag', market: 'coin', storehouse: 'chest', bank: 'bank', companies: 'crate', property: 'house', stocks: 'ingot',
   inbox: 'chat', faction: 'banner', friends: 'people', elections: 'ballot', government: 'scroll', war: 'cross',
 }

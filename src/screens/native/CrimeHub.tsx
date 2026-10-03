@@ -36,6 +36,8 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
   const cat = useBuildingCatalogue()
   const names = useContentNames()
   if (loading && !response) return <ScreenScroll><Header title={t('crime.title')} tone="ruby" /></ScreenScroll>
+  // the categories the place offers are listed even when nothing in them is within reach yet: each one says what is missing
+  const listed = v.empty !== 'level_too_low' && v.empty !== 'no_venue' && (v.categories ?? []).length > 0
   const need = v.need_code ? buildingName(cat, v.need_code) : v.need_role ? t(`crime.role.${v.need_role}` as Key) : ''
 
   return (
@@ -64,16 +66,16 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
 
       {v.empty && (
         <Card>
-          <div style={{ fontSize: 14, marginBottom: 10 }}>{t(`crime.empty.${v.empty}` as Key, { n: v.min_level ?? 0 })}</div>
+          <div style={{ fontSize: 14, marginBottom: 10 }}>{t((listed && v.empty === 'no_targets' ? 'crime.empty.no_targets_yet' : `crime.empty.${v.empty}`) as Key, { n: v.min_level ?? 0 })}</div>
           {v.empty === 'no_venue' && need && <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 10 }}>{t('crime.empty.need_building', { name: need })}</div>}
           {v.empty === 'level_too_low'
             ? <Slab tone="gold" radius={14} lip={4} onClick={() => run('work.home')}>{t('crime.empty.go_work')}</Slab>
-            : <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('activity_hub')}>{t('crime.empty.go_back')}</Slab>}
+            : !listed && <Slab tone="steel" radius={14} lip={4} onClick={() => openLocal('activity_hub')}>{t('crime.empty.go_back')}</Slab>}
         </Card>
       )}
 
       <div className="hub-grid">
-        {(v.empty === 'level_too_low' || v.empty === 'no_venue' ? [] : v.categories ?? []).map((c) => (
+        {(listed ? v.categories ?? [] : []).map((c) => (
           <PTile key={c.code} icon="crime" title={categoryName(c)} onClick={() => c.code && run('crime.list', { category: c.code })} />
         ))}
       </div>
