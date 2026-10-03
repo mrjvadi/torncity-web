@@ -17,6 +17,7 @@ import {
   Attributes, ConfirmPopup, NoticeCard, NotHere, QtyRow, Tail, bandName, branchName, byId, cityName, className, find, goodName, place, rest,
 } from './kit'
 import { bpsPct } from './wording'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 
@@ -54,13 +55,13 @@ const Ministry = flow<MinistryView>(({ view: v, ctx }) => {
   return (
     <Page title={t('mil.ministry.title', { country: place(ctx, v.country) })} tone="ruby">
       <NoticeCard ctx={ctx} n={v.notice} />
-      <div className="mil-list">
+      <CardGrid>
         {navs.map(({ n, a }) => (
           <ListRow key={n.id} icon={n.icon} palette={n.palette} title={ctx.label(a!)} sub={t(key(`mil.nav.${n.id}`))}
             right={n.id === 'military.licences' && v.pending_licences > 0 ? t('mil.nav.pending', { n: formatNumber(v.pending_licences) }) : undefined}
             onClick={() => ctx.go(a!)} />
         ))}
-      </div>
+      </CardGrid>
 
       <Panel tone="ruby">
         <SectionTitle>{t('mil.ministry.money')}</SectionTitle>
@@ -98,7 +99,7 @@ const Ministry = flow<MinistryView>(({ view: v, ctx }) => {
 
       <Panel tone="teal">
         <SectionTitle>{t('mil.ministry.forces')}</SectionTitle>
-        {(v.forces ?? []).map((b) => <BranchBlock key={b.branch.code} ctx={ctx} b={b} cleared={v.cleared} />)}
+        <CardGrid>{(v.forces ?? []).map((b) => <BranchBlock key={b.branch.code} ctx={ctx} b={b} cleared={v.cleared} />)}</CardGrid>
         {(v.forces ?? []).length === 0 && <Hint>{t('mil.forces.none')}</Hint>}
         {v.cleared ? (
           <Facts rows={[
@@ -230,9 +231,9 @@ const Station = flow<StationView>(({ view: v, ctx }) => {
           <>
             <Lead>{t('mil.station.pick_city')}</Lead>
             {cities.length === 0 && <Hint>{t('mil.station.no_cities')}</Hint>}
-            <div className="mil-list">
+            <CardGrid>
               {cities.map((a) => <ListRow key={a.subject} icon="flagobj" palette="sapphire" title={ctx.label(a)} onClick={() => ctx.go(a)} />)}
-            </div>
+            </CardGrid>
           </>
         ) : (
           <>

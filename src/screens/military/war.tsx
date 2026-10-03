@@ -19,6 +19,7 @@ import {
   officeText, operationName, place, proposalName, bandName,
 } from './kit'
 import { bpsPct } from './wording'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 const list = (items: string[]): string => items.join(t('common.sep') + ' ')
@@ -129,10 +130,10 @@ const WarBoard = flow<WarBoardView>(({ view: v, ctx }) => {
         </Panel>
       )}
       {(room || declare) && (
-        <div className="mil-list">
+        <CardGrid>
           {room && <ListRow icon="radar" palette="ruby" title={ctx.label(room)} sub={t('mil.war.room_sub')} onClick={() => ctx.go(room)} />}
           {declare && <ListRow icon="x_flag" palette="ruby" title={ctx.label(declare)} sub={t('mil.war.declare_sub')} onClick={() => ctx.go(declare)} />}
-        </div>
+        </CardGrid>
       )}
       <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
     </Page>
@@ -169,9 +170,9 @@ const Declare = flow<DeclareView>(({ view: v, ctx }) => {
           <>
             <Lead>{t('mil.declare.pick_target')}</Lead>
             {targets.length === 0 && <Hint>{t('mil.declare.no_targets')}</Hint>}
-            <div className="mil-list">
+            <CardGrid>
               {targets.map((a) => <ListRow key={a.subject} icon="x_flag" palette="ruby" title={placeName(ctx.names, (v.targets ?? []).find((p) => p.code === a.subject)) || ctx.label(a)} onClick={() => ctx.go(a)} />)}
-            </div>
+            </CardGrid>
           </>
         ) : (
           <>
@@ -213,7 +214,7 @@ const WarRoom = flow<WarRoomView>(({ view: v, ctx }) => {
       <Panel>
         <SectionTitle>{t('mil.room.targets')}</SectionTitle>
         {(v.targets ?? []).length === 0 && <Hint>{t('mil.room.no_targets')}</Hint>}
-        <div className="mil-list">
+        <CardGrid>
           {(v.targets ?? []).map((tg) => {
             const open = ctx.acts.find((a) => a.id === 'war.target' && a.subject === tg.city_code)
             return (
@@ -222,7 +223,7 @@ const WarRoom = flow<WarRoomView>(({ view: v, ctx }) => {
                 onClick={open ? () => ctx.go(open) : undefined} />
             )
           })}
-        </div>
+        </CardGrid>
       </Panel>
       {(v.running ?? []).length > 0 && (
         <Panel>
