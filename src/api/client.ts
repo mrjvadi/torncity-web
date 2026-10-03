@@ -107,6 +107,8 @@ async function authed<T>(path: string, init: RequestInit): Promise<T> {
       } catch (refreshErr) {
         clearAuth()
         report('auth', 'refresh failed, signed out')
+        // the session tells the app: inside Telegram it signs in again with Telegram's own proof
+        window.dispatchEvent(new Event('tc-auth-lost'))
         throw refreshErr
       }
       const token2 = getAccessToken()
@@ -133,6 +135,8 @@ async function authedResponse(path: string, init: RequestInit): Promise<Response
   } catch (refreshErr) {
     clearAuth()
     report('auth', 'refresh failed, signed out')
+    // the session tells the app: inside Telegram it signs in again with Telegram's own proof
+    window.dispatchEvent(new Event('tc-auth-lost'))
     throw refreshErr
   }
   return send()

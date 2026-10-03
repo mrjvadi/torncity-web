@@ -191,6 +191,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }, [afterSignedIn])
 
+  // A saved session the server no longer accepts (its refresh token was refused) must never strand a player
+  // inside Telegram on the sign-in screen: Telegram vouches for them, so sign in again with that. One retry per
+  // page; outside Telegram the sign-in screen asks for a code as before.
+  const reSignedIn = useRef(false)
+  useEffect(() => {
+    const lost = () => {
+      if (!inTelegram || reSignedIn.current) return
+      reSignedIn.current = true
+      report('auth', 'session lost; signing in again through Telegram')
+      void loginWithTelegram()
+    }
+    window.addEventListener('tc-auth-lost', lost)
+    return () => window.removeEventListener('tc-auth-lost', lost)
+  }, [inTelegram, loginWithTelegram])
+
   const signOut = useCallback(() => {
     syncStore.forget()
     setSynced(false)

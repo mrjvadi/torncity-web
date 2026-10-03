@@ -19,7 +19,8 @@ export function report(kind: string, message: string, extra?: Record<string, unk
       kind,
       message: extra ? `${message} ${JSON.stringify(extra)}` : message,
       agent: navigator.userAgent,
-      page: location.href,
+      // never the #fragment: inside Telegram it carries the signed launch data, which must not reach a log
+      page: location.origin + location.pathname + location.search,
       session: SESSION,
     })
     const blob = new Blob([body], { type: 'text/plain' })
