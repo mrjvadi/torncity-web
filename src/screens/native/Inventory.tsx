@@ -106,7 +106,7 @@ export default function Inventory({ response, loading, run }: ScreenProps) {
                 figures={`${formatNumber(carry.used + carry.reserved)} / ${formatNumber(carry.capacity)}`} />
               <div className="gc-note">
                 {t('sm.fill.load', { w: formatNumber(Math.round(carry.load_g / 1000)), c: formatNumber(Math.round(carry.comfort_g / 1000)), h: formatNumber(Math.round(carry.hard_g / 1000)) })}
-                {carry.reserved > 0 && <> {t('sm.fill.reserved', { n: formatNumber(carry.reserved) })}</>}
+                {carry.reserved > 0 && <>{'، '}{t('sm.fill.reserved', { n: formatNumber(carry.reserved) })}</>}
               </div>
               {full && <Notice>{t('sm.fill.full')}</Notice>}
             </>
