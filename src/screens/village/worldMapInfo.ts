@@ -34,3 +34,12 @@ export interface RegionInfo { name: string; kind: 'country' | 'alliance' }
 /** Countries and alliances layer. The server has no country data yet (they exist only when players found them);
  * when it does, set `regionProvider.at` to look a place up (a polygon test or a tile owner) and the readout shows it. */
 export const regionProvider: { at: (lat: number, lon: number) => RegionInfo | null } = { at: () => null }
+
+/** "35.7 51.4" or "35.7, 51.4" (Persian or Latin digits, a Persian comma too) as a place; null for anything else. */
+export function parseCoords(q: string): { lat: number; lon: number } | null {
+  const latin = q.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٫]/g, '.').replace(/[،]/g, ',')
+  const m = /^\s*(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)\s*$/.exec(latin)
+  if (!m) return null
+  const lat = Number(m[1]), lon = Number(m[2])
+  return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null
+}

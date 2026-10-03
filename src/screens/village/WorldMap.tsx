@@ -9,7 +9,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Emboss } from '../../kit'
-import Popup from '../../ui/Popup'
 import { useChrome } from '../../ui/v6/chrome'
 import { t } from '../../i18n'
 import { money } from '../native/kit/format'
@@ -19,8 +18,8 @@ import type { WorldMapView } from '../../village/worldMapView'
 import type { WorldInfo } from '../../api/types'
 import type { MapView } from '../../api/views.gen'
 import { report } from '../../lib/reporter'
-import { biomeName, climateBand, coordText, niceScale, regionProvider } from './worldMapInfo'
-import type { PlanetTerrain, TileInfo } from '../../village/worldMapTerrain'
+import { biomeName, climateBand, coordText, niceScale, parseCoords, regionProvider } from './worldMapInfo'
+import type { TileInfo } from '../../village/worldMapTerrain'
 import { latLonToDir } from '../../village/geo'
 import './worldMap.css'
 
@@ -47,71 +46,14 @@ const waitText = (sec: number) => (sec >= 5400 ? t('wm.hour', { n: String(Math.r
 const kmText = (km: number) => String(Math.round(km))
 
 
-const EQ_W = 256, EQ_H = 128
-
-/** The whole planet as a small equirectangular colour map, read once from the coarse chunks (LOD 1). */
-function buildEquirect(terrain: PlanetTerrain): Uint8ClampedArray {
-  const out = new Uint8ClampedArray(EQ_W * EQ_H * 3)
-  for (let j = 0; j < EQ_H; j++) {
-    for (let i = 0; i < EQ_W; i++) {
-      const tl = terrain.sample(90 - ((j + 0.5) / EQ_H) * 180, -180 + ((i + 0.5) / EQ_W) * 360, 1)
-      const k = (j * EQ_W + i) * 3
-      out[k] = tl?.rgb[0] ?? 30; out[k + 1] = tl?.rgb[1] ?? 80; out[k + 2] = tl?.rgb[2] ?? 130
-    }
-  }
-  return out
-}
-
-/** The inset globe: the planet seen from above the view centre, a ring for what the view covers, a dot for the player's city. */
-function drawMini(cv: HTMLCanvasElement, eq: Uint8ClampedArray, v: WorldMapView, home: { lat: number; lon: number }, alt: number, R: number) {
-  const ctx = cv.getContext('2d')
-  if (!ctx) return
-  const S = cv.width, r = S / 2 - 3
-  const { f, n } = v.frameVectors()
-  const e = [n[1] * f[2] - n[2] * f[1], n[2] * f[0] - n[0] * f[2], n[0] * f[1] - n[1] * f[0]] // east = n x f
-  const img = ctx.createImageData(S, S)
-  for (let py = 0; py < S; py++) {
-    for (let px = 0; px < S; px++) {
-      const x = (px + 0.5 - S / 2) / r, y = (S / 2 - py - 0.5) / r
-      const d2 = x * x + y * y
-      if (d2 > 1) continue
-      const z = Math.sqrt(1 - d2)
-      const dx = f[0] * z + e[0] * x + n[0] * y, dy = f[1] * z + e[1] * x + n[1] * y, dz = f[2] * z + e[2] * x + n[2] * y
-      const lat = Math.asin(Math.max(-1, Math.min(1, dz))), lon = Math.atan2(dy, dx)
-      const ei = Math.min(EQ_W - 1, Math.floor(((lon / Math.PI + 1) / 2) * EQ_W)), ej = Math.min(EQ_H - 1, Math.floor((0.5 - lat / Math.PI) * EQ_H))
-      const k = (ej * EQ_W + ei) * 3, o = (py * S + px) * 4
-      const shade = 0.55 + 0.45 * z
-      img.data[o] = eq[k] * shade; img.data[o + 1] = eq[k + 1] * shade; img.data[o + 2] = eq[k + 2] * shade; img.data[o + 3] = 255
-    }
-  }
-  ctx.clearRect(0, 0, S, S)
-  ctx.putImageData(img, 0, 0)
-  ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.55)'
-  ctx.beginPath(); ctx.arc(S / 2, S / 2, r, 0, Math.PI * 2); ctx.stroke()
-  // what the view covers
-  const cp = v.compass()
-  const half = Math.min(Math.PI / 2, (cp.kmPerPx * Math.min(v.canvasSize().w, v.canvasSize().h)) / 2 / R)
-  ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff'; ctx.fillStyle = 'rgba(255,255,255,0.18)'
-  ctx.beginPath(); ctx.arc(S / 2, S / 2, Math.max(5, r * Math.sin(half)), 0, Math.PI * 2); ctx.fill(); ctx.stroke()
-  // the player's city: a gold dot, or a faint one on the rim when it is on the far side
-  const h = latLonToDir(home.lat, home.lon)
-  const hx = h[0] * e[0] + h[1] * e[1] + h[2] * e[2], hy = h[0] * n[0] + h[1] * n[1] + h[2] * n[2], hz = h[0] * f[0] + h[1] * f[1] + h[2] * f[2]
-  let px = hx, py = hy, a = 1
-  if (hz < 0) { const l = Math.hypot(hx, hy) || 1; px = hx / l; py = hy / l; a = 0.45 }
-  ctx.globalAlpha = a
-  ctx.fillStyle = '#ffc928'; ctx.strokeStyle = '#4a2f00'; ctx.lineWidth = 2
-  ctx.beginPath(); ctx.arc(S / 2 + px * r, S / 2 - py * r, 5.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
-  ctx.globalAlpha = 1
-  void alt
-}
-
 const gcKm = (a: { lat: number; lon: number }, b: { lat: number; lon: number }, R: number) => {
   const p = latLonToDir(a.lat, a.lon), q = latLonToDir(b.lat, b.lon)
   return Math.acos(Math.min(1, Math.max(-1, p[0] * q[0] + p[1] * q[1] + p[2] * q[2]))) * R
 }
 
-interface Readout { lat: number; lon: number; tile: TileInfo | null; near: { name: string; km: number } | null; region: string }
-const MINI_ALT = 5000
+interface Readout { lat: number; lon: number; tile: TileInfo | null; near: { name: string; km: number; id: string } | null; region: string }
+const LABEL_ALT = 4000
+const LOCATE_ALT = 60
 
 /** M opens or closes the map, H (inside it) goes home; only when no text field or popup has the keyboard. */
 export function useWorldMapKeys(enabled: boolean, mapOn: boolean, toggle: () => void, home: () => void) {
@@ -147,39 +89,37 @@ interface Props {
 export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef }: Props) {
   const chrome = useChrome()
   const desktop = !!chrome?.desktop
+  const R = world.planet_radius_km
+  const rootRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const viewRef = useRef<WorldMapView | null>(null)
   const markerRefs = useRef(new Map<string, HTMLButtonElement>())
-  const chipRef = useRef<HTMLDivElement | null>(null)
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [oblique, setOblique] = useState(false)
+  const [terrainLook, setTerrainLook] = useState(false)
+  const [lookHint, setLookHint] = useState('')
   const [dests, setDests] = useState<Place[]>([])
   const [sel, setSel] = useState<string | null>(null)
-  const [listOpen, setListOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
   const [bottomInset, setBottomInset] = useState(8)
   const [topInset, setTopInset] = useState(0)
-  const [spot, setSpot] = useState<{ lat: number; lon: number } | null>(null)
-  const spotRef = useRef(spot)
+  const [spot, setSpot] = useState<Readout | null>(null)
+  const spotRef = useRef<Readout | null>(null)
   spotRef.current = spot
-  const [read, setRead] = useState<Readout | null>(null)
+  const [atHome, setAtHome] = useState(true)
   const arrowRef = useRef<HTMLButtonElement | null>(null)
   const arrowTxt = useRef<HTMLSpanElement | null>(null)
   const arrowIcon = useRef<HTMLSpanElement | null>(null)
   const compassRef = useRef<HTMLSpanElement | null>(null)
   const scaleBar = useRef<HTMLSpanElement | null>(null)
   const scaleTxt = useRef<HTMLSpanElement | null>(null)
-  const infoRef = useRef<HTMLDivElement | null>(null)
-  const miniRef = useRef<HTMLCanvasElement | null>(null)
-  const miniWrap = useRef<HTMLButtonElement | null>(null)
   const spotMk = useRef<HTMLDivElement | null>(null)
-  const equi = useRef<Uint8ClampedArray | null>(null)
   const insetsRef = useRef({ top: 0, bottom: 0 })
-  const lastRead = useRef({ at: 0, key: '' })
-  const [viewAlt, setViewAlt] = useState(ENTER_ALT)
-  const lastMini = useRef({ at: 0, lat: 999, lon: 999, alt: 0 })
+  const atHomeRef = useRef(true)
+  const readyRef = useRef(false)
 
   const homePlace = useMemo<Place>(() => ({ id: 'home:' + home.id, code: 'home', name: home.name, lat: home.lat, lon: home.lon, kind: 'home', sid: home.id, located: true }), [home.id, home.name, home.lat, home.lon])
   const places = useMemo(() => [homePlace, ...dests.filter((d) => d.sid !== home.id)], [homePlace, dests, home.id])
@@ -214,6 +154,19 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
     return () => { off = true }
   }, [])
 
+  /** What is at a place: coordinates, biome, height, coast, the nearest city. */
+  const readAt = useCallback((lat: number, lon: number): Readout => {
+    const v = viewRef.current
+    const tile = v ? v.terrain.sample(lat, lon) : null
+    let near: Readout['near'] = null
+    for (const p of placesRef.current) {
+      if (!p.located) continue
+      const km = gcKm({ lat, lon }, p, R)
+      if (!near || km < near.km) near = { name: p.name, km, id: p.id }
+    }
+    return { lat, lon, tile, near, region: regionProvider.at(lat, lon)?.name ?? '' }
+  }, [R])
+
   // the 3D view
   useEffect(() => {
     const canvas = canvasRef.current
@@ -233,7 +186,9 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
       viewRef.current = view
       view.onFrame = () => {
         const v = view!
-        // markers follow the globe
+        const st = v.state()
+        // markers follow the globe; far out only the own city and the chosen one keep a name
+        rootRef.current?.classList.toggle('wm-far', st.alt > LABEL_ALT)
         const taken: { x: number; y: number }[] = []
         const order = [...placesRef.current].sort((a, b) => (a.kind === 'home' ? 0 : 1) - (b.kind === 'home' ? 0 : 1))
         for (const p of order) {
@@ -244,14 +199,10 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
           if (!pt.visible) { el.style.display = 'none'; continue }
           el.style.display = ''
           el.style.transform = `translate(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px)`
-          // a label that would sit on another city's label gives way
           const clash = taken.some((o) => Math.abs(o.x - pt.x) < 78 && Math.abs(o.y - pt.y) < 20)
           el.classList.toggle('wm-nolbl', clash)
           if (!clash) taken.push(pt)
         }
-        const st = v.state()
-        if (chipRef.current) chipRef.current.textContent = t('wm.alt', { km: String(Math.round(st.alt)) })
-        const now = performance.now()
         // compass and scale bar follow the camera
         const cp = v.compass()
         if (compassRef.current) compassRef.current.style.transform = `rotate(${(-cp.deg).toFixed(1)}deg)`
@@ -273,7 +224,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
             const b = v.bearingOnScreen(hp.lat, hp.lon)
             const cx = w / 2, cy = ins.top + (h - ins.top - ins.bottom) / 2
             const mx = 34, my = 34
-            const topEdge = Math.max(ins.top + my, (infoRef.current ? infoRef.current.getBoundingClientRect().bottom - cv.getBoundingClientRect().top : 0) + 40)
+            const topEdge = ins.top + my + 56 // clear of the search box
             const kx = b.x === 0 ? Infinity : (b.x > 0 ? (w - mx - cx) : (mx - cx)) / b.x
             const ky = b.y === 0 ? Infinity : (b.y > 0 ? (h - ins.bottom - my - cy) : (topEdge - cy)) / b.y
             const k = Math.min(kx, ky)
@@ -284,43 +235,23 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
             if (arrowTxt.current && arrowTxt.current.textContent !== txt) arrowTxt.current.textContent = txt
           }
         }
-        // a tapped spot keeps its cross on the ground
+        // a dropped pin keeps its place on the ground
         if (spotMk.current) {
           const sp = spotRef.current
           const pt = sp ? v.project(sp.lat, sp.lon) : null
           if (pt && pt.visible) { spotMk.current.style.display = ''; spotMk.current.style.transform = `translate(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px)` } else spotMk.current.style.display = 'none'
         }
-        // the readout and the minimap, a few times a second
-        if (now - lastRead.current.at > 280) {
-          lastRead.current.at = now
-          const at = spotRef.current ?? { lat: st.lat, lon: st.lon }
-          const tile = v.terrain.sample(at.lat, at.lon)
-          let near: Readout['near'] = null
-          for (const p of placesRef.current) {
-            if (!p.located) continue
-            const km = gcKm(at, p, world.planet_radius_km)
-            if (!near || km < near.km) near = { name: p.kind === 'home' ? p.name : p.name, km }
-          }
-          const key = `${at.lat.toFixed(2)},${at.lon.toFixed(2)},${tile?.lod ?? -1},${near?.name},${Math.round(Math.log(st.alt) * 8)}`
-          if (key !== lastRead.current.key) {
-            lastRead.current.key = key
-            setViewAlt(st.alt)
-            setRead({ lat: at.lat, lon: at.lon, tile, near, region: regionProvider.at(at.lat, at.lon)?.name ?? '' })
-          }
-        }
-        if (miniRef.current && st.alt < MINI_ALT) {
-          v.terrain.wantOverview()
-          if (!equi.current && v.terrain.overviewReady()) equi.current = buildEquirect(v.terrain)
-          const lm = lastMini.current
-          if (equi.current && (now - lm.at > 220) && (Math.abs(lm.lat - st.lat) > 0.3 || Math.abs(lm.lon - st.lon) > 0.3 || Math.abs(lm.alt - st.alt) > st.alt * 0.05)) {
-            lastMini.current = { at: now, lat: st.lat, lon: st.lon, alt: st.alt }
-            drawMini(miniRef.current, equi.current, v, hp, st.alt, world.planet_radius_km)
-          }
-        }
+        // the my-location button is lit while the view is centred on the city
+        const near = v.distanceKm(hp.lat, hp.lon) < Math.max(2, st.alt * 0.06)
+        if (near !== atHomeRef.current) { atHomeRef.current = near; setAtHome(near) }
         if (!readyRef.current && v.terrain.stats().shown > 0) { readyRef.current = true; setReady(true) }
       }
-      view.onTap = (x, y) => { setSel(null); const p = view!.pick(x, y); if (p) setSpot(p) }
-      view.onUser = () => undefined
+      view.onTap = (x, y) => {
+        setSel(null); setSearchOpen(false)
+        const p = view!.pick(x, y)
+        if (p) setSpot(readAt(p.lat, p.lon))
+      }
+      view.onUser = () => setSearchOpen(false)
       ro = new ResizeObserver(() => view?.resize())
       ro.observe(canvas)
       view.resize()
@@ -342,7 +273,6 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world])
-  const readyRef = useRef(false)
 
   // the shell's HUD and dock cover the top and bottom of the canvas: the globe is centred in what is left
   useEffect(() => {
@@ -369,7 +299,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
 
   const goHome = useCallback(() => {
     const v = viewRef.current
-    setSel(null); setListOpen(false)
+    setSel(null); setSpot(null); setSearchOpen(false)
     if (!v || leaving) { onLeft(); return }
     setLeaving(true)
     v.flyTo(home.lat, home.lon, 14, () => window.setTimeout(onLeft, 260))
@@ -378,16 +308,45 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
 
   const flyTo = useCallback((p: Place) => {
     if (!p.located) return
-    setSel(p.id)
-    setListOpen(false)
+    setSel(p.id); setSpot(null); setSearchOpen(false); setQuery('')
     viewRef.current?.flyTo(p.lat, p.lon, CITY_ALT)
   }, [])
 
-  // keys: arrows pan, + and - zoom, Escape closes the card or the list
+  const flyToSpot = useCallback((lat: number, lon: number) => {
+    setSel(null); setSearchOpen(false); setQuery('')
+    setSpot(readAt(lat, lon))
+    viewRef.current?.flyTo(lat, lon, 40)
+  }, [readAt])
+
+  const locate = useCallback(() => {
+    setSel(null); setSpot(null)
+    const v = viewRef.current
+    if (!v) return
+    v.resetNorth(); setOblique(false)
+    window.dispatchEvent(new CustomEvent('tc:maptilt-state', { detail: false }))
+    v.flyTo(home.lat, home.lon, LOCATE_ALT)
+  }, [home.lat, home.lon])
+
+  const toggleLook = useCallback(() => {
+    const v = viewRef.current
+    if (!v) return
+    const next = !terrainLook
+    v.setStyle(next ? 'terrain' : 'map')
+    setTerrainLook(next)
+    setLookHint(t(next ? 'wm.look.terrain' : 'wm.look.map'))
+    window.setTimeout(() => setLookHint(''), 1600)
+  }, [terrainLook])
+
+  const resetNorth = useCallback(() => {
+    viewRef.current?.resetNorth(); setOblique(false)
+    window.dispatchEvent(new CustomEvent('tc:maptilt-state', { detail: false }))
+  }, [])
+
+  // keys: arrows pan, + and - zoom, Escape closes the card or the suggestions
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const tg = e.target as HTMLElement | null
-      if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA')) return
+      if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA')) { if (e.key === 'Escape') { setSearchOpen(false); (tg as HTMLInputElement).blur() } return }
       const v = viewRef.current
       if (!v || e.ctrlKey || e.metaKey || e.altKey) return
       const step = 90
@@ -395,15 +354,15 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
       else if (e.key === 'ArrowRight') v.panBy(-step, 0)
       else if (e.key === 'ArrowUp') v.panBy(0, step)
       else if (e.key === 'ArrowDown') v.panBy(0, -step)
-      else if (e.key === '+' || e.key === '=') v.zoomBy(0.7)
-      else if (e.key === '-' || e.key === '_') v.zoomBy(1.4)
-      else if (e.key === 'Escape') { if (sel) setSel(null); else if (listOpen) setListOpen(false) }
+      else if (e.key === '+' || e.key === '=') v.zoomBy(0.6)
+      else if (e.key === '-' || e.key === '_') v.zoomBy(1.6)
+      else if (e.key === 'Escape') { if (spotRef.current) setSpot(null); else setSel(null) }
       else return
       e.preventDefault()
     }
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
-  }, [sel, listOpen])
+  }, [])
 
   // the eye button of the city screen asks for the tilted view here
   useEffect(() => {
@@ -414,29 +373,23 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
   useEffect(() => { window.dispatchEvent(new CustomEvent('tc:maptilt-state', { detail: oblique })) }, [oblique])
 
   const selPlace = places.find((p) => p.id === sel) ?? null
-  const shown = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return places.filter((p) => !q || p.name.toLowerCase().includes(q))
-  }, [places, query])
 
-  const list = (
-    <div className="wm-list">
-      <input className="wm-search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('wm.list.search')} aria-label={t('wm.list.search')} />
-      <div className="wm-rows">
-        {shown.map((p) => (
-          <button key={p.id} type="button" className={`wm-row${p.id === sel ? ' on' : ''}`} onClick={() => (p.kind === 'home' ? goHome() : flyTo(p))} disabled={!p.located}>
-            <span className={`wm-rowdot ${p.kind}`}>{p.kind === 'home' && <Emboss name="house" palette="gold" size={16} />}</span>
-            <span className="wm-rowname">{p.name}</span>
-            <span className="wm-rowkm">{p.kind === 'home' ? t('wm.here') : p.km !== undefined ? t('wm.km', { km: kmText(p.km) }) : ''}</span>
-          </button>
-        ))}
-        {shown.length === 0 && <div className="wm-empty">{places.length <= 1 && !query ? t('wm.list.none') : t('wm.list.empty')}</div>}
-      </div>
-    </div>
-  )
+  // search: the cities that match (all of them when the box is empty), or a pair of coordinates
+  const coords = useMemo(() => parseCoords(query), [query])
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return places.filter((p) => p.located && (!q || p.name.toLowerCase().includes(q))).slice(0, 7)
+  }, [places, query])
+  const pickFirst = () => {
+    if (suggestions[0]) flyTo(suggestions[0])
+    else if (coords) flyToSpot(coords.lat, coords.lon)
+  }
+
+  const cardPlace = selPlace
+  const homeKm = (lat: number, lon: number) => gcKm({ lat, lon }, homeRef.current, R)
 
   return (
-    <div style={{ '--wm-top': `${topInset}px`, '--wm-bot': `${bottomInset}px` } as React.CSSProperties} className={`wm${ready ? ' wm-in' : ''}${leaving ? ' wm-out' : ''}${desktop ? ' wm-desk' : ''}`}>
+    <div ref={rootRef} style={{ '--wm-top': `${topInset}px`, '--wm-bot': `${bottomInset}px` } as React.CSSProperties} className={`wm${ready ? ' wm-in' : ''}${leaving ? ' wm-out' : ''}${desktop ? ' wm-desk' : ''}${terrainLook ? ' wm-terrain' : ''}`}>
       <canvas ref={canvasRef} className="wm-canvas" />
 
       <div className="wm-markers">
@@ -444,7 +397,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
           <button
             key={p.id} type="button" ref={(el) => { if (el) markerRefs.current.set(p.id, el); else markerRefs.current.delete(p.id) }}
             className={`wm-mk ${p.kind}${p.id === sel ? ' sel' : ''}`} style={{ display: 'none' }}
-            onClick={(e) => { e.stopPropagation(); setSel(p.id) }}
+            onClick={(e) => { e.stopPropagation(); setSel(p.id); setSpot(null); setSearchOpen(false) }}
             aria-label={p.name}
           >
             <span className="wm-dot">{p.kind === 'home' && <Emboss name="house" palette="gold" size={18} />}</span>
@@ -458,96 +411,124 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
         <span className="wm-arrow-txt" ref={arrowTxt} />
       </button>
 
-      <div className="wm-spot" ref={spotMk} style={{ display: 'none' }} aria-hidden>✕</div>
+      <div className="wm-spot" ref={spotMk} style={{ display: 'none' }} aria-hidden />
 
-      <div className="wm-info" ref={infoRef} aria-live="polite">
-        <span className="wm-compass" title={t('wm.north')}><span ref={compassRef}><svg viewBox="0 0 24 24" width="30" height="30"><circle cx="12" cy="12" r="11" fill="rgba(7,10,20,0.6)" stroke="rgba(255,255,255,0.4)" /><path d="M12 3 L16 13 L12 11.5 L8 13 Z" fill="#ff5a4a" /><path d="M12 21 L16 13 L12 11.5 L8 13 Z" fill="#dfe4ff" /></svg></span></span>
-        <span className="wm-info-txt">
-          {read && (
-            <>
-              <span className="wm-info-l1">
-                <b>{spot ? t('wm.spot') : t('wm.centre')}</b>
-                <span>{coordText(read.lat, read.lon)}</span>
-              </span>
-              {read.region && <span className="wm-info-l2">{read.region}</span>}
-              <span className="wm-info-l2">
-                {[
-                  read.tile ? biomeName(read.tile.biomeCode) : '',
-                  climateBand(read.lat),
-                  read.tile ? (read.tile.ocean ? t('wm.depth', { m: String(Math.max(0, Math.round(-read.tile.elev))) }) : t('wm.height', { m: String(Math.round(read.tile.elev)) })) : '',
-                  read.tile && !read.tile.ocean && read.tile.tileKm <= 20 ? (read.tile.coast ? t('wm.coast') : t('wm.inland')) : '',
-                ].filter(Boolean).join(' · ')}
-              </span>
-              {read.near && <span className="wm-info-l2">{t('wm.nearest', { name: read.near.name, km: kmText(read.near.km) })}</span>}
-            </>
-          )}
-          <span className="wm-chip" ref={chipRef} />
-        </span>
-        {spot && <button type="button" className="wm-x wm-info-x" onClick={() => setSpot(null)} aria-label={t('wm.spot_clear')}>✕</button>}
-      </div>
-
-      <div className="wm-scale"><span className="wm-scale-bar" ref={scaleBar} /><span ref={scaleTxt} /></div>
-
-      <button type="button" className="wm-mini" ref={miniWrap} onClick={() => { const v = viewRef.current; if (v) { const st = v.state(); v.flyTo(st.lat, st.lon, world.planet_radius_km * 3) } }} aria-label={t('wm.mini')}
-        style={{ display: (read && viewAlt < MINI_ALT) ? '' : 'none' }}>
-        <canvas ref={miniRef} width={176} height={176} />
-      </button>
-
-      <div className="wm-tools">
-        <button type="button" className="k-hdr-btn" onClick={() => setListOpen((o) => !o)} aria-label={t('wm.btn.list')} aria-pressed={listOpen}><Emboss name="m_search" palette="gold" size={22} /></button>
-        {desktop && (
-          <>
-            <button type="button" className="k-hdr-btn wm-zoom" onClick={() => viewRef.current?.zoomBy(0.6)} aria-label={t('wm.btn.zoom_in')}>+</button>
-            <button type="button" className="k-hdr-btn wm-zoom" onClick={() => viewRef.current?.zoomBy(1.6)} aria-label={t('wm.btn.zoom_out')}>−</button>
-          </>
+      <div className="wm-searchbox">
+        <div className="wm-sfield">
+          <Emboss name="m_search" palette="gold" size={20} />
+          <input
+            type="search" value={query} placeholder={t('wm.search.ph')} aria-label={t('wm.search.ph')} autoComplete="off" enterKeyHint="search"
+            onChange={(e) => { setQuery(e.target.value); setSearchOpen(true) }} onFocus={() => setSearchOpen(true)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); pickFirst(); (e.target as HTMLInputElement).blur() } }}
+          />
+          {query && <button type="button" className="wm-sclear" onClick={() => setQuery('')} aria-label={t('wm.close')}>✕</button>}
+        </div>
+        {searchOpen && (suggestions.length > 0 || coords) && (
+          <div className="wm-suggest" role="listbox" onPointerDown={(e) => e.preventDefault()}>
+            {coords && (
+              <button type="button" role="option" aria-selected="false" className="wm-row" onClick={() => flyToSpot(coords.lat, coords.lon)}>
+                <span className="wm-rowdot pin" />
+                <span className="wm-rowname">{coordText(coords.lat, coords.lon)}</span>
+              </button>
+            )}
+            {suggestions.map((p) => (
+              <button key={p.id} type="button" role="option" aria-selected={p.id === sel} className={`wm-row${p.id === sel ? ' on' : ''}`} onClick={() => (p.kind === 'home' ? (flyTo(p)) : flyTo(p))}>
+                <span className={`wm-rowdot ${p.kind}`}>{p.kind === 'home' && <Emboss name="house" palette="gold" size={16} />}</span>
+                <span className="wm-rowname">{p.name}</span>
+                <span className="wm-rowkm">{p.kind === 'home' ? t('wm.here') : t('wm.km', { km: kmText(p.km ?? homeKm(p.lat, p.lon)) })}</span>
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
-      {selPlace && !listOpen && (
-        <div className="wm-card" style={desktop ? undefined : { bottom: bottomInset }} role="dialog" aria-label={selPlace.name}>
-          <div className="wm-card-head">
-            <span className={`wm-rowdot ${selPlace.kind}`}>{selPlace.kind === 'home' && <Emboss name="house" palette="gold" size={16} />}</span>
-            <div className="wm-card-title">
-              <b>{selPlace.name}</b>
-              <small>{selPlace.kind === 'home' ? t('wm.here') : selPlace.kind === 'central' ? '' : t('wm.city')}</small>
-            </div>
-            <button type="button" className="wm-x" onClick={() => setSel(null)} aria-label={t('wm.close')}>✕</button>
-          </div>
-          {selPlace.kind !== 'home' && (
-            <div className="wm-card-facts">
-              {selPlace.km !== undefined && <span>{t('wm.km', { km: kmText(selPlace.km) })}</span>}
-              {selPlace.fare !== undefined && <span>{t('wm.fare', { fare: money(selPlace.fare) })}</span>}
-              {selPlace.wait !== undefined && <span>{t('wm.wait', { t: waitText(selPlace.wait) })}</span>}
-            </div>
+      <div className="wm-tools">
+        <button type="button" className="k-hdr-btn" onClick={toggleLook} aria-label={t(terrainLook ? 'wm.look.to_map' : 'wm.look.to_terrain')} aria-pressed={terrainLook}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ffe9a8" strokeWidth="1.8" strokeLinejoin="round"><path d="M12 3 L21 8 L12 13 L3 8 Z" /><path d="M3 12.5 L12 17.5 L21 12.5" /><path d="M3 16.5 L12 21.5 L21 16.5" /></svg>
+        </button>
+        <button type="button" className="k-hdr-btn" onClick={resetNorth} aria-label={t('wm.compass')}>
+          <span ref={compassRef} className="wm-needle"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2 L17 13 L12 11 L7 13 Z" fill="#ff5a4a" /><path d="M12 22 L17 13 L12 11 L7 13 Z" fill="#dfe4ff" /></svg></span>
+        </button>
+        {desktop && (
+          <>
+            <button type="button" className="k-hdr-btn wm-zoom" onClick={() => viewRef.current?.zoomBy(0.55)} aria-label={t('wm.btn.zoom_in')}>+</button>
+            <button type="button" className="k-hdr-btn wm-zoom" onClick={() => viewRef.current?.zoomBy(1.8)} aria-label={t('wm.btn.zoom_out')}>−</button>
+          </>
+        )}
+        <button type="button" className={`k-hdr-btn wm-locate${atHome ? ' on' : ''}`} onClick={locate} aria-label={t('wm.locate')}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke={atHome ? '#ffc928' : '#ffe9a8'} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="6.5" /><circle cx="12" cy="12" r="2.4" fill={atHome ? '#ffc928' : 'none'} /><path d="M12 1.5 V5 M12 19 V22.5 M1.5 12 H5 M19 12 H22.5" /></svg>
+        </button>
+        {lookHint && <span className="wm-hint">{lookHint}</span>}
+      </div>
+
+      {(cardPlace || spot) && (
+        <div className="wm-card" style={desktop ? undefined : { bottom: bottomInset }} role="dialog" aria-label={cardPlace?.name ?? t('wm.spot')}>
+          {cardPlace ? (
+            <>
+              <div className="wm-card-head">
+                <span className={`wm-rowdot ${cardPlace.kind}`}>{cardPlace.kind === 'home' && <Emboss name="house" palette="gold" size={16} />}</span>
+                <div className="wm-card-title">
+                  <b>{cardPlace.name}</b>
+                  <small>{cardPlace.kind === 'home' ? t('wm.here') : cardPlace.kind === 'central' ? '' : t('wm.city')}</small>
+                </div>
+                <button type="button" className="wm-x" onClick={() => setSel(null)} aria-label={t('wm.close')}>✕</button>
+              </div>
+              {cardPlace.kind !== 'home' && (
+                <div className="wm-card-facts">
+                  {cardPlace.km !== undefined && <span>{t('wm.km', { km: kmText(cardPlace.km) })}</span>}
+                  {cardPlace.fare !== undefined && <span>{t('wm.fare', { fare: money(cardPlace.fare) })}</span>}
+                  {cardPlace.wait !== undefined && <span>{t('wm.wait', { t: waitText(cardPlace.wait) })}</span>}
+                </div>
+              )}
+              <div className="wm-card-acts">
+                {cardPlace.kind === 'home' ? (
+                  <button type="button" className="wm-btn gold" onClick={goHome}>{t('wm.home_go')}</button>
+                ) : (
+                  <>
+                    <button type="button" className="wm-btn gold" onClick={() => flyTo(cardPlace)} disabled={!cardPlace.located}>{t('wm.go')}</button>
+                    {cardPlace.sid && <button type="button" className="wm-btn" onClick={() => { onLeft(); openLocal('village_visit', { id: cardPlace.sid! }) }}>{t('wm.visit')}</button>}
+                    <button type="button" className="wm-btn" onClick={() => { onLeft(); run('travel.options', { city: cardPlace.code }) }}>{t('wm.travel')}</button>
+                  </>
+                )}
+              </div>
+            </>
+          ) : spot && (
+            <>
+              <div className="wm-card-head">
+                <span className="wm-rowdot pin" />
+                <div className="wm-card-title">
+                  <b>{t('wm.spot')}</b>
+                  <small>{coordText(spot.lat, spot.lon)}</small>
+                </div>
+                <button type="button" className="wm-x" onClick={() => setSpot(null)} aria-label={t('wm.close')}>✕</button>
+              </div>
+              <div className="wm-card-facts wm-facts-col">
+                {spot.region && <span>{spot.region}</span>}
+                <span>
+                  {[
+                    spot.tile ? biomeName(spot.tile.biomeCode) : '',
+                    climateBand(spot.lat),
+                    spot.tile ? (spot.tile.ocean ? t('wm.depth', { m: String(Math.max(0, Math.round(-spot.tile.elev))) }) : t('wm.height', { m: String(Math.round(spot.tile.elev)) })) : '',
+                    spot.tile && !spot.tile.ocean && spot.tile.tileKm <= 20 ? (spot.tile.coast ? t('wm.coast') : t('wm.inland')) : '',
+                  ].filter(Boolean).join(' · ')}
+                </span>
+                <span>{t('wm.from_home', { km: kmText(homeKm(spot.lat, spot.lon)) })}</span>
+                {spot.near && <span>{t('wm.nearest', { name: spot.near.name, km: kmText(spot.near.km) })}</span>}
+              </div>
+              {spot.near && (
+                <div className="wm-card-acts">
+                  <button type="button" className="wm-btn gold" onClick={() => { const p = places.find((q) => q.id === spot.near!.id); if (p) flyTo(p) }}>{t('wm.go_nearest')}</button>
+                </div>
+              )}
+            </>
           )}
-          <div className="wm-card-acts">
-            {selPlace.kind === 'home' ? (
-              <button type="button" className="wm-btn gold" onClick={goHome}>{t('wm.home_go')}</button>
-            ) : (
-              <>
-                <button type="button" className="wm-btn gold" onClick={() => flyTo(selPlace)} disabled={!selPlace.located}>{t('wm.go')}</button>
-                {selPlace.sid && <button type="button" className="wm-btn" onClick={() => { onLeftSilently(); openLocal('village_visit', { id: selPlace.sid! }) }}>{t('wm.visit')}</button>}
-                <button type="button" className="wm-btn" onClick={() => { onLeftSilently(); run('travel.options', { city: selPlace.code }) }}>{t('wm.travel')}</button>
-              </>
-            )}
-          </div>
         </div>
       )}
 
-      {listOpen && (desktop ? (
-        <aside className="wm-dock" aria-label={t('wm.list.title')}>
-          <div className="wm-dock-head"><b>{t('wm.list.title')}</b><button type="button" className="wm-x" onClick={() => setListOpen(false)} aria-label={t('wm.close')}>✕</button></div>
-          {list}
-        </aside>
-      ) : (
-        <Popup open title={t('wm.list.title')} tone="navy" onClose={() => setListOpen(false)}>{list}</Popup>
-      ))}
+      <div className="wm-scale"><span className="wm-scale-bar" ref={scaleBar} /><span ref={scaleTxt} /></div>
 
       {!ready && !failed && <div className="wm-load">{t('wm.loading')}</div>}
       {failed && <div className="wm-load">{t('wm.failed')}</div>}
     </div>
   )
-
-  // a travel or visit screen opens over the city: the map closes without the flight home
-  function onLeftSilently() { onLeft() }
 }
