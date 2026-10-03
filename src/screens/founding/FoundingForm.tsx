@@ -70,6 +70,7 @@ export default function FoundingForm({ localArgs, openLocal }: ScreenProps) {
   const [missing, setMissing] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const draftArg = localArgs?.draft ?? ''
+  const tickNow = useNow(1000)
 
   const load = useCallback(async () => {
     try {
@@ -147,7 +148,7 @@ export default function FoundingForm({ localArgs, openLocal }: ScreenProps) {
               <Emblem {...emblemProps(view, view.default_emblem)} size={96} />
               <div className="ff-msg-title">{t('founding.other.title', { founder: view.founder || t('pn.someone') })}</div>
               <div className="ff-msg-body">{t('founding.other.body')}</div>
-              <Chip tone="gold">{t('founding.time_left', { time: timeLeft(view.expires_at, Date.now()) })}</Chip>
+              <Chip tone="gold">{t('founding.time_left', { time: timeLeft(view.expires_at, tickNow) })}</Chip>
             </>
           )}
           {view.state === 'expired' && (

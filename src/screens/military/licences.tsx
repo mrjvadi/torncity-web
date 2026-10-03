@@ -10,6 +10,7 @@ import { hasKey, t, type Key } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerFlow, type FlowCtx } from '../village/flow'
 import { durationText } from '../village/common'
 import { serverNow } from '../../village/clock'
+import { useSecond } from '../../lib/ticker'
 import { ConfirmPopup, NotHere, Tail, byId, place } from './kit'
 
 const key = (k: string) => k as Key
@@ -22,6 +23,7 @@ const typeName = (ctx: FlowCtx, e: { company: { type: { code: string; name: stri
 const until = (at: string | null | undefined): number => (at ? Math.max(0, Math.round((Date.parse(at) - serverNow()) / 1000)) : 0)
 
 function EntryBlock({ ctx, e, acts }: { ctx: FlowCtx; e: LicenceEntry; acts: ReturnType<typeof byId> }) {
+  useSecond() // the notice counts down on the shared ticker
   const ends = e.status === 'revoking' ? until(e.effective_at) : 0
   return (
     <div className="mil-block">
@@ -109,6 +111,7 @@ const CompanyDefence = flow<CompanyDefenceView>(({ view: v, ctx }) => {
 })
 
 const LicenceNotice = flow<LicenceNoticeView>(({ view: v, ctx }) => {
+  useSecond()
   const kind = ['applied', 'approved', 'rejected', 'revoked'].includes(v.kind) ? v.kind : 'applied'
   const ends = until(v.effective_at)
   return (

@@ -5,7 +5,7 @@
 
 export type SyncKind =
   | 'player' | 'vitals' | 'wallet' | 'inventory' | 'skill' | 'timed_action' | 'location' | 'inbox' | 'notice'
-  | 'residence' | 'settlement' | 'relations'
+  | 'residence' | 'settlement' | 'relations' | 'goal'
 
 export type SyncOp = 'set' | 'patch' | 'del'
 
@@ -107,6 +107,37 @@ export interface NoticeData {
 
 export interface ResidenceData { settlement: string; code: string; name: string; tier: string; is_head: boolean; resident: boolean }
 
+export interface ElectionData { office: string; opens_at: string; candidacy_ends_at: string; voting_ends_at: string }
+
+/** The verbs a viewer may perform on a building (the server's list; the client keeps no per-kind table). */
+export type BuildingAction =
+  | 'info' | 'upgrade' | 'demolish' | 'cancel' | 'workers' | 'take_shift' | 'help_build' | 'treasury' | 'research' | 'elections' | 'road'
+
+export type BuildingReason = 'no_road' | 'no_staff' | 'storage_full' | 'no_input' | 'damaged'
+
+export interface BuildingOverlay {
+  id: string
+  /** the level in the role's ladder; 0 outside one (the road, the hall) */
+  tier: number
+  role?: string
+  status: 'working' | 'idle' | 'building'
+  reasons: BuildingReason[]
+  can_upgrade: boolean
+  actions: BuildingAction[]
+  staff?: { have: number; need: number }
+  /** reserved: never sent yet (no building holds its own output) */
+  output_ready?: { good: string; amount: number }
+}
+
+/** The next goal for the quest strip: "<source>.<kind>" with its args, progress against a target, and where to go. */
+export interface GoalData {
+  code: string
+  args: Record<string, string>
+  progress: number
+  target: number
+  go_to: string
+}
+
 export interface SettlementData {
   id: string
   code: string
@@ -118,6 +149,10 @@ export interface SettlementData {
   treasury: { currency: string; balance: number } | null
   knowledge: number
   research: { code: string; finish_at: string } | null
+  /** the open election: the candidacy runs to candidacy_ends_at, then the vote to voting_ends_at (members only) */
+  election: ElectionData | null
+  /** what THIS viewer may do with each building and how it stands; a building with no entry is «info» only */
+  buildings: BuildingOverlay[]
 }
 
 export interface RelationsData {
@@ -139,4 +174,5 @@ export interface KindData {
   residence: ResidenceData
   settlement: SettlementData
   relations: RelationsData
+  goal: GoalData
 }

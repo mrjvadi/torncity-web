@@ -4765,6 +4765,26 @@ v6.ring.knowledge | پژوهش | Research
 v6.ring.learn | آموزش | Learn
 v6.ring.mine | ملک من | My property
 v6.bub.damaged | آسیب دیده | Damaged
+v6.bub.no_staff | کارگر ندارد | No workers
+v6.bub.no_road | راه ندارد | No road
+v6.bub.storage_full | انبار پر است | Store is full
+v6.bub.no_input | مواد کم است | Short of materials
+v6.ring.shift | کار کن | Work a shift
+v6.ring.elections | انتخابات | Election
+v6.ring.workers | کارگرها | Workers
+v6.ring.road | جاده | Road
+v6.ev.election | انتخابات | Election
+v6.tip.election.candidacy | ثبت‌نام نامزدها: {t} دیگر | Candidacy: {t} left
+v6.tip.election.voting | رأی‌گیری: {t} دیگر | Voting: {t} left
+v6.q.mission | کارِ ماموریتت را انجام بده | Carry on with your mission
+v6.q.mission.work_shift | {req} شیفت کار کن | Work {req} shifts
+v6.q.mission.travel | سفرِ ماموریت را انجام بده | Make the mission's journey
+v6.q.mission.course | {req} درس را تمام کن | Finish {req} courses
+v6.q.mission.buy_item | {req} کالا بخر | Buy {req} goods
+v6.q.mission.sell_item | {req} کالا بفروش | Sell {req} goods
+v6.q.mission.crime | {req} بار موفق شو | Succeed {req} times
+v6.q.mission.use_item | {req} کالا مصرف کن | Use {req} goods
+v6.q.mission.deliver | {req} کالا تحویل بده | Hand in {req} goods
 v6.up.title | ارتقای {name} | Upgrade {name}
 v6.up.go | ارتقا بده | Upgrade
 v6.up.cost | هزینه | Cost
@@ -4795,7 +4815,6 @@ v6.ring.build | ساخت | Build
 v6.ring.access | دسترسی | Access
 v6.ring.treasury | خزانه | Treasury
 v6.ring.donate | کمک به انبار | Help the store
-v6.ring.elections | انتخابات | Elections
 v6.ring.lot | قطعه | Lot
 # -- goods lists: search, categories, sorting (market, storehouse) ---------------------------------
 goods.search | جست‌وجوی نام کالا | Search goods by name

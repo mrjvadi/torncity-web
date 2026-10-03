@@ -1,10 +1,11 @@
 // What a tap on a building offers: at most five verbs, «اطلاعات» first, the building's main verb as the gold primary.
-// The verbs follow what the server says about THIS viewer (the building's panel: can_manage, has_upgrade, kind) and the
-// building's own kind; nothing is offered that the viewer may not do, and nothing is invented for a kind the client does
-// not know (it gets «اطلاعات» and, if the server allows it, «ارتقا»).
+// The verbs are the server's own list for THIS viewer (the building overlay of the settlement summary: `actions`);
+// this file only turns each verb into the button and the screen it opens, and orders them. Nothing is offered that
+// the server did not list, and a verb this client does not know is left out.
 
-import type { BuildingPanelView, LayoutBuilding } from '../../api/types'
+import type { LayoutBuilding } from '../../api/types'
 import { t } from '../../i18n'
+import type { BuildingOverlay } from '../../state/syncTypes'
 import type { RingAction } from '../../ui/v6/MapOverlays'
 
 export interface RingHandlers {
@@ -12,38 +13,37 @@ export interface RingHandlers {
   upgrade: () => void
   site: () => void
   open: (screen: string, args?: Record<string, string>) => void
-  /** the society hub lists an election (the server's say) */
-  hasElections?: boolean
   mine: () => void
   run: (command: string) => void
 }
 
-export function ringActions(b: LayoutBuilding, panel: BuildingPanelView | null, h: RingHandlers): RingAction[] {
-  const going = b.state === 'under_construction' || b.state === 'planned'
-  const kind = panel?.kind ?? (b.type === 'road' ? 'road' : 'generic')
-  // the civic hall's «اطلاعات» is the city panel (web map 6.2); every other building's is its own panel
-  const acts: RingAction[] = [{ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: kind === 'civic_hall' && !going ? () => h.open('city_panel') : h.info }]
-  let hasPrimary = false
-  const primary = (a: Omit<RingAction, 'kind'>) => { acts.push({ ...a, kind: 'primary' }); hasPrimary = true }
+const has0 = (ov: BuildingOverlay | null, a: BuildingOverlay['actions'][number]) => !!ov?.actions.includes(a)
 
-  if (going) {
-    if (b.id) primary({ id: 'site', label: t('v6.ring.help_build'), icon: 'hammer', onClick: h.site })
+export function ringActions(b: LayoutBuilding, ov: BuildingOverlay | null, h: RingHandlers): RingAction[] {
+  // the civic hall's «اطلاعات» is the city panel (web map 6.2); every other building's is its own panel
+  const civic = ov?.role === 'governance' && !has0(ov, 'help_build')
+  const acts: RingAction[] = [{ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: civic ? () => h.open('city_panel') : h.info }]
+  const has = (a: BuildingOverlay['actions'][number]) => !!ov?.actions.includes(a)
+  let hasPrimary = false
+  const primary = (a: Omit<RingAction, 'kind'>) => { acts.push(hasPrimary ? a : { ...a, kind: 'primary' }); hasPrimary = true }
+
+  if (has('help_build') && b.id) {
+    primary({ id: 'site', label: t('v6.ring.help_build'), icon: 'hammer', onClick: h.site })
   } else if (b.private && b.mine) {
     primary({ id: 'mine', label: t('v6.ring.mine'), icon: 'bag', onClick: h.mine })
-  } else if (kind === 'storage') {
-    primary({ id: 'storage', label: t('v6.ring.storage'), icon: 'chest', onClick: () => h.open('village_storage') })
-    acts.push({ id: 'donate', label: t('v6.ring.donate'), icon: 'gift', onClick: () => h.open('village_overview', { donate: '1' }) })
-  } else if (kind === 'civic_hall') {
-    // the city panel is the hall's «اطلاعات» (the small first button); research is the main verb, view-only for a resident
-    primary({ id: 'knowledge', label: t('v6.ring.knowledge'), icon: 'book', onClick: () => h.open('village_knowledge') })
-    if (h.hasElections) acts.push({ id: 'elections', label: t('v6.ring.elections'), icon: 'ballot', onClick: () => h.run('election.list') })
-    acts.push({ id: 'treasury', label: t('v6.ring.treasury'), icon: 'coin', onClick: () => h.open('village_overview') })
-  } else if (kind === 'school') {
-    primary({ id: 'learn', label: t('v6.ring.learn'), icon: 'book', onClick: () => h.run('education.list') })
+  } else {
+    if (has('treasury')) primary({ id: 'status', label: t('v6.ring.treasury'), icon: 'scroll', onClick: () => h.open('village_overview') })
+    if (has('take_shift')) primary({ id: 'shift', label: t('v6.ring.shift'), icon: 'tool', onClick: () => h.run('settlement.work') })
+    if (ov?.role === 'storage') primary({ id: 'storage', label: t('v6.ring.storage'), icon: 'chest', onClick: () => h.open('village_storage') })
+    if (ov?.role === 'education') primary({ id: 'learn', label: t('v6.ring.learn'), icon: 'book', onClick: () => h.run('education.list') })
+    if (has('research')) acts.push({ id: 'knowledge', label: t('v6.ring.knowledge'), icon: 'book', onClick: () => h.open('village_knowledge') })
+    if (has('elections')) acts.push({ id: 'elections', label: t('v6.ring.elections'), icon: 'ballot', onClick: () => h.run('election.list') })
+    if (has('workers')) acts.push({ id: 'workers', label: t('v6.ring.workers'), icon: 'people', onClick: () => h.run('settlement.labor.board') })
+    if (has('road')) acts.push({ id: 'road', label: t('v6.ring.road'), icon: 'road', onClick: h.info })
   }
 
-  // the upgrade is offered only to the viewer the server lets manage this building
-  if (!going && panel?.can_manage && panel.has_upgrade) {
+  // the upgrade verb is the server's; the arrow (can_upgrade) decides whether it can be pressed now
+  if (has('upgrade')) {
     const up: RingAction = { id: 'up', label: t('v6.ring.up'), icon: 'up', onClick: h.upgrade }
     acts.push(hasPrimary ? up : { ...up, kind: 'primary' })
   }

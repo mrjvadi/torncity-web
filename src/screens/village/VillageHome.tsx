@@ -8,7 +8,7 @@ import type { ScreenProps } from '../types'
 import { Emboss, Frame, GLabel, Plate, Slab } from '../../kit'
 import { Header } from '../native/kit/Parts'
 import { money } from '../native/kit/format'
-import { t } from '../../i18n'
+import { t, type Key } from '../../i18n'
 import { useSession } from '../../state/SessionContext'
 import { useToast } from '../../state/ToastContext'
 import { buildingName, useBuildingCatalogue, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
@@ -22,7 +22,7 @@ import { MapOverlays, type Mark, type RingAction, type RingModel } from '../../u
 import { ContextMenu, type CtxItem } from '../../ui/v6/parts'
 import { useChrome } from '../../ui/v6/chrome'
 import { buildPercent } from '../../ui/v6/hooks'
-import { useBuildingPanels } from './panels'
+import { useBuildingOverlays } from './overlays'
 import { ringActions } from './ring'
 import UpgradeConfirm from './UpgradeConfirm'
 import { useBuildMode } from './useBuildMode'
@@ -71,17 +71,6 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
   const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
   const resident = !!layout?.viewer.resident && own
-  // the society hub's own word on whether an election exists (the civic ring offers «انتخابات» only then)
-  const [hasElections, setHasElections] = useState(false)
-  useEffect(() => {
-    if (!own || !resident) return
-    let cancelled = false
-    void api.runCommand('society.hub', {}).then((r) => {
-      const v = r.ok !== false ? (r.view as unknown as { entries?: { code: string }[] | null } | undefined) : undefined
-      if (!cancelled) setHasElections((v?.entries ?? []).some((e) => e.code === 'elections'))
-    }).catch(() => undefined)
-    return () => { cancelled = true }
-  }, [own, resident])
   // the lot ring: a tap on bare ground opens the ring of that lot (buy, build, access, info)
   const [lotRing, setLotRing] = useState<{ x: number; y: number; kind: 'free' | 'mine' | 'taken'; owner?: string } | null>(null)
   // Lot access (docs/adr/0043): how each free lot and each of the viewer's bare lots is served by road,
@@ -242,30 +231,29 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   // -- the ring and the map overlays (v6) ------------------------------------------------------------
   // A member of their own village gets the ring; a visitor (coarse layout, no building ids) keeps the plain panel.
   const useRing = own && member0(layout) && layout?.detail === 'full'
-  const { panels } = useBuildingPanels(layout, useRing)
+  const overlays = useBuildingOverlays()
   useEffect(() => {
     // a road has nothing to offer but its panel
     if (useRing && selected && selected.type === 'road') setInfoId(selectedId)
   }, [useRing, selected, selectedId])
   const canPlaceNow = !!layout?.viewer.can_place
   const labelOf = (key: string) => labels.find((l) => l.key === key)
-  const verbsFor = (b: NonNullable<typeof selected>, id: string) => ringActions(b, b.id ? panels.get(b.id) ?? null : null, {
+  const verbsFor = (b: NonNullable<typeof selected>, id: string) => ringActions(b, b.id ? overlays.get(b.id) ?? null : null, {
     info: () => setInfoId(id),
     upgrade: () => setUpId(id),
     site: () => { setInfoSite(true); setInfoId(id) },
     open: (screen, args) => openLocal(screen, args),
-    hasElections,
     mine: () => { setSelectedId(null); run('settlement.mine') },
     run: (command) => run(command),
   })
   const ring: RingModel | null = useRing && !inBuildNow(build.state.step) && selected && selected.type !== 'road' && selectedId && labelOf(selectedId)
     ? (() => {
       const l = labelOf(selectedId)!
-      const panel = selected.id ? panels.get(selected.id) : undefined
+      const ov = selected.id ? overlays.get(selected.id) : undefined
       return {
         key: selectedId,
-        name: buildingName(cat, selected.type, panel?.building.name),
-        level: !selected.private || selected.mine ? panel?.tier : undefined,
+        name: buildingName(cat, selected.type),
+        level: ov && ov.tier > 0 && (!selected.private || selected.mine) ? ov.tier : undefined,
         anchor: [l.x, l.y + 22] as [number, number],
         actions: verbsFor(selected, selectedId),
         onInfo: () => verbsFor(selected, selectedId)[0].onClick(),
@@ -303,12 +291,17 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       if (!b || !b.id || b.type === 'road') return []
       const going = b.state === 'under_construction' || b.state === 'planned'
       if (going) return [{ key: l.key, x: l.x, y: l.y, building: buildPercent(b) }]
-      const panel = panels.get(b.id)
+      const ov = overlays.get(b.id)
       // who is shown a plaque: the head sees the village's buildings, a resident only their own (P9, the role rule)
       const mineView = b.private ? !!b.mine : canPlaceNow
       const m: Mark = { key: l.key, x: l.x, y: l.y }
-      if (mineView && panel) { m.level = panel.tier; m.canUpgrade = panel.can_manage && panel.has_upgrade }
-      if (mineView && (b.damage_bps ?? 0) > 0) m.bubble = { kind: 'status', icon: 'warn', text: t('v6.bub.damaged'), label: t('v6.bub.damaged'), onClick: () => { setSelectedId(l.key); setInfoId(l.key) } }
+      if (mineView && ov && ov.tier > 0) { m.level = ov.tier; m.canUpgrade = ov.can_upgrade }
+      // the reason a standing building cannot work, as the server names it (damage first)
+      const why = mineView ? (ov?.reasons.includes('damaged') ? 'damaged' : ov?.reasons[0]) : undefined
+      if (why) {
+        const txt = t(`v6.bub.${why}` as Key)
+        m.bubble = { kind: 'status', icon: why === 'damaged' ? 'cross' : 'info', text: txt, label: txt, onClick: () => { setSelectedId(l.key); setInfoId(l.key) } }
+      }
       return m.level !== undefined || m.bubble ? [m] : []
     })
     : []
@@ -447,7 +440,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
         const ub = layout?.buildings.find((b, i) => keyOf(i, b) === upId)
         return ub ? <UpgradeConfirm building={ub} cat={cat} onClose={() => setUpId(null)} onOpen={(screen) => openLocal(screen)} onBuild={(code) => { setSelectedId(null); void build.enter().then(() => build.choose(code)) }} /> : null
       })()}
-      {ctx && <ContextMenu at={ctx} title={(() => { const ub = layout?.buildings.find((b, i) => keyOf(i, b) === ctx.id); return ub ? buildingName(cat, ub.type, ub.id ? panels.get(ub.id)?.building.name : undefined) : '' })()} items={ctxItems(ctx.id)} onClose={() => setCtx(null)} />}
+      {ctx && <ContextMenu at={ctx} title={(() => { const ub = layout?.buildings.find((b, i) => keyOf(i, b) === ctx.id); return ub ? buildingName(cat, ub.type) : '' })()} items={ctxItems(ctx.id)} onClose={() => setCtx(null)} />}
       <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} onOther={(l) => setBuyLot(l)} />
       <HouseSheet lot={houseLot} cat={cat} onClose={() => setHouseLot(null)} store={store}
         onNoRoad={(view) => { setHouseLot(null); setFixView(view); setFixLot({ x: view.x, y: view.y }) }} />
