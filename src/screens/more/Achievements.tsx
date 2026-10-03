@@ -41,7 +41,7 @@ export default function Achievements({ response, loading, onAction, run }: Scree
         <CardGrid>
           {open.map((l, i) => (
             <div key={i} className="nx-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 8, textAlign: 'center' }}>
                 <span className="display" style={{ fontSize: 14, color: '#fff' }}>{nameOf(l.achievement)}</span>
                 {!!l.reward && <span className="nx-chip nx-chip-gold">{money(l.reward)}</span>}
               </div>
