@@ -2,6 +2,8 @@
 // price. Pure view over useBuildMode's state; chrome is the kit's frame,
 // slabs, plates and chips.
 
+import { useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Frame, Slab, Plate, Emboss, GLabel } from '../../kit'
 import type { CatalogueBuilding } from '../../api/types'
 import { t } from '../../i18n'
@@ -9,6 +11,7 @@ import { formatNumber, money } from '../native/kit/format'
 import { blockReason, isMulti, type BuildState } from './useBuildMode'
 import { buildingName, useContentNames } from '../../village/useVillage'
 import { durationText, iconForRole } from './common'
+import { BUILD_CATS, buildCatOf, type BuildCat } from './buildCategories'
 
 interface Props {
   state: BuildState
@@ -36,7 +39,21 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
   const multi = isMulti(cat, s.code)
   const unit = s.menu?.lines?.find((l) => l.building.code === s.code)
   const total = (unit?.cost_money ?? 0) * s.picks.length
-  return (
+  // the catalogue: only what the viewer may build here, in categories, with a search; the locked ones sit behind a chip
+  const [cat0, setCat] = useState<BuildCat | 'all'>('all')
+  const [q, setQ] = useState('')
+  const [showLocked, setShowLocked] = useState(false)
+  const lines = s.menu?.lines ?? []
+  const nameOf = (l: (typeof lines)[number]) => buildingName(cat, l.building.code, l.building.name)
+  const lockedN = lines.filter((l) => l.state !== 'available').length
+  const pool = useMemo(() => lines.filter((l) => showLocked || l.state === 'available'), [lines, showLocked])
+  const present = BUILD_CATS.filter((c) => pool.some((l) => buildCatOf(l.role) === c.code))
+  const active = cat0 === 'all' || present.some((c) => c.code === cat0) ? cat0 : 'all'
+  const needle = q.trim()
+  const shown = pool.filter((l) => (active === 'all' || buildCatOf(l.role) === active) && (!needle || nameOf(l).includes(needle)))
+  const host = document.querySelector('.v6-app') ?? document.body
+  return createPortal(
+    <div className={`v6-build step-${s.step}`}>
     <Frame radius={20}>
       <div className="vh-panel">
         <div className="vh-panel-head">
@@ -55,8 +72,14 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
               <span><i className="vh-dot" style={{ background: TAKEN }} />{t('build.legend.taken')}</span>
               {s.menu && <span style={{ marginInlineStart: 'auto' }}>{t('build.queue', { n: s.menu.running_builds, cap: s.menu.concurrent_cap })}</span>}
             </div>
+            <div className="vh-search"><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('build.search')} aria-label={t('build.search')} /></div>
+            <div className="vh-chips" role="tablist">
+              <button role="tab" aria-selected={active === 'all'} className={`vh-chip${active === 'all' ? ' on' : ''}`} onClick={() => setCat('all')}>{t('build.cat.all')}</button>
+              {present.map((c) => <button key={c.code} role="tab" aria-selected={active === c.code} className={`vh-chip${active === c.code ? ' on' : ''}`} onClick={() => setCat(c.code)}>{t(c.label)}</button>)}
+              {lockedN > 0 && <button className={`vh-chip lock${showLocked ? ' on' : ''}`} aria-pressed={showLocked} onClick={() => setShowLocked((v) => !v)}>{t('build.show_locked')} · {lockedN}</button>}
+            </div>
             <div className="vh-cards">
-              {(s.menu?.lines ?? []).map((l) => {
+              {shown.map((l) => {
                 const locked = l.state !== 'available'
                 const { icon, palette } = iconForRole(l.role)
                 const fpc = cat.get(l.building.code)?.footprint
@@ -73,7 +96,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
                   </button>
                 )
               })}
-              {s.menu && (
+              {s.menu && active === 'all' && !needle && (
                 <button className="vh-card" disabled={s.busy} onClick={onGrowAsk}>
                   <Plate size={38} square><Emboss name="world" palette="emerald" size={24} /></Plate>
                   <span className="vh-card-name">{t('grow.button')}</span>
@@ -81,7 +104,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
                 </button>
               )}
               {!s.menu && <div className="vh-hint" style={{ width: '100%' }}>…</div>}
-              {s.menu && !(s.menu.lines ?? []).length && <div className="vh-hint" style={{ width: '100%' }}>{t('build.empty')}</div>}
+              {s.menu && !shown.length && <div className="vh-hint vh-empty">{needle ? t('build.search_empty') : t('build.empty')}</div>}
             </div>
           </>
         )}
@@ -182,5 +205,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
         )}
       </div>
     </Frame>
+    </div>,
+    host,
   )
 }

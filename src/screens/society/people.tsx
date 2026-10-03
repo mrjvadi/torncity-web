@@ -1,12 +1,13 @@
 // People and boards: the friend list, a search for one player, and the leaderboards. A search names
 // exactly one player by an exact identifier and never shows an account's Telegram id.
 
-import { useState } from 'react'
-import type { FlowCtx } from '../village/flow'
-import type { BoardView, FriendAcceptedView, FriendLine, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
+import { useEffect, useState } from 'react'
+import * as api from '../../api/client'
 import type { Action } from '../../api/types'
 import Popup, { ActionButton, Hero, Medallion, Note } from '../../ui/Popup'
 import { PRow } from '../../ui/v6/panel'
+import type { FlowCtx } from '../village/flow'
+import type { BoardView, FriendAcceptedView, FriendDetailView, FriendLine, FriendRemoveAskView, FriendRemovedView, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
 import { Chip, ListRow, Segmented } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { formatNumber } from '../../lib/persian'
@@ -31,25 +32,33 @@ function SearchBox({ ctx }: { ctx: FlowCtx }) {
 
 const name = (n: string) => n || t('soc.unknown_player')
 
-/** A friend, opened: the actions the server really has on a player (pay them, invite them to my faction). The friend's
- * public code comes with the list line; a pending or blocked edge has none, so it offers only what it can. */
+/** A friend, opened as the v6 centred popup. The card is the server's (`social.friend.view`: code, faction, whether I may
+ * invite), and so are its actions: pay, invite to my faction, remove. A pending or blocked edge has no card. */
 function FriendPopup({ f, ctx, onClose }: { f: FriendLine; ctx: FlowCtx; onClose: () => void }) {
+  const [card, setCard] = useState<{ v: FriendDetailView | null; acts: Action[] } | null>(null)
+  const open = ctx.acts.find((a) => a.id === 'social.friend_view' && a.args?.player === f.id)
   const accept = ctx.acts.find((a) => a.id === 'social.accept' && a.args?.player === f.id)
-  const run = (a: Action) => { onClose(); ctx.go(a) }
+  useEffect(() => {
+    if (!open?.command) { setCard({ v: null, acts: [] }); return }
+    let live = true
+    void api.runCommand(open.command, open.args ?? {}).then((r) => { if (live) setCard({ v: (r.view as unknown as FriendDetailView) ?? null, acts: r.actions ?? [] }) }).catch(() => { if (live) setCard({ v: null, acts: [] }) })
+    return () => { live = false }
+  }, [open?.command, open?.args?.player]) // eslint-disable-line react-hooks/exhaustive-deps
+  const go = (a: Action) => { onClose(); ctx.go(a) }
+  const pay = card?.acts.find((a) => a.id === 'social.pay')
+  const invite = card?.acts.find((a) => a.id === 'social.friend_invite')
+  const remove = card?.acts.find((a) => a.id === 'social.friend_remove')
   return (
     <Popup open onClose={onClose} title={name(f.name)} tone="gold">
-      <Hero><Medallion icon="person" palette={f.status === 'blocked' ? 'ruby' : 'emerald'} ring="#f4c441" chip={f.code || undefined} /></Hero>
-      {f.status === 'accepted' && f.code ? (
-        <>
-          <ActionButton tone="gold" onClick={() => run({ kind: 'navigation', id: 'friend.pay', command: 'bank.pay', args: { to: f.code } })}>{t('soc.friends.pay')}</ActionButton>
-          <ActionButton tone="steel" onClick={() => run({ kind: 'primary', id: 'friend.invite', command: 'faction.invite', args: { to: f.code } })}>{t('soc.friends.invite')}</ActionButton>
-          <Note>{t('soc.friends.invite_note')}</Note>
-        </>
-      ) : accept ? (
-        <ActionButton tone="gold" disabled={ctx.busy} onClick={() => run(accept)}>{t('soc.act.social.accept', { name: name(f.name) })}</ActionButton>
-      ) : (
-        <Note>{f.status === 'blocked' ? t('soc.friends.blocked') : t('soc.friends.pending')}</Note>
-      )}
+      <Hero><Medallion icon="person" palette={f.status === 'blocked' ? 'ruby' : 'emerald'} ring="#f4c441" chip={card?.v?.code || f.code || undefined} /></Hero>
+      {card?.v?.faction && <Note>{t('soc.friends.faction')}: {card.v.faction}</Note>}
+      {accept && <ActionButton tone="gold" disabled={ctx.busy} onClick={() => go(accept)}>{t('soc.act.social.accept', { name: name(f.name) })}</ActionButton>}
+      {pay && <ActionButton tone="gold" onClick={() => go(pay)}>{t('soc.friends.pay')}</ActionButton>}
+      {invite && <ActionButton tone="steel" onClick={() => go(invite)}>{t('soc.friends.invite')}</ActionButton>}
+      {card && !invite && card.v && !card.v.faction && <Note>{t('soc.friends.invite_hint')}</Note>}
+      {remove && <ActionButton tone="red" small onClick={() => go(remove)}>{t('soc.act.social.friend_remove')}</ActionButton>}
+      {!card && <Note>…</Note>}
+      {card && !card.v && !accept && <Note>{f.status === 'blocked' ? t('soc.friends.blocked') : t('soc.friends.pending')}</Note>}
     </Popup>
   )
 }
@@ -67,14 +76,11 @@ const Friends = screen<FriendsView>(({ view: v, ctx }) => {
           const act = accept.find((a) => a.args?.player === f.id)
           const incoming = f.incoming && f.status === 'pending'
           const sub = incoming ? t('soc.friends.incoming') : f.status === 'pending' ? t('soc.friends.pending') : f.status === 'blocked' ? t('soc.friends.blocked') : undefined
-          return (
-            <PRow key={f.id} icon="person" title={name(f.name)} sub={sub} tone={incoming ? 'busy' : undefined}
-              badge={act ? t('soc.friends.answer') : undefined} onClick={() => setOpen(f)} />
-          )
+          return <PRow key={f.id} icon="person" title={name(f.name)} sub={sub} tone={incoming ? 'busy' : undefined} badge={act ? t('soc.friends.answer') : undefined} onClick={() => setOpen(f)} />
         })}
       </div>
       {friends.length > 0 && <Pager ctx={ctx} page={v.page} pages={v.pages} />}
-      <Rest ctx={ctx} skip={(a) => a.id === 'social.accept' || a.id === 'page.prev' || a.id === 'page.next'} />
+      <Rest ctx={ctx} skip={(a) => a.id === 'social.accept' || a.id === 'social.friend_view' || a.id === 'page.prev' || a.id === 'page.next'} />
       {open && <FriendPopup f={open} ctx={ctx} onClose={() => setOpen(null)} />}
     </Page>
   )
@@ -103,6 +109,38 @@ const Search = screen<SearchView>(({ view: v, ctx }) => {
     </Page>
   )
 })
+
+/** One friend: who they are, and what to do with them (pay, invite to my faction, remove). */
+const FriendDetail = screen<FriendDetailView>(({ view: v, ctx }) => {
+  const mine = (a: { id?: string }) => a.id === 'social.pay' || a.id === 'social.friend_invite' || a.id === 'social.friend_remove'
+  return (
+    <Page title={name(v.name)} tone="emerald">
+      <Panel tone="emerald">
+        <Facts rows={[
+          ...(v.code ? [{ label: t('soc.friends.code'), value: v.code }] : []),
+          ...(v.faction ? [{ label: t('soc.friends.faction'), value: v.faction }] : []),
+        ]} />
+        {!v.can_invite && !v.faction && <Hint>{t('soc.friends.invite_hint')}</Hint>}
+        <Btns ctx={ctx} list={ctx.acts.filter(mine)} row />
+      </Panel>
+      <Rest ctx={ctx} skip={mine} />
+    </Page>
+  )
+})
+
+const FriendRemoveAsk = screen<FriendRemoveAskView>(({ view: v, ctx }) => (
+  <Page title={t('soc.friends.remove_title')} tone="ruby">
+    <Panel tone="ruby"><Lead>{t('soc.friends.ask_remove', { name: name(v.name) })}</Lead></Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
+const FriendRemoved = screen<FriendRemovedView>(({ view: v, ctx }) => (
+  <Page title={t('soc.friends.remove_title')} tone="emerald">
+    <Panel tone="emerald"><Lead tone="good">{t('soc.friends.removed', { name: name(v.name) })}</Lead></Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
 
 const FriendRequested = screen<FriendRequestedView>(({ view: v, ctx }) => (
   <Page title={t('soc.friends.requested_title')} tone="emerald">
@@ -161,4 +199,4 @@ const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
   )
 })
 
-export const PEOPLE_SCREENS = { friends: Friends, search: Search, friend_requested: FriendRequested, friend_accepted: FriendAccepted, leaderboard: Leaderboard }
+export const PEOPLE_SCREENS = { friends: Friends, search: Search, friend_requested: FriendRequested, friend_accepted: FriendAccepted, friend_detail: FriendDetail, friend_remove_ask: FriendRemoveAsk, friend_removed: FriendRemoved, leaderboard: Leaderboard }

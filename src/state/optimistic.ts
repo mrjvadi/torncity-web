@@ -61,6 +61,17 @@ const RULES: Record<string, Rule> = {
       },
     }]
   },
+  // Opening ONE notice reads only that notice and takes one off the count; every
+  // other notice stays listed and unread.
+  'inbox.read': (args) => {
+    const id = String(args.id ?? '')
+    const n = id ? entitiesOf(syncStore.getView(), 'notice').find(([nid]) => nid === id) : undefined
+    if (!n || n[1].read) return []
+    return [
+      { kind: 'notice', id, fn: (d) => (d ? { ...(d as KindData['notice']), read: true } : d) },
+      { kind: 'inbox', id: 'self', fn: (d) => (d ? { ...(d as KindData['inbox']), unread: Math.max(0, (d as KindData['inbox']).unread - 1) } : d) },
+    ]
+  },
   'inbox.read_all': () => {
     const view = syncStore.getView()
     const out: Patch[] = [{ kind: 'inbox', id: 'self', fn: (d) => (d ? { ...(d as KindData['inbox']), unread: 0 } : d) }]

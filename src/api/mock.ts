@@ -159,7 +159,7 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   })
 }
 
-const OPTIMISTIC_WRITES = new Set(['bank.deposit', 'bank.withdraw', 'inventory.use', 'inbox.read_all'])
+const OPTIMISTIC_WRITES = new Set(['bank.deposit', 'bank.withdraw', 'inventory.use', 'inbox.read_all', 'inbox.read'])
 
 export function installMockApi(): void {
   installVillageMockHandles()

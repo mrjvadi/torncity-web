@@ -299,7 +299,10 @@ export default function Shell() {
     desktop,
     hud: () => els.current.hud?.getBoundingClientRect() ?? null,
     bottom: () => {
-      const a = els.current.info?.getBoundingClientRect(), d = els.current.dock?.getBoundingClientRect()
+      // a strip that is not laid out (zero height, e.g. while it is hidden) is not chrome: its empty rect at the page top
+      // once made the 3D view re-frame itself to nothing, which was the «ساخت» jump
+      const lay = (r: DOMRect | undefined) => (r && r.height > 0 ? r : undefined)
+      const a = lay(els.current.info?.getBoundingClientRect()), d = lay(els.current.dock?.getBoundingClientRect())
       if (a && d) return new DOMRect(d.left, Math.min(a.top, d.top), d.width, d.bottom - Math.min(a.top, d.top))
       return a ?? d ?? null
     },

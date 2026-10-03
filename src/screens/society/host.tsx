@@ -40,7 +40,7 @@ export function registerSociety(screens: Record<string, SocScreen>): void {
 const WRITES = new Set([
   'gov.set', 'gov.seat', 'gov.unseat', 'gov.allocset', 'election.stand', 'election.vote', 'faction.apply', 'faction.answer',
   'faction.join', 'faction.launch', 'faction.calloff', 'faction.plan', 'faction.link', 'law.vote', 'social.friend.add',
-  'social.friend.accept', 'diplomacy.answer', 'faction.invite', 'faction.deposit', 'faction.withdraw', 'gov.appoint',
+  'social.friend.accept', 'social.friend.remove', 'diplomacy.answer', 'faction.invite', 'faction.deposit', 'faction.withdraw', 'gov.appoint',
 ])
 
 /** Typed values: the action's id, the field its command takes it in, and whether it is words. */

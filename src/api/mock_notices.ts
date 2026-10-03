@@ -61,14 +61,24 @@ export function mockNotice(screen: string): MockNotice | undefined {
   return MOCK_NOTICES.find((x) => x.screen === screen)
 }
 
+// The notices read so far (by their position in the list): opening one reads only that one.
+const readIds = new Set<string>()
+const idOf = (i: number) => `00000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`
+export const mockNoticeRead = (id: string) => { readIds.add(id) }
+export const mockNoticeCategoryOf = (id: string) => MOCK_NOTICES.find((_, i) => idOf(i) === id)?.category ?? ''
+export const mockNoticeReadAll = () => { MOCK_NOTICES.forEach((_, i) => readIds.add(idOf(i))) }
+export const mockUnreadCount = () => MOCK_NOTICES.filter((_, i) => !readIds.has(idOf(i))).length
+
+/** The hub: unread per category, and only the categories that still have unread. */
 export function mockInboxCategories(): { category: string; count: number }[] {
   const by = new Map<string, number>()
-  for (const x of MOCK_NOTICES) by.set(x.category, (by.get(x.category) ?? 0) + 1)
+  MOCK_NOTICES.forEach((x, i) => { if (!readIds.has(idOf(i))) by.set(x.category, (by.get(x.category) ?? 0) + 1) })
   return [...by].map(([category, count]) => ({ category, count }))
 }
 
 export function mockInboxItems(category: string) {
-  return MOCK_NOTICES.filter((x) => x.category === category).map((x) => ({
+  return MOCK_NOTICES.map((x, i) => ({ x, i })).filter(({ x }) => x.category === category).map(({ x, i }) => ({
+    id: idOf(i), read: readIds.has(idOf(i)),
     kind: x.kind, notice: { screen: x.screen, view: x.view, text: '' }, ago_seconds: x.ago, link: { command: '', args: null },
   }))
 }

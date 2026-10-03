@@ -17,12 +17,12 @@ export const SOCIETY_CONTENT = {
   entries: {
     office: [
       ['mayor', nm('Mayor', 'شهردار')], ['deputy_mayor', nm('Deputy mayor', 'معاون شهردار')], ['city_council', nm('City council', 'شورای شهر')],
-      ['village_head', nm('Village head', 'شهردار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
+      ['village_head', nm('Village head', 'دهیار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
       ['defence_minister', nm('Defence minister', 'وزیر دفاع')], ['parliament', nm('Parliament', 'مجلس')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     lever: [
       ['city.tax_rate', nm('Tax rate', 'نرخ مالیات')], ['city.minimum_wage', nm('Minimum wage', 'حداقل دستمزد')], ['city.budget', nm('City budget', 'بودجهٔ شهر')],
-      ['village.local_levy', nm('Village levy', 'عوارض محلی شهر')], ['country.arms_exports', nm('Arms export policy', 'سیاست صادرات تسلیحات')],
+      ['village.local_levy', nm('Village levy', 'عوارض محلی روستا')], ['country.arms_exports', nm('Arms export policy', 'سیاست صادرات تسلیحات')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     jurisdiction: [{ code: 'vantor_federation', name: nm('Vantor Federation', 'فدراسیون ونتور') }, { code: 'default_country', name: nm('Commonwealth', 'مشترک‌المنافع') }],
     budget_line: [
@@ -104,8 +104,10 @@ function cityGov(args: Record<string, unknown>) {
     ...(village ? [] : [act('military.ministry', 'military.ministry', { country: COUNTRY.code }, { subject: COUNTRY.code })]),
     back('map.list'), refreshA('gov.city', { city: place.code }),
   ]
-  return mockOk('city_governance', { city: place, sections, holds_office: true, no_city: false, tier: village ? 'village' : 'city' }, acts)
+  return mockOk('city_governance', { city: place, sections, holds_office: true, no_city: false, tier: village ? 'village' : 'city', military_open: !village }, acts)
 }
+
+const AS_VILLAGE_OFFICE = false
 
 function myOffice() {
   const seats: GovSeat[] = [
@@ -121,7 +123,7 @@ function myOffice() {
     act('gov.dismiss', 'gov.dismiss', { office: 'police_chief', place: 'calderis', seat: '1' }, { subject: 'police_chief' }),
     back('gov.city'), refreshA('gov.office'),
   ]
-  return mockOk('my_office', { seats }, acts)
+  return mockOk('my_office', { seats, military_open: !AS_VILLAGE_OFFICE }, acts)
 }
 
 const draftOf = (args: Record<string, unknown>, l: GovLever) => (args.value !== undefined && args.value !== '' ? Number(args.value) : l.value)
@@ -290,7 +292,7 @@ function faction(command: string, args: Record<string, unknown>) {
   const mine = (id: string, c: string) => act(id, c)
   switch (command) {
     case 'faction.list':
-      return mockOk('faction_list', { city_code: 'calderis', city: 'Calderis', fee: 50000, factions: [{ ref: LIONS, members: 18 }, { ref: SHADES, members: 6 }], mine: args.none ? null : LIONS }, [
+      return mockOk('faction_list', { city_code: 'calderis', city: 'Calderis', fee: 50000, factions: [{ ref: LIONS, members: 18 }, { ref: SHADES, members: 6 }], mine: args.none ? null : LIONS, founding: args.none ? { have: 7, need: 20, open: false } : null }, [
         act('faction.view', 'faction.view', { code: LIONS.code }), act('faction.view', 'faction.view', { code: SHADES.code }), mine('faction.mine', 'faction.mine'), back('player.profile.get'), refreshA('faction.list')])
     case 'faction.view':
       if (args.code === 'nope') return refusal('faction_refusal', { kind: 'not_found', min: 0, max: 0, amount: 0, balance: 0, need: 0, have: 0, level: 0 }, 'faction_not_found', [act('faction.list', 'faction.list'), back('player.profile.get')])
@@ -301,6 +303,8 @@ function faction(command: string, args: Record<string, unknown>) {
       return mockOk('faction_found', { city_code: 'calderis', city: 'Calderis', fee: 50000, payment: { amount: 50000, accepted: ['cash', 'card'], usable: ['cash', 'card'], cash: 61000, bank: 320000 }, name_min: 3, name_max: 24 }, [
         act('faction.found.pay', 'faction.found', { method: 'cash' }), act('faction.found.pay', 'faction.found', { method: 'card' }), back('faction.list')])
     case 'faction.mine':
+      // a player in no faction is sent to the list, which says what founding one still needs
+      if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('nofaction')) return faction('faction.list', { none: true })
       return mockOk('faction_home', { ref: LIONS, rank: 'leader', linked: false, rights: ['invite'], city_code: 'calderis', city: 'Calderis', members: 18, max_members: 25, bank: 420000, applications: 2, operation: OP }, [
         mine('faction.members', 'faction.members'), mine('faction.bank', 'faction.bank'), mine('faction.crime', 'faction.crime'), act('faction.invite', 'faction.invite'),
         act('faction.leave', 'faction.leave', undefined, { kind: 'danger' }), back('player.profile.get'), refreshA('faction.mine')])
@@ -467,6 +471,13 @@ function law(command: string, args: Record<string, unknown>) {
 
 // -- people and boards ------------------------------------------------------------------------------------------------
 
+// the friends the mock lists; the second one is in no faction, so the card offers an invitation
+const FRIENDS = [
+  { id: 'p3', name: KAVEH.name, code: KAVEH.code, faction: 'شیرهای البرز' },
+  { id: 'p4', name: 'مینا', code: 'M1N4A7B', faction: '' },
+]
+const FRIENDS_CAN_INVITE = true
+
 function social(command: string, args: Record<string, unknown>) {
   if (command === 'social.search') {
     const q = String(args.query ?? '')
@@ -478,9 +489,21 @@ function social(command: string, args: Record<string, unknown>) {
   }
   if (command === 'social.friend.add') return mockOk('friend_requested', { name: KAVEH.name }, [back('player.profile.get'), refreshA('social.friend.list')])
   if (command === 'social.friend.accept') return mockOk('friend_accepted', { name: NILOO.name }, [back('player.profile.get'), refreshA('social.friend.list')])
+  if (command === 'social.friend.view') {
+    const f = FRIENDS.find((x) => x.id === String(args.player)) ?? FRIENDS[1]
+    return mockOk('friend_detail', { id: f.id, name: f.name, code: f.code, faction: f.faction, can_invite: !f.faction && FRIENDS_CAN_INVITE }, [
+      act('social.pay', 'bank.pay', { to: f.code }),
+      ...(!f.faction && FRIENDS_CAN_INVITE ? [act('social.friend_invite', 'faction.invite', { to: f.code })] : []),
+      act('social.friend_remove', 'social.friend.remove', { player: f.id }), back('social.friend.list'), refreshA('social.friend.view', { player: f.id })])
+  }
+  if (command === 'social.friend.remove') {
+    const f = FRIENDS.find((x) => x.id === String(args.player)) ?? FRIENDS[1]
+    if (args.confirm !== 'yes') return mockOk('friend_remove_ask', { id: f.id, name: f.name }, [act('social.friend_remove_yes', 'social.friend.remove', { player: f.id, confirm: 'yes' }), back('social.friend.view', { player: f.id })])
+    return mockOk('friend_removed', { name: f.name }, [back('social.friend.list'), refreshA('social.friend.list')])
+  }
   const p = Number(args.page ?? 1) || 1
-  return mockOk('friends', { friends: [{ id: 'p2', name: NILOO.name, code: '', status: 'pending', incoming: true }, { id: 'p3', name: KAVEH.name, code: 'K4V3H22', status: 'accepted', incoming: false }, { id: 'p4', name: 'مینا', code: 'M1N4B8C', status: 'accepted', incoming: false }, { id: 'p5', name: 'دانا', code: '', status: 'pending', incoming: false }], page: p, pages: 1 }, [
-    act('social.accept', 'social.friend.accept', { player: 'p2' }), back('player.profile.get'), refreshA('social.friend.list', { page: '1' })])
+  return mockOk('friends', { friends: [{ id: 'p2', name: NILOO.name, code: NILOO.code, status: 'pending', incoming: true }, { id: 'p3', name: KAVEH.name, code: KAVEH.code, status: 'accepted', incoming: false }, { id: 'p4', name: 'مینا', code: 'M1N4A7B', status: 'accepted', incoming: false }, { id: 'p5', name: 'دانا', code: 'D4N2A9C', status: 'pending', incoming: false }], page: p, pages: 1 }, [
+    act('social.accept', 'social.friend.accept', { player: 'p2' }), act('social.friend_view', 'social.friend.view', { player: 'p3' }), act('social.friend_view', 'social.friend.view', { player: 'p4' }), back('player.profile.get'), refreshA('social.friend.list', { page: '1' })])
 }
 
 function board(args: Record<string, unknown>) {
@@ -519,7 +542,7 @@ export function mockSocietyCommand(command: string, args: Record<string, unknown
     case 'gov.appoint': case 'gov.seat': case 'gov.dismiss': case 'gov.unseat': return appoint(command, args)
     case 'election.list': case 'election.view': case 'election.stand': case 'election.vote': return election(command, args)
     case 'life.top': return board(args)
-    case 'social.search': case 'social.friend.list': case 'social.friend.add': case 'social.friend.accept': return social(command, args)
+    case 'social.search': case 'social.friend.list': case 'social.friend.add': case 'social.friend.accept': case 'social.friend.view': case 'social.friend.remove': return social(command, args)
     case 'law.list': case 'law.view': case 'law.vote': return law(command, args)
     default:
       if (command.startsWith('faction.')) return faction(command, args)

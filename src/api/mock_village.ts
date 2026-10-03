@@ -460,7 +460,7 @@ function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
   const promo = promotionView()
   const view: VillageOverviewView = {
-    name: 'آمل', tier: 'village', population: 2, population_cap: 8,
+    name: 'آمل', tier: 'village', development: false, population: 2, population_cap: 8,
     food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
     resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) }, promotion: promo, development: true,
     buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
@@ -1502,6 +1502,7 @@ export function mockBuildingOverlays(): BuildingOverlay[] {
         const sc = CAT.find((c) => c.code === 'school')!
         o.can_upgrade = unmet(sc).length === 0 && st.treasury >= sc.cost
       }
+      if (role === 'security' && manage) { o.actions.push('upgrade'); o.can_upgrade = true } // so the mock shows the one arrow a head is entitled to
       if (b.type === 'woodcutter_camp') { o.staff = { have: 0, need: 3 }; o.status = 'idle'; o.reasons = ['no_staff']; o.actions.push('take_shift') }
       if (manage && b.type !== 'civic_hall') o.actions.push('demolish')
     }

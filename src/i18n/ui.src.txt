@@ -633,6 +633,8 @@ inbox.title | پیام‌ها | Messages
 inbox.empty | پیامی نداری. | No messages.
 inbox.empty_cat | پیامی در این دسته نیست. | No messages in this category.
 inbox.count | {n} پیام | {n} messages
+inbox.new | تازه | New
+inbox.tap_to_read | برای خواندن بزن. | Tap to read.
 inbox.cat.finance | مالی | Finance
 inbox.cat.faction | جناح | Faction
 inbox.cat.work | کار | Work
@@ -2150,6 +2152,10 @@ soc.act.law.list | همهٔ طرح‌ها | All proposals
 soc.act.social.add_friend | افزودن به دوستان | Add as a friend
 soc.act.social.pay | پرداخت به او | Pay them
 soc.act.social.accept | پذیرفتن {name} | Accept {name}
+soc.act.social.friend_invite | دعوت به جناح من | Invite to my faction
+soc.act.social.friend_remove | حذف از دوستان | Remove friend
+soc.act.social.friend_remove_yes | بله، حذفش کن | Yes, remove
+soc.act.social.friend_view | دیدن پروفایل | View profile
 # governance
 soc.gov.title | دولت شهر {place} | {place} government
 soc.gov.title_village | شهرداری {place} | {place} city council
@@ -2318,6 +2324,9 @@ soc.faction.none_here | هنوز جناحی در این شهر نیست. | There
 soc.faction.member_count | {n} عضو | {n} members
 soc.faction.list_mine | جناح تو: {name} | Your faction: {name}
 soc.faction.list_found | جناح خودت را تأسیس کن؛ هزینهٔ ثبت {fee} است. | Found your own faction; registration costs {fee}.
+soc.faction.locked | تأسیس جناح هنوز ممکن نیست: دست‌کم {need} نفر باید ساکن همین‌جا باشند. | You cannot found a faction yet: at least {need} people must live here.
+soc.faction.founders | ساکنان | Residents
+soc.faction.founders_progress | {have} از {need} نفر | {have} of {need} people
 soc.faction.code | کد | Code
 soc.faction.city | شهر | City
 soc.faction.members | اعضا | Members
@@ -2401,6 +2410,7 @@ soc.faction.crime_notice.joined | به گروه پیوستی؛ تا شروع ک�
 soc.faction.crime_notice.launched | کار شروع شد. نتیجه بعد از پایان در پیام خصوصی می‌رسد. | The job has started. The result comes in a private message when it ends.
 soc.faction.crime_notice.called_off | نقشه لغو شد. کسی چیزی نپرداخته بود. | The plan was called off. Nobody had paid anything.
 soc.refusal.faction.none | این دنیا هنوز جناح ندارد. | There are no factions in this world yet.
+soc.refusal.faction.too_few | برای تأسیس جناح دست‌کم {need} نفر باید ساکن همین‌جا باشند؛ الان {have} نفرند. | A faction needs at least {need} residents here; there are {have} now.
 soc.refusal.faction.not_member | عضو هیچ جناحی نیستی. | You are not in any faction.
 soc.refusal.faction.rank | رتبه‌ات اجازهٔ این کار را نمی‌دهد. | Your rank does not allow this.
 soc.refusal.faction.not_found | چنین جناحی پیدا نشد. | No such faction was found.
@@ -2549,6 +2559,12 @@ soc.refusal.bill.not_member | فقط اعضای {body} به این طرح رأی
 soc.refusal.bill.under_way | همین حالا طرحی دربارهٔ همین موضوع در {body} در دست رأی‌گیری است؛ بعد از نتیجه‌اش دوباره امتحان کن. | A proposal on the same matter is already being voted on in {body}; try again after it is decided.
 # friends and search
 soc.friends.title | دوستان | Friends
+soc.friends.code | کد | Code
+soc.friends.faction | جناح | Faction
+soc.friends.invite_hint | برای دعوت به جناح باید خودت در جناحی باشی و حق دعوت داشته باشی، و دوستت در هیچ جناحی نباشد. | To invite, you must be in a faction with the right to invite, and your friend must be in none.
+soc.friends.remove_title | حذف دوست | Remove friend
+soc.friends.ask_remove | {name} را از دوستانت حذف می‌کنی؟ | Remove {name} from your friends?
+soc.friends.removed | {name} دیگر در فهرست دوستانت نیست. | {name} is no longer on your friends list.
 soc.friends.empty | هنوز دوستی نداری. با کد یا نام کاربری دنبال کسی بگرد. | You have no friends yet. Look someone up by code or username.
 soc.friends.incoming | می‌خواهد دوستت باشد | wants to be your friend
 soc.friends.pending | منتظر پاسخ او | waiting for their answer
@@ -4828,3 +4844,16 @@ soc.friends.invite | دعوت به جناح من | Invite to my faction
 soc.friends.invite_note | دعوت را فقط کسی می‌تواند بفرستد که در جناح اجازهٔ دعوت دارد. | Only a member who may invite in the faction can send an invitation.
 soc.friends.answer | پاسخ بده | Answer
 v6.q.ready_head | همهٔ هدف‌های پیش‌رو انجام شد | Every goal ahead is done
+build.cat.all | همه | All
+build.cat.housing | مسکن | Housing
+build.cat.shops | فروشگاه و بازار | Shops and markets
+build.cat.construction | ساخت‌وساز و مصالح | Construction and materials
+build.cat.production | کارگاه و تولید | Workshops and production
+build.cat.farming | کشاورزی | Farming
+build.cat.public | خدمات عمومی | Public services
+build.cat.security | امنیت و دفاع | Security and defence
+build.cat.other | سایر | Other
+build.search | جست‌وجوی ساختمان | Search buildings
+build.search_empty | ساختمانی با این نام پیدا نشد. | No building matches.
+build.show_locked | قفل‌شده‌ها | Locked
+build.locked_n | {n} ساختمان هنوز قفل است | {n} buildings are still locked

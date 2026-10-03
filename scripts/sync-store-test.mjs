@@ -5,12 +5,14 @@
 import { build } from 'esbuild'
 import assert from 'node:assert/strict'
 import { pathToFileURL } from 'node:url'
-import { mkdtempSync } from 'node:fs'
+import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 
 const out = join(mkdtempSync(join(tmpdir(), 'syncstore-')), 'store.mjs')
-await build({ entryPoints: ['src/state/store.ts'], bundle: true, format: 'esm', outfile: out, platform: 'node', logLevel: 'error' })
+const entry = join(dirname(out), 'entry.ts')
+writeFileSync(entry, `export * from ${JSON.stringify(resolve('src/state/store.ts'))}\nexport * from ${JSON.stringify(resolve('src/state/optimistic.ts'))}\n`)
+await build({ entryPoints: [entry], bundle: true, format: 'esm', outfile: out, platform: 'node', logLevel: 'error' })
 
 // a browser just big enough for the store
 const timers = new Map()
@@ -25,7 +27,7 @@ globalThis.setInterval = () => ++tid
 globalThis.clearInterval = () => {}
 const fire = () => { const t = [...timers]; timers.clear(); for (const [, x] of t) x.fn() }
 
-const { SyncStore } = await import(pathToFileURL(out).href)
+const { SyncStore, syncStore, beforeCommand } = await import(pathToFileURL(out).href)
 
 // a fake server: one log
 function server() {
@@ -124,6 +126,37 @@ await t('notice: toast once per id, live only, never from the snapshot', async (
   const re = sv.set('notice', 'n1', { kind: 'x', instant: true, read: true }) // a re-set of the same notice
   st.receive({ type: 'updates', from: 4, to: 4, updates: [re] })
   assert.deepEqual(seen, ['n1'])
+})
+
+// Opening one notice marks only that notice read: the rest stay listed and unread (the
+// "all of them jump away" bug), on the server's records and on the optimistic rule alike.
+await t('inbox: reading one notice changes only that one', async () => {
+  const sv = server()
+  const note = (read) => ({ kind: 'x', category: 'finance', screen: '', view: null, read, instant: false })
+  for (const id of ['n1', 'n2', 'n3']) sv.set('notice', id, note(false))
+  sv.set('inbox', 'self', { unread: 3, latest: ['n3', 'n2', 'n1'] })
+  const st = new SyncStore(); await st.start('p', sv.transport)
+  const r1 = sv.set('notice', 'n3', note(true)), r2 = sv.set('inbox', 'self', { unread: 2, latest: ['n3', 'n2', 'n1'] })
+  st.receive({ type: 'updates', from: r1.pts, to: r2.pts, updates: [r1, r2] })
+  const notices = () => st.getView().entities.get('notice')
+  assert.deepEqual(['n1', 'n2', 'n3'].map((id) => notices().get(id).read), [false, false, true])
+  assert.equal(st.getView().entities.get('inbox').get('self').unread, 2)
+  assert.equal(notices().size, 3)
+})
+
+await t('inbox: the optimistic read marks one notice and one off the count', async () => {
+  const sv = server()
+  const note = (read) => ({ kind: 'x', category: 'finance', screen: '', view: null, read, instant: false })
+  for (const id of ['n1', 'n2', 'n3']) sv.set('notice', id, note(false))
+  sv.set('inbox', 'self', { unread: 3, latest: ['n3', 'n2', 'n1'] })
+  await syncStore.start('p', sv.transport)
+  beforeCommand('inbox.read', { id: 'n2' }, 'k-read')
+  const v = syncStore.getView()
+  assert.deepEqual(['n1', 'n2', 'n3'].map((id) => v.entities.get('notice').get(id).read), [false, true, false])
+  assert.equal(v.entities.get('inbox').get('self').unread, 2)
+  // reading the same one again is not a second decrement
+  beforeCommand('inbox.read', { id: 'n2' }, 'k-read2')
+  assert.equal(syncStore.getView().entities.get('inbox').get('self').unread, 2)
 })
 
 await t('overlay shows at once and is replaced by its own records', async () => {
