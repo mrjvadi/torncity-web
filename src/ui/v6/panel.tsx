@@ -99,7 +99,7 @@ export function PCard({ icon, lead, title, sub, facts, badge, tone, off, foot, o
 }
 
 /** Facts as a compact grid of cells (label small, value big): 2 per row on a phone, 3 to 4 on desktop. */
-export function StatGrid({ items }: { items: { label: ReactNode; value: ReactNode; bad?: boolean; gold?: boolean }[] }) {
+export function PStats({ items }: { items: { label: ReactNode; value: ReactNode; bad?: boolean; gold?: boolean }[] }) {
   return (
     <div className="pn-stats">
       {items.map((x, i) => (

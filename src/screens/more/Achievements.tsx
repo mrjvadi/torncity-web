@@ -3,6 +3,7 @@
 
 import type { ScreenProps } from '../types'
 import { Bar, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
+import { CardGrid } from '../../ui/v6/panel'
 import Actions from '../native/kit/Actions'
 import { clamp01, formatNumber, money } from '../native/kit/format'
 import { t } from '../../i18n'
@@ -28,16 +29,16 @@ export default function Achievements({ response, loading, onAction, run }: Scree
       {lines.length === 0 && <Notice>{t('achievements.none')}</Notice>}
 
       {!!earned.length && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <CardGrid>
           {earned.map((l, i) => (
             <ListRow key={i} icon="trophy" palette="gold" tone="gold" title={nameOf(l.achievement)}
               sub={l.cash ? t('achievements.rewarded', { n: money(l.cash) }) : undefined} />
           ))}
-        </div>
+        </CardGrid>
       )}
 
       {!!open.length && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+        <CardGrid>
           {open.map((l, i) => (
             <div key={i} className="nx-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -48,7 +49,7 @@ export default function Achievements({ response, loading, onAction, run }: Scree
                 label={`${formatNumber(l.done ?? 0)}/${formatNumber(l.count ?? 0)}`} />
             </div>
           ))}
-        </div>
+        </CardGrid>
       )}
 
       <Actions response={response} onAction={onAction} />

@@ -5,6 +5,7 @@
 
 import type { ScreenProps } from '../types'
 import { Card, Header, ListRow, Notice, ScreenScroll, Segmented } from '../native/kit/Parts'
+import { CardGrid } from '../../ui/v6/panel'
 import LangSwitch from '../native/kit/LangSwitch'
 import { useSession } from '../../state/SessionContext'
 import { APP_VERSION, BUILD_ID } from '../../lib/freshness'
@@ -51,8 +52,10 @@ export default function Settings({ response, loading, run }: ScreenProps) {
       )}
 
       <div className="nx-sec">{t('settings.account')}</div>
+      <CardGrid>
       <ListRow icon="phone" palette="sapphire" title={t('settings.devices')} onClick={() => run('device.list')} />
       <ListRow icon="close" palette="ruby" tone="ruby" title={t('settings.sign_out')} onClick={signOut} />
+      </CardGrid>
 
       <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-dim)', opacity: 0.75, marginTop: 6 }}>
         <div title={`#${BUILD_ID}`}>{t('settings.version', { v: APP_VERSION })}</div>
