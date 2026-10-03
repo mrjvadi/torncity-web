@@ -6,6 +6,7 @@ import { ago, formatNumber } from './kit/format'
 import { t, hasKey, type Key } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
 import { genericLine, noticeLine, type Namer } from '../../notices/wording'
+import { CardGrid } from '../../ui/v6/panel'
 
 // The inbox: the notices the server kept for the player, each as data (the notice's screen and
 // its view) that this client words itself. A notice of a screen not carried as data yet has only
@@ -36,7 +37,7 @@ export function InboxHub({ response, loading, onAction, run }: ScreenProps) {
     <ScreenScroll>
       <Header title={t('inbox.title')} tone="sapphire" onRefresh={() => run('inbox.show')} />
       {!v.total && <Notice>{t('inbox.empty')}</Notice>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {(v.categories ?? []).map((c, i) => {
           const meta = catMeta(c.category)
           return (
@@ -45,7 +46,7 @@ export function InboxHub({ response, loading, onAction, run }: ScreenProps) {
               onClick={() => c.category && run('inbox.category', { category: c.category })} />
           )
         })}
-      </div>
+      </CardGrid>
       <Actions response={response} onAction={onAction} refreshCommand="inbox.show" />
     </ScreenScroll>
   )

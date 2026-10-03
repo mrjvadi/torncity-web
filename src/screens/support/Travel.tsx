@@ -25,6 +25,7 @@ import { homeScreen, locationOf, type Destination, type TravelDestination } from
 import { useContentNames } from '../../village/useVillage'
 import VillageHome from '../village/VillageHome'
 import './support.css'
+import { CardGrid } from '../../ui/v6/panel'
 
 const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane' }
 const modeName = (code: string | undefined, fallback?: string) => (code && `sc.mode.${code}` in { 'sc.mode.bus': 1, 'sc.mode.train': 1, 'sc.mode.flight': 1 } ? t(`sc.mode.${code}` as Key) : fallback ?? code ?? '')
@@ -96,7 +97,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
       {hint && <Notice>{t('sc.dest.hint_mode', { mode: modeName(hint) })}</Notice>}
       {failed && <Empty>{t('common.load_failed')}</Empty>}
       {!failed && !data && <Empty>{t('sc.loading')}</Empty>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {data && list.map((d) => {
           const isHome = d.code === bootstrap?.settlement?.code
           const isHere = d.code === here || (!!d.settlement_id && d.settlement_id === loc?.settlement_id)
@@ -113,7 +114,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
             </button>
           )
         })}
-      </div>
+      </CardGrid>
       {data?.mock && <p className="sc-mock">{t('sc.dest.mock')}</p>}
       <ConfirmSheet dest={sel} hint={hint} service={service} onClose={() => setSel(null)} onGo={go} />
     </ScreenScroll>
@@ -176,10 +177,10 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
         <StatCard icon="x_map" palette="sapphire" label={t('sc.confirm.distance')} value={t('sc.dest.km', { n: formatNumber(Math.round(dest.distance_km)) })} />
         {dest.duration_seconds ? <StatCard icon="stopwatch" palette="amber" label={t('sc.confirm.time')} value={roughDuration(dest.duration_seconds)} /> : null}
       </StatGrid>
-      <div className="sc-modes">
-        {options === null && <Note>{t('sc.confirm.loading')}</Note>}
-        {options?.length === 0 && <Note tone="bad">{t('sc.confirm.no_mode')}</Note>}
-        {short > 0 && <Note tone="bad">{t('sc.confirm.short', { n: money(short) })}</Note>}
+      {options === null && <Note>{t('sc.confirm.loading')}</Note>}
+      {options?.length === 0 && <Note tone="bad">{t('sc.confirm.no_mode')}</Note>}
+      {short > 0 && <Note tone="bad">{t('sc.confirm.short', { n: money(short) })}</Note>}
+      <CardGrid>
         {options?.map((o) => (
           <ListRow
             key={o.mode_code}
@@ -192,7 +193,7 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
             onClick={o.busy ? undefined : () => setMode(o.mode_code)}
           />
         ))}
-      </div>
+      </CardGrid>
     </Popup>
   )
 }

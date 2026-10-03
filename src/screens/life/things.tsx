@@ -16,6 +16,7 @@ import { hasKey, refusalText, t, type Key } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, Rest, flow, isBack, isRefresh } from '../village/flow'
 import type { FlowCtx } from '../village/flow'
 import { bps, cityName, clockText, nameOf, tf, tx } from './common'
+import { CardGrid } from '../../ui/v6/panel'
 
 const ITEM_ICON: Record<string, string> = { bread: 'bread', bandage: 'pill', phone: 'phone', lockpick_set: 'keys' }
 const CATEGORY_ICON: Record<string, string> = { food: 'bread', medicine: 'pill', gear: 'gears', electronics: 'phone', defence: 'shield', vehicles: 'x_car' }
@@ -296,9 +297,9 @@ export const Refusal = flow<RefusalView>(({ view: v, ctx }) => {
       <Panel tone="ruby">
         <Lead tone="bad">{refusalText(ctx.res.error?.code ?? `refusal_${v.kind}`, undefined, { ...(ctx.res.error?.args ?? {}), city: cityName(ctx, v.city_code, v.city), fee: money(v.fee), cash: money(v.cash), wait_seconds: v.wait_seconds })}</Lead>
         {missing.length > 0 && (
-          <div className="vf-list">
+          <CardGrid>
             {missing.map((r, i) => <ListRow key={i} icon={r.met ? 'check' : 'm_stop'} palette={r.met ? 'emerald' : 'ruby'} title={reqLine(ctx, r)} />)}
-          </div>
+          </CardGrid>
         )}
         {v.kind === 'shift_in_progress' && v.ends_at && <Hint>{t('lf.req.shift_until', { t: hms(v.wait_seconds), at: clockText(v.ends_at) })}</Hint>}
       </Panel>
