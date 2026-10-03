@@ -27,11 +27,54 @@
 .wm-mk.home .wm-lbl { top: 40px; border-color: var(--gold, #ffd45c); }
 .wm-mk.wm-nolbl:not(.sel):not(.home) .wm-lbl { display: none; }
 
-.wm-chip {
-  position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--wm-top, 0px) + 8px); z-index: 1; pointer-events: none; min-height: 28px; padding: 4px 12px;
-  border-radius: 999px; font-size: 12px; color: #fff; background: rgba(7, 10, 20, 0.7); border: 1px solid rgba(255, 255, 255, 0.18);
+/* the search box on top (Google Maps style): a field and its suggestions; between the city screen's side columns on a phone */
+.wm-searchbox { position: absolute; z-index: 5; left: 70px; right: 80px; top: calc(var(--wm-top, 0px) + 8px); }
+.wm-sfield {
+  display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px 0 12px; border-radius: 22px; box-sizing: border-box;
+  background: rgba(22, 12, 20, 0.94); border: 1.5px solid var(--gold-soft, #b58a2a); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
 }
-.wm-chip:empty { display: none; }
+.wm-sfield input { flex: 1; min-width: 0; height: 40px; background: transparent; border: 0; outline: 0; box-shadow: none; -webkit-appearance: none; appearance: none; border-radius: 0; color: #fff; font-size: 14px; }
+.wm-sfield input:focus { outline: 0; box-shadow: none; }
+.wm-sfield input::-webkit-search-cancel-button { display: none; }
+.wm-sclear { flex: none; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 0; color: #fff; font-size: 13px; }
+.wm-suggest {
+  margin-top: 6px; padding: 6px; display: flex; flex-direction: column; gap: 4px; max-height: 50vh; overflow-y: auto; border-radius: 16px;
+  background: rgba(22, 12, 20, 0.97); border: 1.5px solid var(--gold-soft, #b58a2a); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+}
+.wm-spot { position: absolute; left: 0; top: 0; z-index: 1; width: 0; height: 0; pointer-events: none; }
+.wm-spot::before {
+  content: ''; position: absolute; left: -12px; top: -30px; width: 24px; height: 24px; background: #ea4335; border: 2px solid #fff; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); transform-origin: 0 100%; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); box-sizing: border-box;
+}
+.wm-spot::after { content: ''; position: absolute; left: -4px; top: -22px; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.wm-rowdot.pin { background: #ea4335; border-color: #fff; }
+.wm-needle { display: grid; place-items: center; transition: transform 0.1s linear; }
+.wm-locate.on { box-shadow: 0 0 0 2px rgba(255, 201, 40, 0.8); }
+.wm-hint { position: absolute; right: 56px; top: 0; white-space: nowrap; padding: 4px 10px; border-radius: 999px; font-size: 12px; color: #fff; background: rgba(7, 10, 20, 0.85); animation: wm-fade 1.6s ease forwards; pointer-events: none; }
+@keyframes wm-fade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.wm-far .wm-mk:not(.home):not(.sel) .wm-lbl { display: none; }
+
+/* the arrow on the edge towards the player's city */
+.wm-arrow {
+  position: absolute; left: 0; top: 0; z-index: 3; width: 48px; height: 48px; margin: -24px 0 0 -24px; padding: 0; background: none; border: 0; cursor: pointer; will-change: transform;
+}
+.wm-arrow-ic { display: grid; place-items: center; width: 48px; height: 48px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)); }
+.wm-arrow-txt {
+  position: absolute; top: 44px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; color: #fff; padding: 1px 8px; border-radius: 999px;
+  background: rgba(7, 10, 20, 0.85); border: 1px solid var(--gold, #ffd45c);
+}
+.wm-arrow:active .wm-arrow-ic { transform: scale(0.94); }
+
+/* scale bar and the inset globe, bottom left on a phone */
+.wm-scale { position: absolute; z-index: 1; left: 10px; bottom: var(--wm-bot, 8px); display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: #fff; pointer-events: none; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+.wm-scale-bar { display: block; height: 6px; border: 2px solid #fff; border-top: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+.wm-pulse { display: none; }
+.wm-mk.home .wm-dot { position: relative; }
+.wm-mk.home .wm-dot::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid rgba(255, 201, 40, 0.9); animation: wm-pulse 1.8s ease-out infinite; pointer-events: none;
+}
+@keyframes wm-pulse { 0% { transform: scale(1); opacity: 0.95; } 100% { transform: scale(2.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .wm-mk.home .wm-dot::after { animation: none; opacity: 0.5; transform: scale(1.5); } }
 
 /* same column as (v6.css: phone centred vertically, desktop top 14 right 14) the city screen's side buttons (.vh-side: right 10, top 56, two 42 px buttons, gap 10) */
 .wm-tools { position: absolute; z-index: 3; right: 10px; top: calc(50% + 58px); display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
@@ -39,7 +82,7 @@
 .wm-zoom { font-size: 24px; line-height: 1; color: #ffe9a8; }
 
 .wm-card {
-  position: absolute; z-index: 4; left: 10px; right: 10px; bottom: 8px; padding: 12px; border-radius: 18px;
+  position: absolute; z-index: 4; left: 10px; right: 66px; bottom: 8px; padding: 12px; border-radius: 18px;
   background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55); color: #fff; display: flex; flex-direction: column; gap: 10px;
 }
@@ -62,11 +105,6 @@
 .wm-rowdot.central { background: #7be3d4; border-color: #0f4f57; }
 .wm-rowdot.home { background: linear-gradient(180deg, #ffe08a, #f0a81c); border-color: #5a3b00; width: 30px; height: 30px; }
 
-.wm-list { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.wm-search {
-  width: 100%; min-height: 44px; padding: 0 14px; border-radius: 14px; font-size: 15px; color: #fff; box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.22);
-}
 .wm-rows { display: flex; flex-direction: column; gap: 6px; max-height: 52vh; overflow-y: auto; }
 .wm-row {
   display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; border-radius: 14px; text-align: start; color: #fff;
@@ -78,19 +116,15 @@
 .wm-rowkm { flex: none; font-size: 12px; opacity: 0.7; }
 .wm-empty { padding: 14px; text-align: center; font-size: 14px; opacity: 0.75; }
 
-/* desktop: the list is a docked panel, the card floats bottom-left, markers get hover */
-.wm-desk .wm-card { right: auto; left: 50%; transform: translateX(-50%); bottom: 132px; width: 400px; }
-.wm-dock {
-  position: absolute; z-index: 4; top: 56px; bottom: 16px; left: 16px; width: 340px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
-  border-radius: 18px; color: #fff; background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55);
-}
-.wm-dock .wm-rows { max-height: none; flex: 1; }
-.wm-dock-head { display: flex; align-items: center; justify-content: space-between; font-size: 16px; }
+/* desktop: like Google Maps - the search box top left and the place card as a panel under it */
+.wm-desk .wm-searchbox { left: 16px; right: auto; width: 360px; top: 14px; }
+.wm-desk .wm-card { left: 16px; right: auto; top: 74px; bottom: auto; width: 360px; transform: none; }
+.wm-desk .wm-scale { left: 16px; bottom: 16px; }
 .wm-desk .wm-mk:hover .wm-dot { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.55); }
-.wm-desk .wm-chip { top: 14px; }
+.wm-facts-col { flex-direction: column; gap: 4px; }
 
 /* the city screen's own overlays rest while the map is open */
 .vh--map .vh-top, .vh--map .vh-bottom, .vh--map .vh-labels { display: none; }
 @media (prefers-reduced-motion: reduce) { .wm { transition: none; } }
 @media (min-width: 900px) { .wm-tools { top: 118px; right: 14px; } }
+.wm-tools { position: absolute; }

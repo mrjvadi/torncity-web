@@ -16,7 +16,7 @@ import {
 } from 'three'
 import type { WorldInfo } from '../api/types'
 import { TILE_LAKE, TILE_OCEAN, type Chunk } from './chunk'
-import { faceDirection, type Face } from './geo'
+import { faceDirection, latLonToTile, type Face } from './geo'
 
 export type FetchChunk = (face: number, lod: number, x: number, y: number) => Promise<Chunk>
 
@@ -35,31 +35,47 @@ attribute vec3 aDir;
 attribute vec3 aGrad;
 attribute float aSkirt;
 attribute vec3 aCol;
+attribute vec3 aColM;
+attribute float aWater;
 uniform float uExag;
+uniform float uShade;
+uniform float uStyle;
 varying vec3 vCol;
 varying vec3 vN;
 varying float vDist;
+varying float vWater;
 void main() {
   vec3 p = position + aDir * (aElev * uExag - aSkirt);
-  vN = normalize(aDir - uExag * aGrad);
-  vCol = aCol;
+  vN = normalize(aDir - uShade * aGrad);
+  vCol = mix(aColM, aCol, uStyle);
+  vWater = aWater;
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   vDist = length(mv.xyz);
   gl_Position = projectionMatrix * mv;
 }`
 
 const FRAG = /* glsl */ `
-precision mediump float;
+precision highp float;
 uniform vec3 uLight;
 uniform vec3 uFogColor;
 uniform float uFogNear;
 uniform float uFogFar;
+uniform float uStyle;
 varying vec3 vCol;
 varying vec3 vN;
 varying float vDist;
+varying float vWater;
 void main() {
   float d = max(dot(normalize(vN), uLight), 0.0);
-  vec3 c = vCol * (0.46 + 0.74 * d);
+  float amb = mix(0.80, 0.46, uStyle);
+  float k = mix(0.30, 0.74, uStyle);
+  vec3 c = vCol * (amb + k * d);
+  if (uStyle < 0.5) {
+    // the coast: a thin darker-blue line where the water share crosses one half, about 1.5 px wide at any zoom
+    float e = abs(vWater - 0.5) / (fwidth(vWater) + 1e-5);
+    float line = 1.0 - smoothstep(0.4, 1.4, e);
+    c = mix(c, vec3(0.42, 0.58, 0.72), line * 0.85);
+  }
   c = mix(c, uFogColor, smoothstep(uFogNear, uFogFar, vDist));
   gl_FragColor = vec4(c, 1.0);
 }`
@@ -77,6 +93,8 @@ interface Entry {
   seen: number
   touched: number
 }
+
+export interface TileInfo { elev: number; biome: number; biomeCode: string; ocean: boolean; lake: boolean; coast: boolean; lod: number; tileKm: number; rgb: [number, number, number] }
 
 export interface TerrainStats { loaded: number; loading: number; shown: number; tris: number; meshes: number }
 
@@ -108,6 +126,8 @@ export class PlanetTerrain {
       fragmentShader: FRAG,
       uniforms: {
         uExag: { value: 8 },
+        uShade: { value: 8 },
+        uStyle: { value: 0 },
         uLight: { value: new Vector3(0.4, 0.5, 0.77).normalize() },
         uFogColor: { value: new Color('#b8d0e6') },
         uFogNear: { value: 1e9 },
@@ -188,6 +208,13 @@ export class PlanetTerrain {
       draw.push(e)
     }
     for (let f = 0; f < 6; f++) visit(f, 0, 0, 0)
+    if (this.overview) {
+      for (let f = 0; f < 6; f++) {
+        const r = this.entry(f, 0, 0, 0)
+        if (!r.chunk) want.push({ e: r, pri: 1e9 })
+        for (let y = 0; y < 2; y++) for (let x = 0; x < 2; x++) { const k = this.entry(f, 1, x, y); k.touched = now; if (!k.chunk) want.push({ e: k, pri: 1e9 + 1 }) }
+      }
+    }
 
     // meshes for what is to be drawn
     for (const e of this.shown) e.mesh && (e.mesh.visible = false)
@@ -213,6 +240,48 @@ export class PlanetTerrain {
   }
 
   private lastTris = 0
+  private overview = false
+
+  /** Asks for every chunk down to LOD 1 (30 small chunks) so the whole planet can be read at a coarse grain (minimap). */
+  wantOverview() { this.overview = true }
+
+  /** True when LOD 0 and 1 are all held. */
+  overviewReady(): boolean {
+    for (let f = 0; f < 6; f++) {
+      if (!this.entries.get(`${f}/0/0/0`)?.chunk) return false
+      for (let y = 0; y < 2; y++) for (let x = 0; x < 2; x++) if (!this.entries.get(`${f}/1/${x}/${y}`)?.chunk) return false
+    }
+    return true
+  }
+
+  /** The tile at a place from the finest chunk held (or at most `maxLod`), with its biome, height and whether the sea is next to it. */
+  sample(lat: number, lon: number, maxLod = this.world.chunk.max_lod): TileInfo | null {
+    const E = this.world.chunk.tile_edge
+    for (let lod = Math.min(maxLod, this.world.chunk.max_lod); lod >= 0; lod--) {
+      const tc = latLonToTile(lat, lon, lod, E)
+      const per = (1 << lod) * E
+      const gx = Math.min(per - 1, Math.max(0, Math.floor(tc.gx))), gy = Math.min(per - 1, Math.max(0, Math.floor(tc.gy)))
+      const e = this.entries.get(`${tc.face}/${lod}/${Math.floor(gx / E)}/${Math.floor(gy / E)}`)
+      const c = e?.chunk
+      if (!c) continue
+      const i = gx % E, j = gy % E
+      const k = j * E + i
+      const ocean = (c.flags[k] & TILE_OCEAN) !== 0
+      let coast = false
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const ii = i + di, jj = j + dj
+        if (ii < 0 || jj < 0 || ii >= E || jj >= E) continue
+        if (((c.flags[jj * E + ii] & TILE_OCEAN) !== 0) !== ocean) coast = true
+      }
+      const rgb: [number, number, number] = [0, 0, 0]
+      const tmp = new Uint8Array(3)
+      this.colour(c.biome[k], c.elevation[k], c.flags[k], tmp, 0)
+      rgb[0] = tmp[0]; rgb[1] = tmp[1]; rgb[2] = tmp[2]
+      const biome = c.biome[k]
+      return { elev: c.elevation[k], biome, biomeCode: this.world.biomes.find((b) => b.index === biome)?.code ?? '', ocean, lake: (c.flags[k] & TILE_LAKE) !== 0, coast, lod, tileKm: (this.R * Math.PI) / 2 / per, rgb }
+    }
+    return null
+  }
 
   private pump(now: number) {
     while (this.inflight < MAX_INFLIGHT && this.pending.length) {
@@ -278,6 +347,8 @@ export class PlanetTerrain {
     const baseW = new Float32Array(NV * 3) // sea-level position, world (for the gradient)
     const rgb = new Uint8Array(NV * 3)
     const tmpRgb = new Uint8Array(3)
+    const rgbM = new Uint8Array(NV * 3)
+    const water = new Float32Array(NV)
 
     for (let j = 0; j < G; j++) {
       for (let i = 0; i < G; i++) {
@@ -308,6 +379,19 @@ export class PlanetTerrain {
           }
         }
         rgb[k * 3] = cr / cn; rgb[k * 3 + 1] = cg / cn; rgb[k * 3 + 2] = cb / cn
+        // the same for the flat cartographic palette, and how much of the corner is water
+        let mr = 0, mg = 0, mb = 0, wt = 0
+        for (let tj = j - 1; tj <= j; tj++) {
+          for (let ti = i - 1; ti <= i; ti++) {
+            if (ti < 0 || tj < 0 || ti >= E || tj >= E) continue
+            const t2 = tj * E + ti
+            this.colourMap(c.biome[t2], c.elevation[t2], c.flags[t2], tmpRgb)
+            mr += tmpRgb[0]; mg += tmpRgb[1]; mb += tmpRgb[2]
+            if (this.isWater(c.biome[t2], c.elevation[t2], c.flags[t2])) wt++
+          }
+        }
+        rgbM[k * 3] = mr / cn; rgbM[k * 3 + 1] = mg / cn; rgbM[k * 3 + 2] = mb / cn
+        water[k] = wt / cn
       }
     }
 
@@ -327,6 +411,8 @@ export class PlanetTerrain {
     const grad = new Float32Array(NT * 3)
     const skirt = new Float32Array(NT)
     const col = new Uint8Array(NT * 3)
+    const colM = new Uint8Array(NT * 3)
+    const wat = new Float32Array(NT)
 
     const idx = (i: number, j: number) => Math.min(G - 1, Math.max(0, j)) * G + Math.min(G - 1, Math.max(0, i))
     for (let j = 0; j < G; j++) {
@@ -344,14 +430,17 @@ export class PlanetTerrain {
         elev[k] = hk[k]
         dir[k * 3] = dirs[k * 3]; dir[k * 3 + 1] = dirs[k * 3 + 1]; dir[k * 3 + 2] = dirs[k * 3 + 2]
         col[k * 3] = rgb[k * 3]; col[k * 3 + 1] = rgb[k * 3 + 1]; col[k * 3 + 2] = rgb[k * 3 + 2]
+        colM[k * 3] = rgbM[k * 3]; colM[k * 3 + 1] = rgbM[k * 3 + 1]; colM[k * 3 + 2] = rgbM[k * 3 + 2]
+        wat[k] = water[k]
       }
     }
     for (let b = 0; b < NB; b++) {
       const s = border[b], t = NV + b
       for (let q = 0; q < 3; q++) {
-        pos[t * 3 + q] = pos[s * 3 + q]; dir[t * 3 + q] = dir[s * 3 + q]; grad[t * 3 + q] = grad[s * 3 + q]; col[t * 3 + q] = col[s * 3 + q]
+        pos[t * 3 + q] = pos[s * 3 + q]; dir[t * 3 + q] = dir[s * 3 + q]; grad[t * 3 + q] = grad[s * 3 + q]; col[t * 3 + q] = col[s * 3 + q]; colM[t * 3 + q] = colM[s * 3 + q]
       }
       elev[t] = elev[s]
+      wat[t] = wat[s]
       skirt[t] = skirtKm
     }
 
@@ -377,11 +466,34 @@ export class PlanetTerrain {
     geo.setAttribute('aGrad', new BufferAttribute(grad, 3))
     geo.setAttribute('aSkirt', new BufferAttribute(skirt, 1))
     geo.setAttribute('aCol', new BufferAttribute(col, 3, true))
+    geo.setAttribute('aColM', new BufferAttribute(colM, 3, true))
+    geo.setAttribute('aWater', new BufferAttribute(wat, 1))
     geo.setIndex(new BufferAttribute(index, 1))
     const mesh = new Mesh(geo, this.material)
     mesh.position.set(cx, cy, cz)
     mesh.frustumCulled = false // the cut already culled it (the shader moves the vertices)
     return mesh
+  }
+
+  private isWater(biome: number, elev: number, flags: number) {
+    return (flags & (TILE_OCEAN | TILE_LAKE)) !== 0 || (elev <= 0 && this.biomeWater[biome])
+  }
+
+  /** The flat cartographic palette: pale land by biome, soft blue water, grey rock, white ice. */
+  private colourMap(biome: number, elev: number, flags: number, out: Uint8Array) {
+    let r: number, g: number, b: number
+    if ((flags & TILE_LAKE) !== 0) { r = 168; g = 210; b = 238 } else if (this.isWater(biome, elev, flags)) {
+      const t = Math.min(1, Math.max(0, -elev / 4500))
+      r = 190 + (150 - 190) * t; g = 224 + (196 - 224) * t; b = 246 + (232 - 246) * t
+    } else {
+      const base = this.biomeRgb[biome] ?? [160, 170, 150]
+      r = base[0] * 0.55 + 250 * 0.45; g = base[1] * 0.55 + 246 * 0.45; b = base[2] * 0.55 + 232 * 0.45
+      const rock = s01((elev - 1500) / 1800)
+      r += (214 - r) * rock; g += (208 - g) * rock; b += (196 - b) * rock
+      const snow = s01((elev - 3300) / 900)
+      r += (248 - r) * snow; g += (248 - g) * snow; b += (250 - b) * snow
+    }
+    out[0] = r; out[1] = g; out[2] = b
   }
 
   private colour(biome: number, elev: number, flags: number, out: Uint8Array, at: number) {
