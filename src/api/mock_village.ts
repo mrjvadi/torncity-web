@@ -1342,6 +1342,41 @@ function materialsBuy(args: Record<string, unknown>) {
   return materialsView({ item: line.item, qty, total })
 }
 
+const SHOP_SH = { code: 'food.staples', group: 'food', label: 'خوراک پایه', group_label: 'خوراکی' }
+function shopView() {
+  const view: Record<string, unknown> = {
+    village: 'آمل', building: true, closed: '', next_delivery: new Date(Date.now() + 3 * 3600_000).toISOString(), delivery_hour: 6, wage: 40,
+    tax_bps: 300, tax_max_bps: 1000, tax_presets: [0, 300, 500, 1000], price_cap_bps: 12000, cap_min_bps: 10000, cap_max_bps: 15000, cap_presets: [10500, 12000, 15000],
+    can_set_cap: IS_HEAD, presets: [1, 5, 10], resident: true,
+    lines: [
+      { item: goods('rice'), kind: 'item', shelf: SHOP_SH, price: 13, reference: 12, stock: 40, left_today: 6, fits: 12, max_buy: 6, tradable: true },
+      { item: goods('tea'), kind: 'item', shelf: SHOP_SH, price: 9, reference: 8, stock: 0, left_today: 0, fits: 12, max_buy: 0, tradable: true },
+      { item: goods('bandage'), kind: 'item', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'دارو' }, price: 28, reference: 24, stock: 9, left_today: 2, fits: 0, max_buy: 0, tradable: false },
+    ],
+    locked: [{ item: goods('timber'), kind: 'component', shelf: SHOP_SH, needs_buildings: [goods('woodcutter_camp')], needs_knowledge: null }],
+    free_space: 6, capacity: 20, free_g: 9000,
+    repairs: [{ item: goods('bag_sack'), serial: 'sk-1a2b', slot: 'back', wear: 40, wear_max: 100, torn: false, cost: 12 }], can_repair: true, cash: 800, bought: null, mended: null,
+  }
+  return mockOk('village_shop', view as never, [back('settlement.overview'), refreshA('settlement.shop')])
+}
+function shopBuy(args: Record<string, unknown>) {
+  const qty = Number(args.qty ?? 1)
+  const unit = 13
+  if (args.method) return shopView()
+  return mockOk('village_shop_checkout', {
+    village: 'آمل', item: goods(String(args.item ?? 'rice')), kind: 'item', qty, unit, total: unit * qty, tax: Math.round(unit * qty * 0.03), tax_bps: 300, stock: 40,
+    space: qty, free_space: 6, grams: qty * 1000, payment: { amount: unit * qty, accepted: ['cash', 'card'], usable: ['cash', 'card'], cash: 800, bank: 3000 }, nonce: 'sn1',
+  }, [A('shop.pay', 'settlement.shop.buy', { item: String(args.item ?? 'rice'), qty: String(qty), method: 'cash', nonce: 'sn1' }, { kind: 'confirm' }),
+    A('shop.pay', 'settlement.shop.buy', { item: String(args.item ?? 'rice'), qty: String(qty), method: 'card', nonce: 'sn1' }, { kind: 'confirm' }), back('settlement.shop')])
+}
+function moneyView() {
+  return mockOk('village_money', {
+    village: 'آمل', currency: { code: 'SUP', name: 'ساپ', symbol: '', issued: false }, market: 'none', reserve: 'none', nil_unit_sup: 1000, nil_per_unit_micro: 2400,
+    examples: [{ amount: 100, nil_micro: 240 }, { amount: 1000, nil_micro: 2400 }], treasury: st.treasury, treasury_nil_micro: st.treasury * 2400, output: 1800, output_nil_micro: 4320000, output_days: 7,
+    residents: 9, basket: [{ item: goods('rice'), kind: 'item', week_milli: 1400, reference: 12, price: 13, on_shelf: true }, { item: goods('tea'), kind: 'item', week_milli: 200, reference: 8, price: 9, on_shelf: false }], index_bps: 10800, cover_bps: 7500,
+  }, [back('settlement.shop'), refreshA('settlement.money')])
+}
+
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
   if (!command.startsWith('settlement.')) return null
   if (command.startsWith('settlement.labor.')) return mockLaborCommand(command, args)
@@ -1350,6 +1385,10 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.overview': return overviewView()
     case 'settlement.materials': return materialsView()
     case 'settlement.materials.buy': return materialsBuy(args)
+    case 'settlement.shop': return shopView()
+    case 'settlement.shop.buy': return shopBuy(args)
+    case 'settlement.shop.cap': case 'settlement.shop.tax': return shopView()
+    case 'settlement.money': return moneyView()
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true, String(args.from ?? ''))
     case 'settlement.build.place': return place(args)

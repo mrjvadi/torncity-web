@@ -5514,6 +5514,7 @@ export interface WornBagLine {
 
 /** The screens of the migrated areas: the screen name on the wire, and its view. */
 export interface ScreenViews {
+  village_money: MoneyView
   village_shop_refusal: VillageShopRefusalView
   village_shop_checkout: VillageShopCheckoutView
   village_shop: VillageShopView

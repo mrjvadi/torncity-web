@@ -4905,6 +4905,7 @@ export const uiFa = {
   'sm.money.lbl_unit': 'نیل هر {u} ساپ',
   'sm.money.lbl_output': 'تولید {d} روز',
   'v6.ring.market': 'بازار',
+  'hub.storehouse': 'انبار',
 } as const
 
 export type UiKey = keyof typeof uiFa

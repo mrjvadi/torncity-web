@@ -5001,3 +5001,4 @@ sm.money.lbl_treasury | خزانه | Treasury
 sm.money.lbl_unit | نیل هر {u} ساپ | Nil per {u} money
 sm.money.lbl_output | تولید {d} روز | Output, {d} days
 v6.ring.market | بازار | Market
+hub.storehouse | انبار | Storehouse

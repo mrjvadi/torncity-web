@@ -21,6 +21,7 @@ export const ACTIVITY_ENTRIES: Record<string, { icon: string; palette: IconPalet
 export const ECONOMY_ENTRIES: Record<string, { icon: string; palette: IconPalette; title: Key }> = {
   inventory: { icon: 'm_backpack', palette: 'gold', title: 'hub.inventory' },
   market: { icon: 'market', palette: 'emerald', title: 'hub.market' },
+  storehouse: { icon: 'm_backpack', palette: 'amber', title: 'hub.storehouse' },
   bank: { icon: 'bank', palette: 'sapphire', title: 'hub.bank' },
   companies: { icon: 'factory', palette: 'amber', title: 'hub.companies' },
   property: { icon: 'house', palette: 'emerald', title: 'hub.property' },
@@ -40,6 +41,6 @@ export const SOCIETY_ENTRIES: Record<string, { icon: string; palette: IconPalett
 /** The v6 icon of each hub entry (ui-v6/icons): the hub cards use these, the old table above keeps the rail's words. */
 export const HUB_ICON: Record<string, string> = {
   work: 'tool', learn: 'book', health: 'health', crime: 'crime', missions: 'scroll', rankings: 'trophy',
-  inventory: 'bag', market: 'coin', bank: 'bank', companies: 'crate', property: 'house', stocks: 'trophy',
+  inventory: 'bag', market: 'coin', storehouse: 'crate', bank: 'bank', companies: 'crate', property: 'house', stocks: 'trophy',
   inbox: 'chat', faction: 'banner', friends: 'people', elections: 'ballot', government: 'scroll', war: 'cross',
 }

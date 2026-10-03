@@ -4907,4 +4907,5 @@ export const uiEn: Record<UiKey, string> = {
   'sm.money.lbl_unit': 'Nil per {u} money',
   'sm.money.lbl_output': 'Output, {d} days',
   'v6.ring.market': 'Market',
+  'hub.storehouse': 'Storehouse',
 }
