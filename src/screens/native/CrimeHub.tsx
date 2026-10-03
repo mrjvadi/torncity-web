@@ -1,5 +1,7 @@
 import type { ScreenProps } from '../types'
-import { Bar, Card, Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
+import { Bar, Card, Empty, Header, Notice, ScreenScroll } from './kit/Parts'
+import { CardGrid, PCard, PTile } from '../../ui/v6/panel'
+import { Lines } from './kit/cardparts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms } from './kit/format'
 import { Slab } from '../../kit'
@@ -51,11 +53,6 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
               label={t('crime.heat', { n: formatNumber(v.heat.heat ?? 0) })}
               sub={v.heat.wanted ? t('crime.wanted', { n: formatNumber(v.heat.wanted) }) : undefined} />
           )}
-          {v.nerve && (
-            <Bar frac={v.nerve.max ? clamp01((v.nerve.nerve ?? 0) / v.nerve.max) : 0} color="var(--anar)"
-              label={t('crime.nerve', { a: formatNumber(v.nerve.nerve ?? 0), b: formatNumber(v.nerve.max ?? 0) })}
-              sub={!v.nerve.max || (v.nerve.nerve ?? 0) < v.nerve.max ? t('crime.full_in', { t: hms(v.nerve.full_in_seconds) }) : undefined} />
-          )}
         </div>
         {v.venue?.code && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('crime.venue', { name: names.name('venue', v.venue.code, v.venue.name) })}</div>}
         {v.tier?.tier?.name && (
@@ -75,10 +72,9 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
         </Card>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="hub-grid">
         {(v.empty === 'level_too_low' || v.empty === 'no_venue' ? [] : v.categories ?? []).map((c) => (
-          <ListRow key={c.code} icon="crime" palette="ruby" title={categoryName(c)}
-            onClick={() => c.code && run('crime.list', { category: c.code })} />
+          <PTile key={c.code} icon="crime" title={categoryName(c)} onClick={() => c.code && run('crime.list', { category: c.code })} />
         ))}
       </div>
 
@@ -98,18 +94,19 @@ export function CrimeList({ response, loading, onAction, run }: ScreenProps) {
   return (
     <ScreenScroll>
       <Header title={v.category ? categoryName(v.category) : t('crime.title')} tone="ruby" onBack={() => run('crime.hub')} onRefresh={() => v.category?.code && run('crime.list', { category: v.category.code })} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {(v.crimes ?? []).length === 0 && <Empty>{t('crime.list.empty')}</Empty>}
+      <CardGrid>
         {(v.crimes ?? []).map((c, i) => (
-          <ListRow
+          <PCard
             key={i}
-            icon={c.eligible ? 'crime' : 'm_lock'}
-            palette={c.eligible ? 'ruby' : 'steel'}
+            icon={c.eligible ? 'crime' : 'lock'}
             title={c.crime?.code ? names.name('crime', c.crime.code, c.crime.name) : '—'}
-            sub={`${t('crime.nerve_cost', { n: formatNumber(c.nerve ?? 0) })}${c.duration_seconds ? ` · ${hms(c.duration_seconds)}` : ''}${c.eligible ? '' : ` · ${t('ac.crime.list.locked')}`}`}
+            badge={c.eligible ? undefined : t('ac.crime.list.locked')} tone="off" off={!c.eligible}
+            facts={<Lines lines={[t('crime.nerve_cost', { n: formatNumber(c.nerve ?? 0) }), c.duration_seconds ? hms(c.duration_seconds) : '']} />}
             onClick={() => c.crime?.code && run('crime.view', { crime: c.crime.code })}
           />
         ))}
-      </div>
+      </CardGrid>
       <Actions response={response} onAction={onAction} refreshCommand="crime.list" only={(a) => a.id !== 'crime.view'} />
     </ScreenScroll>
   )

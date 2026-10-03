@@ -1,5 +1,7 @@
 import type { ScreenProps } from '../types'
-import { Bar, Card, Empty, Header, ListRow, ScreenScroll } from './kit/Parts'
+import { Bar, Card, Empty, Header, ScreenScroll } from './kit/Parts'
+import { CardGrid, PCard, PSec } from '../../ui/v6/panel'
+import { Lines, Need } from './kit/cardparts'
 import Actions from './kit/Actions'
 import { clamp01, hms, moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
@@ -8,7 +10,7 @@ import { t, type Key } from '../../i18n'
 interface Named { code?: string; name?: string }
 interface CurrentCourse { course?: Named; percent?: number; remaining_seconds?: number; paused?: boolean }
 interface CourseLine { course?: Named; duration_seconds?: number; eligible?: boolean; fee?: number; min_level?: number }
-interface Need { kind?: string; code?: string; role?: string; tier?: number }
+interface Need { kind?: string; code?: string; name?: string; role?: string; tier?: number }
 interface Gap { course?: Named; fee?: number; duration_seconds?: number; nearest?: Named | null; needs?: Need[] | null }
 interface Literacy { share_bps?: number; next_bps?: number; next_stage?: string }
 interface EducationView {
@@ -38,8 +40,8 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
   const lit = v.literacy
   const needText = (n: Need): string | null => {
     switch (n.kind) {
-      case 'knowledge': return t('education.gap.need.knowledge', { name: names.name('knowledge', n.code ?? '', n.code) })
-      case 'building': return t('education.gap.need.building', { name: n.code ? buildingName(cat, n.code) : names.name('building_role', n.role ?? '', n.role) })
+      case 'knowledge': return t('education.gap.need.knowledge', { name: names.name('knowledge', n.code ?? '', n.name ?? n.code) })
+      case 'building': return t('education.gap.need.building', { name: n.code ? buildingName(cat, n.code, n.name) : names.name('building_role', n.role ?? '', n.role) })
       case 'teacher': return t('education.gap.need.teacher', { name: names.name('building_role', n.role ?? '', n.role) })
       default: return null
     }
@@ -78,39 +80,41 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
       )}
       {v.empty === 'nothing_taught' && <Empty>{t('education.empty.nothing', { place })}</Empty>}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {(v.courses ?? []).map((c, i) => (
-          <ListRow
-            key={c.course?.code ?? i}
-            icon={c.eligible ? 'study' : 'm_lock'}
-            palette={c.eligible ? 'violet' : 'steel'}
-            title={course(c.course)}
-            sub={`${c.fee ? moneyIn(c.fee, v.currency) : t('common.free')} · ${roughDuration(c.duration_seconds)}${!c.eligible && c.min_level ? ` · ${t('common.of_level', { n: c.min_level })}` : ''}`}
-            onClick={() => c.eligible && c.course?.code && run('education.view', { course: c.course.code })}
-          />
-        ))}
-      </div>
+      {(v.courses ?? []).length > 0 && (
+        <>
+          <PSec>{t('education.here_title', { place })}</PSec>
+          <CardGrid>
+            {(v.courses ?? []).map((c, i) => (
+              <PCard
+                key={c.course?.code ?? i}
+                icon={c.eligible ? 'book' : 'lock'}
+                title={course(c.course)}
+                badge={c.eligible ? t('education.open') : t('common.of_level', { n: c.min_level ?? 0 })}
+                tone={c.eligible ? 'good' : 'off'}
+                facts={<Lines lines={[`${c.fee ? moneyIn(c.fee, v.currency) : t('common.free')} · ${roughDuration(c.duration_seconds)}`]} />}
+                onClick={c.eligible && c.course?.code ? () => run('education.view', { course: c.course!.code! }) : undefined}
+              />
+            ))}
+          </CardGrid>
+        </>
+      )}
 
-      {(v.elsewhere ?? []).map((g) => {
-        const near = g.nearest?.name ? names.name('city', g.nearest.code ?? '', g.nearest.name) : ''
-        const needs = (g.needs ?? []).map(needText).filter((x): x is string => !!x)
-        return (
-          <Card key={g.course?.code}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-              <div className="display" style={{ fontSize: 15 }}>{course(g.course)}</div>
-              <span className="nx-chip">{t('education.here_not')}</span>
-            </div>
-            <div className="nx-bar-sub" style={{ marginTop: 4 }}>{`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`}</div>
-            {near && <div className="nx-bar-sub" style={{ marginTop: 4 }}>{t('education.gap.taught_in', { place: near })}</div>}
-            {needs.map((x) => <div key={x} className="nx-bar-sub" style={{ marginTop: 2 }}>{x}</div>)}
-            {near && g.nearest?.code && (
-              <div style={{ marginTop: 8 }}>
-                <ListRow icon="plane" palette="teal" title={t('education.gap.go', { place: near })} onClick={() => run('travel.options', { city: g.nearest!.code! })} />
-              </div>
-            )}
-          </Card>
-        )
-      })}
+      {(v.elsewhere ?? []).length > 0 && (
+        <>
+          <PSec>{t('education.not_here_title')}</PSec>
+          <CardGrid>
+            {(v.elsewhere ?? []).map((g) => {
+              const near = g.nearest?.name ? names.name('city', g.nearest.code ?? '', g.nearest.name) : ''
+              const needs = (g.needs ?? []).map(needText).filter((x): x is string => !!x)
+              return (
+                <PCard key={g.course?.code} off icon="book" title={course(g.course)} badge={t('education.here_not')} tone="off"
+                  facts={<><Lines lines={[`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '']} /><Need lines={needs} /></>}
+                  foot={near && g.nearest?.code ? <button className="pn-btn sec" onClick={() => run('travel.options', { city: g.nearest!.code! })}>{t('education.gap.go', { place: near })}</button> : undefined} />
+              )
+            })}
+          </CardGrid>
+        </>
+      )}
 
       {!!(v.certificates && v.certificates.length) && (
         <Card>

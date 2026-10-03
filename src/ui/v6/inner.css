@@ -387,3 +387,7 @@
 .hub-cards .vf-facts, .hub-cards .pn-stats { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 .hub-cards .vf-fact, .v6 .hub-cards .vf-fact { flex-direction: column; justify-content: center; align-items: center; min-height: 0; padding: 5px 6px; text-align: center; }
 .hub-cards .vf-fact b, .v6 .hub-cards .vf-fact b { text-align: center; font-size: 14px; }
+
+/* lines inside a PCard's facts (activities): one per row, centred; «what is lacking» in red */
+.hub-cards .pc-line { display: block; font: 500 12.5px/1.4 Vazirmatn; color: var(--v6-mut); overflow-wrap: anywhere; }
+.hub-cards .pc-need { color: #ffb4a8; }

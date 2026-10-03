@@ -120,6 +120,10 @@ function openings(page: number, o: { employed?: boolean; travelling?: boolean; e
   const v: JobOpeningsView = {
     companies, city_code: CITY.code, city: CITY.name, travelling: !!o.travelling, employed, current: employed ? (held ?? jr('retail')) : jr('retail'),
     openings: list.length ? list : null, page: p, pages: o.empty ? 1 : pages,
+    gaps: p === 1 && !o.empty && !o.travelling ? [
+      { job: jr('finance'), nearest: { code: 'support', name: 'شهر مرکزی' }, needs: [{ kind: 'knowledge', code: 'double_entry_bookkeeping', name: 'دفترداری دوطرفه', role: '', tier: 0 }, { kind: 'building', code: 'bank', name: 'بانک', role: '', tier: 0 }] },
+      { job: jr('technology'), nearest: { code: 'support', name: 'شهر مرکزی' }, needs: [{ kind: 'knowledge', code: 'computing', name: 'رایانه', role: '', tier: 0 }] },
+    ] : null,
   }
   const a: MockAct[] = []
   if (!o.travelling) {
@@ -229,7 +233,7 @@ const line = (code: string, eligible = true): CourseLine => ({ course: cref(code
 const VILLAGE = { code: 'v-k3x9', name: 'آمل' }
 const MONEY = { code: 'AML', name: 'سکهٔ آمل', symbol: '' }
 
-const need = (kind: string, code: string, role = ''): CourseNeed => ({ kind, code, role, tier: 0 })
+const need = (kind: string, code: string, role = ''): CourseNeed => ({ kind, code, name: '', role, tier: 0 })
 const gap = (code: string, needs: CourseNeed[]): CourseGap => ({ course: cref(code), fee: COURSES[code].fee, duration_seconds: COURSES[code].secs, nearest: { code: 'support', name: 'شهر مرکزی' }, needs })
 
 function education(page: number, mode: string) {
