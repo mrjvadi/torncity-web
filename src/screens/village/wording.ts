@@ -54,7 +54,8 @@ export function actionLabel(a: Action, names?: ContentNames): string {
   const subject = a.subject ?? ''
   const name = subject && names ? names.name(subjectTables(id), subject) : subject
   const params: Record<string, string | number> = { name, n: amountOf(a), city: name }
-  const keys = [...(id ? [`act.${id}`] : []), `cmd.${a.command ?? ''}`]
+  // the server blanks an id that equals its command, so the command is also a name of the action
+  const keys = [...(id ? [`act.${id}`] : []), `cmd.${a.command ?? ''}`, `act.${a.command ?? ''}`]
   for (const key of keys) if (hasKey(key)) return t(key as Key, params)
   if (id.startsWith('support.')) return t('act.support.any', { name })
   noteLabelGap(a)
