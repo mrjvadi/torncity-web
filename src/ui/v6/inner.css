@@ -376,3 +376,4 @@
 .hub-cards > .nx-card { align-items: stretch; justify-content: flex-start; text-align: start; }
 .hub-cards > .nx-card .nx-bar-wrap, .hub-cards > .nx-card .nx-bar { width: 100%; }
 .hub-cards .nx-row-right .vf-cancel, .hub-cards .pc-foot .vf-cancel { min-height: 44px; min-width: 44px; padding: 0 10px; }
+.pn-stats > .pn-stat:only-child, .vf-facts > .vf-fact:only-child { grid-column: 1 / -1; }
