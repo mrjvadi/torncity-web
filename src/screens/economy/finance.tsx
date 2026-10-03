@@ -15,6 +15,7 @@ import { durationText } from '../village/common'
 import { ConfirmPopup, Do, NotHere, PayFooter, Purses, byId, find, nameOf, payNote, rest } from './kit'
 import { noticeLine } from './wording'
 import { clockText, dateText } from './time'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 
@@ -146,17 +147,17 @@ const FinanceHub = flow<FinanceHubView>(({ view: v, ctx }) => {
       </Card>
 
       {products.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <CardGrid>
           <div className="nx-sec">{t('eco.loan.products')}</div>
           {products.map((p) => (
             <ListRow key={p.product.code} icon="bank" palette="sapphire" title={nameOf(ctx, ['loan_product'], p.product)}
               sub={t('finance.product_sub', { p: pct(p.rate_bps / 10000), limit: money(p.limit) })}
               onClick={() => { const a = find(ctx, 'finance.product', { product: p.product.code }); if (a) ctx.go(a) }} />
           ))}
-        </div>
+        </CardGrid>
       )}
       {(v.loans ?? []).length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <CardGrid>
           <div className="nx-sec">{t('finance.my_loans')}</div>
           {(v.loans ?? []).map((l) => (
             <ListRow key={l.no} icon={l.arrears ? 'x_wanted' : 'money'} palette={l.status !== 'active' ? 'steel' : l.arrears ? 'ruby' : 'emerald'}
@@ -164,15 +165,15 @@ const FinanceHub = flow<FinanceHubView>(({ view: v, ctx }) => {
               onClick={() => { const a = find(ctx, 'finance.loan', { no: l.no }); if (a) ctx.go(a) }} />
           ))}
           {v.next_at && <Hint>{t('eco.loan.next_due', { t: clockText(v.next_at) })}</Hint>}
-        </div>
+        </CardGrid>
       )}
       <Hint>{t('finance.deposit', { n: money(v.savings), p: pct(v.savings_bps / 10000) })}</Hint>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {byId(ctx, 'finance.savings', 'finance.insurance', 'finance.exchange', 'finance.gold', 'finance.portfolio').map((a) => (
           <ListRow key={a.id} icon={a.id === 'finance.insurance' ? 'shield' : a.id === 'finance.savings' ? 'bank' : a.id === 'finance.gold' ? 'ring' : 'chart'}
             palette="sapphire" title={ctx.label(a)} onClick={() => ctx.go(a)} />
         ))}
-      </div>
+      </CardGrid>
       <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
     </Page>
   )
@@ -196,21 +197,25 @@ const LoanOffer = flow<LoanOfferView>(({ view: v, ctx }) => {
       {pledges.length > 0 && !v.pledge && (
         <Panel>
           <Lead>{t(key(`eco.loan.choose_pledge.${v.kind}`))}</Lead>
+          <CardGrid>
           {pledges.map((p) => {
             const a = find(ctx, 'finance.pledge', { pledge: p.code || p.no })
             return <ListRow key={p.code || p.no} icon="house" palette="sapphire" title={pledgeTitle(ctx, p)} sub={p.code ? t('eco.loan.secures', { n: money(p.limit) }) : `${t('eco.pledge.worth', { n: money(p.value) })} · ${t('eco.loan.secures', { n: money(p.limit) })}`} onClick={() => a && ctx.go(a)} />
           })}
+          </CardGrid>
         </Panel>
       )}
       {!(pledges.length > 0 && !v.pledge) && (
         options.length === 0 ? <Panel><Hint>{t('eco.loan.nothing')}</Hint></Panel> : (
           <Panel>
             <Lead>{t('eco.loan.limit', { n: money(v.limit) })}</Lead>
+            <CardGrid>
             {options.map((o) => {
               const a = find(ctx, 'finance.option', { amount: o.amount, term: o.term })
               return <ListRow key={`${o.amount}-${o.term}`} icon="money" palette="emerald" title={money(o.amount)}
                 sub={t('eco.loan.option_sub', { term: formatNumber(o.term), instalment: money(o.instalment) })} onClick={() => a && ctx.go(a)} />
             })}
+            </CardGrid>
           </Panel>
         )
       )}
