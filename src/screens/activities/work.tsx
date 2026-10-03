@@ -9,7 +9,7 @@ import type { Action } from '../../api/types'
 import { Bar, Card, ListRow, SectionTitle } from '../native/kit/Parts'
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { Lines, Need } from '../native/kit/cardparts'
-import { needLines } from '../native/kit/needs'
+import { needLines, tripLine } from '../native/kit/needs'
 import { clamp01, hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import Popup, {
@@ -44,7 +44,7 @@ registerLabeler((a, names) => {
 
 const REQ_ICON: Record<string, string> = {
   level: 'x_star', skill: 'study', certificate: 'study', residence: 'house', performance: 'chart', time: 'clock', shifts: 'work', top: 'x_star',
-  course_city: 'x_map', course_full: 'm_stop', already_certified: 'check', already_enrolled: 'study',
+  course_city: 'x_map', course_teacher: 'study', not_head: 'm_stop', teacher_no_pool: 'm_stop', already_teaching: 'check', not_teaching: 'm_stop', teacher_full: 'm_stop', course_full: 'm_stop', already_certified: 'check', already_enrolled: 'study',
 }
 
 function reqText(ctx: FlowCtx, r: Requirement): string {
@@ -120,7 +120,7 @@ export const JobOpenings = flow<JobOpeningsView>(({ view: v, ctx }) => {
               const near = g.nearest ? cityName(ctx, g.nearest.code, g.nearest.name) : ''
               return (
                 <PCard key={g.job.career_code} off icon="tool" title={careerName(ctx, g.job)} badge={t('education.here_not')} tone="off"
-                  facts={<><Lines lines={[near ? t('ac.work.openings.had_in', { place: near }) : '']} /><Need lines={needLines(g.needs, ctx.names, ctx.bname)} /></>}
+                  facts={<><Lines lines={[near ? t('ac.work.openings.had_in', { place: near }) : '', tripLine(g.nearest_trip)]} /><Need lines={needLines(g.needs, ctx.names, ctx.bname)} /></>}
                   foot={near && g.nearest ? <button className="pn-btn sec" onClick={() => ctx.run('travel.options', { city: g.nearest!.code })}>{t('education.gap.go', { place: near })}</button> : undefined} />
               )
             })}
@@ -309,6 +309,10 @@ export const CourseDetail = flow<CourseDetailView>(({ view: v, ctx }) => {
   const name = courseName(ctx, v.course)
   const lines = reqLines(ctx, v.requirements)
   const elsewhere = (v.requirements ?? []).find((r) => r.kind === 'course_city' && !r.met)
+  const hire = act(ctx, 'education.hire')
+  const teachSchool = act(ctx, 'education.teach_school')
+  const teachHome = act(ctx, 'education.teach_home')
+  const staff = v.staff ?? []
   const pays = ctx.acts.filter((a) => a.id?.startsWith('pay.'))
   const bank = act(ctx, 'bank')
   const enrol = act(ctx, 'education.enrol')
@@ -330,10 +334,37 @@ export const CourseDetail = flow<CourseDetailView>(({ view: v, ctx }) => {
             <EffectRow>{(v.skills ?? []).map((g) => <EffectChip key={g.skill} tone="good">{t('ac.work.course.reward', { skill: skillName(ctx, g.skill), xp: formatNumber(g.xp) })}</EffectChip>)}</EffectRow>
           </>
         )}
+        {staff.length > 0 && (
+          <>
+            <div className="ac-work-sub">{t('ac.work.course.staff')}</div>
+            <div className="vf-list">
+              {staff.map((s) => {
+                const end = ctx.acts.find((a) => a.id === 'education.unteach' && a.args?.id === s.id)
+                return (
+                  <div key={s.id} className="vf-line">
+                    <span>{t(`ac.work.teacher.${s.kind}` as Key, { name: s.name, n: formatNumber(s.students), max: formatNumber(s.max) })}</span>
+                    {end && <ActionButton tone="steel" small busy={ctx.busy} onClick={() => ctx.go(end)}>{t('ac.work.teacher.end')}</ActionButton>}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+        {(hire || teachSchool || teachHome) && (
+          <>
+            {v.teaching && <Note>{t('ac.work.teacher.wage', { wage: money(v.teaching.school_wage) })}</Note>}
+            <ActionRow>
+              {hire && <ActionButton tone="green" busy={ctx.busy} onClick={() => ctx.go(hire)}>{t('ac.work.teacher.btn_hire')}</ActionButton>}
+              {teachSchool && <ActionButton tone="green" busy={ctx.busy} onClick={() => ctx.go(teachSchool)}>{t('ac.work.teacher.btn_school')}</ActionButton>}
+              {teachHome && <ActionButton tone="steel" busy={ctx.busy} onClick={() => ctx.go(teachHome)}>{t('ac.work.teacher.btn_home', { tax: formatNumber(Math.round((v.teaching?.tax_bps ?? 0) / 100)) })}</ActionButton>}
+            </ActionRow>
+          </>
+        )}
+        {v.teaching?.no_pool && <Note tone="bad">{t('ac.work.teacher.no_pool')}</Note>}
         <RequirementList lines={lines} title={lines.length ? t('ac.work.detail.reqs') : undefined} />
         {elsewhere && (
           <Unavailable
-            reason={t('ac.work.course.not_here')} hint={t('ac.work.course.taught_in', { place: cityName(ctx, elsewhere.city_code, elsewhere.city) })}
+            reason={t('ac.work.course.not_here')} hint={[t('ac.work.course.taught_in', { place: cityName(ctx, elsewhere.city_code, elsewhere.city) }), tripLine(elsewhere.trip)].filter(Boolean).join(' · ')}
             nearest={{ name: cityName(ctx, elsewhere.city_code, elsewhere.city), onGo: () => ctx.run('travel.options', { city: elsewhere.city_code }), label: t('ac.work.course.go') }}
           />
         )}
@@ -427,6 +458,6 @@ export const WORK_SCREENS: Record<string, ReturnType<typeof flow>> = {
 }
 
 /** Commands of this file's screens that change the world: the flow host runs them itself. */
-export const WORK_WRITES: string[] = ['job.apply', 'job.work', 'job.promote', 'education.enroll']
+export const WORK_WRITES: string[] = ['job.apply', 'job.work', 'job.promote', 'education.enroll', 'education.hire', 'education.teach', 'education.unteach']
 // a resignation is a write only once the player has confirmed it
 registerWrites(['job.quit'], (a) => !!a.args?.confirm)

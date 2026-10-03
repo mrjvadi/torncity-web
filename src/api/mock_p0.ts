@@ -79,13 +79,26 @@ function missions(args: Args) {
 }
 
 export function mockP0Command(command: string, args?: Args) {
+  if (command === 'training.home') {
+    return ok('training_home', {
+      place: AS_CITY ? { code: 'support', name: 'شهر مرکزی' } : { code: VILLAGE.code, name: 'آمل' }, energy: 70, max_energy: 100, stamina: 112, strength_level: 2, energy_cost: 10, max_energy_cap: 30,
+      venues: [
+        { code: 'yard', efficiency_bps: 4000, fee: 0, available: true, missing: null },
+        ...(AS_CITY ? [{ code: 'gym', efficiency_bps: 10000, fee: 60, available: true, missing: null }]
+          : [{ code: 'ground', efficiency_bps: 6000, fee: 20, available: false, missing: { code: 'training_ground', name: 'زمین تمرین' } }]),
+      ],
+    })
+  }
+  if (command === 'training.start') {
+    return ok('trained', { venue: 'yard', stamina: 2, max_energy_added: 0, strength_level: 0, strength_xp: 12, fee: 0, energy: 60, max_energy: 100 })
+  }
   if (command === 'education.list') return education()
   if (command === 'mission.board') return missions(args)
   if (command === 'activities.hub') {
     return ok('activities_hub', {
       place: PLACE,
       entries: [
-        { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' }, ...(AS_CITY ? [] : [{ code: 'crime', command: 'crime.hub' }]),
+        { code: 'work', command: 'work.home' }, { code: 'learn', command: 'education.list' }, { code: 'health', command: 'health.home' }, { code: 'training', command: 'training.home' }, ...(AS_CITY ? [] : [{ code: 'crime', command: 'crime.hub' }]),
         { code: 'missions', command: 'mission.board' }, { code: 'rankings', command: 'life.top' },
       ],
     })

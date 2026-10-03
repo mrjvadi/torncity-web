@@ -4850,3 +4850,50 @@ build.search | جست‌وجوی ساختمان | Search buildings
 build.search_empty | ساختمانی با این نام پیدا نشد. | No building matches.
 build.show_locked | قفل‌شده‌ها | Locked
 build.locked_n | {n} ساختمان هنوز قفل است | {n} buildings are still locked
+# -- teachers and training (docs/research/2026-10-03-activities-audit.md section 7) --------------------
+hub.training | تمرین | Training
+trip.hint | کرایه {fare} · {wait} راه | Fare {fare} · {wait} away
+education.gap.need.teacher_post | برای این درس باید معلم استخدام شود یا کسی که مدرکش را دارد درس بدهد | A teacher must be hired, or someone holding its certificate must teach it
+lf.req.course_teacher | برای این درس اینجا هنوز معلمی نیست. | Nobody teaches this course here yet.
+lf.req.not_head | فقط شهردار می‌تواند معلم مدرسه بگیرد یا کنار بگذارد. | Only the head can hire or dismiss a school teacher.
+lf.req.teacher_no_pool | در شهر کسی بیکار نیست که معلم شود. | Nobody in town is free to become a teacher.
+lf.req.already_teaching | برای این درس همین حالا معلمی هست. | This course already has that teacher.
+lf.req.not_teaching | چنین معلمی در این شهر نیست یا جایگاهش از آنِ شما نیست. | No such teacher here, or the post is not yours.
+lf.req.teacher_full | کلاس این معلم پر شده است. | This teacher's class is full.
+ac.work.course.staff | معلم‌ها | Teachers
+ac.work.teacher.npc | معلم مدرسه · {n} از {max} شاگرد | School teacher · {n} of {max} students
+ac.work.teacher.school | {name}، معلم مدرسه · {n} از {max} شاگرد | {name}, school teacher · {n} of {max} students
+ac.work.teacher.home | {name}، معلم خصوصی · {n} از {max} شاگرد | {name}, private teacher · {n} of {max} students
+ac.work.teacher.end | کنار گذاشتن | Stop
+ac.work.teacher.wage | مزد معلم مدرسه برای هر شاگرد: {wage}. | A school teacher is paid {wage} for each student.
+ac.work.teacher.btn_hire | استخدام معلم | Hire a teacher
+ac.work.teacher.btn_school | معلم مدرسه شدن | Take the school's post
+ac.work.teacher.btn_home | درس دادن در خانه (مالیات {tax}٪) | Teach at home ({tax}% tax)
+ac.work.teacher.no_pool | در شهر کسی بیکار نیست که معلم شود؛ با ساختن خانهٔ بیشتر آدم بیشتری پیدا می‌شود. | Nobody in town is free to become a teacher; more homes bring more people.
+act.education.hire | استخدام معلم | Hire a teacher
+act.education.teach_school | معلم مدرسه شدن | Take the school's post
+act.education.teach_home | درس دادن در خانه | Teach at home
+act.education.unteach | کنار گذاشتن معلم | Stop this teacher
+act.training.start | تمرین | Train
+act.training.again | تمرین دوباره | Train again
+training.title | تمرین | Training
+training.stamina | استقامت | Stamina
+training.strength | قدرت بدنی | Strength
+training.session_cost | هزینهٔ هر جلسه | Cost of a session
+training.energy_n | {n} انرژی | {n} energy
+training.venues | جاهای تمرین | Places to train
+training.venue.yard | زمین باز | Open ground
+training.venue.ground | زمین تمرین | Training ground
+training.venue.gym | باشگاه | Gym
+training.efficiency | بازده {p}٪ | {p}% efficiency
+training.fee | هر جلسه {fee} | {fee} a session
+training.free | رایگان | Free
+training.missing | شهردار باید «{name}» بسازد | The head must build a {name}
+training.start | تمرین کن | Train
+training.again | تمرین دوباره | Train again
+training.bonus | تمرین تا حالا {n} واحد (از سقف {cap}) به سقف انرژی‌ات اضافه کرده. | Training has added {n} (of at most {cap}) to your energy bar.
+training.done_title | تمرین تمام شد | Session done
+training.xp | {n} امتیاز | {n} experience
+training.max_energy | سقف انرژی | Energy bar
+training.paid | هزینهٔ جلسه | Session fee
+training.level_up | قدرت بدنی به سطح {n} رسید. | Strength reached level {n}.

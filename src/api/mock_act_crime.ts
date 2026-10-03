@@ -108,7 +108,7 @@ function list(category: string, page: number) {
 // -- one crime in detail ---------------------------------------------------------------------------------------------------
 
 const req = (r: Partial<CrimeRequirement> & { kind: string }): CrimeRequirement => ({
-  met: true, skill: '', need: 0, have: 0, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0,
+  met: true, skill: '', need: 0, have: 0, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, trip: null,
   tier: N('', ''), have_tier: N('', ''), venues: null, here: N('', ''), facility: '', tool: N('', ''), ...r,
 })
 

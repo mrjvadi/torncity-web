@@ -16,6 +16,7 @@ import Missions from './Missions'
 import Hospital from './Hospital'
 import WorkHome from './WorkHome'
 import HealthHome from './HealthHome'
+import TrainingHome, { Trained } from './TrainingHome'
 import { InboxHub, InboxCategory } from './Inbox'
 
 // Native layouts for server screens, by the server's `screen` name, and the
@@ -36,6 +37,8 @@ const screens: ScreenSet = {
     hospital: Hospital,
     work_home: WorkHome,
     health_home: HealthHome,
+    training_home: TrainingHome,
+    trained: Trained,
     inbox_hub: InboxHub,
     inbox_category: InboxCategory,
     // the hubs also arrive as the answer of their command (a link, a back): the same layout draws them
