@@ -90,6 +90,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
   const [listOpen, setListOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [bottomInset, setBottomInset] = useState(8)
+  const [topInset, setTopInset] = useState(0)
 
   const homePlace = useMemo<Place>(() => ({ id: 'home:' + home.id, code: 'home', name: home.name, lat: home.lat, lon: home.lon, kind: 'home', sid: home.id, located: true }), [home.id, home.name, home.lat, home.lon])
   const places = useMemo(() => [homePlace, ...dests.filter((d) => d.sid !== home.id)], [homePlace, dests, home.id])
@@ -107,6 +108,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
           const v = r.view as MapView | undefined
           if (r.ok === false || !v) break
           for (const d of v.destinations ?? []) {
+            if (out.some((o) => o.id === d.code)) continue
             const central = d.code === 'support'
             out.push({
               id: d.code, code: d.code, name: central ? t('wm.central') : d.name, lat: d.lat, lon: d.lon, kind: central ? 'central' : 'city',
@@ -198,6 +200,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
       }
       v?.setInsets(top, bottom)
       setBottomInset(bottom + 8)
+      setTopInset(top)
     }
     sync()
     const off = chrome?.subscribe(sync)
@@ -274,7 +277,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
   )
 
   return (
-    <div className={`wm${ready ? ' wm-in' : ''}${leaving ? ' wm-out' : ''}${desktop ? ' wm-desk' : ''}`}>
+    <div style={{ '--wm-top': `${topInset}px` } as React.CSSProperties} className={`wm${ready ? ' wm-in' : ''}${leaving ? ' wm-out' : ''}${desktop ? ' wm-desk' : ''}`}>
       <canvas ref={canvasRef} className="wm-canvas" />
 
       <div className="wm-markers">

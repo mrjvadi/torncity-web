@@ -28,13 +28,13 @@
 .wm-mk.wm-nolbl:not(.sel):not(.home) .wm-lbl { display: none; }
 
 .wm-chip {
-  position: absolute; left: 10px; top: 56px; z-index: 1; pointer-events: none; min-height: 28px; padding: 4px 12px;
+  position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--wm-top, 0px) + 8px); z-index: 1; pointer-events: none; min-height: 28px; padding: 4px 12px;
   border-radius: 999px; font-size: 12px; color: #fff; background: rgba(7, 10, 20, 0.7); border: 1px solid rgba(255, 255, 255, 0.18);
 }
 .wm-chip:empty { display: none; }
 
-/* same column as the city screen's side buttons (.vh-side: right 10, top 56, two 42 px buttons, gap 10) */
-.wm-tools { position: absolute; z-index: 3; right: 10px; top: 168px; display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
+/* same column as (v6.css: phone centred vertically, desktop top 14 right 14) the city screen's side buttons (.vh-side: right 10, top 56, two 42 px buttons, gap 10) */
+.wm-tools { position: absolute; z-index: 3; right: 10px; top: calc(50% + 58px); display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
 .wm-tools .k-hdr-btn { padding: 0; min-width: 44px; min-height: 44px; }
 .wm-zoom { font-size: 24px; line-height: 1; color: #ffe9a8; }
 
@@ -88,8 +88,9 @@
 .wm-dock .wm-rows { max-height: none; flex: 1; }
 .wm-dock-head { display: flex; align-items: center; justify-content: space-between; font-size: 16px; }
 .wm-desk .wm-mk:hover .wm-dot { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.55); }
-.wm-desk .wm-chip { left: 16px; }
+.wm-desk .wm-chip { top: 14px; }
 
 /* the city screen's own overlays rest while the map is open */
 .vh--map .vh-top, .vh--map .vh-bottom, .vh--map .vh-labels { display: none; }
 @media (prefers-reduced-motion: reduce) { .wm { transition: none; } }
+@media (min-width: 900px) { .wm-tools { top: 118px; right: 14px; } }

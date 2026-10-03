@@ -277,6 +277,7 @@ export class PlanetTerrain {
     const base = new Float32Array(NV * 3) // sea-level position, chunk-local
     const baseW = new Float32Array(NV * 3) // sea-level position, world (for the gradient)
     const rgb = new Uint8Array(NV * 3)
+    const tmpRgb = new Uint8Array(3)
 
     for (let j = 0; j < G; j++) {
       for (let i = 0; i < G; i++) {
@@ -296,10 +297,17 @@ export class PlanetTerrain {
           }
         }
         hk[k] = n ? sum / n / 1000 : 0
-        // colour of the tile the corner belongs to (nearest)
-        const ti = Math.min(E - 1, i), tj = Math.min(E - 1, j)
-        const ti2 = tj * E + ti
-        this.colour(c.biome[ti2], c.elevation[ti2], c.flags[ti2], rgb, k * 3)
+        // colour: the mean of the tiles around the corner, so coasts and biomes blend instead of stepping
+        let cr = 0, cg = 0, cb = 0, cn = 0
+        for (let tj = j - 1; tj <= j; tj++) {
+          for (let ti = i - 1; ti <= i; ti++) {
+            if (ti < 0 || tj < 0 || ti >= E || tj >= E) continue
+            const t2 = tj * E + ti
+            this.colour(c.biome[t2], c.elevation[t2], c.flags[t2], tmpRgb, 0)
+            cr += tmpRgb[0]; cg += tmpRgb[1]; cb += tmpRgb[2]; cn++
+          }
+        }
+        rgb[k * 3] = cr / cn; rgb[k * 3 + 1] = cg / cn; rgb[k * 3 + 2] = cb / cn
       }
     }
 
