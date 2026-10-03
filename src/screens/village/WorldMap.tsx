@@ -312,7 +312,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
             <span className={`wm-rowdot ${selPlace.kind}`}>{selPlace.kind === 'home' && <Emboss name="house" palette="gold" size={16} />}</span>
             <div className="wm-card-title">
               <b>{selPlace.name}</b>
-              <small>{selPlace.kind === 'home' ? t('wm.here') : selPlace.kind === 'central' ? t('wm.central') : t('wm.city')}</small>
+              <small>{selPlace.kind === 'home' ? t('wm.here') : selPlace.kind === 'central' ? '' : t('wm.city')}</small>
             </div>
             <button type="button" className="wm-x" onClick={() => setSel(null)} aria-label={t('wm.close')}>✕</button>
           </div>

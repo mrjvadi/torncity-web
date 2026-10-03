@@ -79,7 +79,7 @@
 .wm-empty { padding: 14px; text-align: center; font-size: 14px; opacity: 0.75; }
 
 /* desktop: the list is a docked panel, the card floats bottom-left, markers get hover */
-.wm-desk .wm-card { right: auto; left: 50%; transform: translateX(-50%); bottom: 16px; width: 400px; }
+.wm-desk .wm-card { right: auto; left: 50%; transform: translateX(-50%); bottom: 132px; width: 400px; }
 .wm-dock {
   position: absolute; z-index: 4; top: 56px; bottom: 16px; left: 16px; width: 340px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
   border-radius: 18px; color: #fff; background: linear-gradient(180deg, rgba(40, 18, 30, 0.96), rgba(22, 10, 18, 0.96)); border: 2px solid var(--gold-soft, #b58a2a);
