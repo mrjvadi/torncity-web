@@ -7,6 +7,8 @@ import type {
 } from '../../api/views.gen'
 import type { Action } from '../../api/types'
 import { Bar, Card, ListRow, SectionTitle } from '../native/kit/Parts'
+import { PCard, PGrid } from '../../ui/v6/panel'
+import { needLines } from '../native/kit/needs'
 import { clamp01, hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import Popup, {
@@ -74,6 +76,7 @@ export const JobOpenings = flow<JobOpeningsView>(({ view: v, ctx }) => {
   const city = cityName(ctx, v.city_code, v.city)
   const openings = v.openings ?? []
   const companies = v.companies ?? []
+  const gaps = v.gaps ?? []
   const paging = ctx.acts.filter((a) => a.id === 'page.prev' || a.id === 'page.next')
   const mine = act(ctx, 'job.mine')
   if (v.travelling) {
@@ -93,37 +96,56 @@ export const JobOpenings = flow<JobOpeningsView>(({ view: v, ctx }) => {
       {openings.length > 0 && (
         <>
           <SectionTitle>{t('ac.work.openings.base', { city })}</SectionTitle>
-          <div className="vf-list">
+          <PGrid>
             {openings.map((o) => {
               const go = act(ctx, 'job.opening', (a) => a.subject === o.job.career_code)
               return (
-                <ListRow
-                  key={`${o.job.career_code}.${o.job.rank}`} icon={o.eligible ? 'work' : 'm_lock'} palette={o.eligible ? 'gold' : 'steel'}
-                  title={tierName(ctx, o.job)} sub={`${careerName(ctx, o.job)} · ${t('ac.work.pay_shift', { pay: money(o.pay) })}`}
-                  right={<span className={`nx-chip${o.eligible ? ' nx-chip-emerald' : ''}`}>{o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')}</span>}
+                <PCard
+                  key={`${o.job.career_code}.${o.job.rank}`} icon={o.eligible ? 'tool' : 'lock'}
+                  title={tierName(ctx, o.job)} chip={o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')} chipTone={o.eligible ? 'ok' : 'off'}
+                  lines={[careerName(ctx, o.job), t('ac.work.pay_shift', { pay: money(o.pay) })]}
                   onClick={go ? () => ctx.go(go) : undefined}
                 />
               )
             })}
-          </div>
+          </PGrid>
+        </>
+      )}
+      {gaps.length > 0 && (
+        <>
+          <SectionTitle>{t('ac.work.openings.not_here', { city })}</SectionTitle>
+          <PGrid>
+            {gaps.map((g) => {
+              const near = g.nearest ? cityName(ctx, g.nearest.code, g.nearest.name) : ''
+              return (
+                <PCard key={g.job.career_code} off icon="tool" title={careerName(ctx, g.job)} chip={t('education.here_not')} chipTone="off"
+                  lines={[near ? t('ac.work.openings.had_in', { place: near }) : '']}>
+                  {needLines(g.needs, ctx.names, ctx.bname).map((x) => <span key={x} className="cc-line need">{x}</span>)}
+                  {near && g.nearest && (
+                    <button className="pn-btn sec cc-go" onClick={() => ctx.run('travel.options', { city: g.nearest!.code })}>{t('education.gap.go', { place: near })}</button>
+                  )}
+                </PCard>
+              )
+            })}
+          </PGrid>
         </>
       )}
       {companies.length > 0 && (
         <>
           <SectionTitle>{t('ac.work.openings.companies')}</SectionTitle>
-          <div className="vf-list">
+          <PGrid>
             {companies.map((o) => {
               const go = act(ctx, 'company.opening', (a) => a.args?.no === String(o.no))
               return (
-                <ListRow
-                  key={o.no} icon={o.eligible ? 'factory' : 'm_lock'} palette={o.eligible ? 'sapphire' : 'steel'}
-                  title={tierName(ctx, o.job)} sub={`${o.company} · ${t('ac.work.pay_shift', { pay: money(o.pay) })}`}
-                  right={<span className={`nx-chip${o.eligible ? ' nx-chip-emerald' : ''}`}>{o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')}</span>}
+                <PCard
+                  key={o.no} icon={o.eligible ? 'crate' : 'lock'} title={tierName(ctx, o.job)}
+                  chip={o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')} chipTone={o.eligible ? 'ok' : 'off'}
+                  lines={[o.company, t('ac.work.pay_shift', { pay: money(o.pay) })]}
                   onClick={go ? () => ctx.go(go) : undefined}
                 />
               )
             })}
-          </div>
+          </PGrid>
         </>
       )}
       {openings.length === 0 && companies.length === 0 && (

@@ -285,3 +285,25 @@
   .v6 .hub-vitals .v6-vit { flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
   .v6 .hub-vitals .v6-vrow { width: auto; }
 }
+
+/* ---------- choice cards (hiring board, courses, crimes, missions): compact, several per row (owner 2026-10-03) ---------- */
+.v6 .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+.v6 .choice-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; padding: 10px 10px 10px; text-align: start; border-radius: 14px; background: var(--v6-glass); border: 1px solid var(--v6-line); box-shadow: var(--v6-sh); color: var(--v6-txt); }
+.v6 .choice-card.tap:active { background: #ffffff12; transform: scale(.99); }
+.v6 .choice-card.here-not { background: none; border: 1.5px dashed var(--v6-line); box-shadow: none; }
+.v6 .choice-card .cc-head { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; }
+.v6 .choice-card .cc-ico { flex: none; width: 32px; height: 32px; display: grid; place-items: center; }
+.v6 .choice-card .cc-ico img { width: 100%; height: 100%; object-fit: contain; }
+.v6 .choice-card .cc-title { flex: 1; min-width: 0; font: 900 14.5px/1.3 Vazirmatn; color: #fff; overflow-wrap: anywhere; }
+.v6 .choice-card .cc-chip { padding: 1px 8px; border-radius: 9px; background: #56d44729; color: #9be88d; font: 800 12px/1.5 Vazirmatn; }
+.v6 .choice-card .cc-chip.off { background: #ffffff14; color: var(--v6-mut); }
+.v6 .choice-card .cc-chip.busy { background: #f4c44124; color: var(--v6-gold-hi); }
+.v6 .choice-card .cc-line { font: 500 13px/1.5 Vazirmatn; color: var(--v6-mut); overflow-wrap: anywhere; }
+.v6 .choice-card .cc-line.need { color: #ffb4a8; }
+.v6 .choice-card .cc-go { margin-top: auto; width: 100%; }
+@media (min-width: 900px) {
+  /* a docked panel that holds choice cards is wider, so 3 to 4 sit side by side (owner 2026-10-03) */
+  .v6-app[data-panel="open"]:has(.choice-grid) { --v6-panel-w: 780px; }
+  .v6 .choice-grid { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 10px; }
+  .v6 .choice-card.tap:hover { border-color: var(--v6-gold); }
+}

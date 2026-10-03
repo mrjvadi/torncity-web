@@ -60,6 +60,39 @@ export function PTile({ icon, title, badge, tone, onClick }: {
   )
 }
 
+/** A choice as a compact card, several per row (owner 2026-10-03: a hiring board, courses, crimes and missions are
+ * cards side by side, never one full-width row each): icon and title, a chip in the corner, a few fact lines and the
+ * action inside the card. `off` is a thing that is not here: dashed, with its reason and way (children) inside. */
+export function PCard({ icon, title, chip, chipTone, lines, off, onClick, children }: {
+  icon: string
+  title: ReactNode
+  chip?: ReactNode
+  chipTone?: 'ok' | 'off' | 'busy'
+  lines?: ReactNode[]
+  off?: boolean
+  onClick?: () => void
+  children?: ReactNode
+}) {
+  const body = (
+    <>
+      <span className="cc-head">
+        <span className="cc-ico"><Ic name={icon} /></span>
+        <span className="cc-title">{title}</span>
+      </span>
+      {chip && <span className={`cc-chip${chipTone ? ' ' + chipTone : ''}`}>{chip}</span>}
+      {(lines ?? []).filter(Boolean).map((l, i) => <span key={i} className="cc-line">{l}</span>)}
+      {children}
+    </>
+  )
+  const cls = `choice-card${off ? ' here-not' : ''}${onClick ? ' tap' : ''}`
+  return onClick ? <button className={cls} onClick={onClick}>{body}</button> : <div className={cls}>{body}</div>
+}
+
+/** The grid of choice cards: 2 per row on a phone, 3 or 4 on desktop. */
+export function PGrid({ children }: { children: ReactNode }) {
+  return <div className="choice-grid">{children}</div>
+}
+
 export function PRow({ icon, title, sub, badge, tone, off, onClick, children }: {
   icon: string
   title: ReactNode

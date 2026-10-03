@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { ScreenProps } from '../types'
-import { Empty, Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
+import { Empty, Header, Notice, ScreenScroll } from './kit/Parts'
+import { PCard, PGrid, PTile } from '../../ui/v6/panel'
 import Actions from './kit/Actions'
 import { moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
 import { useContentNames, type ContentNames } from '../../village/useVillage'
@@ -60,10 +61,9 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
       <Header title={v.board ? boardName(v.board) : t('missions.title')} tone="violet" onRefresh={() => run('mission.board', v.board?.code ? { board: v.board.code } : {})} />
 
       {!v.board && boards.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="hub-grid">
           {boards.map((b, i) => (
-            <ListRow key={b.code ?? i} icon="missions" palette="violet" title={boardName(b)}
-              sub={[b.open ? t('missions.open', { n: b.open }) : '', (b.place?.code ? names.name('place', b.place.code, b.place.name) : b.place?.name) ?? ''].filter(Boolean).join(' · ') || undefined}
+            <PTile key={b.code ?? i} icon="scroll" title={boardName(b)} badge={b.open ? t('missions.open', { n: b.open }) : undefined}
               onClick={() => b.code && run('mission.board', { board: b.code })} />
           ))}
         </div>
@@ -73,29 +73,27 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
       {v.board && !v.here && <Notice>{t('missions.need_board')}</Notice>}
       {v.board && (v.missions ?? []).length === 0 && <Empty>{t('missions.empty')}</Empty>}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <PGrid>
         {(v.missions ?? []).map((m, i) => {
-          const objectives = (m.objectives ?? []).map((o) => `• ${objectiveText(o, names)}`)
           const reward = rewardText(m.reward)
           return (
-            <ListRow
+            <PCard
               key={m.mission?.code ?? i}
-              icon={m.blocked ? 'm_lock' : 'missions'}
-              palette={m.blocked ? 'steel' : 'violet'}
+              icon={m.blocked ? 'lock' : 'scroll'}
+              off={!!m.blocked}
               title={m.mission?.code ? names.name('mission', m.mission.code, m.mission.name) : m.mission?.name ?? '—'}
-              sub={(
-                <>
-                  {objectives.map((o) => <span key={o} style={{ display: 'block' }}>{o}</span>)}
-                  {reward && <span style={{ display: 'block' }}>{t('missions.reward', { r: reward })}</span>}
-                  {m.repeatable && !m.blocked && <span style={{ display: 'block' }}>{t('missions.repeat')}</span>}
-                  {m.blocked && <span style={{ display: 'block' }}>{blockedText(m.blocked)}{m.wait_seconds ? ` · ${t('missions.wait', { t: roughDuration(m.wait_seconds) })}` : ''}</span>}
-                </>
-              )}
-              onClick={() => !m.blocked && m.mission?.code && run('mission.view', { mission: m.mission.code })}
+              chip={m.blocked ? blockedText(m.blocked) : m.repeatable ? t('missions.repeat') : undefined}
+              chipTone="off"
+              lines={[
+                ...(m.objectives ?? []).map((o) => `• ${objectiveText(o, names)}`),
+                reward && t('missions.reward', { r: reward }),
+                m.blocked && m.wait_seconds ? t('missions.wait', { t: roughDuration(m.wait_seconds) }) : '',
+              ]}
+              onClick={!m.blocked && m.mission?.code ? () => run('mission.view', { mission: m.mission!.code! }) : undefined}
             />
           )
         })}
-      </div>
+      </PGrid>
 
       <Actions response={response} onAction={onAction} only={(a) => a.id !== 'mission.board' && a.id !== 'mission.view'} refreshCommand="mission.board" />
     </ScreenScroll>

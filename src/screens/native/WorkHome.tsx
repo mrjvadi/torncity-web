@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react'
 import type { ScreenProps } from '../types'
-import { Bar, Card, Chip, Empty, Header, Notice, ScreenScroll, SectionTitle } from './kit/Parts'
+import { Card, Empty, Header, Notice, ScreenScroll, SectionTitle } from './kit/Parts'
+import { PCard, PGrid, PTile } from '../../ui/v6/panel'
 import { Slab } from '../../kit'
-import { clamp01, formatNumber, hms, money, roughDuration } from './kit/format'
+import { formatNumber, hms, money, roughDuration } from './kit/format'
 import * as api from '../../api/client'
 import type { WorkHomeView } from '../../api/views.gen'
 import { buildingName, useBuildingCatalogue, useContentNames, useNow, useVillageCommand } from '../../village/useVillage'
@@ -45,13 +46,6 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
     <ScreenScroll>
       <Header title={t('job.title')} tone="gold" onRefresh={() => void reload()} />
 
-      {/* a village shift costs no energy (ADR 0038): the bar is for jobs that spend it */}
-      {v.max_energy > 0 && v.place.tier !== 'village' && v.empty !== 'no_settlement' && (
-        <Card>
-          <Bar frac={clamp01(v.energy / v.max_energy)} color="var(--leaf)" label={t('work.energy', { a: formatNumber(v.energy), b: formatNumber(v.max_energy) })} />
-        </Card>
-      )}
-
       {v.empty === 'no_settlement' ? (
         <>
           <Empty>{t('work.empty.no_settlement')}</Empty>
@@ -73,45 +67,46 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
           )}
 
           {jobs.length > 0 && <SectionTitle>{t('work.jobs')}</SectionTitle>}
-          {jobs.map((j) => (
-            <Card key={j.id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                <b>{buildingName(cat, j.building.code, j.building.name)}</b>
-                <Chip tone="gold">{t('labor.per_shift', { w: money(j.wage) })}</Chip>
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--text-dim)', margin: '4px 0 8px' }}>
-                {t(j.kind === 'construction' ? 'labor.job.construction' : 'labor.job.production')} · {j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village')} · {t('labor.shifts_left', { n: j.left })}
-              </div>
-              {j.can_take
-                ? <Slab tone="gold" radius={12} lip={3} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</Slab>
-                : <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{t('work.not_here')}</div>}
-            </Card>
-          ))}
+          <PGrid>
+            {jobs.map((j) => (
+              <PCard key={j.id} icon="tool" title={buildingName(cat, j.building.code, j.building.name)}
+                chip={t('labor.per_shift', { w: money(j.wage) })} chipTone="busy"
+                lines={[
+                  t(j.kind === 'construction' ? 'labor.job.construction' : 'labor.job.production'),
+                  j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village'),
+                  t('labor.shifts_left', { n: j.left }),
+                ]}
+                off={!j.can_take}>
+                {j.can_take
+                  ? <button className={`pn-btn cc-go${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</button>
+                  : <span className="cc-line need">{t('work.not_here')}</span>}
+              </PCard>
+            ))}
+          </PGrid>
 
           {places.length > 0 && <SectionTitle>{t('work.workplaces')}</SectionTitle>}
-          {places.map((w) => {
-            const full = w.busy >= w.workers
-            const makes = (w.produces ?? []).map((m) => `${formatNumber(m.quantity)} ${names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ')
-            return (
-              <Card key={w.id}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                  <b>{buildingName(cat, w.building.code, w.building.name)}</b>
-                  <Chip tone="gold">{t('labor.per_shift', { w: money(w.wage) })}</Chip>
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-dim)', margin: '4px 0 8px' }}>
-                  {makes && `${t('work.makes', { list: makes })} · `}{t('work.shift_len', { t: roughDuration(w.shift_seconds) })}
-                </div>
-                {!w.ready && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 6 }}>{t('work.needs_inputs')}</div>}
-                {w.ready && full && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 6 }}>{t('work.full')}</div>}
-                <Slab tone="gold" radius={12} lip={3} disabled={busy || !!v.working || !w.ready || full || !v.resident}
-                  onClick={() => void act('settlement.work', { id: w.id })}>{t('work.start', { w: money(w.wage) })}</Slab>
-              </Card>
-            )
-          })}
+          <PGrid>
+            {places.map((w) => {
+              const full = w.busy >= w.workers
+              const makes = (w.produces ?? []).map((m) => `${formatNumber(m.quantity)} ${names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ')
+              const off = busy || !!v.working || !w.ready || full || !v.resident
+              return (
+                <PCard key={w.id} icon="tool" title={buildingName(cat, w.building.code, w.building.name)}
+                  chip={t('labor.per_shift', { w: money(w.wage) })} chipTone="busy"
+                  lines={[makes && t('work.makes', { list: makes }), t('work.shift_len', { t: roughDuration(w.shift_seconds) })]}>
+                  {!w.ready && <span className="cc-line need">{t('work.needs_inputs')}</span>}
+                  {w.ready && full && <span className="cc-line need">{t('work.full')}</span>}
+                  <button className={`pn-btn cc-go${off ? ' dis' : ''}`} disabled={off} onClick={() => void act('settlement.work', { id: w.id })}>{t('work.start', { w: money(w.wage) })}</button>
+                </PCard>
+              )
+            })}
+          </PGrid>
 
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Slab tone="steel" radius={14} lip={4} onClick={() => run('settlement.labor.board')}>{t('labor.btn.board')}</Slab>
-            <Slab tone="steel" radius={14} lip={4} onClick={() => run('settlement.labor.mine')}>{t('labor.btn.mine')}</Slab>
+          <div className="hub-grid">
+            <PTile icon="tool" title={t('labor.btn.board')} onClick={() => run('settlement.labor.board')} />
+            <PTile icon="info" title={t('labor.btn.mine')} onClick={() => run('settlement.labor.mine')} />
+            <PTile icon="book" title={t('ac.work.openings.title')} onClick={() => run('job.list')} />
+            <PTile icon="person" title={t('work.career')} onClick={() => run('job.status')} />
           </div>
         </>
       )}

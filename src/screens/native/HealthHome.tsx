@@ -1,8 +1,7 @@
 import type { ScreenProps } from '../types'
-import { Card, Empty, Header, ListRow, Notice, Ring, ScreenScroll, SectionTitle } from './kit/Parts'
-import { Slab } from '../../kit'
-import Icon from '../../ui/Icon'
-import { clamp01, formatNumber, hms } from './kit/format'
+import { Empty, Header, Notice, ScreenScroll } from './kit/Parts'
+import { PCard, PGrid, PSec } from '../../ui/v6/panel'
+import { hms } from './kit/format'
 import type { HealthHomeView } from '../../api/views.gen'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
 import { t, type Key } from '../../i18n'
@@ -26,39 +25,35 @@ export default function HealthHome({ response, run, openLocal }: ScreenProps) {
     <ScreenScroll>
       <Header title={title} tone="ruby" onRefresh={() => run('health.home')} />
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '8px 0' }}>
-        <Ring frac={v.max_health ? clamp01(v.health / v.max_health) : 1} color={v.admitted ? 'var(--anar)' : 'var(--leaf)'} size={110}>
-          <Icon name="health" palette={v.admitted ? 'ruby' : 'emerald'} size={32} />
-        </Ring>
-        <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{t('health.of', { a: formatNumber(v.health), b: formatNumber(v.max_health) })}</div>
-      </div>
-
       {v.admitted && <Notice alert>{t('health.admitted', { t: hms(v.admitted.remaining_seconds) })}</Notice>}
 
-      <SectionTitle>{t('health.rest')}</SectionTitle>
-      <Card>
-        {v.rest.has ? (
-          v.rest.can_rest
-            ? <Slab tone="gold" radius={12} lip={3} onClick={() => run('settlement.home.rest')}>{t('health.rest_home')}</Slab>
-            : <div style={{ fontSize: 13 }}>{t('health.rest_wait', { t: hms(v.rest.wait_seconds) })}</div>
-        ) : <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{t('health.no_home')}</div>}
-      </Card>
+      {/* health points are on the HUD already: no second copy here (owner 2026-10-03) */}
+      <PSec>{t('health.rest')}</PSec>
+      <PGrid>
+        <PCard icon="house" title={t('health.rest')}
+          chip={v.rest.has && !v.rest.can_rest ? t('health.rest_wait', { t: hms(v.rest.wait_seconds) }) : undefined} chipTone="busy"
+          lines={[v.rest.has ? '' : t('health.no_home')]}
+          off={!v.rest.has}>
+          {v.rest.has && v.rest.can_rest && <button className="pn-btn cc-go" onClick={() => run('settlement.home.rest')}>{t('health.rest_home')}</button>}
+        </PCard>
+        <PCard icon="heart" title={t('health.sleep')} onClick={() => run('life.me')} lines={[t('health.sleep_open')]} />
+      </PGrid>
 
-      <SectionTitle>{t('health.sleep')}</SectionTitle>
-      <ListRow icon="moon" palette="violet" title={t('health.sleep_open')} onClick={() => run('life.me')} />
-
-      <SectionTitle>{t('health.care')}</SectionTitle>
-      {facilities.map((f, i) => (
-        <ListRow key={i} icon="stetho" palette="emerald" title={buildingName(cat, f.building.code, f.building.name)} sub={t('health.facility.sub')} />
-      ))}
+      <PSec>{t('health.care')}</PSec>
+      <PGrid>
+        {facilities.map((f, i) => (
+          <PCard key={i} icon="health" title={buildingName(cat, f.building.code, f.building.name)} lines={[t('health.facility.sub')]} />
+        ))}
+        {(isCity || v.admitted) && (
+          <PCard icon="cross" title={t('hub.hospital')} onClick={() => run('health.hospital')} lines={[t('health.hospital_open')]} />
+        )}
+        {v.refer && (
+          <PCard off icon="road" title={t('education.here_not')} chip={refer} chipTone="off" lines={[t('health.refer', { city: refer })]}>
+            <button className="pn-btn cc-go" onClick={() => openLocal('support_travel', { to: v.refer!.code, service: 'hospital' })}>{t('health.refer_go', { city: refer })}</button>
+          </PCard>
+        )}
+      </PGrid>
       {v.empty && <Empty>{t(`health.empty.${v.empty}` as Key)}</Empty>}
-      {(isCity || v.admitted) && <Slab tone="steel" radius={14} lip={4} onClick={() => run('health.hospital')}>{t('health.hospital_open')}</Slab>}
-      {v.refer && (
-        <Card tone="gold">
-          <div style={{ fontSize: 14, marginBottom: 8 }}>{t('health.refer', { city: refer })}</div>
-          <Slab tone="gold" radius={14} lip={4} onClick={() => openLocal('support_travel', { to: v.refer!.code, service: 'hospital' })}>{t('health.refer_go', { city: refer })}</Slab>
-        </Card>
-      )}
     </ScreenScroll>
   )
 }
