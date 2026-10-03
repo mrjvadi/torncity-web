@@ -8,7 +8,7 @@ import { clamp01, formatNumber } from '../native/kit/format'
 import { t } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
 
-interface SkillLine { code?: string; level?: number; xp?: number; next?: number; percent?: number; max?: boolean }
+interface SkillLine { code?: string; level?: number; xp?: number; from?: number; next?: number; percent?: number; max?: boolean }
 interface SkillsView { lines?: SkillLine[] | null }
 
 export default function Skills({ response, loading, onAction, run }: ScreenProps) {
@@ -34,7 +34,7 @@ export default function Skills({ response, loading, onAction, run }: ScreenProps
               <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{t('skills.maxed')}</div>
             ) : (
               <Bar frac={clamp01((l.percent ?? 0) / 100)} color="var(--violet)"
-                label={`${formatNumber(l.xp ?? 0)}/${formatNumber(l.next ?? 0)}`} />
+                label={`${formatNumber(Math.max(0, (l.xp ?? 0) - (l.from ?? 0)))}/${formatNumber((l.next ?? 0) - (l.from ?? 0))}`} />
             )}
           </Card>
         ))}

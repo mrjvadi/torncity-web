@@ -423,7 +423,6 @@ export const CourseCompleted = flow<CourseCompletedView>(({ view: v, ctx }) => (
 export const Skills = flow<SkillsView>(({ view: v, ctx }) => {
   const lines = v.lines ?? []
   const trained = lines.filter((l) => l.level > 0 || l.xp > 0)
-  const rest = lines.filter((l) => !(l.level > 0 || l.xp > 0))
   return (
     <Page title={t('ac.work.skills.title')} tone="violet">
       {trained.length === 0 && <Panel><Lead>{t('ac.work.skills.none')}</Lead><Hint>{t('ac.work.skills.how')}</Hint></Panel>}
@@ -436,16 +435,10 @@ export const Skills = flow<SkillsView>(({ view: v, ctx }) => {
             </div>
             {l.max
               ? <Hint tone="good">{t('ac.work.skills.max')}</Hint>
-              : <Bar frac={clamp01(l.percent / 100)} color="var(--violet)" label={t('ac.work.of', { a: formatNumber(l.xp), b: formatNumber(l.next) })} />}
+              : <Bar frac={clamp01(l.percent / 100)} color="var(--violet)" label={t('ac.work.of', { a: formatNumber(Math.max(0, l.xp - (l.from ?? 0))), b: formatNumber(l.next - (l.from ?? 0)) })} />}
           </div>
         </Card>
       ))}
-      {rest.length > 0 && trained.length > 0 && (
-        <Panel>
-          <SectionTitle>{t('ac.work.skills.untrained')}</SectionTitle>
-          <div className="ac-work-chips">{rest.map((l) => <span key={l.code} className="nx-chip">{skillName(ctx, l.code)}</span>)}</div>
-        </Panel>
-      )}
       <Btns ctx={ctx} list={backOf(ctx)} />
     </Page>
   )

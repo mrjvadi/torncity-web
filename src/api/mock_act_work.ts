@@ -241,7 +241,7 @@ function education(page: number, mode: string) {
   const city = AS_CITY || mode === 'city'
   const base: EducationView = {
     current: null, certificates: null, place: city ? { code: '', name: '' } : VILLAGE, tier: city ? '' : 'village', currency: city ? null : MONEY,
-    literacy: city ? null : { share_bps: 1800, next_bps: 2000, next_stage: 'town' }, courses: null, elsewhere: null, empty: '', build: null, page: 1, pages: 1,
+    literacy: city ? null : { share_bps: 1800 }, courses: null, elsewhere: null, empty: '', build: null, page: 1, pages: 1,
   }
   let v: EducationView
   if (city) {
@@ -251,7 +251,7 @@ function education(page: number, mode: string) {
   } else if (mode === 'empty') {
     v = { ...base, empty: 'nothing_taught', elsewhere: [gap('first_aid', [need('knowledge', 'basic_medicine'), need('building', 'health_house', 'health')])] }
   } else if (mode === 'no_class') {
-    v = { ...base, literacy: { share_bps: 600, next_bps: 2000, next_stage: 'town' }, empty: 'no_class', build: { code: 'school', name: 'School' }, elsewhere: [gap('reading_writing', [need('building', 'school', 'education')])] }
+    v = { ...base, literacy: { share_bps: 600 }, empty: 'no_class', build: { code: 'school', name: 'School' }, elsewhere: [gap('reading_writing', [need('building', 'school', 'education')])] }
   } else {
     v = {
       ...base, courses: [line('reading_writing'), line('bookkeeping'), line('culinary_arts', false)], elsewhere: [gap('first_aid', [need('knowledge', 'basic_medicine')]), gap('nursing', [need('teacher', '', 'health')])],
@@ -313,10 +313,10 @@ function completed(certified = true) {
 
 function skills(none = false) {
   const all = ['management', 'finance', 'cooking', 'driving', 'medicine', 'programming']
-  const lines: SkillLine[] = all.map((code) => ({ code, level: 0, xp: 0, next: 100, percent: 0, max: false }))
+  const lines: SkillLine[] = all.map((code) => ({ code, level: 0, xp: 0, from: 0, next: 100, percent: 0, max: false }))
   if (!none) {
-    Object.assign(lines[0], { level: 3, xp: 340, next: 500, percent: 68 })
-    Object.assign(lines[1], { level: 2, xp: 260, next: 400, percent: 40 })
+    Object.assign(lines[0], { level: 3, xp: 340, from: 300, next: 500, percent: 20 })
+    Object.assign(lines[1], { level: 2, xp: 309, from: 300, next: 600, percent: 3 })
     Object.assign(lines[3], { level: 5, xp: 1500, next: 0, percent: 100, max: true })
   }
   return mockOk('skills', { lines } as SkillsView, [back('player.profile.get'), refreshA('skills.list')])
