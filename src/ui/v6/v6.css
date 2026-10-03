@@ -374,3 +374,6 @@
 /* the world map takes the screen like a maps app: the work and events columns and the quest strip step aside
    (hidden, never removed, so nothing reflows when it closes) */
 .v6-app:has(.wm.wm-in) .v6-wip, .v6-app:has(.wm.wm-in) .v6-events, .v6-app:has(.wm.wm-in) .v6-info { visibility: hidden; }
+
+/* touch targets (owner rule, 44px): the money chip and the ticker are drawn small but tap like a full-size control */
+.v6-chip-hit::before, .v6-ticker::before { content: ""; position: absolute; inset: -8px 0; }
