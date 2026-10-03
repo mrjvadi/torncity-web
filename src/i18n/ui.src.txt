@@ -113,7 +113,7 @@ eco.act.auction.house | حراجی | The auction house
 eco.na.from | {service} از «{stage}» به بالا هست؛ اینجا هنوز {here} است. | {service} starts at the {stage} stage; this is still a {here}.
 eco.na.only_support | {service} فقط در {place} هست. | {service} is only in {place}.
 eco.na.somewhere | شهر مرکزی | the central city
-eco.na.hint | ساختمان لازم: {buildings}. دهیار می‌تواند آن را بسازد. | Building needed: {buildings}. The village head can build it.
+eco.na.hint | ساختمان لازم: {buildings}. شهردار می‌تواند آن را بسازد. | Building needed: {buildings}. The mayor can build it.
 eco.na.go | سفر به {city} | Travel to {city}
 eco.service.bank | بانک | The bank
 eco.service.credit | امتیاز اعتبار | The credit score
@@ -124,8 +124,8 @@ eco.service.stocks | بورس | The stock exchange
 eco.service.gold | خرید و فروش طلا | The gold dealer
 eco.service.auction_house | حراج | The auction house
 eco.service.unknown | این خدمت | This service
-eco.stage.village | روستا | village
-eco.stage.town | شهرک | town
+eco.stage.village | شهر | city
+eco.stage.town | شهر | city
 eco.stage.city | شهر | city
 eco.stage.country | کشور | country
 eco.stage.support | شهر مرکزی | central city
@@ -665,11 +665,11 @@ hub.faction | جناح | Faction
 hub.friends | دوستان | Friends
 hub.elections | انتخابات | Elections
 hub.government | دولت شهر | City government
-hub.government_village | دهیاری | Village council
+hub.government_village | شهرداری | City council
 hub.war | ارتش و جنگ | Army and war
 hub.family | خانواده | Family
-hub.village | روستای من | My village
-hub.neighbour | روستای همسایه | Neighbouring village
+hub.village | شهر من | My city
+hub.neighbour | شهر همسایه | Neighbouring city
 # -- market / stocks / property ----------------------------------------------
 market.title | بازار | Market
 market.book_title | دفتر | Order book
@@ -710,7 +710,7 @@ life.home_bed | جای خواب | Where I sleep
 life.home_bed_in | خانهٔ من: {name} | My house: {name}
 life.home_bed_ready | همین حالا می‌توانی در خانه استراحت کنی | You can rest at home now
 life.home_bed_wait | تا استراحت بعدی در خانه: {t} | Until you can rest at home again: {t}
-profile.village | روستا | Village
+profile.village | شهر | City
 property.none | هنوز ملکی نداری. | You do not own any property yet.
 property.home | مسکونی | Residential
 property.commercial | تجاری | Commercial
@@ -1012,7 +1012,7 @@ err.internal | مشکلی پیش آمد. کمی بعد دوباره امتحان
 err.network | ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید. | Could not reach the server. Check your connection.
 shell.tab.profile | من | Me
 shell.tab.activity | فعالیت | Activity
-shell.tab.city | روستا | Village
+shell.tab.city | شهر | City
 shell.tab.market | اقتصاد | Economy
 shell.tab.society | جامعه | Society
 shell.menu | منو | Menu
@@ -1512,8 +1512,8 @@ citizen.bar.land | زمین بخر | Buy land
 citizen.bar.build | خانه بساز | Build a house
 citizen.bar.mine | دارایی من | My property
 citizen.bar.work | کار کن | Work
-citizen.hub.title | کارهای تو در روستا | What you can do here
-citizen.hub.hint | اینجا خانهٔ توست؛ زمین بخر، خانه بساز و روستا را آباد کن. | This is your home: buy land, build a house and help the village grow.
+citizen.hub.title | کارهای تو در شهر | What you can do here
+citizen.hub.hint | اینجا خانهٔ توست؛ زمین بخر، خانه بساز و شهر را آباد کن. | This is your home: buy land, build a house and help the city grow.
 citizen.hub.donate | کمک به خزانه | Help the treasury
 citizen.hub.who | ساکنان | Residents
 citizen.legend.free | آزاد، کنار جاده | Free, on the road
@@ -1527,7 +1527,7 @@ citizen.buy.lot | ردیف {y}، ستون {x} | Row {y}, column {x}
 citizen.buy.price | قیمت زمین | Lot price
 citizen.buy.cash | پول تو | Your cash
 citizen.buy.after | پس از خرید | After buying
-citizen.buy.note | پول به خزانهٔ روستا می‌رود و زمین برای همیشه مال تو می‌شود. | The money goes to the village treasury and the lot is yours for good.
+citizen.buy.note | پول به خزانهٔ شهر می‌رود و زمین برای همیشه مال تو می‌شود. | The money goes to the city treasury and the lot is yours for good.
 citizen.buy.confirm | بخر - {p} | Buy - {p}
 citizen.buy.done | زمین مال توست. حالا می‌توانی رویش خانه بسازی. | The lot is yours. You can build a house on it now.
 citizen.buy.no_cash | پولت برای خرید این زمین کافی نیست. | You cannot afford this lot.
@@ -1536,7 +1536,7 @@ citizen.taken | این زمین شخصی است. | This lot is private.
 citizen.taken_note | فقط صاحبش می‌تواند رویش بسازد. | Only its owner can build on it.
 citizen.build.title | ساخت روی زمین تو | Build on your lot
 citizen.build.pick | چه می‌خواهی بسازی؟ | What do you want to build?
-citizen.build.empty | فعلاً چیزی برای ساخت باز نشده؛ با پیشرفت دانش روستا بیشتر می‌شود. | Nothing is open to build yet; more opens as the village learns.
+citizen.build.empty | فعلاً چیزی برای ساخت باز نشده؛ با پیشرفت دانش شهر بیشتر می‌شود. | Nothing is open to build yet; more opens as the city learns.
 citizen.build.no_land | برای ساختن اول باید یک زمین داشته باشی. | You need a lot before you can build.
 citizen.build.cost | هزینهٔ ساختمان | Building cost
 citizen.build.permit | مجوز ساخت (به خزانه) | Building permit (to the treasury)
@@ -1568,14 +1568,14 @@ citizen.mine.nothing_paid | پولت برای پرداخت کافی نبود. | 
 citizen.owner | مالک: {name} | Owner: {name}
 citizen.owner_you | مالک: تو | Owner: you
 citizen.private_building | ساختمان شخصی | Private building
-citizen.work.title | کار در روستا | Work in the village
-citizen.work.body | کارگاه‌ها و مزرعه‌های روستا با ساخته‌شدن باز می‌شوند. تا آن روز کار و شغل در «{city}» است. | The village's workshops and farms open as they are built. Until then, jobs are in {city}.
+citizen.work.title | کار در شهر | Work in the city
+citizen.work.body | کارگاه‌ها و مزرعه‌های شهر با ساخته‌شدن باز می‌شوند. تا آن روز کار و شغل در «{city}» است. | The city's workshops and farms open as they are built. Until then, jobs are in {city}.
 citizen.work.go | رفتن به {city} | Go to {city}
 event.lot_bought | زمینی خریداری شد | A lot was bought
 event.lot_repaired | راه یا فروش یک زمین درست شد | A lot's road or sale was put right
 refusal.village_citizen_lot_taken | این زمین را همین حالا کس دیگری خرید. | Someone bought this lot just now.
 refusal.village_citizen_lot_limit | به سقف زمین‌های شخصی رسیده‌ای؛ اول روی زمین‌هایت بساز. | You have reached the personal lot limit; build on your lots first.
-refusal.village_citizen_zoning | سهم زمین‌های شخصی این روستا پر شده است. | The share of private lots in this village is full.
+refusal.village_citizen_zoning | سهم زمین‌های شخصی این شهر پر شده است. | The share of private lots in this city is full.
 refusal.village_citizen_not_owner | این زمین مال تو نیست؛ فقط روی زمین خودت می‌توانی بسازی. | This lot is not yours; you can only build on your own lot.
 refusal.village_citizen_no_cash | پولت برای این کار کافی نیست. | You do not have enough money for this.
 refusal.village_citizen_private_only | این ساختمان شخصی است و ساکنان روی زمین خودشان می‌سازند. | This is a private building: residents build it on their own lot.
@@ -1584,7 +1584,7 @@ refusal.village_citizen_rest_wait | هنوز سرحال هستی؛ کمی بعد
 refusal.village_citizen_no_house | برای استراحت اول باید خانه‌ات ساخته شود. | You need a finished house to rest at home.
 refusal.village_citizen_terms_range | این عدد خارج از محدودهٔ مجاز است. | That number is outside the allowed range.
 refusal.village_citizen_no_debt | بدهی مالیاتی‌ای نداری. | You have no tax debt.
-refusal.village_citizen_off | خرید زمین هنوز در این روستا باز نشده است. | Buying land is not open in this village yet.
+refusal.village_citizen_off | خرید زمین هنوز در این شهر باز نشده است. | Buying land is not open in this city yet.
 refusal.village_citizen_no_lots | زمینی نداری؛ اول یک زمین بخر. | You own no lots; buy one first.
 citizen.pct | {p}٪ | {p}%
 citizen.legend.needs | آزاد، باید راهش را کشید | Free, a road must be laid
@@ -1616,7 +1616,7 @@ citizen.fix.none | هیچ راهی به این زمین نمی‌رسد؛ فقط
 citizen.fix.connect | راه را بکش - {p} | Lay the road - {p}
 citizen.fix.carve | راه را از زمین خودم بکش ({n} قطعه) - {p} | Cut the road through my land ({n} lots) - {p}
 citizen.fix.refund | فروش را لغو کن، {p} پس بگیر | Cancel the sale, get {p} back
-citizen.fix.refund_note | فروش لغو می‌شود و خزانهٔ روستا {p} به تو پس می‌دهد؛ زمین دوباره مال روستا می‌شود. | The sale is cancelled, the village treasury pays you back {p} and the lot returns to the village.
+citizen.fix.refund_note | فروش لغو می‌شود و خزانهٔ شهر {p} به تو پس می‌دهد؛ زمین دوباره مال شهر می‌شود. | The sale is cancelled, the city treasury pays you back {p} and the lot returns to the city.
 citizen.fix.refund_total | پولی که برمی‌گردد | Money returned
 citizen.fix.sure | بله، انجام بده | Yes, do it
 citizen.fix.sure_refund | بله، فروش را لغو کن | Yes, cancel the sale
@@ -1629,7 +1629,7 @@ citizen.mine.fix | راه زمین ردیف {y}، ستون {x} | Road to the lot
 refusal.village_citizen_lot_reserved | این قطعه حریم جاده است و فروشی نیست. | This lot is road reserve and not for sale.
 refusal.village_citizen_no_access | به این زمین هیچ راهی نمی‌رسد و فروخته نمی‌شود. | No road can reach this lot, so it is not sold.
 refusal.village_citizen_no_option | این کار برای این زمین ممکن نیست. | That cannot be done for this lot.
-refusal.village_citizen_refund_treasury | خزانهٔ روستا الان پول کافی برای برگرداندن پولت ندارد. | The village treasury cannot cover the refund right now.
+refusal.village_citizen_refund_treasury | خزانهٔ شهر الان پول کافی برای برگرداندن پولت ندارد. | The city treasury cannot cover the refund right now.
 refusal.village_road_reserved | این جاده راه یک زمین است و حریم جاده می‌ماند؛ خراب نمی‌شود. | This road is someone's way in and stays road reserve; it cannot be torn down.
 refusal.village_reserved | این قطعه حریم جاده است؛ فقط جاده رویش ساخته می‌شود. | This lot is road reserve; only a road can be built on it.
 refusal.village_no_road | به این ساختمان راهی نمی‌رسد. زمین دیگری را امتحان کن. | No road can reach this building. Try another lot.
@@ -1669,7 +1669,7 @@ sc.dest.title | مقصد سفر | Where to
 sc.dest.here | اینجا هستید | You are here
 sc.dest.km | {n} کیلومتر | {n} km
 sc.dest.city | شهر مرکزی | Central city
-sc.dest.village | روستا | Village
+sc.dest.village | شهر | City
 sc.dest.empty | مقصدی برای سفر نیست. | No destination to travel to.
 sc.dest.mock | داده‌ی آزمایشی: فهرست مقصدها هنوز از سرور نمی‌آید. | Sample data: the server does not send destinations yet.
 sc.dest.hint_mode | پیشنهاد: {mode} | Suggested: {mode}
@@ -1704,8 +1704,8 @@ profile.travel | سفر بین‌شهری | Intercity travel
 common.prev | قبلی | Previous
 common.next | بعدی | Next
 toast.unnamed | یک مورد | An item
-shell.tab.village | روستا | Village
-shell.tab.town | شهر | Town
+shell.tab.village | شهر | City
+shell.tab.town | شهر | City
 # -- the labour market (hiring board, construction sites) ---------------------
 labor.board.title | تابلوی استخدام | Hiring board
 labor.board.empty | فعلاً آگهی استخدامی نیست. هر ساختمانِ در حال ساخت برای کارگر آگهی می‌دهد. | No jobs are posted right now. Every building going up posts one.
@@ -1729,7 +1729,7 @@ labor.market.min | حداقل مزد: {w} | Minimum wage: {w}
 labor.market.hint | خانهٔ بیشتر یعنی ساکن و کارگر بیشتر؛ کمبود کارگر مزد را بالا می‌برد. | More homes mean more residents and workers; a shortage pushes wages up.
 labor.job.construction | ساخت‌وساز | Construction
 labor.job.production | تولید | Production
-labor.employer.village | دهیاری | The village
+labor.employer.village | شهرداری | The city
 labor.employer.player | {name} | {name}
 labor.per_shift | {w} / شیفت | {w} / shift
 labor.wage_per_shift | دستمزد هر شیفت: {w} | Wage per shift: {w}
@@ -1758,7 +1758,7 @@ labor.hire_n | {n} کارگر | Hire {n}
 labor.hire_none | مرخص کردن خدمه | Release the crew
 labor.wage_set | دستمزد بازیکن‌ها | Wage for players
 labor.close | بستن آگهی | Close the job
-labor.not_resident | شما ساکن این روستا نیستید؛ تا وقتی اینجا هستید می‌توانید روزمزد کار کنید. | You do not live here, but you can work by the day while you are in the village.
+labor.not_resident | شما ساکن این شهر نیستید؛ تا وقتی اینجا هستید می‌توانید روزمزد کار کنید. | You do not live here, but you can work by the day while you are in the city.
 labor.btn.site | کارگاه | Site
 labor.btn.mine | کار من | My work
 labor.btn.board | تابلوی استخدام | Hiring board
@@ -1768,27 +1768,27 @@ labor.just.wage | دستمزد تغییر کرد. | Wage changed.
 labor.just.posted | آگهی روی تابلو رفت. | The job is on the board.
 labor.just.closed | آگهی بسته شد. | The job is closed.
 # -- village storage and market -----------------------------------------------
-storage.title | انبار و بازار | Storage and market
+storage.title | انبار شهر | City storehouse
 storage.capacity | ظرفیت انبار | Storage capacity
-storage.treasury | خزانهٔ روستا | Village treasury
+storage.treasury | خزانهٔ شهر | City treasury
 storage.used | {p}٪ پر است | {p}% full
 storage.full | انبار پر است؛ برای جا باز کردن، انبار غله بساز یا مصالح را مصرف کن. | The store is full; build a granary for more room, or use up some materials.
 storage.stock | موجودی انبار | In stock
 storage.stock_empty | انبار فعلاً خالی است. | The store is empty for now.
 storage.market | بازار مصالح | Materials market
-storage.market_hint | مصالحی که دهیار می‌تواند با پول خزانه از بازار {city} بخرد؛ جنس به انبار روستا می‌رسد. | Materials the head can buy with treasury money from the {city} market; the goods arrive in the village store.
+storage.market_hint | مصالحی که شهردار می‌تواند با پول خزانه از بازار {city} بخرد؛ جنس به انبار شهر می‌رسد. | Materials the head can buy with treasury money from the {city} market; the goods arrive in the city store.
 storage.market_empty | فعلاً چیزی برای خرید نیست. | Nothing to buy right now.
 storage.unit_price | هر واحد {p} | {p} each
 storage.source | بازار {city} | {city} market
 storage.buy_qty | خرید {q} | Buy {q}
-storage.head_only | خرید از خزانه فقط با کسی است که مسئول روستاست. | Only the village head can spend the treasury on purchases.
+storage.head_only | خرید از خزانه فقط با کسی است که مسئول شهر است. | Only the mayor can spend the treasury on purchases.
 storage.confirm.title | تأیید خرید | Confirm purchase
 storage.confirm.body | {qty} واحد {name} به قیمت هر واحد {unit}؛ جمعاً {total}. | {qty} x {name} at {unit} each: {total} in all.
 storage.confirm.hint | از خزانه (موجودی {treasury}) پرداخت می‌شود و کالا به انبار می‌رود؛ جای خالی انبار: {free} واحد. | Paid from the treasury ({treasury} available) and delivered to the store; free room: {free} units.
 storage.confirm.yes | بخر ({total}) | Buy ({total})
 storage.bought | {qty} واحد {name} به مبلغ {total} خریده شد و به انبار رفت. | Bought {qty} x {name} for {total}; it is in the store.
 storage.open | انبار و بازار | Storage and market
-refusal.village_materials | مصالح انبار روستا کافی نیست؛ برای دیدن انبار و خرید مصالح، همین‌جا را لمس کن. | The village store lacks the materials; tap here to open the store and buy them.
+refusal.village_materials | مصالح انبار شهر کافی نیست؛ برای دیدن انبار و خرید مصالح، همین‌جا را لمس کن. | The city store lacks the materials; tap here to open the store and buy them.
 labor.by_work_hint | این ساختمان با کار کارگرها بالا می‌رود. در کارگاه، خودتان شیفت بزنید یا کارگر استخدام کنید. | Workers raise this building. At its site, work a shift yourself or hire labourers.
 # -- village screens drawn from the contract (docs/adr/0039): the web's own words ------
 vx.loading | در حال بارگذاری… | Loading…
@@ -1799,10 +1799,10 @@ vx.rf.title | انجام نشد | Not done
 vx.rf.batch_lot | ردیف {y}، ستون {x}: {reason} | Row {y}, column {x}: {reason}
 vx.rf.batch.occupied | قبلاً ساخته شده | Already built on
 vx.rf.batch.unbuildable | آب است یا شیبش زیاد است | Water or too steep
-vx.rf.batch.out_of_bounds | بیرون از روستاست | Outside the village
+vx.rf.batch.out_of_bounds | بیرون از شهر است | Outside the city
 vx.rf.batch.terrain | زمینش جور نیست | The ground does not suit it
 vx.rf.batch.prerequisite | پیش‌نیازش کامل نیست | Its requirements are not met
-vx.rf.batch.literacy | سواد روستا کافی نیست | Not enough literacy in the village
+vx.rf.batch.literacy | سواد شهر کافی نیست | Not enough literacy in the city
 vx.rf.batch.concurrent_cap | صف ساخت جا ندارد | The building queue is full
 vx.rf.batch.not_available | این را دسته‌جمعی نمی‌شود ساخت | This cannot be built in a batch
 vx.rf.batch.not_found | قطعه درست نیست | Not a valid lot
@@ -1811,23 +1811,23 @@ vx.needs.build | برای ساختن «{name}» هنوز چیزی کم است: |
 vx.needs.research | برای پژوهش «{name}» هنوز چیزی کم است: | Something is still missing to research {name}:
 vx.needs.work | برای کار در «{name}» هنوز چیزی کم است: | Something is still missing to work at {name}:
 vx.needs.any | چیزی که کم است: | What is missing:
-vx.need.material | {need} عدد {name} لازم است؛ در انبار روستا {have} تا هست. | {need} of {name} needed; the village store has {have}.
+vx.need.material | {need} عدد {name} لازم است؛ در انبار شهر {have} تا هست. | {need} of {name} needed; the city store has {have}.
 vx.need.made_built | «{building}» این را تولید می‌کند؛ همان‌جا کار کن. | {building} makes it; go and work there.
 vx.need.made_unbuilt | «{building}» را بساز تا تولید کند. | Build {building} so it gets made.
 vx.need.buy | یا از بازار بخر (هر عدد {price}). | Or buy it at the market ({price} each).
-vx.need.knowledge | دانش «{name}» لازم است؛ در بخش دانش روستا پژوهشش کن. | The knowledge "{name}" is needed; research it in the village knowledge page.
-vx.need.knowledge_any | یکی از این دانش‌ها لازم است: {names}. در بخش دانش روستا پژوهش کن. | One of these is needed: {names}. Research it in the village knowledge page.
+vx.need.knowledge | دانش «{name}» لازم است؛ در بخش دانش شهر پژوهشش کن. | The knowledge "{name}" is needed; research it in the city knowledge page.
+vx.need.knowledge_any | یکی از این دانش‌ها لازم است: {names}. در بخش دانش شهر پژوهش کن. | One of these is needed: {names}. Research it in the city knowledge page.
 vx.need.building | یکی از این ساختمان‌ها باید باشد: {names}. اول آن را بساز. | One of these buildings must stand: {names}. Build it first.
 vx.donate.cash_after | پولت بعد از کمک | Your cash afterwards
 vx.donate.treasury_after | خزانه بعد از کمک | Treasury afterwards
 vx.goal.residents | ساکنان: {cur} از {req} | Residents: {cur} of {req}
-vx.goal.literacy | سواد روستا: {cur}% از {req}% | Literacy: {cur}% of {req}%
+vx.goal.literacy | سواد شهر: {cur}% از {req}% | Literacy: {cur}% of {req}%
 vx.goal.buildings | ساختمان‌های ساخته‌شده (بی‌جاده): {cur} از {req} | Buildings built (no roads): {cur} of {req}
-vx.goal.knowledge | دانشی که روستا خودش یاد گرفته: {cur} از {req} | Knowledge the village learned itself: {cur} of {req}
+vx.goal.knowledge | دانشی که شهر خودش یاد گرفته: {cur} از {req} | Knowledge the city learned itself: {cur} of {req}
 vx.goal.treasury | خزانه: {cur} از {req} | Treasury: {cur} of {req}
 vx.goal.role_any | یک ساختمان از نوع «{role}» | A building of the kind "{role}"
 vx.goal.role.food.1 | یک ساختمان تأمین خوراک (مزرعه یا دامداری) | A food building (a farm or a stockyard)
-vx.goal.role.education.1 | یک ساختمان آموزشی (کلاس درس) | A teaching building (a village classroom)
+vx.goal.role.education.1 | یک ساختمان آموزشی (کلاس درس) | A teaching building (a classroom)
 vx.goal.role.education.2 | مدرسه | A school
 vx.goal.role.health.1 | یک ساختمان درمانی (خانهٔ بهداشت) | A health building (a health house)
 vx.goal.role.health.2 | درمانگاه | A clinic
@@ -1835,28 +1835,28 @@ vx.goal.role.market.2 | بازار | A market
 vx.goal.role.security.1 | یک ساختمان امنیتی (دیده‌بانی یا پاسگاه) | A security building (a watch hut or a post)
 vx.promo.title | راه {tier} شدن | The way to becoming a {tier}
 vx.promo.intro | «{village}» با زمین بیشتر {tier} نمی‌شود؛ مردم، سواد، ساختمان، دانش و خزانهٔ پُر می‌خواهد. این‌ها قدم‌های پیش رویش است: | {village} does not become a {tier} through more land; it takes people, literacy, buildings, knowledge and a full treasury. These are the steps ahead:
-vx.promo.ready_head | همهٔ قدم‌ها برداشته شد. حالا می‌توانی روستا را {tier} کنی. | Every step is done. You can make the village a {tier} now.
-vx.promo.ready_member | همهٔ قدم‌ها برداشته شد؛ ارتقا با دهیار است. | Every step is done; upgrading is up to the head.
-vx.promo.not_ready | هر قدمی که برداشته شود تیک می‌خورد. وقتی همه تیک خوردند، دهیار می‌تواند روستا را ارتقا بدهد. | Each step done gets ticked. When all are ticked, the head can upgrade the village.
+vx.promo.ready_head | همهٔ قدم‌ها برداشته شد. حالا می‌توانی شهر را {tier} کنی. | Every step is done. You can make the city a {tier} now.
+vx.promo.ready_member | همهٔ قدم‌ها برداشته شد؛ ارتقا با شهردار است. | Every step is done; upgrading is up to the head.
+vx.promo.not_ready | هر قدمی که برداشته شود تیک می‌خورد. وقتی همه تیک خوردند، شهردار می‌تواند شهر را ارتقا بدهد. | Each step done gets ticked. When all are ticked, the head can upgrade the city.
 vx.promo.ask_title | «{village}» را {tier} می‌کنی؟ | Make {village} a {tier}?
-vx.promo.ask_body.town | دهیار فرماندار می‌شود و سرپرست روستا می‌ماند؛ ساخت‌وساز گسترده‌تر می‌شود و ساختمان و دانش تازه‌ای باز می‌شود. ارتقا هزینه ندارد، برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | The head becomes the governor and stays in charge; building widens and new buildings and knowledge open up. Upgrading costs nothing and cannot be undone; the group is told.
+vx.promo.ask_body.town | شهردار فرماندار می‌شود و سرپرست شهر می‌ماند؛ ساخت‌وساز گسترده‌تر می‌شود و ساختمان و دانش تازه‌ای باز می‌شود. ارتقا هزینه ندارد، برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | The head becomes the governor and stays in charge; building widens and new buildings and knowledge open up. Upgrading costs nothing and cannot be undone; the group is told.
 vx.promo.ask_body.city | فرماندار شهردار می‌شود و سرپرست می‌ماند؛ دولت شهر با مالیات، شورا و انتخابات راه می‌افتد. ارتقا هزینه ندارد، برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | The governor becomes the mayor and stays in charge; city government starts with taxes, a council and elections. Upgrading costs nothing and cannot be undone; the group is told.
 vx.promo.ask_body.any | ارتقا هزینه ندارد و برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | Upgrading costs nothing and cannot be undone; the group is told.
 vx.promo.yes | بله، ارتقا بده | Yes, upgrade it
 vx.promo.done_title | «{village}» حالا {tier} است! | {village} is now a {tier}!
-vx.promo.done_body.town | دهیار حالا فرماندار است. ساختمان‌ها و دانش تازهٔ شهرک در فهرست ساخت و دانش پیداست و خبرش در گروه اعلام شد. | The head is now the governor. The new buildings and knowledge of a town show in the build and knowledge lists, and the group was told.
+vx.promo.done_body.town | شهردار حالا فرماندار است. ساختمان‌ها و دانش تازهٔ شهرک در فهرست ساخت و دانش پیداست و خبرش در گروه اعلام شد. | The head is now the governor. The new buildings and knowledge of a town show in the build and knowledge lists, and the group was told.
 vx.promo.done_body.city | فرماندار حالا شهردار است. کارهای شهری باز شد و خبرش در گروه اعلام شد. | The governor is now the mayor. City works are open and the group was told.
-vx.promo.done_body.any | روستا ارتقا پیدا کرد و خبرش در گروه اعلام شد. | The village was upgraded and the group was told.
+vx.promo.done_body.any | شهر ارتقا پیدا کرد و خبرش در گروه اعلام شد. | The city was upgraded and the group was told.
 vx.res.join_title | ساکن «{village}» می‌شوی؟ | Live in {village}?
 vx.res.join_body | «{village}» خانهٔ تو می‌شود: از خزانه و ساخت‌وساز و دانش مشترکش سهم می‌بری و می‌توانی زمین بخری و خانه بسازی. | {village} becomes your home: you share its treasury, building and knowledge, and you can buy land and build a house.
 vx.res.join_yes | بله، ساکن می‌شوم | Yes, I will live here
 vx.res.leave_title | از «{village}» می‌روی؟ | Leave {village}?
-vx.res.leave_body | از این روستا می‌روی و به {home} برمی‌گردی. | You leave this village and go back to {home}.
+vx.res.leave_body | از این شهر می‌روی و به {home} برمی‌گردی. | You leave this city and go back to {home}.
 vx.res.leave_yes | بله، می‌روم | Yes, I leave
 vx.res.cooldown | تا {time} دیگر نمی‌توانی دوباره جابه‌جا شوی. | You cannot move again for {time}.
 vx.res.joined_title | ساکن «{village}» شدی | You live in {village} now
-vx.res.joined_body | خوش آمدی! حالا {n} نفر در این روستا زندگی می‌کنند. | Welcome! {n} people live in this village now.
-vx.res.left_title | از روستا رفتی | You left the village
+vx.res.joined_body | خوش آمدی! حالا {n} نفر در این شهر زندگی می‌کنند. | Welcome! {n} people live in this city now.
+vx.res.left_title | از شهر رفتی | You left the city
 vx.res.left_body | حالا دوباره در {home} هستی. | You are back in {home}.
 vx.legend.building | ساختمان | Building
 vx.legend.water | آب | Water
@@ -1880,35 +1880,35 @@ vx.terms.permit | پروانهٔ ساخت | Building permit
 vx.terms.tax | مالیات دارایی | Property tax
 vx.terms.range | بین {min} و {max} | Between {min} and {max}
 vx.terms.upto | تا {max} | Up to {max}
-vx.terms.note | همهٔ این پول‌ها به خزانهٔ روستا می‌رود. | All of this money goes to the village treasury.
+vx.terms.note | همهٔ این پول‌ها به خزانهٔ شهر می‌رود. | All of this money goes to the city treasury.
 vx.work.title | کار در «{village}» | Work in {village}
 vx.work.started | شیفتت شروع شد. وقتی تمام شود، دستمزدت را می‌گیری. | Your shift has started. You are paid when it ends.
 vx.work.mine | شیفت تو در «{building}» | Your shift at {building}
 vx.work.mine_sub | {t} مانده · دستمزد {wage} | {t} left · wage {wage}
-vx.work.not_resident | فقط ساکنان روستا کار می‌کنند؛ اول ساکن روستا شو. | Only villagers work here; live in the village first.
+vx.work.not_resident | فقط ساکنان شهر کار می‌کنند؛ اول ساکن شهر شو. | Only residents work here; live in the city first.
 vx.work.none | هنوز کارگاهی ساخته نشده. | No workshop has been built yet.
 vx.work.suggest | برای شروع یکی از این‌ها را بساز: {names}. | To start, build one of these: {names}.
 vx.work.place_sub | هر شیفت {shift} · دستمزد {wage} | {shift} a shift · wage {wage}
 vx.work.busy | {busy} از {total} جا پر است | {busy} of {total} places taken
 vx.work.uses | مصرف: {list} | Uses: {list}
 vx.work.makes | تولید: {list} | Makes: {list}
-vx.work.hint | هر شیفت را یک نفر کار می‌کند؛ بدون کارگر چیزی تولید نمی‌شود و دستمزد از خزانهٔ روستا داده می‌شود. | One person works each shift; nothing is made without workers, and wages come from the village treasury.
+vx.work.hint | هر شیفت را یک نفر کار می‌کند؛ بدون کارگر چیزی تولید نمی‌شود و دستمزد از خزانهٔ شهر داده می‌شود. | One person works each shift; nothing is made without workers, and wages come from the city treasury.
 vx.work.capacity | جای انبار: {used} از {cap} | Store room: {used} of {cap}
-vx.who.head | {n} نفر از اهالی «{village}» الان آنلاین هستند. | {n} villagers of {village} are online now.
+vx.who.head | {n} نفر از اهالی «{village}» الان آنلاین هستند. | {n} residents of {village} are online now.
 vx.who.nobody | الان کسی آنلاین نیست. | Nobody is online now.
 vx.who.offline | {n} نفر دیگر آنلاین نیستند. | {n} more are offline.
 vx.build.running | ساخت‌های در جریان | Builds in progress
 vx.build.empty | فعلاً ساختمانی برای ساختن باز نشده. | Nothing is open to build yet.
-vx.build.short | در انبار روستا کم است: {list} | Short in the village store: {list}
+vx.build.short | در انبار شهر کم است: {list} | Short in the city store: {list}
 vx.build.roads | جاده‌ای که خودکار کشیده می‌شود | Road laid along with it
-vx.build.from_stock | مصالح از انبار روستا برداشته می‌شود. | The materials are taken from the village store.
+vx.build.from_stock | مصالح از انبار شهر برداشته می‌شود. | The materials are taken from the city store.
 vx.build.yes | بله، بساز · {p} | Yes, build it · {p}
 vx.batch.count | {n} قطعه را یک‌جا می‌سازی. | You are building on {n} lots at once.
-vx.grow.title | گسترش زمین روستا | Growing the village land
-vx.grow.body | زمین روستا از {from}×{from} به {to}×{to} می‌رسد. | The village land grows from {from}×{from} to {to}×{to}.
+vx.grow.title | گسترش زمین شهر | Growing the city land
+vx.grow.body | زمین شهر از {from}×{from} به {to}×{to} می‌رسد. | The city land grows from {from}×{from} to {to}×{to}.
 vx.grow.lots | قطعهٔ تازه | New lots
 vx.grow.buildable | قابل ساخت | Buildable
-vx.grow.short | خزانهٔ روستا برای این کار کافی نیست. | The village treasury cannot pay for this.
+vx.grow.short | خزانهٔ شهر برای این کار کافی نیست. | The city treasury cannot pay for this.
 vx.grow.yes | بله، زمین را بزرگ کن · {p} | Yes, grow the land · {p}
 vx.lots.pick | روی قطعه‌ای بزن که می‌خواهی آنجا ساخته شود. | Tap the lot where you want it built.
 vx.lots.line_from | اول قطعهٔ شروعِ ردیف را بزن. | First tap the lot where the row starts.
@@ -1923,20 +1923,20 @@ act.fallback | ادامه | Continue
 act.confirm | تأیید | Confirm
 act.back | بازگشت | Back
 act.refresh | تازه‌سازی | Refresh
-act.village.join | ساکن این روستا شو | Live in this village
-act.village.who | اهالی روستا | Villagers
-act.village.work | کار در روستا | Work in the village
+act.village.join | ساکن این شهر شو | Live in this city
+act.village.who | اهالی شهر | Residents
+act.village.work | کار در شهر | Work in the city
 act.village.donate | کمک به خزانه | Give to the treasury
-act.village.knowledge | دانش روستا | Village knowledge
+act.village.knowledge | دانش شهر | City knowledge
 act.village.progress | ساخت‌وساز در جریان | Building in progress
 act.village.materials | انبار و بازار | Store and market
 act.village.build | ساختن | Build
 act.village.terms | شرایط زمین | Land terms
-act.village.promote | ارتقای روستا | Upgrade the village
+act.village.promote | ارتقای شهر | Upgrade the city
 act.village.promotion | راه ارتقا | The way up
-act.village.leave | ترک روستا | Leave the village
-act.village.overview | وضعیت روستا | Village status
-act.village.found | ساختن روستا | Found a village
+act.village.leave | ترک شهر | Leave the city
+act.village.overview | وضعیت شهر | City status
+act.village.found | ساختن شهر | Found a city
 act.citizen.land | زمین و قطعه‌ها | Land and lots
 act.citizen.more_land | زمین بیشتر بخر | Buy more land
 act.citizen.build_house | خانه و ساختمان شخصی | My house and buildings
@@ -1954,9 +1954,9 @@ act.support.jail | زندان، در {name} | The jail, in {name}
 act.needs.work | کار در {name} | Work at {name}
 act.needs.build | ساختن {name} | Build {name}
 act.needs.buy | خرید {name} از بازار | Buy {name} at the market
-act.needs.knowledge | دانش روستا | Village knowledge
+act.needs.knowledge | دانش شهر | City knowledge
 act.build.place | ساختن {name} | Build {name}
-act.build.grow | زمین بیشتر برای روستا | More land for the village
+act.build.grow | زمین بیشتر برای شهر | More land for the city
 act.construction.site | کار در این ساختمان | Work on this building
 act.construction.open | نگاهی به {name} | Look at {name}
 act.construction.standing | {name} | {name}
@@ -1984,56 +1984,56 @@ act.work.start | شروع کار در {name} | Start work at {name}
 cmd.settlement.knowledge.research | پژوهش {name} | Research {name}
 cmd.settlement.knowledge.buy | خرید {name} | Buy {name}
 # -- a building's own page, worded from what it is (kind, role, code) ---------------------
-bld.desc.road | جادهٔ روستا؛ قطعه‌ها را به هم وصل می‌کند و اهالی از آن رفت‌وآمد می‌کنند. | The village road; it joins the lots and villagers walk on it.
-bld.desc.civic_hall | دهیاری؛ دهیار از اینجا روستا را می‌گرداند. خزانه، دانش و ساخت‌وساز روستا همین‌جا دست اوست. | The village hall; the head runs the village from here, with the treasury, knowledge and building.
-bld.desc.role.security | نگهبانی از روستا؛ امنیت روستا را بالا می‌برد. | Guards the village; raises its security.
-bld.desc.role.craft | کارگاه؛ کالاهای روستا اینجا ساخته می‌شود. | A workshop; the village's goods are made here.
+bld.desc.road | جادهٔ شهر؛ قطعه‌ها را به هم وصل می‌کند و اهالی از آن رفت‌وآمد می‌کنند. | The city road; it joins the lots and residents walk on it.
+bld.desc.civic_hall | شهرداری؛ شهردار از اینجا شهر را می‌گرداند. خزانه، دانش و ساخت‌وساز شهر همین‌جا دست اوست. | The city hall; the head runs the city from here, with the treasury, knowledge and building.
+bld.desc.role.security | نگهبانی از شهر؛ امنیت شهر را بالا می‌برد. | Guards the city; raises its security.
+bld.desc.role.craft | کارگاه؛ کالاهای شهر اینجا ساخته می‌شود. | A workshop; the city's goods are made here.
 bld.desc.role.extraction | از زمین مواد خام درمی‌آورند. | Raw materials are taken out of the ground.
-bld.desc.role.water_infra | آب را برای زندگی و کشاورزی روستا می‌رساند. | Brings water for life and farming in the village.
-bld.desc.role.food | خوراک روستا اینجا تولید می‌شود و سفرهٔ اهالی را پُرتر می‌کند. | The village's food is made here and the villagers' tables are fuller.
+bld.desc.role.water_infra | آب را برای زندگی و کشاورزی شهر می‌رساند. | Brings water for life and farming in the city.
+bld.desc.role.food | خوراک شهر اینجا تولید می‌شود و سفرهٔ اهالی را پُرتر می‌کند. | The city's food is made here and the residents' tables are fuller.
 bld.desc.role.health | اینجا به بیمارها رسیدگی می‌کنند. | The sick are looked after here.
-bld.desc.role.education | اینجا به اهالی درس می‌دهند؛ تا این بنا سرپا باشد، سواد کم‌کم بین مردم پخش می‌شود. | Villagers are taught here; while it stands, literacy slowly spreads.
-bld.desc.role.market | جای خرید و فروش اهالی؛ کالا اینجا دست‌به‌دست می‌شود. | Where villagers trade; goods change hands here.
-bld.desc.role.storage | انبار روستا؛ مصالح و کالای مشترک اینجا می‌ماند و ساخت‌وساز از همین برمی‌دارد. | The village store; shared materials and goods are kept here and building draws on them.
-bld.desc.role.housing | خانهٔ اهالی؛ جای بیشتری برای ساکنان درست می‌کند. | Homes for villagers; makes room for more people.
-bld.desc.code.housing_block | خانه‌های تازه برای اهالی؛ روستا جای بیشتری برای ساکنان پیدا می‌کند. | New homes for villagers; the village has room for more people.
-bld.desc.code.park | فضای سبز روستا؛ حال اهالی را بهتر می‌کند. | The village green; it lifts the villagers' mood.
-bld.desc.code.bank | این بنا مالِ شهرهای بزرگ‌تر است؛ وقتی روستا رشد کند به کارش می‌آید. | A building of larger towns; it will be of use once the village grows.
-bld.desc.code.barracks | این بنا مالِ شهرهای بزرگ‌تر است؛ وقتی روستا رشد کند به کارش می‌آید. | A building of larger towns; it will be of use once the village grows.
-bld.desc.code.port | این بنا مالِ شهرهای بزرگ‌تر است؛ وقتی روستا رشد کند به کارش می‌آید. | A building of larger towns; it will be of use once the village grows.
-bld.desc.code.airport | این بنا مالِ شهرهای بزرگ‌تر است؛ وقتی روستا رشد کند به کارش می‌آید. | A building of larger towns; it will be of use once the village grows.
-bld.desc.generic | یکی از ساختمان‌های روستا. | One of the village's buildings.
+bld.desc.role.education | اینجا به اهالی درس می‌دهند؛ تا این بنا سرپا باشد، سواد کم‌کم بین مردم پخش می‌شود. | Residents are taught here; while it stands, literacy slowly spreads.
+bld.desc.role.market | جای خرید و فروش اهالی؛ کالا اینجا دست‌به‌دست می‌شود. | Where residents trade; goods change hands here.
+bld.desc.role.storage | انبار شهر؛ مصالح و کالای مشترک اینجا می‌ماند و ساخت‌وساز از همین برمی‌دارد. | The city store; shared materials and goods are kept here and building draws on them.
+bld.desc.role.housing | خانهٔ اهالی؛ جای بیشتری برای ساکنان درست می‌کند. | Homes for residents; makes room for more people.
+bld.desc.code.housing_block | خانه‌های تازه برای اهالی؛ شهر جای بیشتری برای ساکنان پیدا می‌کند. | New homes for residents; the city has room for more people.
+bld.desc.code.park | فضای سبز شهر؛ حال اهالی را بهتر می‌کند. | The city green; it lifts the residents' mood.
+bld.desc.code.bank | این بنا وقتی به کار می‌آید که شهر رشد کند و دانشش بیشتر شود. | This building becomes useful once the city has grown and learned more.
+bld.desc.code.barracks | این بنا وقتی به کار می‌آید که شهر رشد کند و دانشش بیشتر شود. | This building becomes useful once the city has grown and learned more.
+bld.desc.code.port | این بنا وقتی به کار می‌آید که شهر رشد کند و دانشش بیشتر شود. | This building becomes useful once the city has grown and learned more.
+bld.desc.code.airport | این بنا وقتی به کار می‌آید که شهر رشد کند و دانشش بیشتر شود. | This building becomes useful once the city has grown and learned more.
+bld.desc.generic | یکی از ساختمان‌های شهر. | One of the city's buildings.
 # -- refusals of the village area, by code (the core sends a code and data, never a sentence) ----
-refusal.village_insufficient_funds | خزانهٔ روستا برای این کار کافی نیست. | The village treasury cannot pay for this.
-refusal.village_busy | روستا همین حالا سرگرم کار دیگری است؛ صبر کن تمام شود. | The village is busy with something else; wait for it to finish.
-refusal.village_already_owned | روستا این را از قبل یاد گرفته. | The village already learned this.
+refusal.village_insufficient_funds | خزانهٔ شهر برای این کار کافی نیست. | The city treasury cannot pay for this.
+refusal.village_busy | شهر همین حالا سرگرم کار دیگری است؛ صبر کن تمام شود. | The city is busy with something else; wait for it to finish.
+refusal.village_already_owned | شهر این را از قبل یاد گرفته. | The city already learned this.
 refusal.village_not_available | این یکی الان نه پژوهش می‌شود نه خریدنی است. | This cannot be researched or bought right now.
-refusal.village_terrain | زمین این روستا برای این کار جور نیست. | The ground of this village does not suit it.
+refusal.village_terrain | زمین این شهر برای این کار جور نیست. | The ground of this city does not suit it.
 refusal.village_prerequisite | پیش‌نیازهای این کار هنوز آماده نیست. | The requirements for this are not ready yet.
-refusal.village_literacy | سواد روستا هنوز به اندازهٔ کافی نیست. | The village is not literate enough yet.
+refusal.village_literacy | سواد شهر هنوز به اندازهٔ کافی نیست. | The city is not literate enough yet.
 refusal.village_not_found | این پیدا نشد. | That was not found.
-refusal.village_out_of_bounds | این جا بیرون از روستاست. | That spot is outside the village.
-refusal.village_concurrent_cap | صف ساخت روستا پُر است؛ صبر کن یکی از ساخت‌ها تمام شود. | The village building queue is full; wait for one to finish.
+refusal.village_out_of_bounds | این جا بیرون از شهر است. | That spot is outside the city.
+refusal.village_concurrent_cap | صف ساخت شهر پُر است؛ صبر کن یکی از ساخت‌ها تمام شود. | The city building queue is full; wait for one to finish.
 refusal.village_not_demolishable | این ساختمان را الان نمی‌شود خراب کرد. | This building cannot be pulled down now.
 refusal.village_not_cancellable | این ساختمان دیگر در حال ساخت نیست و لغو نمی‌شود. | This building is no longer going up, so it cannot be cancelled.
-refusal.village_already_resident | تو همین حالا ساکن این روستایی. | You already live in this village.
-refusal.village_not_resident | تو ساکن این روستا نیستی. | You do not live in this village.
+refusal.village_already_resident | تو همین حالا ساکن این شهری. | You already live in this city.
+refusal.village_not_resident | تو ساکن این شهر نیستی. | You do not live in this city.
 refusal.village_residence_cooldown | تازه جابه‌جا شده‌ای؛ {time} دیگر می‌توانی دوباره جابه‌جا شوی. | You moved only just now; you can move again in {time}.
-refusal.village_holds_office | تا وقتی دهیار هستی نمی‌توانی روستا را ترک کنی. | You cannot leave the village while you are its head.
+refusal.village_holds_office | تا وقتی شهردار هستی نمی‌توانی شهر را ترک کنی. | You cannot leave the city while you are its head.
 refusal.village_no_home | هنوز شهرِ برگشتت مشخص نیست. | The city you would return to is not set yet.
 refusal.village_donate_range | مبلغ کمک باید بین {min} و {max} باشد. | A gift must be between {min} and {max}.
-refusal.village_promotion_top | این روستا به بالاترین رده رسیده؛ قدم بعدی ندارد. | This village is at the top tier; there is no next step.
-refusal.village_storage_full | انبار روستا جا ندارد؛ انبار غله ظرفیتش را بیشتر می‌کند. | The village store is full; a granary adds room.
+refusal.village_promotion_top | این شهر به بالاترین رده رسیده؛ قدم بعدی ندارد. | This city is at the top tier; there is no next step.
+refusal.village_storage_full | انبار شهر جا ندارد؛ انبار غله ظرفیتش را بیشتر می‌کند. | The city store is full; a granary adds room.
 refusal.village_already_working | تو همین حالا در یک شیفتی؛ صبر کن تمام شود. | You are already on a shift; wait for it to end.
 refusal.village_workplace_full | همهٔ جاهای این کارگاه پُر است؛ کمی بعد یا جای دیگری کار کن. | Every place at this workshop is taken; try again later or work elsewhere.
 refusal.village_not_workplace | در این ساختمان کار نمی‌شود. | There is no work to do in this building.
 refusal.village_labor_no_job | این کار دیگر روی تابلو نیست. | This job is no longer on the board.
-refusal.village_labor_not_here | برای کار باید ساکن این روستا باشی یا همین‌جا حضور داشته باشی. | To work you must live in this village or be here.
+refusal.village_labor_not_here | برای کار باید ساکن این شهر باشی یا همین‌جا حضور داشته باشی. | To work you must live in this city or be here.
 refusal.village_labor_fully_staffed | کارگر به اندازهٔ کافی روی این کارگاه هست؛ بعد از پایان شیفتشان دوباره سر بزن. | There are enough workers here; look in again after their shifts end.
 refusal.village_labor_budget_spent | کارفرما پول دیگری برای دستمزد این کار کنار نگذاشته. | The employer has set no more wages aside for this job.
 refusal.village_labor_not_employer | این کار فقط دست کارفرمای همین کار است. | Only this job's employer can do that.
-refusal.village_labor_no_npc | امروز کارگر آزاد در روستا نیست؛ با خانهٔ بیشتر، کارگر بیشتر می‌شود. | There are no free workers in the village today; more houses bring more workers.
-refusal.village_labor_wage_too_low | این دستمزد از کمترین دستمزد روستا پایین‌تر است. | This wage is below the village's lowest wage.
+refusal.village_labor_no_npc | امروز کارگر آزاد در شهر نیست؛ با خانهٔ بیشتر، کارگر بیشتر می‌شود. | There are no free workers in the city today; more houses bring more workers.
+refusal.village_labor_wage_too_low | این دستمزد از کمترین دستمزد شهر پایین‌تر است. | This wage is below the city's lowest wage.
 refusal.village_labor_employer_broke | کارفرما پول دستمزد این شیفت را ندارد. | The employer cannot pay this shift's wage.
 refusal.village_labor_no_site | چنین کارگاهی پیدا نشد. | No such site was found.
 vx.ov.people | {n} نفر | {n} people
@@ -2043,17 +2043,17 @@ vx.ov.steps_open | ببین چه کم داری | See what is missing
 vx.ov.promote | ارتقا به {tier} | Upgrade to {tier}
 vx.prog.by_work | با کارِ کارگرها ساخته می‌شود | Raised by the workers' labour
 vx.prog.hours | {done} از {total} نفر-ساعت کار شده | {done} of {total} worker-hours done
-menu.my_life | زندگی من در روستا | My life in the village
+menu.my_life | زندگی من در شهر | My life in the city
 menu.land | زمین و قطعه‌ها | Land and lots
 menu.house | خانه و ساختمان شخصی | My house and buildings
 menu.mine | دارایی من | My property
 menu.work | کار | Work
-menu.status | وضعیت روستا | Village status
+menu.status | وضعیت شهر | City status
 menu.terms | شرایط زمین | Land terms
-menu.leave | ترک روستا | Leave the village
-vx.work.open | کارگاه‌های روستا | Village workshops
-vx.call.body | روستا خانهٔ گروه شماست: خزانه، ساخت‌وساز و دانش مشترک دارد و همهٔ اهالی در آن سهیم‌اند. فرم ساخت روستا را باز کن و روستای خودت را بساز. | A village is your group's home: it has a shared treasury, building and knowledge, and all its villagers share in it. Open the founding form to found yours.
-vx.rf.screen.village_materials | مصالح انبار روستا برای این ساخت کافی نیست. | The village store lacks the materials for this.
+menu.leave | ترک شهر | Leave the city
+vx.work.open | کارگاه‌های شهر | City workshops
+vx.call.body | شهر خانهٔ گروه شماست: خزانه، ساخت‌وساز و دانش مشترک دارد و همهٔ اهالی در آن سهیم‌اند. فرم ساخت شهر را باز کن و شهر خودت را بساز. | A city is your group's home: it has a shared treasury, building and knowledge, and all its residents share in it. Open the founding form to found yours.
+vx.rf.screen.village_materials | مصالح انبار شهر برای این ساخت کافی نیست. | The city store lacks the materials for this.
 # -- popups (building panel) ----------------------------------------------------
 building.stat.spot | جای ساختمان | Position
 building.stat.size | اندازه | Size
@@ -2066,7 +2066,7 @@ storage.stat.qty | تعداد | Quantity
 storage.stat.unit | قیمت هر واحد | Price each
 storage.stat.total | جمع | Total
 storage.stat.treasury | موجودی خزانه | Treasury
-donate.stat.treasury | خزانهٔ روستا | Village treasury
+donate.stat.treasury | خزانهٔ شهر | City treasury
 donate.stat.cash | پول تو | Your cash
 citizen.mine.no_home_chip | بدون خانه | No house
 know.stat.buy | قیمت خرید | Price to buy
@@ -2172,7 +2172,7 @@ soc.act.social.pay | پرداخت به او | Pay them
 soc.act.social.accept | پذیرفتن {name} | Accept {name}
 # governance
 soc.gov.title | دولت شهر {place} | {place} government
-soc.gov.title_village | دهیاری {place} | {place} village council
+soc.gov.title_village | شهرداری {place} | {place} city council
 soc.gov.title_plain | دولت شهر | City government
 soc.gov.no_city | هنوز در شهری نیستی؛ دولت همان جایی است که در آن زندگی می‌کنی. | You are not in a city yet; government belongs to the place you live in.
 soc.gov.no_offices | منصبی اینجا تعریف نشده است. | No offices are set up here.
@@ -2235,7 +2235,7 @@ soc.refusal.gov.cooldown_later | هنوز زود است؛ کمی بعد دوبا
 soc.refusal.gov.unknown_lever | چنین سیاستی وجود ندارد. | There is no such policy.
 soc.refusal.gov.unknown_place | چنین جایی پیدا نشد. | That place was not found.
 soc.refusal.gov.wrong_place | این منصب یا سیاست مال آن جا نیست. | That office or policy does not belong to this place.
-soc.refusal.gov.city_only | این کار فقط در شهر شدنی است، نه در روستا یا شهرک. | This can only be done in a city, not in a village or town.
+soc.refusal.gov.city_only | این کار هنوز در این شهر ممکن نیست؛ با رشد شهر و برپا شدن نهادهایش باز می‌شود. | This is not possible in this city yet; it opens as the city grows and sets up its institutions.
 soc.refusal.gov.unsupported | این نوع سیاست هنوز قابل تغییر نیست. | This kind of policy cannot be changed yet.
 soc.refusal.gov.invalid_allocation | جمع سهم‌ها باید از کل بیشتر نشود. | The shares must not add up to more than the whole.
 soc.refusal.gov.office_not_found | چنین منصبی وجود ندارد. | There is no such office.
@@ -2262,11 +2262,11 @@ soc.election.title_plain | انتخابات | Elections
 soc.election.no_city | هنوز در شهری نیستی. هر کس در انتخابات جایی رأی می‌دهد که در آن زندگی می‌کند. | You are not in a city yet. People vote where they live.
 soc.election.none | الان انتخاباتی در جریان نیست. | No election is running right now.
 soc.election.hint | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at city hall and each resident votes once, in secret.
-soc.election.hint_village | نامزدها در دهیاری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at the village office and each resident votes once, in secret.
+soc.election.hint_village | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at the city office and each resident votes once, in secret.
 soc.election.of | انتخابات {office} {place} | {office} election in {place}
 soc.election.this | این انتخابات | this election
 soc.election.name.mayor | انتخابات شهرداری {place} | Mayoral election in {place}
-soc.election.name.village_head | انتخابات دهیاری {place} | Village head election in {place}
+soc.election.name.village_head | انتخابات شهرداری {place} | Mayor election in {place}
 soc.election.name.city_council | انتخابات شورای شهر {place} | City council election in {place}
 soc.election.name.president | انتخابات ریاست‌جمهوری {place} | Presidential election in {place}
 soc.phase.candidacy | ثبت‌نام نامزدها | Candidacy
@@ -2321,7 +2321,7 @@ soc.refusal.election.none | چنین انتخاباتی پیدا نشد. | No su
 soc.refusal.election.not_candidacy | الان ثبت‌نام نامزدهای {election} باز نیست. | Registration for {election} is not open now.
 soc.refusal.election.not_voting | الان رأی‌گیری {election} باز نیست. | Voting in {election} is not open now.
 soc.refusal.election.away | نامزدی را باید در شهرداریِ همان شهری ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city hall of the city the election is for.
-soc.refusal.election.away_village | نامزدی را باید در دهیاریِ همان روستا ثبت کنی که انتخابات برای آن است. | You register as a candidate at the village office of the village the election is for.
+soc.refusal.election.away_village | نامزدی را باید در شهرداریِ همان شهر ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city office of the city the election is for.
 soc.refusal.election.no_candidate | این نامزد در فهرست نیست. | That candidate is not on the list.
 soc.refusal.election.not_resident | در {election} فقط ساکنان همان‌جا شرکت می‌کنند. | Only residents take part in {election}.
 soc.refusal.election.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که در {election} شرکت کنی. | You have not lived here long enough to take part in {election}.
@@ -2628,7 +2628,7 @@ lf.map.going_up | در حال ساخت | Going up
 lf.map.village_standing | ساختمان‌های اینجا | Buildings here
 lf.map.village_going | در حال ساخت | Being built
 lf.map.travelling | در سفر به {city} هستی؛ نقشه تا رسیدن بسته است. | You are travelling to {city}; the map is closed until you arrive.
-lf.map.no_city | هنوز در هیچ شهر یا روستایی نیستی. | You are not in any city or village yet.
+lf.map.no_city | هنوز در هیچ شهری نیستی. | You are not in any city yet.
 lf.map.village_title | جاهای اینجا | Places here
 lf.map.city_title | جاهای {city} | Places in {city}
 lf.map.walking | در راه {place} هستی؛ {t} مانده، ساعت {at} می‌رسی. | You are walking to {place}; {t} left, you arrive at {at}.
@@ -2664,9 +2664,9 @@ lf.status.arriving | همین الان می‌رسی | Arriving any moment
 lf.arrived.title | رسیدی | Arrived
 lf.arrived.lead | به {city} رسیدی. | You have arrived in {city}.
 lf.arrived.xp | +{n} امتیاز تجربه | +{n} XP
-lf.here.no_village | این گروه هنوز روستایی ندارد، پس مقصدی برای سفر نیست. | This group has no village yet, so there is nowhere to go.
+lf.here.no_village | این گروه هنوز شهری ندارد، پس مقصدی برای سفر نیست. | This group has no city yet, so there is nowhere to go.
 lf.here.already_there | همین حالا در {village} هستی و سفری لازم نیست. | You are already in {village}; no trip is needed.
-lf.here.group_only | «سفر به این روستا» را در گروه خودِ روستا بزن؛ برای جاهای دیگر شهرها را ببین. | Use “travel to this village” in the village’s own group; for anywhere else see the cities.
+lf.here.group_only | «سفر به این شهر» را در گروه خودِ شهر بزن؛ برای جاهای دیگر شهرها را ببین. | Use “travel to this city” in the city’s own group; for anywhere else see the cities.
 lf.walk.title | پیاده‌روی | Walk
 lf.walk.lead | به {place} راه افتادی. | You set off for {place}.
 lf.walk.go | برو آنجا | Go there
@@ -2755,7 +2755,7 @@ refusal.life_too_soon | تازه خوابیده‌ای؛ تا خواب بعدی 
 refusal.life_no_spot | این جای خواب در این شهر نیست. | That place to sleep is not in this city.
 refusal.life_no_avatar | این آواتار در فهرست نیست؛ یکی از فهرست را بردار. | That avatar is not on the list; pick one from it.
 refusal.life_no_player | بازیکنی با این کد یا نام کاربری پیدا نشد. | No player was found with that code or username.
-refusal.life_no_city | برای خوابیدن باید در یک شهر یا روستا باشی، نه در راه. | To sleep you must be in a city or village, not on the road.
+refusal.life_no_city | برای خوابیدن باید در یک شهر باشی، نه در راه. | To sleep you must be in a city, not on the road.
 refusal.life_rested | تازه استراحت کرده‌ای؛ کمی بعد دوباره امتحان کن. | You have just rested; try again a little later.
 lf.life.notice.slept | خوب خوابیدی ({spot}) و {rest} واحد از خستگی‌ات کم شد. | You slept well ({spot}) and {rest} points of tiredness went.
 lf.life.notice.bio | بیوگرافیت ذخیره شد. | Your bio is saved.
@@ -2962,7 +2962,7 @@ lf.err.gov.refusal.cooldown_later | این سیاست تازه تغییر کرد
 lf.err.gov.refusal.unknown_lever | این سیاست دیگر وجود ندارد. | This policy no longer exists.
 lf.err.gov.refusal.unknown_place | این جا پیدا نشد؛ نقشه را باز کن و دوباره امتحان کن. | That place was not found; open the map and try again.
 lf.err.gov.refusal.wrong_place | این سیاست در اینجا کاربردی ندارد. | This policy does not apply here.
-lf.err.gov.refusal.city_only | این بخش مخصوص شهرهاست؛ روستا هنوز بودجه و شورای شهر ندارد. وقتی روستا رشد کند این‌ها هم باز می‌شوند. | This is for cities; a village has no budget or city council yet. They open when the village grows.
+lf.err.gov.refusal.city_only | بودجه و شورای شهر هنوز برپا نشده؛ با رشد شهر باز می‌شود. | The budget and the city council are not set up yet; they open as the city grows.
 lf.err.gov.refusal.unsupported | این نوع سیاست هنوز قابل تغییر نیست. | This kind of policy cannot be changed yet.
 lf.err.gov.refusal.invalid_allocation | این تقسیم مجاز نیست؛ فقط ردیف‌های همین بودجه سهم می‌گیرند و جمع سهم‌ها حداکثر ۱۰۰٪ است. | That split is not allowed; only this budget’s lines get a share and the shares add up to at most 100%.
 lf.err.gov.refusal.office_not_found | چنین منصبی اینجا نیست. | There is no such office here.
@@ -2988,7 +2988,7 @@ act.education | آموزش | Learning
 act.bank | بانک | Bank
 act.property.mine | ملک من | My property
 act.shops | مغازه‌ها | Shops
-act.village.home | روستای من | My village
+act.village.home | شهر من | My city
 act.city.gov | مناصب و سیاست‌ها | Offices and policies
 act.companies | شرکت‌ها | Companies
 act.faction.mine | جناح من | My faction
@@ -3145,7 +3145,7 @@ pn.news.bought | {village} دانش «{knowledge}» را خرید. | {village} b
 pn.news.taught | سواد {village} به {percent}٪ رسید. | Literacy in {village} reached {percent}%.
 pn.news.resident_joined | {player} ساکن {village} شد. | {player} became a resident of {village}.
 pn.news.donated | {player} به خزانهٔ {village} کمک کرد. | {player} gave to the treasury of {village}.
-pn.news.promoted | {village} رشد کرد و ارتقا گرفت. | {village} has grown to the next tier.
+pn.news.promoted | {village} رشد کرد. | {village} has grown.
 pn.news.more | و {n} مورد دیگر. | and {n} more.
 # -- inbox categories the server uses ---------------------------------------------
 inbox.cat.companies | شرکت‌ها | Companies
@@ -3192,21 +3192,21 @@ founding.icon.key | کلید | Key
 founding.icon.book | کتاب | Book
 founding.icon.horse | اسب | Horse
 founding.icon.fish | ماهی | Fish
-founding.draft.title | ساخت روستا | Found a village
-founding.draft.body | فرم تأسیس روستا باز است. مشخصات را کامل کن تا روستا ساخته شود. | The founding form is open. Fill it in to create the village.
-founding.draft.pending | {founder} در حال تکمیل فرم این روستاست. | {founder} is filling in this village's form.
-founding.draft.open | تکمیل اطلاعات روستا | Fill in the village form
-founding.checked.body | فرم درست است؛ می‌توانی روستای «{name}» را بسازی. | The form is fine; you can found “{name}”.
-founding.refusal.title | تأسیس روستا نشد | The village was not founded
-refusal.settlement_group_only | تأسیس روستا فقط در گروه بازی ممکن است. | A village can only be founded from a game group.
+founding.draft.title | ساخت شهر | Found a city
+founding.draft.body | فرم تأسیس شهر باز است. مشخصات را کامل کن تا شهر ساخته شود. | The founding form is open. Fill it in to create the city.
+founding.draft.pending | {founder} در حال تکمیل فرم این شهر است. | {founder} is filling in this city's form.
+founding.draft.open | تکمیل اطلاعات شهر | Fill in the city form
+founding.checked.body | فرم درست است؛ می‌توانی شهر «{name}» را بسازی. | The form is fine; you can found “{name}”.
+founding.refusal.title | تأسیس شهر نشد | The city was not founded
+refusal.settlement_group_only | تأسیس شهر فقط در گروه بازی ممکن است. | A city can only be founded from a game group.
 refusal.settlement_no_world | نقشهٔ جهان هنوز آماده نیست؛ کمی بعد دوباره امتحان کن. | The world map is not ready yet; try again shortly.
-refusal.settlement_already | این گروه پیش‌تر روستای «{name}» را ساخته است. | This group has already founded “{name}”.
-founded.title | روستای «{name}» ساخته شد | “{name}” is founded
-founded.body | شما دهیار این روستا هستید. | You are the head of this village.
+refusal.settlement_already | این گروه پیش‌تر شهر «{name}» را ساخته است. | This group has already founded “{name}”.
+founded.title | شهر «{name}» ساخته شد | “{name}” is founded
+founded.body | شما شهردار این شهر هستید. | You are the mayor of this city.
 act.inbox.open | دیدن پیام‌ها | See messages
 act.inbox.read_all | خواندن همه | Mark all read
 act.inbox.open_item | باز کردن | Open
-act.founding.open_form | تکمیل اطلاعات روستا | Fill in the village form
+act.founding.open_form | تکمیل اطلاعات شهر | Fill in the city form
 
 # -- P0: activities, work, health, crime empty, travel, friends -------------------
 common.loading | در حال بارگذاری… | Loading…
@@ -3226,13 +3226,13 @@ work.needs_inputs | مواد این کارگاه کم است. | This workplace i
 work.full | همه‌ی جاهای کار پر است. | Every place is taken.
 work.makes | می‌سازد: {list} | Makes: {list}
 work.empty.no_jobs | فعلاً آگهی کاری نیست و کارگاهی هم برای کار کردن نیست. | No job is posted and there is no workplace to work at yet.
-work.empty.not_resident | برای کار کردن باید ساکن این روستا باشی. | You have to live in this village to work here.
+work.empty.not_resident | برای کار کردن باید ساکن این شهر باشی. | You have to live in this city to work here.
 work.empty.no_settlement | اینجا کار همان شغل‌های شهر است. | Here, work means the careers of the city.
-work.next.build | رفتن به روستا و ساختن کارگاه | Go to the village and build a workplace
-work.next.ask_head | از دهیار بخواه کارگاه بسازد یا آگهی کار بگذارد. | Ask the village head to build a workplace or post a job.
-work.next.join | اول باید به این روستا نقل‌مکان کنی. | Move to this village first.
+work.next.build | رفتن به شهر و ساختن کارگاه | Go to the city and build a workplace
+work.next.ask_head | از شهردار بخواه کارگاه بسازد یا آگهی کار بگذارد. | Ask the mayor to build a workplace or post a job.
+work.next.join | اول باید به این شهر نقل‌مکان کنی. | Move to this city first.
 work.career | شغل من | My career
-work.not_here | برای شروع باید همین‌جا در روستا باشی. | You have to be in the village to start.
+work.not_here | برای شروع باید همین‌جا در شهر باشی. | You have to be in the city to start.
 health.of | {a} از {b} | {a} of {b}
 health.admitted | بستری هستی · {t} تا ترخیص | You are admitted · {t} until discharge
 health.rest | استراحت | Rest
@@ -4303,13 +4303,13 @@ pn.war.report | گزارش عملیات شمارهٔ {no} دربارهٔ {city} 
 # -- activities P1: education, missions, knowledge, rankings (the settlement's own offer) ------------------------
 education.here_not | اینجا نیست | Not here
 education.empty.no_class | اینجا هنوز کلاسی نیست، برای همین درسی هم داده نمی‌شود. | There is no class here yet, so nothing is taught.
-education.empty.build | دهیار می‌تواند «{name}» را بسازد. | The village head can build “{name}”.
+education.empty.build | شهردار می‌تواند «{name}» را بسازد. | The mayor can build “{name}”.
 education.empty.nothing | فعلاً درسی در {place} داده نمی‌شود. | Nothing is taught in {place} for now.
 education.empty.where | درس‌ها را می‌شود در شهر مرکزی خواند. | Courses can be taken in the central city.
 education.gap.taught_in | در {place} درس داده می‌شود | Taught in {place}
 education.gap.go | سفر به {place} | Travel to {place}
-education.gap.need.knowledge | دهیار می‌تواند «{name}» را پژوهش کند | The head can research “{name}”
-education.gap.need.building | دهیار می‌تواند «{name}» را بسازد | The head can build “{name}”
+education.gap.need.knowledge | شهردار می‌تواند «{name}» را پژوهش کند | The head can research “{name}”
+education.gap.need.building | شهردار می‌تواند «{name}» را بسازد | The head can build “{name}”
 education.gap.need.teacher | برای درس دادن «{name}» لازم است | “{name}” is needed to teach it
 education.gap.fee | {fee} · {time} | {fee} · {time}
 education.literacy.title | خواندن و نوشتن | Reading and writing
@@ -4322,7 +4322,7 @@ missions.reward | پاداش: {r} | Reward: {r}
 missions.reward_item | {qty} {item} | {qty} {item}
 missions.open | {n} کار روی تابلو | {n} jobs on the board
 missions.empty | فعلاً کاری روی تابلو نیست. | There are no jobs on the board right now.
-missions.no_boards_village | تابلوی روستا فعلاً خالی است. | The village board is empty for now.
+missions.no_boards_village | تابلوی شهر فعلاً خالی است. | The city board is empty for now.
 missions.no_boards | اینجا فعلاً مأموریتی نیست. | There are no missions here for now.
 missions.repeat | هر روز تازه می‌شود | Comes back every day
 missions.wait | {t} دیگر | {t} more
@@ -4349,9 +4349,9 @@ know.unlock.building | ساختمان {name} | the building {name}
 know.unlock.knowledge | دانش {name} | the knowledge {name}
 know.unlock.course | درس {name} | the course {name}
 know.afford | می‌توانی بپردازی | Affordable
-soc.board.tab.village | روستا | Village
+soc.board.tab.village | شهر | City
 soc.board.village | ثروتمندترین‌های {place} | The richest in {place}
-soc.board.hint.village | هم‌روستایی‌ها بر پایهٔ دارایی‌شان. | Your neighbours by what they own.
+soc.board.hint.village | هم‌شهری‌ها بر پایهٔ دارایی‌شان. | Your neighbours by what they own.
 
 # -- activities: health and missions (docs/adr/0039) ---
 ac.health.clinic_name | درمانگاه {name} | The {name} clinic
@@ -4591,7 +4591,7 @@ ac.crime.refused.busy | هنوز سرگرم کار قبلی هستی؛ {time} د
 ac.crime.refused.work | الان سر کار هستی؛ اول شیفتت تمام شود. | You are at work; finish your shift first.
 ac.crime.refused.travelling | در راه سفری؛ تا نرسیده نمی‌شود. | You are on a journey; wait until you arrive.
 ac.crime.refused.walking | هنوز در راهی؛ اول برس. | You are still walking; arrive first.
-ac.crime.refused.nowhere | برای این کار باید در یک روستا یا شهر باشی. | You must be in a village or a city for this.
+ac.crime.refused.nowhere | برای این کار باید در یک شهر باشی. | You must be in a city for this.
 ac.crime.refused.nerve | جسارتت کم است: {need} لازم داری و {have} داری. {time} دیگر پر می‌شود. | Not enough nerve: you need {need} and have {have}. It refills in {time}.
 ac.crime.refused.nerve_now | جسارتت کم است: {need} لازم داری و {have} داری. | Not enough nerve: you need {need} and have {have}.
 ac.crime.refused.no_victim | الان کسی نیست که چیزی ازش برداری. | There is nobody to take from right now.
@@ -4774,3 +4774,59 @@ v6.up.blocked | اول موارد قرمز را درست کن | Fix the red rows
 v6.fix | برو و درستش کن | Go and fix it
 v6.have | دارد | Have it
 v6.rail.build | ساخت | Build
+# -- the city panel (web map 6.2) and the v6 re-hosted screens ---------------------------------------
+city.title | شهر | City
+city.status | وضعیت شهر | City status
+city.treasury | خزانه | Treasury
+city.storage | انبار شهر | City storehouse
+city.affairs | کارهای شهر | City affairs
+city.charter | منشور و منصب‌ها | Charter and offices
+city.roles | ساختمان‌های خدماتی | Service buildings
+city.role.level | {role} · سطح {n} | {role} · level {n}
+city.next.title | قدم‌های بعدی | What comes next
+city.next.none | فعلاً قدم تازه‌ای پیش رویتان نیست. | Nothing new is waiting right now.
+city.dim.people | اهالی | Residents
+city.dim.buildings | ساختمان‌ها | Buildings
+city.dim.knowledge | دانش | Knowledge
+city.dim.of | {load} از {cap} | {load} of {cap}
+city.dim.over | بیشتر از ظرفیت است؛ شهر با کمبود کار می‌کند. | Over capacity; the city works at a loss.
+v6.ring.buy | خرید | Buy
+v6.ring.build | ساخت | Build
+v6.ring.access | دسترسی | Access
+v6.ring.treasury | خزانه | Treasury
+v6.ring.donate | کمک به انبار | Help the store
+v6.ring.elections | انتخابات | Elections
+v6.ring.lot | قطعه | Lot
+# -- goods lists: search, categories, sorting (market, storehouse) ---------------------------------
+goods.search | جست‌وجوی نام کالا | Search goods by name
+goods.cat.all | همه | All
+goods.cat.other | سایر | Other
+goods.cat.food | خوراک | Food
+goods.cat.drink | نوشیدنی | Drink
+goods.cat.medicine | دارو | Medicine
+goods.cat.gear | ابزار و تجهیزات | Tools and gear
+goods.cat.electronics | لوازم برقی | Electronics
+goods.cat.valuables | گران‌بها | Valuables
+goods.cat.vehicles | وسایل نقلیه | Vehicles
+goods.cat.materials | مصالح و مواد | Materials
+goods.cat.fuel | سوخت | Fuel
+goods.cat.farm | محصول و بذر | Crops and seed
+goods.sort.label | مرتب‌سازی | Sort
+goods.sort.name | نام | Name
+goods.sort.low | ارزان‌ترین | Cheapest
+goods.sort.high | گران‌ترین | Priciest
+goods.sort.qty | بیشترین موجودی | Most in stock
+goods.count | {n} کالا | {n} goods
+goods.none | کالایی با این جست‌وجو پیدا نشد. | No goods match this search.
+goods.clear | پاک کردن جست‌وجو | Clear search
+market.buy_price | خرید | Buy
+market.sell_price | فروش | Sell
+market.last | آخرین قیمت | Last price
+profile.wealth | دارایی و جایگاه | Money and place
+profile.doing | الان مشغول | In progress
+profile.all_achievements | همهٔ دستاوردها | All achievements
+profile.settings_area | تنظیمات | Settings
+soc.friends.pay | پرداخت پول | Send money
+soc.friends.invite | دعوت به جناح من | Invite to my faction
+soc.friends.invite_note | دعوت را فقط کسی می‌تواند بفرستد که در جناح اجازهٔ دعوت دارد. | Only a member who may invite in the faction can send an invitation.
+soc.friends.answer | پاسخ بده | Answer

@@ -6,6 +6,7 @@ import './styles/i18n.css'
 import './styles/shell-fix.css'
 import { installScale } from './lib/scale'
 import { installGlobalReporter, report } from './lib/reporter'
+import { installPersianDigits } from './ui/v6/digits'
 import { watchForNewBuild, APP_VERSION, BUILD_ID } from './lib/freshness'
 
 installGlobalReporter()
@@ -44,6 +45,7 @@ async function boot() {
       <App />
     </StrictMode>,
   )
+  installPersianDigits()
   if (params.get('mock') !== '1') watchForNewBuild()
 
   // The design-feedback toolbar exists only in a local dev server; the

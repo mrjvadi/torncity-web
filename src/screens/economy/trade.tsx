@@ -5,7 +5,9 @@ import type {
   BookView, MarketCheckoutView, MarketRefusalView, MarketView, MyOrdersView, OrderCancelledView, OrderPlacedView,
   SellOffersView, ShopBoughtView, ShopCheckoutView, ShopRefusalView, ShopSoldView, ShopView, ShopsView, Way,
 } from '../../api/views.gen'
+import { useMemo } from 'react'
 import { ListRow, Notice, Stat, StatPair } from '../native/kit/Parts'
+import { GoodsTools, useGoodsFilter, type GoodsRow } from '../../ui/v6/goodsFilter'
 import { formatNumber, hms, money } from '../native/kit/format'
 import { CostSummary } from '../../ui/Popup'
 import { hasKey, t, type Key } from '../../i18n'
@@ -30,23 +32,37 @@ function WalkTo({ way, ctx }: { way: Way | null; ctx: FlowCtx }) {
 
 // -- the market ------------------------------------------------------------------------------------
 
+/** The market screen is the market only (the order book of goods): search by name, tabs by the catalogue's category,
+ * sorting. The storehouse is a screen of its own (village_storage). */
+function MarketBody({ v, ctx }: { v: MarketView; ctx: FlowCtx }) {
+  const rows = useMemo<GoodsRow<{ code: string; ask: number; bid: number; last: number; book: boolean }>[]>(() => [
+    ...(v.books ?? []).map((b) => ({ item: { code: b.item.code, ask: b.best_ask, bid: b.best_bid, last: b.last, book: true }, name: nameOf(ctx, ['item', 'component'], b.item), category: ctx.names.category(['item', 'component'], b.item.code), price: b.best_ask > 0 ? b.best_ask : b.last > 0 ? b.last : undefined })),
+    ...(v.yours ?? []).map((y) => ({ item: { code: y.code, ask: 0, bid: 0, last: 0, book: false }, name: nameOf(ctx, ['item', 'component'], y), category: ctx.names.category(['item', 'component'], y.code), price: undefined })),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [v, ctx.names])
+  const f = useGoodsFilter(rows, ['name', 'low', 'high'])
+  return (
+    <>
+      <GoodsTools f={f as never} />
+      {f.shown.length === 0 && <p className="pn-hint">{t('goods.none')}</p>}
+      <div className="gf-list">
+        {f.shown.map((r) => (
+          <button key={r.item.code} className="gf-row" onClick={() => { const a = find(ctx, 'market.book', { item: r.item.code }); if (a) ctx.go(a) }}>
+            <span className="gf-name">{r.name}<span>{r.item.book ? t('market.bid_ask', { bid: r.item.bid > 0 ? formatNumber(r.item.bid) : '—', ask: r.item.ask > 0 ? formatNumber(r.item.ask) : '—' }) : t('market.no_book')}</span></span>
+            {r.item.last > 0 && <span className="gf-price">{formatNumber(r.item.last)}<span>{t('market.last')}</span></span>}
+          </button>
+        ))}
+      </div>
+    </>
+  )
+}
+
 const Market = flow<MarketView>(({ view: v, ctx }) => (
   <Page title={t('market.title')} tone="emerald">
     {!v.at_market && !v.way && <Notice>{t('eco.market.away')}</Notice>}
     {!v.at_market && <WalkTo way={v.way} ctx={ctx} />}
     {(v.books ?? []).length === 0 && (v.yours ?? []).length === 0 && <Notice>{t('eco.market.empty')}</Notice>}
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {(v.books ?? []).map((b) => (
-        <ListRow key={b.item.code} icon="cart" palette="emerald" title={nameOf(ctx, ['item', 'component'], b.item)}
-          sub={t('market.bid_ask', { bid: b.best_bid > 0 ? formatNumber(b.best_bid) : '—', ask: b.best_ask > 0 ? formatNumber(b.best_ask) : '—' })}
-          right={b.last > 0 ? formatNumber(b.last) : undefined}
-          onClick={() => { const a = find(ctx, 'market.book', { item: b.item.code }); if (a) ctx.go(a) }} />
-      ))}
-      {(v.yours ?? []).map((y) => (
-        <ListRow key={y.code} icon="box" palette="steel" title={nameOf(ctx, ['item', 'component'], y)} sub={t('market.no_book')}
-          onClick={() => { const a = find(ctx, 'market.book', { item: y.code }); if (a) ctx.go(a) }} />
-      ))}
-    </div>
+    <MarketBody v={v} ctx={ctx} />
     <Btns ctx={ctx} list={byId(ctx, 'market.mine', 'market.auctions', 'market.goods')} />
     <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
   </Page>

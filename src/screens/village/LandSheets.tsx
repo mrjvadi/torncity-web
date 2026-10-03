@@ -3,7 +3,7 @@
 // the village menu: settlement_mine, labor_board). They speak the
 // server's own two-step commands (settlement.lot.buy, settlement.private.place
 // each answer a bill first and only pay when sent `confirm`), so nothing is
-// spent by opening a sheet. All render at the document body (BottomSheet).
+// spent by opening a sheet. All render at the document body (Popup).
 
 import { useEffect, useState } from 'react'
 import Popup, { ActionButton, ActionRow, CostSummary, Hero, RequirementList, Medallion, Note, Section, type RequirementLine } from '../../ui/Popup'

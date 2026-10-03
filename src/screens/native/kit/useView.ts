@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react'
 import * as api from '../../../api/client'
+import { useLive } from '../../../lib/live'
 
 export function useView<T>(command: string, args?: Record<string, string>): T | null {
   const [view, setView] = useState<T | null>(null)
@@ -16,5 +17,6 @@ export function useView<T>(command: string, args?: Record<string, string>): T | 
     return () => { live = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key])
+  useLive(view)
   return view
 }

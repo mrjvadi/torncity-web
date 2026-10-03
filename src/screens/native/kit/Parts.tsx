@@ -48,9 +48,10 @@ export function Header({ title, onBack }: {
 }) {
   const nav = useNav()
   const back = nav ? nav.back : onBack
+  const showBack = !!back && !nav?.hideBack
   return (
-    <div className="cx-hdr">
-      {back && <button className="cx-hdr-btn" onClick={back} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>}
+    <div className={`cx-hdr${showBack ? ' has-back' : ''}`}>
+      {showBack && <button className="cx-hdr-btn" onClick={back ?? undefined} aria-label={t('common.back')}>{isRtl() ? '›' : '‹'}</button>}
       <span className="cx-hdr-title display">{title}</span>
     </div>
   )

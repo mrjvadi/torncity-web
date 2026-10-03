@@ -84,9 +84,14 @@ export function useLang(): Lang {
 
 applyDocumentLang()
 
+/** A figure in the player's script: Persian digits in the Persian UI (a number given to a string is always display text). */
+function digits(s: string): string {
+  return isRtl() ? s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d]) : s
+}
+
 export function t(key: Key, params?: Record<string, string | number>): string {
   let s: string = (current === 'en' ? EN[key] : undefined) ?? FA[key] ?? key
-  if (params) for (const [k, v] of Object.entries(params)) s = s.split(`{${k}}`).join(String(v))
+  if (params) for (const [k, v] of Object.entries(params)) s = s.split(`{${k}}`).join(typeof v === 'number' ? digits(String(v)) : String(v))
   return s
 }
 

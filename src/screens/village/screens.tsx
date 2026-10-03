@@ -7,7 +7,7 @@
 import { useState, type ReactNode } from 'react'
 import type {
   BatchConfirmView, BuildMenuView, BuildingPanelView, DonateView, GridGrowView, LandView, LotAccessView, LotBuyView, LotConfirmView, LotGridView, LotRepairView,
-  MaterialBuyConfirmView, MineView, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView, ResidenceView,
+  MaterialBuyConfirmView, MineView, PrivateConfirmView, PrivateLotsView, PrivateMenuView, ResidenceView,
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
 import type { LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
@@ -28,10 +28,6 @@ const key = (k: string) => k as Key
 
 /** The 0/1 argument of a rotate toggle, as the server reads it. */
 const token = (x: number, y: number, rotated = false) => `${x}-${y}${rotated ? '-r' : ''}`
-
-function tierName(tier: string): string {
-  return hasKey(`village.tier.${tier}`) ? t(key(`village.tier.${tier}`)) : tier
-}
 
 function mats(ctx: FlowCtx, list: { component: { code: string; name: string }; quantity: number }[] | null | undefined): ReactNode {
   const l = list ?? []
@@ -161,73 +157,6 @@ const DonateDone = flow<DonateView>(({ view: v, ctx }) => (
     <Panel tone="emerald">
       <Lead tone="good">{t('donate.done', { amount: money(v.amount) })}</Lead>
       <Hint tone="good">{t('donate.done_body', { treasury: money(v.treasury) })}</Hint>
-    </Panel>
-    <Rest ctx={ctx} />
-  </Page>
-))
-
-// -- promotion -------------------------------------------------------------------------------
-
-function criterionLine(ctx: FlowCtx, c: PromotionView['criteria'] extends (infer U)[] | null ? U : never): { text: string; frac: number } {
-  const frac = c.required > 0 ? Math.min(1, c.current / c.required) : 1
-  switch (c.kind) {
-    case 'residents': return { text: t('vx.goal.residents', { cur: formatNumber(c.current), req: formatNumber(c.required) }), frac }
-    case 'literacy': return { text: t('vx.goal.literacy', { cur: formatNumber(c.current / 100), req: formatNumber(c.required / 100) }), frac }
-    case 'buildings': return { text: t('vx.goal.buildings', { cur: formatNumber(c.current), req: formatNumber(c.required) }), frac }
-    case 'knowledge': return { text: t('vx.goal.knowledge', { cur: formatNumber(c.current), req: formatNumber(c.required) }), frac }
-    case 'treasury': return { text: t('vx.goal.treasury', { cur: money(c.current), req: money(c.required) }), frac }
-    default: {
-      const k = `vx.goal.role.${c.role}.${c.required}`
-      return { text: hasKey(k) ? t(key(k)) : t('vx.goal.role_any', { role: hasKey(`role.${c.role}`) ? t(key(`role.${c.role}`)) : c.role }), frac: c.met ? 1 : 0 }
-    }
-  }
-}
-
-/** The goals of the next tier, with progress. Also the block the status page carries. */
-export function Goals({ v, ctx }: { v: PromotionView; ctx: FlowCtx }) {
-  return (
-    <div className="vf-goals">
-      {(v.criteria ?? []).map((c, i) => {
-        const l = criterionLine(ctx, c)
-        return (
-          <div key={i} className={`vf-goal${c.met ? ' met' : ''}`}>
-            <span className="vf-goal-mark">{c.met ? '✓' : '○'}</span>
-            <div className="vf-goal-body">
-              <div>{l.text}</div>
-              {!c.met && c.kind !== 'role' && <Bar frac={l.frac} color="#8e6cf0" label={`${Math.round(l.frac * 100)}%`} />}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-const Promotion = flow<PromotionView>(({ view: v, ctx }) => (
-  <Page title={t('vx.promo.title', { tier: tierName(v.to) })} tone="violet">
-    <Panel tone="violet">
-      <Lead>{t('vx.promo.intro', { village: v.village, tier: tierName(v.to) })}</Lead>
-      <Goals v={v} ctx={ctx} />
-      <Hint tone={v.met ? 'good' : undefined}>{v.met ? (v.can_promote ? t('vx.promo.ready_head', { tier: tierName(v.to) }) : t('vx.promo.ready_member')) : t('vx.promo.not_ready')}</Hint>
-    </Panel>
-    <Rest ctx={ctx} />
-  </Page>
-))
-
-const PromoteConfirm = flow<PromotionView>(({ view: v, ctx }) => (
-  <Page title={t('vx.promo.ask_title', { village: v.village, tier: tierName(v.to) })} tone="violet">
-    <Panel tone="violet">
-      <Lead>{hasKey(`vx.promo.ask_body.${v.to}`) ? t(key(`vx.promo.ask_body.${v.to}`)) : t('vx.promo.ask_body.any')}</Lead>
-    </Panel>
-    <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')} yes={t('vx.promo.yes')} />
-    <Cancel ctx={ctx} />
-  </Page>
-))
-
-const Promoted = flow<PromotionView>(({ view: v, ctx }) => (
-  <Page title={t('vx.promo.done_title', { village: v.village, tier: tierName(v.to) })} tone="emerald">
-    <Panel tone="emerald">
-      <Lead tone="good">{hasKey(`vx.promo.done_body.${v.to}`) ? t(key(`vx.promo.done_body.${v.to}`)) : t('vx.promo.done_body.any')}</Lead>
     </Panel>
     <Rest ctx={ctx} />
   </Page>
@@ -878,7 +807,6 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
 registerFlow({
   village_refusal: Refusal,
   village_donate_menu: DonateMenu, village_donate_confirm: DonateConfirm, village_donate_done: DonateDone,
-  village_promotion: Promotion, village_promote_confirm: PromoteConfirm, village_promoted: Promoted,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
   settlement_lot_access: LotAccessPage, settlement_lot_repair_done: LotRepairDone,
@@ -892,8 +820,8 @@ registerFlow({
 
 /** The server screens the flow host draws. */
 export const FLOW_SCREENS = [
-  'village_refusal', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done', 'village_promotion', 'village_promote_confirm',
-  'village_promoted', 'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
+  'village_refusal', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
+  'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',
   'village_work_started', 'settlement_who', 'village_home_call', 'village_home_none', 'settlement_build_menu', 'settlement_build_lots',

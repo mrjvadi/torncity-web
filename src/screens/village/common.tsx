@@ -8,6 +8,7 @@ import * as api from '../../api/client'
 import type { CommandResponse } from '../../api/types'
 import type { IconPalette } from '../../ui/Icon'
 import { t } from '../../i18n'
+import { useLive } from '../../lib/live'
 import { hms } from '../native/kit/format'
 import { useSettlementId, useVillage } from '../../village/useVillage'
 import { Card, type Tone } from '../native/kit/Parts'
@@ -73,6 +74,7 @@ export function useVillageView<V>(command: string, initial: CommandResponse | nu
     }
   }, [command, enabled])
   useEffect(() => { void run() }, [run, tick])
+  useLive(res?.view, () => void run())
   return { res, view: (res?.view ?? null) as V | null, loading, refresh: run }
 }
 

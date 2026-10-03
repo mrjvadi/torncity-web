@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { takeResume, saveResume } from '../i18n/resume'
 import { Screen } from '../kit'
 import GenericScreen from './GenericScreen'
-import MenuSheet, { MY_LIFE, THE_VILLAGE } from './MenuSheet'
+import { cityItemsFor } from '../screens/village/cityItems'
+import { pushNativeBack, hasNativeBack } from '../lib/nativeBack'
+import { SideCtx, type Side } from '../state/SideContext'
 import { useSession } from '../state/SessionContext'
 import { seedScreen, useScreen } from '../state/useScreen'
 import type { Action } from '../api/types'
@@ -10,6 +12,8 @@ import { LOCAL_SCREENS, SERVER_SCREENS } from '../screens/registry'
 import { foundingDraftFromLaunch } from '../lib/telegram'
 import * as api from '../api/client'
 import { t, type Key } from '../i18n'
+import { useLive } from '../lib/live'
+import { syncStore } from '../state/store'
 import { HOME_SCREENS, homeScreen, locationKey } from '../support/location'
 import { useToast } from '../state/ToastContext'
 import { NavCtx } from '../state/NavContext'
@@ -21,6 +25,7 @@ import { HudBar, WipColumn, EventsColumn, QuestStrip, PhoneDock, NavRail, Docked
 import { useDesktop, useHud, usePortrait, useWip, useEvents, useQuest, useTicker } from './v6/hooks'
 import { ChromeCtx, type Chrome } from './v6/chrome'
 import './v6/v6.css'
+import './v6/inner.css'
 
 export type TabKey = 'profile' | 'activity' | 'city' | 'market' | 'society'
 const TAB_ORDER: TabKey[] = ['profile', 'activity', 'city', 'market', 'society']
@@ -47,12 +52,6 @@ const TAB_HUB: Partial<Record<TabKey, string>> = {
 const TAB_ICON: Record<TabKey, string> = { profile: 'user', activity: 'tool', city: 'house', market: 'bag', society: 'banner' }
 const TAB_LABEL: Record<TabKey, Key> = { profile: 'shell.tab.profile', activity: 'shell.tab.activity', city: 'shell.tab.city', market: 'shell.tab.market', society: 'shell.tab.society' }
 const PLACE_LABEL: Record<string, Key> = { village: 'shell.tab.village', town: 'shell.tab.town', city: 'shell.tab.city' }
-
-/** The starter city, whose services are a journey from a village. */
-function supportCity(b: { cities: { code: string; name: string }[] } | null | undefined) {
-  const c = b?.cities.find((x) => x.code === 'support')
-  return { code: c?.code ?? 'support', name: c?.name ?? 'Support' }
-}
 
 /** Screens that fill the area edge to edge (3D views), without the screen frame. */
 const FULL_BLEED = new Set(['village_home', 'support_home', 'support_journey', 'village_visit'])
@@ -104,6 +103,11 @@ function useHubEntries(enabled: boolean, placeKey: string) {
   return { hubs, tier }
 }
 
+function LiveBoundary({ view, onDone, children }: { view: unknown; onDone: () => void; children: () => ReactNode }) {
+  useLive(view, onDone)
+  return <>{children()}</>
+}
+
 export default function Shell() {
   const { profile, unread, exec, bootstrap } = useSession()
   const desktop = useDesktop()
@@ -117,7 +121,12 @@ export default function Shell() {
     // ?mock=1&open=<command> (&args={"id":"..."}) opens a screen straight, for screenshots of the mock
     const q = new URLSearchParams(location.search)
     if (q.get('mock') === '1' && q.get('open')) {
-      try { return { command: q.get('open')!, args: q.get('args') ? JSON.parse(q.get('args')!) : undefined } } catch { /* a bad hook is ignored */ }
+      try {
+        const open = q.get('open')!
+        const args = q.get('args') ? JSON.parse(q.get('args')!) : undefined
+        // ?open=local:city_panel opens a client-only screen
+        return open.startsWith('local:') ? { command: '', local: open.slice(6), args } : { command: open, args }
+      } catch { /* a bad hook is ignored */ }
     }
     const draft = foundingDraftFromLaunch()
     if (draft) return { command: '', local: 'founding_form', args: { draft } }
@@ -129,7 +138,6 @@ export default function Shell() {
   const tab = tabOfScreen(screenKey) ?? tabState
   useEffect(() => { if (tab !== tabState) setTab(tab) }, [tab, tabState])
   useEffect(() => { saveResume({ tab, screen: screenKey }) }, [tab, screenKey])
-  const [menuOpen, setMenuOpen] = useState(false)
 
   // Opened without the parameter (the link was lost, or the game came from the
   // bot's chat): a player with no village who has an open founding draft of
@@ -215,6 +223,22 @@ export default function Shell() {
   // -- what is on screen -------------------------------------------------------------------------------
   // A phone shows one screen at a time. A desktop keeps the world (the village or the city) always drawn and docks
   // every other screen beside it, so opening something never throws the world away.
+  const nativeBack = hasNativeBack()
+  const goBackRef = useRef(goBack); goBackRef.current = goBack
+  // Telegram's native BackButton is the one back control on a phone inside Telegram (P18)
+  useEffect(() => {
+    if (atRoot || !nativeBack) return
+    return pushNativeBack(() => goBackRef.current())
+  }, [atRoot, nativeBack])
+  // the desktop dock offered to the village page: one object's panel (a building's) docks beside the world
+  const [side, setSide] = useState<{ title: string; onClose: () => void } | null>(null)
+  const [sideEl, setSideEl] = useState<HTMLElement | null>(null)
+  const claimSide = useCallback((title: string, onClose: () => void) => {
+    const me = { title, onClose }
+    setSide(me)
+    return () => setSide((cur) => (cur === me ? null : cur))
+  }, [])
+  const sideApi = useMemo<Side>(() => ({ el: sideEl, desktop, claim: claimSide }), [sideEl, desktop, claimSide])
   const home = homeScreen(bootstrap)
   const homeIsWorld = FULL_BLEED.has(home.local)
   const screenIsWorld = !!screenKey.local && FULL_BLEED.has(screenKey.local)
@@ -222,6 +246,7 @@ export default function Shell() {
   const worldKey: ScreenKey | null = splitWorld ? (screenIsWorld ? screenKey : { command: '', local: home.local, args: home.args }) : null
   const contentKey: ScreenKey | null = splitWorld && screenIsWorld ? null : screenKey
   const panelOpen = splitWorld && !screenIsWorld
+  const sideOpen = desktop && splitWorld && !!side && !panelOpen
   const worldShown = worldKey ?? (screenIsWorld ? screenKey : null)
   const ownVillageHome = !!worldShown && worldShown.local === 'village_home' && !worldShown.args?.id
 
@@ -230,7 +255,7 @@ export default function Shell() {
   const props = { response: isLocal ? null : response, loading, onAction, run, openLocal, localArgs: contentKey?.args }
   const Local = contentKey?.local ? LOCAL_SCREENS[contentKey.local] : undefined
   const Native = contentKey && !isLocal && response?.screen ? SERVER_SCREENS[response.screen] : undefined
-  const content: ReactNode = !contentKey ? null
+  const drawContent = (): ReactNode => !contentKey ? null
     : contentKey.local && FULL_BLEED.has(contentKey.local) && Local ? <Local {...props} />
       : (
         <Screen>
@@ -239,6 +264,9 @@ export default function Shell() {
               : <GenericScreen response={response} loading={loading} onAction={onAction} />}
         </Screen>
       )
+  // a screen whose view counts a time (remaining / elapsed) is drawn again every second by the shared ticker; when its
+  // first countdown ends the view is read once more (and the state-sync store pulled), so it shows the finished state
+  const content: ReactNode = <LiveBoundary view={isLocal ? null : response?.view} onDone={() => { void syncStore.pull().catch(() => undefined); if (!isLocal) setAgain((n) => n + 1) }}>{drawContent}</LiveBoundary>
   const WorldLocal = worldKey?.local ? LOCAL_SCREENS[worldKey.local] : undefined
   const world: ReactNode = worldKey && WorldLocal ? <WorldLocal response={null} loading={false} onAction={onAction} run={run} openLocal={openLocal} localArgs={worldKey.args} /> : null
 
@@ -251,7 +279,7 @@ export default function Shell() {
   const canBuild = !!layout?.viewer.can_place || !!layout?.viewer.resident
   const wip = useWip(layout, canBuild)
   const events = useEvents()
-  const quest = useQuest(settlementId, layout?.version)
+  const quest = useQuest(settlementId, layout?.version, canBuild && !!layout?.viewer.can_place)
   const ticker = useTicker()
   const place = placeTier(bootstrap) ?? 'village'
 
@@ -315,8 +343,7 @@ export default function Shell() {
     } else if (bootstrap?.settlement) {
       const s = bootstrap.settlement
       if (layout?.viewer.can_place && homeIsWorld) items.push({ key: 'build', label: t('v6.rail.build'), onClick: () => openLocal('village_home', { build: '1' }) })
-      for (const it of [...MY_LIFE, ...THE_VILLAGE]) {
-        if ((it.head && !s.is_head) || (it.notHead && s.is_head) || (it.resident && s.resident === false)) continue
+      for (const it of cityItemsFor(s)) {
         const isCmd = !!it.command
         items.push({
           key: it.key, label: t(it.label),
@@ -328,8 +355,8 @@ export default function Shell() {
     return { key: k, icon: TAB_ICON[k], label: tabLabel(k), kbd: String(i + 1), items, onSelect: () => selectTab(k) }
   })
 
-  const stateRef = useRef({ panelOpen, canPlace: !!layout?.viewer.can_place, homeIsWorld })
-  stateRef.current = { panelOpen, canPlace: !!layout?.viewer.can_place, homeIsWorld }
+  const stateRef = useRef({ panelOpen, canPlace: !!layout?.viewer.can_place, homeIsWorld, sideClose: null as (() => void) | null })
+  stateRef.current = { panelOpen, canPlace: !!layout?.viewer.can_place, homeIsWorld, sideClose: sideOpen && side ? side.onClose : null }
   const selectTabRef = useRef(selectTab); selectTabRef.current = selectTab
   const openLocalRef = useRef(openLocal); openLocalRef.current = openLocal
   useEffect(() => {
@@ -343,7 +370,10 @@ export default function Shell() {
       if (e.code === 'KeyM') { selectTabRef.current('city'); return }
       if (e.code === 'KeyB' && stateRef.current.canPlace && stateRef.current.homeIsWorld) { openLocalRef.current('village_home', { build: '1' }); return }
       // Escape closes the popup first (it handles itself), then the ring (the village view handles that), then the panel
-      if (e.key === 'Escape' && stateRef.current.panelOpen && !document.querySelector('.v6-scrim, .v6-ring, .pp-overlay')) selectTabRef.current('city')
+      if (e.key === 'Escape' && !document.querySelector('.v6-scrim, .v6-ring, .pp-overlay')) {
+        if (stateRef.current.panelOpen) selectTabRef.current('city')
+        else stateRef.current.sideClose?.()
+      }
     }
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
@@ -367,20 +397,17 @@ export default function Shell() {
   }, [panelOpen, screenKey, readTitle])
 
   const tabs: DockTab[] = TAB_ORDER.map((k) => ({ key: k, icon: TAB_ICON[k], label: tabLabel(k), dot: k === 'society' ? unread : 0 }))
-  function onDock(k: string) {
-    // pressing the place tab again, at the village page, opens the village menu (a phone has no rail)
-    if (k === 'city' && tab === 'city' && atRoot && screenKey.local === 'village_home' && bootstrap?.settlement) { setMenuOpen(true); return }
-    selectTab(k as TabKey)
-  }
+  function onDock(k: string) { selectTab(k as TabKey) }
 
   const showWorldChrome = ownVillageHome
   const kind = worldShown ? 'world' : 'screen'
   const onBank = () => void onAction({ label: '', command: 'bank.show', row: 0, kind: 'navigation' })
 
   return (
-    <NavCtx.Provider value={{ back: atRoot ? null : goBack }}>
+    <NavCtx.Provider value={{ back: atRoot ? null : goBack, hideBack: nativeBack || (desktop && hist.length < 2) }}>
+      <SideCtx.Provider value={sideApi}>
       <ChromeCtx.Provider value={chrome}>
-        <div className="v6 v6-app" data-panel={panelOpen ? 'open' : 'closed'} data-desk={desktop ? '1' : '0'}>
+        <div className="v6 v6-app" data-panel={panelOpen || sideOpen ? 'open' : 'closed'} data-desk={desktop ? '1' : '0'}>
           <main className="v6-main" data-kind={kind}>
             {splitWorld ? world : content}
           </main>
@@ -402,7 +429,7 @@ export default function Shell() {
           {showWorldChrome && (
             <QuestStrip
               quest={quest} ticker={ticker}
-              onQuest={() => run('settlement.promotion.view')} onTicker={() => run('inbox.show')}
+              onQuest={() => openLocal('city_panel')} onTicker={() => run('inbox.show')}
               ownRef={(e) => { els.current.info = e }}
             />
           )}
@@ -428,17 +455,15 @@ export default function Shell() {
             </DockedPanel>
           )}
 
+          {sideOpen && side && (
+            <DockedPanel crumbs={[{ label: tabLabel('city'), onClick: side.onClose }, { label: side.title }]} onClose={side.onClose}>
+              <div ref={setSideEl} className="v6-side-slot" />
+            </DockedPanel>
+          )}
           <TipHost />
-          <MenuSheet
-            open={menuOpen}
-            onClose={() => setMenuOpen(false)}
-            village={bootstrap?.settlement ? { name: bootstrap.settlement.name, isHead: bootstrap.settlement.is_head, resident: bootstrap.settlement.resident, support: supportCity(bootstrap) } : undefined}
-            onVillage={(local, args) => { setTab('city'); openLocal(local, args) }}
-            onCommand={(command, args) => { setTab('city'); run(command, args) }}
-            onTravel={(code, service) => { setTab('city'); openLocal('support_travel', { to: code, service }) }}
-          />
         </div>
       </ChromeCtx.Provider>
+      </SideCtx.Provider>
     </NavCtx.Provider>
   )
 }

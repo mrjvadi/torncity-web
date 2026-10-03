@@ -22,7 +22,7 @@ const e = (code: string, en: string, fa: string): Entry => ({ code, name: { en, 
 /** The catalogue names these screens mention (the mock's copy of GET /api/v1/content for them). */
 export const P1_CONTENT: Record<string, Entry[]> = {
   course: [e('first_aid', 'First aid', 'کمک‌های اولیه'), e('driving_licence', 'Driving licence', 'گواهینامهٔ رانندگی'), e('bookkeeping', 'Bookkeeping', 'دفترداری'), e('culinary_arts', 'Culinary arts', 'هنر آشپزی')],
-  mission_board: [e('village_works', 'Village works board', 'تابلوی کارهای روستا'), e('city_hall', 'Civic noticeboard', 'تابلوی اعلانات شهرداری'), e('police', 'Police board', 'تابلوی پلیس')],
+  mission_board: [e('village_works', 'Village works board', 'تابلوی کارهای شهر'), e('city_hall', 'Civic noticeboard', 'تابلوی اعلانات شهرداری'), e('police', 'Police board', 'تابلوی پلیس')],
   mission: [e('village_first_lesson', 'First lesson', 'اولین درس'), e('village_bread_run', 'Bread for the store', 'نان برای انبار'), e('village_bandage_run', 'Bandages for the health house', 'باند برای خانهٔ بهداشت'), e('first_steps', 'First steps', 'قدم‌های اول')],
   settlement_knowledge: [e('basic_medicine', 'Basic medicine', 'پزشکی ابتدایی')],
   building_role: [e('education', 'A class', 'کلاس'), e('health', 'A health house', 'خانهٔ بهداشت')],
@@ -63,7 +63,7 @@ function missions(args: Args) {
       ],
     })
   }
-  const boards = [{ code: 'village_works', name: 'تابلوی کارهای روستا', place: { code: '', name: '' }, open: 3 }]
+  const boards = [{ code: 'village_works', name: 'تابلوی کارهای شهر', place: { code: '', name: '' }, open: 3 }]
   const code = String(args?.board ?? '')
   if (!code) return ok('mission_board', { city: 'آمل', city_code: VILLAGE.code, tier: 'village', currency: MONEY, boards, board: null, here: true, missions: null })
   return ok('mission_board', {

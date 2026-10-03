@@ -11,15 +11,18 @@ export interface RingHandlers {
   info: () => void
   upgrade: () => void
   site: () => void
-  open: (screen: string) => void
+  open: (screen: string, args?: Record<string, string>) => void
+  /** the society hub lists an election (the server's say) */
+  hasElections?: boolean
   mine: () => void
   run: (command: string) => void
 }
 
 export function ringActions(b: LayoutBuilding, panel: BuildingPanelView | null, h: RingHandlers): RingAction[] {
   const going = b.state === 'under_construction' || b.state === 'planned'
-  const acts: RingAction[] = [{ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: h.info }]
   const kind = panel?.kind ?? (b.type === 'road' ? 'road' : 'generic')
+  // the civic hall's «اطلاعات» is the city panel (web map 6.2); every other building's is its own panel
+  const acts: RingAction[] = [{ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: kind === 'civic_hall' && !going ? () => h.open('city_panel') : h.info }]
   let hasPrimary = false
   const primary = (a: Omit<RingAction, 'kind'>) => { acts.push({ ...a, kind: 'primary' }); hasPrimary = true }
 
@@ -29,10 +32,12 @@ export function ringActions(b: LayoutBuilding, panel: BuildingPanelView | null, 
     primary({ id: 'mine', label: t('v6.ring.mine'), icon: 'bag', onClick: h.mine })
   } else if (kind === 'storage') {
     primary({ id: 'storage', label: t('v6.ring.storage'), icon: 'chest', onClick: () => h.open('village_storage') })
+    acts.push({ id: 'donate', label: t('v6.ring.donate'), icon: 'gift', onClick: () => h.open('village_overview', { donate: '1' }) })
   } else if (kind === 'civic_hall') {
-    primary({ id: 'status', label: t('v6.ring.status'), icon: 'scroll', onClick: () => h.open('village_overview') })
-    acts.push({ id: 'knowledge', label: t('v6.ring.knowledge'), icon: 'book', onClick: () => h.open('village_knowledge') })
-    acts.push({ id: 'storage', label: t('v6.ring.storage'), icon: 'chest', onClick: () => h.open('village_storage') })
+    // the city panel is the hall's «اطلاعات» (the small first button); research is the main verb, view-only for a resident
+    primary({ id: 'knowledge', label: t('v6.ring.knowledge'), icon: 'book', onClick: () => h.open('village_knowledge') })
+    if (h.hasElections) acts.push({ id: 'elections', label: t('v6.ring.elections'), icon: 'ballot', onClick: () => h.run('election.list') })
+    acts.push({ id: 'treasury', label: t('v6.ring.treasury'), icon: 'coin', onClick: () => h.open('village_overview') })
   } else if (kind === 'school') {
     primary({ id: 'learn', label: t('v6.ring.learn'), icon: 'book', onClick: () => h.run('education.list') })
   }

@@ -1,7 +1,7 @@
 // «کمک به خزانه»: a resident gives from their own cash to the village
 // treasury. Three steps as the server has them (settlement.donate): the
 // amounts, the confirm, the result. A bottom sheet, opened from the village's
-// overview and from the menu; it renders at the document body (BottomSheet),
+// overview and from the menu; it renders at the document body (Popup),
 // so it and its buttons are above every menu.
 
 import { useEffect, useState } from 'react'

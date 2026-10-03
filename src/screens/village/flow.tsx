@@ -17,6 +17,7 @@ import Popup, { ActionButton } from '../../ui/Popup'
 import { toWesternDigits } from '../../lib/persian'
 import Skeleton from '../../ui/Skeleton'
 import { noticeText, refusalText, t } from '../../i18n'
+import { useLive } from '../../lib/live'
 import { useNav } from '../../state/NavContext'
 import { useToast } from '../../state/ToastContext'
 import { useSession } from '../../state/SessionContext'
@@ -180,6 +181,7 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
   const [busy, setBusy] = useState(false)
   const [asking, setAsking] = useState<Action | null>(null)
   useEffect(() => setRes(response), [response])
+  useLive(res?.view)
 
   const go = useCallback(async (a: Action) => {
     if (a.url) { window.open(a.url, '_blank', 'noopener'); return }

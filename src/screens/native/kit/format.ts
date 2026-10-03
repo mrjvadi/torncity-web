@@ -1,8 +1,9 @@
-// Small formatting helpers shared by the native screens. Everything in
-// Western digits (repo rule): no locale that would print Persian glyphs.
+// Small formatting helpers shared by the native screens. Persian digits in the Persian UI (owner, v6),
+// Western digits in English: the digits are chosen by the one helper in ui/v6/format.ts.
 
 import { formatNumber } from '../../../lib/persian'
 import { t } from '../../../i18n'
+import { fa } from '../../../ui/v6/format'
 
 export { formatNumber }
 
@@ -21,14 +22,14 @@ export function moneyIn(n: number | undefined | null, currency?: PlaceCurrency |
 }
 
 /** A whole-second duration as "H:MM" (an hour or more) or "MM:SS" (under
- * an hour), Western digits — the prototype's own countdown format. */
+ * an hour), the prototype's own countdown format. */
 export function hms(seconds: number | undefined | null): string {
   const s = Math.max(0, Math.floor(seconds ?? 0))
   const h = Math.floor(s / 3600)
   const m = Math.floor((s % 3600) / 60)
   const sec = s % 60
-  if (h > 0) return `${h}:${String(m).padStart(2, '0')}`
-  return `${m}:${String(sec).padStart(2, '0')}`
+  if (h > 0) return fa(`${h}:${String(m).padStart(2, '0')}`)
+  return fa(`${m}:${String(sec).padStart(2, '0')}`)
 }
 
 /** A duration rounded to the coarsest sensible unit, for a static line
@@ -51,7 +52,7 @@ export function ago(seconds: number | undefined | null): string {
 /** A percent from a 0..1 fraction, one decimal dropped when whole. */
 export function pct(frac: number): string {
   const v = Math.round(frac * 1000) / 10
-  return `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}%`
+  return fa(`${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}%`)
 }
 
 export function clamp01(v: number): number {

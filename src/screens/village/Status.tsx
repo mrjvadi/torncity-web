@@ -9,6 +9,7 @@ import DonateSheet from './Donate'
 import type { ScreenProps } from '../types'
 import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
+import { PBtn } from '../../ui/v6/panel'
 import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { hms, money, moneyIn } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
@@ -42,14 +43,10 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
     { key: 'overview.security', frac: v.security_percent / 100, color: '#e5484d' },
     { key: 'overview.literacy', frac: v.literacy_percent / 100, color: '#8e6cf0' },
   ] : []
-  const promo = v?.promotion ?? null
-  const done = promo ? (promo.criteria ?? []).filter((c) => c.met).length : 0
-  const promoteAct = (res?.actions ?? []).find((a) => a.id === 'village.promote')
-  const detailAct = (res?.actions ?? []).find((a) => a.id === 'village.promotion')
   const role = v?.is_head ? t('village.head') : v?.resident ? t('village.member') : t('village.visitor')
   return (
     <ScreenScroll>
-      <Header title={v?.name ?? t('overview.title')} tone="emerald" onBack={back(openLocal)} onRefresh={() => void refresh()} />
+      <Header title={t('city.treasury')} tone="emerald" onBack={back(openLocal)} onRefresh={() => void refresh()} />
       {v && (
         <>
           <Card tone="emerald">
@@ -62,11 +59,11 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
               <div><div className="nx-stat-label">{t('overview.treasury')}</div><div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
             </div>
             <div className="vs-grid" style={{ marginTop: 10 }}>
-              <div><div className="nx-stat-label">{t('village.sheet.tier')}</div><div>{tierText(v.tier)}</div></div>
               <div><div className="nx-stat-label">{t('village.sheet.role')}</div><div>{role}</div></div>
               {players && !players.hidden && <div><div className="nx-stat-label">{t('village.sheet.online')}</div><div>{formatNumber(players.online)}</div></div>}
             </div>
           </Card>
+          {v.resident && <PBtn onClick={() => setDonate(true)}>{t('village.btn.donate')}</PBtn>}
           <Card>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {bars.map((b) => (
@@ -77,16 +74,6 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
               ))}
             </div>
           </Card>
-          {promo && (
-            <Card tone="violet">
-              <SectionTitle>{t('vx.promo.title', { tier: tierText(promo.to) })}</SectionTitle>
-              <div className="vh-hint" style={{ textAlign: 'start' }}>{t('vx.ov.steps', { done, total: (promo.criteria ?? []).length })}</div>
-              <div className="vs-btns">
-                {detailAct?.command && <Slab tone="steel" radius={12} lip={3} onClick={() => run(detailAct.command!, detailAct.args)}>{t('vx.ov.steps_open')}</Slab>}
-                {promoteAct?.command && <Slab tone="gold" radius={12} lip={3} onClick={() => run(promoteAct.command!, promoteAct.args)}>{t('vx.ov.promote', { tier: tierText(promo.to) })}</Slab>}
-              </div>
-            </Card>
-          )}
           <SectionTitle>{t('overview.buildings')}</SectionTitle>
           {(v.buildings ?? []).length === 0 && <Empty>{t('overview.no_buildings')}</Empty>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -101,8 +88,6 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
     </ScreenScroll>
   )
 }
-
-const tierText = (tier: string) => t(`village.tier.${tier}` as Key)
 
 // -- construction progress -------------------------------------------------------------------------
 

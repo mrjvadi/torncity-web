@@ -17,12 +17,12 @@ export const SOCIETY_CONTENT = {
   entries: {
     office: [
       ['mayor', nm('Mayor', 'شهردار')], ['deputy_mayor', nm('Deputy mayor', 'معاون شهردار')], ['city_council', nm('City council', 'شورای شهر')],
-      ['village_head', nm('Village head', 'دهیار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
+      ['village_head', nm('Village head', 'شهردار')], ['president', nm('President', 'رئیس‌جمهور')], ['foreign_minister', nm('Foreign minister', 'وزیر امور خارجه')], ['police_chief', nm('Police chief', 'رئیس پلیس')],
       ['defence_minister', nm('Defence minister', 'وزیر دفاع')], ['parliament', nm('Parliament', 'مجلس')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     lever: [
       ['city.tax_rate', nm('Tax rate', 'نرخ مالیات')], ['city.minimum_wage', nm('Minimum wage', 'حداقل دستمزد')], ['city.budget', nm('City budget', 'بودجهٔ شهر')],
-      ['village.local_levy', nm('Village levy', 'عوارض محلی روستا')], ['country.arms_exports', nm('Arms export policy', 'سیاست صادرات تسلیحات')],
+      ['village.local_levy', nm('Village levy', 'عوارض محلی شهر')], ['country.arms_exports', nm('Arms export policy', 'سیاست صادرات تسلیحات')],
     ].map(([code, name]) => ({ code: code as string, name: name as { en: string; fa: string } })),
     jurisdiction: [{ code: 'vantor_federation', name: nm('Vantor Federation', 'فدراسیون ونتور') }, { code: 'default_country', name: nm('Commonwealth', 'مشترک‌المنافع') }],
     budget_line: [
@@ -479,7 +479,7 @@ function social(command: string, args: Record<string, unknown>) {
   if (command === 'social.friend.add') return mockOk('friend_requested', { name: KAVEH.name }, [back('player.profile.get'), refreshA('social.friend.list')])
   if (command === 'social.friend.accept') return mockOk('friend_accepted', { name: NILOO.name }, [back('player.profile.get'), refreshA('social.friend.list')])
   const p = Number(args.page ?? 1) || 1
-  return mockOk('friends', { friends: [{ id: 'p2', name: NILOO.name, status: 'pending', incoming: true }, { id: 'p3', name: KAVEH.name, status: 'accepted', incoming: false }, { id: 'p4', name: 'مینا', status: 'accepted', incoming: false }, { id: 'p5', name: 'دانا', status: 'pending', incoming: false }], page: p, pages: 1 }, [
+  return mockOk('friends', { friends: [{ id: 'p2', name: NILOO.name, code: '', status: 'pending', incoming: true }, { id: 'p3', name: KAVEH.name, code: 'K4V3H22', status: 'accepted', incoming: false }, { id: 'p4', name: 'مینا', code: 'M1N4B8C', status: 'accepted', incoming: false }, { id: 'p5', name: 'دانا', code: '', status: 'pending', incoming: false }], page: p, pages: 1 }, [
     act('social.accept', 'social.friend.accept', { player: 'p2' }), back('player.profile.get'), refreshA('social.friend.list', { page: '1' })])
 }
 

@@ -23,7 +23,7 @@ import { mockLaborCommand, laborProgressLines } from './mock_labor'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
   BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, GridGrowView, KnowledgeListView, LandCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
-  LotBuyView, LotConfirmView, LotGridView, MaterialBuyView, MaterialsView, MineView, Named, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView,
+  LotBuyView, LotConfirmView, LotGridView, MaterialBuyView, MaterialsView, MineView, Named, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView, DevelopmentView,
   ResidenceView, SettlementWhoView, TermsView, VillageNeed, VillageOverviewView, WorkView,
 } from './views.gen'
 const OWN_ID = MOCK_VILLAGE_IDS.own
@@ -44,7 +44,7 @@ interface CatEntry { capExempt?: boolean; code: string; fa: string; en: string; 
 
 const CAT: CatEntry[] = [
   { code: 'road', fa: 'جاده', en: 'Road', fp: [1, 1], cost: 50, time: 600, role: '', capExempt: true },
-  { code: 'civic_hall', fa: 'خانهٔ دهیاری', en: 'Civic hall', fp: [2, 2], cost: 1000, time: 7200, role: '', materials: [['timber', 'چوب', 5]] },
+  { code: 'civic_hall', fa: 'شهرداری', en: 'City hall', fp: [2, 2], cost: 1000, time: 7200, role: '', materials: [['timber', 'چوب', 5]] },
   { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 700, time: 2700, role: '', materials: [['timber', 'چوب', 2]] },
   { code: 'housing_block', fa: 'آپارتمان', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 40]] },
   { code: 'park', fa: 'پارک', en: 'Park', fp: [2, 2], cost: 800, time: 3600, role: '' },
@@ -433,13 +433,35 @@ function promotionView(): PromotionView {
   return { village: 'آمل', from: 'village', to: 'town', criteria, met: criteria.every((c) => c.met), can_promote: IS_HEAD, office: '', settlement_id: OWN_ID }
 }
 
+/** The development readout (G1, `settlement.development.view` -> `village_development`): what the city carries against what
+ * it can carry, the service buildings it has, and what could be added next. No stage word, no act. */
+function developmentView() {
+  const stands = st.buildings.filter((b) => b.state === 'built')
+  const roles = new Map<string, number>()
+  for (const b of stands) {
+    const role = CAT.find((c) => c.code === b.type)?.role
+    if (role) roles.set(role, Math.max(roles.get(role) ?? 0, 1))
+  }
+  const view: DevelopmentView = {
+    village: 'آمل', settlement_id: OWN_ID,
+    dimensions: [
+      { code: 'people', load: 2, capacity: 8 },
+      { code: 'buildings', load: stands.filter((b) => b.type !== 'road').length, capacity: 0 },
+      { code: 'knowledge', load: st.know.filter((k) => k.state === 'held').length, capacity: 0 },
+    ],
+    roles: [...roles.entries()].map(([role, level]) => ({ role, level })),
+    next: promotionView().criteria,
+  }
+  return mockOk('village_development', view, [back('settlement.overview'), refreshA('settlement.development.view')])
+}
+
 function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
   const promo = promotionView()
   const view: VillageOverviewView = {
     name: 'آمل', tier: 'village', population: 2, population_cap: 8,
     food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
-    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) }, promotion: promo,
+    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) }, promotion: promo, development: true,
     buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
   }
   const acts: MockAct[] = [
@@ -447,7 +469,6 @@ function overviewView() {
     A('village.donate', 'settlement.donate'), A('village.who', 'settlement.who'),
     A('village.knowledge', 'settlement.knowledge'), A('village.progress', 'settlement.build.progress'), A('village.materials', 'settlement.materials'),
     ...(IS_HEAD ? [A('village.build', 'settlement.build'), A('village.terms', 'settlement.terms')] : []),
-    promo.met && promo.can_promote ? A('village.promote', 'settlement.promote') : A('village.promotion', 'settlement.promotion.view'),
     A('village.leave', 'settlement.leave', undefined, { kind: 'danger' }),
     ...['bank', 'market', 'jobs', 'knowledge', 'hospital', 'jail'].map((c) => A(`support.${c}`, 'travel.options', { city: 'support' }, { subject: 'support' })),
   ]
@@ -1351,6 +1372,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.private.lots': return privateLots(args)
     case 'settlement.tax.pay': return taxPay()
     case 'settlement.terms': return termsView(args)
+    case 'settlement.development.view': return developmentView()
     case 'settlement.promotion.view': return promotionScreen('view')
     case 'settlement.promote': return promotionScreen(args.confirm === 'confirm' ? 'done' : 'ask')
     case 'settlement.join': return residence(false, args)

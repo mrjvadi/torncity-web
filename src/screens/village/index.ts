@@ -3,6 +3,7 @@ import VillageHome from './VillageHome'
 import VillageCall from './VillageCall'
 import { Knowledge, Overview, Progress, Who } from './Status'
 import Storage from './Storage'
+import CityPanel from './CityPanel'
 import { LaborBoard, LaborMine, LaborSiteScreen } from './Labor'
 import { FlowHost, NATIVE } from './flow'
 import { FLOW_SCREENS } from './screens'
@@ -27,6 +28,7 @@ const screens: ScreenSet = {
     village_overview: Overview,
     village_progress: Progress,
     village_knowledge: Knowledge,
+    city_panel: CityPanel,
     village_who: Who,
     village_labor: LaborBoard,
     village_storage: Storage,

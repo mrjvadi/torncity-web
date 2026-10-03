@@ -5,7 +5,8 @@
 // from the civic hall and the granary, so a village with no granary can still
 // see its stock. Also the server screen `village_materials`.
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { GoodsTools, useGoodsFilter } from '../../ui/v6/goodsFilter'
 import Popup, { ActionButton, ActionRow, CostSummary, Hero, Medallion, RequirementList } from '../../ui/Popup'
 import { Slab } from '../../kit'
 import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
@@ -47,8 +48,11 @@ export default function Storage({ response, openLocal }: ScreenProps) {
     else void refresh()
   }
 
-  if (loading && !v) return <ScreenScroll><Header title={t('storage.title')} tone="sapphire" onBack={back} /></ScreenScroll>
   const stock = v?.stock ?? []
+  // the store's goods: search, the catalogue's categories, sorting (the market is a screen of its own)
+  const rows = useMemo(() => stock.map((s) => ({ item: s.item, name: goods(s.item), category: names.category(['component', 'item'], s.item.code), qty: s.qty })), [stock, names]) // eslint-disable-line react-hooks/exhaustive-deps
+  const f = useGoodsFilter(rows, ['name', 'qty'])
+  if (loading && !v) return <ScreenScroll><Header title={t('storage.title')} tone="sapphire" onBack={back} /></ScreenScroll>
   const market = v?.market ?? []
   const frac = v && v.capacity > 0 ? Math.min(1, v.used / v.capacity) : 0
   const full = !!v && v.capacity > 0 && v.used >= v.capacity
@@ -80,11 +84,15 @@ export default function Storage({ response, openLocal }: ScreenProps) {
           {stock.length === 0
             ? <Empty>{t('storage.stock_empty')}</Empty>
             : (
-              <div className="vh-stock">
-                {stock.map((s) => (
-                  <div key={s.item.code} className="vh-stockrow"><span>{goods(s.item)}</span><b>{formatNumber(s.qty)}</b></div>
-                ))}
-              </div>
+              <>
+                <GoodsTools f={f as never} />
+                {f.shown.length === 0 && <p className="pn-hint">{t('goods.none')}</p>}
+                <div className="gf-list">
+                  {f.shown.map((r) => (
+                    <div key={r.item.code} className="gf-row"><span className="gf-name">{r.name}</span><span className="gf-price">{formatNumber(r.qty ?? 0)}</span></div>
+                  ))}
+                </div>
+              </>
             )}
 
           <SectionTitle>{t('storage.market')}</SectionTitle>

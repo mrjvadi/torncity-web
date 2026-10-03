@@ -7,7 +7,7 @@
 // location.ts. A missing `travel.destinations` falls back to `map.cities`
 // (cities only); the mock (?mock=1, src/support/mock.ts) serves both.
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ScreenProps } from '../types'
 import { Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
 import { hms, money, roughDuration } from '../native/kit/format'
@@ -19,7 +19,7 @@ import Popup, { ActionButton, Hero, Note, StatCard, StatGrid } from '../../ui/Po
 import * as api from '../../api/client'
 import { useSession } from '../../state/SessionContext'
 import { useToast } from '../../state/ToastContext'
-import { serverNow } from '../../village/clock'
+import { useCountdown } from '../../ui/v6/countdown'
 import { refusalText, t, type Key } from '../../i18n'
 import { homeScreen, locationOf, type Destination, type TravelDestination } from '../../support/location'
 import { useContentNames } from '../../village/useVillage'
@@ -202,20 +202,13 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
 export function SupportJourney({ openLocal }: ScreenProps) {
   const { bootstrap, refreshBootstrap } = useSession()
   const loc = locationOf(bootstrap)
-  const [now, setNow] = useState(serverNow())
-  useEffect(() => { const id = window.setInterval(() => setNow(serverNow()), 1000); return () => clearInterval(id) }, [])
-
-  const arrivesMs = loc?.arrives_at ? Date.parse(loc.arrives_at) : NaN
-  const left = Number.isFinite(arrivesMs) ? Math.max(0, Math.round((arrivesMs - now) / 1000)) : loc?.remaining_seconds ?? 0
+  // one countdown from the arrival instant on the server's clock; at zero the bootstrap is read ONCE (the server moves the player on arrival)
+  const fromRemaining = useRef(Date.now() + (loc?.remaining_seconds ?? 0) * 1000)
+  const endsAt = loc?.arrives_at ?? fromRemaining.current
+  const left = useCountdown(endsAt, () => { void refreshBootstrap() }) ?? 0
   const total = loc?.total_seconds ?? Math.max(left, 1)
   const frac = Math.max(0, Math.min(1, 1 - left / total))
   const done = left <= 0
-
-  // the server moves the player on arrival: ask again until the bootstrap says so
-  useEffect(() => {
-    const id = window.setInterval(() => { void refreshBootstrap() }, done ? 2500 : 10000)
-    return () => clearInterval(id)
-  }, [done, refreshBootstrap])
 
   const to = loc?.to
   return (

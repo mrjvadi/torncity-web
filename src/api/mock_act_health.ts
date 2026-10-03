@@ -24,7 +24,7 @@ export const HEALTH_CONTENT: ContentTables = {
     e('village_first_lesson', 'First lesson', 'اولین درس'), e('village_bread_run', 'Bread for the store', 'نان برای انبار'),
     e('village_bandage_run', 'Bandages for the health house', 'باند برای خانهٔ بهداشت'),
   ],
-  mission_board: [e('village_works', 'Village works board', 'تابلوی کارهای روستا'), e('city_hall', 'Civic noticeboard', 'تابلوی اعلانات شهرداری'), e('police', 'Police board', 'تابلوی پلیس')],
+  mission_board: [e('village_works', 'Village works board', 'تابلوی کارهای شهر'), e('city_hall', 'Civic noticeboard', 'تابلوی اعلانات شهرداری'), e('police', 'Police board', 'تابلوی پلیس')],
   item: [e('bread', 'Bread', 'نان'), e('bandage', 'Bandage', 'باند'), e('sandwich', 'Sandwich', 'ساندویچ'), e('painkiller', 'Painkiller', 'مسکن')],
   crime: [e('pickpocket', 'Pickpocketing', 'جیب‌بری'), e('shoplift', 'Shoplifting', 'دزدی از مغازه')],
   crime_category: [e('petty_theft', 'Petty theft', 'دزدی‌های ریز')],

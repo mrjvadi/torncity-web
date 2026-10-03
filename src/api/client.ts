@@ -1,3 +1,4 @@
+import { liveView } from '../lib/live'
 import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary, RealtimeToken, WorldInfo, VillageLayout, SettlementPlayers, PlayerStatus } from './types'
 import { report } from '../lib/reporter'
 import { syncStore } from '../state/store'
@@ -228,6 +229,8 @@ export async function runCommand(
   }
   if (res && res.view && typeof res.view === 'object') {
     for (const fn of viewListeners) fn(res.view as Record<string, unknown>, res.screen ?? '')
+    // the view's remaining/elapsed fields become end times on the server's clock (lib/live.ts)
+    res.view = liveView(res.view)
   }
   return res
 }

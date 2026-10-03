@@ -3,7 +3,10 @@
 
 import { useState } from 'react'
 import type { FlowCtx } from '../village/flow'
-import type { BoardView, FriendAcceptedView, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
+import type { BoardView, FriendAcceptedView, FriendLine, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
+import type { Action } from '../../api/types'
+import Popup, { ActionButton, Hero, Medallion, Note } from '../../ui/Popup'
+import { PRow } from '../../ui/v6/panel'
 import { Chip, ListRow, Segmented } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { formatNumber } from '../../lib/persian'
@@ -28,26 +31,51 @@ function SearchBox({ ctx }: { ctx: FlowCtx }) {
 
 const name = (n: string) => n || t('soc.unknown_player')
 
+/** A friend, opened: the actions the server really has on a player (pay them, invite them to my faction). The friend's
+ * public code comes with the list line; a pending or blocked edge has none, so it offers only what it can. */
+function FriendPopup({ f, ctx, onClose }: { f: FriendLine; ctx: FlowCtx; onClose: () => void }) {
+  const accept = ctx.acts.find((a) => a.id === 'social.accept' && a.args?.player === f.id)
+  const run = (a: Action) => { onClose(); ctx.go(a) }
+  return (
+    <Popup open onClose={onClose} title={name(f.name)} tone="gold">
+      <Hero><Medallion icon="person" palette={f.status === 'blocked' ? 'ruby' : 'emerald'} ring="#f4c441" chip={f.code || undefined} /></Hero>
+      {f.status === 'accepted' && f.code ? (
+        <>
+          <ActionButton tone="gold" onClick={() => run({ kind: 'navigation', id: 'friend.pay', command: 'bank.pay', args: { to: f.code } })}>{t('soc.friends.pay')}</ActionButton>
+          <ActionButton tone="steel" onClick={() => run({ kind: 'primary', id: 'friend.invite', command: 'faction.invite', args: { to: f.code } })}>{t('soc.friends.invite')}</ActionButton>
+          <Note>{t('soc.friends.invite_note')}</Note>
+        </>
+      ) : accept ? (
+        <ActionButton tone="gold" disabled={ctx.busy} onClick={() => run(accept)}>{t('soc.act.social.accept', { name: name(f.name) })}</ActionButton>
+      ) : (
+        <Note>{f.status === 'blocked' ? t('soc.friends.blocked') : t('soc.friends.pending')}</Note>
+      )}
+    </Popup>
+  )
+}
+
 const Friends = screen<FriendsView>(({ view: v, ctx }) => {
   const friends = v.friends ?? []
   const accept = ctx.acts.filter((a) => a.id === 'social.accept')
+  const [open, setOpen] = useState<FriendLine | null>(null)
   return (
     <Page title={t('soc.friends.title')} tone="emerald">
       {friends.length === 0 && <Panel tone="emerald"><Lead>{t('soc.friends.empty')}</Lead></Panel>}
       <SearchBox ctx={ctx} />
-      <div className="vf-stack">
+      <div className="hub-list">
         {friends.map((f) => {
           const act = accept.find((a) => a.args?.player === f.id)
           const incoming = f.incoming && f.status === 'pending'
           const sub = incoming ? t('soc.friends.incoming') : f.status === 'pending' ? t('soc.friends.pending') : f.status === 'blocked' ? t('soc.friends.blocked') : undefined
           return (
-            <ListRow key={f.id} icon="person" palette={f.status === 'blocked' ? 'ruby' : incoming ? 'gold' : 'emerald'} title={name(f.name)} sub={sub}
-              right={act ? <Slab tone="green" radius={12} lip={3} disabled={ctx.busy} onClick={() => ctx.go(act)}>{t('soc.act.social.accept', { name: name(f.name) })}</Slab> : undefined} />
+            <PRow key={f.id} icon="person" title={name(f.name)} sub={sub} tone={incoming ? 'busy' : undefined}
+              badge={act ? t('soc.friends.answer') : undefined} onClick={() => setOpen(f)} />
           )
         })}
       </div>
       {friends.length > 0 && <Pager ctx={ctx} page={v.page} pages={v.pages} />}
       <Rest ctx={ctx} skip={(a) => a.id === 'social.accept' || a.id === 'page.prev' || a.id === 'page.next'} />
+      {open && <FriendPopup f={open} ctx={ctx} onClose={() => setOpen(null)} />}
     </Page>
   )
 })

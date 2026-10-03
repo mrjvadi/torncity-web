@@ -9,6 +9,8 @@
 // call), the sheet falls back to what the layout itself says.
 
 import { useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useSide } from '../../state/SideContext'
 import Popup, { ActionButton, ActionRow, EffectChip, EffectRow, Gauge, Hero, Medallion, Note, ProgressRow, Section, StatCard, StatGrid } from '../../ui/Popup'
 import type { BuildingPanelView, CatalogueBuilding, LayoutBuilding } from '../../api/types'
 import { t, type Key } from '../../i18n'
@@ -64,6 +66,16 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
   }, [id, state, load])
   const [site, setSite] = useState(false)
   useEffect(() => { if (startSite && id) setSite(true) }, [startSite, id])
+  // desktop: this panel docks beside the world (web map 6.4); a phone gets the centred popup
+  const side = useSide()
+  const docked = !!side?.desktop
+  const dockTitle = b ? buildingName(cat, b.type, panel?.building.name) : ''
+  const closeAll = useCallback(() => { setAsk(null); onClose() }, [onClose])
+  const claim = side?.claim
+  useEffect(() => {
+    if (!docked || !b || !claim) return
+    return claim(dockTitle, closeAll)
+  }, [docked, !!b, dockTitle, claim, closeAll])
   if (!b) return null
 
   const entry = cat.get(b.type)
@@ -111,8 +123,8 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
     <ActionButton tone="gold" onClick={() => void reveal()}>{t('building.upgrade')}</ActionButton>
   ) : undefined
 
-  return (
-    <Popup open onClose={() => { setAsk(null); onClose() }} title={name} tone="gold" footer={footer}>
+  const content = (
+    <>
       <Hero>
         {going && <Gauge frac={p} color="var(--saffron)" numTone="gold" value={t('progress.percent', { p: Math.round(p * 100) })} caption={b.finish_at ? countdown(b.finish_at, now) : t('labor.btn.site')} />}
         <Medallion icon={icon} palette={palette} ring="#d99a1f" chip={t(`building.state.${b.state}` as Key)} />
@@ -148,8 +160,10 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
           <button className="vh-linkbtn" onClick={() => setAsk('demolish')}>{t('building.demolish_small')}</button>
         </div>
       )}
-    </Popup>
+    </>
   )
+  if (docked) return side?.el ? createPortal(<div className="nx-scroll bp-dock">{content}{footer && <div className="bp-foot">{footer}</div>}</div>, side.el) : null
+  return <Popup open onClose={closeAll} title={name} tone="gold" footer={footer}>{content}</Popup>
 }
 
 function TypePanel({ kind, panel, names, onOpen, onClose }: {

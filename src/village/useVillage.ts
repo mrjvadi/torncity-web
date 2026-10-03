@@ -11,6 +11,7 @@ import { careWord, useCare } from '../support/care'
 import { refusalText } from '../i18n'
 import { getVillageStore, type VillageSnapshot, type VillageStore } from './villageStore'
 import { serverNow } from './clock'
+import { useServerNow } from '../lib/ticker'
 
 /** The id of the settlement a village screen shows: an explicit one (a
  * neighbour's), else the player's own from the bootstrap. */
@@ -30,12 +31,9 @@ export function useVillage(id: string | undefined): (VillageSnapshot & { store: 
 
 /** Server time in ms, refreshed every `everyMs`. */
 export function useNow(everyMs = 1000): number {
-  const [now, setNow] = useState(serverNow())
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(serverNow()), everyMs)
-    return () => clearInterval(id)
-  }, [everyMs])
-  return now
+  // the one shared 1 s ticker (lib/ticker.ts); a slower rate just re-reads the clock less often
+  const now = useServerNow()
+  return everyMs > 1000 ? Math.floor(now / everyMs) * everyMs : now
 }
 
 export interface VillageResult {
@@ -72,7 +70,7 @@ export function useVillageCommand() {
 
 // -- the content catalogue (GET /api/v1/content): names of content by code ------------
 
-type Entries = Record<string, { code: string; name?: Record<string, string> }[]>
+type Entries = Record<string, { code: string; name?: Record<string, string>; category?: string }[]>
 let content: Promise<Entries> | null = null
 
 /** The catalogue's tables, read once. Names of buildings, components, items, cities,
@@ -95,6 +93,8 @@ export interface ContentNames {
   /** The name of a content code in the player's language, from the first of `tables` that has it.
    * The authored name the view carries is only the last resort (a content gap), then the code. */
   name(tables: string | string[], code: string, authored?: string): string
+  /** The catalogue's own category of a good (`food`, `gear`, `wood`...), '' when the catalogue has none. */
+  category(tables: string | string[], code: string): string
   loaded: boolean
 }
 
@@ -126,6 +126,13 @@ export function useContentNames(): ContentNames {
   const care = useCare()
   return useMemo(() => ({
     loaded: !!entries,
+    category: (tables, code) => {
+      for (const table of Array.isArray(tables) ? tables : [tables]) {
+        const c = entries?.[table]?.find((e) => e.code === code)?.category
+        if (c) return c
+      }
+      return ''
+    },
     name: (tables, code, authored) => {
       // the budget's health line is named by the place of care the settlement has: its hospital, its health house
       if (code === 'hospital' && (Array.isArray(tables) ? tables : [tables]).includes('budget_line') && careWord(care) !== 'hospital') return t(`eco.budget.line.care_${careWord(care)}` as Key)

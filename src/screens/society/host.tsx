@@ -7,6 +7,7 @@
 // it here, with an idempotency key, and shows the answer: the result, or the refusal) or a typed
 // value (asks for it in a centred popup first).
 
+import { useLive } from '../../lib/live'
 import { useCallback, useEffect, useState, type ComponentType, type ReactNode } from 'react'
 import * as api from '../../api/client'
 import type { Action, CommandResponse } from '../../api/types'
@@ -85,6 +86,7 @@ export const SocietyHost: ScreenComponent = (props: ScreenProps) => {
   const [busy, setBusy] = useState(false)
   const [asking, setAsking] = useState<Action | null>(null)
   useEffect(() => setRes(response), [response])
+  useLive(res?.view)
 
   const exec = useCallback(async (a: Action, extra: Record<string, string> = {}) => {
     setBusy(true)

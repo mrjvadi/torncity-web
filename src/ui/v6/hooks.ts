@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import * as api from '../../api/client'
 import type { ProfileView, VillageLayout } from '../../api/types'
-import type { PromotionView } from '../../api/views.gen'
+import type { DevelopmentView } from '../../api/views.gen'
 import { entitiesOf, entityOf } from '../../state/store'
 import { meterNow, useStoreView, useTick } from '../../state/useSync'
 import { useSession } from '../../state/SessionContext'
@@ -151,23 +151,23 @@ export function useEvents(): EventSlot[] {
 
 export interface Quest { text: string; prog: string; done: boolean }
 
-/** The quest strip's sentence: the next unmet goal of the village's promotion (settlement.promotion.view), one
- * imperative sentence with its progress; green when every goal is met. Gone when the server has no promotion for me. */
-export function useQuest(settlementId: string | undefined, layoutVersion: string | undefined): Quest | null {
+/** The quest strip's sentence: the next goal still ahead in the city's development readout
+ * (settlement.development.view, neutral view `village_development`), one imperative sentence with its progress.
+ * Only a viewer who holds the matching permission (`enabled`, the server's can_place) gets it; the rest see no
+ * sentence. Gone when nothing is ahead. */
+export function useQuest(settlementId: string | undefined, layoutVersion: string | undefined, enabled = true): Quest | null {
   const [q, setQ] = useState<Quest | null>(null)
   useEffect(() => {
-    if (!settlementId) { setQ(null); return }
+    if (!settlementId || !enabled) { setQ(null); return }
     let cancelled = false
-    void api.runCommand('settlement.promotion.view', {}).then((r) => {
+    void api.runCommand('settlement.development.view', {}).then((r) => {
       if (cancelled) return
-      const v = r.ok !== false ? (r.view as unknown as PromotionView | undefined) : undefined
-      if (!v) { setQ(null); return }
-      const crit = (v.criteria ?? []).find((c) => !c.met)
-      if (!crit) { setQ({ text: t(v.can_promote ? 'v6.q.ready_head' : 'v6.q.ready_member'), prog: '', done: true }); return }
-      setQ(questOf(crit))
+      const v = r.ok !== false ? (r.view as unknown as DevelopmentView | undefined) : undefined
+      const crit = (v?.next ?? []).find((c) => !c.met)
+      setQ(crit ? questOf(crit) : null)
     }).catch(() => { if (!cancelled) setQ(null) })
     return () => { cancelled = true }
-  }, [settlementId, layoutVersion])
+  }, [settlementId, layoutVersion, enabled])
   return q
 }
 

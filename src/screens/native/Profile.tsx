@@ -8,12 +8,12 @@
 import { useContentNames } from '../../village/useVillage'
 import type { CSSProperties } from 'react'
 import type { ScreenProps } from '../types'
-import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair, Tile, TileGrid } from './kit/Parts'
+import { Header, ScreenScroll } from './kit/Parts'
 import LangSwitch from './kit/LangSwitch'
 import { useView } from './kit/useView'
 import { clamp01, formatNumber, hms, money } from './kit/format'
-import Icon from '../../ui/Icon'
-import { GLabel } from '../../kit'
+import { Ic } from '../../ui/v6/parts'
+import { PBar, PBtn, PRow, PSec, PWhy } from '../../ui/v6/panel'
 import { t } from '../../i18n'
 import { locationOf } from '../../support/location'
 import { useSession } from '../../state/SessionContext'
@@ -76,124 +76,126 @@ export default function Profile({ response, loading, run }: ScreenProps) {
 
   return (
     <ScreenScroll>
-      <Header title={t('profile.title')} tone="teal" onRefresh={() => run('player.profile.get')} />
+      <Header title={t('profile.title')} />
 
-      <Card tone="teal" className="pf-card">
-        <div className="pf-id">
-          <div className="pf-avatar" style={{ '--pf-xp': `${xpFrac * 360}deg` } as CSSProperties}>
-            <span className="pf-avatar-in">{v.avatar ? <span className="pf-emoji">{v.avatar}</span> : <Icon name="fox" palette="fox" size={54} />}</span>
-            <span className="pf-level display">{formatNumber(v.level ?? 0)}</span>
-          </div>
-          <div className="pf-id-text">
-            <GLabel className="pf-name" top="#ffffff" bottom="#ffe6b8" stroke={1.4}>{v.name || '…'}</GLabel>
-            {subline && <div className="pf-sub">{subline}</div>}
-            <div className="pf-xp">
-              <div className="pf-xp-bar">
-                <div className="pf-xp-fill" style={{ width: `${xpFrac * 100}%` }} />
-                <span className="pf-xp-label display" dir="ltr">{formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}</span>
-              </div>
-              <span className="nx-chip nx-chip-gold">{t('common.level', { n: formatNumber(v.level ?? 0) })}</span>
-            </div>
+      {/* who I am: identity, level and progress (P6: the profile is the player, nothing about a place's services) */}
+      <section className="pf2-id">
+        <div className="pf2-avatar" style={{ '--p': xpFrac } as CSSProperties}>
+          <i className="pf2-ring" />
+          <span className="pf2-face">{v.avatar ? <span className="pf2-emoji">{v.avatar}</span> : <Ic name="portrait" />}</span>
+          <b className="pf2-lvl v6-otl">{formatNumber(v.level ?? 0)}</b>
+        </div>
+        <div className="pf2-who">
+          <h2>{v.name || '…'}</h2>
+          {subline && <p>{subline}</p>}
+          <div className="pf2-xp" dir="ltr" aria-label={t('common.level', { n: formatNumber(v.level ?? 0) })}>
+            <i style={{ width: `${xpFrac * 100}%` }} />
+            <span>{formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}</span>
           </div>
         </div>
-        {v.code && (
-          <div className="pf-code"><span>{t('profile.code')}</span><b dir="ltr">{v.code}</b></div>
-        )}
-        <div className="pf-btns">
-          <button className="pf-btn" onClick={() => run('player.settings')}><Icon name="gears" palette="steel" size={20} />{t('profile.settings')}</button>
-          <button className="pf-btn pf-btn-violet" onClick={() => run('life.avatar')}><Icon name="fox" palette="violet" size={20} />{t('profile.avatar')}</button>
-        </div>
-        <LangSwitch compact />
-      </Card>
+        {v.code && <div className="pf2-code"><span>{t('profile.code')}</span><b dir="ltr" data-latin>{v.code}</b></div>}
+      </section>
 
-      {v.jail && <Notice alert>{t('dashboard.jail', { city: city(v.jail.city_code, v.jail.city), t: hms(v.jail.remaining_seconds) })}</Notice>}
-      {v.hospital && <Notice alert>{t('dashboard.hospital', { city: city(v.hospital.city_code, v.hospital.city), t: hms(v.hospital.remaining_seconds) })}</Notice>}
-      {v.travelling && <Notice>{t('profile.travelling', { city: city(v.travel_to_code, v.travel_to), t: hms(v.travel_remaining_seconds) })}</Notice>}
-      {v.walk && <Notice>{t('profile.walking', { place: names.name('place', v.walk.to?.code ?? '', v.walk.to?.name), t: hms(v.walk.remaining_seconds) })}</Notice>}
+      {v.jail && <PWhy title={t('dashboard.jail', { city: city(v.jail.city_code, v.jail.city), t: hms(v.jail.remaining_seconds) })} />}
+      {v.hospital && <PWhy title={t('dashboard.hospital', { city: city(v.hospital.city_code, v.hospital.city), t: hms(v.hospital.remaining_seconds) })} />}
+      {v.travelling && <PWhy ok title={t('profile.travelling', { city: city(v.travel_to_code, v.travel_to), t: hms(v.travel_remaining_seconds) })} />}
+      {v.walk && <PWhy ok title={t('profile.walking', { place: names.name('place', v.walk.to?.code ?? '', v.walk.to?.name), t: hms(v.walk.remaining_seconds) })} />}
 
-      <StatPair
-        left={<Stat icon="coins" palette="gold" label={t('profile.cash')} value={money(v.cash)} />}
-        right={<Stat icon="bank" palette="sapphire" label={t('profile.bank')} value={money(v.bank)} />}
-      />
-      <StatPair
-        left={<Stat icon="crowncoin" palette="emerald" label={t('profile.net_worth')} value={life?.worth?.total !== undefined ? money(life.worth.total) : '—'} />}
-        right={<Stat icon="rank" palette="gold" label={t('profile.wealth_rank')} value={rankName || '—'} />}
-      />
-      <StatPair
-        left={<Stat icon="city" palette="steel" label={t(inVillage ? 'profile.village' : 'profile.city')} value={city(v.city_code, v.city) || '—'} />}
-        right={inVillage ? <span /> : <Stat icon="x_map" palette="steel" label={t('profile.place')} value={v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : '—'} />}
-      />
+      <PSec>{t('profile.wealth')}</PSec>
+      <div className="pf2-grid">
+        <Fig icon="coin" label={t('profile.cash')} value={money(v.cash)} />
+        <Fig icon="bank" label={t('profile.bank')} value={money(v.bank)} />
+        <Fig icon="chest" label={t('profile.net_worth')} value={life?.worth?.total !== undefined ? money(life.worth.total) : '—'} />
+        <Fig icon="trophy" label={t('profile.wealth_rank')} value={rankName || '—'} />
+        <Fig icon="house" label={t(inVillage ? 'profile.village' : 'profile.city')} value={city(v.city_code, v.city) || '—'} />
+        {!inVillage && <Fig icon="road" label={t('profile.place')} value={v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : '—'} />}
+      </div>
 
-      <div className="pf-sec display">{t('profile.needs')}</div>
-      <Card>
-        <div className="pf-needs">
-          <NeedBar icon="energy" palette="amber" color="var(--saffron)" label={t('profile.energy')} value={v.energy} max={v.max_energy} />
-          <NeedBar icon="health" palette="ruby" color="var(--anar)" label={t('profile.health')} value={v.health} max={v.max_health} />
-          {needs && <>
-            <NeedBar icon="sleepy" palette="violet" color="var(--violet)" label={t('need.sleep')} value={needs.sleep} />
-            <NeedBar icon="bread" palette="amber" color="var(--saffron)" label={t('need.hunger')} value={needs.hunger} />
-            <NeedBar icon="sun" palette="emerald" color="var(--leaf)" label={t('need.happiness')} value={needs.happiness} />
-            <NeedBar icon="x_flame" palette="ruby" color="var(--anar)" label={t('need.stress')} value={needs.stress} />
-          </>}
-        </div>
-      </Card>
+      <PSec>{t('profile.needs')}</PSec>
+      <div className="pf2-needs">
+        <NeedBar icon="bolt" color="blue" label={t('profile.energy')} value={v.energy} max={v.max_energy} />
+        <NeedBar icon="heart" color="green" label={t('profile.health')} value={v.health} max={v.max_health} />
+        {needs && <>
+          <NeedBar icon="timer" color="blue" label={t('need.sleep')} value={needs.sleep} bad />
+          <NeedBar icon="bread" color="green" label={t('need.hunger')} value={needs.hunger} bad />
+          <NeedBar icon="people" color="green" label={t('need.happiness')} value={needs.happiness} />
+          <NeedBar icon="nerve" color="orange" label={t('need.stress')} value={needs.stress} bad />
+        </>}
+      </div>
 
       {(v.work?.job || v.work?.course) && (
-        <div className="pf-list">
-          {v.work?.job && (
-            <ListRow icon="work" palette="emerald" title={v.work.job.job?.title ? names.name('career_tier', `${v.work.job.job.career_code ?? ''}.${v.work.job.job.rank ?? ''}`, v.work.job.job.title) : t('profile.work')}
-              sub={v.work.job.shift_ends_in_seconds ? t('profile.shift_ends', { t: hms(v.work.job.shift_ends_in_seconds) }) : t('profile.per_shift', { pay: money(v.work.job.pay) })}
-              onClick={() => run('job.status')} />
-          )}
-          {v.work?.course && (
-            <ListRow icon="study" palette="violet" title={v.work.course.course?.name ? names.name('course', v.work.course.course.code ?? '', v.work.course.course.name) : t('profile.study')}
-              sub={v.work.course.paused ? t('education.paused') : t('profile.course_left', { t: hms(v.work.course.remaining_seconds) })}
-              onClick={() => run('education.list')} />
-          )}
-        </div>
+        <>
+          <PSec>{t('profile.doing')}</PSec>
+          <div className="hub-list">
+            {v.work?.job && (
+              <PRow icon="tool" title={v.work.job.job?.title ? names.name('career_tier', `${v.work.job.job.career_code ?? ''}.${v.work.job.job.rank ?? ''}`, v.work.job.job.title) : t('profile.work')}
+                sub={v.work.job.shift_ends_in_seconds ? t('profile.shift_ends', { t: hms(v.work.job.shift_ends_in_seconds) }) : t('profile.per_shift', { pay: money(v.work.job.pay) })}
+                onClick={() => run('job.status')} />
+            )}
+            {v.work?.course && (
+              <PRow icon="book" title={v.work.course.course?.name ? names.name('course', v.work.course.course.code ?? '', v.work.course.course.name) : t('profile.study')}
+                sub={v.work.course.paused ? t('education.paused') : t('profile.course_left', { t: hms(v.work.course.remaining_seconds) })}
+                onClick={() => run('education.list')} />
+            )}
+          </div>
+        </>
       )}
 
-      <button className="pf-sec pf-sec-link display" onClick={() => run('achievement.list')}>
-        {ach ? t('profile.achievements', { a: formatNumber(earned), b: formatNumber(lines.length) })
-          : t('profile.achievements_n', { a: formatNumber(v.achievements ?? 0) })}
-      </button>
+      <PSec>{ach ? t('profile.achievements', { a: formatNumber(earned), b: formatNumber(lines.length) }) : t('profile.achievements_n', { a: formatNumber(v.achievements ?? 0) })}</PSec>
       {medals.length > 0 ? (
-        <div className="pf-medals">
+        <div className="pf2-medals">
           {medals.map((m, i) => (
-            <button key={i} className={`pf-medal${m.earned ? '' : ' pf-medal-off'}`} title={m.achievement?.name ? names.name('achievement', m.achievement.code ?? '', m.achievement.name) : undefined} onClick={() => run('achievement.list')}>
-              <Icon name={['trophy', 'medal', 'ribbon', 'x_star', 'x_laurel', 'x_crown', 'x_gem', 'shield'][i % 8]} palette={m.earned ? 'gold' : 'steel'} size={30} />
+            <button key={i} className={`pf2-medal${m.earned ? '' : ' off'}`} title={m.achievement?.name ? names.name('achievement', m.achievement.code ?? '', m.achievement.name) : undefined} onClick={() => run('achievement.list')}>
+              <Ic name={['trophy', 'banner', 'scroll', 'gem', 'crime', 'house', 'coin', 'health'][i % 8]} />
             </button>
           ))}
         </div>
-      ) : ach ? <Notice>{t('profile.no_achievements')}</Notice> : null}
+      ) : ach ? <p className="pn-hint">{t('profile.no_achievements')}</p> : null}
+      <PBtn kind="sec" onClick={() => run('achievement.list')}>{t('profile.all_achievements')}</PBtn>
 
-      <div className="pf-sec display">{t('profile.more')}</div>
-      <TileGrid>
-        <Tile icon="chart" palette="violet" title={t('profile.skills')} onClick={() => run('skills.list')} />
-        <Tile icon="f_house" palette="emerald" title={t('profile.life')} onClick={() => run('life.me')} />
-        <Tile icon="person" palette="gold" title={t('profile.card')} onClick={() => run('life.card')} />
-        <Tile icon="x_map" palette="teal" title={t('profile.map')} onClick={() => run('map.list')} />
-        <Tile icon="plane" palette="sapphire" title={t('profile.travel')} onClick={() => run('map.cities')} />
-        <Tile icon="phone" palette="sapphire" title={t('profile.devices')} onClick={() => run('device.list')} />
-      </TileGrid>
+      <PSec>{t('profile.more')}</PSec>
+      <div className="hub-list">
+        <PRow icon="pick" title={t('profile.skills')} onClick={() => run('skills.list')} />
+        <PRow icon="house" title={t('profile.life')} onClick={() => run('life.me')} />
+        <PRow icon="user" title={t('profile.card')} onClick={() => run('life.card')} />
+        <PRow icon="globe" title={t('profile.map')} onClick={() => run('map.list')} />
+        <PRow icon="road" title={t('profile.travel')} onClick={() => run('map.cities')} />
+        <PRow icon="tool" title={t('profile.devices')} onClick={() => run('device.list')} />
+      </div>
 
+      {/* settings are a separate, quiet area below what the player does often (research: settings apart from product actions) */}
+      <PSec>{t('profile.settings_area')}</PSec>
+      <div className="hub-list">
+        <PRow icon="person" title={t('profile.avatar')} onClick={() => run('life.avatar')} />
+        <PRow icon="tool" title={t('profile.settings')} onClick={() => run('player.settings')} />
+      </div>
+      <LangSwitch compact />
     </ScreenScroll>
   )
 }
 
-function NeedBar({ icon, palette, color, label, value, max = 100 }: {
-  icon: string; palette: 'amber' | 'ruby' | 'violet' | 'emerald'; color: string; label: string; value?: number; max?: number
-}) {
-  if (value === undefined) return null
+function Fig({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <div className="pf-need">
-      <span className="pf-need-icon"><Icon name={icon} palette={palette} size={22} /></span>
-      <div className="pf-need-main">
-        <span className="pf-need-label">{label}</span>
-        <div className="nx-bar" style={{ borderColor: color, height: 20 }}>
-          <div className="nx-bar-fill" style={{ width: `${clamp01(value / (max || 100)) * 100}%`, background: color }} />
-          <span className="nx-bar-label display" style={{ lineHeight: '16px', fontSize: 12 }}>{formatNumber(value)}{max !== 100 ? ` / ${formatNumber(max)}` : ''}</span>
-        </div>
+    <div className="pf2-fig">
+      <Ic name={icon} />
+      <span><em>{label}</em><b>{value}</b></span>
+    </div>
+  )
+}
+
+/** A need or a vital as a thin bar: green is fine, amber low, red blocked; energy is blue, nerve orange (owner). `bad` marks a
+ * need that is worse when HIGHER (sleepiness, hunger, stress). */
+function NeedBar({ icon, color, label, value, max = 100, bad }: { icon: string; color: 'blue' | 'green' | 'orange'; label: string; value?: number; max?: number; bad?: boolean }) {
+  if (value === undefined) return null
+  const f = clamp01(value / (max || 100))
+  const level = (bad ? 1 - f : f)
+  const tone = level < 0.2 ? 'bad' : level < 0.4 ? 'low' : color
+  return (
+    <div className="pf2-need">
+      <Ic name={icon} />
+      <div>
+        <span><em>{label}</em><b>{formatNumber(value)}{max !== 100 ? ` / ${formatNumber(max)}` : ''}</b></span>
+        <PBar frac={f} tone={tone === 'bad' || tone === 'low' ? tone : undefined} cls={tone} />
       </div>
     </div>
   )

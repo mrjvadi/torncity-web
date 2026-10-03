@@ -1,5 +1,7 @@
 // Persian/Arabic-Indic digit handling and paste-safe link-code extraction.
 
+import { isRtl } from '../i18n'
+
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
 const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩'
 const BIDI_MARKS = /[‎‏‪-‮⁦-⁩﻿]/g
@@ -23,9 +25,11 @@ export function toWesternDigits(input: string): string {
   return out
 }
 
-/** Format an integer with thousands separators, always in Western digits. */
+/** Format an integer with thousands separators for display: Persian digits and the Persian thousands mark in the
+ * Persian UI, Western digits in English. Never feed the result back into a number input or a parse. */
 export function formatNumber(n: number): string {
-  return Math.round(n).toLocaleString('en-US')
+  const s = Math.round(n).toLocaleString('en-US')
+  return isRtl() ? s.replace(/,/g, '٬').replace(/\d/g, (d) => FA_DIGITS[+d]) : s
 }
 
 /**

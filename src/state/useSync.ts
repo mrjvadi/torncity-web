@@ -9,6 +9,7 @@ import { entityOf, primaryWallet, syncStore, type StoreView } from './store'
 export { primaryWallet }
 import type { KindData, Meter, SyncKind } from './syncTypes'
 import { serverNow } from '../village/clock'
+import { useServerNow } from '../lib/ticker'
 
 export function useStoreView(): StoreView {
   return useSyncExternalStore(syncStore.subscribe, syncStore.getView, syncStore.getView)
@@ -47,12 +48,8 @@ export function meterNow(m: Meter | undefined, now: number): { value: number; fu
 
 /** A clock that ticks every `ms`, for figures that move with time. */
 export function useTick(ms: number): number {
-  const [now, setNow] = useState(() => serverNow())
-  useEffect(() => {
-    const t = window.setInterval(() => setNow(serverNow()), ms)
-    return () => window.clearInterval(t)
-  }, [ms])
-  return now
+  const now = useServerNow()
+  return ms > 1000 ? Math.floor(now / ms) * ms : now
 }
 
 

@@ -13,9 +13,9 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Icon, { type IconPalette } from './Icon'
-import { GLabel } from '../kit'
+import { IC, fa } from './v6/format'
 import { t, isRtl } from '../i18n'
-import { getTelegramWebApp } from '../lib/telegram'
+import { pushNativeBack } from '../lib/nativeBack'
 import './popup.css'
 
 export type PopupTone = 'red' | 'navy' | 'green' | 'gold' | 'violet'
@@ -84,10 +84,8 @@ function PopupInner({ onClose, title, children, footer, tone, dismissible }: Omi
     }
     document.addEventListener('keydown', onKey, true)
 
-    // Telegram's own back button (Android's back key lands here too).
-    const bb = getTelegramWebApp()?.BackButton
-    const onBack = () => dismiss()
-    if (bb) { try { bb.onClick(onBack); bb.show() } catch { /* best effort */ } }
+    // Telegram's own back button (Android's back key lands here too): the one wiring in lib/nativeBack.ts.
+    const offBack = pushNativeBack(() => dismiss())
 
     return () => {
       document.removeEventListener('keydown', onKey, true)
@@ -96,7 +94,7 @@ function PopupInner({ onClose, title, children, footer, tone, dismissible }: Omi
       listeners.delete(sync)
       changed()
       lockScroll(false)
-      if (bb) { try { bb.offClick(onBack); if (stack.length === 0) bb.hide() } catch { /* best effort */ } }
+      offBack()
       if (opener && document.contains(opener)) opener.focus({ preventScroll: true })
     }
   }, [])
@@ -114,13 +112,9 @@ function PopupInner({ onClose, title, children, footer, tone, dismissible }: Omi
         aria-labelledby={title ? titleId : undefined}
         tabIndex={-1}
       >
-        {title && (
-          <div className="pp-ribbon">
-            <GLabel className="pp-title" top="#ffffff" bottom="#ffe0b8" stroke={1.4}><span id={titleId}>{title}</span></GLabel>
-          </div>
-        )}
+        {title && <h2 className="pp-title" id={titleId}>{title}</h2>}
         {dismissible !== false && (
-          <button className="pp-close" onClick={() => close.current()} aria-label={t('common.close')}>×</button>
+          <button className="pp-close" onClick={() => close.current()} aria-label={t('common.close')}><img src={IC('close')} alt="" /></button>
         )}
         <div className="pp-scroll">{children}</div>
         {footer && <div className="pp-foot">{footer}</div>}
@@ -165,7 +159,7 @@ export function Gauge({ frac, value, caption, note, color = 'var(--leaf)', size 
           <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={sw} stroke="currentColor" strokeDasharray={`${v * c} ${c}`} className="pp-ring-val" />
         </svg>
         <div className="pp-gauge-in">
-          <GLabel className="pp-gauge-num" top={numTone === 'gold' ? '#fff6c8' : '#e8ffe9'} bottom={numTone === 'gold' ? '#ffb21f' : '#4cc47e'} stroke={1.4}>{value ?? `${Math.round(v * 100)}٪`}</GLabel>
+          <span className={`pp-gauge-num pp-gauge-${numTone}`}>{value ?? `${fa(Math.round(v * 100))}٪`}</span>
           {caption && <span className="pp-gauge-cap display">{caption}</span>}
         </div>
       </div>
@@ -286,7 +280,7 @@ export function ActionButton({ children, onClick, tone = 'green', cost, costIcon
             {costIcon && <Icon name={costIcon} palette={costPalette} size={30} />}
           </span>
         )}
-        <GLabel className="pp-act-label" top="#ffffff" bottom="#e9ffe9" stroke={1.4}>{children}</GLabel>
+        <span className="pp-act-label">{children}</span>
       </button>
       {disabled && reason && <div className="pp-act-reason">{reason}</div>}
     </div>

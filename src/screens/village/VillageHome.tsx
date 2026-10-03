@@ -16,8 +16,9 @@ import { constructionProgress } from '../../village/progress'
 import type { VillageScene, ScreenLabel } from '../../village/villageScene'
 import { clockSkewMs } from '../../village/clock'
 import { report } from '../../lib/reporter'
+import * as api from '../../api/client'
 import { countdown } from './common'
-import { MapOverlays, type Mark, type RingModel } from '../../ui/v6/MapOverlays'
+import { MapOverlays, type Mark, type RingAction, type RingModel } from '../../ui/v6/MapOverlays'
 import { ContextMenu, type CtxItem } from '../../ui/v6/parts'
 import { useChrome } from '../../ui/v6/chrome'
 import { buildPercent } from '../../ui/v6/hooks'
@@ -70,6 +71,19 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
   const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
   const resident = !!layout?.viewer.resident && own
+  // the society hub's own word on whether an election exists (the civic ring offers «انتخابات» only then)
+  const [hasElections, setHasElections] = useState(false)
+  useEffect(() => {
+    if (!own || !resident) return
+    let cancelled = false
+    void api.runCommand('society.hub', {}).then((r) => {
+      const v = r.ok !== false ? (r.view as unknown as { entries?: { code: string }[] | null } | undefined) : undefined
+      if (!cancelled) setHasElections((v?.entries ?? []).some((e) => e.code === 'elections'))
+    }).catch(() => undefined)
+    return () => { cancelled = true }
+  }, [own, resident])
+  // the lot ring: a tap on bare ground opens the ring of that lot (buy, build, access, info)
+  const [lotRing, setLotRing] = useState<{ x: number; y: number; kind: 'free' | 'mine' | 'taken'; owner?: string } | null>(null)
   // Lot access (docs/adr/0043): how each free lot and each of the viewer's bare lots is served by road,
   // read from the land screen's own answer whenever the land map is on or the layout changed.
   const cmd = useVillageCommand()
@@ -78,7 +92,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [fixView, setFixView] = useState<LotAccessView | null>(null)
   const layoutVersion = layout?.version
   useEffect(() => {
-    if (!landOn || !resident) return
+    if ((!landOn && !lotRing) || !resident) return
     let cancelled = false
     void cmd('settlement.land', {}, { silent: true }).then((r) => {
       if (cancelled || !r.ok || !r.res?.view) return
@@ -88,7 +102,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [landOn, resident, layoutVersion])
+  }, [landOn, !!lotRing, resident, layoutVersion])
   // a lot picked for purchase is framed and outlined on the map
   useEffect(() => {
     const sc = sceneRef.current
@@ -97,8 +111,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   }, [buyLot, sceneReady])
   useEffect(() => {
     if (!sceneReady) return
-    sceneRef.current?.setOverlayTones(landOn && layout && build.state.step === 'off' ? tonesForLand(layout, access) : null)
-  }, [landOn, layout, sceneReady, build.state.step, access])
+    sceneRef.current?.setOverlayTones((landOn || lotRing) && layout && build.state.step === 'off' ? tonesForLand(layout, access) : null)
+  }, [landOn, lotRing, layout, sceneReady, build.state.step, access])
   // the menu's «زمین و قطعه‌ها» opens the village straight on the land map (the page may already be showing:
   // the arguments are new each time the entry is pressed)
   const handledLand = useRef<unknown>(null)
@@ -202,17 +216,15 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       return
     }
     if (build.state.step !== 'off') return
-    if (landOn && layout && lot && resident) {
+    // a ring is open: a tap on the ground only puts it away (P10)
+    if (lotRing) { setLotRing(null); return }
+    if (selectedId && !bid) { setSelectedId(null); return }
+    if (!bid && layout && lot && resident) {
       const k = classifyLot(layout, lot.x, lot.y)
-      if (k.kind === 'free') { setSelectedId(null); setBuyLot(lot); return }
-      if (k.kind === 'mine') {
-        setSelectedId(null)
-        // a bare lot of one's own that no road touches opens its fixes, not the house catalogue
-        const a = access?.get(`${lot.x},${lot.y}`)
-        if (a && a !== 'road') { setFixView(null); setFixLot(lot) } else setHouseLot(lot)
-        return
-      }
-      if (k.kind === 'taken') { setSelectedId(null); setTakenLot({ ...lot, owner: k.owner }); return }
+      setSelectedId(null)
+      if (k.kind === 'free') { setLotRing({ x: lot.x, y: lot.y, kind: 'free' }); return }
+      if (k.kind === 'mine') { setLotRing({ x: lot.x, y: lot.y, kind: 'mine' }); return }
+      if (k.kind === 'taken') { setLotRing({ x: lot.x, y: lot.y, kind: 'taken', owner: k.owner }); return }
     }
     setSelectedId(bid)
   }
@@ -241,7 +253,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     info: () => setInfoId(id),
     upgrade: () => setUpId(id),
     site: () => { setInfoSite(true); setInfoId(id) },
-    open: (screen) => openLocal(screen),
+    open: (screen, args) => openLocal(screen, args),
+    hasElections,
     mine: () => { setSelectedId(null); run('settlement.mine') },
     run: (command) => run(command),
   })
@@ -255,10 +268,35 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
         level: !selected.private || selected.mine ? panel?.tier : undefined,
         anchor: [l.x, l.y + 22] as [number, number],
         actions: verbsFor(selected, selectedId),
-        onInfo: () => setInfoId(selectedId),
+        onInfo: () => verbsFor(selected, selectedId)[0].onClick(),
       }
     })()
     : null
+  // the ring of a bare lot: buy / build / access / info, by what the lot is to this viewer (the same sheets as before)
+  const lotRingModel: RingModel | null = (() => {
+    if (!lotRing || !sceneReady || !sceneRef.current || !canvasRef.current || !layout) return null
+    const r = canvasRef.current.getBoundingClientRect()
+    const p = sceneRef.current.screenOfLot(lotRing.x, lotRing.y)
+    const lot = { x: lotRing.x, y: lotRing.y }
+    const go = (fn: () => void) => () => { setLotRing(null); fn() }
+    const acts: RingAction[] = []
+    if (lotRing.kind === 'free') {
+      const buy = go(() => setBuyLot(lot))
+      acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: buy })
+      acts.push({ id: 'buy', label: t('v6.ring.buy'), icon: 'coin', kind: 'primary', onClick: buy })
+      if (canPlaceNow) acts.push({ id: 'build', label: t('v6.ring.build'), icon: 'hammer', onClick: go(() => { void build.enter() }) })
+    } else if (lotRing.kind === 'mine') {
+      const a = access?.get(`${lot.x},${lot.y}`)
+      const noRoad = !!a && a !== 'road'
+      const open = go(() => { if (noRoad) { setFixView(null); setFixLot(lot) } else setHouseLot(lot) })
+      acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: open })
+      acts.push({ id: 'build', label: t('v6.ring.build'), icon: 'hammer', kind: 'primary', onClick: go(() => setHouseLot(lot)), off: noRoad })
+      acts.push({ id: 'access', label: t('v6.ring.access'), icon: 'road', onClick: go(() => { setFixView(null); setFixLot(lot) }) })
+    } else {
+      acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => setTakenLot({ ...lot, owner: lotRing.owner })) })
+    }
+    return { key: `lot-${lot.x}-${lot.y}`, name: t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 }), anchor: [p.x - r.left, p.y - r.top] as [number, number], actions: acts, onInfo: acts[0].onClick }
+  })()
   const marks: Mark[] = useRing && !inBuildNow(build.state.step) && !landOn
     ? labels.filter((l) => l.visible).flatMap((l): Mark[] => {
       const b = layout?.buildings.find((x, i) => keyOf(i, x) === l.key)
@@ -332,7 +370,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       <canvas ref={canvasRef} className="vh-canvas" />
 
       {useRing ? (
-        <MapOverlays marks={marks} ring={ring} onDismiss={() => setSelectedId(null)} />
+        <MapOverlays marks={marks} ring={ring ?? lotRingModel} onDismiss={() => { setSelectedId(null); setLotRing(null) }} />
       ) : (
       <div className="vh-labels">
         {labels.filter((l) => l.visible).map((l) => {
@@ -400,13 +438,6 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
           </Frame>
         )}
       </div>
-      {!useRing && !inBuild && canPlace && member && !landOn && (
-        <button className="vh-fab" onClick={() => void build.enter()} aria-label={t('village.btn.build')}>
-          <Plate size={54} rim="#ffd66b"><Emboss name="house" palette="gold" size={32} /></Plate>
-          <span>{t('village.build_fab')}</span>
-        </button>
-      )}
-
       <BuildingSheet building={useRing ? (layout?.buildings.find((b, i) => keyOf(i, b) === infoId) ?? null) : selected} canPlace={canPlace} cat={cat} store={store}
         startSite={infoSite}
         onClose={() => { setInfoId(null); setInfoSite(false); if (!useRing) setSelectedId(null) }}
