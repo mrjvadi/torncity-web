@@ -13,7 +13,12 @@ function cryptoRandomId(): string {
   }
 }
 
+// only the real site reports: a local preview or a mock-mode check would fill the live log with test runs
+const SILENT = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+  || new URLSearchParams(location.search).get('mock') === '1'
+
 export function report(kind: string, message: string, extra?: Record<string, unknown>): void {
+  if (SILENT) return
   try {
     const body = JSON.stringify({
       kind,
