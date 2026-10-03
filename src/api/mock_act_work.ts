@@ -64,7 +64,7 @@ const PAY: Record<string, number> = { retail: 120, hospitality: 110, logistics: 
 const LOCKED = new Set(['technology', 'healthcare'])
 
 const iso = (seconds: number) => new Date(Date.now() + seconds * 1000).toISOString()
-const req = (kind: string, met: boolean, o: Partial<Requirement> = {}): Requirement => ({ kind, met, skill: '', need: 0, have: 0, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, ...o })
+const req = (kind: string, met: boolean, o: Partial<Requirement> = {}): Requirement => ({ kind, met, skill: '', need: 0, have: 0, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, trip: null, ...o })
 
 // the player's job in the mock: it changes with applying, promotion and resigning
 let held: JobRef | null = jr('retail')
@@ -121,8 +121,8 @@ function openings(page: number, o: { employed?: boolean; travelling?: boolean; e
     companies, city_code: CITY.code, city: CITY.name, travelling: !!o.travelling, employed, current: employed ? (held ?? jr('retail')) : jr('retail'),
     openings: list.length ? list : null, page: p, pages: o.empty ? 1 : pages,
     gaps: p === 1 && !o.empty && !o.travelling ? [
-      { job: jr('finance'), nearest: { code: 'support', name: 'شهر مرکزی' }, needs: [{ kind: 'knowledge', code: 'double_entry_bookkeeping', name: 'دفترداری دوطرفه', role: '', tier: 0 }, { kind: 'building', code: 'bank', name: 'بانک', role: '', tier: 0 }] },
-      { job: jr('technology'), nearest: { code: 'support', name: 'شهر مرکزی' }, needs: [{ kind: 'knowledge', code: 'computing', name: 'رایانه', role: '', tier: 0 }] },
+      { job: jr('finance'), nearest: { code: 'support', name: 'شهر مرکزی' }, nearest_trip: TRIP, needs: [{ kind: 'knowledge', code: 'double_entry_bookkeeping', name: 'دفترداری دوطرفه', role: '', tier: 0 }, { kind: 'building', code: 'bank', name: 'بانک', role: '', tier: 0 }] },
+      { job: jr('technology'), nearest: { code: 'support', name: 'شهر مرکزی' }, nearest_trip: TRIP, needs: [{ kind: 'knowledge', code: 'computing', name: 'رایانه', role: '', tier: 0 }] },
     ] : null,
   }
   const a: MockAct[] = []
@@ -231,10 +231,11 @@ const cref = (code: string) => ({ code, name: nm(code) })
 const line = (code: string, eligible = true): CourseLine => ({ course: cref(code), fee: COURSES[code].fee, duration_seconds: COURSES[code].secs, min_level: COURSES[code].min ?? 1, eligible })
 
 const VILLAGE = { code: 'v-k3x9', name: 'آمل' }
+const TRIP = { mode: 'bus', mode_name: 'اتوبوس', fare: 120, wait_seconds: 900 }
 const MONEY = { code: 'AML', name: 'سکهٔ آمل', symbol: '' }
 
 const need = (kind: string, code: string, role = ''): CourseNeed => ({ kind, code, name: '', role, tier: 0 })
-const gap = (code: string, needs: CourseNeed[]): CourseGap => ({ course: cref(code), fee: COURSES[code].fee, duration_seconds: COURSES[code].secs, nearest: { code: 'support', name: 'شهر مرکزی' }, needs })
+const gap = (code: string, needs: CourseNeed[]): CourseGap => ({ course: cref(code), fee: COURSES[code].fee, duration_seconds: COURSES[code].secs, nearest: { code: 'support', name: 'شهر مرکزی' }, nearest_trip: TRIP, needs })
 
 function education(page: number, mode: string) {
   const city = AS_CITY || mode === 'city'
@@ -278,6 +279,8 @@ function courseDetail(code: string) {
   const can = !elsewhere && !lowLevel
   const v: CourseDetailView = {
     course: cref(c.code), institution: c.inst, city_code: elsewhere ? 'support' : '', city: elsewhere ? 'شهر مرکزی' : '', fee: c.fee, duration_seconds: c.secs, seats_left: c.seats ?? 0,
+    staff: c.code === 'reading_writing' ? [{ id: 'tc1', kind: 'npc', name: '', students: 1, max: 12, mine: false, can_end: true }, { id: 'tc2', kind: 'home', name: 'کاوه', students: 0, max: 12, mine: false, can_end: false }] : null,
+    teaching: c.code === 'reading_writing' ? { can_hire: false, hire_wage: 120, no_pool: false, can_school: false, can_home: true, school_wage: 120, tax_bps: 500 } : null,
     limited: !!c.seats, skills: c.skills.map(([skill, xp]) => ({ skill, xp, level: 0 })), certifies: c.certifies, requirements, can_enrol: can,
     payment: can && c.fee > 0 ? pay(poor ? [] : c.code === 'bookkeeping' ? ['cash'] : ['cash', 'card'], c.fee) : null,
   }
@@ -287,6 +290,9 @@ function courseDetail(code: string) {
       if ((v.payment.usable ?? []).length) for (const m of v.payment.usable ?? []) a.push(A(`pay.${m}`, 'education.enroll', { course: c.code, method: m }))
       else a.push(A('bank', 'bank.show'))
     } else a.push(A('education.enrol', 'education.enroll', { course: c.code }, { subject: c.code }))
+  }
+  if (c.code === 'reading_writing') {
+    a.push(A('education.teach_home', 'education.teach', { course: c.code, mode: 'home' }), A('education.unteach', 'education.unteach', { course: c.code, id: 'tc1' }))
   }
   a.push(back('education.list'), refreshA('education.view', { course: c.code }))
   return mockOk('course_detail', v, a)

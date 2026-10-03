@@ -2,6 +2,8 @@ import type { ScreenProps } from '../types'
 import { Bar, Card, Empty, Header, ScreenScroll } from './kit/Parts'
 import { CardGrid, PCard, PSec } from '../../ui/v6/panel'
 import { Lines, Need } from './kit/cardparts'
+import { tripLine } from './kit/needs'
+import type { TripHint } from '../../api/views.gen'
 import Actions from './kit/Actions'
 import { clamp01, hms, moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
@@ -11,7 +13,7 @@ interface Named { code?: string; name?: string }
 interface CurrentCourse { course?: Named; percent?: number; remaining_seconds?: number; paused?: boolean }
 interface CourseLine { course?: Named; duration_seconds?: number; eligible?: boolean; fee?: number; min_level?: number }
 interface Need { kind?: string; code?: string; name?: string; role?: string; tier?: number }
-interface Gap { course?: Named; fee?: number; duration_seconds?: number; nearest?: Named | null; needs?: Need[] | null }
+interface Gap { course?: Named; fee?: number; duration_seconds?: number; nearest?: Named | null; nearest_trip?: TripHint | null; needs?: Need[] | null }
 interface Literacy { share_bps?: number; next_bps?: number; next_stage?: string }
 interface EducationView {
   current?: CurrentCourse | null
@@ -42,7 +44,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
     switch (n.kind) {
       case 'knowledge': return t('education.gap.need.knowledge', { name: names.name('knowledge', n.code ?? '', n.name ?? n.code) })
       case 'building': return t('education.gap.need.building', { name: n.code ? buildingName(cat, n.code, n.name) : names.name('building_role', n.role ?? '', n.role) })
-      case 'teacher': return t('education.gap.need.teacher', { name: names.name('building_role', n.role ?? '', n.role) })
+      case 'teacher': return n.role ? t('education.gap.need.teacher', { name: names.name('building_role', n.role, n.role) }) : t('education.gap.need.teacher_post')
       default: return null
     }
   }
@@ -108,7 +110,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
               const needs = (g.needs ?? []).map(needText).filter((x): x is string => !!x)
               return (
                 <PCard key={g.course?.code} off icon="book" title={course(g.course)} badge={t('education.here_not')} tone="off"
-                  facts={<><Lines lines={[`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '']} /><Need lines={needs} /></>}
+                  facts={<><Lines lines={[`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '', tripLine(g.nearest_trip)]} /><Need lines={needs} /></>}
                   foot={near && g.nearest?.code ? <button className="pn-btn sec" onClick={() => run('travel.options', { city: g.nearest!.code! })}>{t('education.gap.go', { place: near })}</button> : undefined} />
               )
             })}

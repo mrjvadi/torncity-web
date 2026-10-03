@@ -227,8 +227,8 @@ function opening(no: number) {
   return mockOk('company_opening', {
     no, company: WORK, job: j, city_code: 'calderis', city: city.name, place: N('workshop', 'کارگاه'), wage: j === SELLER ? 260 : 300, energy_cost: 10, shift_length_seconds: 1800, free: 2,
     requirements: [
-      { kind: 'level', met: true, skill: '', need: 3, have: 7, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0 },
-      { kind: 'skill', met: false, skill: 'baking', need: 2, have: 1, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0 },
+      { kind: 'level', met: true, skill: '', need: 3, have: 7, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, trip: null },
+      { kind: 'skill', met: false, skill: 'baking', need: 2, have: 1, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, trip: null },
     ], can_apply: true, applied: false, employed: false, auto_accept: false, closed: false,
   }, [primary('company.apply', 'company.apply', { no: String(no) }), act('company.page', 'company.view', { code: WORK.code }), back('job.list'), refreshA('company.opening', { no: String(no) })])
 }
