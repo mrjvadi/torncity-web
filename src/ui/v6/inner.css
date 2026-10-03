@@ -375,3 +375,4 @@
 @media (min-width: 900px) { .ft-section { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); } .ft-section > * { grid-column: 1 / -1; } .ft-section > .ft-row { grid-column: auto; } }
 .hub-cards > .nx-card { align-items: stretch; justify-content: flex-start; text-align: start; }
 .hub-cards > .nx-card .nx-bar-wrap, .hub-cards > .nx-card .nx-bar { width: 100%; }
+.hub-cards .nx-row-right .vf-cancel, .hub-cards .pc-foot .vf-cancel { min-height: 44px; min-width: 44px; padding: 0 10px; }
