@@ -6,9 +6,10 @@ export interface RingSpec { size: number; lw: number; lh: number }
 export interface Placed { x: number; y: number; ly: number }
 export interface RingPlan { flip: boolean; items: Placed[]; plateX: number; plateY: number }
 
-// owner 2026-10-03: the ring was too big; the visible discs shrink, every hit area stays >= 44 px (P24)
-export const SIZE = { info: 44, normal: 46, primary: 56 }
-const STEP = 68, BASE = 26, DEPTH = 28, PLATE_H = 32
+// owner 2026-10-03 (twice): the ring was too big. The visible discs are small; each button's hit area is grown by
+// 5 px on every side in CSS, so the finger target stays >= 44 px (P24)
+export const SIZE = { info: 38, normal: 40, primary: 48 }
+const STEP = 62, BASE = 22, DEPTH = 24, PLATE_H = 28
 
 type Rect = [number, number, number, number]
 const bounds = (rects: Rect[]) => rects.reduce((a, r) => ({ x0: Math.min(a.x0, r[0]), y0: Math.min(a.y0, r[1]), x1: Math.max(a.x1, r[2]), y1: Math.max(a.y1, r[3]) }), { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 })

@@ -140,7 +140,7 @@ function Ring({ model, onDismiss }: { model: RingModel; onDismiss: () => void })
         return (
           <span key={a.id} style={{ display: 'contents' }}>
             <button className={`v6-rbtn${a.kind ? ' ' + a.kind : ''}${a.off ? ' off' : ''}${open ? ' v6-ring-open' : ''}`} data-act={a.id}
-              style={{ width: size, height: size, ...at(it?.x ?? ax, it?.y ?? ay, 0.3, j) }}
+              style={{ width: size, height: size, '--rs': `${size}px`, ...at(it?.x ?? ax, it?.y ?? ay, 0.3, j) } as React.CSSProperties}
               aria-label={a.label} data-tip={a.label}
               onClick={(e) => { e.stopPropagation(); a.onClick() }}>
               <Ic name={a.icon} />{a.badge && <span className="v6-badge">{a.badge}</span>}

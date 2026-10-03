@@ -214,7 +214,9 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     // a ring is open: a tap on the ground only puts it away (P10)
     if (lotRing) { setLotRing(null); return }
     if (selectedId && !bid) { setSelectedId(null); return }
-    if (!bid && layout && lot && resident) {
+    // a lot's ring (buy, build, access) opens only in the land or build tools, never on a stray touch of the ground
+    // while looking around the city (owner 2026-10-03); outside them a tap on the ground does nothing
+    if (!bid && layout && lot && resident && landOn) {
       const k = classifyLot(layout, lot.x, lot.y)
       setSelectedId(null)
       if (k.kind === 'free') { setLotRing({ x: lot.x, y: lot.y, kind: 'free' }); return }
