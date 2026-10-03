@@ -76,7 +76,7 @@ function ShopBody({ v, names, onBuy, onWrite, onMoney }: {
             {(v.locked ?? []).map((l) => (
               <PCard key={l.item.code} icon="lock" title={goodsName(names, l)} off
                 facts={<>
-                  {(l.needs_buildings ?? []).length > 0 && <span>{t('sm.shop.needs_building', { list: (l.needs_buildings ?? []).map((b) => names.name('building', b.code, b.name)).join('، ') })}</span>}
+                  {(l.needs_buildings ?? []).length > 0 && <span>{t('sm.shop.needs_building', { list: (l.needs_buildings ?? []).map((b) => names.name('settlement_building', b.code, b.name)).join('، ') })}</span>}
                   {(l.needs_knowledge ?? []).length > 0 && <span>{t('sm.shop.needs_knowledge', { list: (l.needs_knowledge ?? []).map((k) => names.name('knowledge', k.code, k.name)).join('، ') })}</span>}
                 </>} />
             ))}

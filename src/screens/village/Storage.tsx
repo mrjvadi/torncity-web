@@ -114,7 +114,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
               <SectionTitle>{t('sm.st.stores')}</SectionTitle>
               <CardGrid>
                 {(v.stores ?? []).map((st, i) => (
-                  <PCard key={i} icon="box" title={names.name('building', st.building.code, st.building.name)}
+                  <PCard key={i} icon="box" title={names.name('settlement_building', st.building.code, st.building.name)}
                     sub={st.kept ? t('sm.st.kept', { wage: money(v.wage) }) : t('sm.st.unkept')} tone={st.kept ? 'good' : 'danger'}
                     facts={st.kept ? undefined : t('sm.st.unkept_why')} />
                 ))}
