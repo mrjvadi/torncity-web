@@ -306,7 +306,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
         )}
       </div>
 
-      {selPlace && (
+      {selPlace && !listOpen && (
         <div className="wm-card" style={desktop ? undefined : { bottom: bottomInset }} role="dialog" aria-label={selPlace.name}>
           <div className="wm-card-head">
             <span className={`wm-rowdot ${selPlace.kind}`}>{selPlace.kind === 'home' && <Emboss name="house" palette="gold" size={16} />}</span>
