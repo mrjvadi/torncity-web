@@ -14,7 +14,7 @@ interface CurrentCourse { course?: Named; percent?: number; remaining_seconds?: 
 interface CourseLine { course?: Named; duration_seconds?: number; eligible?: boolean; fee?: number; min_level?: number }
 interface Need { kind?: string; code?: string; name?: string; role?: string; tier?: number }
 interface Gap { course?: Named; fee?: number; duration_seconds?: number; nearest?: Named | null; nearest_trip?: TripHint | null; needs?: Need[] | null }
-interface Literacy { share_bps?: number; next_bps?: number; next_stage?: string }
+interface Literacy { share_bps?: number }
 interface EducationView {
   current?: CurrentCourse | null
   certificates?: Named[] | null
@@ -58,9 +58,8 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
           <div className="nx-sec">{t('education.literacy.title')}</div>
           <div className="nx-bar-sub" style={{ margin: '4px 0 8px' }}>{t('education.literacy.first')}</div>
           <Bar
-            frac={clamp01((lit.share_bps ?? 0) / Math.max(1, lit.next_bps || 10000))} color="var(--violet)"
+            frac={clamp01((lit.share_bps ?? 0) / 10000)} color="var(--violet)"
             label={t('education.literacy.share', { p: pct(lit.share_bps), place })}
-            sub={lit.next_bps ? t('education.literacy.next', { p: pct(lit.next_bps), stage: t(`eco.stage.${lit.next_stage ?? 'town'}` as Key) }) : undefined}
           />
         </Card>
       )}

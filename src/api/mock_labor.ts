@@ -32,7 +32,7 @@ function init() {
   S.ready = true
   S.sites = [
     { id: 'lb-site-1', code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: 'Woodcutter camp', x: 1, y: 0, required: 120, done: 42, jobId: 'lb-job-1', left: 3, total: 4, crew: 0, wage: 30, status: 'building', employer: '' },
-    { id: 'lb-site-2', code: 'cottage', fa: 'خانهٔ روستایی', en: 'Cottage', x: 3, y: 1, required: 240, done: 0, jobId: 'lb-job-2', left: 6, total: 6, crew: 0, wage: 45, status: 'building', employer: 'سارا' },
+    { id: 'lb-site-2', code: 'cottage', fa: 'خانهٔ کوچک', en: 'Cottage', x: 3, y: 1, required: 240, done: 0, jobId: 'lb-job-2', left: 6, total: 6, crew: 0, wage: 45, status: 'building', employer: 'سارا' },
   ]
   S.shifts = [{ id: 'lb-shift-0', siteId: 'lb-site-1', npc: false, name: 'سارا', level: 'journeyman', finish: Date.now() + 5 * 60_000, wage: 30, points: 60 }]
 }
@@ -88,7 +88,7 @@ function jobView(s: Site): LaborJobView {
   return {
     id: s.jobId, building_id: s.id, building: named(s), kind: 'construction', employer_kind: s.employer ? 'player' : 'settlement', employer: s.employer,
     wage: s.wage, left: s.left, total: s.total, progress_bps: Math.floor((s.done * 10000) / s.required), left_minutes: s.required - s.done,
-    workers: shifts.length, npc_crew: s.crew, can_take: s.status === 'building' && s.left > 0 && s.required - s.done - pending > 0 && !mine(), mine: !!s.employer && false, points: 42,
+    workers: shifts.length, npc_crew: s.crew, can_take: s.status === 'building' && s.left > 0 && s.required - s.done - pending > 0 && !mine(), mine: !!s.employer && false, points: 42, lot_x: s.x, lot_y: s.y,
   }
 }
 

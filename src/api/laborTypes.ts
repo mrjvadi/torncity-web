@@ -31,6 +31,8 @@ export interface LaborJobView {
   can_take: boolean
   mine: boolean
   points: number
+  lot_x: number
+  lot_y: number
 }
 
 export interface LaborShiftView {
