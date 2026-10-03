@@ -240,17 +240,17 @@ const achievements = () => mockOk('achievements', { lines: [
 ] }, [back('player.profile.get'), refreshA('achievement.list')])
 
 const BAG = [
-  { item: N('bread', 'Bread'), category: 'food', shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, qty: 3, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
-  { item: N('bandage', 'Bandage'), category: 'medicine', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'دارو' }, qty: 2, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
-  { item: N('phone', 'Phone'), category: 'electronics', shelf: { code: 'tools.devices', group: 'tools', label: 'دستگاه', group_label: 'ابزار' }, qty: 1, serial: 'ph-7f3a', quality: 74, uses_left: 18, durability: 80, design: '' },
+  { item: N('bread', 'Bread'), category: 'food', shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'item_shelf_group.food' }, qty: 3, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
+  { item: N('bandage', 'Bandage'), category: 'medicine', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'item_shelf_group.medicine' }, qty: 2, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
+  { item: N('phone', 'Phone'), category: 'electronics', shelf: { code: 'tools.devices', group: 'tools', label: 'دستگاه', group_label: 'item_shelf_group.tools' }, qty: 1, serial: 'ph-7f3a', quality: 74, uses_left: 18, durability: 80, design: '' },
 ]
 
 const inventory = () => mockOk('inventory', {
   lines: BAG, page: 1, pages: 1, total: 3, in_escrow: 2,
   bags: [{ slot: 'belt', bag: null }, { slot: 'back', bag: { item: N('bag_sack', 'کیسه'), serial: 'sk-1a2b', full_space: 12, space: 12, wear: 70, wear_max: 100, torn: false, comfort_kg: 8, hard_kg: 14 } }],
   carry: { used: 14, reserved: 2, capacity: 20, base: 8, load_g: 5200, comfort_g: 12000, hard_g: 20000 },
-  home: { capacity: 40, used: 6, here: true, lines: [{ item: N('plank', 'تخته'), category: 'wood', shelf: { code: 'materials.wood', group: 'materials', label: 'چوب', group_label: 'مصالح' }, qty: 3, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' }] },
-  claims: [{ item: N('bandage', 'Bandage'), category: 'medicine', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'دارو' }, qty: 2, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' }],
+  home: { capacity: 40, used: 6, here: true, lines: [{ item: N('plank', 'تخته'), category: 'wood', shelf: { code: 'materials.wood', group: 'materials', label: 'چوب', group_label: 'item_shelf_group.materials' }, qty: 3, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' }] },
+  claims: [{ item: N('bandage', 'Bandage'), category: 'medicine', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'item_shelf_group.medicine' }, qty: 2, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' }],
 }, [
   ...BAG.map((l) => A('item.open', 'inventory.item', { item: l.serial || l.item.code }, { subject: l.item.code })), A('shops', 'shop.list'), A('market', 'market.list'), back('player.profile.get'), refreshA('inventory.show'),
 ])

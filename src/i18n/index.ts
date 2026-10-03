@@ -89,8 +89,15 @@ function digits(s: string): string {
   return isRtl() ? s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d]) : s
 }
 
+const missingKeys = new Set<string>()
+
 export function t(key: Key, params?: Record<string, string | number>): string {
-  let s: string = (current === 'en' ? EN[key] : undefined) ?? FA[key] ?? key
+  let s: string | undefined = (current === 'en' ? EN[key] : undefined) ?? FA[key]
+  if (s === undefined) {
+    // a key with no words is a gap to fix, never text for a player: it is dropped (and shown in the dev console)
+    if (import.meta.env.DEV && !missingKeys.has(key)) { missingKeys.add(key); console.warn(`[i18n] missing key: ${key}`) }
+    return ''
+  }
   if (params) for (const [k, v] of Object.entries(params)) s = s.split(`{${k}}`).join(typeof v === 'number' ? digits(String(v)) : String(v))
   return s
 }

@@ -272,7 +272,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
     // -- the item market
     case 'market.list':
       return mockOk('market', {
-        city_code: 'calderis', city: city.name, books: [{ item: bread, shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, best_bid: 38, best_ask: 44, last: 40 }, { item: N('plank', 'تخته'), shelf: { code: 'materials.wood', group: 'materials', label: 'چوب', group_label: 'مصالح' }, best_bid: 0, best_ask: 90, last: 85 }], yours: [sword],
+        city_code: 'calderis', city: city.name, books: [{ item: bread, shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'item_shelf_group.food' }, best_bid: 38, best_ask: 44, last: 40 }, { item: N('plank', 'تخته'), shelf: { code: 'materials.wood', group: 'materials', label: 'چوب', group_label: 'item_shelf_group.materials' }, best_bid: 0, best_ask: 90, last: 85 }], yours: [sword],
         at_market: !args.away, way: args.away ? { place: N('bazaar', 'بازارچه'), walk_seconds: 240 } : null, unavailable: null,
         village: { stalls: 6, stalls_used: 2, per_player: 3, mine: 1, listing_bps: 100, dues_bps: 300, market_day: false },
       }, [
@@ -319,7 +319,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
     case 'shop.view':
       return mockOk('shop_detail', {
         shop: N('grocery', 'خواربارفروشی'), place: N('bazaar', 'بازارچه'), here: !args.away, walk_seconds: args.away ? 180 : 0,
-        shelves: [{ item: bread, shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, price: 40, stock: 12, busy: false, buyback: 18, next_restock: null }, { item: N('rice', 'برنج'), shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, price: 120, stock: 0, busy: true, buyback: 0, next_restock: LATER }], tax_bps: 500,
+        shelves: [{ item: bread, shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'item_shelf_group.food' }, price: 40, stock: 12, busy: false, buyback: 18, next_restock: null }, { item: N('rice', 'برنج'), shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'item_shelf_group.food' }, price: 120, stock: 0, busy: true, buyback: 0, next_restock: LATER }], tax_bps: 500,
       }, [
         ...(args.away ? [goA('place.walk', 'place.go', { place: 'bazaar', then: 'shop.view', arg: 'grocery' }, 'bazaar')] : [goA('shop.buy', 'shop.buy', { shop: 'grocery', item: 'bread', qty: '1' }, 'bread')]),
         back('shop.list'), refreshA('shop.view', { shop: 'grocery' }),
