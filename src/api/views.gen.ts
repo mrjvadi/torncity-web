@@ -329,6 +329,7 @@ export interface BookLevel {
 
 export interface BookSummary {
   item: Named
+  shelf: ShelfRef
   best_bid: number
   best_ask: number
   last: number
@@ -346,6 +347,8 @@ export interface BookView {
   at_market: boolean
   way: Way | null
   nonce: string
+  unavailable: Unavailable | null
+  village: VillageBookView | null
 }
 
 export interface BoughtView {
@@ -402,6 +405,7 @@ export interface BudgetView {
 export interface BuildLine {
   building: Named
   role: string
+  category: string
   state: string
   cost_money: number
   build_time_seconds: number
@@ -476,6 +480,7 @@ export interface BuildingView {
   research: BuildingResearchLine | null
   has_upgrade: boolean
   upgrades: BuildingUpgradeLine[] | null
+  shop: VillageShopView | null
 }
 
 export interface BuyView {
@@ -2217,6 +2222,7 @@ export interface InsureConfirmView {
 export interface InventoryLine {
   item: Named
   category: string
+  shelf: ShelfRef
   qty: number
   serial: string
   quality: number
@@ -2231,6 +2237,10 @@ export interface InventoryView {
   pages: number
   total: number
   in_escrow: number
+  bags: BagSlotLine[] | null
+  carry: CarryLine
+  home: HomeStoreView | null
+  claims: InventoryLine[] | null
 }
 
 export interface ItemDetailView {
@@ -2247,11 +2257,13 @@ export interface ItemDetailView {
   gear: GearLine | null
   usable: boolean
   tradeable: boolean
+  can_store: boolean
   cooldown_seconds: number
   cooling_for_seconds: number
   ready_at: string | null
   nonce: string
   give_to: Named[] | null
+  bag: BagDetail | null
 }
 
 export interface ItemDroppedView {
@@ -2939,6 +2951,7 @@ export interface MarketRefusalView {
   kind: string
   item: Named
   count: number
+  unavailable: Unavailable | null
 }
 
 export interface MarketView {
@@ -2948,6 +2961,8 @@ export interface MarketView {
   yours: Named[] | null
   at_market: boolean
   way: Way | null
+  unavailable: Unavailable | null
+  village: VillageBookView | null
 }
 
 export interface MaterialBought {
@@ -2987,6 +3002,10 @@ export interface MaterialsView {
   stock: MaterialStockLine[] | null
   used: number
   capacity: number
+  classes: StockClassLine[] | null
+  stores: StockStoreLine[] | null
+  wage: number
+  spoil_bps: number
   market: MaterialMarketLine[] | null
   can_buy: boolean
   presets: number[] | null
@@ -3338,6 +3357,7 @@ export interface OrderLine {
 }
 
 export interface OrderPlacedView {
+  listing_fee: number
   item: Named
   side: string
   no: number
@@ -4336,6 +4356,7 @@ export interface SettlementWhoView {
 
 export interface ShelfLine {
   item: Named
+  shelf: ShelfRef
   price: number
   stock: number
   busy: boolean
@@ -4997,6 +5018,7 @@ export interface VillageRefusalView {
   min: number
   max: number
   lots: BatchLotFailure[] | null
+  missing: number
   action: string
   subject: Named
   needs: VillageNeed[] | null
@@ -5229,8 +5251,325 @@ export interface WorthView {
   total: number
 }
 
+export interface CarryLine {
+  used: number
+  reserved: number
+  capacity: number
+  base: number
+  load_g: number
+  comfort_g: number
+  hard_g: number
+}
+
+
+export interface HomeStoreView {
+  capacity: number
+  used: number
+  here: boolean
+  lines: InventoryLine[] | null
+}
+
+
+export interface NoRoomView {
+  item: Named
+  qty: number
+  need_space: number
+  free_space: number
+  short: number
+  need_g: number
+  free_g: number
+  heavy: boolean
+  back: string
+}
+
+
+export interface StockClassLine {
+  class: string
+  used: number
+  capacity: number
+  reserved: number
+}
+
+
+export interface StockStoreLine {
+  building: Named
+  kept: boolean
+}
+
+
+export interface VillageBookView {
+  stalls: number
+  stalls_used: number
+  per_player: number
+  mine: number
+  listing_bps: number
+  dues_bps: number
+  market_day: boolean
+}
+
+
+export interface VillageShopCheckoutView {
+  village: string
+  item: Named
+  kind: string
+  qty: number
+  unit: number
+  total: number
+  tax: number
+  tax_bps: number
+  stock: number
+  space: number
+  free_space: number
+  grams: number
+  payment: PaymentChoice
+  nonce: string
+}
+
+
+export interface VillageShopLine {
+  item: Named
+  kind: string
+  shelf: ShelfRef
+  price: number
+  reference: number
+  stock: number
+  left_today: number
+  fits: number
+  max_buy: number
+  tradable: boolean
+}
+
+
+export interface VillageShopRefusalView {
+  kind: string
+  item: Named
+  closed: string
+  stock: number
+  left_today: number
+  free_space: number
+  need_space: number
+  free_g: number
+  need_g: number
+  min: number
+  max: number
+  next_delivery: string | null
+}
+
+
+export interface VillageShopView {
+  village: string
+  building: boolean
+  closed: string
+  next_delivery: string | null
+  delivery_hour: number
+  wage: number
+  tax_bps: number
+  tax_max_bps: number
+  tax_presets: number[] | null
+  price_cap_bps: number
+  cap_min_bps: number
+  cap_max_bps: number
+  cap_presets: number[] | null
+  can_set_cap: boolean
+  presets: number[] | null
+  resident: boolean
+  lines: VillageShopLine[] | null
+  locked: ShopLockedLine[] | null
+  free_space: number
+  capacity: number
+  free_g: number
+  repairs: ShopRepairLine[] | null
+  can_repair: boolean
+  cash: number
+  bought: ShopBought | null
+  mended: ShopMended | null
+}
+
+
+export interface BagSlotLine {
+  slot: string
+  bag: WornBagLine | null
+}
+
+
+export interface BagDetail {
+  slot: string
+  space: number
+  comfort_kg: number
+  hard_kg: number
+  worn: boolean
+  torn: boolean
+  repair_cost: number
+}
+
+
+export interface JobGap {
+  job: JobRef
+  nearest: Named | null
+  needs: CourseNeed[] | null
+}
+
+
+export interface MoneyBasketLine {
+  item: Named
+  kind: string
+  week_milli: number
+  reference: number
+  price: number
+  on_shelf: boolean
+}
+
+
+export interface MoneyCurrency {
+  code: string
+  name: string
+  symbol: string
+  issued: boolean
+}
+
+
+export interface MoneyView {
+  village: string
+  currency: MoneyCurrency
+  market: string
+  reserve: string
+  nil_unit_sup: number
+  nil_per_unit_micro: number
+  examples: NilExample[] | null
+  treasury: number
+  treasury_nil_micro: number
+  output: number
+  output_nil_micro: number
+  output_days: number
+  residents: number
+  basket: MoneyBasketLine[] | null
+  index_bps: number
+  cover_bps: number
+}
+
+
+export interface NilExample {
+  amount: number
+  nil_micro: number
+}
+
+
+export interface RoadCancelledView {
+  settlement_name: string
+  plan_id: string
+  lots: number
+}
+
+
+export interface RoadClassOption {
+  class: Named
+  lot_cost: number
+  available: boolean
+  missing: Named[] | null
+}
+
+
+export interface RoadPlanLine {
+  id: string
+  class: Named
+  lots: number
+  built: number
+  open: number
+  sold: number
+  to: LotRef
+  cancellable: boolean
+}
+
+
+export interface RoadQuoteView {
+  settlement_name: string
+  settlement_id: string
+  plan_id: string
+  from: LotRef
+  to: LotRef
+  class: Named
+  options: RoadClassOption[] | null
+  lots: number
+  crossings: number
+  length_m: number
+  climb_m: number
+  max_grade_bps: number
+  lot_cost: number
+  crossing_cost: number
+  full_cost: number
+  opens: number
+  usable: number
+  water: number
+  steep: number
+  path: LotRef[] | null
+  open_cells: LandCell[] | null
+}
+
+
+export interface ShelfRef {
+  code: string
+  group: string
+  label: string
+  group_label: string
+}
+
+
+export interface ShopBought {
+  item: Named
+  kind: string
+  qty: number
+  total: number
+  tax: number
+  method: string
+}
+
+
+export interface ShopLockedLine {
+  item: Named
+  kind: string
+  shelf: ShelfRef
+  needs_buildings: Named[] | null
+  needs_knowledge: Named[] | null
+}
+
+
+export interface ShopMended {
+  item: Named
+  cost: number
+}
+
+
+export interface ShopRepairLine {
+  item: Named
+  serial: string
+  slot: string
+  wear: number
+  wear_max: number
+  torn: boolean
+  cost: number
+}
+
+
+export interface WornBagLine {
+  item: Named
+  serial: string
+  full_space: number
+  space: number
+  wear: number
+  wear_max: number
+  torn: boolean
+  comfort_kg: number
+  hard_kg: number
+}
+
+
 /** The screens of the migrated areas: the screen name on the wire, and its view. */
 export interface ScreenViews {
+  village_money: MoneyView
+  village_shop_refusal: VillageShopRefusalView
+  village_shop_checkout: VillageShopCheckoutView
+  village_shop: VillageShopView
+  no_room: NoRoomView
   achievement_notice: AchievementView
   achievements: AchievementsView
   activities_hub: ActivitiesHubView
@@ -5545,4 +5884,4 @@ export interface ScreenViews {
 }
 
 /** Screens whose response is a refusal: the answer carries an error code instead of ok. */
-export const REFUSAL_SCREENS = ['appoint_refusal', 'auction_refusal', 'bill_refusal', 'company_refusal', 'crime_refusal', 'diplomacy_refusal', 'election_refusal', 'faction_refusal', 'finance_refusal', 'founding_refusal', 'health_refusal', 'item_refusal', 'life_refusal', 'market_refusal', 'military_refusal', 'mission_refusal', 'policy_refused', 'production_refusal', 'property_refusal', 'recruit_refusal', 'refusal', 'sanction_blocked', 'settlement_refusal', 'shop_refusal', 'village_refusal', 'war_blocked', 'war_refusal'] as const
+export const REFUSAL_SCREENS = ['appoint_refusal', 'auction_refusal', 'bill_refusal', 'company_refusal', 'crime_refusal', 'diplomacy_refusal', 'election_refusal', 'faction_refusal', 'finance_refusal', 'founding_refusal', 'health_refusal', 'item_refusal', 'life_refusal', 'market_refusal', 'military_refusal', 'mission_refusal', 'no_room', 'policy_refused', 'production_refusal', 'property_refusal', 'recruit_refusal', 'refusal', 'sanction_blocked', 'settlement_refusal', 'shop_refusal', 'village_refusal', 'village_shop_refusal', 'war_blocked', 'war_refusal'] as const

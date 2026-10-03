@@ -391,3 +391,32 @@
 /* lines inside a PCard's facts (activities): one per row, centred; «what is lacking» in red */
 .hub-cards .pc-line { display: block; font: 500 12.5px/1.4 Vazirmatn; color: var(--v6-mut); overflow-wrap: anywhere; }
 .hub-cards .pc-need { color: #ffb4a8; }
+/* ---------- the goods grid: the backpack, the stores and the holding slot (storage and market audit F13) ----------
+   3-4 cells a row on a phone (390 px), 6-8 on desktop (1440 px): the grid counts by the width of its own box, so the
+   docked panel (468 px) gets 6 and a wide page 8. A cell: icon, short name, quantity badge; a tap opens the good. */
+.ig-wrap { container-type: inline-size; }
+.ig-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@container (min-width: 420px) { .ig-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@container (min-width: 660px) { .ig-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+.ig-cell { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; min-width: 0; min-height: 88px;
+  padding: 8px 4px 6px; border-radius: 12px; background: var(--v6-glass); border: 1px solid var(--v6-line); box-shadow: var(--v6-sh); color: var(--v6-txt); text-align: center; }
+button.ig-cell:active { background: #ffffff12; }
+button.ig-cell:hover { border-color: var(--v6-gold); }
+.ig-cell.warn { border-color: #f4c44199; }
+.ig-cell.bad { border-color: #ff5a4799; }
+.ig-cell.good { border-color: #56d44799; }
+.ig-name { font: 700 12.5px/1.25 Vazirmatn; color: var(--v6-txt); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ig-sub { font: 500 11.5px/1.2 Vazirmatn; color: var(--v6-mut); }
+.ig-qty { position: absolute; top: 3px; inset-inline-start: 3px; min-width: 22px; padding: 0 6px; border-radius: 9px; background: #05080ecc; color: var(--v6-gold-hi); font: 800 12px/18px Vazirmatn; font-variant-numeric: tabular-nums; }
+.ig-fill { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 14px; background: var(--v6-glass); border: 1px solid var(--v6-line); }
+.ig-fill-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font: 600 13.5px/1.3 Vazirmatn; color: var(--v6-mut); }
+.ig-fill-head b { color: var(--v6-txt); font: 800 15px/1.3 Vazirmatn; font-variant-numeric: tabular-nums; direction: ltr; }
+.ig-fill .pn-bar { margin: 0; }
+.ig-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ig-slot { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 8px 10px; border-radius: 12px; background: #ffffff0d; border: 1px dashed var(--v6-line); font: 600 13px/1.3 Vazirmatn; color: var(--v6-mut); }
+.ig-slot.on { border-style: solid; background: var(--v6-glass); color: var(--v6-txt); }
+.ig-slot.torn { border-color: #ff5a4799; }
+.ig-slot b { font: 800 13.5px/1.3 Vazirmatn; color: var(--v6-txt); }
+.ig-src { display: flex; gap: 6px; }
+.gc-price { color: var(--v6-gold); font-variant-numeric: tabular-nums; }
+.gc-note { font: 500 12.5px/1.4 Vazirmatn; color: var(--v6-mut); }

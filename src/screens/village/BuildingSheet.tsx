@@ -31,7 +31,7 @@ interface Props {
   cat: Map<string, CatalogueBuilding>
   store: VillageStore | null
   /** Opens one of the village's own screens (the civic hall's doors). */
-  onOpen?: (screen: 'village_overview' | 'village_knowledge' | 'village_progress' | 'village_storage') => void
+  onOpen?: (screen: 'village_overview' | 'village_knowledge' | 'village_progress' | 'village_storage' | 'village_shop') => void
   /** Starts build mode on a building code (an upgrade line's button). */
   onBuild?: (code: string) => void
   onClose: () => void
@@ -193,6 +193,17 @@ function TypePanel({ kind, panel, names, onOpen, onClose }: {
           {onOpen && (
             <ActionButton tone="steel" small onClick={() => { onClose(); onOpen('village_storage') }}>{t('storage.open')}</ActionButton>
           )}
+        </>
+      )}
+      {kind === 'shop' && panel.shop && (
+        <>
+          <Section>{t('sm.shop.title')}</Section>
+          <Note>{panel.shop.closed ? t(`sm.shop.closed.${panel.shop.closed}` as Key) : t('sm.shop.open')}</Note>
+          <StatGrid>
+            <StatCard icon="box" palette="amber" label={t('sm.shop.lbl_price')} value={formatNumber((panel.shop.lines ?? []).length)} />
+            <StatCard icon="coins" palette="gold" label={t('sm.shop.lbl_wage')} value={money(panel.shop.wage)} />
+          </StatGrid>
+          {onOpen && <ActionButton tone="gold" small onClick={() => { onClose(); onOpen('village_shop') }}>{t('sm.shop.open')}</ActionButton>}
         </>
       )}
       {kind === 'school' && (

@@ -7,13 +7,15 @@ import CityPanel from './CityPanel'
 import { LaborBoard, LaborMine, LaborSiteScreen } from './Labor'
 import { FlowHost, NATIVE } from './flow'
 import { FLOW_SCREENS } from './screens'
+import { SHOP_FLOWS, SHOP_SCREENS, ShopLocal } from './shop'
+import { registerFlow } from './flow'
 
 // The village: a local home screen (the 3D view) and the status screens,
 // which are also the layouts of the server screens the same commands answer
 // with (client-api.md section 4.3). See ../registry.ts.
 const screens: ScreenSet = {
   SERVER: {
-    ...Object.fromEntries(FLOW_SCREENS.map((name) => [name, FlowHost])),
+    ...Object.fromEntries([...FLOW_SCREENS, ...SHOP_SCREENS].map((name) => [name, FlowHost])),
     village_overview: Overview,
     settlement_construction_progress: Progress,
     settlement_knowledge_list: Knowledge,
@@ -32,8 +34,11 @@ const screens: ScreenSet = {
     village_who: Who,
     village_labor: LaborBoard,
     village_storage: Storage,
+    village_shop: ShopLocal,
   },
 }
+
+registerFlow(SHOP_FLOWS)
 
 // a write that answers one of these hands over to its own layout (flow.tsx)
 for (const name of ['village_overview', 'settlement_construction_progress', 'settlement_knowledge_list', 'village_materials', 'labor_board', 'labor_site', 'labor_mine']) {

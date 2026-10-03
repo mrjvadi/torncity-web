@@ -272,8 +272,9 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
     // -- the item market
     case 'market.list':
       return mockOk('market', {
-        city_code: 'calderis', city: city.name, books: [{ item: bread, best_bid: 38, best_ask: 44, last: 40 }, { item: N('plank', 'تخته'), best_bid: 0, best_ask: 90, last: 85 }], yours: [sword],
-        at_market: !args.away, way: args.away ? { place: N('bazaar', 'بازارچه'), walk_seconds: 240 } : null,
+        city_code: 'calderis', city: city.name, books: [{ item: bread, shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, best_bid: 38, best_ask: 44, last: 40 }, { item: N('plank', 'تخته'), shelf: { code: 'materials.wood', group: 'materials', label: 'چوب', group_label: 'مصالح' }, best_bid: 0, best_ask: 90, last: 85 }], yours: [sword],
+        at_market: !args.away, way: args.away ? { place: N('bazaar', 'بازارچه'), walk_seconds: 240 } : null, unavailable: null,
+        village: { stalls: 6, stalls_used: 2, per_player: 3, mine: 1, listing_bps: 100, dues_bps: 300, market_day: false },
       }, [
         goA('market.book', 'market.book', { item: 'bread' }, 'bread'), goA('market.book', 'market.book', { item: 'plank' }, 'plank'), goA('market.book', 'market.book', { item: 'sword' }, 'sword'),
         goA('market.mine', 'market.mine'), goA('market.auctions', 'auction.list'), goA('market.goods', 'company.goods'),
@@ -282,7 +283,8 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
     case 'market.book':
       return mockOk('book', {
         item: args.item === 'sword' ? sword : bread, city_code: 'calderis', city: city.name, bids: [{ price: 38, qty: 12 }, { price: 36, qty: 30 }], asks: [{ price: 44, qty: 8 }, { price: 48, qty: 20 }],
-        trades: [{ qty: 2, price: 40, at: AT }, { qty: 6, price: 41, at: AT }], reference: 40, holding: 4, at_market: true, way: null, nonce: 'mk1',
+        trades: [{ qty: 2, price: 40, at: AT }, { qty: 6, price: 41, at: AT }], reference: 40, holding: 4, at_market: true, way: null, nonce: 'mk1', unavailable: null,
+        village: { stalls: 6, stalls_used: 2, per_player: 3, mine: 1, listing_bps: 100, dues_bps: 300, market_day: false },
       }, [
         goA('market.buy_at', 'market.order', { side: 'buy', item: 'bread', qty: '1', price: '44' }), goA('market.bid_at', 'market.order', { side: 'buy', item: 'bread', qty: '1', price: '40' }),
         goA('market.sell_at', 'market.order', { side: 'sell', item: 'bread', qty: '1', price: '38', nonce: 'mk1' }), goA('market.ask_at', 'market.order', { side: 'sell', item: 'bread', qty: '1', price: '40', nonce: 'mk1' }),
@@ -290,7 +292,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
       ])
     case 'market.order':
       if (a('method') || (a('side') === 'sell' && a('nonce'))) {
-        return mockOk('order_placed', { item: bread, side: a('side') || 'buy', no: 12, qty: Number(args.qty ?? 2), filled: 1, price: Number(args.price ?? 44), rests: true, spent: 44, got: 38, expires_at: LATER, method: a('method') || 'cash', embargoed: 0 },
+        return mockOk('order_placed', { item: bread, side: a('side') || 'buy', no: 12, qty: Number(args.qty ?? 2), filled: 1, price: Number(args.price ?? 44), rests: true, spent: 44, got: 38, expires_at: LATER, method: a('method') || 'cash', embargoed: 0, listing_fee: 10 },
           [goA('market.mine', 'market.mine'), goA('market.book', 'market.book', { item: 'bread' }, 'bread'), back('market.list')])
       }
       return mockOk('market_checkout', { item: bread, qty: Number(args.qty ?? 2), price: Number(args.price ?? 44), reserve: 88, payment: { ...pay2, amount: 88 }, nonce: 'mk2' }, [
@@ -307,7 +309,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
         ],
       }, [goA('market.cancel', 'market.cancel', { no: '12' }), back('market.list'), refreshA('market.mine')])
     case 'market.refused':
-      return { ...mockOk('market_refusal', { kind: 'too_many', item: bread, count: 5 }, [goA('market.list', 'market.list'), back('player.profile.get')]), ok: false, error: { code: 'market_too_many', args: { count: 5 } } }
+      return { ...mockOk('market_refusal', { kind: 'too_many', item: bread, count: 5, unavailable: null }, [goA('market.list', 'market.list'), back('player.profile.get')]), ok: false, error: { code: 'market_too_many', args: { count: 5 } } }
 
     // -- the shops
     case 'shop.list':
@@ -317,7 +319,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
     case 'shop.view':
       return mockOk('shop_detail', {
         shop: N('grocery', 'خواربارفروشی'), place: N('bazaar', 'بازارچه'), here: !args.away, walk_seconds: args.away ? 180 : 0,
-        shelves: [{ item: bread, price: 40, stock: 12, busy: false, buyback: 18, next_restock: null }, { item: N('rice', 'برنج'), price: 120, stock: 0, busy: true, buyback: 0, next_restock: LATER }], tax_bps: 500,
+        shelves: [{ item: bread, shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, price: 40, stock: 12, busy: false, buyback: 18, next_restock: null }, { item: N('rice', 'برنج'), shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'خوراکی' }, price: 120, stock: 0, busy: true, buyback: 0, next_restock: LATER }], tax_bps: 500,
       }, [
         ...(args.away ? [goA('place.walk', 'place.go', { place: 'bazaar', then: 'shop.view', arg: 'grocery' }, 'bazaar')] : [goA('shop.buy', 'shop.buy', { shop: 'grocery', item: 'bread', qty: '1' }, 'bread')]),
         back('shop.list'), refreshA('shop.view', { shop: 'grocery' }),

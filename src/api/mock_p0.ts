@@ -100,7 +100,7 @@ export function mockP0Command(command: string, args?: Args) {
       return ok('economy_hub', {
         place,
         entries: [
-          e('inventory', 'inventory.show'), e('market', city ? 'market.list' : 'settlement.materials'), e('bank', 'bank.show'),
+          e('inventory', 'inventory.show'), e('market', 'market.list'), ...(city ? [] : [e('storehouse', 'settlement.materials')]), e('bank', 'bank.show'),
           ...(city ? [e('companies', 'company.mine'), e('property', 'property.mine'), e('stocks', 'stock.list')] : [e('companies', 'company.mine')]),
         ],
       })
