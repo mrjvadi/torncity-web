@@ -64,6 +64,9 @@ export interface VillageGround {
   lotCentre(x: number, y: number): { x: number; z: number }
   /** The lot under a scene x/z, or null outside the village grid. */
   lotAt(x: number, z: number): { x: number; y: number } | null
+  /** The lot under a scene x/z wherever it lies: the land has no edge (ADR 0044), so a lot west or
+   * south of the first grid has negative coordinates. */
+  lotAtAny(x: number, z: number): { x: number; y: number }
   /** Vertices per lot edge of the ground mesh, and the height grid it is drawn from
    * (raw metres, without FINE_GROUND_LIFT): (F-1)*SUB+1 squared, row-major, with the
    * server's lot heights exactly at every SUB-th vertex. */
@@ -415,6 +418,9 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
     const groundY = (x: number, z: number): number => {
       const fx = (x - p00.x) / stepX
       const fy = (z - p00.z) / stepZ
+      // beyond the fine window (a road drawn far out of the village) the ground is the coarse
+      // backdrop's own surface; on the window's edge the two are the same height
+      if (fx < 0 || fy < 0 || fx > N - 1 || fy > N - 1) return coarseSurf(fx / SUB, fy / SUB)
       const i = Math.max(0, Math.min(N - 2, Math.floor(fx)))
       const j = Math.max(0, Math.min(N - 2, Math.floor(fy)))
       const u = Math.max(0, Math.min(1, fx - i))
@@ -441,6 +447,10 @@ export async function loadVillageGround(world: WorldInfo, layout: VillageLayout,
         const ly = n - 1 - Math.round((z - p00.z) / sz - originY)
         return lx >= 0 && lx < n && ly >= 0 && ly < n ? { x: lx, y: ly } : null
       },
+      lotAtAny: (x, z) => ({
+        x: Math.round((x - p00.x) / sx - originX),
+        y: n - 1 - Math.round((z - p00.z) / sz - originY),
+      }),
       isWaterLot: (x, y) => lotWater[y * n + x] !== WATER_KIND_NONE,
       span(x0, z0, x1, z1) {
         let min = Infinity, max = -Infinity

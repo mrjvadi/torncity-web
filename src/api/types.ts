@@ -352,7 +352,20 @@ export interface VillageLayout {
   roads?: { x: number; y: number }[]
   tenure?: LayoutTenure[]
   terms?: LayoutTerms
+  /** The land the roads opened beyond the first grid (ADR 0044 5.5), for a member. */
+  land?: LayoutLand
 }
+
+/** A road drawn out of the first grid. */
+export interface LayoutRoadPlan { id: string; class: string; lots: number; to_x: number; to_y: number }
+/** One lot of a drawn road; `built` once a buyer's purchase laid it. Lot coordinates may be negative. */
+export interface LayoutRoadCell { x: number; y: number; plan: string; built: boolean; water?: 'stream' | 'river'; height_m: number }
+/** A lot a road opened; `reason` says why a lot cannot be used ('water' or 'steep'). */
+export interface LayoutOpenLot {
+  x: number; y: number; buildable: boolean; reason?: 'water' | 'steep'
+  height_m: number; slope_m: number; biome?: string; water?: string; tags?: string[]
+}
+export interface LayoutLand { plans: LayoutRoadPlan[]; cells: LayoutRoadCell[]; open: LayoutOpenLot[] }
 
 export type PresenceActivity = 'idle' | 'travelling' | 'working' | 'studying' | 'training' | 'hospital' | 'jail' | 'building' | 'fighting'
 
@@ -381,7 +394,7 @@ export interface LayoutVersions { head: string; member: string; public: string }
 /** What arrives on settlement:<id> (section 5.4). */
 export interface SettlementEvent {
   type:
-    | 'build_started' | 'build_finished' | 'build_cancelled' | 'build_salvaged' | 'build_batch_started' | 'grid_grown'
+    | 'build_started' | 'build_finished' | 'build_cancelled' | 'build_salvaged' | 'build_batch_started' | 'land_changed'
     | 'research_started' | 'research_finished' | 'knowledge_bought' | 'literacy_changed'
     | 'head_changed' | 'member_joined' | 'member_left' | 'lot_bought' | 'lot_repaired'
   settlement_id: string
@@ -393,7 +406,7 @@ export interface SettlementEvent {
   lot_y?: number
   rotated?: boolean
   finish_at?: string
-  /** build_batch_started: how many, and which; grid_grown: the new side. */
+  /** build_batch_started: how many, and which. */
   count?: number
   buildings?: { building_id: string; lot_x: number; lot_y: number }[]
   grid_lots?: number
@@ -415,7 +428,7 @@ export interface SettlementEvent {
 // The names below are the ones the village code already uses.
 
 export type {
-  Named, VillageOverviewView, DonateView, BuildMenuView, LotGridView, LotConfirmView, GridGrowView,
+  Named, VillageOverviewView, DonateView, BuildMenuView, LotGridView, LotCell, LandCell, LotConfirmView, RoadQuoteView, RoadCancelledView, RoadPlanLine,
   ConstructionProgressView, KnowledgeListView, LotBuyView, LotAccessView, LotRepairView, PrivateMenuView, PrivateConfirmView, MineView,
   MaterialBuyView as MaterialBuyConfirmView, MaterialsView as VillageMaterialsView, BuildingView as BuildingPanelView,
   LotBatchConfirmView as BatchConfirmView, VillageRefusalView, PromotionView, ResidenceView, WorkView, TermsView,

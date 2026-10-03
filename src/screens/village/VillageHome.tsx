@@ -30,6 +30,7 @@ import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
 import { BuyLotSheet, HouseSheet, LotAccessSheet, TakenLotSheet } from './LandSheets'
 import { classifyLot, tonesForLand, type LotAccessMap } from './citizen'
+import { classifyOuter, inFirstGrid, outerAccess, outerForLand } from './outer'
 import type { LandView, LotAccessView } from '../../api/types'
 import './village.css'
 
@@ -62,6 +63,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const own = !localArgs?.id
   const build = useBuildMode(store, layout, sceneRef, cat)
   const tapRef = useRef<(lot: { x: number; y: number } | null, bid: string | null) => void>(() => undefined)
+  // a tap on the ground wherever it lands, the first grid or the land beyond it (negative lots west and south)
+  const groundRef = useRef<(lot: { x: number; y: number }) => void>(() => undefined)
 
   // The citizen loop (docs/adr/0033 section 4.4): a resident buys a free lot,
   // builds a house on their own, sees their property. `landOn` is the land map
@@ -92,7 +95,9 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     void cmd('settlement.land', {}, { silent: true }).then((r) => {
       if (cancelled || !r.ok || !r.res?.view) return
       const m = new Map<string, string>()
-      for (const row of (r.res.view as unknown as LandView).rows ?? []) for (const c of row ?? []) if (c.access) m.set(`${c.x},${c.y}`, c.access)
+      const lv = r.res.view as unknown as LandView
+      for (const row of lv.rows ?? []) for (const c of row ?? []) if (c.access) m.set(`${c.x},${c.y}`, c.access)
+      for (const [k, a] of outerAccess(lv.outer)) m.set(k, a)
       setAccess(m)
     })
     return () => { cancelled = true }
@@ -107,6 +112,11 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   useEffect(() => {
     if (!sceneReady) return
     sceneRef.current?.setOverlayTones((landOn || lotRing) && layout && build.state.step === 'off' ? tonesForLand(layout, access) : null)
+  }, [landOn, lotRing, layout, sceneReady, build.state.step, access])
+  // the land the roads opened (ADR 0044 5.5): tinted in the land tool like the first grid
+  useEffect(() => {
+    if (!sceneReady || build.state.step !== 'off') return
+    sceneRef.current?.setLandCells((landOn || lotRing) && layout ? outerForLand(layout, access) : null)
   }, [landOn, lotRing, layout, sceneReady, build.state.step, access])
   // the menu's «زمین و قطعه‌ها» opens the village straight on the land map (the page may already be showing:
   // the arguments are new each time the entry is pressed)
@@ -142,6 +152,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       try {
         const scene = await VillageScene.create(canvas, ground, world, layoutRef.current!, {
           onTap: (lot, bid) => tapRef.current(lot, bid),
+          onGround: (lot) => groundRef.current(lot),
           onLabels: setLabels,
           clockSkewMs,
         })
@@ -224,6 +235,24 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       if (k.kind === 'taken') { setLotRing({ x: lot.x, y: lot.y, kind: 'taken', owner: k.owner }); return }
     }
     setSelectedId(bid)
+  }
+
+  groundRef.current = (lot) => {
+    if (!layout || inFirstGrid(layout, lot.x, lot.y)) return
+    // the road tool: the end of the road is any place on the ground
+    if (build.state.step === 'road') { build.roadTap(lot); return }
+    // the build picker: a lot the roads opened takes a building like a lot of the first grid
+    if (build.state.step === 'lot') { build.tapLot(lot); return }
+    if (build.state.step !== 'off' || !resident || !landOn) return
+    if (lotRing) { setLotRing(null); return }
+    // the land tool: a lot a road opened has its ring; a lot it cannot use says why
+    const k = classifyOuter(layout, lot.x, lot.y)
+    setSelectedId(null)
+    if (k.kind === 'free' || k.kind === 'mine') setLotRing({ x: lot.x, y: lot.y, kind: k.kind })
+    else if (k.kind === 'taken') setLotRing({ x: lot.x, y: lot.y, kind: 'taken', owner: k.owner })
+    else if (k.kind === 'water') toast.push(t('land.lot.water'), { kind: 'info' })
+    else if (k.kind === 'steep') toast.push(t('land.lot.steep'), { kind: 'info' })
+    else if (k.kind === 'road') toast.push(t('land.lot.road'), { kind: 'info' })
   }
 
   useEffect(() => { sceneRef.current?.setSelectedBuilding(build.state.step === 'off' ? selectedId : null) }, [selectedId, build.state.step, sceneReady])
@@ -416,7 +445,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
             onExit={build.exit} onChoose={(c) => void build.choose(c)} onRotate={() => void build.rotate()}
             onNext={() => void build.next()} onConfirm={() => void build.confirm()} onBack={build.back}
             onUndo={build.undoPick} onClear={build.clearPicks} onPathMode={build.setPathMode}
-            onGrowAsk={() => void build.growAsk()} onGrowConfirm={() => void build.growConfirm()}
+            canDraw={canPlace} plans={layout?.land?.plans ?? []} onEnterRoad={build.enterRoad} onRoadClass={build.roadClass}
+            onRoadConfirm={() => void build.roadConfirm()} onRoadCancel={(id) => void build.roadCancel(id)}
           />
         ) : null}
         {!inBuild && resident && landOn && (
@@ -437,6 +467,9 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
                 <span><i className="vh-dot" style={{ background: '#9aa0b4' }} />{t('citizen.legend.taken')}</span>
               </div>
               <div className="vh-hint">{t('citizen.land.hint')}</div>
+              {canPlace && (
+                <button className="vh-chip road" onClick={() => { setLandOn(false); void build.enter().then(() => build.enterRoad()) }}>{t('road.draw_btn')}</button>
+              )}
             </div>
           </Frame>
         )}

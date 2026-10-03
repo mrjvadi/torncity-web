@@ -1892,12 +1892,6 @@ vx.build.roads | جاده‌ای که خودکار کشیده می‌شود | Ro
 vx.build.from_stock | مصالح از انبار شهر برداشته می‌شود. | The materials are taken from the city store.
 vx.build.yes | بله، بساز · {p} | Yes, build it · {p}
 vx.batch.count | {n} قطعه را یک‌جا می‌سازی. | You are building on {n} lots at once.
-vx.grow.title | گسترش زمین شهر | Growing the city land
-vx.grow.body | زمین شهر از {from}×{from} به {to}×{to} می‌رسد. | The city land grows from {from}×{from} to {to}×{to}.
-vx.grow.lots | قطعهٔ تازه | New lots
-vx.grow.buildable | قابل ساخت | Buildable
-vx.grow.short | خزانهٔ شهر برای این کار کافی نیست. | The city treasury cannot pay for this.
-vx.grow.yes | بله، زمین را بزرگ کن · {p} | Yes, grow the land · {p}
 vx.lots.pick | روی قطعه‌ای بزن که می‌خواهی آنجا ساخته شود. | Tap the lot where you want it built.
 vx.lots.line_from | اول قطعهٔ شروعِ ردیف را بزن. | First tap the lot where the row starts.
 vx.lots.line_to | حالا قطعهٔ آخرِ ردیف را بزن. | Now tap the lot where the row ends.
@@ -1942,7 +1936,6 @@ act.needs.build | ساختن {name} | Build {name}
 act.needs.buy | خرید {name} از بازار | Buy {name} at the market
 act.needs.knowledge | دانش شهر | City knowledge
 act.build.place | ساختن {name} | Build {name}
-act.build.grow | زمین بیشتر برای شهر | More land for the city
 act.construction.site | کار در این ساختمان | Work on this building
 act.construction.open | نگاهی به {name} | Look at {name}
 act.construction.standing | {name} | {name}

@@ -196,6 +196,12 @@
 .vh-chip { flex: none; height: 36px; padding: 0 12px; border-radius: 18px; font: 700 13px Vazirmatn, system-ui, sans-serif; white-space: nowrap; color: var(--text); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); }
 .vh-chip.on { color: #2a1c04; background: linear-gradient(180deg, #ffe9a0, #f4c441); border-color: #f4c441; }
 .vh-chip.lock { color: var(--text-dim); }
+.vh-chip.road { color: #2a1c04; background: linear-gradient(180deg, #ffe9a0, #f4c441); border-color: #f4c441; }
+.vh-chip:disabled { opacity: 0.55; }
+/* the road tool (ADR 0044 5.5): the roads already drawn, each with its way to take it back */
+.vh-roads { display: flex; flex-direction: column; gap: 6px; }
+.vh-roads-title { font-size: 12.5px; color: var(--text-dim); }
+.vh-roads-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--text); }
 .vh-empty { width: 100%; text-align: center; padding: 18px 0; }
 @media (min-width: 900px) {
   /* desktop: the same slim bar, centred at the bottom of the world (left of the rail), like a city builder's toolbar */

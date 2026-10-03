@@ -27,6 +27,7 @@ import { ColorGeom } from './colorGeom'
 import { makeBuildingMaterials, type BuildingMaterials } from './buildingMaterials'
 import { buildVillageRoads, type RoadsMesh } from './villageRoads'
 import { LotOverlay } from './lotOverlay'
+import { LandOverlay, type OuterCell } from './landOverlay'
 import { TreeField, type TreeSpot } from './vegetation'
 import { createSky, type Sky } from './sky'
 import { constructionProgress } from './progress'
@@ -58,6 +59,9 @@ export interface SceneOptions {
   onLabels?: (labels: ScreenLabel[]) => void
   /** Milliseconds to add to Date.now() to get the server's clock. */
   clockSkewMs?: () => number
+  /** A tap on the ground, wherever it lands: the lot under it may lie beyond the first grid (negative
+   * coordinates west and south of it), where `onTap` gets null. Fired before `onTap`. */
+  onGround?: (lot: { x: number; y: number }) => void
 }
 
 type Pose = { cx: number; cz: number; W: number; D: number; base: number; foundation: number }
@@ -86,6 +90,9 @@ export class VillageScene {
   private roads: RoadsMesh | null = null
   private mats: BuildingMaterials
   private overlay: LotOverlay
+  private land: LandOverlay
+  /** How far the roads' land reaches from the village centre, in metres (the camera may go there). */
+  private reachM = 0
   private builtMesh: Mesh | null = null
   private scaffoldMesh: Mesh | null = null
   private ghostMesh: Mesh | null = null
@@ -110,6 +117,8 @@ export class VillageScene {
   private insets = { top: 0, bottom: 0 }
   private userMoved = false
   private lastMode: 'aerial' | 'close' | 'lot' = 'aerial'
+  /** The width, in lots, the last aerial framing was asked to hold (the road tool shows a wide stretch of land). */
+  private lastSpan = 0
   private sun!: DirectionalLight
   private shadowsOn = true
 
@@ -152,6 +161,9 @@ export class VillageScene {
     this.mats = makeBuildingMaterials()
     this.overlay = new LotOverlay(ground)
     this.scene.add(...this.overlay.objects)
+    this.land = new LandOverlay(ground)
+    this.scene.add(...this.land.objects)
+    this.measureReach()
 
     canvas.addEventListener('pointerdown', this.onDown)
     canvas.addEventListener('pointerup', this.onUp)
@@ -404,6 +416,7 @@ export class VillageScene {
   /** A new layout (a building placed, finished, pulled down): rebuild what stands. */
   setLayout(layout: VillageLayout) {
     this.layout = layout
+    this.measureReach()
     this.rebuildRoads()
     this.rebuildBuildings()
     this.rebakeControl()
@@ -489,6 +502,41 @@ export class VillageScene {
     this.request()
   }
 
+  // -- the land beyond the first grid (ADR 0044 5.5) --------------------------------------
+
+  /** Tinted lots beyond the first grid (absolute lot coordinates); an empty list or null clears. */
+  setLandCells(cells: readonly OuterCell[] | null) {
+    this.land.setCells(cells ?? [])
+    this.land.setVisible(!!cells && cells.length > 0)
+    this.request()
+  }
+
+  /** The road being drawn, as a ribbon through the lots; null clears. */
+  setRoadRibbon(path: readonly { x: number; y: number }[] | null) {
+    this.land.setRibbon(path)
+    this.request()
+  }
+
+  /** The roads' land reaches this far from the centre: the camera may follow, up to the world. */
+  private measureReach() {
+    const g = this.ground
+    const mid = g.lotCentre((g.n - 1) / 2, (g.n - 1) / 2)
+    let far = 0
+    const see = (x: number, y: number) => {
+      const c = g.lotCentre(x, y)
+      const d = Math.hypot(c.x - mid.x, c.z - mid.z)
+      if (d > far) far = d
+    }
+    const land = this.layout?.land
+    if (land) {
+      for (const c of land.cells) see(c.x, c.y)
+      for (const o of land.open) see(o.x, o.y)
+    }
+    for (const r of this.layout?.roads ?? []) see(r.x, r.y)
+    this.reachM = far
+    this.controls.maxDistance = Math.min(6000, Math.max(1400, far * 1.5 + 900))
+  }
+
   /** Outline (lots) round the chosen footprint; null clears. */
   setSelection(rect: { x: number; y: number; w: number; h: number; ok: boolean } | null) {
     this.overlay.setOutline(rect ? { ...rect, color: rect.ok ? 0xffe27a : 0xff6a5a } : null)
@@ -550,9 +598,10 @@ export class VillageScene {
   }
 
   /** Frames the whole village from above (`aerial`), tighter (`close`), or on one lot. */
-  frame(mode: 'aerial' | 'close' | 'lot', lot?: { x: number; y: number }) {
+  frame(mode: 'aerial' | 'close' | 'lot', lot?: { x: number; y: number }, spanLots = this.lastSpan) {
     this.userMoved = false
     this.lastMode = mode
+    this.lastSpan = mode === 'aerial' ? spanLots : 0
     const g = this.ground
     const n = g.n
     const mid = g.lotCentre((n - 1) / 2, (n - 1) / 2)
@@ -571,7 +620,7 @@ export class VillageScene {
     const vFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * free)
     const hFov = 2 * Math.atan(Math.tan(((this.camera.fov * Math.PI) / 180) / 2) * aspect)
     const polar = mode === 'aerial' ? 0.95 : 1.1
-    const span = mode === 'aerial' ? Math.max(n + 2, 7) * g.lot : mode === 'close' ? 70 : 50
+    const span = mode === 'aerial' ? Math.max(Math.max(n + 2, 7) * g.lot, this.reachM * 2 + 8 * g.lot, spanLots * g.lot) : mode === 'close' ? 70 : 50
     const dist = Math.max(this.controls.minDistance, (span / 2 / Math.tan(Math.min(hFov, vFov) / 2)) * (mode === 'aerial' ? 1.12 : 1))
     const az = -0.5
     this.camera.position.set(tx + dist * Math.sin(polar) * Math.sin(az), ty + dist * Math.cos(polar), tz + dist * Math.sin(polar) * Math.cos(az))
@@ -605,6 +654,7 @@ export class VillageScene {
     if (!d || !this.opts.onTap) return
     if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 9 || performance.now() - d.t > 500) return
     const p = this.pickGround(e.clientX, e.clientY)
+    if (p) this.opts.onGround?.(this.ground.lotAtAny(p.x, p.z))
     const lot = p ? this.ground.lotAt(p.x, p.z) : null
     let id: string | null = null
     if (lot) {
@@ -625,7 +675,7 @@ export class VillageScene {
     const o = this.raycaster.ray.origin, d = this.raycaster.ray.direction
     const groundY = this.ground.groundY
     let prev = 0
-    const maxT = 4000
+    const maxT = 12000
     for (let t = 1; t < maxT; t += Math.max(2, t * 0.02)) {
       const y = o.y + d.y * t
       if (y <= groundY(o.x + d.x * t, o.z + d.z * t)) {
@@ -648,7 +698,7 @@ export class VillageScene {
     this.lastMoved = performance.now()
     // keep the target near the village and the camera above the ground
     const t = this.controls.target
-    const half = this.ground.n * this.ground.lot * 0.9 + 60
+    const half = Math.max(this.ground.n * this.ground.lot * 0.9 + 60, this.reachM + 160)
     const dx = t.x - this.center.x, dz = t.z - this.center.z
     const dd = Math.hypot(dx, dz)
     if (dd > half) { t.x = this.center.x + (dx / dd) * half; t.z = this.center.z + (dz / dd) * half }
@@ -893,6 +943,7 @@ export class VillageScene {
     this.trees?.dispose()
     this.roads?.dispose()
     this.overlay.dispose()
+    this.land.dispose()
     this.builtMesh?.geometry.dispose()
     this.scaffoldMesh?.geometry.dispose()
     this.ghostMesh?.geometry.dispose()
