@@ -62,15 +62,27 @@ export function InboxCategory({ response, loading, onAction, run }: ScreenProps)
       <Header title={meta.label} tone="sapphire" onBack={() => run('inbox.show')}
         onRefresh={() => v.category && run('inbox.category', { category: v.category })} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {(v.items ?? []).map((it, i) => (
-          <div key={i} style={{ background: 'var(--panel)', border: '1px solid rgba(242,194,85,0.18)', borderRadius: 14, padding: '10px 12px' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-faint)', marginBottom: 4 }}>{ago(it.ago_seconds)}</div>
-            <div style={{ fontSize: 14, color: 'var(--text)' }}>{storedLine(it.notice, names.name)}</div>
-          </div>
-        ))}
+        {(v.items ?? []).map((it, i) => {
+          // Opening a new notice reads that notice only: the others stay listed and the next one opens as usual.
+          const fresh = !it.read && !!it.id
+          const open = () => run('inbox.read', { id: it.id, page: String(v.page || 1) })
+          return (
+            <div key={it.id || i} className={fresh ? 'inbox-item inbox-item-new' : 'inbox-item'}
+              role={fresh ? 'button' : undefined} tabIndex={fresh ? 0 : undefined}
+              onClick={fresh ? open : undefined} onKeyDown={fresh ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open() } } : undefined}
+              style={{ background: 'var(--panel)', border: fresh ? '1px solid rgba(242,194,85,0.6)' : '1px solid rgba(242,194,85,0.18)', borderRadius: 14, padding: '10px 12px', cursor: fresh ? 'pointer' : 'default', minHeight: 44 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-faint)', marginBottom: 4, display: 'flex', gap: 8, alignItems: 'center' }}>
+                {fresh && <span style={{ color: 'var(--gold, #f2c255)', fontWeight: 700 }}>{t('inbox.new')}</span>}
+                <span>{ago(it.ago_seconds)}</span>
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--text)', fontWeight: fresh ? 600 : 400 }}>{storedLine(it.notice, names.name)}</div>
+              {fresh && <div style={{ fontSize: 11, color: 'var(--text-faint)', marginTop: 4 }}>{t('inbox.tap_to_read')}</div>}
+            </div>
+          )
+        })}
         {!(v.items && v.items.length) && <Notice>{t('inbox.empty_cat')}</Notice>}
       </div>
-      <Actions response={response} onAction={onAction} refreshCommand="inbox.category" />
+      <Actions response={response} onAction={onAction} refreshCommand="inbox.category" only={(a) => a.command !== 'inbox.read'} />
     </ScreenScroll>
   )
 }

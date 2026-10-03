@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import type { FlowCtx } from '../village/flow'
-import type { BoardView, FriendAcceptedView, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
+import type { BoardView, FriendAcceptedView, FriendDetailView, FriendRemoveAskView, FriendRemovedView, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
 import { Chip, ListRow, Segmented } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { formatNumber } from '../../lib/persian'
@@ -31,6 +31,7 @@ const name = (n: string) => n || t('soc.unknown_player')
 const Friends = screen<FriendsView>(({ view: v, ctx }) => {
   const friends = v.friends ?? []
   const accept = ctx.acts.filter((a) => a.id === 'social.accept')
+  const card = ctx.acts.filter((a) => a.id === 'social.friend_view')
   return (
     <Page title={t('soc.friends.title')} tone="emerald">
       {friends.length === 0 && <Panel tone="emerald"><Lead>{t('soc.friends.empty')}</Lead></Panel>}
@@ -38,16 +39,18 @@ const Friends = screen<FriendsView>(({ view: v, ctx }) => {
       <div className="vf-stack">
         {friends.map((f) => {
           const act = accept.find((a) => a.args?.player === f.id)
+          const open = card.find((a) => a.args?.player === f.id)
           const incoming = f.incoming && f.status === 'pending'
           const sub = incoming ? t('soc.friends.incoming') : f.status === 'pending' ? t('soc.friends.pending') : f.status === 'blocked' ? t('soc.friends.blocked') : undefined
           return (
             <ListRow key={f.id} icon="person" palette={f.status === 'blocked' ? 'ruby' : incoming ? 'gold' : 'emerald'} title={name(f.name)} sub={sub}
+              onClick={open ? () => ctx.go(open) : undefined}
               right={act ? <Slab tone="green" radius={12} lip={3} disabled={ctx.busy} onClick={() => ctx.go(act)}>{t('soc.act.social.accept', { name: name(f.name) })}</Slab> : undefined} />
           )
         })}
       </div>
       {friends.length > 0 && <Pager ctx={ctx} page={v.page} pages={v.pages} />}
-      <Rest ctx={ctx} skip={(a) => a.id === 'social.accept' || a.id === 'page.prev' || a.id === 'page.next'} />
+      <Rest ctx={ctx} skip={(a) => a.id === 'social.accept' || a.id === 'social.friend_view' || a.id === 'page.prev' || a.id === 'page.next'} />
     </Page>
   )
 })
@@ -75,6 +78,38 @@ const Search = screen<SearchView>(({ view: v, ctx }) => {
     </Page>
   )
 })
+
+/** One friend: who they are, and what to do with them (pay, invite to my faction, remove). */
+const FriendDetail = screen<FriendDetailView>(({ view: v, ctx }) => {
+  const mine = (a: { id?: string }) => a.id === 'social.pay' || a.id === 'social.friend_invite' || a.id === 'social.friend_remove'
+  return (
+    <Page title={name(v.name)} tone="emerald">
+      <Panel tone="emerald">
+        <Facts rows={[
+          ...(v.code ? [{ label: t('soc.friends.code'), value: v.code }] : []),
+          ...(v.faction ? [{ label: t('soc.friends.faction'), value: v.faction }] : []),
+        ]} />
+        {!v.can_invite && !v.faction && <Hint>{t('soc.friends.invite_hint')}</Hint>}
+        <Btns ctx={ctx} list={ctx.acts.filter(mine)} row />
+      </Panel>
+      <Rest ctx={ctx} skip={mine} />
+    </Page>
+  )
+})
+
+const FriendRemoveAsk = screen<FriendRemoveAskView>(({ view: v, ctx }) => (
+  <Page title={t('soc.friends.remove_title')} tone="ruby">
+    <Panel tone="ruby"><Lead>{t('soc.friends.ask_remove', { name: name(v.name) })}</Lead></Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
+const FriendRemoved = screen<FriendRemovedView>(({ view: v, ctx }) => (
+  <Page title={t('soc.friends.remove_title')} tone="emerald">
+    <Panel tone="emerald"><Lead tone="good">{t('soc.friends.removed', { name: name(v.name) })}</Lead></Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
 
 const FriendRequested = screen<FriendRequestedView>(({ view: v, ctx }) => (
   <Page title={t('soc.friends.requested_title')} tone="emerald">
@@ -133,4 +168,4 @@ const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
   )
 })
 
-export const PEOPLE_SCREENS = { friends: Friends, search: Search, friend_requested: FriendRequested, friend_accepted: FriendAccepted, leaderboard: Leaderboard }
+export const PEOPLE_SCREENS = { friends: Friends, search: Search, friend_requested: FriendRequested, friend_accepted: FriendAccepted, friend_detail: FriendDetail, friend_remove_ask: FriendRemoveAsk, friend_removed: FriendRemoved, leaderboard: Leaderboard }

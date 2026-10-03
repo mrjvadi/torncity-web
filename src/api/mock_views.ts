@@ -3,7 +3,7 @@
 // internal/telegram/screens/testdata/view-snapshots/fa/*.json, translated
 // to plausible Persian sample data. Wired into src/api/mock.ts.
 
-import { MOCK_NOTICES, mockInboxCategories, mockInboxItems } from './mock_notices'
+import { MOCK_NOTICES, mockInboxCategories, mockInboxItems, mockNoticeCategoryOf, mockNoticeRead, mockNoticeReadAll, mockUnreadCount } from './mock_notices'
 
 function back(command: string): Record<string, unknown> {
   return { label: 'بازگشت', command, row: 9, kind: 'back', icon: 'action:player' }
@@ -173,9 +173,20 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
 
   'inbox.show': () => ({
     screen: 'inbox_hub', text: '',
-    view: { total: MOCK_NOTICES.length, categories: mockInboxCategories() },
+    view: { total: mockUnreadCount(), categories: mockInboxCategories() },
     actions: [refresh('inbox.show'), back('society_hub')],
   }),
+  'inbox.read_all': () => {
+    mockNoticeReadAll()
+    return { screen: 'inbox_hub', text: '', view: { total: 0, categories: [] }, actions: [refresh('inbox.show'), back('society_hub')] }
+  },
+  // opening ONE notice reads only it; the same category's list comes back with every other notice where it was
+  'inbox.read': (ctx) => {
+    const id = String(ctx.args?.id ?? '')
+    mockNoticeRead(id)
+    const category = mockNoticeCategoryOf(id) || 'finance'
+    return { screen: 'inbox_category', text: '', view: { category, items: mockInboxItems(category), page: 1, total_pages: 1 }, actions: [back('inbox.show')] }
+  },
   'inbox.category': (ctx) => ({
     screen: 'inbox_category', text: '',
     view: {
