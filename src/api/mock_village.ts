@@ -1480,6 +1480,7 @@ export function mockBuildingOverlays(): BuildingOverlay[] {
         const sc = CAT.find((c) => c.code === 'school')!
         o.can_upgrade = unmet(sc).length === 0 && st.treasury >= sc.cost
       }
+      if (role === 'security' && manage) { o.actions.push('upgrade'); o.can_upgrade = true } // so the mock shows the one arrow a head is entitled to
       if (b.type === 'woodcutter_camp') { o.staff = { have: 0, need: 3 }; o.status = 'idle'; o.reasons = ['no_staff']; o.actions.push('take_shift') }
       if (manage && b.type !== 'civic_hall') o.actions.push('demolish')
     }

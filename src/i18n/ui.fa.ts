@@ -4701,6 +4701,19 @@ export const uiFa = {
   'v6.fix': 'برو و درستش کن',
   'v6.have': 'دارد',
   'v6.rail.build': 'ساخت',
+  'build.cat.all': 'همه',
+  'build.cat.housing': 'مسکن',
+  'build.cat.shops': 'فروشگاه و بازار',
+  'build.cat.construction': 'ساخت‌وساز و مصالح',
+  'build.cat.production': 'کارگاه و تولید',
+  'build.cat.farming': 'کشاورزی',
+  'build.cat.public': 'خدمات عمومی',
+  'build.cat.security': 'امنیت و دفاع',
+  'build.cat.other': 'سایر',
+  'build.search': 'جست‌وجوی ساختمان',
+  'build.search_empty': 'ساختمانی با این نام پیدا نشد.',
+  'build.show_locked': 'قفل‌شده‌ها',
+  'build.locked_n': '{n} ساختمان هنوز قفل است',
 } as const
 
 export type UiKey = keyof typeof uiFa

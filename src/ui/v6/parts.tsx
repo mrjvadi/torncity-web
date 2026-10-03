@@ -1,7 +1,7 @@
 // The v6 design system's components (ported from the approved prototype, torncity-lab/ui-concepts/v6-home).
 // Pure presentation: data comes in as props, events go out as callbacks. Styles: v6.css (every class is v6-prefixed).
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { t, type Key } from '../../i18n'
 import { IC, cashCompact, faNum, fa } from './format'
@@ -158,24 +158,47 @@ export function QuestStrip({ quest, ticker, onQuest, onTicker, ownRef }: { quest
 
 export interface DockTab { key: string; icon: string; label: string; dot?: number }
 
-/** Five slots, the place in the middle and larger, labels always shown. Carries the old class names too
- * (dock-bar, dock-tab, dock-label) so the existing smoke checks keep finding it. */
-export function PhoneDock({ tabs, active, onSelect, middle = 2, ownRef }: { tabs: DockTab[]; active: string; onSelect: (key: string) => void; middle?: number; ownRef?: (el: HTMLElement | null) => void }) {
+/** Five equal slots, labels always shown. The raised round disc is ONE element that slides to the active tab (transform
+ * only, measured from the real button so it works in RTL and at any width); the active tab's icon rides in the disc.
+ * Carries the old class names too (dock-bar, dock-tab, dock-label) so the existing smoke checks keep finding it. */
+export function PhoneDock({ tabs, active, onSelect, ownRef }: { tabs: DockTab[]; active: string; onSelect: (key: string) => void; ownRef?: (el: HTMLElement | null) => void }) {
+  const nav = useRef<HTMLElement | null>(null)
+  const [x, setX] = useState<number | null>(null)
+  const [ready, setReady] = useState(false)
+  const act = tabs.find((tb) => tb.key === active)
+  useLayoutEffect(() => {
+    const el = nav.current
+    if (!el) return
+    const measure = () => {
+      const on = el.querySelector<HTMLElement>('.v6-tab.on')
+      if (on) setX((p) => { const n = on.offsetLeft + on.offsetWidth / 2; return p === n ? p : n })
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  })
+  // the first placement is instant; every later one slides
+  useEffect(() => {
+    if (x === null) return
+    const id = requestAnimationFrame(() => setReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [x])
   return (
-    <nav className="v6-dock dock-bar" ref={ownRef} aria-label={t('v6.nav.title')}>
-      {tabs.map((tab, i) => {
+    <nav className="v6-dock dock-bar" ref={(e) => { nav.current = e; ownRef?.(e) }} aria-label={t('v6.nav.title')}>
+      {act && x !== null && (
+        <span className={`v6-disc${ready ? ' slide' : ''}`} style={{ transform: `translateX(${x - 31}px)` }} aria-hidden="true">
+          <Ic key={act.key} name={act.icon} className="v6-disc-ic" />
+        </span>
+      )}
+      {tabs.map((tab) => {
         const on = tab.key === active
-        const mid = i === middle
         return (
-          <button key={tab.key} className={`v6-tab dock-tab${mid ? ' mid' : ''}${on ? ' on' : ''}`} onClick={() => onSelect(tab.key)} aria-current={on ? 'page' : undefined}>
-            {mid
-              ? <span className="v6-disc"><Ic name={tab.icon} /></span>
-              : (
-                <span className="v6-ico">
-                  <Ic name={tab.icon} />
-                  {tab.dot ? (tab.dot > 1 ? <i className="v6-dot n">{tab.dot > 9 ? fa('9+') : fa(tab.dot)}</i> : <i className="v6-dot" />) : null}
-                </span>
-              )}
+          <button key={tab.key} className={`v6-tab dock-tab${on ? ' on' : ''}`} onClick={() => onSelect(tab.key)} aria-current={on ? 'page' : undefined}>
+            <span className="v6-ico">
+              <Ic name={tab.icon} />
+              {tab.dot ? (tab.dot > 1 ? <i className="v6-dot n">{tab.dot > 9 ? fa('9+') : fa(tab.dot)}</i> : <i className="v6-dot" />) : null}
+            </span>
             <b className="dock-label">{tab.label}</b>
           </button>
         )
