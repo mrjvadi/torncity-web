@@ -6,7 +6,7 @@
 
 import { useState, type ReactNode } from 'react'
 import type {
-  BatchConfirmView, BuildMenuView, BuildingPanelView, DonateView, GridGrowView, LandView, LotAccessView, LotBuyView, LotConfirmView, LotGridView, LotRepairView,
+  BatchConfirmView, BuildMenuView, RoadCancelledView, RoadQuoteView, BuildingPanelView, DonateView, LandView, LotAccessView, LotBuyView, LotConfirmView, LotGridView, LotRepairView,
   MaterialBuyConfirmView, MineView, PrivateConfirmView, PrivateLotsView, PrivateMenuView, ResidenceView,
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
@@ -28,7 +28,9 @@ const Empt = Empty
 const key = (k: string) => k as Key
 
 /** The 0/1 argument of a rotate toggle, as the server reads it. */
-const token = (x: number, y: number, rotated = false) => `${x}-${y}${rotated ? '-r' : ''}`
+/** A lot's token: a coordinate west or south of the first grid is written with an "m" (the server's LotToken). */
+const coord = (v: number) => (v < 0 ? `m${-v}` : String(v))
+const token = (x: number, y: number, rotated = false) => `${coord(x)}-${coord(y)}${rotated ? '-r' : ''}`
 
 function mats(ctx: FlowCtx, list: { component: { code: string; name: string }; quantity: number }[] | null | undefined): ReactNode {
   const l = list ?? []
@@ -248,6 +250,20 @@ const Land = flow<LandView>(({ view: v, ctx }) => {
         />
         <Hint>{v.can_buy ? t('vx.land.hint') : v.owned >= v.max ? t('vx.land.limit') : t('vx.land.hint_none')}</Hint>
       </Panel>
+      {(v.roads?.length ?? 0) > 0 && (
+        <Panel tone="gold">
+          <Lead>{t('road.roads')}</Lead>
+          <Facts rows={(v.roads ?? []).map((r) => ({
+            label: r.class.name,
+            value: t('road.line', { lots: formatNumber(r.lots), built: formatNumber(r.built), open: formatNumber(r.open), sold: formatNumber(r.sold) }),
+          }))} />
+          {/* the cheapest lots the roads opened: the first grid's map cannot show them */}
+          {v.can_buy && (v.outer ?? []).filter((c) => c.state === 'free' && c.access !== 'none').sort((a, b) => a.cost - b.cost || a.y - b.y || a.x - b.x).slice(0, 6).map((c) => (
+            <Do key={`${c.x},${c.y}`} ctx={ctx} tone="steel" label={`${t('citizen.buy.lot', { x: c.x + 1, y: c.y + 1 })} · ${money(v.price + c.cost)}`}
+              a={{ command: 'settlement.lot.buy', args: { lot: token(c.x, c.y) }, kind: 'primary', id: 'lot.buy' }} />
+          ))}
+        </Panel>
+      )}
       <Rest ctx={ctx} />
     </Page>
   )
@@ -710,20 +726,45 @@ const BatchConfirm = flow<BatchConfirmView>(({ view: v, ctx }) => (
   </Page>
 ))
 
-const GridGrow = flow<GridGrowView>(({ view: v, ctx }) => (
-  <Page title={t('vx.grow.title')} tone="gold">
+// -- a road drawn out of the first grid (ADR 0044 5.5): the quote, the stored plan, the plan taken back --------
+
+const RoadFacts = ({ v }: { v: RoadQuoteView }) => (
+  <Facts rows={[
+    { label: t('road.class'), value: v.class.name },
+    { label: t('road.length'), value: t('road.length_v', { n: formatNumber(v.lots), m: formatNumber(v.length_m) }) },
+    { label: t('road.climb'), value: t('road.climb_v', { m: formatNumber(v.climb_m), g: formatNumber(Math.round(v.max_grade_bps / 100)) }) },
+    ...(v.crossings > 0 ? [{ label: t('road.crossings'), value: t('road.crossings_v', { n: formatNumber(v.crossings) }) }] : []),
+    { label: t('road.price_lot'), value: money(v.lot_cost) },
+    { label: t('road.price_all'), value: money(v.full_cost), gold: true },
+    { label: t('road.opens'), value: t('road.opens_v', { u: formatNumber(v.usable), w: formatNumber(v.water), s: formatNumber(v.steep) }) },
+  ]} />
+)
+
+const RoadQuotePage = flow<RoadQuoteView>(({ view: v, ctx }) => (
+  <Page title={t('road.title')} tone="gold">
     <Panel tone="gold">
-      <Lead>{t('vx.grow.body', { from: v.side, to: v.new_side })}</Lead>
-      <Facts rows={[
-        { label: t('vx.grow.lots'), value: formatNumber(v.lots_gained) },
-        { label: t('vx.grow.buildable'), value: formatNumber(v.buildable_gained) },
-        { label: t('citizen.buy.price'), value: money(v.price), gold: true },
-        { label: t('know.treasury'), value: money(v.treasury) },
-      ]} />
-      {v.treasury < v.price && <Hint tone="bad">{t('vx.grow.short')}</Hint>}
+      <RoadFacts v={v} />
+      <Hint>{t('road.note')}</Hint>
     </Panel>
-    <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')} yes={t('vx.grow.yes', { p: money(v.price) })} />
+    <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')} yes={t('road.confirm')} />
     <Cancel ctx={ctx} />
+  </Page>
+))
+
+const RoadPlannedPage = flow<RoadQuoteView>(({ view: v, ctx }) => (
+  <Page title={t('road.title')} tone="emerald">
+    <Panel tone="emerald">
+      <Lead tone="good">{t('road.done')}</Lead>
+      <RoadFacts v={v} />
+    </Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
+const RoadCancelledPage = flow<RoadCancelledView>(({ ctx }) => (
+  <Page title={t('road.title')} tone="gold">
+    <Panel tone="gold"><Lead>{t('road.cancelled')}</Lead></Panel>
+    <Rest ctx={ctx} />
   </Page>
 ))
 
@@ -817,7 +858,8 @@ registerFlow({
   settlement_mine: Mine, settlement_terms: Terms, village_work: Work, village_work_started: Work,
   settlement_who: Who, village_home_call: HomeCall, village_home_none: HomeNone,
   settlement_build_menu: BuildMenu, settlement_build_lots: BuildLots, settlement_build_confirm: BuildConfirm,
-  settlement_build_batch_confirm: BatchConfirm, settlement_grid_grow: GridGrow,
+  settlement_build_batch_confirm: BatchConfirm,
+  settlement_road_quote: RoadQuotePage, settlement_road_planned: RoadPlannedPage, settlement_road_cancelled: RoadCancelledPage,
   village_materials_buy_confirm: MaterialBuyConfirm, settlement_building_view: BuildingPage,
 })
 
@@ -828,5 +870,5 @@ export const FLOW_SCREENS = [
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',
   'village_work_started', 'settlement_who', 'village_home_call', 'village_home_none', 'settlement_build_menu', 'settlement_build_lots',
-  'settlement_build_confirm', 'settlement_build_batch_confirm', 'settlement_grid_grow', 'village_materials_buy_confirm', 'settlement_building_view',
+  'settlement_build_confirm', 'settlement_build_batch_confirm', 'settlement_road_quote', 'settlement_road_planned', 'settlement_road_cancelled', 'village_materials_buy_confirm', 'settlement_building_view',
 ]

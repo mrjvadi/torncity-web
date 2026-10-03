@@ -4,17 +4,35 @@
 // without `confirm`), and confirms. The 3D scene follows: lots are tinted,
 // the chosen footprint outlined, a translucent model stands where it would
 // go. Every refusal is shown by its code (i18n refusalText).
+//
+// The road tool (ADR 0044 5.5, "a road opens the land it reaches") is the other half of building: the head
+// taps the ground where a road should end, wherever that is (the land has no edge), reads the quote
+// (settlement.road.plan without `confirm`) and stores the plan. Nothing is built or charged until a buyer
+// takes a lot beside it; the lots along the road then appear in the land tool and in the build picker.
 
-import { useCallback, useEffect, useMemo, useState, type MutableRefObject } from 'react'
-import type { BatchConfirmView, BuildMenuView, CatalogueBuilding, GridGrowView, LotConfirmView, LotGridView, VillageLayout } from '../../api/types'
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react'
+import type { BatchConfirmView, BuildMenuView, CatalogueBuilding, LotConfirmView, LotGridView, RoadQuoteView, VillageLayout } from '../../api/types'
 import type { VillageScene } from '../../village/villageScene'
 import { TONE_BAD, TONE_NONE, TONE_OK, TONE_PICK, TONE_TAKEN } from '../../village/lotOverlay'
 import { useToast } from '../../state/ToastContext'
 import { t } from '../../i18n'
 import { useVillageCommand } from '../../village/useVillage'
 import type { VillageStore } from '../../village/villageStore'
+import { TONE_NEEDS, TONE_OK as TONE_FREE, TONE_PICK as TONE_ROAD } from '../../village/lotOverlay'
+import { lotCellAt, outerFromLayout, outerFromLots } from './outer'
+import type { OuterCell } from '../../village/landOverlay'
 
-export type BuildStep = 'off' | 'menu' | 'lot' | 'confirm' | 'grow'
+export type BuildStep = 'off' | 'menu' | 'lot' | 'confirm' | 'road'
+
+/** The road tool's state: where the road should end, and the quote for it. */
+export interface RoadDraft {
+  to: { x: number; y: number } | null
+  quote: RoadQuoteView | null
+  /** The road class asked for (`path` until the settlement has researched better). */
+  cls: string
+  /** A quote is being asked. */
+  asking: boolean
+}
 
 export interface BuildState {
   step: BuildStep
@@ -32,12 +50,17 @@ export interface BuildState {
   batch: BatchConfirmView | null
   /** Lots a refused batch named. */
   badLots: { x: number; y: number; kind: string }[]
-  grow: GridGrowView | null
+  road: RoadDraft
 }
+
+const NO_ROAD: RoadDraft = { to: null, quote: null, cls: 'path', asking: false }
+
+/** How many lots across the camera shows when the road tool opens (about 1.2 km). */
+const ROAD_VIEW_LOTS = 40
 
 const OFF: BuildState = {
   step: 'off', menu: null, code: null, rotated: false, lots: null, anchor: null, confirm: null, busy: false,
-  picks: [], pathMode: false, batch: null, badLots: [], grow: null,
+  picks: [], pathMode: false, batch: null, badLots: [], road: NO_ROAD,
 }
 
 /** The run of lots from a to b: along the row, then down the column (the server's own rule). */
@@ -91,14 +114,19 @@ export function footprintOf(cat: Map<string, CatalogueBuilding>, code: string | 
 export function blockReason(lots: LotGridView | null, anchor: { x: number; y: number }, w: number, h: number): string | null {
   if (!lots) return null
   const n = lots.grid_lots
-  if (anchor.x < 0 || anchor.y < 0 || anchor.x + w > n || anchor.y + h > n) return t('build.reason.bounds')
+  const inside = anchor.x >= 0 && anchor.y >= 0 && anchor.x + w <= n && anchor.y + h <= n
+  const beyond = !inside && (lots.outer?.length ?? 0) > 0
+  if (!inside && !beyond) return t('build.reason.bounds')
   for (let y = anchor.y; y < anchor.y + h; y++) {
     for (let x = anchor.x; x < anchor.x + w; x++) {
-      const s = lots.rows?.[y]?.[x]?.state
+      const c = lotCellAt(lots, x, y)
+      // land no road opened is not for building yet
+      if (!c) return t('build.reason.closed')
+      const s = c.state
       if (s === 'water') return t('build.reason.water')
       if (s === 'steep') return t('build.reason.steep')
       if (s === 'occupied') return t('build.reason.occupied')
-      if (s === 'road') return t('build.reason.road')
+      if (s === 'road' || s === 'planned') return t('build.reason.road')
     }
   }
   return null
@@ -112,14 +140,15 @@ export function anchorFor(lots: LotGridView, tap: { x: number; y: number }, w: n
   for (let ay = tap.y - h + 1; ay <= tap.y; ay++) {
     for (let ax = tap.x - w + 1; ax <= tap.x; ax++) {
       const cx = ax + (w - 1) / 2, cy = ay + (h - 1) / 2
-      const inside = ax >= 0 && ay >= 0 && ax + w <= n && ay + h <= n
-      cands.push({ x: ax, y: ay, d: Math.hypot(cx - tap.x, cy - tap.y), fits: inside && !!lots.rows?.[ay]?.[ax]?.fits })
+      cands.push({ x: ax, y: ay, d: Math.hypot(cx - tap.x, cy - tap.y), fits: !!lotCellAt(lots, ax, ay)?.fits })
     }
   }
   cands.sort((a, b) => Number(b.fits) - Number(a.fits) || a.d - b.d)
   const best = cands[0]
-  // never let an unfit centred pick hang off the grid: clamp it inside
-  return best.fits ? { x: best.x, y: best.y } : { x: Math.max(0, Math.min(n - w, best.x)), y: Math.max(0, Math.min(n - h, best.y)) }
+  // never let an unfit centred pick hang off the first grid when the tap is in it: clamp it inside
+  const tapInside = tap.x >= 0 && tap.y >= 0 && tap.x < n && tap.y < n
+  if (best.fits || !tapInside) return { x: best.x, y: best.y }
+  return { x: Math.max(0, Math.min(n - w, best.x)), y: Math.max(0, Math.min(n - h, best.y)) }
 }
 
 export function useBuildMode(
@@ -129,6 +158,8 @@ export function useBuildMode(
   cat: Map<string, CatalogueBuilding>,
 ) {
   const [s, setS] = useState<BuildState>(OFF)
+  const sRef = useRef(s)
+  sRef.current = s
   const cmd = useVillageCommand()
   const toast = useToast()
 
@@ -140,24 +171,62 @@ export function useBuildMode(
 
   const exit = useCallback(() => setS(OFF), [])
 
-  /** Land: ask for the price of the next expansion, then buy it. */
-  const growAsk = useCallback(async () => {
-    setS((p) => ({ ...p, busy: true }))
-    const r = await cmd('settlement.grid.grow')
-    setS((p) => (r.ok && r.res?.screen === 'settlement_grid_grow'
-      ? { ...p, step: 'grow', grow: r.res.view as unknown as GridGrowView, busy: false }
-      : { ...p, busy: false }))
+  // -- the road tool (ADR 0044 5.5) ----------------------------------------------------------
+  /** Opens the road tool: the next tap on the ground is where the road should end. */
+  const enterRoad = useCallback(() => {
+    setS((p) => ({ ...p, step: 'road', road: NO_ROAD, code: null, lots: null, anchor: null, confirm: null, picks: [], badLots: [], batch: null }))
+    // a road goes out into the land: show a stretch of it round the village, not only the first grid
+    sceneRef.current?.frame('aerial', undefined, ROAD_VIEW_LOTS)
+  }, [sceneRef])
+
+  /** Asks for the quote of a road to a lot of the ground (anywhere); a refusal is shown by its code and the old end stays. */
+  const askRoad = useCallback(async (to: { x: number; y: number }, cls?: string) => {
+    let want = ''
+    setS((p) => { want = cls ?? p.road.cls; return { ...p, road: { ...p.road, asking: true, cls: want } } })
+    const r = await cmd('settlement.road.plan', { x: to.x, y: to.y, ...(want ? { class: want } : {}) })
+    setS((p) => {
+      if (p.step !== 'road') return p
+      if (r.ok && r.res?.screen === 'settlement_road_quote') {
+        return { ...p, road: { to, quote: r.res.view as unknown as RoadQuoteView, cls: want, asking: false } }
+      }
+      return { ...p, road: { ...p.road, asking: false } }
+    })
   }, [cmd])
 
-  const growConfirm = useCallback(async () => {
+  /** The tool's tap: where on the ground the road should end. */
+  const roadTap = useCallback((lot: { x: number; y: number }) => {
+    if (sRef.current.step !== 'road' || sRef.current.road.asking) return
+    void askRoad(lot)
+  }, [askRoad])
+
+  const roadClass = useCallback((cls: string) => {
+    const to = sRef.current.road.to
+    if (to) void askRoad(to, cls)
+    else setS((p) => ({ ...p, road: { ...p.road, cls } }))
+  }, [askRoad])
+
+  /** Stores the plan: free, and nothing is built until a buyer takes a lot beside it. */
+  const roadConfirm = useCallback(async () => {
+    const { to, cls } = sRef.current.road
+    if (!to) return
     setS((p) => ({ ...p, busy: true }))
-    const r = await cmd('settlement.grid.grow', { confirm: 'confirm' }, { write: true })
+    const r = await cmd('settlement.road.plan', { x: to.x, y: to.y, ...(cls ? { class: cls } : {}), confirm: 'confirm' }, { write: true })
     if (r.ok) {
-      toast.push(t('grow.done'), { kind: 'success' })
+      toast.push(t('road.done'), { kind: 'success' })
       void store?.refetchLayout()
-      const menu = r.res?.screen === 'settlement_build_menu' ? (r.res.view as unknown as BuildMenuView) : null
-      setS((p) => ({ ...p, step: 'menu', grow: null, busy: false, menu: menu ?? p.menu }))
+      setS((p) => ({ ...p, busy: false, road: { ...NO_ROAD, cls } }))
     } else setS((p) => ({ ...p, busy: false }))
+  }, [cmd, store, toast])
+
+  /** Takes an unlaid, unsold plan back. */
+  const roadCancel = useCallback(async (id: string) => {
+    setS((p) => ({ ...p, busy: true }))
+    const r = await cmd('settlement.road.cancel', { id }, { write: true })
+    if (r.ok) {
+      toast.push(t('road.cancelled'), { kind: 'success' })
+      void store?.refetchLayout()
+    }
+    setS((p) => ({ ...p, busy: false }))
   }, [cmd, store, toast])
 
   const loadLots = useCallback(async (code: string, rotated: boolean) => {
@@ -189,7 +258,7 @@ export function useBuildMode(
     setS((p) => {
       if (p.step !== 'lot' || !p.lots) return p
       if (isMulti(cat, p.code)) {
-        const fitsAt = (q: { x: number; y: number }) => !!p.lots?.rows?.[q.y]?.[q.x]?.fits
+        const fitsAt = (q: { x: number; y: number }) => !!p.lots && !!lotCellAt(p.lots, q.x, q.y)?.fits
         const last = p.picks[p.picks.length - 1]
         if (p.pathMode && last && (last.x !== lot.x || last.y !== lot.y)) {
           // the run from the last pick: every fitting lot on it not yet picked
@@ -208,7 +277,7 @@ export function useBuildMode(
 
   const fits = useMemo(() => {
     if (!s.lots || !s.anchor) return false
-    return !!s.lots.rows?.[s.anchor.y]?.[s.anchor.x]?.fits
+    return !!lotCellAt(s.lots, s.anchor.x, s.anchor.y)?.fits
   }, [s.lots, s.anchor])
 
   const undoPick = useCallback(() => setS((p) => ({ ...p, picks: p.picks.slice(0, -1), badLots: [] })), [])
@@ -270,7 +339,7 @@ export function useBuildMode(
 
   const back = useCallback(() => {
     setS((p) => {
-      if (p.step === 'grow') return { ...p, step: 'menu', grow: null }
+      if (p.step === 'road') return p.road.to ? { ...p, road: { ...p.road, to: null, quote: null } } : { ...p, step: 'menu', road: NO_ROAD }
       if (p.step === 'confirm') return { ...p, step: 'lot', confirm: null, batch: null }
       if (p.step === 'lot') return { ...p, step: 'menu', code: null, lots: null, anchor: null, rotated: false, picks: [], badLots: [], pathMode: false }
       return OFF
@@ -284,27 +353,46 @@ export function useBuildMode(
     if (!scene) return
     if (s.step === 'off' || !layout) {
       scene.setOverlayTones(null)
+      scene.setLandCells(null)
+      scene.setRoadRibbon(null)
       scene.setSelection(null)
       scene.setGhost(null)
       return
     }
-    scene.setOverlayTones(s.step === 'menu' || s.step === 'grow' || !s.lots ? tonesFromLayout(layout) : tonesFromLots(s.lots, s.picks, s.badLots))
-    if (s.step !== 'menu' && s.step !== 'grow' && s.code && s.anchor && !isMulti(cat, s.code)) {
+    scene.setOverlayTones(s.step === 'menu' || s.step === 'road' || !s.lots ? tonesFromLayout(layout) : tonesFromLots(s.lots, s.picks, s.badLots))
+    // the land beyond the first grid: what the roads opened (the picker's own answer when a building is being placed)
+    // and, in the road tool, the road being drawn with the lots it would open
+    let outer: OuterCell[] = s.step === 'lot' && s.lots ? outerFromLots(s.lots, s.picks, s.badLots) : outerFromLayout(layout)
+    if (s.step === 'road' && s.road.quote) {
+      const q = s.road.quote
+      const draft: OuterCell[] = (q.open_cells ?? []).map((c) => ({ x: c.x, y: c.y, tone: c.state === 'water' ? TONE_BAD : c.state === 'steep' ? TONE_NEEDS : TONE_FREE }))
+      const path: OuterCell[] = (q.path ?? []).map((c) => ({ x: c.x, y: c.y, tone: TONE_ROAD }))
+      const have = new Set([...draft, ...path].map((c) => `${c.x},${c.y}`))
+      outer = [...outer.filter((c) => !have.has(`${c.x},${c.y}`)), ...draft, ...path]
+      scene.setRoadRibbon(q.path ?? null)
+    } else scene.setRoadRibbon(null)
+    scene.setLandCells(outer)
+    if (s.step !== 'menu' && s.step !== 'road' && s.code && s.anchor && !isMulti(cat, s.code)) {
       scene.setSelection({ x: s.anchor.x, y: s.anchor.y, w: fp.w, h: fp.h, ok: fits })
       scene.setGhost({ type: s.code, x: s.anchor.x, y: s.anchor.y, w: fp.w, h: fp.h, rotated: s.rotated, ok: fits })
     } else {
       scene.setSelection(null)
       scene.setGhost(null)
     }
-  }, [s.step, s.lots, s.anchor, s.code, s.rotated, s.picks, s.badLots, fits, layout, fp.w, fp.h, sceneRef, cat])
+  }, [s.step, s.lots, s.anchor, s.code, s.rotated, s.picks, s.badLots, s.road.quote, fits, layout, fp.w, fp.h, sceneRef, cat])
 
   // leaving build mode (unmount) clears the overlay
   useEffect(() => () => {
     const scene = sceneRef.current
     scene?.setOverlayTones(null)
+    scene?.setLandCells(null)
+    scene?.setRoadRibbon(null)
     scene?.setSelection(null)
     scene?.setGhost(null)
   }, [sceneRef])
 
-  return { state: s, fits, footprint: fp, enter, exit, choose, rotate, tapLot, next, confirm, back, undoPick, clearPicks, setPathMode, growAsk, growConfirm }
+  return {
+    state: s, fits, footprint: fp, enter, exit, choose, rotate, tapLot, next, confirm, back, undoPick, clearPicks, setPathMode,
+    enterRoad, roadTap, roadClass, roadConfirm, roadCancel,
+  }
 }

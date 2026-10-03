@@ -5,7 +5,7 @@
 import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Frame, Slab, Plate, Emboss, GLabel } from '../../kit'
-import type { CatalogueBuilding } from '../../api/types'
+import type { CatalogueBuilding, LayoutRoadPlan } from '../../api/types'
 import { t } from '../../i18n'
 import { formatNumber, money } from '../native/kit/format'
 import { blockReason, isMulti, type BuildState } from './useBuildMode'
@@ -27,13 +27,18 @@ interface Props {
   onUndo: () => void
   onClear: () => void
   onPathMode: (on: boolean) => void
-  onGrowAsk: () => void
-  onGrowConfirm: () => void
+  /** The road tool (ADR 0044 5.5): shown to whoever may draw roads. */
+  canDraw: boolean
+  plans: LayoutRoadPlan[]
+  onEnterRoad: () => void
+  onRoadClass: (code: string) => void
+  onRoadConfirm: () => void
+  onRoadCancel: (id: string) => void
 }
 
 const OK = '#40d96b', BAD = '#eb4a40', TAKEN = '#9aa0b4'
 
-export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit, onChoose, onRotate, onNext, onConfirm, onBack, onUndo, onClear, onPathMode, onGrowAsk, onGrowConfirm }: Props) {
+export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit, onChoose, onRotate, onNext, onConfirm, onBack, onUndo, onClear, onPathMode, canDraw, plans, onEnterRoad, onRoadClass, onRoadConfirm, onRoadCancel }: Props) {
   const names = useContentNames()
   const name = s.code ? buildingName(cat, s.code, s.lots?.building.name ?? s.confirm?.building.name ?? s.batch?.building.name) : ''
   const multi = isMulti(cat, s.code)
@@ -63,7 +68,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
             ? <button className="vh-x" onClick={onBack} aria-label={t('build.back')}>›</button>
             : <button className={`vh-x${searching ? ' on' : ''}`} onClick={() => { setSearching((v) => !v); setQ('') }} aria-pressed={searching} aria-label={t('build.search')}>{searching ? '›' : '⌕'}</button>}
           <GLabel className="vh-panel-title" top="#fff6c8" bottom="#ffb21f" stroke={1}>
-            {s.step === 'menu' ? t('village.btn.build') : s.step === 'grow' ? t('grow.title') : name}
+            {s.step === 'menu' ? t('village.btn.build') : s.step === 'road' ? t('road.title') : name}
           </GLabel>
           {s.step === 'menu' && s.menu && <span className="vh-queue">{t('build.queue', { n: s.menu.running_builds, cap: s.menu.concurrent_cap })}</span>}
           <button className="vh-x" onClick={onExit} aria-label={t('build.exit')}>✕</button>
@@ -76,7 +81,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
               : <div className="vh-chips" role="tablist">
                 {present.map((c) => <button key={c.code} role="tab" aria-selected={active === c.code} className={`vh-chip${active === c.code ? ' on' : ''}`} onClick={() => setCat(c.code)}>{t(c.label)}</button>)}
                 {lockedN > 0 && <button className={`vh-chip lock${showLocked ? ' on' : ''}`} aria-pressed={showLocked} onClick={() => setShowLocked((v) => !v)}>{t('build.show_locked')} · {formatNumber(lockedN)}</button>}
-                {s.menu && <button className="vh-chip lock" disabled={s.busy} onClick={onGrowAsk}>{t('grow.button')}</button>}
+                {canDraw && <button className="vh-chip road" disabled={s.busy} onClick={onEnterRoad}>{t('road.chip')}</button>}
               </div>}
             <div className="vh-cards">
               {shown.map((l) => {
@@ -160,21 +165,56 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
           </>
         )}
 
-        {s.step === 'grow' && s.grow && (
-          <>
-            <div className="vh-facts">
-              <span>{t('grow.side', { a: s.grow.side, b: s.grow.new_side })}</span>
-              <span>{t('grow.lots', { n: s.grow.lots_gained, m: s.grow.buildable_gained })}</span>
-              <span>{t('build.cost')}: <b>{money(s.grow.price)}</b></span>
-              <span>{t('build.treasury')}: <b>{money(s.grow.treasury)}</b></span>
-            </div>
-            <div className="vh-hint">{t('grow.note')}</div>
-            <div className="vh-row">
-              <Slab tone="steel" radius={14} lip={4} className="narrow" onClick={onBack} disabled={s.busy}>{t('build.back')}</Slab>
-              <Slab tone="green" radius={14} lip={4} onClick={onGrowConfirm} disabled={s.busy || s.grow.treasury < s.grow.price}>{t('grow.confirm')}</Slab>
-            </div>
-          </>
-        )}
+        {s.step === 'road' && (() => {
+          const q = s.road.quote
+          if (!q) {
+            return (
+              <>
+                <div className="vh-hint">{s.road.asking ? t('road.quoting') : t('road.hint')}</div>
+                {plans.length > 0 && (
+                  <div className="vh-roads">
+                    <div className="vh-roads-title">{t('road.roads')}</div>
+                    {plans.map((p) => (
+                      <div key={p.id} className="vh-roads-line">
+                        <span>{t('road.planned')}: {t('road.length_v', { n: formatNumber(p.lots), m: formatNumber(Math.round(p.lots * 30.5)) })}</span>
+                        <button className="vh-chip lock" disabled={s.busy} onClick={() => onRoadCancel(p.id)}>{t('road.cancel')}</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )
+          }
+          return (
+            <>
+              {(q.options?.length ?? 0) > 1 && (
+                <div className="vh-chips" role="tablist" aria-label={t('road.class')}>
+                  {q.options!.map((o) => (
+                    <button key={o.class.code} role="tab" aria-selected={q.class.code === o.class.code} disabled={!o.available || s.road.asking}
+                      className={`vh-chip${q.class.code === o.class.code ? ' on' : ''}${o.available ? '' : ' lock'}`}
+                      title={o.available ? undefined : `${t('road.class_locked')}: ${(o.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ')}`}
+                      onClick={() => onRoadClass(o.class.code)}>
+                      {o.class.name}{o.available ? '' : ' 🔒'}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="vh-facts">
+                <span>{t('road.length')}: <b>{t('road.length_v', { n: formatNumber(q.lots), m: formatNumber(q.length_m) })}</b></span>
+                <span>{t('road.climb')}: <b>{t('road.climb_v', { m: formatNumber(q.climb_m), g: formatNumber(Math.round(q.max_grade_bps / 100)) })}</b></span>
+                {q.crossings > 0 && <span>{t('road.crossings')}: <b>{t('road.crossings_v', { n: formatNumber(q.crossings) })}</b></span>}
+                <span>{t('road.price_lot')}: <b>{money(q.lot_cost)}</b></span>
+                <span>{t('road.price_all')}: <b>{money(q.full_cost)}</b></span>
+                <span style={{ gridColumn: '1 / -1' }}>{t('road.opens')}: <b>{t('road.opens_v', { u: formatNumber(q.usable), w: formatNumber(q.water), s: formatNumber(q.steep) })}</b></span>
+              </div>
+              <div className="vh-hint">{s.road.asking ? t('road.quoting') : t('road.note')}</div>
+              <div className="vh-row">
+                <Slab tone="steel" radius={14} lip={4} className="narrow" onClick={onBack} disabled={s.busy}>{t('road.back')}</Slab>
+                <Slab tone="gold" radius={14} lip={4} onClick={onRoadConfirm} disabled={s.busy || s.road.asking}>{t('road.confirm')}</Slab>
+              </div>
+            </>
+          )
+        })()}
 
         {s.step === 'confirm' && s.confirm && (
           <>

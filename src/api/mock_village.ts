@@ -20,10 +20,11 @@ import { latLonToTile, offsetLatLon } from '../village/geo'
 import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIVER_HALF_TILES, MOCK_FACE } from './mock_village_world'
 
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
+import * as landMock from './mock_village_land'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
-  BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, GridGrowView, KnowledgeListView, LandCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
+  BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, KnowledgeListView, LandCell, LotCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
   LotBuyView, LotConfirmView, LotGridView, MaterialBuyView, MaterialsView, MineView, Named, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView, DevelopmentView,
   ResidenceView, SettlementWhoView, TermsView, VillageNeed, VillageOverviewView, WorkView,
 } from './views.gen'
@@ -180,6 +181,13 @@ function init() {
     { code: 'geometry', state: 'locked', cost: 6000, time: 7200, buy: 0, missing: [], terrain: false },
   ]
   for (const b of st.buildings) if (b.state === 'under_construction') schedule(b)
+  // ?plan=1 opens the mock with a road already drawn out of the grid (the land tool's demo for a resident)
+  try {
+    if (new URLSearchParams(location.search).get('plan') === '1') {
+      const dr = landMock.draft(landHost, { x: -9, y: 8 }, 'path')
+      if (!dr.error) landMock.store(dr)
+    }
+  } catch { /* no window */ }
 }
 
 function schedule(b: MBuilding) {
@@ -234,6 +242,7 @@ function layoutFor(id: string): VillageLayout {
   seedCitizen()
   const ver = own ? `${IS_HEAD ? 'h' : 'm'}${st.ver}` : `p${st.ver}`
   const buildings: LayoutBuilding[] = list.map((b) => toLayoutBuilding(b, own))
+  const outerLand = own ? landMock.layoutLand() : undefined
   for (const r of roads) buildings.push({ type: 'road', x: r.x, y: r.y, w: 1, h: 1, rotated: false, state: 'built', visual_seed: 7, ...(own ? { id: `road-${r.x}-${r.y}` } : {}) })
   return {
     version: ver, detail,
@@ -242,7 +251,7 @@ function layoutFor(id: string): VillageLayout {
     grid: { lots: own ? size() : GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
     lots: own ? st.lots : st.otherLots,
     buildings,
-    ...(own ? { roads, tenure: cz.tenure.map((l) => ({ x: l.x, y: l.y, tenure: 'freehold' as const, mine: l.mine, owner: l.owner })), terms: { lot_price: LOT_PRICE, permit_fee: PERMIT_FEE, tax_bps: TAX_BPS } } : {}),
+    ...(own ? { roads, ...(outerLand ? { land: outerLand } : {}), tenure: cz.tenure.map((l) => ({ x: l.x, y: l.y, tenure: 'freehold' as const, mine: l.mine, owner: l.owner })), terms: { lot_price: LOT_PRICE, permit_fee: PERMIT_FEE, tax_bps: TAX_BPS } } : {}),
   }
 }
 
@@ -290,14 +299,16 @@ function refusal(kind: string, o: Parameters<typeof mockRefusal>[1] = {}) {
 /** A lot named by the number pair or by the token the server's own buttons carry ("3-1", "3-1-r"). */
 function lotArg(args: Record<string, unknown>): { x: number; y: number; rotated: boolean } | null {
   if (typeof args.lot === 'string') {
-    const m = /^(\d+)-(\d+)(-r)?$/.exec(args.lot.trim())
-    return m ? { x: +m[1], y: +m[2], rotated: !!m[3] } : null
+    const m = /^(m?\d+)-(m?\d+)(-r)?$/.exec(args.lot.trim())
+    const num = (s: string) => (s.startsWith('m') ? -Number(s.slice(1)) : Number(s))
+    return m ? { x: num(m[1]), y: num(m[2]), rotated: !!m[3] } : null
   }
   const x = Number(args.x), y = Number(args.y)
   if (!Number.isInteger(x) || !Number.isInteger(y)) return null
   return { x, y, rotated: args.rotated === true || args.rotated === 'true' || args.rotated === '1' || args.rotated === 1 }
 }
-const token = (x: number, y: number, rotated = false) => `${x}-${y}${rotated ? '-r' : ''}`
+const coord = (v: number) => (v < 0 ? `m${-v}` : String(v))
+const token = (x: number, y: number, rotated = false) => `${coord(x)}-${coord(y)}${rotated ? '-r' : ''}`
 
 const MAKERS: Record<string, string[]> = { timber: ['woodcutter_camp', 'carpentry_workshop'] }
 const MARKET_PRICE: Record<string, number> = { timber: 22, stone: 30, iron_bar: 64 }
@@ -323,7 +334,7 @@ function unmet(e: CatEntry): string[] { return (e.needs ?? []).filter((n) => st.
 
 function occupiedMap(): boolean[][] {
   const m: boolean[][] = Array.from({ length: size() }, () => Array(size()).fill(false))
-  for (const b of st.buildings) for (let yy = b.y; yy < b.y + b.h; yy++) for (let xx = b.x; xx < b.x + b.w; xx++) m[yy][xx] = true
+  for (const b of st.buildings) for (let yy = b.y; yy < b.y + b.h; yy++) for (let xx = b.x; xx < b.x + b.w; xx++) if (xx >= 0 && yy >= 0 && xx < size() && yy < size()) m[yy][xx] = true
   for (const r of st.roads) m[r.y][r.x] = true
   return m
 }
@@ -359,7 +370,13 @@ function lotsView(code: string, rotate: boolean, from = '') {
   const multi = !!e.capExempt && e.fp[0] === 1 && e.fp[1] === 1
   const m = /^(\d+)-(\d+)/.exec(from)
   const line = !multi ? '' : from === 'line' ? 'line' : m ? 'end' : ''
+  const outerFits = (x: number, y: number) => {
+    if (multi) return outerFree(x, y, 1, 1) === null
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) if (outerFree(xx, yy, 1, 1) !== null && !inGridMock(xx, yy)) return false
+    return !(inGridMock(x, y) && !fits(x, y)) && outerFree(x, y, w, h) === null
+  }
   const view: LotGridView = {
+    outer: landMock.land.plans.length ? outerPickerCells(outerFits) : null,
     settlement_name: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated: rotate, grid_lots: size(), rows, multi, line,
     from: m ? { x: +m[1], y: +m[2] } : { x: 0, y: 0 }, win_x: 0, win_y: 0,
   }
@@ -488,7 +505,7 @@ function menuView() {
   })
   const view: BuildMenuView = { name: 'آمل', treasury: st.treasury, running_builds: running(), concurrent_cap: CONCURRENT_CAP, lines }
   const acts = lines.filter((l) => l.state === 'available').map((l) => A('build.place', 'settlement.build.lots', { code: l.building.code }, { subject: l.building.code }))
-  return mockOk('settlement_build_menu', view, [...acts, A('build.grow', 'settlement.grid.grow'), back('settlement.overview'), refreshA('settlement.build')])
+  return mockOk('settlement_build_menu', view, [...acts, back('settlement.overview'), refreshA('settlement.build')])
 }
 
 function place(args: Record<string, unknown>) {
@@ -499,12 +516,18 @@ function place(args: Record<string, unknown>) {
   if (!at) return refusal('not_found')
   const { x, y, rotated } = at
   const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
-  if (x < 0 || y < 0 || x + w > size() || y + h > size()) return refusal('out_of_bounds')
-  const occ = occupiedMap()
-  for (let yy = y; yy < y + h; yy++) {
-    for (let xx = x; xx < x + w; xx++) {
-      if (!st.lots[yy][xx].buildable) return refusal('unbuildable')
-      if (occ[yy][xx]) return refusal('occupied')
+  const beyond = x < 0 || y < 0 || x + w > size() || y + h > size()
+  if (beyond) {
+    const why = outerFree(x, y, w, h)
+    if (why) return refusal(why)
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) if (tenureAt(xx, yy)) return refusal('citizen_lot_private')
+  } else {
+    const occ = occupiedMap()
+    for (let yy = y; yy < y + h; yy++) {
+      for (let xx = x; xx < x + w; xx++) {
+        if (!st.lots[yy][xx].buildable) return refusal('unbuildable')
+        if (occ[yy][xx]) return refusal('occupied')
+      }
     }
   }
   const miss = unmet(e)
@@ -516,9 +539,20 @@ function place(args: Record<string, unknown>) {
     })
   }
   if (code !== 'road' && running() >= CONCURRENT_CAP) return refusal('concurrent_cap')
-  const street = code === 'road' ? [] : planAutoRoads(x, y, w, h)
+  let street: { x: number; y: number }[] | 'none' = code === 'road' ? [] : beyond ? 'none' : planAutoRoads(x, y, w, h)
+  let fee = 0
+  if (beyond && code !== 'road') {
+    // the road of a building out there: the lane and the unlaid stretch of the drawn road
+    let best: MAcc | null = null
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+      const a = outerAcc(xx, yy)
+      if (a && (!best || a.cost < best.cost)) best = a
+    }
+    street = best ? best.path : 'none'
+    fee = best?.cost ?? 0
+  }
   if (street === 'none') return refusal('no_road')
-  const fee = street.length * AUTO_ROAD_FEE
+  if (!beyond) fee = street.length * AUTO_ROAD_FEE
   if (st.treasury < e.cost + fee) return refusal('insufficient_funds')
   if (args.confirm !== 'confirm') {
     const view: LotConfirmView = {
@@ -530,7 +564,12 @@ function place(args: Record<string, unknown>) {
   st.treasury -= e.cost + fee
   for (const [c, , q] of e.materials ?? []) MAT_STOCK[c] = Math.max(0, (MAT_STOCK[c] ?? 0) - q)
   // the game lays the connecting street at once
-  const laid = street.map((q) => { const r = mkRoad(q.x, q.y, 'built'); st.buildings.push(r); return { building_id: r.id, lot_x: q.x, lot_y: q.y } })
+  const laid = street.map((q) => {
+    const r = mkRoad(q.x, q.y, 'built'); st.buildings.push(r)
+    const cell = landMock.land.cells.get(landMock.keyOf(q.x, q.y))
+    if (cell) cell.built = true
+    return { building_id: r.id, lot_x: q.x, lot_y: q.y }
+  })
   // the mock builds faster than the real duration so a demo sees it finish
   const sec = Math.min(90, Math.max(25, Math.round(e.time / 120)))
   const started = Date.now()
@@ -672,6 +711,121 @@ function bill(e: CatEntry) {
 }
 function citizenUnmet(e: CatEntry): boolean { return unmet(e).length > 0 }
 
+// -- the land beyond the first grid (ADR 0044 5.5): a road opens the land it reaches -------------------------
+
+const inGridMock = (x: number, y: number) => x >= 0 && y >= 0 && x < size() && y < size()
+
+function lotGround(x: number, y: number): { height: number; wet: boolean } {
+  const place = mockVillagePlace(GRID)
+  const ll = offsetLatLon(place.origin.lat, place.origin.lon, x * MOCK_WORLD.lot_m, y * MOCK_WORLD.lot_m, MOCK_WORLD.planet_radius_km)
+  const t = latLonToTile(ll.lat, ll.lon, MOCK_WORLD.chunk.max_lod, MOCK_WORLD.chunk.tile_edge)
+  return { height: mockHeight(t.gx, t.gy) + lotNoise(x, y, 1) * 0.9, wet: t.face === MOCK_FACE && Math.abs(t.gy - RIVER_GY) < RIVER_HALF_TILES }
+}
+
+const landHost: landMock.LandHost = {
+  gridSize: () => size(),
+  height: (x, y) => (inGridMock(x, y) ? st.lots[y][x].height_m : lotGround(x, y).height),
+  wet: (x, y) => (inGridMock(x, y) ? !!st.lots[y][x].water : lotGround(x, y).wet),
+  blocked: (x, y) => st.buildings.some((b) => b.type !== 'road' && x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h) || !!tenureAt(x, y),
+  anchors: () => {
+    const out = st.roads.map((r) => ({ x: r.x, y: r.y }))
+    for (const b of st.buildings) {
+      if (b.type === 'road') out.push({ x: b.x, y: b.y })
+      if (b.type === 'civic_hall') for (let yy = b.y; yy < b.y + b.h; yy++) for (let xx = b.x; xx < b.x + b.w; xx++) out.push({ x: xx, y: yy })
+    }
+    return out
+  },
+  roadCost: 10, crossCost: 60, slopeLimit: 8,
+}
+
+/** The road a lot beyond the grid needs, as the access screens read it. */
+function outerAcc(x: number, y: number): MAcc | null {
+  const a = landMock.accessOf(landHost, x, y)
+  if (!a) return null
+  return { kind: a.kind, roads: a.roads, crossings: a.crossings, cost: a.cost, path: a.path, carved: [] }
+}
+
+function haveKnowledge(code: string): boolean { return st.know.find((k) => k.code === code)?.state === 'held' }
+
+function roadPlan(args: Record<string, unknown>) {
+  if (!IS_HEAD) return refusal('not_office_holder')
+  const x = Number(args.x), y = Number(args.y)
+  const to = typeof args.to === 'string' ? lotArg({ lot: args.to }) : Number.isInteger(x) && Number.isInteger(y) ? { x, y } : null
+  if (!to) return refusal('not_found', { back: { command: 'settlement.land', args: null } })
+  const cls = String(args.class || 'path')
+  const def = landMock.CLASSES.find((c) => c.code === cls)
+  if (!def) return refusal('not_found', { back: { command: 'settlement.land', args: null } })
+  if (def.needs.some((k) => !haveKnowledge(k))) return refusal('road_class_locked', { back: { command: 'settlement.land', args: null } })
+  const dr = landMock.draft(landHost, { x: to.x, y: to.y }, cls)
+  if (dr.error) return refusal(dr.error, { back: { command: 'settlement.land', args: null } })
+  const view = landMock.quoteView(landHost, dr, 'آمل', OWN_ID, haveKnowledge)
+  if (args.confirm !== 'confirm') {
+    return mockOk('settlement_road_quote', view, [confirmA('settlement.road.plan', { to: token(to.x, to.y), class: cls }), back('settlement.land')])
+  }
+  const plan = landMock.store(dr)
+  view.plan_id = plan.id
+  st.ver++
+  emit({ type: 'land_changed', layout_version: versions() })
+  return mockOk('settlement_road_planned', view, [A('citizen.more_land', 'settlement.land'), back('settlement.land')])
+}
+
+function roadCancel(args: Record<string, unknown>) {
+  if (!IS_HEAD) return refusal('not_office_holder')
+  const id = String(args.id ?? '')
+  const plan = landMock.land.plans.find((p) => p.id === id)
+  if (!plan) return refusal('not_found', { back: { command: 'settlement.land', args: null } })
+  const sold = [...landMock.land.open.values()].some((o) => o.plan === id && (tenureAt(o.x, o.y) || st.buildings.some((b) => b.x === o.x && b.y === o.y)))
+  if (plan.cells.some((c) => c.built) || sold) return refusal('road_in_use', { back: { command: 'settlement.land', args: null } })
+  landMock.land.plans = landMock.land.plans.filter((p) => p.id !== id)
+  for (const c of plan.cells) landMock.land.cells.delete(landMock.keyOf(c.x, c.y))
+  for (const [k, o] of landMock.land.open) if (o.plan === id) landMock.land.open.delete(k)
+  st.ver++
+  emit({ type: 'land_changed', layout_version: versions() })
+  return mockOk('settlement_road_cancelled', { settlement_name: 'آمل', plan_id: id, lots: plan.cells.length }, [back('settlement.land')])
+}
+
+/** The land screen's and the pickers' view of the lots beyond the grid. */
+function outerLandCells(): LandCell[] {
+  const out: LandCell[] = []
+  for (const c of landMock.land.cells.values()) out.push({ x: c.x, y: c.y, state: c.built ? 'road' : 'planned', owner: '', building: c.built ? 'road' : '', access: '', roads: 0, crossings: 0, cost: 0 })
+  for (const o of landMock.land.open.values()) {
+    const own = tenureAt(o.x, o.y)
+    const b = st.buildings.find((q) => q.type !== 'road' && o.x >= q.x && o.x < q.x + q.w && o.y >= q.y && o.y < q.y + q.h)
+    const state = own ? (own.mine ? 'mine' : 'taken') : b ? 'building' : o.reason === 'water' ? 'water' : o.reason === 'steep' ? 'steep' : 'free'
+    const cell: LandCell = { x: o.x, y: o.y, state, owner: own && !own.mine ? own.owner : '', building: b ? b.type : '', access: '', roads: 0, crossings: 0, cost: 0 }
+    if (state === 'free' || (state === 'mine' && !b)) {
+      const a = outerAcc(o.x, o.y)
+      if (a) { cell.access = a.kind; cell.roads = a.roads; cell.crossings = a.crossings; cell.cost = a.cost }
+    }
+    out.push(cell)
+  }
+  return out
+}
+
+function outerPickerCells(fits: (x: number, y: number) => boolean, own = false): LotCell[] {
+  const out: LotCell[] = []
+  for (const c of landMock.land.cells.values()) out.push({ x: c.x, y: c.y, state: c.built ? 'road' : 'planned', own: false, fits: false })
+  for (const o of landMock.land.open.values()) {
+    const b = st.buildings.some((q) => o.x >= q.x && o.x < q.x + q.w && o.y >= q.y && o.y < q.y + q.h)
+    const state = b ? 'occupied' : o.reason === 'water' ? 'water' : o.reason === 'steep' ? 'steep' : 'free'
+    out.push({ x: o.x, y: o.y, state, own: own && !!tenureAt(o.x, o.y)?.mine, fits: state === 'free' && fits(o.x, o.y) })
+  }
+  return out
+}
+
+/** A footprint on the land beyond the grid: every lot of it open, buildable and free. */
+function outerFree(x: number, y: number, w: number, h: number): string | null {
+  for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+    if (inGridMock(xx, yy)) continue
+    if (landMock.land.cells.has(landMock.keyOf(xx, yy))) return 'occupied'
+    const o = landMock.land.open.get(landMock.keyOf(xx, yy))
+    if (!o) return 'out_of_bounds'
+    if (!o.buildable) return 'unbuildable'
+    if (st.buildings.some((q) => xx >= q.x && xx < q.x + q.w && yy >= q.y && yy < q.y + q.h)) return 'occupied'
+  }
+  return null
+}
+
 // -- lot access (docs/adr/0043): a lot is sold only when a road can reach it ---------------------------
 // The mock follows the server's rules in small: the road is laid over public lots at AUTO_ROAD_FEE a lot,
 // water costs CROSS_FEE a lot (at most MAX_CROSS in one road), another resident's lot or a building is
@@ -694,6 +848,8 @@ function netCells(): Set<string> {
 }
 
 function mockAccess(x: number, y: number, carve = false): MAcc {
+  // land beyond the first grid is served by its road's plan, not by the grid's router
+  if (!inGridMock(x, y)) return outerAcc(x, y) ?? { kind: 'none', roads: 0, crossings: 0, cost: 0, path: [], carved: [] }
   const n = size()
   const occ = occupiedMap()
   const net = netCells()
@@ -752,6 +908,7 @@ const accessOf = (a: MAcc) => ({
 })
 
 function onOffer(x: number, y: number): boolean {
+  if (!inGridMock(x, y)) return outerFree(x, y, 1, 1) === null && !tenureAt(x, y)
   return x >= 0 && y >= 0 && x < size() && y < size() && st.lots[y][x].buildable && !occupiedMap()[y][x] && !tenureAt(x, y)
 }
 
@@ -769,7 +926,12 @@ function nearbyLots(x: number, y: number) {
 /** The road of a connection: the carved lots go back to the village, the path is laid as finished road. */
 function layAccess(a: MAcc) {
   for (const p of a.carved) cz.tenure = cz.tenure.filter((l) => !(l.x === p.x && l.y === p.y))
-  for (const p of a.path) st.buildings.push(mkRoad(p.x, p.y, 'built'))
+  for (const p of a.path) {
+    st.buildings.push(mkRoad(p.x, p.y, 'built'))
+    // a lot of a drawn road (ADR 0044 5.5) is laid by this
+    const cell = landMock.land.cells.get(landMock.keyOf(p.x, p.y))
+    if (cell) cell.built = true
+  }
 }
 
 function lotAccessView(x: number, y: number): LotAccessView {
@@ -798,7 +960,7 @@ function lotAccessActions(v: LotAccessView): MockAct[] {
 function lotAccess(args: Record<string, unknown>) {
   seedCitizen()
   const at = lotArg(args)
-  if (!at || at.x >= size() || at.y >= size()) return refusal('not_found')
+  if (!at || (inGridMock(at.x, at.y) ? false : !landMock.land.open.has(landMock.keyOf(at.x, at.y))) || at.x >= size() && inGridMock(at.x, at.y) || at.y >= size() && inGridMock(at.x, at.y)) return refusal('not_found')
   const v = lotAccessView(at.x, at.y)
   return mockOk('settlement_lot_access', v, lotAccessActions(v))
 }
@@ -839,10 +1001,16 @@ function lotBuy(args: Record<string, unknown>) {
   const at = lotArg(args)
   if (!at) return refusal('not_found')
   const { x, y } = at
-  if (x < 0 || y < 0 || x >= size() || y >= size()) return refusal('not_found')
+  const outerLot = !inGridMock(x, y)
+  if (outerLot && !landMock.land.open.has(landMock.keyOf(x, y))) return refusal('out_of_bounds')
   if (tenureAt(x, y)) return refusal('citizen_lot_taken', { back: { command: 'settlement.land', args: null } })
-  if (!st.lots[y][x].buildable) return refusal('unbuildable')
-  if (occupiedMap()[y][x]) return refusal('occupied')
+  if (outerLot) {
+    const why = outerFree(x, y, 1, 1)
+    if (why) return refusal(why)
+  } else {
+    if (!st.lots[y][x].buildable) return refusal('unbuildable')
+    if (occupiedMap()[y][x]) return refusal('occupied')
+  }
   if (cz.tenure.filter((l) => l.mine).length >= MAX_LOTS) return refusal('citizen_lot_limit', { back: { command: 'settlement.land', args: null } })
   if (cz.cash < LOT_PRICE) return refusal('citizen_no_cash', { back: { command: 'settlement.land', args: null } })
   if (tenureAt(x, y)) return refusal('citizen_lot_taken')
@@ -894,7 +1062,22 @@ function landView() {
   const owned = cz.tenure.filter((l) => l.mine).length
   const free = rows.flat().filter((c) => c.state === 'free').length
   const served = rows.flat().filter((c) => c.state === 'free' && c.access !== 'none').length
-  const view: LandView = { village: 'آمل', settlement_id: OWN_ID, grid_lots: size(), rows, price: LOT_PRICE, cash: cz.cash, owned, max: MAX_LOTS, can_buy: owned < MAX_LOTS && cz.cash >= LOT_PRICE && served > 0, free_lots: free, served_lots: served }
+  const outer = outerLandCells()
+  const outerFree_ = outer.filter((c) => c.state === 'free').length
+  const outerServed = outer.filter((c) => c.state === 'free' && c.access !== 'none').length
+  const roadLines = landMock.land.plans.map((p) => {
+    const lots = [...landMock.land.open.values()].filter((o) => o.plan === p.id && o.buildable)
+    return {
+      id: p.id, class: { code: p.cls, name: p.cls === 'track' ? 'جادهٔ خاکی' : 'راه مالرو' }, lots: p.cells.length, built: p.cells.filter((c) => c.built).length,
+      open: lots.filter((o) => !tenureAt(o.x, o.y) && !st.buildings.some((b) => b.x === o.x && b.y === o.y)).length, sold: lots.filter((o) => tenureAt(o.x, o.y)).length,
+      to: { x: p.to.x, y: p.to.y }, cancellable: !p.cells.some((c) => c.built) && !lots.some((o) => tenureAt(o.x, o.y)),
+    }
+  })
+  const view: LandView = {
+    village: 'آمل', settlement_id: OWN_ID, grid_lots: size(), rows, price: LOT_PRICE, cash: cz.cash, owned, max: MAX_LOTS,
+    can_buy: owned < MAX_LOTS && cz.cash >= LOT_PRICE && (served > 0 || outerServed > 0), free_lots: free + outerFree_, served_lots: served + outerServed,
+    outer: outer.length ? outer : null, roads: roadLines.length ? roadLines : null, can_draw: IS_HEAD,
+  }
   return mockOk('settlement_land', view, [...(owned > 0 ? [A('citizen.build_house', 'settlement.private')] : []), back('settlement.overview'), refreshA('settlement.land')])
 }
 
@@ -902,7 +1085,8 @@ function privateMenu() {
   seedCitizen()
   const owned = cz.tenure.filter((l) => l.mine)
   const occ = occupiedMap()
-  const freeOwn = owned.filter((l) => !occ[l.y][l.x]).length
+  const standsAt = (x: number, y: number) => (inGridMock(x, y) ? occ[y][x] : st.buildings.some((b) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h))
+  const freeOwn = owned.filter((l) => !standsAt(l.x, l.y)).length
   const lines = CITIZEN_CAT.filter((e) => !citizenUnmet(e)).map((e) => {
     const b = bill(e)
     return {
@@ -935,7 +1119,17 @@ function privateLots(args: Record<string, unknown>) {
     return true
   }
   const rows = st.lots.map((row, y) => row.map((_, x) => ({ x, y, state: stateOf(x, y), own: fits(x, y), fits: fits(x, y) })))
-  const view: PrivateLotsView = { village: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated, grid_lots: size(), rows }
+  const outerFits = (x: number, y: number) => {
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+      if (inGridMock(xx, yy) ? occ[yy][xx] : outerFree(xx, yy, 1, 1) !== null) return false
+      if (!tenureAt(xx, yy)?.mine) return false
+    }
+    return true
+  }
+  const view: PrivateLotsView = {
+    village: 'آمل', building: nameOf(code), can_rotate: e.fp[0] !== e.fp[1], rotated, grid_lots: size(), rows,
+    outer: landMock.land.plans.length ? outerPickerCells(outerFits, true) : null,
+  }
   return mockOk('settlement_private_lots', view, [...(view.can_rotate ? [A('lots.rotate', 'settlement.private.lots', { code, rotate: rotated ? '0' : '1' })] : []), back('settlement.private'), refreshA('settlement.private.lots', { code })])
 }
 
@@ -951,14 +1145,24 @@ function privatePlace(args: Record<string, unknown>) {
   const occ = occupiedMap()
   for (let yy = y; yy < y + h; yy++) {
     for (let xx = x; xx < x + w; xx++) {
-      if (xx >= size() || yy >= size()) return refusal('out_of_bounds')
-      if (occ[yy][xx]) return refusal('occupied')
+      if (inGridMock(xx, yy)) { if (occ[yy][xx]) return refusal('occupied') } else {
+        const why = outerFree(xx, yy, 1, 1)
+        if (why) return refusal(why)
+      }
       if (!tenureAt(xx, yy)?.mine) return refusal('citizen_not_owner', { back: { command: 'settlement.private', args: null } })
     }
   }
   if (citizenUnmet(e)) return refusal('prerequisite')
   // no road can be laid to the lot: the answer is the lot's own fixes, never a dead end
-  if (planAutoRoads(x, y, w, h) === 'none') {
+  const beyond = x < 0 || y < 0 || x + w > size() || y + h > size()
+  let outerRoad: MAcc | null = null
+  if (beyond) {
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
+      const a = outerAcc(xx, yy)
+      if (a && (!outerRoad || a.cost < outerRoad.cost)) outerRoad = a
+    }
+  }
+  if (beyond ? !outerRoad : planAutoRoads(x, y, w, h) === 'none') {
     const v = lotAccessView(x, y)
     v.building = nameOf(code)
     return mockOk('settlement_lot_access', v, lotAccessActions(v))
@@ -971,6 +1175,8 @@ function privatePlace(args: Record<string, unknown>) {
   }
   cz.cash -= b.total
   st.treasury += PERMIT_FEE
+  // a building out there brings the unlaid stretch of its road
+  if (outerRoad) layAccess(outerRoad)
   const sec = 40
   const started = Date.now()
   const nb: MBuilding = { id: `b-${st.nextId++}`, type: code, x, y, w, h, rotated, state: 'under_construction', started, finish: started + sec * 1000, seed: 77021 + st.nextId * 17, priv: true, owner: 'تو', mine: true }
@@ -1106,9 +1312,6 @@ const homeNone = () => mockOk('village_home_none', {}, [back('player.profile.get
 // -- roads: automatic and in batches (contract 1.4) ------------------------------------------
 
 const AUTO_ROAD_FEE = 10
-const GROW_LOT_PRICE = 50
-const GROW_STEP_BPS = 500
-const GROW_MAX = 41
 
 function isRoadAt(x: number, y: number): boolean {
   return st.roads.some((r) => r.x === x && r.y === y) || st.buildings.some((b) => b.type === 'road' && b.x === x && b.y === y)
@@ -1288,25 +1491,6 @@ function buildingView(args: Record<string, unknown>) {
 
 // -- land -------------------------------------------------------------------------------------------
 
-function growView(args: Record<string, unknown>) {
-  const side = size()
-  if (side + 1 > GROW_MAX) return refusal('grid_max')
-  const lotsGained = 2 * side + 1
-  const price = Math.floor((lotsGained * GROW_LOT_PRICE * (10_000 + GROW_STEP_BPS * st.growth)) / 10_000)
-  if (args.confirm !== 'confirm') {
-    const view: GridGrowView = { settlement_name: 'آمل', side, new_side: side + 1, lots_gained: lotsGained, buildable_gained: Math.round(lotsGained * 0.82), price, treasury: st.treasury }
-    return mockOk('settlement_grid_grow', view, [confirmA('settlement.grid.grow'), back('settlement.build')])
-  }
-  if (st.treasury < price) return refusal('insufficient_funds')
-  st.treasury -= price
-  st.growth++
-  const place = mockVillagePlace(GRID)
-  st.lots = makeLots(place.origin, [[4, 0, 11]], size())
-  st.ver++
-  emit({ type: 'grid_grown', grid_lots: size(), layout_version: versions() })
-  return menuView()
-}
-
 // -- storage and market (settlement.materials, .buy) ---------------------------------------------
 const MARKET = [
   { item: goods('timber'), price: 22 },
@@ -1353,7 +1537,8 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.build.place': return place(args)
     case 'settlement.build.place_many': return placeMany(args)
     case 'settlement.building.view': return buildingView(args)
-    case 'settlement.grid.grow': return growView(args)
+    case 'settlement.road.plan': return roadPlan(args)
+    case 'settlement.road.cancel': return roadCancel(args)
     case 'settlement.build.cancel': return cancelOrDemolish(args, false)
     case 'settlement.build.demolish': return cancelOrDemolish(args, true)
     case 'settlement.build.progress': return progressView()

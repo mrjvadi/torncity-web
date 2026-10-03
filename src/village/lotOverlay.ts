@@ -36,6 +36,11 @@ const TONES: Record<number, [number, number, number, number]> = {
   [TONE_OWN_LOCKED]: [1, 0.3, 0.7, 0.82],
 }
 
+/** The RGBA of a tone, for the overlay of the land beyond the first grid (landOverlay.ts). */
+export function toneColor(tone: number): [number, number, number, number] {
+  return TONES[tone] ?? TONES[TONE_NONE]
+}
+
 export class LotOverlay {
   readonly tint: Mesh
   readonly borders: LineSegments
