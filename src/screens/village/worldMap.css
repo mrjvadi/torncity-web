@@ -81,7 +81,7 @@
 .wm-zoom { font-size: 24px; line-height: 1; color: #ffe9a8; }
 
 .wm-card {
-  position: absolute; z-index: 4; left: 10px; right: 10px; bottom: 8px; padding: 12px; border-radius: 18px;
+  position: absolute; z-index: 4; left: 10px; right: 66px; bottom: 8px; padding: 12px; border-radius: 18px;
   background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55); color: #fff; display: flex; flex-direction: column; gap: 10px;
 }
