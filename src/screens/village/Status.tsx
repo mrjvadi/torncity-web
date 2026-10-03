@@ -9,7 +9,7 @@ import DonateSheet from './Donate'
 import type { ScreenProps } from '../types'
 import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
-import { PBtn } from '../../ui/v6/panel'
+import { PBtn, CardGrid } from '../../ui/v6/panel'
 import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { hms, money, moneyIn } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
@@ -76,12 +76,12 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
           </Card>
           <SectionTitle>{t('overview.buildings')}</SectionTitle>
           {(v.buildings ?? []).length === 0 && <Empty>{t('overview.no_buildings')}</Empty>}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <CardGrid>
             {(v.buildings ?? []).map((b, i) => {
               const { icon, palette } = iconForRole(b.role)
               return <ListRow key={i} icon={icon} palette={palette} tone={ROLE_TONE[b.role]} title={buildingName(cat, b.building.code, b.building.name)} sub={t(`role.${b.role}` as Key)} />
             })}
-          </div>
+          </CardGrid>
         </>
       )}
       <DonateSheet open={donate} onClose={() => setDonate(false)} onDone={() => void refresh()} />
@@ -120,7 +120,7 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
       <Header title={t('progress.title')} tone="gold" onBack={back(openLocal)} onRefresh={() => void refresh()} />
       {loading && !v && <Empty>…</Empty>}
       {!loading && lines.length === 0 && <Empty>{t('progress.empty')}</Empty>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {lines.map((l, i) => {
           // the layout knows when it started; the view only when it ends
           const lb = layout?.buildings.find((b) => b.x === l.lot_x && b.y === l.lot_y && b.type === l.building.code)
@@ -172,7 +172,7 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
             </RowCard>
           )
         })}
-      </div>
+      </CardGrid>
     </ScreenScroll>
   )
 }
@@ -243,7 +243,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
           {!canAct && <Notice>{t('know.only_head')}</Notice>}
           {(v.lines ?? []).some((l) => l.state === 'available') && <div className="nx-bar-sub">{t('know.explain')}</div>}
           {(v.lines ?? []).length === 0 && <Empty>{t('know.empty')}</Empty>}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <CardGrid>
             {(v.lines ?? []).map((l) => {
               const held = l.state === 'held'
               const locked = l.state === 'locked'
@@ -276,7 +276,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
                 </RowCard>
               )
             })}
-          </div>
+          </CardGrid>
           {v.hidden > 0 && <div className="nx-bar-sub" style={{ textAlign: 'center' }}>{t('know.hidden', { n: formatNumber(v.hidden) })}</div>}
         </>
       )}
@@ -321,7 +321,7 @@ export function Who({ openLocal }: ScreenProps) {
       {players?.hidden && <Notice>{t('who.hidden')}</Notice>}
       {players && !players.hidden && <div className="nx-bar-sub" style={{ textAlign: 'center' }}>{t('who.count', { n: players.online, total: list.length })}</div>}
       {players && list.length === 0 && <Empty>{t('who.empty')}</Empty>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {list.map((p) => {
           const known = p.visible && !players?.hidden
           const label = p.activity && hasKey(`activity.${p.activity}`) ? t(`activity.${p.activity}` as Key) : (p.activity_label ?? '')
@@ -336,7 +336,7 @@ export function Who({ openLocal }: ScreenProps) {
             />
           )
         })}
-      </div>
+      </CardGrid>
     </ScreenScroll>
   )
 }
