@@ -20,9 +20,9 @@ import {
 import { TABLES, goodName, namedOf, skillLevel, unitQty } from './wording'
 import { unlockHint } from './production'
 import type { FlowCtx } from '../village/flow'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
-const col = { display: 'flex', flexDirection: 'column', gap: 8 } as const
 
 const attrName = (ctx: FlowCtx, code: string) => ctx.names.name([...TABLES.attribute], code, code)
 const slotName = (ctx: FlowCtx, code: string) => ctx.names.name([...TABLES.slot], code, code)
@@ -40,30 +40,30 @@ const Studio = flow<StudioView>(({ view: v, ctx }) => {
   return (
     <Page title={t('co.studio.title', { name: v.ref.name })} tone="violet">
       {(v.designs ?? []).length === 0 && <Notice>{t('co.studio.none')}</Notice>}
-      <div style={col}>
+      <CardGrid>
         {(v.designs ?? []).map((d) => (
           <ListRow key={d.no} icon={d.status === 'final' ? 'check' : 'quill'} palette={d.status === 'final' ? 'emerald' : 'gold'} title={designTitle(d.name, d.no)}
             sub={`${nameOf(ctx, TABLES.item, d.item)} - ${t(`co.design.status.${d.status}` as Key)}${d.origin === 'reverse_engineered' ? ` - ${t('co.design.copy_short')}` : ''}`}
             onClick={go(ctx, 'production.design', { no: d.no })} />
         ))}
-      </div>
+      </CardGrid>
       {v.can_design ? (
         <>
           <Lead>{(v.kinds ?? []).length > 0 ? t('co.studio.new') : t('co.studio.no_kinds')}</Lead>
-          <div style={col}>
+          <CardGrid>
             {(v.kinds ?? []).map((k) => {
               const a = news.find((x) => x.args?.item === k.code)
               return <ListRow key={k.code} icon="quill" palette="gold" title={nameOf(ctx, TABLES.item, k)} onClick={a ? () => ctx.go(a) : undefined} />
             })}
-          </div>
+          </CardGrid>
         </>
       ) : <Notice alert>{t('co.studio.at_max', { max: formatNumber(v.max) })}</Notice>}
       {(v.next ?? []).length > 0 && (
         <>
           <Lead>{(v.kinds ?? []).length === 0 ? t('co.studio.none_ready') : t('co.studio.next')}</Lead>
-          <div style={col}>
+          <CardGrid>
             {(v.next ?? []).map((k) => <ListRow key={k.item.code} icon="m_lock" palette="steel" title={nameOf(ctx, TABLES.item, k.item)} sub={unlockHint(ctx, k.steps ?? [])} />)}
-          </div>
+          </CardGrid>
         </>
       )}
       {v.hidden && <Hint>{t('co.studio.later')}</Hint>}
@@ -106,7 +106,7 @@ const Design = flow<DesignView>(({ view: v, ctx }) => {
     return (
       <Page title={t('co.design.choose', { slot: slotName(ctx, slot.slot) })} tone="violet">
         {slot.min !== slot.max && <Hint>{t('co.design.range', { lo: unitQty(slot.unit, slot.min), hi: unitQty(slot.unit, slot.max) })}</Hint>}
-        <div style={col}>
+        <CardGrid>
           {(v.candidates ?? []).map((c) => {
             const a = ctx.acts.find((x) => x.id === 'production.candidate' && x.args?.component === c.component.code)
             return (
@@ -115,7 +115,7 @@ const Design = flow<DesignView>(({ view: v, ctx }) => {
                 onClick={a && !c.locked ? () => ctx.go(a) : undefined} />
             )
           })}
-        </div>
+        </CardGrid>
         <Btns ctx={ctx} list={byId(ctx, 'production.slot_clear', 'production.slot_qty')} />
         <BackBtn ctx={ctx} />
       </Page>
@@ -137,7 +137,7 @@ const Design = flow<DesignView>(({ view: v, ctx }) => {
         {v.origin === 'reverse_engineered' && <Hint>{t('co.design.copy', { source: v.source, loss: bps(v.quality_loss_bps), overhead: bps(v.overhead_bps) })}</Hint>}
         {v.version > 1 && <Hint>{t('co.design.version', { version: formatNumber(v.version) })}</Hint>}
       </Panel>
-      <div style={col}>{slotRows}</div>
+      <CardGrid>{slotRows}</CardGrid>
       {attrs}
       {draft && (
         <>
@@ -227,7 +227,7 @@ const Lab = flow<LabView>(({ view: v, ctx }) => (
       <Notice>{t('co.lab.running', { tech: namedOf(ctx.names, TABLES.tech, v.running.tech), time: clockText(v.running.finish_at), duration: left(v.running.left_seconds) })}</Notice>
     )}
     {(v.techs ?? []).length === 0 && <Notice>{t('co.lab.none')}</Notice>}
-    <div style={col}>
+    <CardGrid>
       {(v.techs ?? []).map((x) => {
         const name = namedOf(ctx.names, TABLES.tech, x.tech)
         const sub =
@@ -242,7 +242,7 @@ const Lab = flow<LabView>(({ view: v, ctx }) => (
             onClick={go(ctx, 'production.tech', { tech: x.tech.code })} />
         )
       })}
-    </div>
+    </CardGrid>
     {v.hidden > 0 && <Hint>{t('co.lab.later', { count: formatNumber(v.hidden) })}</Hint>}
     <Hint>{t('co.lab.hint')}</Hint>
     <BackBtn ctx={ctx} />
@@ -319,17 +319,17 @@ const ReverseLab = flow<ReverseLabView>(({ view: v, ctx }) => {
       ]} />
       <Lead>{t('co.relab.samples')}</Lead>
       {(v.samples ?? []).length === 0 && <Notice>{t('co.relab.no_samples')}</Notice>}
-      <div style={col}>
+      <CardGrid>
         {(v.samples ?? []).map((s, i) => (
           <ListRow key={s.serial} icon="m_search" palette="violet" title={goodName(ctx.names, s.good)}
             sub={t('co.relab.sample', { maker: s.maker, quality: formatNumber(s.quality), chance: bps(s.chance_bps) })}
             onClick={samples[i] ? () => ctx.go(samples[i]) : undefined} />
         ))}
-      </div>
+      </CardGrid>
       {(v.jobs ?? []).length > 0 && (
         <>
           <Lead>{t('co.relab.jobs')}</Lead>
-          <div style={col}>
+          <CardGrid>
             {(v.jobs ?? []).map((j) => {
               const open = j.result_no > 0 ? ctx.acts.find((a) => a.id === 'production.design' && a.args?.no === String(j.result_no)) : undefined
               return (
@@ -340,7 +340,7 @@ const ReverseLab = flow<ReverseLabView>(({ view: v, ctx }) => {
                   onClick={open ? () => ctx.go(open) : undefined} />
               )
             })}
-          </div>
+          </CardGrid>
         </>
       )}
       <Hint>{t('co.relab.hint')}</Hint>

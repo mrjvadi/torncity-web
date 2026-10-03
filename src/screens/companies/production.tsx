@@ -17,6 +17,7 @@ import {
 import { NextStepCard } from './manage'
 import { TABLES, goodName, namedOf, skillLevel } from './wording'
 import type { FlowCtx } from '../village/flow'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 const col = { display: 'flex', flexDirection: 'column', gap: 8 } as const
@@ -108,24 +109,24 @@ const Orders = flow<OrdersView>(({ view: v, ctx }) => {
         { label: t('co.orders.crew'), value: formatNumber(v.crew) },
         { label: t('co.orders.running'), value: t('co.of', { a: formatNumber(v.running), b: formatNumber(v.max) }) },
       ]} />
-      {running.length > 0 && <><Lead>{t('co.orders.in_progress')}</Lead><div style={col}>{running.map((o) => <OrderLine key={o.no} ctx={ctx} o={o} />)}</div></>}
-      {done.length > 0 && <><Lead>{t('co.orders.finished')}</Lead><div style={col}>{done.map((o) => <OrderLine key={o.no} ctx={ctx} o={o} />)}</div></>}
+      {running.length > 0 && <><Lead>{t('co.orders.in_progress')}</Lead><CardGrid>{running.map((o) => <OrderLine key={o.no} ctx={ctx} o={o} />)}</CardGrid></>}
+      {done.length > 0 && <><Lead>{t('co.orders.finished')}</Lead><CardGrid>{done.map((o) => <OrderLine key={o.no} ctx={ctx} o={o} />)}</CardGrid></>}
       {(v.orders ?? []).length === 0 && <Notice>{t('co.orders.none')}</Notice>}
       <Lead>{t('co.orders.new')}</Lead>
       {(v.targets ?? []).length === 0 && <Notice>{t('co.orders.no_targets')}</Notice>}
-      <div style={col}>
+      <CardGrid>
         {(v.targets ?? []).map((tg, i) => (
           <ListRow key={i} icon="gears" palette="gold" title={goodName(ctx.names, tg.good)}
             sub={tg.batch > 0 ? t('co.orders.batch', { batch: formatNumber(tg.batch) }) : undefined}
             onClick={produce[i] ? () => ctx.go(produce[i]) : undefined} />
         ))}
-      </div>
+      </CardGrid>
       {(v.locked ?? []).length > 0 && (
         <>
           <Lead>{t('co.orders.locked')}</Lead>
-          <div style={col}>
+          <CardGrid>
             {(v.locked ?? []).map((l, i) => <ListRow key={i} icon="m_lock" palette="steel" title={goodName(ctx.names, l.good)} sub={unlockHint(ctx, l.steps ?? [])} />)}
-          </div>
+          </CardGrid>
         </>
       )}
       <BackBtn ctx={ctx} />
@@ -158,13 +159,13 @@ const Produce = flow<ProduceView>(({ view: v, ctx }) => {
       <Panel>
         {batch > 0 && <Hint>{t('co.produce.batch', { batch: formatNumber(batch) })}</Hint>}
         <Lead>{t(v.qty > 0 ? 'co.produce.recipe_order' : 'co.produce.recipe')}</Lead>
-        <div style={col}>
+        <CardGrid>
           {(v.recipe ?? []).map((r) => {
             const ok = r.have >= (v.qty > 0 ? r.need : r.per)
             return <ListRow key={r.component.code} icon={ok ? 'check' : 'close'} palette={ok ? 'emerald' : 'ruby'} title={nameOf(ctx, TABLES.component, r.component)}
               sub={v.qty > 0 ? t('co.produce.need', { need: formatNumber(r.need), have: formatNumber(r.have) }) : t('co.produce.per', { per: formatNumber(r.per), have: formatNumber(r.have) })} />
           })}
-        </div>
+        </CardGrid>
       </Panel>
       {v.qty <= 0 && <Lead>{t('co.produce.choose', { max: formatNumber(v.max_qty) })}</Lead>}
       {v.qty > 0 && (
