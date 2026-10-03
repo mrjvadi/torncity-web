@@ -2,7 +2,8 @@
 // your own, or another player's found through search or a leaderboard.
 
 import type { ScreenProps } from '../types'
-import { Card as Panel, Header, Notice, ScreenScroll, Stat, StatPair } from '../native/kit/Parts'
+import { Card as Panel, Header, Notice, ScreenScroll } from '../native/kit/Parts'
+import { PStats } from '../../ui/v6/panel'
 import Actions from '../native/kit/Actions'
 import { ago, formatNumber } from '../native/kit/format'
 import { hasKey, t, type Key } from '../../i18n'
@@ -61,14 +62,12 @@ export default function PlayerCard({ response, loading, onAction, run }: ScreenP
         {v.self && !v.bio && <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 10 }}>{t('card.no_bio')}</div>}
       </Panel>
 
-      <StatPair
-        left={<Stat icon="x_crown" palette="gold" label={t('card.level')} value={formatNumber(v.level ?? 0)} />}
-        right={<Stat icon="trophy" palette="gold" label={t('card.achievements')} value={formatNumber(v.achievements ?? 0)} />}
-      />
-      <StatPair
-        left={<Stat icon="book" palette="violet" label={t('card.entries')} value={formatNumber(v.entries ?? 0)} />}
-        right={<Stat icon="clock" palette="steel" label={t('card.joined')} value={joinedAgo(v.joined_at) ?? '—'} />}
-      />
+      <PStats items={[
+        { label: t('card.level'), value: formatNumber(v.level ?? 0) },
+        { label: t('card.achievements'), value: formatNumber(v.achievements ?? 0) },
+        { label: t('card.entries'), value: formatNumber(v.entries ?? 0) },
+        { label: t('card.joined'), value: joinedAgo(v.joined_at) ?? '—' },
+      ]} />
 
       <Actions response={response} onAction={onAction} />
     </ScreenScroll>

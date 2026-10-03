@@ -1,6 +1,7 @@
 import type { ScreenProps } from '../types'
 import { Bar, Card, Empty, Header, Notice, ScreenScroll } from './kit/Parts'
-import { PCard, PGrid, PTile } from '../../ui/v6/panel'
+import { CardGrid, PCard, PTile } from '../../ui/v6/panel'
+import { Lines } from './kit/cardparts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms } from './kit/format'
 import { Slab } from '../../kit'
@@ -94,18 +95,18 @@ export function CrimeList({ response, loading, onAction, run }: ScreenProps) {
     <ScreenScroll>
       <Header title={v.category ? categoryName(v.category) : t('crime.title')} tone="ruby" onBack={() => run('crime.hub')} onRefresh={() => v.category?.code && run('crime.list', { category: v.category.code })} />
       {(v.crimes ?? []).length === 0 && <Empty>{t('crime.list.empty')}</Empty>}
-      <PGrid>
+      <CardGrid>
         {(v.crimes ?? []).map((c, i) => (
           <PCard
             key={i}
             icon={c.eligible ? 'crime' : 'lock'}
             title={c.crime?.code ? names.name('crime', c.crime.code, c.crime.name) : '—'}
-            chip={c.eligible ? undefined : t('ac.crime.list.locked')} chipTone="off"
-            lines={[t('crime.nerve_cost', { n: formatNumber(c.nerve ?? 0) }), c.duration_seconds ? hms(c.duration_seconds) : '']}
+            badge={c.eligible ? undefined : t('ac.crime.list.locked')} tone="off" off={!c.eligible}
+            facts={<Lines lines={[t('crime.nerve_cost', { n: formatNumber(c.nerve ?? 0) }), c.duration_seconds ? hms(c.duration_seconds) : '']} />}
             onClick={() => c.crime?.code && run('crime.view', { crime: c.crime.code })}
           />
         ))}
-      </PGrid>
+      </CardGrid>
       <Actions response={response} onAction={onAction} refreshCommand="crime.list" only={(a) => a.id !== 'crime.view'} />
     </ScreenScroll>
   )

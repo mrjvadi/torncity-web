@@ -38,7 +38,7 @@
 .sc-emb { flex: none; width: 40px; height: 40px; display: grid; place-items: center; }
 .sc-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
 .sc-mock { font-size: 11px; color: var(--text-dim); text-align: center; margin: 4px 0 0; opacity: 0.8; }
-.sc-modes { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+
 .sc-sheet-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .sc-sheet-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size: 13px; color: var(--text); margin: 6px 0 4px; }
 .sc-sheet-facts b { color: var(--gold); font-weight: 400; }

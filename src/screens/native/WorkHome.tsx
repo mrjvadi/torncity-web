@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react'
 import type { ScreenProps } from '../types'
 import { Card, Empty, Header, Notice, ScreenScroll, SectionTitle } from './kit/Parts'
-import { PCard, PGrid, PTile } from '../../ui/v6/panel'
+import { CardGrid, PCard, PTile } from '../../ui/v6/panel'
+import { Lines, Need } from './kit/cardparts'
 import { Slab } from '../../kit'
 import { formatNumber, hms, money, roughDuration } from './kit/format'
 import * as api from '../../api/client'
@@ -67,40 +68,41 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
           )}
 
           {jobs.length > 0 && <SectionTitle>{t('work.jobs')}</SectionTitle>}
-          <PGrid>
+          <CardGrid>
             {jobs.map((j) => (
               <PCard key={j.id} icon="tool" title={buildingName(cat, j.building.code, j.building.name)}
-                chip={t('labor.per_shift', { w: money(j.wage) })} chipTone="busy"
-                lines={[
-                  t(j.kind === 'construction' ? 'labor.job.construction' : 'labor.job.production'),
-                  j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village'),
-                  t('labor.shifts_left', { n: j.left }),
-                ]}
-                off={!j.can_take}>
-                {j.can_take
-                  ? <button className={`pn-btn cc-go${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</button>
-                  : <span className="cc-line need">{t('work.not_here')}</span>}
-              </PCard>
+                badge={t('labor.per_shift', { w: money(j.wage) })} tone="busy" off={!j.can_take}
+                facts={<>
+                  <Lines lines={[
+                    t(j.kind === 'construction' ? 'labor.job.construction' : 'labor.job.production'),
+                    j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village'),
+                    t('labor.shifts_left', { n: j.left }),
+                  ]} />
+                  {!j.can_take && <Need lines={[t('work.not_here')]} />}
+                </>}
+                foot={j.can_take
+                  ? <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</button>
+                  : undefined} />
             ))}
-          </PGrid>
+          </CardGrid>
 
           {places.length > 0 && <SectionTitle>{t('work.workplaces')}</SectionTitle>}
-          <PGrid>
+          <CardGrid>
             {places.map((w) => {
               const full = w.busy >= w.workers
               const makes = (w.produces ?? []).map((m) => `${formatNumber(m.quantity)} ${names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ')
               const off = busy || !!v.working || !w.ready || full || !v.resident
               return (
                 <PCard key={w.id} icon="tool" title={buildingName(cat, w.building.code, w.building.name)}
-                  chip={t('labor.per_shift', { w: money(w.wage) })} chipTone="busy"
-                  lines={[makes && t('work.makes', { list: makes }), t('work.shift_len', { t: roughDuration(w.shift_seconds) })]}>
-                  {!w.ready && <span className="cc-line need">{t('work.needs_inputs')}</span>}
-                  {w.ready && full && <span className="cc-line need">{t('work.full')}</span>}
-                  <button className={`pn-btn cc-go${off ? ' dis' : ''}`} disabled={off} onClick={() => void act('settlement.work', { id: w.id })}>{t('work.start', { w: money(w.wage) })}</button>
-                </PCard>
+                  badge={t('labor.per_shift', { w: money(w.wage) })} tone="busy"
+                  facts={<>
+                    <Lines lines={[makes && t('work.makes', { list: makes }), t('work.shift_len', { t: roughDuration(w.shift_seconds) })]} />
+                    <Need lines={[!w.ready ? t('work.needs_inputs') : '', w.ready && full ? t('work.full') : ''].filter(Boolean)} />
+                  </>}
+                  foot={<button className={`pn-btn${off ? ' dis' : ''}`} disabled={off} onClick={() => void act('settlement.work', { id: w.id })}>{t('work.start', { w: money(w.wage) })}</button>} />
               )
             })}
-          </PGrid>
+          </CardGrid>
 
           <div className="hub-grid">
             <PTile icon="tool" title={t('labor.btn.board')} onClick={() => run('settlement.labor.board')} />

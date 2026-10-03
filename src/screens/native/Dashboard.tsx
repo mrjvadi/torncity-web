@@ -1,7 +1,8 @@
 import type { ScreenProps } from '../types'
-import { Bar, Card, Header, Notice, ScreenScroll, Stat, StatPair } from './kit/Parts'
+import { Card, Header, Notice, ScreenScroll } from './kit/Parts'
+import { PStats } from '../../ui/v6/panel'
 import Actions from './kit/Actions'
-import { clamp01, formatNumber, hms, money } from './kit/format'
+import { hms, money } from './kit/format'
 import { t } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
 
@@ -27,14 +28,10 @@ export default function Dashboard({ response, loading, onAction, run }: ScreenPr
         <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 8 }}>
           {v.travelling ? t('dashboard.travelling') : [v.city ? names.name('city', v.city_code ?? '', v.city) : '', v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : ''].filter(Boolean).join(' · ')}
         </div>
-        <Bar frac={v.max_energy ? clamp01((v.energy ?? 0) / v.max_energy) : 0} color="var(--saffron)"
-          label={`${formatNumber(v.energy ?? 0)}/${formatNumber(v.max_energy ?? 0)}`} />
       </Card>
 
-      <StatPair
-        left={<Stat icon="coins" palette="gold" label={t('bank.cash')} value={money(v.cash)} />}
-        right={<Stat icon="bank" palette="sapphire" label={t('bank.title')} value={money(v.bank)} />}
-      />
+      {/* energy and cash are on the HUD; only the bank balance is new here */}
+      <PStats items={[{ label: t('bank.title'), value: money(v.bank), gold: true }]} />
 
       <Actions response={response} onAction={onAction} refreshCommand="player.profile.get" />
     </ScreenScroll>

@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import type { ScreenProps } from '../types'
 import { Empty, Header, Notice, ScreenScroll } from './kit/Parts'
-import { PCard, PGrid, PTile } from '../../ui/v6/panel'
+import { CardGrid, PCard, PTile } from '../../ui/v6/panel'
+import { Lines } from './kit/cardparts'
 import Actions from './kit/Actions'
 import { moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
 import { useContentNames, type ContentNames } from '../../village/useVillage'
@@ -73,7 +74,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
       {v.board && !v.here && <Notice>{t('missions.need_board')}</Notice>}
       {v.board && (v.missions ?? []).length === 0 && <Empty>{t('missions.empty')}</Empty>}
 
-      <PGrid>
+      <CardGrid>
         {(v.missions ?? []).map((m, i) => {
           const reward = rewardText(m.reward)
           return (
@@ -82,18 +83,18 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
               icon={m.blocked ? 'lock' : 'scroll'}
               off={!!m.blocked}
               title={m.mission?.code ? names.name('mission', m.mission.code, m.mission.name) : m.mission?.name ?? '—'}
-              chip={m.blocked ? blockedText(m.blocked) : m.repeatable ? t('missions.repeat') : undefined}
-              chipTone="off"
-              lines={[
+              badge={m.blocked ? blockedText(m.blocked) : m.repeatable ? t('missions.repeat') : undefined}
+              tone={m.blocked ? 'off' : 'good'}
+              facts={<Lines lines={[
                 ...(m.objectives ?? []).map((o) => `• ${objectiveText(o, names)}`),
                 reward && t('missions.reward', { r: reward }),
                 m.blocked && m.wait_seconds ? t('missions.wait', { t: roughDuration(m.wait_seconds) }) : '',
-              ]}
+              ]} />}
               onClick={!m.blocked && m.mission?.code ? () => run('mission.view', { mission: m.mission!.code! }) : undefined}
             />
           )
         })}
-      </PGrid>
+      </CardGrid>
 
       <Actions response={response} onAction={onAction} only={(a) => a.id !== 'mission.board' && a.id !== 'mission.view'} refreshCommand="mission.board" />
     </ScreenScroll>

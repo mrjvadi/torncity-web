@@ -60,37 +60,53 @@ export function PTile({ icon, title, badge, tone, onClick }: {
   )
 }
 
-/** A choice as a compact card, several per row (owner 2026-10-03: a hiring board, courses, crimes and missions are
- * cards side by side, never one full-width row each): icon and title, a chip in the corner, a few fact lines and the
- * action inside the card. `off` is a thing that is not here: dashed, with its reason and way (children) inside. */
-export function PCard({ icon, title, chip, chipTone, lines, off, onClick, children }: {
-  icon: string
+/** The grid of a list of CHOICES (owner 2026-10-03): 2 cards per row on a phone, 3 to 4 on desktop. Children are
+ * `PCard`s, or the older rows (`ListRow`, `PRow`, `RowCard`, `Line`) which this grid redraws as cards, so one look
+ * serves every screen. Pure data (messages, ledger, history) stays a column of rows and does not use this. */
+export function CardGrid({ children, wide }: { children: ReactNode; wide?: boolean }) {
+  return <div className={`hub-cards${wide ? ' wide' : ''}`}>{children}</div>
+}
+
+/** One choice as a compact card: a lead (icon or avatar), a title, one or two key facts, and the main action or
+ * state inside the card (`foot`: a short button, a price, a badge). A card with `onClick` is a button as a whole. */
+export function PCard({ icon, lead, title, sub, facts, badge, tone, off, foot, onClick }: {
+  icon?: string
+  /** an avatar or any picture, in place of an icon */
+  lead?: ReactNode
   title: ReactNode
-  chip?: ReactNode
-  chipTone?: 'ok' | 'off' | 'busy'
-  lines?: ReactNode[]
+  sub?: ReactNode
+  /** one or two key facts under the title */
+  facts?: ReactNode
+  badge?: ReactNode
+  tone?: 'busy' | 'off' | 'danger' | 'good'
+  /** a thing that is not here: dashed */
   off?: boolean
+  foot?: ReactNode
   onClick?: () => void
-  children?: ReactNode
 }) {
   const body = (
     <>
-      <span className="cc-head">
-        <span className="cc-ico"><Ic name={icon} /></span>
-        <span className="cc-title">{title}</span>
-      </span>
-      {chip && <span className={`cc-chip${chipTone ? ' ' + chipTone : ''}`}>{chip}</span>}
-      {(lines ?? []).filter(Boolean).map((l, i) => <span key={i} className="cc-line">{l}</span>)}
-      {children}
+      {badge && <span className={`hub-badge${tone ? ' ' + tone : ''}`}>{badge}</span>}
+      <span className="hub-ico">{lead ?? (icon ? <Ic name={icon} /> : null)}</span>
+      <span className="pc-title">{title}</span>
+      {sub && <span className="pc-sub">{sub}</span>}
+      {facts && <span className="pc-facts">{facts}</span>}
+      {foot && <span className="pc-foot">{foot}</span>}
     </>
   )
-  const cls = `choice-card${off ? ' here-not' : ''}${onClick ? ' tap' : ''}`
+  const cls = `pcard${tone ? ' ' + tone : ''}${off ? ' here-not' : ''}`
   return onClick ? <button className={cls} onClick={onClick}>{body}</button> : <div className={cls}>{body}</div>
 }
 
-/** The grid of choice cards: 2 per row on a phone, 3 or 4 on desktop. */
-export function PGrid({ children }: { children: ReactNode }) {
-  return <div className="choice-grid">{children}</div>
+/** Facts as a compact grid of cells (label small, value big): 2 per row on a phone, 3 to 4 on desktop. */
+export function PStats({ items }: { items: { label: ReactNode; value: ReactNode; bad?: boolean; gold?: boolean }[] }) {
+  return (
+    <div className="pn-stats">
+      {items.map((x, i) => (
+        <div key={i} className={`pn-stat${x.bad ? ' bad' : ''}${x.gold ? ' gold' : ''}`}><b>{x.value}</b><span>{x.label}</span></div>
+      ))}
+    </div>
+  )
 }
 
 export function PRow({ icon, title, sub, badge, tone, off, onClick, children }: {

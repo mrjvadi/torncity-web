@@ -8,6 +8,7 @@
 // If the server has no panel for the building (an older server, a failed
 // call), the sheet falls back to what the layout itself says.
 
+import { CardGrid } from '../../ui/v6/panel'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSide } from '../../state/SideContext'
@@ -237,6 +238,7 @@ function UpgradeList({ panel, cat, names, onBuild }: { panel: BuildingPanelView 
   return (
     <>
       <Section>{t('building.upgrade.intro')}</Section>
+      <CardGrid>
       {ups.map((u) => (
         <div key={u.building.code} className={`vh-upgrade${u.available ? '' : ' locked'}`}>
           <div className="vh-upgrade-name">{buildingName(cat, u.building.code, u.building.name)}</div>
@@ -246,6 +248,7 @@ function UpgradeList({ panel, cat, names, onBuild }: { panel: BuildingPanelView 
             : <div className="vh-hint bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') }) : t('building.upgrade.locked')}</div>}
         </div>
       ))}
+      </CardGrid>
     </>
   )
 }

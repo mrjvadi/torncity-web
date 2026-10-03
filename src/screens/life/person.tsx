@@ -3,6 +3,7 @@
 // code that links one. Words are the web's own; names of content come from the catalogue.
 
 import type { AvatarsView, DeviceLinkView, DevicesView, HistoryView, LifeRefusalView, SleepPayView } from '../../api/views.gen'
+import { CardGrid } from '../../ui/v6/panel'
 import { Empty, ListRow } from '../native/kit/Parts'
 import { hms, money } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
@@ -118,7 +119,7 @@ export const Devices = flow<DevicesView>(({ view: v, ctx }) => {
     <Page title={t('screen.devices')} tone="teal">
       {v.notice && <Hint tone={v.notice === 'revoked' ? 'good' : undefined}>{tx(`lf.devices.notice.${v.notice}`)}</Hint>}
       {list.length === 0 && <Empty>{t('lf.devices.empty')}</Empty>}
-      <div className="vf-list">
+      <CardGrid>
         {list.map((d) => {
           const out = ctx.acts.find((a) => a.id === 'device.revoke' && a.args?.device === d.id)
           return (
@@ -129,7 +130,7 @@ export const Devices = flow<DevicesView>(({ view: v, ctx }) => {
             />
           )
         })}
-      </div>
+      </CardGrid>
       <Btns ctx={ctx} list={ctx.by('device.link')} />
     </Page>
   )

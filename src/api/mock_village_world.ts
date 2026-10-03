@@ -6,7 +6,7 @@
 
 import type { WorldInfo } from './types'
 import { encodeChunk } from '../village/chunk'
-import { latLonToTile, tileToLatLon, type Face } from '../village/geo'
+import { latLonToDir, latLonToTile, tileToLatLon, type Face } from '../village/geo'
 import { TILE_LAKE, TILE_OCEAN, TILE_STREAM } from '../village/chunk'
 
 export const MOCK_FACE: Face = 4
@@ -103,22 +103,65 @@ export function mockTile(gx: number, gy: number): { elev: number; biome: number;
   return { elev, biome, flags }
 }
 
-export function mockChunkBytes(face: number, lod: number, cx: number, cy: number): ArrayBuffer | null {
-  if (face !== MOCK_FACE || lod !== LOD) {
-    // other faces / LODs: open ocean-free plain so a stray request never fails
-    const n = EDGE * EDGE
-    return encodeChunk({
-      generator: 1, seed: 20280928n, face, lod, x: cx, y: cy, edge: EDGE,
-      elevation: new Int16Array(n).fill(20), biome: new Uint8Array(n).fill(5), flags: new Uint8Array(n), deposit: new Uint8Array(n), deposits: [],
-    })
+// -- planet scale (the world map): continents from 3D value noise, so every LOD of every face answers --
+
+function hash3(a: number, b: number, c: number): number {
+  let h = (Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263) + Math.imul(c | 0, 1274126177)) | 0
+  h = Math.imul(h ^ (h >>> 13), 1103515245)
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967295
+}
+function vnoise3(x: number, y: number, z: number): number {
+  const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z)
+  const fx = x - ix, fy = y - iy, fz = z - iz
+  const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy), w = fz * fz * (3 - 2 * fz)
+  const l = (a: number, b: number, t: number) => a + (b - a) * t
+  const x00 = l(hash3(ix, iy, iz), hash3(ix + 1, iy, iz), u), x10 = l(hash3(ix, iy + 1, iz), hash3(ix + 1, iy + 1, iz), u)
+  const x01 = l(hash3(ix, iy, iz + 1), hash3(ix + 1, iy, iz + 1), u), x11 = l(hash3(ix, iy + 1, iz + 1), hash3(ix + 1, iy + 1, iz + 1), u)
+  return l(l(x00, x10, v), l(x01, x11, v), w)
+}
+/** Metres at a unit direction: continents, mountain ranges, sea; sea level 0. */
+function planetHeight(d: [number, number, number]): number {
+  let f = 0, amp = 0.5, k = 1.7, sum = 0
+  for (let o = 0; o < 6; o++) { f += amp * vnoise3(d[0] * k + 11, d[1] * k + 5, d[2] * k + 2); sum += amp; amp *= 0.5; k *= 2.05 }
+  f /= sum
+  const ridge = 1 - Math.abs(2 * vnoise3(d[0] * 7 + 3, d[1] * 7, d[2] * 7 + 9) - 1)
+  const land = f - 0.5
+  return land * 4200 + (land > 0 ? ridge * ridge * 3200 * Math.min(1, land * 6) : 0) + 20
+}
+
+/** One tile of any face and LOD: the village's own heightfield near the village, the planet's elsewhere. */
+function mockTileAt(face: number, lod: number, gx: number, gy: number): { elev: number; biome: number; flags: number } {
+  const k = 2 ** (LOD - lod)
+  const gx10 = gx * k, gy10 = gy * k
+  const dv = Math.hypot(gx10 - VILLAGE_TILE.gx, gy10 - VILLAGE_TILE.gy)
+  if (face === MOCK_FACE && dv < 1500) return mockTile(gx10, gy10)
+  const ll = tileToLatLon(face as Face, gx, gy, lod, EDGE)
+  const dir = latLonToDir(ll.lat, ll.lon)
+  let elev = planetHeight(dir)
+  if (face === MOCK_FACE) {
+    const w = s01((dv - 1500) / 2500)
+    elev = mockHeight(gx10, gy10) * (1 - w) + elev * w
   }
+  elev = Math.round(elev)
+  const lat = Math.abs(ll.lat)
+  let flags = 0, biome: number
+  if (elev <= 0) { flags |= TILE_OCEAN; biome = 0 }
+  else {
+    const moist = vnoise3(dir[0] * 4 + 40, dir[1] * 4, dir[2] * 4 + 7)
+    biome = lat > 72 || elev > 3600 ? 2 : lat > 60 || elev > 2600 ? 3 : lat > 48 ? 4
+      : lat < 28 && moist < 0.42 ? 10 : lat < 14 ? (moist > 0.5 ? 9 : 8) : moist > 0.55 ? 6 : moist > 0.42 ? 7 : 5
+  }
+  return { elev, biome, flags }
+}
+
+export function mockChunkBytes(face: number, lod: number, cx: number, cy: number): ArrayBuffer | null {
   const n = EDGE * EDGE
   const elevation = new Int16Array(n)
   const biome = new Uint8Array(n)
   const flags = new Uint8Array(n)
   for (let j = 0; j < EDGE; j++) {
     for (let i = 0; i < EDGE; i++) {
-      const t = mockTile(cx * EDGE + i + 0.5, cy * EDGE + j + 0.5)
+      const t = mockTileAt(face, lod, cx * EDGE + i + 0.5, cy * EDGE + j + 0.5)
       elevation[j * EDGE + i] = t.elev
       biome[j * EDGE + i] = t.biome
       flags[j * EDGE + i] = t.flags

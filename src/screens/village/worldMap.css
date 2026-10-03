@@ -1,0 +1,96 @@
+/* The world map mode (WorldMap.tsx). Class prefix `wm-`. It covers the city canvas; the city screen's own side
+   buttons (globe/home, eye) stay above it. Phone first, desktop below. */
+.wm { position: absolute; inset: 0; z-index: 2; opacity: 0; transition: opacity 0.28s ease; background: #070b18; }
+.wm-in { opacity: 1; }
+.wm-out { opacity: 0; }
+.wm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.wm-canvas:active { cursor: grabbing; }
+.wm-load { position: absolute; inset: 0; display: grid; place-items: center; color: #dfe4ff; font-size: 15px; pointer-events: none; }
+
+.wm-markers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.wm-mk {
+  position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0;
+  display: grid; place-items: center; background: none; border: 0; pointer-events: auto; will-change: transform; cursor: pointer;
+}
+.wm-dot {
+  width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center;
+  background: #eef2fb; border: 3px solid #1b2a44; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+.wm-mk.central .wm-dot { background: #7be3d4; border-color: #0f4f57; }
+.wm-mk.home .wm-dot { width: 30px; height: 30px; background: linear-gradient(180deg, #ffe08a, #f0a81c); border-color: #5a3b00; }
+.wm-mk.sel .wm-dot { box-shadow: 0 0 0 4px rgba(255, 224, 120, 0.85), 0 2px 6px rgba(0, 0, 0, 0.55); }
+.wm-lbl {
+  position: absolute; top: 36px; left: 50%; transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+  padding: 1px 9px; border-radius: 999px; font-size: 12px; color: #fff;
+  background: rgba(7, 10, 20, 0.82); border: 1px solid var(--gold-soft, #b58a2a); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.wm-mk.home .wm-lbl { top: 40px; border-color: var(--gold, #ffd45c); }
+.wm-mk.wm-nolbl:not(.sel):not(.home) .wm-lbl { display: none; }
+
+.wm-chip {
+  position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--wm-top, 0px) + 8px); z-index: 1; pointer-events: none; min-height: 28px; padding: 4px 12px;
+  border-radius: 999px; font-size: 12px; color: #fff; background: rgba(7, 10, 20, 0.7); border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.wm-chip:empty { display: none; }
+
+/* same column as (v6.css: phone centred vertically, desktop top 14 right 14) the city screen's side buttons (.vh-side: right 10, top 56, two 42 px buttons, gap 10) */
+.wm-tools { position: absolute; z-index: 3; right: 10px; top: calc(50% + 58px); display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
+.wm-tools .k-hdr-btn { padding: 0; min-width: 44px; min-height: 44px; }
+.wm-zoom { font-size: 24px; line-height: 1; color: #ffe9a8; }
+
+.wm-card {
+  position: absolute; z-index: 4; left: 10px; right: 10px; bottom: 8px; padding: 12px; border-radius: 18px;
+  background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55); color: #fff; display: flex; flex-direction: column; gap: 10px;
+}
+.wm-card-head { display: flex; align-items: center; gap: 10px; }
+.wm-card-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.wm-card-title b { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wm-card-title small { font-size: 12px; opacity: 0.7; }
+.wm-card-facts { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: #d8def2; }
+.wm-card-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.wm-btn {
+  flex: 1 1 auto; min-height: 44px; padding: 0 14px; border-radius: 14px; font-size: 14px; color: #fff;
+  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.wm-btn.gold { background: linear-gradient(180deg, #ffd45c, #e59a14); color: #2b1a00; border-color: #7a4f00; font-weight: 600; }
+.wm-btn:disabled { opacity: 0.45; }
+.wm-btn:active { transform: translateY(2px); }
+.wm-x { flex: none; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); color: #fff; font-size: 16px; }
+
+.wm-rowdot { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #eef2fb; border: 3px solid #1b2a44; box-sizing: border-box; }
+.wm-rowdot.central { background: #7be3d4; border-color: #0f4f57; }
+.wm-rowdot.home { background: linear-gradient(180deg, #ffe08a, #f0a81c); border-color: #5a3b00; width: 30px; height: 30px; }
+
+.wm-list { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.wm-search {
+  width: 100%; min-height: 44px; padding: 0 14px; border-radius: 14px; font-size: 15px; color: #fff; box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.wm-rows { display: flex; flex-direction: column; gap: 6px; max-height: 52vh; overflow-y: auto; }
+.wm-row {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; border-radius: 14px; text-align: start; color: #fff;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.wm-row.on { border-color: var(--gold, #ffd45c); }
+.wm-row:disabled { opacity: 0.5; }
+.wm-rowname { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wm-rowkm { flex: none; font-size: 12px; opacity: 0.7; }
+.wm-empty { padding: 14px; text-align: center; font-size: 14px; opacity: 0.75; }
+
+/* desktop: the list is a docked panel, the card floats bottom-left, markers get hover */
+.wm-desk .wm-card { right: auto; left: 50%; transform: translateX(-50%); bottom: 132px; width: 400px; }
+.wm-dock {
+  position: absolute; z-index: 4; top: 56px; bottom: 16px; left: 16px; width: 340px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+  border-radius: 18px; color: #fff; background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55);
+}
+.wm-dock .wm-rows { max-height: none; flex: 1; }
+.wm-dock-head { display: flex; align-items: center; justify-content: space-between; font-size: 16px; }
+.wm-desk .wm-mk:hover .wm-dot { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.55); }
+.wm-desk .wm-chip { top: 14px; }
+
+/* the city screen's own overlays rest while the map is open */
+.vh--map .vh-top, .vh--map .vh-bottom, .vh--map .vh-labels { display: none; }
+@media (prefers-reduced-motion: reduce) { .wm { transition: none; } }
+@media (min-width: 900px) { .wm-tools { top: 118px; right: 14px; } }

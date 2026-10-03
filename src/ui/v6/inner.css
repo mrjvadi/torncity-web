@@ -286,24 +286,108 @@
   .v6 .hub-vitals .v6-vrow { width: auto; }
 }
 
-/* ---------- choice cards (hiring board, courses, crimes, missions): compact, several per row (owner 2026-10-03) ---------- */
-.v6 .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
-.v6 .choice-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; padding: 10px 10px 10px; text-align: start; border-radius: 14px; background: var(--v6-glass); border: 1px solid var(--v6-line); box-shadow: var(--v6-sh); color: var(--v6-txt); }
-.v6 .choice-card.tap:active { background: #ffffff12; transform: scale(.99); }
-.v6 .choice-card.here-not { background: none; border: 1.5px dashed var(--v6-line); box-shadow: none; }
-.v6 .choice-card .cc-head { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; }
-.v6 .choice-card .cc-ico { flex: none; width: 32px; height: 32px; display: grid; place-items: center; }
-.v6 .choice-card .cc-ico img { width: 100%; height: 100%; object-fit: contain; }
-.v6 .choice-card .cc-title { flex: 1; min-width: 0; font: 900 14.5px/1.3 Vazirmatn; color: #fff; overflow-wrap: anywhere; }
-.v6 .choice-card .cc-chip { padding: 1px 8px; border-radius: 9px; background: #56d44729; color: #9be88d; font: 800 12px/1.5 Vazirmatn; }
-.v6 .choice-card .cc-chip.off { background: #ffffff14; color: var(--v6-mut); }
-.v6 .choice-card .cc-chip.busy { background: #f4c44124; color: var(--v6-gold-hi); }
-.v6 .choice-card .cc-line { font: 500 13px/1.5 Vazirmatn; color: var(--v6-mut); overflow-wrap: anywhere; }
-.v6 .choice-card .cc-line.need { color: #ffb4a8; }
-.v6 .choice-card .cc-go { margin-top: auto; width: 100%; }
+/* ---------- the card grid: a list of CHOICES, 2 per row on a phone, 3-4 on desktop (owner 2026-10-03) ---------- */
+.hub-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+.hub-cards > .pcard, .hub-cards > .vh-upgrade, .hub-cards > .nx-row, .hub-cards > .hub-card, .hub-cards > .nx-card, .hub-cards > .sc-line {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 5px; width: 100%; min-width: 0; min-height: 104px;
+  padding: 12px 8px 10px; text-align: center; border-radius: 14px; background: var(--v6-glass); border: 1px solid var(--v6-line); box-shadow: var(--v6-sh); color: var(--v6-txt); }
+.hub-cards > button:active { background: #ffffff12; }
+.hub-cards > .here-not { background: none; border: 1.5px dashed var(--v6-line); box-shadow: none; }
+.hub-cards > .danger { border-color: #ff5a4799; }
+.hub-cards > .busy { border-color: #f4c44199; }
+.hub-cards .hub-ico { flex: none; width: 44px; height: 44px; display: grid; place-items: center; }
+.hub-cards .hub-ico img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+.hub-cards .pc-title, .hub-cards .nx-row-title, .hub-cards .hub-title, .hub-cards .sc-line-title { font: 800 14px/1.3 Vazirmatn; color: #fff; white-space: normal; overflow: visible; display: block; }
+.hub-cards .pc-sub, .hub-cards .nx-row-sub, .hub-cards .hub-sub, .hub-cards .sc-line-sub { font: 500 12.5px/1.4 Vazirmatn; color: var(--v6-mut); margin: 0; display: block; }
+.hub-cards .pc-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; font: 600 12.5px/1.4 Vazirmatn; color: var(--v6-txt); }
+.hub-cards .pc-foot { margin-top: auto; padding-top: 4px; width: 100%; display: flex; justify-content: center; font: 800 13.5px/1.3 Vazirmatn; color: var(--v6-gold); }
+.hub-cards .pc-foot > button, .hub-cards .pc-foot > .pn-btn { width: 100%; min-height: 44px; }
+.hub-cards > .nx-row .nx-row-plate { width: 44px; height: 44px; }
+.hub-cards > .nx-row .nx-row-text, .hub-cards > .hub-card .hub-body, .hub-cards > .sc-line .sc-line-text { flex: none; width: 100%; align-items: center; text-align: center; gap: 2px; display: flex; flex-direction: column; }
+.hub-cards > .nx-row .nx-row-right, .hub-cards > .sc-line .sc-line-end { margin-top: auto; font: 800 13.5px/1.3 Vazirmatn; color: var(--v6-gold); }
+.hub-cards > .hub-card .hub-chev { display: none; }
+.hub-cards > .hub-card .hub-ico { width: 44px; height: 44px; }
+.hub-cards > .hub-card .hub-title { font-size: 14px; }
+.hub-cards > .nx-card .vs-head { flex-direction: column; align-items: center; text-align: center; gap: 5px; }
+.hub-cards .hub-badge { position: static; order: 9; align-self: center; padding: 1px 9px; border-radius: 9px; background: #f4c44124; color: var(--v6-gold-hi); font: 800 12px/1.5 Vazirmatn; flex: none; }
+.hub-cards .hub-badge.good { background: #56d44729; color: #9be88d; }
+.hub-cards .hub-badge.danger { background: #ff5a4726; color: #ff9a8c; }
+.hub-cards.wide { grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 900px) {
-  /* a docked panel that holds choice cards is wider, so 3 to 4 sit side by side (owner 2026-10-03) */
-  .v6-app[data-panel="open"]:has(.choice-grid) { --v6-panel-w: 780px; }
-  .v6 .choice-grid { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 10px; }
-  .v6 .choice-card.tap:hover { border-color: var(--v6-gold); }
+  .hub-cards { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+  .hub-cards:has(> .nx-card, > .sc-block, > .mil-block, > .vh-upgrade, > .sc-cand) { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
+  .hub-cards > button:hover { border-color: var(--v6-gold); }
 }
+
+/* ---------- the stat grid: facts as compact cells, 2 per row on a phone, 3-4 on desktop ---------- */
+.pn-stats, .v6 .vf-facts, .pp-overlay .vf-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pn-stat { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: 2px; min-height: 60px; padding: 8px 6px; border-radius: 12px; background: #ffffff12; text-align: center; }
+.pn-stat b { font: 800 16px/1.3 Vazirmatn; color: var(--v6-txt); font-variant-numeric: tabular-nums; }
+.pn-stat span { font: 500 12.5px/1.35 Vazirmatn; color: var(--v6-mut); }
+.pn-stat.gold b { color: var(--v6-gold); }
+.pn-stat.bad b { color: #ff9a8c; }
+.v6 .vf-fact { flex-direction: column-reverse; align-items: center; justify-content: center; gap: 2px; min-height: 60px; padding: 8px 6px; text-align: center; background: #ffffff12; }
+.v6 .vf-fact b { text-align: center; font: 800 16px/1.3 Vazirmatn; }
+.v6 .vf-fact span { font: 500 12.5px/1.35 Vazirmatn; }
+@media (min-width: 900px) {
+  .pn-stats, .v6 .vf-facts, .pp-overlay .vf-facts { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+}
+
+/* society blocks (offices, policies, candidates, treaties, members) are cards in the same grid */
+.v6 .sc-lines, .pp-overlay .sc-lines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.hub-cards > .sc-block, .sc-lines > .sc-block, .hub-cards > .sc-cand, .sc-lines > .sc-line, .hub-cards > .mil-block {
+  position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 10px; border-radius: 14px; background: var(--v6-glass); border: 1px solid var(--v6-line); box-shadow: var(--v6-sh); color: var(--v6-txt); text-align: start; }
+.hub-cards > .sc-block, .hub-cards > .sc-cand, .hub-cards > .mil-block { align-items: stretch; justify-content: flex-start; min-height: 0; }
+.hub-cards > .sc-block .sc-line, .sc-lines > .sc-block .sc-line { flex-direction: column; align-items: flex-start; gap: 2px; }
+.sc-lines > .sc-line, .sc-lines > .sc-line { align-items: flex-start; flex-direction: column; justify-content: flex-start; gap: 3px; }
+.sc-lines .sc-line-title, .hub-cards > .sc-block .sc-line-title { font: 800 14px/1.3 Vazirmatn; color: #fff; }
+.sc-lines .sc-line-end, .hub-cards > .sc-block .sc-line-end { text-align: start; font: 600 13px/1.4 Vazirmatn; }
+.hub-cards > .sc-cand .sc-cand-head { flex-direction: column; align-items: flex-start; }
+@media (min-width: 900px) { .v6 .sc-lines, .pp-overlay .sc-lines { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; } }
+.sc-lines > .vh-hint, .hub-cards > .vh-hint, .hub-cards > .nx-notice, .hub-cards > .nx-empty, .hub-cards > .pn-hint, .hub-cards > .nx-sec { grid-column: 1 / -1; }
+.hub-cards > .vh-upgrade { align-items: stretch; text-align: start; justify-content: flex-start; min-height: 0; } .hub-cards > .vh-upgrade .k-slab { margin-top: auto; }
+
+/* the lot popups' choices (nearby lots, ways to fix access, buildings to raise) are cards too */
+.v6 .vc-list, .pp-overlay .vc-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0 6px; }
+.vc-list > .vc-line { flex-direction: column; justify-content: flex-start; align-items: center; text-align: center; gap: 5px; min-height: 104px; padding: 10px 6px; }
+.vc-list > .vc-line .vc-line-text { flex: none; width: 100%; align-items: center; }
+.vc-list > .vc-line .vc-line-name { font: 800 14px/1.3 Vazirmatn; }
+.vc-list > .vc-line .vc-line-price { margin-top: auto; font: 800 13.5px/1.3 Vazirmatn; }
+.vc-list > .vc-line .vc-chev { display: none; }
+@media (min-width: 900px) { .vc-list { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); } }
+
+/* the server's action keyboard (Actions.tsx): navigation entries sit side by side as cards; primaries, danger, chips and the pager keep a full row */
+.v6 .nx-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.v6 .nx-actions > .nx-primary, .nx-actions > .nx-action-danger, .nx-actions > .ax-chips, .nx-actions > .ax-pager { grid-column: 1 / -1; }
+.v6 .ax-row { flex-direction: column; justify-content: center; text-align: center; gap: 6px; min-height: 88px; padding: 10px 6px; border-radius: 14px; background: var(--v6-glass); border: 1px solid var(--v6-line); box-shadow: var(--v6-sh); }
+.v6 .ax-row-plate { width: 40px; height: 40px; }
+.v6 .ax-row-label { flex: none; width: 100%; font: 800 14px/1.3 Vazirmatn; color: #fff; }
+.v6 .ax-row-chev { display: none; }
+@media (min-width: 900px) { .v6 .nx-actions { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; } .v6 .ax-row:hover { border-color: var(--v6-gold); } }
+
+/* preview (coming soon) screens: the rows of a section sit side by side as cards, everything else keeps a full row */
+.v6 .ft-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ft-section > * { grid-column: 1 / -1; }
+.ft-section > .ft-row { grid-column: auto; flex-direction: column; justify-content: flex-start; align-items: center; text-align: center; gap: 5px; min-height: 104px; padding: 12px 8px 10px; border-radius: 14px; }
+.ft-section > .ft-row .ft-row-body { flex: none; width: 100%; align-items: center; }
+.ft-section > .ft-row .ft-row-title { font: 800 14px/1.3 Vazirmatn; }
+.ft-section > .ft-row .ft-row-sub { font: 500 12.5px/1.4 Vazirmatn; }
+.ft-section > .ft-row .ft-row-right { margin-top: auto; font: 800 13.5px/1.3 Vazirmatn; }
+@media (min-width: 900px) { .ft-section { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); } .ft-section > * { grid-column: 1 / -1; } .ft-section > .ft-row { grid-column: auto; } }
+.hub-cards > .nx-card { align-items: stretch; justify-content: flex-start; text-align: start; }
+.hub-cards > .nx-card .nx-bar-wrap, .hub-cards > .nx-card .nx-bar { width: 100%; }
+.hub-cards .nx-row-right .vf-cancel, .hub-cards .pc-foot .vf-cancel { min-height: 44px; min-width: 44px; padding: 0 10px; }
+.pn-stats > .pn-stat:only-child, .vf-facts > .vf-fact:only-child { grid-column: 1 / -1; }
+/* a panel inside a card never pushes the card wider; its header row stacks, its facts become thin rows */
+.hub-cards > .nx-card > *, .hub-cards > .nx-card .vf-panel > * { min-width: 0; max-width: 100%; }
+.hub-cards > .nx-card .vf-panel > .nx-row { flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 6px 4px; background: none; min-height: 0; }
+.hub-cards > .nx-card .nx-row-text { flex: none; width: 100%; align-items: center; text-align: center; }
+.hub-cards > .nx-card .nx-row-title { white-space: normal; }
+.hub-cards > .nx-card .vf-line { flex-wrap: wrap; justify-content: space-between; }
+.hub-cards .vf-facts, .hub-cards .pn-stats { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.hub-cards .vf-fact, .v6 .hub-cards .vf-fact { flex-direction: column; justify-content: center; align-items: center; min-height: 0; padding: 5px 6px; text-align: center; }
+.hub-cards .vf-fact b, .v6 .hub-cards .vf-fact b { text-align: center; font-size: 14px; }
+
+/* lines inside a PCard's facts (activities): one per row, centred; «what is lacking» in red */
+.hub-cards .pc-line { display: block; font: 500 12.5px/1.4 Vazirmatn; color: var(--v6-mut); overflow-wrap: anywhere; }
+.hub-cards .pc-need { color: #ffb4a8; }

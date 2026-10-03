@@ -7,7 +7,8 @@ import type {
 } from '../../api/views.gen'
 import type { Action } from '../../api/types'
 import { Bar, Card, ListRow, SectionTitle } from '../native/kit/Parts'
-import { PCard, PGrid } from '../../ui/v6/panel'
+import { CardGrid, PCard } from '../../ui/v6/panel'
+import { Lines, Need } from '../native/kit/cardparts'
 import { needLines } from '../native/kit/needs'
 import { clamp01, hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
@@ -96,56 +97,52 @@ export const JobOpenings = flow<JobOpeningsView>(({ view: v, ctx }) => {
       {openings.length > 0 && (
         <>
           <SectionTitle>{t('ac.work.openings.base', { city })}</SectionTitle>
-          <PGrid>
+          <CardGrid>
             {openings.map((o) => {
               const go = act(ctx, 'job.opening', (a) => a.subject === o.job.career_code)
               return (
                 <PCard
                   key={`${o.job.career_code}.${o.job.rank}`} icon={o.eligible ? 'tool' : 'lock'}
-                  title={tierName(ctx, o.job)} chip={o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')} chipTone={o.eligible ? 'ok' : 'off'}
-                  lines={[careerName(ctx, o.job), t('ac.work.pay_shift', { pay: money(o.pay) })]}
+                  title={tierName(ctx, o.job)} badge={o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')} tone={o.eligible ? 'good' : 'off'}
+                  facts={<Lines lines={[careerName(ctx, o.job), t('ac.work.pay_shift', { pay: money(o.pay) })]} />}
                   onClick={go ? () => ctx.go(go) : undefined}
                 />
               )
             })}
-          </PGrid>
+          </CardGrid>
         </>
       )}
       {gaps.length > 0 && (
         <>
           <SectionTitle>{t('ac.work.openings.not_here', { city })}</SectionTitle>
-          <PGrid>
+          <CardGrid>
             {gaps.map((g) => {
               const near = g.nearest ? cityName(ctx, g.nearest.code, g.nearest.name) : ''
               return (
-                <PCard key={g.job.career_code} off icon="tool" title={careerName(ctx, g.job)} chip={t('education.here_not')} chipTone="off"
-                  lines={[near ? t('ac.work.openings.had_in', { place: near }) : '']}>
-                  {needLines(g.needs, ctx.names, ctx.bname).map((x) => <span key={x} className="cc-line need">{x}</span>)}
-                  {near && g.nearest && (
-                    <button className="pn-btn sec cc-go" onClick={() => ctx.run('travel.options', { city: g.nearest!.code })}>{t('education.gap.go', { place: near })}</button>
-                  )}
-                </PCard>
+                <PCard key={g.job.career_code} off icon="tool" title={careerName(ctx, g.job)} badge={t('education.here_not')} tone="off"
+                  facts={<><Lines lines={[near ? t('ac.work.openings.had_in', { place: near }) : '']} /><Need lines={needLines(g.needs, ctx.names, ctx.bname)} /></>}
+                  foot={near && g.nearest ? <button className="pn-btn sec" onClick={() => ctx.run('travel.options', { city: g.nearest!.code })}>{t('education.gap.go', { place: near })}</button> : undefined} />
               )
             })}
-          </PGrid>
+          </CardGrid>
         </>
       )}
       {companies.length > 0 && (
         <>
           <SectionTitle>{t('ac.work.openings.companies')}</SectionTitle>
-          <PGrid>
+          <CardGrid>
             {companies.map((o) => {
               const go = act(ctx, 'company.opening', (a) => a.args?.no === String(o.no))
               return (
                 <PCard
                   key={o.no} icon={o.eligible ? 'crate' : 'lock'} title={tierName(ctx, o.job)}
-                  chip={o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')} chipTone={o.eligible ? 'ok' : 'off'}
-                  lines={[o.company, t('ac.work.pay_shift', { pay: money(o.pay) })]}
+                  badge={o.eligible ? t('ac.work.openings.open') : t('ac.work.openings.locked')} tone={o.eligible ? 'good' : 'off'}
+                  facts={<Lines lines={[o.company, t('ac.work.pay_shift', { pay: money(o.pay) })]} />}
                   onClick={go ? () => ctx.go(go) : undefined}
                 />
               )
             })}
-          </PGrid>
+          </CardGrid>
         </>
       )}
       {openings.length === 0 && companies.length === 0 && (

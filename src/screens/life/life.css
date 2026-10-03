@@ -10,3 +10,4 @@
 .lf-avatar:disabled { opacity: 0.6; }
 .lf-avatar-emoji { font-size: 30px; line-height: 1; }
 .lf-avatar-name { font-size: 12px; }
+@media (min-width: 900px) { .lf-avatars { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); } }

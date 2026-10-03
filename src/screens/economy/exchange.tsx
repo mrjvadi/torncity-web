@@ -14,6 +14,7 @@ import { durationText } from '../village/common'
 import { ConfirmPopup, Do, NotHere, byId, find, nameOf, rest } from './kit'
 import { noticeLine } from './wording'
 import { clockText } from './time'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 
@@ -74,14 +75,14 @@ const Exchange = flow<ExchangeView>(({ view: v, ctx }) => {
   return (
     <Page title={t('stocks.title')} tone="emerald">
       {(v.lines ?? []).length === 0 && <Notice>{t('eco.stock.empty')}</Notice>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {(v.lines ?? []).map((l) => (
           <ListRow key={l.company.code} icon="chart" palette="emerald" title={l.company.name}
             sub={`${nameOf(ctx, ['company_type'], l.type)} · ${ctx.names.name(['city'], l.city.code, l.city.name)}`}
             right={<span dir="ltr">{formatNumber(l.price)} <Move price={l.price} prev={l.prev} /></span>}
             onClick={() => { const a = find(ctx, 'stock.open', { code: l.company.code }); if (a) ctx.go(a) }} />
         ))}
-      </div>
+      </CardGrid>
       <Hint>{t('eco.stock.hint')}</Hint>
       <Btns ctx={ctx} list={rest(ctx, (a) => a.id === 'stock.open' || isBack(a))} />
       <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
@@ -181,13 +182,13 @@ const Portfolio = flow<PortfolioView>(({ view: v, ctx }) => {
         right={<Stat icon="chart" palette="emerald" label={t(v.gain < 0 ? 'eco.stock.loss' : 'stocks.gain')} value={money(Math.abs(v.gain))} />}
       />
       {(v.holdings ?? []).length === 0 && <Notice>{t('eco.stock.no_shares')}</Notice>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {(v.holdings ?? []).map((h) => (
           <ListRow key={h.company.code} icon="chart" palette="emerald" title={h.company.name}
             sub={t(h.listed ? 'eco.stock.holding_line' : 'eco.stock.holding_private', { shares: formatNumber(h.shares), price: money(h.price), cost: money(h.cost) })}
             right={money(h.value)} onClick={() => { const a = find(ctx, 'stock.open', { code: h.company.code }); if (a) ctx.go(a) }} />
         ))}
-      </div>
+      </CardGrid>
       {(v.orders ?? []).length > 0 && (
         <Panel>
           <Lead>{t('stocks.open_orders')}</Lead>

@@ -1,6 +1,7 @@
 import type { ScreenProps } from '../types'
 import { Bar, Card, Empty, Header, ScreenScroll } from './kit/Parts'
-import { PCard, PGrid, PSec } from '../../ui/v6/panel'
+import { CardGrid, PCard, PSec } from '../../ui/v6/panel'
+import { Lines, Need } from './kit/cardparts'
 import Actions from './kit/Actions'
 import { clamp01, hms, moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
@@ -82,40 +83,36 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
       {(v.courses ?? []).length > 0 && (
         <>
           <PSec>{t('education.here_title', { place })}</PSec>
-          <PGrid>
+          <CardGrid>
             {(v.courses ?? []).map((c, i) => (
               <PCard
                 key={c.course?.code ?? i}
                 icon={c.eligible ? 'book' : 'lock'}
                 title={course(c.course)}
-                chip={c.eligible ? t('education.open') : t('common.of_level', { n: c.min_level ?? 0 })}
-                chipTone={c.eligible ? 'ok' : 'off'}
-                lines={[`${c.fee ? moneyIn(c.fee, v.currency) : t('common.free')} · ${roughDuration(c.duration_seconds)}`]}
+                badge={c.eligible ? t('education.open') : t('common.of_level', { n: c.min_level ?? 0 })}
+                tone={c.eligible ? 'good' : 'off'}
+                facts={<Lines lines={[`${c.fee ? moneyIn(c.fee, v.currency) : t('common.free')} · ${roughDuration(c.duration_seconds)}`]} />}
                 onClick={c.eligible && c.course?.code ? () => run('education.view', { course: c.course!.code! }) : undefined}
               />
             ))}
-          </PGrid>
+          </CardGrid>
         </>
       )}
 
       {(v.elsewhere ?? []).length > 0 && (
         <>
           <PSec>{t('education.not_here_title')}</PSec>
-          <PGrid>
+          <CardGrid>
             {(v.elsewhere ?? []).map((g) => {
               const near = g.nearest?.name ? names.name('city', g.nearest.code ?? '', g.nearest.name) : ''
               const needs = (g.needs ?? []).map(needText).filter((x): x is string => !!x)
               return (
-                <PCard key={g.course?.code} off icon="book" title={course(g.course)} chip={t('education.here_not')} chipTone="off"
-                  lines={[`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '']}>
-                  {needs.map((x) => <span key={x} className="cc-line need">{x}</span>)}
-                  {near && g.nearest?.code && (
-                    <button className="pn-btn sec cc-go" onClick={() => run('travel.options', { city: g.nearest!.code! })}>{t('education.gap.go', { place: near })}</button>
-                  )}
-                </PCard>
+                <PCard key={g.course?.code} off icon="book" title={course(g.course)} badge={t('education.here_not')} tone="off"
+                  facts={<><Lines lines={[`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '']} /><Need lines={needs} /></>}
+                  foot={near && g.nearest?.code ? <button className="pn-btn sec" onClick={() => run('travel.options', { city: g.nearest!.code! })}>{t('education.gap.go', { place: near })}</button> : undefined} />
               )
             })}
-          </PGrid>
+          </CardGrid>
         </>
       )}
 
