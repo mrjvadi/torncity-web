@@ -18,9 +18,9 @@ import {
   reqLabel, typeReason,
 } from './kit'
 import { TABLES, goodName, jobTitle, careerName, namedOf } from './wording'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
-const col = { display: 'flex', flexDirection: 'column', gap: 8 } as const
 
 /** A city's name from the catalogue. */
 const cityOf = (ctx: { names: { name: (t: string[], c: string, a?: string) => string } }, code: string, name: string) => ctx.names.name([...TABLES.city], code, name)
@@ -40,13 +40,13 @@ const Registry = flow<CompanyRegistryView>(({ view: v, ctx }) => (
       <>
         <Hint>{t('co.registry.hint')}</Hint>
         {(v.companies ?? []).length === 0 && <Notice>{t('co.registry.none')}</Notice>}
-        <div style={col}>
+        <CardGrid>
           {(v.companies ?? []).map((l) => (
             <ListRow key={l.ref.code} icon="factory" palette={l.mine ? 'gold' : 'emerald'} title={l.ref.name}
               sub={lineSub(nameOf(ctx, TABLES.type, l.ref.type), l.staff, l.openings)} right={<Stars stars={l.stars} rated={l.rated} />}
               onClick={go(ctx, 'company.open', { code: l.ref.code })} />
           ))}
-        </div>
+        </CardGrid>
         <Btns ctx={ctx} list={byId(ctx, 'company.register', 'company.mine')} />
       </>
     )}
@@ -56,13 +56,13 @@ const Registry = flow<CompanyRegistryView>(({ view: v, ctx }) => (
 
 function OpeningRows({ ctx, list }: { ctx: Parameters<typeof go>[0]; list: CompanyOpeningLine[] }) {
   return (
-    <div style={col}>
+    <CardGrid>
       {list.map((o) => (
         <ListRow key={o.no} icon="work" palette="gold" title={jobTitle(ctx.names, o.job)}
           sub={t('co.opening.sub', { career: careerName(ctx.names, o.job), wage: money(o.wage), free: formatNumber(Math.max(0, o.positions - o.filled)) })}
           onClick={go(ctx, 'company.opening', { no: o.no })} />
       ))}
-    </div>
+    </CardGrid>
   )
 }
 
@@ -111,23 +111,23 @@ const Types = flow<CompanyTypesView>(({ view: v, ctx }) => {
           <Hint>{t('co.register.intro')}</Hint>
           {v.max > 0 && v.owned >= v.max && <Notice alert>{t('co.at_limit', { max: formatNumber(v.max) })}</Notice>}
           {types.length === 0 && <Notice>{t('co.types.none')}</Notice>}
-          <div style={col}>
+          <CardGrid>
             {open.map((x) => (
               <ListRow key={x.type.code} icon="factory" palette="emerald" title={nameOf(ctx, TABLES.type, x.type)}
                 sub={t('co.type.cost', { fee: money(x.fee), upkeep: money(x.upkeep) })}
                 right={x.licensed ? t('co.type.licensed') : undefined}
                 onClick={go(ctx, 'company.type', { type: x.type.code })} />
             ))}
-          </div>
+          </CardGrid>
           {locked.length > 0 && (
             <>
               <Lead>{t('co.types.locked')}</Lead>
-              <div style={col}>
+              <CardGrid>
                 {locked.map((x) => (
                   <ListRow key={x.type.code} icon="m_lock" palette="steel" title={nameOf(ctx, TABLES.type, x.type)}
                     sub={x.unavailable ? typeReason(ctx, x.unavailable) : undefined} />
                 ))}
-              </div>
+              </CardGrid>
               {travel && near && <One ctx={ctx} id="support.travel" tone="gold" label={t('eco.na.go', { city: cityOf(ctx, near.code, near.name) })} />}
             </>
           )}
@@ -204,14 +204,14 @@ const Founded = flow<CompanyFoundedView>(({ view: v, ctx }) => (
 const Mine = flow<CompanyMineView>(({ view: v, ctx }) => (
   <Page title={t('co.mine.title')} tone="emerald">
     {(v.companies ?? []).length === 0 && <Notice>{t('co.mine.none')}</Notice>}
-    <div style={col}>
+    <CardGrid>
       {(v.companies ?? []).map((l) => (
         <ListRow key={l.ref.code} icon="factory" palette={l.mine ? 'gold' : 'emerald'} title={l.ref.name}
           sub={lineSub(nameOf(ctx, TABLES.type, l.ref.type), l.staff, l.openings)}
           right={t(l.mine ? 'co.mine.owner' : 'co.mine.manager')}
           onClick={go(ctx, 'company.manage', { company: l.ref.code })} />
       ))}
-    </div>
+    </CardGrid>
     <Btns ctx={ctx} list={byId(ctx, 'company.register')} />
     <BackBtn ctx={ctx} />
   </Page>
@@ -261,7 +261,7 @@ const Staff = flow<CompanyStaffView>(({ view: v, ctx }) => {
         </>
       )}
       {(v.employees ?? []).length === 0 && <Notice>{t('co.staff.none')}</Notice>}
-      <div style={col}>
+      <CardGrid>
         {(v.employees ?? []).map((e) => {
           const fire = ctx.acts.find((a) => a.id === 'company.fire' && a.args?.player === e.player.code)
           return (
@@ -272,7 +272,7 @@ const Staff = flow<CompanyStaffView>(({ view: v, ctx }) => {
             </Panel>
           )
         })}
-      </div>
+      </CardGrid>
       {v.citizens.vacant > 0 && (
         <Hint>{v.citizens.workers > 0
           ? t('co.citizens.working', { workers: formatNumber(v.citizens.workers), vacant: formatNumber(v.citizens.vacant), wages: money(v.citizens.wages) })

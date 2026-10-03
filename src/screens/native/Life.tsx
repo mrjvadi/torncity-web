@@ -1,5 +1,6 @@
 import type { ScreenProps } from '../types'
-import { Card, Header, ListRow, Notice, ScreenScroll, Stat, StatPair } from './kit/Parts'
+import { Card, Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
+import { CardGrid, PStats } from '../../ui/v6/panel'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms, money } from './kit/format'
 import { hasKey, t, type Key } from '../../i18n'
@@ -60,11 +61,11 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
 
       {v.worth && (
         <>
-          <Stat icon="crowncoin" palette="gold" label={t('life.net_worth')} value={money(v.worth.total)} />
-          <StatPair
-            left={<Stat icon="coins" palette="gold" label={t('life.cash_bank')} value={money((v.worth.cash ?? 0) + (v.worth.bank ?? 0))} />}
-            right={<Stat icon="house" palette="emerald" label={t('life.property')} value={money(v.worth.property)} />}
-          />
+          <PStats items={[
+            { label: t('life.net_worth'), value: money(v.worth.total), gold: true },
+            { label: t('life.cash_bank'), value: money((v.worth.cash ?? 0) + (v.worth.bank ?? 0)) },
+            { label: t('life.property'), value: money(v.worth.property) },
+          ]} />
         </>
       )}
 
@@ -80,7 +81,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
       {!!(v.spots && v.spots.length) && (
         <Card>
           <div className="nx-sec" style={{ marginBottom: 8 }}>{t('life.sleep_spots')}</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <CardGrid>
             {v.spots!.map((s, i) => {
               // the server lists what may be done by meaning: sleep here, or walk there and sleep
               const act = (response?.actions ?? []).find((a) => (a.id === 'life.sleep' || a.id === 'life.sleep_walk') && a.subject === s.spot?.code)
@@ -90,7 +91,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
                   onClick={act && !v.sleep_in_seconds ? () => onAction(act) : undefined} />
               )
             })}
-          </div>
+          </CardGrid>
           {!!v.sleep_in_seconds && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('life.sleep_again', { t: hms(v.sleep_in_seconds) })}</div>}
         </Card>
       )}

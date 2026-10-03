@@ -15,9 +15,9 @@ import { bps } from '../economy/kit'
 import { BackBtn, Chip, Facts, Hint, Lead, Notice, Page, Panel, byId, formatNumber, money, roughDuration } from './kit'
 import { TABLES, skillLevel, specialistName } from './wording'
 import type { FlowCtx } from '../village/flow'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
-const col = { display: 'flex', flexDirection: 'column', gap: 8 } as const
 const city = (ctx: FlowCtx, n: { code: string; name: string }) => ctx.names.name([...TABLES.city], n.code, n.name)
 
 function Cancel({ ctx }: { ctx: FlowCtx }) {
@@ -56,13 +56,13 @@ const Hub = flow<RecruitHubView>(({ view: v, ctx }) => (
     ]} />
     <Lead>{t('co.rc.campaigns')}</Lead>
     {(v.campaigns ?? []).length === 0 && <Notice>{t('co.rc.none')}</Notice>}
-    <div style={col}>
+    <CardGrid>
       {(v.campaigns ?? []).map((l) => (
         <ListRow key={l.no} icon="x_mega" palette={l.status === 'running' ? 'gold' : l.status === 'filled' ? 'emerald' : 'steel'}
           title={t('co.rc.campaign', { no: formatNumber(l.no), what: skillLevel(ctx.names, l.skill, l.level) })} sub={campaignSub(ctx, l)}
           onClick={() => { const a = ctx.acts.find((x) => x.id === 'recruit.campaign' && x.args?.no === String(l.no)); if (a) ctx.go(a) }} />
       ))}
-    </div>
+    </CardGrid>
     <Hint>{t('co.rc.hint')}</Hint>
     <Btns ctx={ctx} list={byId(ctx, 'recruit.new', 'recruit.specialists')} />
     <BackBtn ctx={ctx} />
@@ -192,13 +192,13 @@ const Draft = flow<RecruitDraftView>(({ view: v, ctx }) => {
 
       {section === 'cities' && !v.confirm && (
         <>
-          <div style={col}>
+          <CardGrid>
             {(v.cities ?? []).map((c) => {
               const a = ctx.acts.find((x) => x.id === 'recruit.set_city' && x.args?.value === c.code)
               return <ListRow key={c.code} icon={c.on ? 'check' : 'city'} palette={c.on ? 'emerald' : 'steel'} title={city(ctx, c)} sub={c.abroad ? t('co.rd.abroad') : undefined}
                 onClick={a ? () => ctx.go(a) : undefined} />
             })}
-          </div>
+          </CardGrid>
           <Btns ctx={ctx} list={byId(ctx, 'recruit.scope_own', 'recruit.scope_nation', 'recruit.scope_all')} />
         </>
       )}

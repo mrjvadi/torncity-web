@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import * as api from '../../api/client'
 import type { Action } from '../../api/types'
 import Popup, { ActionButton, Hero, Medallion, Note } from '../../ui/Popup'
-import { PRow } from '../../ui/v6/panel'
+import { PRow, CardGrid } from '../../ui/v6/panel'
 import type { FlowCtx } from '../village/flow'
 import type { BoardView, FriendAcceptedView, FriendDetailView, FriendLine, FriendRemoveAskView, FriendRemovedView, FriendRequestedView, FriendsView, SearchView } from '../../api/views.gen'
 import { Chip, ListRow, Segmented } from '../native/kit/Parts'
@@ -71,14 +71,14 @@ const Friends = screen<FriendsView>(({ view: v, ctx }) => {
     <Page title={t('soc.friends.title')} tone="emerald">
       {friends.length === 0 && <Panel tone="emerald"><Lead>{t('soc.friends.empty')}</Lead></Panel>}
       <SearchBox ctx={ctx} />
-      <div className="hub-list">
+      <CardGrid>
         {friends.map((f) => {
           const act = accept.find((a) => a.args?.player === f.id)
           const incoming = f.incoming && f.status === 'pending'
           const sub = incoming ? t('soc.friends.incoming') : f.status === 'pending' ? t('soc.friends.pending') : f.status === 'blocked' ? t('soc.friends.blocked') : undefined
           return <PRow key={f.id} icon="person" title={name(f.name)} sub={sub} tone={incoming ? 'busy' : undefined} badge={act ? t('soc.friends.answer') : undefined} onClick={() => setOpen(f)} />
         })}
-      </div>
+      </CardGrid>
       {friends.length > 0 && <Pager ctx={ctx} page={v.page} pages={v.pages} />}
       <Rest ctx={ctx} skip={(a) => a.id === 'social.accept' || a.id === 'social.friend_view' || a.id === 'page.prev' || a.id === 'page.next'} />
       {open && <FriendPopup f={open} ctx={ctx} onClose={() => setOpen(null)} />}

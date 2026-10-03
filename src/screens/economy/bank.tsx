@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react'
 import type {
   BankView, BudgetView, PayConfirmView, PayHelpView, PaySentView, PayView, PaymentDeclinedView,
 } from '../../api/views.gen'
-import { Card, ListRow, Notice, Stat, StatPair } from '../native/kit/Parts'
+import { Card, ListRow, Notice } from '../native/kit/Parts'
+import { PStats } from '../../ui/v6/panel'
 import { formatNumber, money, pct } from '../native/kit/format'
 import { toWesternDigits } from '../../lib/persian'
 import { ActionButton, ActionRow, CostSummary, Note, Unavailable as UnavailableBlock } from '../../ui/Popup'
@@ -22,6 +23,7 @@ import { careWord, useCare, type Care } from '../../support/care'
 import { usePending, useStoreView, primaryWallet } from '../../state/useSync'
 import { entitiesOf } from '../../state/store'
 import { setOptimisticHint } from '../../state/optimistic'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 const MAX_DIGITS = 12
@@ -74,10 +76,8 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
       {v.jailed && <Notice alert>{t('bank.jailed')}</Notice>}
 
       <Card tone="sapphire" className={pending ? 'sync-pending' : undefined}>
-        <StatPair
-          left={<Stat icon="coins" palette="gold" label={t('bank.cash')} value={money(cash)} />}
-          right={<Stat icon="bank" palette="sapphire" label={t('bank.balance')} value={money(bank)} />}
-        />
+        {/* cash is on the HUD; the bank shows only what is in the bank */}
+        <PStats items={[{ label: t('bank.balance'), value: money(bank), gold: true }]} />
         {purses.map(([id, w]) => (
           <div key={id} className="bk-branch">{t('bank.village_purse', { currency: ctx.names.name(['currency'], w.currency, w.currency), cash: formatNumber(w.cash), bank: formatNumber(w.bank) })}</div>
         ))}
@@ -137,12 +137,12 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
         </>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <CardGrid>
         {byId(ctx, 'bank.pay', 'bank.finance').map((a) => (
           <ListRow key={a.id} icon={a.id === 'bank.pay' ? 'coins' : 'bank'} palette={a.id === 'bank.pay' ? 'gold' : 'sapphire'}
             title={ctx.label(a)} sub={t(a.id === 'bank.pay' ? 'eco.bank.pay_sub' : 'eco.bank.finance_sub')} onClick={() => ctx.go(a)} />
         ))}
-      </div>
+      </CardGrid>
     </Page>
   )
 })

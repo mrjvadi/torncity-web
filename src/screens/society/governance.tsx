@@ -297,7 +297,7 @@ const GovHistory = screen<GovHistoryView>(({ view: v, ctx }) => (
   <Page title={t('soc.history.title', { city: placeName(ctx.names, v.city) })} tone="gold">
     <Panel tone="gold">
       {(v.entries ?? []).length === 0 && <Lead>{t('soc.history.empty')}</Lead>}
-      <div className="sc-lines">
+      <div className="sc-rows">
         {(v.entries ?? []).map((e, i) => {
           const lever = { code: e.lever, type: e.type }
           return (

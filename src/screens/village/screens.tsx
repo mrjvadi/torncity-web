@@ -21,6 +21,7 @@ import { buildingBlurb } from './wording'
 import {
   Btns, Cancel, Facts, flow, Hint, Lead, Page, Panel, registerFlow, Rest, isBack, isRefresh, type FlowCtx,
 } from './flow'
+import { CardGrid } from '../../ui/v6/panel'
 
 const Empt = Empty
 
@@ -411,7 +412,7 @@ const PrivateMenu = flow<PrivateMenuView>(({ view: v, ctx }) => {
         {v.owned_lots > 0 && v.free_lots === 0 && <Lead>{t('vx.private.no_free')}</Lead>}
       </Panel>
       {v.owned_lots > 0 && (v.lines ?? []).length === 0 && <Empt>{t('citizen.build.empty')}</Empt>}
-      <div className="vf-stack">
+      <CardGrid>
         {(v.lines ?? []).map((l) => {
           const act = places.find((a) => a.subject === l.building.code)
           const name = ctx.bname(l.building.code, l.building.name)
@@ -430,7 +431,7 @@ const PrivateMenu = flow<PrivateMenuView>(({ view: v, ctx }) => {
             </Panel>
           )
         })}
-      </div>
+      </CardGrid>
       <Hint>{t('citizen.build.pay_note')}</Hint>
       <Rest ctx={ctx} skip={(a) => a.id === 'citizen.place'} />
     </Page>
@@ -586,11 +587,13 @@ const Who = flow<SettlementWhoView>(({ view: v, ctx }) => (
     <Panel tone="teal">
       <Lead>{t('vx.who.head', { village: v.name, n: (v.online ?? []).length })}</Lead>
       {(v.online ?? []).length === 0 && <Hint>{t('vx.who.nobody')}</Hint>}
+      <CardGrid>
       {(v.online ?? []).map((p, i) => (
         <ListRow key={i} icon="person" palette="emerald"
           title={<span><i className="vs-dot on" />{p.name}</span>}
           sub={[hasKey(`activity.${p.activity}`) ? t(key(`activity.${p.activity}`)) : '', p.place ? ctx.names.name(['place'], p.place) : ''].filter(Boolean).join(' · ')} />
       ))}
+      </CardGrid>
       {v.offline > 0 && <Hint>{t('vx.who.offline', { n: v.offline })}</Hint>}
     </Panel>
     <Rest ctx={ctx} />
@@ -630,7 +633,7 @@ const BuildMenu = flow<BuildMenuView>(({ view: v, ctx }) => {
         ]} />
       </Panel>
       {lines.length === 0 && <Empt>{t('vx.build.empty')}</Empt>}
-      <div className="vf-stack">
+      <CardGrid>
         {lines.map((l) => {
           const locked = l.state !== 'available'
           const { icon, palette } = iconForRole(l.role)
@@ -648,7 +651,7 @@ const BuildMenu = flow<BuildMenuView>(({ view: v, ctx }) => {
             </Panel>
           )
         })}
-      </div>
+      </CardGrid>
       <Rest ctx={ctx} skip={(a) => a.id === 'build.place'} />
     </Page>
   )

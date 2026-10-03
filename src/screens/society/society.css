@@ -30,3 +30,4 @@
   background: rgba(0, 0, 0, 0.35); border: 1.5px solid var(--gold-soft, rgba(227, 176, 35, 0.5)); outline: none;
 }
 .sc-input:focus { border-color: var(--gold); }
+.sc-rows { display: flex; flex-direction: column; gap: 6px; }

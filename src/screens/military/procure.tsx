@@ -8,6 +8,7 @@ import { ActionButton } from '../../ui/Popup'
 import { hasKey, t, type Key } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerFlow, type FlowCtx } from '../village/flow'
 import { Attributes, ConfirmPopup, NoticeCard, NotHere, QtyRow, Tail, byId, cityName, goodName, officeText, place } from './kit'
+import { CardGrid } from '../../ui/v6/panel'
 
 const key = (k: string) => k as Key
 
@@ -26,7 +27,7 @@ const Procure = flow<ProcureView>(({ view: v, ctx }) => {
         <Facts rows={[{ label: t('mil.procure.fund'), value: money(v.fund), gold: true }]} />
         <Hint>{t('mil.procure.hint')}</Hint>
       </Panel>
-      <div className="mil-list">
+      <CardGrid>
         {(v.offers ?? []).map((o) => {
           const open = opens.find((a) => a.args?.no === String(o.no))
           const why = o.blocked ? (hasKey(`mil.procure.blocked.${o.blocked}`) ? t(key(`mil.procure.blocked.${o.blocked}`)) : t('mil.procure.blocked.other')) : ''
@@ -36,7 +37,7 @@ const Procure = flow<ProcureView>(({ view: v, ctx }) => {
               onClick={open ? () => ctx.go(open) : undefined} />
           )
         })}
-      </div>
+      </CardGrid>
       {(v.offers ?? []).length === 0 && <Panel><Hint>{t('mil.procure.none')}</Hint></Panel>}
       <Tail ctx={ctx} />
     </Page>

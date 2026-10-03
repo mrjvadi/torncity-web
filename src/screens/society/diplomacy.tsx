@@ -3,6 +3,7 @@
 // refusal a sanction answers a blocked action with. Public business: anyone reads the boards;
 // deciding is the office holder's.
 
+import { CardGrid } from '../../ui/v6/panel'
 import type {
   DiplomacyHistoryView, DiplomacyNotice, DiplomacyRefusalView, EndTreatyView, ImposeView, LiftView, ProposeView, SanctionBlockedView,
   SanctionLine, SanctionsView, TreatiesView, TreatyLine,
@@ -57,12 +58,14 @@ const Sanctions = screen<SanctionsView>(({ view: v, ctx }) => {
       <Panel tone="ruby">
         <SectionTitle>{t('soc.dip.imposed')}</SectionTitle>
         {(v.imposed ?? []).length === 0 && <Hint>{t('soc.dip.none')}</Hint>}
+        <CardGrid>
         {(v.imposed ?? []).map((s) => <SanctionBlock key={s.no} ctx={ctx} s={s} imposed lift={lifts.find((a) => a.args?.no === String(s.no))} />)}
+        </CardGrid>
       </Panel>
       <Panel>
         <SectionTitle>{t('soc.dip.suffered')}</SectionTitle>
         {(v.suffered ?? []).length === 0 && <Hint>{t('soc.dip.none')}</Hint>}
-        {(v.suffered ?? []).map((s) => <SanctionBlock key={s.no} ctx={ctx} s={s} imposed={false} />)}
+        <CardGrid>{(v.suffered ?? []).map((s) => <SanctionBlock key={s.no} ctx={ctx} s={s} imposed={false} />)}</CardGrid>
       </Panel>
       <Hint>{t('soc.dip.sanctions_footer')}</Hint>
       <Rest ctx={ctx} skip={(a) => a.id === 'diplomacy.lift'} />
@@ -152,11 +155,13 @@ const Treaties = screen<TreatiesView>(({ view: v, ctx }) => {
       <Notice ctx={ctx} n={v.notice} />
       <Panel tone="sapphire">
         {(v.treaties ?? []).length === 0 && <Lead>{t('soc.dip.treaties_none')}</Lead>}
+        <CardGrid>
         {(v.treaties ?? []).map((tr) => {
           const acts = ctx.acts.filter((a) => a.args?.no === String(tr.no) && (a.command === 'diplomacy.answer' || a.command === 'diplomacy.end'))
           acts.forEach((a) => used.add(a))
           return <TreatyBlock key={tr.no} ctx={ctx} tr={tr} acts={acts} />
         })}
+        </CardGrid>
       </Panel>
       <Hint>{t('soc.dip.treaties_footer')}</Hint>
       <Rest ctx={ctx} skip={(a) => used.has(a)} />

@@ -18,6 +18,7 @@ import { useVillage } from '../../village/useVillage'
 import { iconForRole } from '../village/common'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, isRefresh } from '../village/flow'
 import { bps, cityName, clockText, nameOf, tx } from './common'
+import { CardGrid } from '../../ui/v6/panel'
 
 /** The name of a city place by its code. */
 const tx2 = (ctx: Parameters<Parameters<typeof flow>[0]>[0]['ctx'], code?: string): string => (code ? ctx.names.name('place', code, code) : '')
@@ -75,8 +76,8 @@ function VillagePlaces({ ctx, id }: { ctx: Parameters<Parameters<typeof flow>[0]
   }
   return (
     <>
-      {rows.stand.length > 0 && <><SectionTitle>{t('lf.map.village_standing')}</SectionTitle><div className="vf-list">{rows.stand.map(row)}</div></>}
-      {rows.going.length > 0 && <><SectionTitle>{t('lf.map.village_going')}</SectionTitle><div className="vf-list">{rows.going.map(row)}</div></>}
+      {rows.stand.length > 0 && <><SectionTitle>{t('lf.map.village_standing')}</SectionTitle><CardGrid>{rows.stand.map(row)}</CardGrid></>}
+      {rows.going.length > 0 && <><SectionTitle>{t('lf.map.village_going')}</SectionTitle><CardGrid>{rows.going.map(row)}</CardGrid></>}
     </>
   )
 }
@@ -109,7 +110,7 @@ export const CityMap = flow<CityMapView>(({ view: v, ctx }) => {
           {inVillage
             ? <VillagePlaces ctx={ctx} id={villageId} />
             : places.length
-              ? <div className="vf-list">{places.map((l) => <PlaceRow key={l.place.code} l={l} ctx={ctx} walking={walking} />)}</div>
+              ? <CardGrid>{places.map((l) => <PlaceRow key={l.place.code} l={l} ctx={ctx} walking={walking} />)}</CardGrid>
               : <Empty>{t('lf.map.no_places')}</Empty>}
           {!inVillage && [...ctx.by('shops.here'), ...ctx.by('shops.at')].map((a) => (
             <ListRow key={`${a.id}-${a.subject}`} icon="cart" palette="amber" title={t('lf.map.shops_at', { place: tx2(ctx, a.subject) })} onClick={() => ctx.go(a)} />
@@ -140,7 +141,7 @@ export const Cities = flow<MapView>(({ view: v, ctx }) => {
         <>
           <Panel tone="teal"><Lead>{t('lf.cities.origin', { city: cityName(ctx, v.origin_code, v.origin) })}</Lead></Panel>
           {dests.length === 0 && <Empty>{t('lf.cities.none')}</Empty>}
-          <div className="vf-list">
+          <CardGrid>
             {dests.map((d) => {
               const go = ctx.acts.find((a) => a.id === 'travel.to' && a.subject === d.code)
               return (
@@ -153,7 +154,7 @@ export const Cities = flow<MapView>(({ view: v, ctx }) => {
                 />
               )
             })}
-          </div>
+          </CardGrid>
           {(prev || next) && (
             <div className="vf-btns row">
               {prev && <Btns ctx={ctx} list={[prev]} row />}
@@ -178,7 +179,7 @@ export const TravelOptions = flow<TravelOptionsView>(({ view: v, ctx }) => {
         <Lead>{t('lf.options.lead', { from: cityName(ctx, v.from_code, v.from), to: cityName(ctx, v.to_code, v.to) })}</Lead>
       </Panel>
       {options.length === 0 && <Empty>{t('lf.options.none')}</Empty>}
-      <div className="vf-list">
+      <CardGrid>
         {options.map((o) => {
           const go = ctx.acts.find((a) => a.id === 'travel.go' && a.subject === o.mode_code)
           const own = o.vehicle ? nameOf(ctx, 'item', o.vehicle) : ''
@@ -192,7 +193,7 @@ export const TravelOptions = flow<TravelOptionsView>(({ view: v, ctx }) => {
             />
           )
         })}
-      </div>
+      </CardGrid>
       <Hint>{t('lf.options.cash', { cash: money(v.cash) })}</Hint>
     </Page>
   )

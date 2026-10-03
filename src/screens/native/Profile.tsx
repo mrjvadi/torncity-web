@@ -13,7 +13,7 @@ import LangSwitch from './kit/LangSwitch'
 import { useView } from './kit/useView'
 import { clamp01, formatNumber, hms, money } from './kit/format'
 import { Ic } from '../../ui/v6/parts'
-import { PBar, PBtn, PRow, PSec, PTile, PWhy } from '../../ui/v6/panel'
+import { CardGrid, PBar, PBtn, PRow, PSec, PTile, PWhy } from '../../ui/v6/panel'
 import { t } from '../../i18n'
 import { locationOf } from '../../support/location'
 import { useSession } from '../../state/SessionContext'
@@ -125,7 +125,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
       {(v.work?.job || v.work?.course) && (
         <>
           <PSec>{t('profile.doing')}</PSec>
-          <div className="hub-list">
+          <CardGrid>
             {v.work?.job && (
               <PRow icon="tool" title={v.work.job.job?.title ? names.name('career_tier', `${v.work.job.job.career_code ?? ''}.${v.work.job.job.rank ?? ''}`, v.work.job.job.title) : t('profile.work')}
                 sub={v.work.job.shift_ends_in_seconds ? t('profile.shift_ends', { t: hms(v.work.job.shift_ends_in_seconds) }) : t('profile.per_shift', { pay: money(v.work.job.pay) })}
@@ -136,7 +136,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
                 sub={v.work.course.paused ? t('education.paused') : t('profile.course_left', { t: hms(v.work.course.remaining_seconds) })}
                 onClick={() => run('education.list')} />
             )}
-          </div>
+          </CardGrid>
         </>
       )}
 
