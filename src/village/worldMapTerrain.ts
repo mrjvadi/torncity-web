@@ -16,7 +16,7 @@ import {
 } from 'three'
 import type { WorldInfo } from '../api/types'
 import { TILE_LAKE, TILE_OCEAN, type Chunk } from './chunk'
-import { faceDirection, type Face } from './geo'
+import { faceDirection, latLonToTile, type Face } from './geo'
 
 export type FetchChunk = (face: number, lod: number, x: number, y: number) => Promise<Chunk>
 
@@ -77,6 +77,8 @@ interface Entry {
   seen: number
   touched: number
 }
+
+export interface TileInfo { elev: number; biome: number; biomeCode: string; ocean: boolean; lake: boolean; coast: boolean; lod: number; tileKm: number; rgb: [number, number, number] }
 
 export interface TerrainStats { loaded: number; loading: number; shown: number; tris: number; meshes: number }
 
@@ -188,6 +190,13 @@ export class PlanetTerrain {
       draw.push(e)
     }
     for (let f = 0; f < 6; f++) visit(f, 0, 0, 0)
+    if (this.overview) {
+      for (let f = 0; f < 6; f++) {
+        const r = this.entry(f, 0, 0, 0)
+        if (!r.chunk) want.push({ e: r, pri: 1e9 })
+        for (let y = 0; y < 2; y++) for (let x = 0; x < 2; x++) { const k = this.entry(f, 1, x, y); k.touched = now; if (!k.chunk) want.push({ e: k, pri: 1e9 + 1 }) }
+      }
+    }
 
     // meshes for what is to be drawn
     for (const e of this.shown) e.mesh && (e.mesh.visible = false)
@@ -213,6 +222,48 @@ export class PlanetTerrain {
   }
 
   private lastTris = 0
+  private overview = false
+
+  /** Asks for every chunk down to LOD 1 (30 small chunks) so the whole planet can be read at a coarse grain (minimap). */
+  wantOverview() { this.overview = true }
+
+  /** True when LOD 0 and 1 are all held. */
+  overviewReady(): boolean {
+    for (let f = 0; f < 6; f++) {
+      if (!this.entries.get(`${f}/0/0/0`)?.chunk) return false
+      for (let y = 0; y < 2; y++) for (let x = 0; x < 2; x++) if (!this.entries.get(`${f}/1/${x}/${y}`)?.chunk) return false
+    }
+    return true
+  }
+
+  /** The tile at a place from the finest chunk held (or at most `maxLod`), with its biome, height and whether the sea is next to it. */
+  sample(lat: number, lon: number, maxLod = this.world.chunk.max_lod): TileInfo | null {
+    const E = this.world.chunk.tile_edge
+    for (let lod = Math.min(maxLod, this.world.chunk.max_lod); lod >= 0; lod--) {
+      const tc = latLonToTile(lat, lon, lod, E)
+      const per = (1 << lod) * E
+      const gx = Math.min(per - 1, Math.max(0, Math.floor(tc.gx))), gy = Math.min(per - 1, Math.max(0, Math.floor(tc.gy)))
+      const e = this.entries.get(`${tc.face}/${lod}/${Math.floor(gx / E)}/${Math.floor(gy / E)}`)
+      const c = e?.chunk
+      if (!c) continue
+      const i = gx % E, j = gy % E
+      const k = j * E + i
+      const ocean = (c.flags[k] & TILE_OCEAN) !== 0
+      let coast = false
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const ii = i + di, jj = j + dj
+        if (ii < 0 || jj < 0 || ii >= E || jj >= E) continue
+        if (((c.flags[jj * E + ii] & TILE_OCEAN) !== 0) !== ocean) coast = true
+      }
+      const rgb: [number, number, number] = [0, 0, 0]
+      const tmp = new Uint8Array(3)
+      this.colour(c.biome[k], c.elevation[k], c.flags[k], tmp, 0)
+      rgb[0] = tmp[0]; rgb[1] = tmp[1]; rgb[2] = tmp[2]
+      const biome = c.biome[k]
+      return { elev: c.elevation[k], biome, biomeCode: this.world.biomes.find((b) => b.index === biome)?.code ?? '', ocean, lake: (c.flags[k] & TILE_LAKE) !== 0, coast, lod, tileKm: (this.R * Math.PI) / 2 / per, rgb }
+    }
+    return null
+  }
 
   private pump(now: number) {
     while (this.inflight < MAX_INFLIGHT && this.pending.length) {

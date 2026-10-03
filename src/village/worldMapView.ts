@@ -47,8 +47,8 @@ export class WorldMapView {
   private tmpB = new Vector3()
   /** after every drawn frame (the markers follow the camera) */
   onFrame: () => void = () => undefined
-  /** a tap that landed on bare globe (the card closes) */
-  onTap: () => void = () => undefined
+  /** a tap that landed on bare globe, in CSS px of the canvas (the card closes, the spot is read) */
+  onTap: (x: number, y: number) => void = () => undefined
   /** the player has moved the camera by hand */
   onUser: () => void = () => undefined
 
@@ -195,7 +195,7 @@ export class WorldMapView {
     this.pointers.delete(e.pointerId)
     this.pinch = this.spread()
     if (d && this.pointers.size === 0 && e.type === 'pointerup') {
-      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) <= 9 && performance.now() - d.t < 500) { this.vel = { x: 0, y: 0 }; this.onTap() }
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) <= 9 && performance.now() - d.t < 500) { this.vel = { x: 0, y: 0 }; const r = this.canvas.getBoundingClientRect(); this.onTap(e.clientX - r.left, e.clientY - r.top) }
     }
     this.down = null
     if (performance.now() - this.lastMove > 60) this.vel = { x: 0, y: 0 }
@@ -244,6 +244,52 @@ export class WorldMapView {
     const v = p.project(this.camera)
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight
     return { x: ((v.x + 1) / 2) * w, y: ((1 - v.y) / 2) * h, visible: facing > horizon + 0.004 && v.z < 1 && Math.abs(v.x) < 1.15 && Math.abs(v.y) < 1.15 }
+  }
+
+  /** The place under a canvas point (CSS px), or null off the planet. */
+  pick(x: number, y: number): { lat: number; lon: number } | null {
+    const w = this.canvas.clientWidth, h = this.canvas.clientHeight
+    if (!w || !h) return null
+    const o = this.camera.position
+    const d = new Vector3((x / w) * 2 - 1, -(y / h) * 2 + 1, 0.5).unproject(this.camera).sub(o).normalize()
+    const b = o.dot(d), c = o.lengthSq() - this.R * this.R
+    const disc = b * b - c
+    if (disc < 0) return null
+    const t = -b - Math.sqrt(disc)
+    if (t < 0) return null
+    const p = o.clone().addScaledVector(d, t)
+    return dirToLatLon(p.x, p.y, p.z)
+  }
+
+  /** Screen-plane direction (x right, y down, unit) from the view centre towards a place, over the globe's surface. */
+  bearingOnScreen(lat: number, lon: number): { x: number; y: number } {
+    const dd = latLonToDir(lat, lon)
+    const q = new Vector3(dd[0], dd[1], dd[2])
+    q.addScaledVector(this.f, -q.dot(this.f))
+    const me = this.camera.matrixWorld.elements
+    const right = new Vector3(me[0], me[1], me[2])
+    const x = q.dot(right), y = -q.dot(this.n)
+    const l = Math.hypot(x, y) || 1
+    return { x: x / l, y: y / l }
+  }
+
+  canvasSize() { return { w: this.canvas.clientWidth, h: this.canvas.clientHeight } }
+
+  /** The view centre and the screen-up tangent as unit vectors (for the minimap). */
+  frameVectors(): { f: [number, number, number]; n: [number, number, number] } {
+    return { f: [this.f.x, this.f.y, this.f.z], n: [this.n.x, this.n.y, this.n.z] }
+  }
+
+  /** Screen angle of north in degrees (0 = up, clockwise), and kilometres per CSS px at the view centre. */
+  compass(): { deg: number; kmPerPx: number } {
+    const me = this.camera.matrixWorld.elements
+    const right = new Vector3(me[0], me[1], me[2])
+    const up = new Vector3(me[4], me[5], me[6])
+    const z = new Vector3(0, 0, 1)
+    z.addScaledVector(this.f, -z.dot(this.f))
+    const deg = z.lengthSq() < 1e-9 ? 0 : (Math.atan2(z.dot(right), z.dot(up)) * 180) / Math.PI
+    const h = this.canvas.clientHeight || 1
+    return { deg, kmPerPx: (2 * this.alt * Math.tan((this.camera.fov * Math.PI) / 360)) / h }
   }
 
   /** Kilometres between the camera's focus and a place (great circle). */

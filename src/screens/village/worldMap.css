@@ -27,11 +27,52 @@
 .wm-mk.home .wm-lbl { top: 40px; border-color: var(--gold, #ffd45c); }
 .wm-mk.wm-nolbl:not(.sel):not(.home) .wm-lbl { display: none; }
 
-.wm-chip {
-  position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--wm-top, 0px) + 8px); z-index: 1; pointer-events: none; min-height: 28px; padding: 4px 12px;
-  border-radius: 999px; font-size: 12px; color: #fff; background: rgba(7, 10, 20, 0.7); border: 1px solid rgba(255, 255, 255, 0.18);
+/* the readout: compass, where the view centre (or the tapped spot) is, what is there, the nearest city */
+.wm-info {
+  position: absolute; z-index: 1; left: 50%; transform: translateX(-50%); top: calc(var(--wm-top, 0px) + 8px);
+  width: min(236px, calc(100% - 150px)); display: flex; align-items: flex-start; gap: 8px; padding: 6px 10px 6px 8px; box-sizing: border-box;
+  border-radius: 14px; color: #fff; background: rgba(7, 10, 20, 0.74); border: 1px solid rgba(255, 255, 255, 0.18); pointer-events: none;
 }
+.wm-info:has(.wm-info-x) { pointer-events: auto; }
+.wm-compass { flex: none; width: 30px; height: 30px; display: block; }
+.wm-compass > span { display: block; width: 30px; height: 30px; transition: transform 0.12s linear; }
+.wm-info-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; line-height: 1.45; }
+.wm-info-l1 { display: flex; flex-direction: column; }
+.wm-info-l1 b { font-size: 12px; color: var(--gold, #ffd45c); font-weight: 600; }
+.wm-info-l2 { opacity: 0.92; }
+.wm-chip { opacity: 0.6; font-size: 11px; }
 .wm-chip:empty { display: none; }
+.wm-info-x { width: 44px; height: 44px; margin: -6px -8px -6px 0; pointer-events: auto; }
+.wm-spot { position: absolute; left: 0; top: 0; z-index: 1; width: 0; height: 0; pointer-events: none; }
+.wm-spot::before { content: ''; position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #1b2a44, 0 2px 6px rgba(0, 0, 0, 0.6); background: rgba(255, 255, 255, 0.2); box-sizing: border-box; }
+.wm-spot { font-size: 0; }
+
+/* the arrow on the edge towards the player's city */
+.wm-arrow {
+  position: absolute; left: 0; top: 0; z-index: 3; width: 48px; height: 48px; margin: -24px 0 0 -24px; padding: 0; background: none; border: 0; cursor: pointer; will-change: transform;
+}
+.wm-arrow-ic { display: grid; place-items: center; width: 48px; height: 48px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)); }
+.wm-arrow-txt {
+  position: absolute; top: 44px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; color: #fff; padding: 1px 8px; border-radius: 999px;
+  background: rgba(7, 10, 20, 0.85); border: 1px solid var(--gold, #ffd45c);
+}
+.wm-arrow:active .wm-arrow-ic { transform: scale(0.94); }
+
+/* scale bar and the inset globe, bottom left on a phone */
+.wm-scale { position: absolute; z-index: 1; left: 10px; bottom: var(--wm-bot, 8px); display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: #fff; pointer-events: none; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+.wm-scale-bar { display: block; height: 6px; border: 2px solid #fff; border-top: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+.wm-mini {
+  position: absolute; z-index: 1; left: 10px; bottom: calc(var(--wm-bot, 8px) + 40px); width: 88px; height: 88px; padding: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(7, 10, 20, 0.55); border: 2px solid rgba(255, 255, 255, 0.35); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+}
+.wm-mini canvas { width: 100%; height: 100%; display: block; border-radius: 50%; }
+.wm-pulse { display: none; }
+.wm-mk.home .wm-dot { position: relative; }
+.wm-mk.home .wm-dot::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid rgba(255, 201, 40, 0.9); animation: wm-pulse 1.8s ease-out infinite; pointer-events: none;
+}
+@keyframes wm-pulse { 0% { transform: scale(1); opacity: 0.95; } 100% { transform: scale(2.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .wm-mk.home .wm-dot::after { animation: none; opacity: 0.5; transform: scale(1.5); } }
 
 /* same column as (v6.css: phone centred vertically, desktop top 14 right 14) the city screen's side buttons (.vh-side: right 10, top 56, two 42 px buttons, gap 10) */
 .wm-tools { position: absolute; z-index: 3; right: 10px; top: calc(50% + 58px); display: flex; flex-direction: column; gap: 10px; --k-btn: 42px; }
@@ -88,7 +129,11 @@
 .wm-dock .wm-rows { max-height: none; flex: 1; }
 .wm-dock-head { display: flex; align-items: center; justify-content: space-between; font-size: 16px; }
 .wm-desk .wm-mk:hover .wm-dot { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.55); }
-.wm-desk .wm-chip { top: 14px; }
+.wm-desk .wm-info { top: 14px; width: 300px; font-size: 12.5px; }
+.wm-desk .wm-info-txt { font-size: 12.5px; }
+.wm-desk .wm-mini { left: 16px; top: 14px; bottom: auto; width: 120px; height: 120px; }
+.wm-desk .wm-dock { top: 150px; }
+.wm-desk .wm-scale { left: 16px; bottom: 16px; }
 
 /* the city screen's own overlays rest while the map is open */
 .vh--map .vh-top, .vh--map .vh-bottom, .vh--map .vh-labels { display: none; }
