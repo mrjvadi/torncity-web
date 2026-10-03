@@ -39,45 +39,45 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
   const multi = isMulti(cat, s.code)
   const unit = s.menu?.lines?.find((l) => l.building.code === s.code)
   const total = (unit?.cost_money ?? 0) * s.picks.length
-  // the catalogue: only what the viewer may build here, in categories, with a search; the locked ones sit behind a chip
-  const [cat0, setCat] = useState<BuildCat | 'all'>('all')
+  // the catalogue: a slim bar (the Cities: Skylines toolbar pattern): one row of categories, and the chosen
+  // category's buildings in one horizontal row; search looks across every category; locked ones sit behind a chip
+  const [cat0, setCat] = useState<BuildCat | null>(null)
   const [q, setQ] = useState('')
+  const [searching, setSearching] = useState(false)
   const [showLocked, setShowLocked] = useState(false)
   const lines = s.menu?.lines ?? []
   const nameOf = (l: (typeof lines)[number]) => buildingName(cat, l.building.code, l.building.name)
   const lockedN = lines.filter((l) => l.state !== 'available').length
   const pool = useMemo(() => lines.filter((l) => showLocked || l.state === 'available'), [lines, showLocked])
   const present = BUILD_CATS.filter((c) => pool.some((l) => buildCatOf(l.role) === c.code))
-  const active = cat0 === 'all' || present.some((c) => c.code === cat0) ? cat0 : 'all'
-  const needle = q.trim()
-  const shown = pool.filter((l) => (active === 'all' || buildCatOf(l.role) === active) && (!needle || nameOf(l).includes(needle)))
+  const active = cat0 && present.some((c) => c.code === cat0) ? cat0 : present[0]?.code
+  const needle = searching ? q.trim() : ''
+  const shown = needle ? pool.filter((l) => nameOf(l).includes(needle)) : pool.filter((l) => buildCatOf(l.role) === active)
   const host = document.querySelector('.v6-app') ?? document.body
   return createPortal(
     <div className={`v6-build step-${s.step}`}>
     <Frame radius={20}>
       <div className="vh-panel">
         <div className="vh-panel-head">
-          {s.step !== 'menu' ? <button className="vh-x" onClick={onBack} aria-label={t('build.back')}>›</button> : <span style={{ width: 34 }} />}
+          {s.step !== 'menu'
+            ? <button className="vh-x" onClick={onBack} aria-label={t('build.back')}>›</button>
+            : <button className={`vh-x${searching ? ' on' : ''}`} onClick={() => { setSearching((v) => !v); setQ('') }} aria-pressed={searching} aria-label={t('build.search')}>{searching ? '›' : '⌕'}</button>}
           <GLabel className="vh-panel-title" top="#fff6c8" bottom="#ffb21f" stroke={1}>
-            {s.step === 'menu' ? t('build.choose') : s.step === 'grow' ? t('grow.title') : name}
+            {s.step === 'menu' ? t('village.btn.build') : s.step === 'grow' ? t('grow.title') : name}
           </GLabel>
+          {s.step === 'menu' && s.menu && <span className="vh-queue">{t('build.queue', { n: s.menu.running_builds, cap: s.menu.concurrent_cap })}</span>}
           <button className="vh-x" onClick={onExit} aria-label={t('build.exit')}>✕</button>
         </div>
 
         {s.step === 'menu' && (
           <>
-            <div className="vh-legend">
-              <span><i className="vh-dot" style={{ background: OK }} />{t('build.legend.ok')}</span>
-              <span><i className="vh-dot" style={{ background: BAD }} />{t('build.legend.bad')}</span>
-              <span><i className="vh-dot" style={{ background: TAKEN }} />{t('build.legend.taken')}</span>
-              {s.menu && <span style={{ marginInlineStart: 'auto' }}>{t('build.queue', { n: s.menu.running_builds, cap: s.menu.concurrent_cap })}</span>}
-            </div>
-            <div className="vh-search"><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('build.search')} aria-label={t('build.search')} /></div>
-            <div className="vh-chips" role="tablist">
-              <button role="tab" aria-selected={active === 'all'} className={`vh-chip${active === 'all' ? ' on' : ''}`} onClick={() => setCat('all')}>{t('build.cat.all')}</button>
-              {present.map((c) => <button key={c.code} role="tab" aria-selected={active === c.code} className={`vh-chip${active === c.code ? ' on' : ''}`} onClick={() => setCat(c.code)}>{t(c.label)}</button>)}
-              {lockedN > 0 && <button className={`vh-chip lock${showLocked ? ' on' : ''}`} aria-pressed={showLocked} onClick={() => setShowLocked((v) => !v)}>{t('build.show_locked')} · {lockedN}</button>}
-            </div>
+            {searching
+              ? <div className="vh-search"><input type="search" autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('build.search')} aria-label={t('build.search')} /></div>
+              : <div className="vh-chips" role="tablist">
+                {present.map((c) => <button key={c.code} role="tab" aria-selected={active === c.code} className={`vh-chip${active === c.code ? ' on' : ''}`} onClick={() => setCat(c.code)}>{t(c.label)}</button>)}
+                {lockedN > 0 && <button className={`vh-chip lock${showLocked ? ' on' : ''}`} aria-pressed={showLocked} onClick={() => setShowLocked((v) => !v)}>{t('build.show_locked')} · {formatNumber(lockedN)}</button>}
+                {s.menu && <button className="vh-chip lock" disabled={s.busy} onClick={onGrowAsk}>{t('grow.button')}</button>}
+              </div>}
             <div className="vh-cards">
               {shown.map((l) => {
                 const locked = l.state !== 'available'
@@ -85,7 +85,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
                 const fpc = cat.get(l.building.code)?.footprint
                 return (
                   <button key={l.building.code} className={`vh-card${locked ? ' locked' : ''}`} disabled={locked || s.busy} onClick={() => onChoose(l.building.code)}>
-                    <Plate size={38} square><Emboss name={icon} palette={locked ? 'steel' : palette} size={24} /></Plate>
+                    <Plate size={32} square><Emboss name={icon} palette={locked ? 'steel' : palette} size={20} /></Plate>
                     <span className="vh-card-name">{buildingName(cat, l.building.code, l.building.name)}</span>
                     {locked
                       ? <span className="vh-card-meta">{t('build.needs', { list: (l.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') })}</span>
@@ -96,13 +96,6 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
                   </button>
                 )
               })}
-              {s.menu && active === 'all' && !needle && (
-                <button className="vh-card" disabled={s.busy} onClick={onGrowAsk}>
-                  <Plate size={38} square><Emboss name="world" palette="emerald" size={24} /></Plate>
-                  <span className="vh-card-name">{t('grow.button')}</span>
-                  <span className="vh-card-meta">{t('grow.card_hint')}</span>
-                </button>
-              )}
               {!s.menu && <div className="vh-hint" style={{ width: '100%' }}>…</div>}
               {s.menu && !shown.length && <div className="vh-hint vh-empty">{needle ? t('build.search_empty') : t('build.empty')}</div>}
             </div>

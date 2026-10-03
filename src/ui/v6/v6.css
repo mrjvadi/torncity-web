@@ -367,4 +367,4 @@
 /* the land map brings its own panel at the bottom: the quest strip steps aside. It is hidden, never removed from the layout:
    display:none used to shrink the bottom inset, and the 3D view re-framed itself (the «ساخت» jump). The build panel is a
    layer above (.v6-build, z 40) and covers the strip without touching it. */
-.v6-app:has(.vh-bottom .vh-panel) .v6-info { visibility: hidden; }
+.v6-app:has(.vh-bottom .vh-panel) .v6-info, .v6-app:has(.v6-build) .v6-info { visibility: hidden; }
