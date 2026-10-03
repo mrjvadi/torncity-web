@@ -71,6 +71,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
   const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
   const resident = !!layout?.viewer.resident && own
+  // the dock's place slot pressed again: put the world back in view, ring and selection away
+  useEffect(() => {
+    const on = () => { setSelectedId(null); setLotRing(null); sceneRef.current?.frame('aerial') }
+    window.addEventListener('tc:recentre', on)
+    return () => window.removeEventListener('tc:recentre', on)
+  }, [])
   // the lot ring: a tap on bare ground opens the ring of that lot (buy, build, access, info)
   const [lotRing, setLotRing] = useState<{ x: number; y: number; kind: 'free' | 'mine' | 'taken'; owner?: string } | null>(null)
   // Lot access (docs/adr/0043): how each free lot and each of the viewer's bare lots is served by road,
@@ -243,6 +249,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     upgrade: () => setUpId(id),
     site: () => { setInfoSite(true); setInfoId(id) },
     open: (screen, args) => openLocal(screen, args),
+    civic: b.type === 'civic_hall' || cat.get(b.type)?.category === 'governance',
     mine: () => { setSelectedId(null); run('settlement.mine') },
     run: (command) => run(command),
   })

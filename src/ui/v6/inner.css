@@ -235,3 +235,33 @@
 .v6 .hub-vitals .v6-vit { position: static; width: auto; height: auto; padding: 10px 12px; gap: 8px; }
 .v6 .hub-vitals .v6-vrow { height: 22px; }
 .v6 .hub-vitals .v6-vrow em { width: 56px; }
+
+/* ---------- the view-driven flow pages (village/flow.tsx and its areas) ---------- */
+.v6 .vf-lead { font: 500 15px/1.85 Vazirmatn; color: var(--v6-txt); }
+.v6 .vf-lead.good { color: #9be88d; } .v6 .vf-lead.bad { color: #ff9a8c; }
+.v6 .vh-hint { font: 500 13.5px/1.7 Vazirmatn; color: var(--v6-mut); }
+.v6 .vh-hint.bad { color: #ff9a8c; } .v6 .vh-hint.good { color: #9be88d; }
+.v6 .vf-fact { background: #ffffff12; border-radius: 12px; font: 500 14.5px/1.5 Vazirmatn; color: var(--v6-mut); padding: 9px 12px; }
+.v6 .vf-fact b { font-weight: 800; color: #fff; }
+.v6 .vf-fact b.gold { color: var(--v6-gold-hi); }
+.v6 .vf-list { background: #ffffff0d; border: 0; border-radius: 12px; }
+.v6 .vf-line { font: 500 14.5px/1.6 Vazirmatn; }
+.v6 .vf-line b { font-weight: 800; color: var(--v6-gold-hi); }
+.v6 .vf-need { background: #ffffff0d; border: 0; font: 500 14.5px/1.7 Vazirmatn; }
+.v6 .vf-goal-mark { background: #ffffff14; }
+.v6 .vf-goal.met .vf-goal-mark { background: #56d44733; color: #9be88d; }
+.v6 .vf-cancel { color: var(--v6-mut); font: 700 14.5px/1.4 Vazirmatn; min-height: 44px; }
+.v6 .vf-btns .k-slab { min-height: 46px; font-size: 16px; }
+.v6 .vh-stockrow, .v6 .vh-info-row { background: #ffffff12; border-radius: 12px; }
+.v6 .vc-line, .v6 .vh-upgrade { background: #ffffff12; border: 0; border-radius: 14px; }
+.v6 .vh-panel { color: var(--v6-txt); }
+.v6 .vh-panel-title { font: 900 16px/1.3 Vazirmatn; color: var(--v6-gold-hi); }
+.v6 .vh-x { background: #ffffff14; border: 1px solid var(--v6-line); }
+.v6 .vh-card { background: var(--v6-glass); border: 1px solid var(--v6-line); border-radius: 14px; box-shadow: none; }
+.v6 .vh-card-name { font: 800 13.5px/1.3 Vazirmatn; }
+.v6 .vh-legend { font: 500 12.5px/1.5 Vazirmatn; color: var(--v6-mut); }
+.v6 .vh-bottom .k-frame { border-radius: 16px; border: 1px solid #f4c44173; }
+.v6 .vh-pill { background: #0a101af2; border: 1px solid var(--v6-gold); font: 700 12.5px/1.4 Vazirmatn; }
+.v6 .sc-input, .v6 .ff-input { background: #0d141f; border: 1px solid var(--v6-line); border-radius: 12px; color: var(--v6-txt); min-height: 46px; font: 700 16px/1.4 Vazirmatn; }
+/* the ring and its marks stay above the camera buttons the village page keeps at the side */
+.v6 .v6-ovl { z-index: 6; }

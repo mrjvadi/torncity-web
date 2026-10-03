@@ -19,7 +19,9 @@ function skipped(n: Node): boolean {
 function convert(n: Text) {
   const v = n.nodeValue
   if (!v || !/\d/.test(v) || skipped(n)) return
-  n.nodeValue = v.replace(/\d/g, (d) => FD[+d])
+  // a token that holds a Latin letter next to digits is a code or an id (KAV4E7Z, a player code): copied and typed in Latin, so left alone
+  const out = v.replace(/[A-Za-z0-9]+/g, (tok) => (/[A-Za-z]/.test(tok) ? tok : tok.replace(/\d/g, (d) => FD[+d])))
+  if (out !== v) n.nodeValue = out // never write the same text back: a write is a mutation the observer would see again
 }
 
 function sweep(root: Node) {

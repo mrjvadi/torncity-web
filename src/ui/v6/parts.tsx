@@ -160,14 +160,22 @@ export interface DockTab { key: string; icon: string; label: string; dot?: numbe
 
 /** Five slots, the place in the middle and larger, labels always shown. Carries the old class names too
  * (dock-bar, dock-tab, dock-label) so the existing smoke checks keep finding it. */
-export function PhoneDock({ tabs, active, onSelect, middle = 2, ownRef }: { tabs: DockTab[]; active: string; onSelect: (key: string) => void; middle?: number; ownRef?: (el: HTMLElement | null) => void }) {
+export function PhoneDock({ tabs, active, onSelect, onLong, middle = 2, ownRef }: { tabs: DockTab[]; active: string; onSelect: (key: string) => void; onLong?: (key: string) => void; middle?: number; ownRef?: (el: HTMLElement | null) => void }) {
+  // a long press on the place slot opens the city panel; the click that follows it is swallowed
+  const press = useRef<{ timer: number; fired: boolean } | null>(null)
+  const down = (key: string) => {
+    if (!onLong) return
+    const p = { timer: window.setTimeout(() => { p.fired = true; onLong(key) }, 520), fired: false }
+    press.current = p
+  }
+  const up = () => { if (press.current) window.clearTimeout(press.current.timer) }
   return (
     <nav className="v6-dock dock-bar" ref={ownRef} aria-label={t('v6.nav.title')}>
       {tabs.map((tab, i) => {
         const on = tab.key === active
         const mid = i === middle
         return (
-          <button key={tab.key} className={`v6-tab dock-tab${mid ? ' mid' : ''}${on ? ' on' : ''}`} onClick={() => onSelect(tab.key)} aria-current={on ? 'page' : undefined}>
+          <button key={tab.key} className={`v6-tab dock-tab${mid ? ' mid' : ''}${on ? ' on' : ''}`} onClick={() => { if (press.current?.fired) { press.current = null; return } onSelect(tab.key) }} onPointerDown={mid ? () => down(tab.key) : undefined} onPointerUp={mid ? up : undefined} onPointerLeave={mid ? up : undefined} onPointerCancel={mid ? up : undefined} onContextMenu={mid ? (e) => e.preventDefault() : undefined} aria-current={on ? 'page' : undefined}>
             {mid
               ? <span className="v6-disc"><Ic name={tab.icon} /></span>
               : (

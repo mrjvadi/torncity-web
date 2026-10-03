@@ -397,7 +397,13 @@ export default function Shell() {
   }, [panelOpen, screenKey, readTitle])
 
   const tabs: DockTab[] = TAB_ORDER.map((k) => ({ key: k, icon: TAB_ICON[k], label: tabLabel(k), dot: k === 'society' ? unread : 0 }))
-  function onDock(k: string) { selectTab(k as TabKey) }
+  // the place slot again at the world home re-centres the world; a long press opens the city panel; any other slot navigates
+  // in ONE tap (nothing is open that could swallow it: the village menu is gone)
+  function onDock(k: string) {
+    if (k === 'city' && tab === 'city' && atRoot && homeIsWorld && bootstrap?.settlement) { window.dispatchEvent(new Event('tc:recentre')); return }
+    selectTab(k as TabKey)
+  }
+  function onDockLong(k: string) { if (k === 'city' && bootstrap?.settlement) openLocal('city_panel') }
 
   const showWorldChrome = ownVillageHome
   const kind = worldShown ? 'world' : 'screen'
@@ -434,7 +440,7 @@ export default function Shell() {
             />
           )}
 
-          {!desktop && <PhoneDock tabs={tabs} active={tab} onSelect={onDock} ownRef={(e) => { els.current.dock = e }} />}
+          {!desktop && <PhoneDock tabs={tabs} active={tab} onSelect={onDock} onLong={onDockLong} ownRef={(e) => { els.current.dock = e }} />}
 
           {desktop && (
             <NavRail sections={sections} active={tab} brand={bootstrap?.settlement?.name ?? t('v6.brand')} sub={profile?.name}>

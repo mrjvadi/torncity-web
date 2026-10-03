@@ -64,6 +64,17 @@ const v2 = m.liveView({ remaining_seconds: 60 })
 now += 30_000
 assert.equal(v2.remaining_seconds, 30, 'counted on the server clock')
 
+// a later reading with a round trip: half the trip is added; a slower reading does not replace a better one
+now = 3_000_000_000_000
+m.setServerTime(new Date(now).toISOString())
+const t0 = now; now += 100 // a 100 ms trip: the server stamped it ~50 ms in
+m.observeServerTime(new Date(t0 + 50).toISOString(), t0, now)
+assert.equal(m.serverNow(), now + 0, 'device and server agree after a symmetric trip')
+const before = m.serverNow()
+const t1 = now; now += 2000 // a 2 s trip says the server is far ahead: too uncertain, ignored
+m.observeServerTime(new Date(t1 + 5000).toISOString(), t1, now)
+assert.equal(m.serverNow(), before + 2000, 'a slow reading does not replace a good one')
+
 // -- the shared ticker --------------------------------------------------------------------------------
 let a = 0, b = 0, c = 0
 const offA = m.subscribeTick(() => a++), offB = m.subscribeTick(() => b++), offC = m.subscribeTick(() => c++)

@@ -6,7 +6,7 @@
 // Sources (read): MDN Page Visibility API - timers in a hidden page are throttled, so stop and resume on
 // visibilitychange; MDN setInterval - the real delay may be longer than asked, so never count the calls.
 
-import { useEffect, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import { serverNow } from '../village/clock'
 
 let n = 0
@@ -59,8 +59,7 @@ export function useServerNow(): number {
 
 /** Subscribes only while `on` is true. */
 export function useSecondWhen(on: boolean): void {
-  useEffect(() => (on ? subscribeTick(() => undefined) : undefined), [on])
-  // re-render with the tick when on
+  // re-renders the caller with every tick while `on`; subscribes to nothing otherwise
   useSyncExternalStore(on ? subscribeTick : noop, () => (on ? n : 0), () => 0)
 }
 const noop = () => () => undefined

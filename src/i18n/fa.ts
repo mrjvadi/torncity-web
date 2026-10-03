@@ -4,9 +4,6 @@
 
 export const fa = {
   'village.title': 'شهر من',
-  'village.tier.village': 'شهر',
-  'village.tier.town': 'شهر',
-  'village.tier.city': 'شهر',
   'village.head': 'شهردار',
   'village.member': 'عضو شهر',
   'village.visitor': 'بازدیدکننده',

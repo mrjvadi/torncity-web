@@ -14,6 +14,8 @@ export interface RingHandlers {
   site: () => void
   open: (screen: string, args?: Record<string, string>) => void
   mine: () => void
+  /** this building is the civic hall (its «اطلاعات» is the city panel) */
+  civic?: boolean
   run: (command: string) => void
 }
 
@@ -21,7 +23,7 @@ const has0 = (ov: BuildingOverlay | null, a: BuildingOverlay['actions'][number])
 
 export function ringActions(b: LayoutBuilding, ov: BuildingOverlay | null, h: RingHandlers): RingAction[] {
   // the civic hall's «اطلاعات» is the city panel (web map 6.2); every other building's is its own panel
-  const civic = ov?.role === 'governance' && !has0(ov, 'help_build')
+  const civic = !!h.civic && !has0(ov, 'help_build')
   const acts: RingAction[] = [{ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: civic ? () => h.open('city_panel') : h.info }]
   const has = (a: BuildingOverlay['actions'][number]) => !!ov?.actions.includes(a)
   let hasPrimary = false

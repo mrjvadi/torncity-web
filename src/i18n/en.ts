@@ -6,9 +6,6 @@ import type { Key } from './fa'
 
 export const en: Partial<Record<Key, string>> = {
   'village.title': 'My city',
-  'village.tier.village': 'City',
-  'village.tier.town': 'City',
-  'village.tier.city': 'City',
   'village.head': 'Mayor',
   'village.member': 'Resident',
   'village.visitor': 'Visitor',

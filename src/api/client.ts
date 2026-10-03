@@ -1,4 +1,5 @@
 import { liveView } from '../lib/live'
+import { observeServerTime } from '../village/clock'
 import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary, RealtimeToken, WorldInfo, VillageLayout, SettlementPlayers, PlayerStatus } from './types'
 import { report } from '../lib/reporter'
 import { syncStore } from '../state/store'
@@ -239,7 +240,11 @@ export async function runCommand(
 
 /** GET /state: every entity and the pts it is current to. */
 export async function getState(): Promise<SyncSnapshot> {
-  return authed<SyncSnapshot>('/api/v1/state', { method: 'GET' })
+  const sent = Date.now()
+  const snap = await authed<SyncSnapshot>('/api/v1/state', { method: 'GET' })
+  // the snapshot carries the server's time: refine the offset of the shared clock with the round trip
+  observeServerTime(snap?.server_time, sent, Date.now())
+  return snap
 }
 
 /** GET /updates?since=: what came after, or a reset. */

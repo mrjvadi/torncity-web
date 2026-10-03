@@ -110,7 +110,7 @@ eco.act.auction.mine | حراج‌های من | My auctions
 eco.act.auction.terms | شروع حراج | Start the auction
 eco.act.auction.house | حراجی | The auction house
 # a service that is not offered here
-eco.na.from | {service} از «{stage}» به بالا هست؛ اینجا هنوز {here} است. | {service} starts at the {stage} stage; this is still a {here}.
+eco.na.from | {service} اینجا هنوز راه نیفتاده است. | {service} has not been set up here yet.
 eco.na.only_support | {service} فقط در {place} هست. | {service} is only in {place}.
 eco.na.somewhere | شهر مرکزی | the central city
 eco.na.hint | ساختمان لازم: {buildings}. شهردار می‌تواند آن را بسازد. | Building needed: {buildings}. The mayor can build it.
@@ -1833,20 +1833,6 @@ vx.goal.role.health.1 | یک ساختمان درمانی (خانهٔ بهداش�
 vx.goal.role.health.2 | درمانگاه | A clinic
 vx.goal.role.market.2 | بازار | A market
 vx.goal.role.security.1 | یک ساختمان امنیتی (دیده‌بانی یا پاسگاه) | A security building (a watch hut or a post)
-vx.promo.title | راه {tier} شدن | The way to becoming a {tier}
-vx.promo.intro | «{village}» با زمین بیشتر {tier} نمی‌شود؛ مردم، سواد، ساختمان، دانش و خزانهٔ پُر می‌خواهد. این‌ها قدم‌های پیش رویش است: | {village} does not become a {tier} through more land; it takes people, literacy, buildings, knowledge and a full treasury. These are the steps ahead:
-vx.promo.ready_head | همهٔ قدم‌ها برداشته شد. حالا می‌توانی شهر را {tier} کنی. | Every step is done. You can make the city a {tier} now.
-vx.promo.ready_member | همهٔ قدم‌ها برداشته شد؛ ارتقا با شهردار است. | Every step is done; upgrading is up to the head.
-vx.promo.not_ready | هر قدمی که برداشته شود تیک می‌خورد. وقتی همه تیک خوردند، شهردار می‌تواند شهر را ارتقا بدهد. | Each step done gets ticked. When all are ticked, the head can upgrade the city.
-vx.promo.ask_title | «{village}» را {tier} می‌کنی؟ | Make {village} a {tier}?
-vx.promo.ask_body.town | شهردار فرماندار می‌شود و سرپرست شهر می‌ماند؛ ساخت‌وساز گسترده‌تر می‌شود و ساختمان و دانش تازه‌ای باز می‌شود. ارتقا هزینه ندارد، برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | The head becomes the governor and stays in charge; building widens and new buildings and knowledge open up. Upgrading costs nothing and cannot be undone; the group is told.
-vx.promo.ask_body.city | فرماندار شهردار می‌شود و سرپرست می‌ماند؛ دولت شهر با مالیات، شورا و انتخابات راه می‌افتد. ارتقا هزینه ندارد، برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | The governor becomes the mayor and stays in charge; city government starts with taxes, a council and elections. Upgrading costs nothing and cannot be undone; the group is told.
-vx.promo.ask_body.any | ارتقا هزینه ندارد و برگشت هم ندارد؛ خبرش در گروه اعلام می‌شود. | Upgrading costs nothing and cannot be undone; the group is told.
-vx.promo.yes | بله، ارتقا بده | Yes, upgrade it
-vx.promo.done_title | «{village}» حالا {tier} است! | {village} is now a {tier}!
-vx.promo.done_body.town | شهردار حالا فرماندار است. ساختمان‌ها و دانش تازهٔ شهرک در فهرست ساخت و دانش پیداست و خبرش در گروه اعلام شد. | The head is now the governor. The new buildings and knowledge of a town show in the build and knowledge lists, and the group was told.
-vx.promo.done_body.city | فرماندار حالا شهردار است. کارهای شهری باز شد و خبرش در گروه اعلام شد. | The governor is now the mayor. City works are open and the group was told.
-vx.promo.done_body.any | شهر ارتقا پیدا کرد و خبرش در گروه اعلام شد. | The city was upgraded and the group was told.
 vx.res.join_title | ساکن «{village}» می‌شوی؟ | Live in {village}?
 vx.res.join_body | «{village}» خانهٔ تو می‌شود: از خزانه و ساخت‌وساز و دانش مشترکش سهم می‌بری و می‌توانی زمین بخری و خانه بسازی. | {village} becomes your home: you share its treasury, building and knowledge, and you can buy land and build a house.
 vx.res.join_yes | بله، ساکن می‌شوم | Yes, I will live here
@@ -1932,8 +1918,6 @@ act.village.progress | ساخت‌وساز در جریان | Building in progres
 act.village.materials | انبار و بازار | Store and market
 act.village.build | ساختن | Build
 act.village.terms | شرایط زمین | Land terms
-act.village.promote | ارتقای شهر | Upgrade the city
-act.village.promotion | راه ارتقا | The way up
 act.village.leave | ترک شهر | Leave the city
 act.village.overview | وضعیت شهر | City status
 act.village.found | ساختن شهر | Found a city
@@ -2022,7 +2006,6 @@ refusal.village_residence_cooldown | تازه جابه‌جا شده‌ای؛ {t
 refusal.village_holds_office | تا وقتی شهردار هستی نمی‌توانی شهر را ترک کنی. | You cannot leave the city while you are its head.
 refusal.village_no_home | هنوز شهرِ برگشتت مشخص نیست. | The city you would return to is not set yet.
 refusal.village_donate_range | مبلغ کمک باید بین {min} و {max} باشد. | A gift must be between {min} and {max}.
-refusal.village_promotion_top | این شهر به بالاترین رده رسیده؛ قدم بعدی ندارد. | This city is at the top tier; there is no next step.
 refusal.village_storage_full | انبار شهر جا ندارد؛ انبار غله ظرفیتش را بیشتر می‌کند. | The city store is full; a granary adds room.
 refusal.village_already_working | تو همین حالا در یک شیفتی؛ صبر کن تمام شود. | You are already on a shift; wait for it to end.
 refusal.village_workplace_full | همهٔ جاهای این کارگاه پُر است؛ کمی بعد یا جای دیگری کار کن. | Every place at this workshop is taken; try again later or work elsewhere.
@@ -2038,9 +2021,6 @@ refusal.village_labor_employer_broke | کارفرما پول دستمزد این
 refusal.village_labor_no_site | چنین کارگاهی پیدا نشد. | No such site was found.
 vx.ov.people | {n} نفر | {n} people
 vx.ov.cap | ظرفیت خانه‌ها {n} | Room in the homes: {n}
-vx.ov.steps | {done} قدم از {total} قدم برداشته شده | {done} of {total} steps done
-vx.ov.steps_open | ببین چه کم داری | See what is missing
-vx.ov.promote | ارتقا به {tier} | Upgrade to {tier}
 vx.prog.by_work | با کارِ کارگرها ساخته می‌شود | Raised by the workers' labour
 vx.prog.hours | {done} از {total} نفر-ساعت کار شده | {done} of {total} worker-hours done
 menu.my_life | زندگی من در شهر | My life in the city
@@ -3281,7 +3261,7 @@ co.walk_there | رفتن به {place} | Walk to {place}
 co.no_city | در سفر هستید. وقتی به شهر برسید، شرکت‌های آنجا همین‌جا پیدا می‌شوند. | You are travelling. Once you reach a city, its companies show up here.
 co.at_limit | همین حالا {max} شرکت دارید و بیشتر از این نمی‌توانید ثبت کنید. | You already have {max} companies and cannot register more.
 # kinds of business that are not reached here
-co.na.from | {type} از «{stage}» به بالا هست؛ اینجا هنوز {here} است. | {type} starts at the {stage} stage; this is still a {here}.
+co.na.from | {type} اینجا هنوز راه نیفتاده است. | {type} has not been set up here yet.
 co.na.only_support | {type} فقط در {place} ثبت می‌شود. | {type} can only be registered in {place}.
 co.na.role | {role} (سطح {tier}) | {role} (level {tier})
 # the registry and a company's page
@@ -4315,7 +4295,7 @@ education.gap.fee | {fee} · {time} | {fee} · {time}
 education.literacy.title | خواندن و نوشتن | Reading and writing
 education.literacy.first | اولین درس همه خواندن و نوشتن است. | Everyone’s first lesson is reading and writing.
 education.literacy.share | {p}% مردم {place} باسوادند | {p}% of the people of {place} can read and write
-education.literacy.next | برای {stage} شدن {p}% لازم است | {p}% is needed to become a {stage}
+education.literacy.next | برای قدم بعدی، سواد باید به {p}% برسد | Literacy must reach {p}% for the next step
 education.fee | شهریه {n} | Fee {n}
 missions.xp | {n} امتیاز تجربه | {n} experience points
 missions.reward | پاداش: {r} | Reward: {r}
@@ -4754,8 +4734,6 @@ v6.q.buildings | {req} ساختمان بساز | Build {req} buildings
 v6.q.knowledge | {req} دانش پژوهش کن | Research {req} kinds of knowledge
 v6.q.treasury | خزانه را پر کن | Fill the treasury
 v6.q.build_what | {what} بساز | Build: {what}
-v6.q.ready_head | ارتقا را شروع کن | Start the upgrade
-v6.q.ready_member | آمادهٔ ارتقاست | Ready to upgrade
 v6.ring.info | اطلاعات | Info
 v6.ring.up | ارتقا | Upgrade
 v6.ring.help_build | کمک به ساخت | Help build
@@ -4849,3 +4827,4 @@ soc.friends.pay | پرداخت پول | Send money
 soc.friends.invite | دعوت به جناح من | Invite to my faction
 soc.friends.invite_note | دعوت را فقط کسی می‌تواند بفرستد که در جناح اجازهٔ دعوت دارد. | Only a member who may invite in the faction can send an invitation.
 soc.friends.answer | پاسخ بده | Answer
+v6.q.ready_head | همهٔ هدف‌های پیش‌رو انجام شد | Every goal ahead is done
