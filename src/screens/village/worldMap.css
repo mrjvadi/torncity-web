@@ -40,7 +40,7 @@
 
 .wm-card {
   position: absolute; z-index: 4; left: 10px; right: 10px; bottom: 8px; padding: 12px; border-radius: 18px;
-  background: linear-gradient(180deg, rgba(40, 18, 30, 0.96), rgba(22, 10, 18, 0.96)); border: 2px solid var(--gold-soft, #b58a2a);
+  background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55); color: #fff; display: flex; flex-direction: column; gap: 10px;
 }
 .wm-card-head { display: flex; align-items: center; gap: 10px; }
@@ -82,7 +82,7 @@
 .wm-desk .wm-card { right: auto; left: 50%; transform: translateX(-50%); bottom: 132px; width: 400px; }
 .wm-dock {
   position: absolute; z-index: 4; top: 56px; bottom: 16px; left: 16px; width: 340px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
-  border-radius: 18px; color: #fff; background: linear-gradient(180deg, rgba(40, 18, 30, 0.96), rgba(22, 10, 18, 0.96)); border: 2px solid var(--gold-soft, #b58a2a);
+  border-radius: 18px; color: #fff; background: linear-gradient(180deg, #281220, #160a12); border: 2px solid var(--gold-soft, #b58a2a);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55);
 }
 .wm-dock .wm-rows { max-height: none; flex: 1; }
