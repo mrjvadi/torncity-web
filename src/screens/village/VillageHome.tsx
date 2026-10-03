@@ -31,6 +31,7 @@ import BuildingSheet from './BuildingSheet'
 import { BuyLotSheet, HouseSheet, LotAccessSheet, TakenLotSheet } from './LandSheets'
 import { classifyLot, tonesForLand, type LotAccessMap } from './citizen'
 import type { LandView, LotAccessView } from '../../api/types'
+import WorldMap, { useWorldMapKeys } from './WorldMap'
 import './village.css'
 
 const member0 = (l: { viewer: { member: boolean } } | null | undefined) => !!l?.viewer.member
@@ -60,6 +61,19 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   layoutRef.current = layout
 
   const own = !localArgs?.id
+  // world map mode (WorldMap.tsx): the globe button opens it, the same button is the way home
+  const [mapOn, setMapOn] = useState(false)
+  const [mapTilt, setMapTilt] = useState(false)
+  const mapLeave = useRef<(() => void) | null>(null)
+  const mapHome = layout?.settlement.centre && world ? { id: layout.settlement.id, name: layout.settlement.name, lat: layout.settlement.centre.lat, lon: layout.settlement.centre.lon } : null
+  useEffect(() => {
+    const on = (e: Event) => setMapTilt(!!(e as CustomEvent).detail)
+    window.addEventListener('tc:maptilt-state', on)
+    return () => window.removeEventListener('tc:maptilt-state', on)
+  }, [])
+  useEffect(() => { sceneRef.current?.setActive(!mapOn); if (!mapOn) setMapTilt(false) }, [mapOn, sceneReady])
+  const leftMap = useCallback(() => { setMapOn(false); sceneRef.current?.frame('aerial') }, [])
+  useWorldMapKeys(!!mapHome && sceneReady, mapOn, () => (mapOn ? mapLeave.current?.() : setMapOn(true)), () => mapLeave.current?.())
   const build = useBuildMode(store, layout, sceneRef, cat)
   const tapRef = useRef<(lot: { x: number; y: number } | null, bid: string | null) => void>(() => undefined)
 
@@ -369,10 +383,11 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const inBuild = build.state.step !== 'off'
 
   return (
-    <div className="vh" onContextMenu={onContext}>
+    <div className={`vh${mapOn ? ' vh--map' : ''}`} onContextMenu={onContext}>
       <canvas ref={canvasRef} className="vh-canvas" />
+      {mapOn && mapHome && world && <WorldMap world={world} home={mapHome} run={run} openLocal={openLocal} onLeft={leftMap} leaveRef={mapLeave} />}
 
-      {useRing ? (
+      {mapOn ? null : useRing ? (
         <MapOverlays marks={marks} ring={ring ?? lotRingModel} onDismiss={() => { setSelectedId(null); setLotRing(null) }} />
       ) : (
       <div className="vh-labels">
@@ -405,8 +420,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       </div>
 
       <div className="vh-side">
-        <button className="k-hdr-btn" onClick={() => sceneRef.current?.frame('aerial')} aria-label={t('village.btn.aerial')}><Emboss name="world" palette="gold" size={22} /></button>
-        <button className="k-hdr-btn" onClick={() => sceneRef.current?.frame('close')} aria-label={t('village.btn.close')}><Emboss name="eye" palette="gold" size={22} /></button>
+        {mapOn ? (
+          <button className="k-hdr-btn" onClick={() => mapLeave.current?.()} aria-label={t('wm.btn.home')}><Emboss name="house" palette="gold" size={22} /></button>
+        ) : (
+          <button className="k-hdr-btn" onClick={() => (mapHome ? setMapOn(true) : sceneRef.current?.frame('aerial'))} aria-label={t(mapHome ? 'wm.btn.world' : 'village.btn.aerial')}><Emboss name="world" palette="gold" size={22} /></button>
+        )}
+        <button className="k-hdr-btn" onClick={() => (mapOn ? window.dispatchEvent(new Event('tc:maptilt')) : sceneRef.current?.frame('close'))} aria-label={mapOn ? t(mapTilt ? 'wm.btn.flat' : 'wm.btn.tilt') : t('village.btn.close')}><Emboss name="eye" palette="gold" size={22} /></button>
       </div>
 
       <div className="vh-bottom" ref={bottomRef}>
