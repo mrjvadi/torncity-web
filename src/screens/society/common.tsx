@@ -89,7 +89,8 @@ export function actionLabel(a: Action, names?: ContentNames, vars: Record<string
   const tables = id.startsWith('gov.lever') || id === 'gov.appoint' || id === 'gov.dismiss' ? ['lever', 'office'] : id.startsWith('diplomacy.') ? ['sanction_measure', 'sanction_ground', 'jurisdiction'] : ['city', 'jurisdiction', 'crime']
   const name = subject && names ? names.name(tables, subject) : subject
   const params = { name, ...vars }
-  for (const k of [`soc.act.${id}`, `soc.cmd.${a.command ?? ''}`]) if (hasKey(k)) return t(key(k), params)
+  // the server blanks an id that equals its command, so the command is also a name of the action
+  for (const k of [`soc.act.${id}`, `soc.cmd.${a.command ?? ''}`, `soc.act.${a.command ?? ''}`, `act.${a.command ?? ''}`]) if (hasKey(k)) return t(key(k), params)
   noteLabelGap(a)
   return t('soc.act.fallback')
 }

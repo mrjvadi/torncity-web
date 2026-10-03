@@ -40,7 +40,7 @@ function education() {
   }
   return ok('education', {
     current: null, certificates: null, place: VILLAGE, tier: 'village', currency: MONEY,
-    literacy: { share_bps: 1800, next_bps: 2000, next_stage: 'town' },
+    literacy: { share_bps: 1800 },
     courses: [],
     elsewhere: [{ course: { code: 'first_aid', name: 'First Aid' }, fee: 4200, duration_seconds: 7200, nearest: { code: 'support', name: 'شهر مرکزی' },
       needs: [{ kind: 'knowledge', code: 'basic_medicine', role: '', tier: 0 }, { kind: 'building', code: 'health_house', role: 'health', tier: 1 }] }],
@@ -131,7 +131,7 @@ export function mockP0Command(command: string, args?: Args) {
     return ok('work_home', {
       place: { code: 'v-k3x9', name: 'آمل', tier: 'village' }, resident: true, energy: 72, max_energy: 100, working: labor?.working ?? null, is_head: false,
       // the jobs are the labour mock's own, so taking one finds it on the board
-      jobs: labor?.jobs?.length ? labor.jobs : [{ id: 'j1', building_id: 'b1', building: { code: 'cottage', name: 'Cottage' }, kind: 'construction', employer_kind: 'settlement', employer: '', wage: 21, left: 6, total: 8, progress_bps: 3000, left_minutes: 300, workers: 1, npc_crew: 0, can_take: true, mine: false, points: 60 }],
+      jobs: labor?.jobs?.length ? labor.jobs : [{ id: 'j1', building_id: 'b1', building: { code: 'cottage', name: 'Cottage' }, kind: 'construction', employer_kind: 'settlement', employer: '', wage: 21, left: 6, total: 8, progress_bps: 3000, left_minutes: 300, workers: 1, npc_crew: 0, can_take: true, mine: false, points: 60, lot_x: 12, lot_y: 7 }],
       workplaces: [{ id: 'w1', building: { code: 'woodcutter_camp', name: 'Woodcutter camp' }, produces: [{ component: { code: 'timber', name: 'Timber' }, quantity: 4 }], consumes: [], wage: 18, shift_seconds: 600, workers: 2, busy: 0, ready: true }],
       market: { housing: 4, pool: 21, available: 21, working: 0, vacancies: 6, tightness_bps: 3000, level: 'slack', npc_wage: 21, min_wage: 15 }, empty: '', next: '',
     })

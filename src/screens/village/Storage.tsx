@@ -22,7 +22,14 @@ import type { ScreenProps } from '../types'
 import type { MaterialBuyConfirmView, MaterialMarketLineView, VillageMaterialsView } from '../../api/types'
 import { useContentNames, useVillageCommand } from '../../village/useVillage'
 import { useVillageView } from './common'
+import { dateText } from '../life/common'
 import './village.css'
+
+/** A share in basis points as a percentage with its real decimals (5 bps is «۰٫۰۵٪», never a rounded «۰٪»). */
+function bpsText(bps: number): string {
+  const s = (bps / 100).toFixed(2).replace(/\.?0+$/, '')
+  return `${s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d]).replace('.', '٫')}٪`
+}
 
 export default function Storage({ response, openLocal }: ScreenProps) {
   const names = useContentNames()
@@ -68,6 +75,8 @@ export default function Storage({ response, openLocal }: ScreenProps) {
   const market = v?.market ?? []
   const reserved = (v?.classes ?? []).reduce((n, c) => n + c.reserved, 0)
   const full = !!v && v.capacity > 0 && v.used + reserved >= v.capacity
+  // more is stored than the room holds (a store lost its keeper): nothing is lost, nothing new fits
+  const over = v ? Math.max(0, v.used - v.capacity) : 0
 
   async function move(command: 'settlement.stock.donate' | 'settlement.stock.take', qty: number) {
     if (!pick) return
@@ -104,7 +113,8 @@ export default function Storage({ response, openLocal }: ScreenProps) {
             <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: goods(v.bought.item), total: money(v.bought.total) })}</Notice>
           )}
           <FillBar used={v.used} reserved={reserved} capacity={v.capacity} label={t('storage.capacity')} figures={`${formatNumber(v.used + reserved)} / ${formatNumber(v.capacity)}`} />
-          {full && <Notice>{t('storage.full')} {t('sm.st.fix_full')}</Notice>}
+          {over > 0 && <Notice>{t('sm.st.over', { n: formatNumber(over) })}</Notice>}
+          {full && over === 0 && <Notice>{t('storage.full')}</Notice>}
           {(v.classes ?? []).map((c) => (
             <FillBar key={c.class} used={c.used} reserved={c.reserved} capacity={c.capacity} label={t(`sm.st.class.${c.class}` as Key)}
               figures={`${formatNumber(c.used + c.reserved)} / ${formatNumber(c.capacity)}`} />
@@ -115,13 +125,13 @@ export default function Storage({ response, openLocal }: ScreenProps) {
               <CardGrid>
                 {(v.stores ?? []).map((st, i) => (
                   <PCard key={i} icon="chest" title={names.name('settlement_building', st.building.code, st.building.name)}
-                    sub={st.kept ? t('sm.st.kept', { wage: money(v.wage) }) : t('sm.st.unkept')} tone={st.kept ? 'good' : 'danger'}
+                    sub={st.kept ? t('sm.st.kept', { wage: money(v.wage) }) : st.grace_until ? t('sm.st.grace', { date: dateText(st.grace_until) }) : t('sm.st.unkept')} tone={st.kept ? 'good' : st.grace_until ? 'busy' : 'danger'}
                     facts={st.kept ? undefined : t('sm.st.unkept_why')} />
                 ))}
               </CardGrid>
             </>
           )}
-          {v.spoil_bps > 0 && <div className="gc-note">{t('sm.st.spoil', { p: `${formatNumber(Math.round(v.spoil_bps) / 100)}٪` })}</div>}
+          {v.spoil_bps > 0 && <div className="gc-note">{t('sm.st.spoil', { p: bpsText(v.spoil_bps) })}</div>}
 
           <SectionTitle>{t('storage.stock')}</SectionTitle>
           {stock.length === 0

@@ -74,7 +74,7 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
                 badge={t('labor.per_shift', { w: money(j.wage) })} tone="busy" off={!j.can_take}
                 facts={<>
                   <Lines lines={[
-                    t(j.kind === 'construction' ? 'labor.job.construction' : 'labor.job.production'),
+                    j.kind === 'construction' ? t('labor.job.site', { x: formatNumber(j.lot_x), y: formatNumber(j.lot_y), p: formatNumber(Math.floor(j.progress_bps / 100)) }) : t('labor.job.production'),
                     j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village'),
                     t('labor.shifts_left', { n: j.left }),
                   ]} />

@@ -12,6 +12,10 @@
 
 import { useMemo, useState } from 'react'
 import { t, hasKey, type Key } from '../../i18n'
+import { useContentNames } from '../../village/useVillage'
+
+/** A locale key such as «item_shelf_group.bags»: the server sends the key of a shelf's words, never for a player to read. */
+const keyLike = (s: string): boolean => /^[a-z0-9_]+(\.[a-z0-9_]+)+$/i.test(s.trim())
 
 /** The catalogue's fine categories grouped into a few general tabs a player understands. Anything unlisted is «سایر». */
 const GROUP: Record<string, string> = {
@@ -45,11 +49,19 @@ export function useGoodsFilter<T>(rows: GoodsRow<T>[], sorts: SortKey[]) {
     return [...shelves, ...ORDER.filter((g) => have.has(g))]
   }, [rows])
   // the server's own words for its shelf groups
+  // (the server sends a locale key; the catalogue's `item_shelf_group` table words it, a ready word is used as it is)
+  const names = useContentNames()
   const labels = useMemo(() => {
     const m = new Map<string, string>()
-    for (const r of rows) if (r.shelf?.group && r.shelf.group_label) m.set(`shelf:${r.shelf.group}`, r.shelf.group_label)
+    for (const r of rows) {
+      const g = r.shelf?.group
+      if (!g) continue
+      const given = r.shelf?.group_label ?? ''
+      const word = names.name('item_shelf_group', g, given && !keyLike(given) ? given : '')
+      if (word && !keyLike(word)) m.set(`shelf:${g}`, word)
+    }
     return m
-  }, [rows])
+  }, [rows, names])
   const shown = useMemo(() => {
     const needle = q.trim().toLowerCase()
     let out = rows.filter((r) => (cat === 'all' || rowGroup(r) === cat) && (!needle || r.name.toLowerCase().includes(needle)))

@@ -113,6 +113,10 @@ export const LifeRefusal = flow<LifeRefusalView>(({ view: v, ctx }) => (
 
 // -- the linked devices -------------------------------------------------------------------------------------------
 
+/** A device is named by the client that linked it («Telegram», «iPhone Web»): worded in the player's language. */
+const DEVICE_NAMES: Record<string, string> = { 'Telegram': 'lf.devices.name.telegram', 'Web': 'lf.devices.name.web', 'iPhone Web': 'lf.devices.name.iphone', 'Android Web': 'lf.devices.name.android' }
+const deviceTitle = (name: string): string => (DEVICE_NAMES[name] ? tx(DEVICE_NAMES[name]) : name)
+
 export const Devices = flow<DevicesView>(({ view: v, ctx }) => {
   const list = v.devices ?? []
   return (
@@ -124,7 +128,7 @@ export const Devices = flow<DevicesView>(({ view: v, ctx }) => {
           const out = ctx.acts.find((a) => a.id === 'device.revoke' && a.args?.device === d.id)
           return (
             <ListRow
-              key={d.id} icon="phone" palette="sapphire" title={d.name}
+              key={d.id} icon="phone" palette="sapphire" title={deviceTitle(d.name)}
               sub={[tx(`lf.devices.via.${d.via}`), t('lf.devices.since', { date: dateText(d.created_at) }), t('lf.devices.seen', { date: dateText(d.last_seen_at) })].join(' · ')}
               right={out ? <button className="vf-cancel" onClick={() => ctx.go(out)} disabled={ctx.busy}>{t('lf.devices.revoke')}</button> : undefined}
             />

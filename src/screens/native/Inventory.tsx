@@ -62,8 +62,20 @@ export default function Inventory({ response, loading, run }: ScreenProps) {
 
   const lines = useMemo(() => {
     const base = v.lines ?? []
-    return synced && view.ready && !fresh ? fromStore(base, entitiesOf(view, 'inventory')) : base
-  }, [v.lines, synced, view, fresh])
+    const all = synced && view.ready && !fresh ? fromStore(base, entitiesOf(view, 'inventory')) : base
+    // a bag that is worn sits in its slot, it is not a good that is carried: never listed in the goods too
+    const worn = (v.bags ?? []).flatMap((s) => (s.bag ? [s.bag] : []))
+    if (worn.length === 0) return all
+    const serials = new Set(worn.map((b) => b.serial).filter(Boolean))
+    const perCode = new Map<string, number>()
+    for (const b of worn) perCode.set(b.item.code, (perCode.get(b.item.code) ?? 0) + 1)
+    return all.flatMap((l) => {
+      if (l.serial && serials.has(l.serial)) return []
+      const n = !l.serial ? perCode.get(l.item?.code ?? '') ?? 0 : 0
+      if (n > 0) { perCode.set(l.item?.code ?? '', 0); return l.qty - n > 0 ? [{ ...l, qty: l.qty - n }] : [] }
+      return [l]
+    })
+  }, [v.lines, v.bags, synced, view, fresh])
 
   const nameOf = (l: InventoryLine) => (l.item?.code ? names.name(['item', 'component'], l.item.code, l.item.name) : '—')
   const rows = useMemo(() => lines.map((l) => ({ item: l, name: nameOf(l), category: l.category ?? '', qty: l.qty, shelf: l.shelf })),

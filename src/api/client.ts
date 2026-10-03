@@ -232,6 +232,9 @@ export async function runCommand(
     if (res?.ok === false) syncStore.dropOverlay(idempotencyKey)
     else syncStore.bindOverlay(idempotencyKey, res?.request_id)
   }
+  // the server leaves an action's id empty when it equals its command: the id is then the command, so the wording
+  // and the screens' filters by id work the same whichever way the server sent it
+  if (res && Array.isArray(res.actions)) for (const a of res.actions) if (!a.id && a.command) a.id = a.command
   if (res && res.view && typeof res.view === 'object') {
     for (const fn of viewListeners) fn(res.view as Record<string, unknown>, res.screen ?? '')
     // the view's remaining/elapsed fields become end times on the server's clock (lib/live.ts)

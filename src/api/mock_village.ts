@@ -47,7 +47,7 @@ interface CatEntry { capExempt?: boolean; code: string; fa: string; en: string; 
 const CAT: CatEntry[] = [
   { code: 'road', fa: 'جاده', en: 'Road', fp: [1, 1], cost: 50, time: 600, role: '', capExempt: true },
   { code: 'civic_hall', fa: 'شهرداری', en: 'City hall', fp: [2, 2], cost: 1000, time: 7200, role: '', materials: [['timber', 'چوب', 5]] },
-  { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 700, time: 2700, role: '', materials: [['timber', 'چوب', 2]] },
+  { code: 'village_house', fa: 'خانهٔ کوچک', en: 'Village house', fp: [1, 1], cost: 700, time: 2700, role: '', materials: [['timber', 'چوب', 2]] },
   { code: 'housing_block', fa: 'آپارتمان', en: 'Housing block', fp: [2, 2], cost: 3000, time: 10800, role: '', materials: [['timber', 'چوب', 40]] },
   { code: 'park', fa: 'پارک', en: 'Park', fp: [2, 2], cost: 800, time: 3600, role: '' },
   { code: 'watch_hut', fa: 'نگهبانی محله', en: 'Watch hut', fp: [1, 1], cost: 400, time: 1800, role: 'security' },
@@ -663,8 +663,8 @@ interface MLot { x: number; y: number; owner: string; mine: boolean }
 const cz = { tenure: [] as MLot[], cash: 12450, lastRest: 0, seeded: false, debt: 340, debtPeriods: 2 }
 
 const CITIZEN_CAT: CatEntry[] = [
-  { code: 'cottage', fa: 'کلبهٔ روستایی', en: 'Cottage', fp: [1, 1], cost: 800, time: 7200, role: '', materials: [['timber', 'الوار', 3]] },
-  { code: 'village_house', fa: 'خانهٔ روستایی', en: 'Village house', fp: [1, 1], cost: 1800, time: 14400, role: '', needs: ['carpentry'], materials: [['timber', 'الوار', 8]] },
+  { code: 'cottage', fa: 'کلبهٔ چوبی', en: 'Cottage', fp: [1, 1], cost: 800, time: 7200, role: '', materials: [['timber', 'الوار', 3]] },
+  { code: 'village_house', fa: 'خانهٔ کوچک', en: 'Village house', fp: [1, 1], cost: 1800, time: 14400, role: '', needs: ['carpentry'], materials: [['timber', 'الوار', 8]] },
   { code: 'home_workshop', fa: 'کارگاه خانگی', en: 'Home workshop', fp: [2, 1], cost: 1500, time: 10800, role: 'craft', needs: ['carpentry'], materials: [['timber', 'الوار', 6]] },
   { code: 'market_stall', fa: 'غرفهٔ بازار', en: 'Market stall', fp: [1, 1], cost: 500, time: 3600, role: 'market', materials: [['timber', 'الوار', 2]] },
 ]
@@ -1497,14 +1497,14 @@ const MARKET = [
   { item: goods('stone'), price: 30 },
   { item: goods('iron_bar'), price: 64 },
 ]
-const MAT_STOCK: Record<string, number> = { timber: 15, stone: 8 }
-const MAT_BASE_CAP = 100
+const MAT_STOCK: Record<string, number> = { timber: 95, stone: 48 }
+const MAT_BASE_CAP = 60
 function materialsView(bought?: { item: Named; qty: number; total: number }) {
   const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
   const stock = Object.keys(MAT_STOCK).sort().map((c) => ({ item: goods(c), qty: MAT_STOCK[c] }))
   const view: MaterialsView = { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: MAT_BASE_CAP,
-    classes: [{ class: 'bulk', used, capacity: 60, reserved: 4 }, { class: 'food', used: 0, capacity: 20, reserved: 0 }, { class: 'goods', used: 0, capacity: 20, reserved: 0 }],
-    stores: [{ building: goods('granary'), kept: false }], wage: 40, spoil_bps: 30, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
+    classes: [{ class: 'bulk', used, capacity: 60, reserved: 0 }, { class: 'food', used: 0, capacity: 20, reserved: 0 }, { class: 'goods', used: 0, capacity: 20, reserved: 0 }],
+    stores: [{ building: goods('granary'), kept: false, grace_until: '2026-10-17T00:00:00Z' }, { building: goods('storehouse'), kept: false, grace_until: null }], wage: 40, spoil_bps: 5, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
   const acts: MockAct[] = []
   if (IS_HEAD) for (const l of MARKET) for (const q of [5, 10, 25]) acts.push(A('materials.buy', 'settlement.materials.buy', { item: l.item.code, qty: String(q) }, { subject: l.item.code }))
   return mockOk('village_materials', view, [...acts, A('village.work', 'settlement.work'), A('village.build', 'settlement.build'), back('settlement.overview'), refreshA('settlement.materials')])
@@ -1526,7 +1526,7 @@ function materialsBuy(args: Record<string, unknown>) {
   return materialsView({ item: line.item, qty, total })
 }
 
-const SHOP_SH = { code: 'food.staples', group: 'food', label: 'خوراک پایه', group_label: 'خوراکی' }
+const SHOP_SH = { code: 'food.staples', group: 'food', label: 'خوراک پایه', group_label: 'item_shelf_group.food' }
 function shopView() {
   const view: Record<string, unknown> = {
     village: 'آمل', building: true, closed: '', next_delivery: new Date(Date.now() + 3 * 3600_000).toISOString(), delivery_hour: 6, wage: 40,
@@ -1535,7 +1535,7 @@ function shopView() {
     lines: [
       { item: goods('rice'), kind: 'item', shelf: SHOP_SH, price: 13, reference: 12, stock: 40, left_today: 6, fits: 12, max_buy: 6, tradable: true },
       { item: goods('tea'), kind: 'item', shelf: SHOP_SH, price: 9, reference: 8, stock: 0, left_today: 0, fits: 12, max_buy: 0, tradable: true },
-      { item: goods('bandage'), kind: 'item', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'دارو' }, price: 28, reference: 24, stock: 9, left_today: 2, fits: 0, max_buy: 0, tradable: false },
+      { item: goods('bandage'), kind: 'item', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'item_shelf_group.medicine' }, price: 28, reference: 24, stock: 9, left_today: 2, fits: 0, max_buy: 0, tradable: false },
     ],
     locked: [{ item: goods('timber'), kind: 'component', shelf: SHOP_SH, needs_buildings: [goods('woodcutter_camp')], needs_knowledge: null }],
     free_space: 6, capacity: 20, free_g: 9000,
@@ -1619,12 +1619,13 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
       version: 'v1', langs: ['en', 'fa'],
       availability: SOCIETY_CONTENT.availability,
       entries: mergeTables(ACTIVITIES_CONTENT, mergeTables(P1_CONTENT, mergeTables(MILITARY_CONTENT, mergeTables(mergeTables(SOCIETY_CONTENT.entries, COMPANIES_CONTENT), mergeTables({
-        settlement_building: [{ code: 'stall', name: { en: 'Stall', fa: 'دکه' }, category: 'market', footprint: [1, 1] }, ...[...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) }))],
+        settlement_building: [{ code: 'storehouse', name: { en: 'Storehouse', fa: 'انبار کالا' }, category: 'storage', footprint: [2, 2] }, { code: 'stall', name: { en: 'Stall', fa: 'دکه' }, category: 'market', footprint: [1, 1] }, ...[...CAT, ...CITIZEN_CAT].map((c) => ({ code: c.code, name: { en: c.en, fa: c.fa }, category: c.role, footprint: c.fp, ...(c.capExempt ? { cap_exempt: true } : {}) }))],
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
         place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
         component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
         item: [{ code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
+        item_shelf_group: [['food', 'خوراک', 'Food'], ['medicine', 'دارو و کمک‌های اولیه', 'Medicine'], ['materials', 'مصالح و مواد', 'Materials'], ['tools', 'ابزار', 'Tools'], ['bags', 'کیف و بار', 'Bags']].map(([code, fa, en]) => ({ code, name: { en, fa } })),
         shop: ECONOMY_CONTENT.shop, budget_line: ECONOMY_CONTENT.budget_line, company_type: ECONOMY_CONTENT.company_type,
         // what the pushed notices name (api/client-api.md section 4.1)
         crime: [{ code: 'pickpocket', name: { en: 'Pickpocketing', fa: 'جیب‌بری' } }, { code: 'warehouse_heist', name: { en: 'Warehouse heist', fa: 'دزدی از انبار' } }],

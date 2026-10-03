@@ -101,7 +101,7 @@ export interface ContentNames {
 /** The catalogue tables a name may live in: the tables the server has, then the ones it is asked to add (a
  * content gap until it does: settlement knowledge, life ranks, stages and sleep spots are not served yet). */
 const ALIAS: Record<string, string[]> = {
-  knowledge: ['settlement_knowledge', 'knowledge'], rank: ['life_rank', 'rank'], life_stage: ['life_stage', 'stage'], sleep_spot: ['sleep_spot', 'spot'],
+  venue: ['venue', 'place'], knowledge: ['settlement_knowledge', 'knowledge'], rank: ['life_rank', 'rank'], life_stage: ['life_stage', 'stage'], sleep_spot: ['sleep_spot', 'spot'],
 }
 
 export function contentName(entries: Entries, tables: string | string[], code: string, authored?: string): string {

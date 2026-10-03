@@ -20,7 +20,7 @@ export interface MockAct {
 /** An action. An empty `id` is left out, as the server leaves it out for a command without a name. */
 export function A(id: string, command: string, args?: Record<string, string>, o: { kind?: string; subject?: string } = {}): MockAct {
   const kind = o.kind ?? (id === 'back' ? 'back' : id === 'refresh' ? 'navigation' : id === 'confirm' ? 'confirm' : 'secondary')
-  return { ...(id ? { id } : {}), command, ...(args ? { args } : {}), kind, icon: 'action:default', ...(o.subject ? { subject: o.subject } : {}) }
+  return { ...(id && id !== command ? { id } : {}), command, ...(args ? { args } : {}), kind, icon: 'action:default', ...(o.subject ? { subject: o.subject } : {}) }
 }
 
 export const back = (command: string, args?: Record<string, string>) => A('back', command, args)
