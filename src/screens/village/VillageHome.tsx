@@ -297,12 +297,12 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       const b = layout?.buildings.find((x, i) => keyOf(i, x) === l.key)
       if (!b || !b.id || b.type === 'road') return []
       const going = b.state === 'under_construction' || b.state === 'planned'
-      if (going) return [{ key: l.key, x: l.x, y: l.y, building: buildPercent(b) }]
+      if (going) return [{ key: l.key, x: l.x, y: l.y, s: l.s, building: buildPercent(b) }]
       const ov = overlays.get(b.id)
       // who is shown a plaque (P9): only a building the viewer can act on, i.e. the server says they can upgrade it, or it is
       // their own. Every other building shows nothing until tapped; its level then rides on the name plate.
       const mineView = b.private ? !!b.mine : canPlaceNow
-      const m: Mark = { key: l.key, x: l.x, y: l.y }
+      const m: Mark = { key: l.key, x: l.x, y: l.y, s: l.s }
       if (ov && ov.tier > 0 && (ov.can_upgrade || (b.private && b.mine))) { m.level = ov.tier; m.canUpgrade = ov.can_upgrade }
       // the reason a standing building cannot work, as the server names it (damage first)
       const why = mineView ? (ov?.reasons.includes('damaged') ? 'damaged' : ov?.reasons[0]) : undefined

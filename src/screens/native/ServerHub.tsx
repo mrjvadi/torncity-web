@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { ScreenProps } from '../types'
 import { Empty, Header, PrimaryButton, ScreenScroll } from './kit/Parts'
-import { PRow } from '../../ui/v6/panel'
+import { PTile } from '../../ui/v6/panel'
 import { HUB_ICON } from './kit/hubs'
 import * as api from '../../api/client'
 import type { HubView } from '../../api/views.gen'
@@ -42,11 +42,11 @@ export default function ServerHub({ command, title, tone, look, run, rename }: P
           </>
         )}
         {load.state === 'ready' && (
-          <div className="hub-list">
+          <div className="hub-grid">
             {(load.view.entries ?? []).map((e) => {
               const entry = look[e.code]
               if (!entry) return null
-              return <PRow key={e.code} icon={HUB_ICON[e.code] ?? 'info'} title={t(rename?.(e.code, load.view.place) ?? entry.title)} onClick={() => run(e.command)} />
+              return <PTile key={e.code} icon={HUB_ICON[e.code] ?? 'info'} title={t(rename?.(e.code, load.view.place) ?? entry.title)} onClick={() => run(e.command)} />
             })}
           </div>
         )}

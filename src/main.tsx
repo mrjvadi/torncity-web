@@ -11,6 +11,9 @@ import { watchForNewBuild, APP_VERSION, BUILD_ID } from './lib/freshness'
 
 installGlobalReporter()
 installScale()
+// iOS WebKit still zooms the page on a pinch whatever the viewport meta says; its gesture events are the only way to
+// refuse it (the 3D map reads pinches through pointer events, which these do not touch)
+for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false })
 report('boot', `client v${APP_VERSION} (${BUILD_ID})`)
 
 const params = new URLSearchParams(location.search)

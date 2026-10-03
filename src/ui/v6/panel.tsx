@@ -42,6 +42,24 @@ export function PWhy({ title, text, ok }: { title: ReactNode; text?: ReactNode; 
 }
 
 /** A list card in the prototype's pattern: an icon, a title and a sub line, a badge or a chevron at the end. */
+/** A menu entry as a tile (owner 2026-10-03: entries sit side by side, several per row, not one long row each):
+ * icon over a short name, an optional badge (a countdown, a count) in the corner. Lists of data keep PRow. */
+export function PTile({ icon, title, badge, tone, onClick }: {
+  icon: string
+  title: ReactNode
+  badge?: ReactNode
+  tone?: 'busy' | 'danger'
+  onClick: () => void
+}) {
+  return (
+    <button className={`hub-tile${tone ? ' ' + tone : ''}`} onClick={onClick}>
+      <span className="hub-ico"><Ic name={icon} /></span>
+      <span className="hub-title">{title}</span>
+      {badge && <span className={`hub-badge${tone ? ' ' + tone : ''}`}>{badge}</span>}
+    </button>
+  )
+}
+
 export function PRow({ icon, title, sub, badge, tone, off, onClick, children }: {
   icon: string
   title: ReactNode

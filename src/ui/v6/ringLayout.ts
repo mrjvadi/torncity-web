@@ -1,13 +1,14 @@
 // The ring's geometry (ported from the approved prototype, home.js `place` / `openRing`): the actions fan out
 // below the building (or above, when that would leave the safe rectangle), the arc is clamped inside it and is
-// never clipped (P12). Every button is >= 48px with >= 8px between neighbours (P13). Pure maths, no DOM.
+// never clipped (P12). Every button is >= 44px with >= 8px between neighbours (P13, P24). Pure maths, no DOM.
 
 export interface RingSpec { size: number; lw: number; lh: number }
 export interface Placed { x: number; y: number; ly: number }
 export interface RingPlan { flip: boolean; items: Placed[]; plateX: number; plateY: number }
 
-export const SIZE = { info: 48, normal: 54, primary: 68 }
-const STEP = 76, BASE = 30, DEPTH = 34, PLATE_H = 36
+// owner 2026-10-03: the ring was too big; the visible discs shrink, every hit area stays >= 44 px (P24)
+export const SIZE = { info: 44, normal: 46, primary: 56 }
+const STEP = 68, BASE = 26, DEPTH = 28, PLATE_H = 32
 
 type Rect = [number, number, number, number]
 const bounds = (rects: Rect[]) => rects.reduce((a, r) => ({ x0: Math.min(a.x0, r[0]), y0: Math.min(a.y0, r[1]), x1: Math.max(a.x1, r[2]), y1: Math.max(a.y1, r[3]) }), { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 })

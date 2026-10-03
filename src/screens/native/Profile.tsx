@@ -13,7 +13,7 @@ import LangSwitch from './kit/LangSwitch'
 import { useView } from './kit/useView'
 import { clamp01, formatNumber, hms, money } from './kit/format'
 import { Ic } from '../../ui/v6/parts'
-import { PBar, PBtn, PRow, PSec, PWhy } from '../../ui/v6/panel'
+import { PBar, PBtn, PRow, PSec, PTile, PWhy } from '../../ui/v6/panel'
 import { t } from '../../i18n'
 import { locationOf } from '../../support/location'
 import { useSession } from '../../state/SessionContext'
@@ -111,17 +111,16 @@ export default function Profile({ response, loading, run }: ScreenProps) {
         {!inVillage && <Fig icon="road" label={t('profile.place')} value={v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : '—'} />}
       </div>
 
+      {/* health and energy live on the HUD; only the needs the HUD does not show are here (owner 2026-10-03) */}
+      {needs && <>
       <PSec>{t('profile.needs')}</PSec>
       <div className="pf2-needs">
-        <NeedBar icon="bolt" color="blue" label={t('profile.energy')} value={v.energy} max={v.max_energy} />
-        <NeedBar icon="heart" color="green" label={t('profile.health')} value={v.health} max={v.max_health} />
-        {needs && <>
           <NeedBar icon="timer" color="blue" label={t('need.sleep')} value={needs.sleep} bad />
           <NeedBar icon="bread" color="green" label={t('need.hunger')} value={needs.hunger} bad />
           <NeedBar icon="people" color="green" label={t('need.happiness')} value={needs.happiness} />
           <NeedBar icon="nerve" color="orange" label={t('need.stress')} value={needs.stress} bad />
-        </>}
       </div>
+      </>}
 
       {(v.work?.job || v.work?.course) && (
         <>
@@ -154,20 +153,20 @@ export default function Profile({ response, loading, run }: ScreenProps) {
       <PBtn kind="sec" onClick={() => run('achievement.list')}>{t('profile.all_achievements')}</PBtn>
 
       <PSec>{t('profile.more')}</PSec>
-      <div className="hub-list">
-        <PRow icon="pick" title={t('profile.skills')} onClick={() => run('skills.list')} />
-        <PRow icon="house" title={t('profile.life')} onClick={() => run('life.me')} />
-        <PRow icon="user" title={t('profile.card')} onClick={() => run('life.card')} />
-        <PRow icon="globe" title={t('profile.map')} onClick={() => run('map.list')} />
-        <PRow icon="road" title={t('profile.travel')} onClick={() => run('map.cities')} />
-        <PRow icon="tool" title={t('profile.devices')} onClick={() => run('device.list')} />
+      <div className="hub-grid">
+        <PTile icon="pick" title={t('profile.skills')} onClick={() => run('skills.list')} />
+        <PTile icon="house" title={t('profile.life')} onClick={() => run('life.me')} />
+        <PTile icon="user" title={t('profile.card')} onClick={() => run('life.card')} />
+        <PTile icon="globe" title={t('profile.map')} onClick={() => run('map.list')} />
+        <PTile icon="road" title={t('profile.travel')} onClick={() => run('map.cities')} />
+        <PTile icon="tool" title={t('profile.devices')} onClick={() => run('device.list')} />
       </div>
 
       {/* settings are a separate, quiet area below what the player does often (research: settings apart from product actions) */}
       <PSec>{t('profile.settings_area')}</PSec>
-      <div className="hub-list">
-        <PRow icon="person" title={t('profile.avatar')} onClick={() => run('life.avatar')} />
-        <PRow icon="tool" title={t('profile.settings')} onClick={() => run('player.settings')} />
+      <div className="hub-grid">
+        <PTile icon="person" title={t('profile.avatar')} onClick={() => run('life.avatar')} />
+        <PTile icon="tool" title={t('profile.settings')} onClick={() => run('player.settings')} />
       </div>
       <LangSwitch compact />
     </ScreenScroll>

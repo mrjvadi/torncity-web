@@ -14,6 +14,8 @@ export interface Mark {
   key: string
   x: number
   y: number
+  /** overlay size for the current zoom (0..1, from the scene); below MIN_S the marks are not drawn */
+  s?: number
   /** the level plaque (omitted when this viewer is not shown one) */
   level?: number
   /** a green arrow: only when the server says this viewer can upgrade it */
@@ -53,17 +55,24 @@ export function MapOverlays({ marks, ring, onDismiss }: { marks: Mark[]; ring: R
   )
 }
 
+// overlays never grow past their base size when the camera comes close, shrink with the buildings when it pulls
+// back, and are not drawn at all once a lot is only a few pixels wide (the plaques would cover the city)
+const MIN_S = 0.35, FLOOR_S = 0.78
+
 function MarkView({ m }: { m: Mark }) {
+  const s = m.s ?? 1
+  if (s < MIN_S) return null
   // the plaque sits just under the building's top point, the arrow above it
-  const px = m.x, py = m.y + 14
+  const ms = Math.max(FLOOR_S, s)
+  const px = m.x, py = m.y + 14 * ms
   return (
-    <>
+    <span style={{ display: 'contents', '--ms': ms } as React.CSSProperties}>
       {m.building !== undefined
         ? <div className="v6-cons v6-mark" style={{ left: px, top: py }}><Ic name="hammer" /><b>{fa(m.building)}٪</b></div>
         : m.level !== undefined && (
           <>
             <div className="v6-plq v6-mark" style={{ left: px, top: py }}>{fa(m.level)}</div>
-            {m.canUpgrade && <div className="v6-arw v6-mark" style={{ left: px, top: py - 10 }}><Ic name="up" /></div>}
+            {m.canUpgrade && <div className="v6-arw v6-mark" style={{ left: px, top: py - 10 * ms }}><Ic name="up" /></div>}
           </>
         )}
       {m.bubble && (
@@ -71,7 +80,7 @@ function MarkView({ m }: { m: Mark }) {
           <Ic name={m.bubble.icon} />{m.bubble.kind === 'out' ? <b>{m.bubble.text}</b> : <span>{m.bubble.text}</span>}
         </button>
       )}
-    </>
+    </span>
   )
 }
 

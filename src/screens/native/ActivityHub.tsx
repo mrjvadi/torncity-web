@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { ScreenProps } from '../types'
 import { Empty, Header, PrimaryButton, ScreenScroll } from './kit/Parts'
-import { PRow } from '../../ui/v6/panel'
-import { VitalsBar } from '../../ui/v6/parts'
-import { useHud, useWip } from '../../ui/v6/hooks'
+import { PTile } from '../../ui/v6/panel'
+import { useWip } from '../../ui/v6/hooks'
 import { ACTIVITY_ENTRIES, HUB_ICON } from './kit/hubs'
 import * as api from '../../api/client'
 import type { ActivitiesHubView } from '../../api/views.gen'
 import { t } from '../../i18n'
 import { careWord, useCare } from '../../support/care'
-import { useSession } from '../../state/SessionContext'
 
 type Load = { state: 'loading' } | { state: 'failed' } | { state: 'ready'; view: ActivitiesHubView }
 
@@ -17,8 +15,6 @@ type Load = { state: 'loading' } | { state: 'failed' } | { state: 'ready'; view:
  * An activity that is not listed is not mentioned; the client holds no rule about which are. */
 export default function ActivityHub({ run }: ScreenProps) {
   const care = useCare()
-  const { profile } = useSession()
-  const hud = useHud(profile)
   // what I am busy with right now (a running shift, a running study): from the state-sync timers, not from this view
   const busy = useWip(null, false).filter((s) => !s.idle && s.key !== 'build')
   const [load, setLoad] = useState<Load>({ state: 'loading' })
@@ -43,19 +39,15 @@ export default function ActivityHub({ run }: ScreenProps) {
         )}
         {load.state === 'ready' && (
           <>
-            <div className="hub-vitals"><VitalsBar hud={hud} /></div>
-            {busy.length > 0 && (
-              <div className="hub-list">
-                {busy.map((b) => <PRow key={b.key} icon={b.icon} title={b.label} badge={b.time} tone="busy" onClick={() => run(b.key === 'shift' ? 'job.status' : 'education.list')} />)}
-              </div>
-            )}
-            <div className="hub-list">
+            {/* health, energy and nerve are on the HUD already: no second copy here (owner 2026-10-03) */}
+            <div className="hub-grid">
+              {busy.map((b) => <PTile key={b.key} icon={b.icon} title={b.label} badge={b.time} tone="busy" onClick={() => run(b.key === 'shift' ? 'job.status' : 'education.list')} />)}
               {(load.view.entries ?? []).map((e) => {
                 const look = ACTIVITY_ENTRIES[e.code]
                 if (!look) return null
                 // «بیمارستان» is the name only where the place has a hospital; otherwise it is «سلامت»
                 const title = e.code === 'health' && careWord(care) === 'hospital' ? t('hub.hospital') : t(look.title)
-                return <PRow key={e.code} icon={HUB_ICON[e.code] ?? 'info'} title={title} onClick={() => run(e.command)} />
+                return <PTile key={e.code} icon={HUB_ICON[e.code] ?? 'info'} title={title} onClick={() => run(e.command)} />
               })}
             </div>
           </>

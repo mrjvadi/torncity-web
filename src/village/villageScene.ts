@@ -47,7 +47,9 @@ function valueNoise(x: number, y: number): number {
 }
 const smoothstep = (a: number, b: number, v: number) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t) }
 
-export interface ScreenLabel { key: string; x: number; y: number; visible: boolean }
+/** `s`: how big a lot looks right now, relative to a comfortable reading size (1 = full size), so the overlays shrink
+ * with the buildings when the camera pulls back instead of growing over them. */
+export interface ScreenLabel { key: string; x: number; y: number; visible: boolean; s: number }
 
 export interface Ghost { type: string; w: number; h: number; x: number; y: number; rotated: boolean; ok: boolean }
 
@@ -755,10 +757,16 @@ export class VillageScene {
     if (!this.opts.onLabels) return
     const r = this.canvas.getBoundingClientRect()
     const out: ScreenLabel[] = []
-    const v = new Vector3()
+    const v = new Vector3(), w = new Vector3()
+    // a lot spanning LOT_FULL css px or more gets full-size overlays; smaller lots scale them down (two decimals,
+    // so the label json only changes when the size really does)
+    const LOT_FULL = 56, lot = this.ground.lot
     for (const [key, p] of this.poses) {
       v.set(p.cx, p.base + p.height + 2, p.cz).project(this.camera)
-      out.push({ key, x: Math.round(((v.x + 1) / 2) * r.width), y: Math.round(((1 - v.y) / 2) * r.height), visible: v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1 })
+      w.set(p.cx + lot, p.base, p.cz).project(this.camera)
+      const span = Math.hypot((w.x - v.x) * r.width, (w.y - v.y) * r.height) / 2
+      const s = Math.round(Math.min(1, span / LOT_FULL) * 20) / 20
+      out.push({ key, x: Math.round(((v.x + 1) / 2) * r.width), y: Math.round(((1 - v.y) / 2) * r.height), visible: v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1, s })
     }
     const json = JSON.stringify(out)
     if (!force && json === this.lastLabelJson) return

@@ -8,7 +8,7 @@
 
 import type { ScreenProps } from '../types'
 import { Empty, Header, ScreenScroll } from '../native/kit/Parts'
-import { PBar, PRow, PSec } from '../../ui/v6/panel'
+import { PBar, PRow, PSec, PTile } from '../../ui/v6/panel'
 import { hasKey, t, type Key } from '../../i18n'
 import { formatNumber } from '../../lib/persian'
 import { useSession } from '../../state/SessionContext'
@@ -77,14 +77,14 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
         </div>
       )}
       <PSec>{t('city.affairs')}</PSec>
-      <div className="hub-list">
+      <div className="hub-grid">
         {items.map((it) => (
-          <PRow
+          <PTile
             key={it.key} icon={it.icon} title={t(it.label)} tone={it.key === 'leave' ? 'danger' : undefined}
             onClick={() => (it.command ? run(it.command) : openLocal(it.local!, it.args))}
           />
         ))}
-        <PRow icon="banner" title={t('city.charter')} onClick={() => run('gov.city')} />
+        <PTile icon="banner" title={t('city.charter')} onClick={() => run('gov.city')} />
       </div>
     </ScreenScroll>
   )
