@@ -246,6 +246,7 @@ export const en: Partial<Record<Key, string>> = {
   'road.chip': 'Road',
   'road.title': 'New road',
   'road.hint': 'Tap the ground where the road should end. The further it goes, the more land opens for sale.',
+  'road.tap_outside': 'Tap the ground outside the city edge to draw a new road.',
   'road.hint_again': 'Tap somewhere else to move the end of the road.',
   'road.quoting': 'Working out the road…',
   'road.class': 'Kind of road',

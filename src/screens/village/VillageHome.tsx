@@ -235,6 +235,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       if (lot) build.tapLot(lot)
       return
     }
+    // the road tool opens new land: a tap inside the city's first block has nothing to open, so say where to tap
+    if (build.state.step === 'road') { toast.push(t('road.tap_outside')); return }
     if (build.state.step !== 'off') return
     // a ring is open: a tap on the ground only puts it away (P10)
     if (lotRing) { setLotRing(null); return }

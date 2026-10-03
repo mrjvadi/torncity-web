@@ -20,6 +20,7 @@ import { useVillageCommand } from '../../village/useVillage'
 import type { VillageStore } from '../../village/villageStore'
 import { TONE_NEEDS, TONE_OK as TONE_FREE, TONE_PICK as TONE_ROAD } from '../../village/lotOverlay'
 import { lotCellAt, outerFromLayout, outerFromLots } from './outer'
+import { report } from '../../lib/reporter'
 import type { OuterCell } from '../../village/landOverlay'
 
 export type BuildStep = 'off' | 'menu' | 'lot' | 'confirm' | 'road'
@@ -184,6 +185,8 @@ export function useBuildMode(
     let want = ''
     setS((p) => { want = cls ?? p.road.cls; return { ...p, road: { ...p.road, asking: true, cls: want } } })
     const r = await cmd('settlement.road.plan', { x: to.x, y: to.y, ...(want ? { class: want } : {}) })
+    // what the server answered a road ask, so a quote that never appears on a phone can be traced in the client log
+    report('road', `ask ${to.x},${to.y} ${want || '-'} -> ${r.ok ? (r.res?.screen ?? 'no screen') : (r.code ?? 'refused')}`)
     setS((p) => {
       if (p.step !== 'road') return p
       if (r.ok && r.res?.screen === 'settlement_road_quote') {
