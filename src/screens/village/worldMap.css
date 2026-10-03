@@ -36,13 +36,14 @@
 .wm-info:has(.wm-info-x) { pointer-events: auto; }
 .wm-compass { flex: none; width: 30px; height: 30px; display: block; }
 .wm-compass > span { display: block; width: 30px; height: 30px; transition: transform 0.12s linear; }
-.wm-info-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; line-height: 1.45; }
+.wm-info-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 11px; line-height: 1.4; }
 .wm-info-l1 { display: flex; flex-direction: column; }
 .wm-info-l1 b { font-size: 12px; color: var(--gold, #ffd45c); font-weight: 600; }
 .wm-info-l2 { opacity: 0.92; }
-.wm-chip { opacity: 0.6; font-size: 11px; }
+.wm-chip { display: none; }
 .wm-chip:empty { display: none; }
-.wm-info-x { width: 44px; height: 44px; margin: -6px -8px -6px 0; pointer-events: auto; }
+.wm-info-x { position: absolute; left: -2px; top: -2px; width: 44px; height: 44px; font-size: 13px; pointer-events: auto; background: rgba(7, 10, 20, 0.5); }
+.wm-info:has(.wm-info-x) { padding-left: 40px; }
 .wm-spot { position: absolute; left: 0; top: 0; z-index: 1; width: 0; height: 0; pointer-events: none; }
 .wm-spot::before { content: ''; position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #1b2a44, 0 2px 6px rgba(0, 0, 0, 0.6); background: rgba(255, 255, 255, 0.2); box-sizing: border-box; }
 .wm-spot { font-size: 0; }

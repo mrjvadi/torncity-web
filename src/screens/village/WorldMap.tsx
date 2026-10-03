@@ -171,6 +171,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
   const compassRef = useRef<HTMLSpanElement | null>(null)
   const scaleBar = useRef<HTMLSpanElement | null>(null)
   const scaleTxt = useRef<HTMLSpanElement | null>(null)
+  const infoRef = useRef<HTMLDivElement | null>(null)
   const miniRef = useRef<HTMLCanvasElement | null>(null)
   const miniWrap = useRef<HTMLButtonElement | null>(null)
   const spotMk = useRef<HTMLDivElement | null>(null)
@@ -272,8 +273,9 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
             const b = v.bearingOnScreen(hp.lat, hp.lon)
             const cx = w / 2, cy = ins.top + (h - ins.top - ins.bottom) / 2
             const mx = 34, my = 34
+            const topEdge = Math.max(ins.top + my, (infoRef.current ? infoRef.current.getBoundingClientRect().bottom - cv.getBoundingClientRect().top : 0) + 40)
             const kx = b.x === 0 ? Infinity : (b.x > 0 ? (w - mx - cx) : (mx - cx)) / b.x
-            const ky = b.y === 0 ? Infinity : (b.y > 0 ? (h - ins.bottom - my - cy) : (ins.top + my - cy)) / b.y
+            const ky = b.y === 0 ? Infinity : (b.y > 0 ? (h - ins.bottom - my - cy) : (topEdge - cy)) / b.y
             const k = Math.min(kx, ky)
             arrowRef.current.style.display = ''
             arrowRef.current.style.transform = `translate(${(cx + b.x * k).toFixed(1)}px, ${(cy + b.y * k).toFixed(1)}px)`
@@ -458,7 +460,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
 
       <div className="wm-spot" ref={spotMk} style={{ display: 'none' }} aria-hidden>✕</div>
 
-      <div className="wm-info" aria-live="polite">
+      <div className="wm-info" ref={infoRef} aria-live="polite">
         <span className="wm-compass" title={t('wm.north')}><span ref={compassRef}><svg viewBox="0 0 24 24" width="30" height="30"><circle cx="12" cy="12" r="11" fill="rgba(7,10,20,0.6)" stroke="rgba(255,255,255,0.4)" /><path d="M12 3 L16 13 L12 11.5 L8 13 Z" fill="#ff5a4a" /><path d="M12 21 L16 13 L12 11.5 L8 13 Z" fill="#dfe4ff" /></svg></span></span>
         <span className="wm-info-txt">
           {read && (
