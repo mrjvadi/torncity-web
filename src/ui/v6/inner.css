@@ -265,3 +265,9 @@
 .v6 .sc-input, .v6 .ff-input { background: #0d141f; border: 1px solid var(--v6-line); border-radius: 12px; color: var(--v6-txt); min-height: 46px; font: 700 16px/1.4 Vazirmatn; }
 /* the ring and its marks stay above the camera buttons the village page keeps at the side */
 .v6 .v6-ovl { z-index: 6; }
+.v6 .nx-hub-body { gap: 10px; }
+.v6 .nx-hub-body { display: flex; flex-direction: column; gap: 10px; }
+@media (min-width: 900px) {
+  .v6 .hub-vitals .v6-vit { flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
+  .v6 .hub-vitals .v6-vrow { width: auto; }
+}
