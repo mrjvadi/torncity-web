@@ -179,6 +179,16 @@ export function mockSyncCommand<T extends Record<string, unknown>>(command: stri
         else if (cur) add(patch<Inv>('inventory', code, (i) => ({ ...i, qty: i.qty - 1, holdings: { ...i.holdings, carried: i.qty - 1 } }), requestId))
         break
       }
+      case 'inbox.read': {
+        // one notice only: it is read, the count falls by one, every other notice stays unread
+        const id = String(args?.id ?? '')
+        const held = byKind('notice').get(id)
+        if (held && !(held.d as Notice).read) {
+          add(patch<Notice>('notice', id, (n) => ({ ...n, read: true }), requestId))
+          add(patch<Inbox>('inbox', 'self', (b) => ({ ...b, unread: Math.max(0, b.unread - 1) }), requestId))
+        }
+        break
+      }
       case 'inbox.read_all': {
         for (const [id, h] of [...byKind('notice')]) {
           if (!(h.d as Notice).read) add(patch<Notice>('notice', id, (n) => ({ ...n, read: true }), requestId))

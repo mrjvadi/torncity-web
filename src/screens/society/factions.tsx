@@ -8,7 +8,7 @@ import type {
   FactionPageView, FactionRefusalView,
 } from '../../api/views.gen'
 import type { Action } from '../../api/types'
-import { Chip, ListRow, SectionTitle } from '../native/kit/Parts'
+import { Bar, Chip, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { formatNumber } from '../../lib/persian'
 import { money } from '../native/kit/format'
@@ -56,7 +56,15 @@ const FactionList = screen<FactionListView>(({ view: v, ctx }) => {
         })}
       </div>
       <Panel tone="gold">
-        {v.mine ? <Lead>{t('soc.faction.list_mine', { name: v.mine.name })}</Lead> : <Lead>{t('soc.faction.list_found', { fee: money(v.fee) })}</Lead>}
+        {v.mine ? <Lead>{t('soc.faction.list_mine', { name: v.mine.name })}</Lead>
+          : v.founding && !v.founding.open ? (
+            // the founding rule: enough people must live here; shown locked with the reason and the progress
+            <>
+              <Lead tone="bad">{t('soc.faction.locked', { need: formatNumber(v.founding.need) })}</Lead>
+              <Bar frac={v.founding.need ? Math.min(1, v.founding.have / v.founding.need) : 0} color="#f2c255"
+                label={t('soc.faction.founders')} sub={t('soc.faction.founders_progress', { have: formatNumber(v.founding.have), need: formatNumber(v.founding.need) })} />
+            </>
+          ) : <Lead>{t('soc.faction.list_found', { fee: money(v.fee) })}</Lead>}
       </Panel>
       <Rest ctx={ctx} skip={(a) => a.id === 'faction.view'} />
     </Page>
