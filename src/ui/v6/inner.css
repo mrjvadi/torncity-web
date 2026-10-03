@@ -377,3 +377,12 @@
 .hub-cards > .nx-card .nx-bar-wrap, .hub-cards > .nx-card .nx-bar { width: 100%; }
 .hub-cards .nx-row-right .vf-cancel, .hub-cards .pc-foot .vf-cancel { min-height: 44px; min-width: 44px; padding: 0 10px; }
 .pn-stats > .pn-stat:only-child, .vf-facts > .vf-fact:only-child { grid-column: 1 / -1; }
+/* a panel inside a card never pushes the card wider; its header row stacks, its facts become thin rows */
+.hub-cards > .nx-card > *, .hub-cards > .nx-card .vf-panel > * { min-width: 0; max-width: 100%; }
+.hub-cards > .nx-card .vf-panel > .nx-row { flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 6px 4px; background: none; min-height: 0; }
+.hub-cards > .nx-card .nx-row-text { flex: none; width: 100%; align-items: center; text-align: center; }
+.hub-cards > .nx-card .nx-row-title { white-space: normal; }
+.hub-cards > .nx-card .vf-line { flex-wrap: wrap; justify-content: space-between; }
+.hub-cards .vf-facts, .hub-cards .pn-stats { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.hub-cards .vf-fact { flex-direction: row; justify-content: space-between; align-items: baseline; min-height: 0; padding: 5px 8px; text-align: start; }
+.hub-cards .vf-fact b { text-align: end; font-size: 14px; }
