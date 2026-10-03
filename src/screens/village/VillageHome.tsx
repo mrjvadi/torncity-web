@@ -266,10 +266,11 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       const going = b.state === 'under_construction' || b.state === 'planned'
       if (going) return [{ key: l.key, x: l.x, y: l.y, building: buildPercent(b) }]
       const ov = overlays.get(b.id)
-      // who is shown a plaque: the head sees the village's buildings, a resident only their own (P9, the role rule)
+      // who is shown a plaque (P9): only a building the viewer can act on, i.e. the server says they can upgrade it, or it is
+      // their own. Every other building shows nothing until tapped; its level then rides on the name plate.
       const mineView = b.private ? !!b.mine : canPlaceNow
       const m: Mark = { key: l.key, x: l.x, y: l.y }
-      if (mineView && ov && ov.tier > 0) { m.level = ov.tier; m.canUpgrade = ov.can_upgrade }
+      if (ov && ov.tier > 0 && (ov.can_upgrade || (b.private && b.mine))) { m.level = ov.tier; m.canUpgrade = ov.can_upgrade }
       // the reason a standing building cannot work, as the server names it (damage first)
       const why = mineView ? (ov?.reasons.includes('damaged') ? 'damaged' : ov?.reasons[0]) : undefined
       if (why) {

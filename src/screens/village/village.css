@@ -172,3 +172,30 @@
 
 .vc-chev { font-size: 22px; color: var(--gold); padding-inline-start: 6px; line-height: 1; }
 .vc-line:active { transform: scale(0.98); }
+
+/* the build panel: a layer of the shell, above the dock, HUD, quest strip and rail (z 40), never under them.
+   Phone: it sits on the bottom edge and covers the dock while building (the world above stays untouched).
+   Desktop: a docked panel on the world's left edge, beside the rail's mirror side. */
+.v6-build { position: absolute; z-index: 40; left: 8px; right: 8px; bottom: calc(var(--v6-dock-h, 0px) + var(--safe-b, 0px) + 8px); max-height: calc(100% - var(--safe-t, 0px) - var(--v6-hud-h, 66px) - var(--v6-dock-h, 0px) - var(--safe-b, 0px) - 28px); display: flex; flex-direction: column; --k-h: 40px; --k-btn: 40px; }
+.v6-build > * { min-height: 0; }
+.v6-build .vh-panel { max-height: inherit; overflow: hidden; }
+.v6-build.step-menu .vh-panel { max-height: min(60vh, 520px); }
+.v6-build.step-menu .vh-cards { flex: 1; min-height: 0; flex-wrap: wrap; align-content: flex-start; justify-content: center; overflow-x: hidden; overflow-y: auto; gap: 8px; padding: 2px 2px 8px; margin: 0; overscroll-behavior: contain; }
+.v6-build.step-menu .vh-card { width: calc(33.3% - 6px); min-width: 92px; }
+.vh-search input { width: 100%; height: 40px; padding: 0 12px; border-radius: 12px; font: 500 14px Vazirmatn, system-ui, sans-serif; color: var(--text); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); }
+.vh-search input::placeholder { color: var(--text-dim); }
+.vh-chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 4px; flex: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.vh-chips::-webkit-scrollbar { display: none; }
+.vh-chip { flex: none; height: 36px; padding: 0 12px; border-radius: 18px; font: 700 13px Vazirmatn, system-ui, sans-serif; white-space: nowrap; color: var(--text); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); }
+.vh-chip.on { color: #2a1c04; background: linear-gradient(180deg, #ffe9a0, #f4c441); border-color: #f4c441; }
+.vh-chip.lock { color: var(--text-dim); }
+.vh-empty { width: 100%; text-align: center; padding: 18px 0; }
+@media (min-width: 900px) {
+  .v6-build { left: 0; right: auto; top: 84px; bottom: 0; width: 420px; max-height: none; padding: 10px; }
+  .v6-build .vh-panel { height: 100%; }
+  .v6-build.step-menu .vh-panel { height: 100%; max-height: none; }
+  .v6-build:not(.step-menu) { top: auto; }
+  .v6-build.step-menu .vh-card { width: calc(50% - 4px); }
+}
+@media (prefers-reduced-motion: no-preference) { .v6-build { animation: v6-build-in .18s ease-out; } }
+@keyframes v6-build-in { from { opacity: 0; transform: translateY(10px); } }

@@ -4810,3 +4810,16 @@ v6.up.blocked | اول موارد قرمز را درست کن | Fix the red rows
 v6.fix | برو و درستش کن | Go and fix it
 v6.have | دارد | Have it
 v6.rail.build | ساخت | Build
+build.cat.all | همه | All
+build.cat.housing | مسکن | Housing
+build.cat.shops | فروشگاه و بازار | Shops and markets
+build.cat.construction | ساخت‌وساز و مصالح | Construction and materials
+build.cat.production | کارگاه و تولید | Workshops and production
+build.cat.farming | کشاورزی | Farming
+build.cat.public | خدمات عمومی | Public services
+build.cat.security | امنیت و دفاع | Security and defence
+build.cat.other | سایر | Other
+build.search | جست‌وجوی ساختمان | Search buildings
+build.search_empty | ساختمانی با این نام پیدا نشد. | No building matches.
+build.show_locked | قفل‌شده‌ها | Locked
+build.locked_n | {n} ساختمان هنوز قفل است | {n} buildings are still locked
