@@ -371,3 +371,6 @@
    display:none used to shrink the bottom inset, and the 3D view re-framed itself (the «ساخت» jump). The build panel is a
    layer above (.v6-build, z 40) and covers the strip without touching it. */
 .v6-app:has(.vh-bottom .vh-panel) .v6-info, .v6-app:has(.v6-build) .v6-info { visibility: hidden; }
+/* the world map takes the screen like a maps app: the work and events columns and the quest strip step aside
+   (hidden, never removed, so nothing reflows when it closes) */
+.v6-app:has(.wm.wm-in) .v6-wip, .v6-app:has(.wm.wm-in) .v6-events, .v6-app:has(.wm.wm-in) .v6-info { visibility: hidden; }
