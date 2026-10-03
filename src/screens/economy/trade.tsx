@@ -5,14 +5,18 @@ import type {
   BookView, MarketCheckoutView, MarketRefusalView, MarketView, MyOrdersView, OrderCancelledView, OrderPlacedView,
   SellOffersView, ShopBoughtView, ShopCheckoutView, ShopRefusalView, ShopSoldView, ShopView, ShopsView, Way,
 } from '../../api/views.gen'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ListRow, Notice, Stat, StatPair } from '../native/kit/Parts'
 import { GoodsTools, useGoodsFilter, type GoodsRow } from '../../ui/v6/goodsFilter'
+import GoodsCard from '../../ui/v6/GoodsCard'
+import { CardGrid, PStats, PTabs } from '../../ui/v6/panel'
+import { useVillageCommand } from '../../village/useVillage'
+import type { VillageShopView } from '../../api/views.gen'
 import { formatNumber, hms, money } from '../native/kit/format'
 import { CostSummary } from '../../ui/Popup'
 import { hasKey, t, type Key } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerFlow, type FlowCtx } from '../village/flow'
-import { ConfirmPopup, Do, PayFooter, Purses, byId, find, nameOf, payNote, rest } from './kit'
+import { ConfirmPopup, Do, NotHere, PayFooter, Purses, bps, byId, find, nameOf, payNote, rest } from './kit'
 import { BookTables, TradeList } from './exchange'
 import { clockText } from './time'
 
@@ -35,29 +39,58 @@ function WalkTo({ way, ctx }: { way: Way | null; ctx: FlowCtx }) {
 /** The market screen is the market only (the order book of goods): search by name, tabs by the catalogue's category,
  * sorting. The storehouse is a screen of its own (village_storage). */
 function MarketBody({ v, ctx }: { v: MarketView; ctx: FlowCtx }) {
-  const rows = useMemo<GoodsRow<{ code: string; ask: number; bid: number; last: number; book: boolean }>[]>(() => [
-    ...(v.books ?? []).map((b) => ({ item: { code: b.item.code, ask: b.best_ask, bid: b.best_bid, last: b.last, book: true }, name: nameOf(ctx, ['item', 'component'], b.item), category: ctx.names.category(['item', 'component'], b.item.code), price: b.best_ask > 0 ? b.best_ask : b.last > 0 ? b.last : undefined })),
-    ...(v.yours ?? []).map((y) => ({ item: { code: y.code, ask: 0, bid: 0, last: 0, book: false }, name: nameOf(ctx, ['item', 'component'], y), category: ctx.names.category(['item', 'component'], y.code), price: undefined })),
+  const cmd = useVillageCommand()
+  // the village's own shop sells on the same page (ADR 0046 section 9): «از دکان» beside «از اهالی»
+  const [shop, setShop] = useState<VillageShopView | null>(null)
+  const [source, setSource] = useState<'all' | 'shop' | 'people'>('all')
+  useEffect(() => {
+    if (!v.village) return
+    void cmd('settlement.shop', {}, { silent: true }).then((r) => { if (r.ok && r.res?.view) setShop(r.res.view as unknown as VillageShopView) })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [v.village])
+  type Row = { code: string; ask: number; bid: number; last: number; book: boolean; from: 'shop' | 'people'; stock?: number }
+  const rows = useMemo<GoodsRow<Row>[]>(() => [
+    ...(v.books ?? []).map((b) => ({ item: { code: b.item.code, ask: b.best_ask, bid: b.best_bid, last: b.last, book: true, from: 'people' as const }, name: nameOf(ctx, ['item', 'component'], b.item), category: ctx.names.category(['item', 'component'], b.item.code), shelf: b.shelf, price: b.best_ask > 0 ? b.best_ask : b.last > 0 ? b.last : undefined })),
+    ...(v.yours ?? []).map((y) => ({ item: { code: y.code, ask: 0, bid: 0, last: 0, book: false, from: 'people' as const }, name: nameOf(ctx, ['item', 'component'], y), category: ctx.names.category(['item', 'component'], y.code), price: undefined })),
+    ...((shop && shop.closed === '' ? shop.lines ?? [] : []).map((l) => ({ item: { code: l.item.code, ask: l.price, bid: 0, last: 0, book: true, from: 'shop' as const, stock: l.stock }, name: nameOf(ctx, ['item', 'component'], l.item), category: ctx.names.category(['item', 'component'], l.item.code), shelf: l.shelf, price: l.price }))),
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [v, ctx.names])
+  ], [v, shop, ctx.names])
   const f = useGoodsFilter(rows, ['name', 'low', 'high'])
+  const shown = f.shown.filter((r) => source === 'all' || r.item.from === source)
+  const village = v.village
   return (
     <>
+      {village && (
+        <>
+          <PStats items={[
+            { label: t('sm.mk.stalls', { used: formatNumber(village.stalls_used), n: formatNumber(village.stalls), mine: formatNumber(village.mine), per: formatNumber(village.per_player) }), value: `${formatNumber(village.stalls_used)} / ${formatNumber(village.stalls)}` },
+          ]} />
+          <Hint>{village.market_day ? t('sm.mk.day') : t('sm.mk.rates', { d: bps(village.dues_bps), l: bps(village.listing_bps) })}</Hint>
+          <Hint>{t('sm.mk.away')}</Hint>
+          <PTabs tabs={[{ key: 'all', label: t('sm.mk.source.all') }, { key: 'shop', label: t('sm.mk.source.shop') }, { key: 'people', label: t('sm.mk.source.people') }]} value={source} onChange={(k) => setSource(k as typeof source)} />
+        </>
+      )}
       <GoodsTools f={f as never} />
-      {f.shown.length === 0 && <p className="pn-hint">{t('goods.none')}</p>}
-      <div className="gf-list">
-        {f.shown.map((r) => (
-          <button key={r.item.code} className="gf-row" onClick={() => { const a = find(ctx, 'market.book', { item: r.item.code }); if (a) ctx.go(a) }}>
-            <span className="gf-name">{r.name}<span>{r.item.book ? t('market.bid_ask', { bid: r.item.bid > 0 ? formatNumber(r.item.bid) : '—', ask: r.item.ask > 0 ? formatNumber(r.item.ask) : '—' }) : t('market.no_book')}</span></span>
-            {r.item.last > 0 && <span className="gf-price">{formatNumber(r.item.last)}<span>{t('market.last')}</span></span>}
-          </button>
+      {shown.length === 0 && <p className="pn-hint">{t('goods.none')}</p>}
+      <CardGrid>
+        {shown.map((r) => (
+          <GoodsCard key={`${r.item.from}:${r.item.code}`} code={r.item.code} name={r.name} group={r.shelf?.group ?? r.category}
+            price={r.item.from === 'shop' ? money(r.item.ask) : r.item.last > 0 ? money(r.item.last) : undefined}
+            price2={r.item.from === 'shop' ? t('sm.mk.shop_left', { n: formatNumber(r.item.stock ?? 0) }) : r.item.book ? t('market.bid_ask', { bid: r.item.bid > 0 ? formatNumber(r.item.bid) : '—', ask: r.item.ask > 0 ? formatNumber(r.item.ask) : '—' }) : t('market.no_book')}
+            source={village ? (r.item.from === 'shop' ? t('sm.mk.source.shop') : t('sm.mk.source.people')) : undefined}
+            onClick={() => {
+              if (r.item.from === 'shop') { ctx.run('settlement.shop'); return }
+              const a = find(ctx, 'market.book', { item: r.item.code }); if (a) ctx.go(a)
+            }} />
         ))}
-      </div>
+      </CardGrid>
     </>
   )
 }
 
-const Market = flow<MarketView>(({ view: v, ctx }) => (
+const Market = flow<MarketView>(({ view: v, ctx }) => v.unavailable ? (
+  <NotHere u={v.unavailable} ctx={ctx} title={t('sm.mk.closed_title')} tone="emerald" />
+) : (
   <Page title={t('market.title')} tone="emerald">
     {!v.at_market && !v.way && <Notice>{t('eco.market.away')}</Notice>}
     {!v.at_market && <WalkTo way={v.way} ctx={ctx} />}
@@ -163,7 +196,8 @@ const MyOrders = flow<MyOrdersView>(({ view: v, ctx }) => (
 ))
 
 const MarketRefusal = flow<MarketRefusalView>(({ view: v, ctx }) => {
-  const k = `eco.market.refused.${v.kind}`
+  if (v.unavailable) return <NotHere u={v.unavailable} ctx={ctx} title={t('sm.mk.closed_title')} tone="ruby" />
+  const k = hasKey(`sm.mk.refused.${v.kind}`) ? `sm.mk.refused.${v.kind}` : `eco.market.refused.${v.kind}`
   return (
     <Page title={t('eco.refused.title')} tone="ruby">
       <Panel tone="ruby">

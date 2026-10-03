@@ -49,10 +49,10 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
   const nameOf = (l: (typeof lines)[number]) => buildingName(cat, l.building.code, l.building.name)
   const lockedN = lines.filter((l) => l.state !== 'available').length
   const pool = useMemo(() => lines.filter((l) => showLocked || l.state === 'available'), [lines, showLocked])
-  const present = BUILD_CATS.filter((c) => pool.some((l) => buildCatOf(l.role) === c.code))
+  const present = BUILD_CATS.filter((c) => pool.some((l) => buildCatOf(l.category) === c.code))
   const active = cat0 && present.some((c) => c.code === cat0) ? cat0 : present[0]?.code
   const needle = searching ? q.trim() : ''
-  const shown = needle ? pool.filter((l) => nameOf(l).includes(needle)) : pool.filter((l) => buildCatOf(l.role) === active)
+  const shown = needle ? pool.filter((l) => nameOf(l).includes(needle)) : pool.filter((l) => buildCatOf(l.category) === active)
   const host = document.querySelector('.v6-app') ?? document.body
   return createPortal(
     <div className={`v6-build step-${s.step}`}>

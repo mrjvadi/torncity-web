@@ -4857,3 +4857,147 @@ build.search | جست‌وجوی ساختمان | Search buildings
 build.search_empty | ساختمانی با این نام پیدا نشد. | No building matches.
 build.show_locked | قفل‌شده‌ها | Locked
 build.locked_n | {n} ساختمان هنوز قفل است | {n} buildings are still locked
+# -- storage and market (audit 2026-10-03, P4): the backpack, the stores, the market, the shop, the money ----------------
+sm.tab.carried | همراه من | On me
+sm.tab.home | انبار من | My store
+sm.tab.city | انبار شهر | City store
+sm.fill.space | جا | Space
+sm.fill.reserved | {n} جا برای سفارش‌ها و حراج‌ها کنار است. | {n} space is set aside for orders and auctions.
+sm.fill.load | بار: {w} کیلو (راحت تا {c}، حداکثر {h}) | Load: {w} kg (comfortable to {c}, at most {h})
+sm.fill.full | پر است. چیزی را بفروشید، در انبار بگذارید یا کولهٔ بزرگ‌تری ببندید. | Full. Sell something, store it or put on a bigger bag.
+sm.bags.title | کوله‌ها | Bags
+sm.slot.belt | کمر | Belt
+sm.slot.back | پشت | Back
+sm.slot.empty | خالی | Empty
+sm.slot.space | {n} جا | {n} space
+sm.slot.wear | {w} از {m} سالم | {w} of {m} sound
+sm.slot.torn | پاره؛ فقط {s} از {f} جا | Torn; only {s} of {f} space
+sm.slot.off | درآوردن | Take off
+sm.claims.title | در امانت، منتظر جا | Held for you, waiting for room
+sm.claims.hint | این‌ها گم نمی‌شوند؛ جا باز کنید و بردارید. | These are not lost; make room and claim them.
+sm.claims.take | برداشتن | Claim
+sm.claims.done | برداشتید. | Claimed.
+sm.home.title | انبار من | My store
+sm.home.none | هنوز خانه، کلبه یا انباری ندارید. با ساختن یک انباری جای نگه‌داشتن پیدا می‌کنید. | You have no house, cottage or shed yet. Build a shed to get a place to keep things.
+sm.home.away | برای گذاشتن یا برداشتن باید در شهری باشید که خانه یا انباری دارید. | To put in or take out you must be in a settlement where you hold a house or shed.
+sm.home.empty | انبار شما خالی است. | Your store is empty.
+sm.home.take | آوردن به کوله | Bring to bag
+sm.pop.qty | {n} عدد | {n} units
+sm.pop.worth | ارزش تقریبی {p} | Worth about {p}
+sm.pop.quality | کیفیت {q} | Quality {q}
+sm.pop.uses | {n} بار مصرف مانده | {n} uses left
+sm.pop.use | مصرف | Use
+sm.pop.sell | فروش در بازار | Sell at the market
+sm.pop.store | گذاشتن در انبار من | Put in my store
+sm.pop.drop | دور انداختن | Throw away
+sm.pop.drop_sure | {name} برای همیشه از بین می‌رود. | {name} is gone for good.
+sm.pop.wear | بستن به خود | Put on
+sm.pop.bag_off | درآوردن | Take off
+sm.pop.bag | {space} جا می‌دهد، تا {comfort} کیلو راحت و تا {hard} کیلو را می‌کشد. | Gives {space} space; comfortable to {comfort} kg, carries at most {hard} kg.
+sm.pop.bag_repair | دوختنش در دکان {cost} خرج دارد. | Mending it at the shop costs {cost}.
+sm.pop.give | بده به {name} | Give to {name}
+sm.pop.cooling | دوباره تا {t} دیگر | Again in {t}
+sm.pop.done | انجام شد. | Done.
+sm.noroom.title | جا ندارید | No room
+sm.noroom.space | {qty} عدد {item} {need} جا می‌خواهد و فقط {free} جا خالی دارید؛ {short} جا کم است. | {qty} x {item} needs {need} space and you have {free} free; {short} short.
+sm.noroom.heavy | این بار برای شما زیادی سنگین است. | That load is too heavy for you.
+sm.noroom.fix | چیزی را بفروشید، در انبار خانه بگذارید یا کولهٔ بزرگ‌تری ببندید. | Sell something, store it at home or put on a bigger bag.
+sm.st.class.bulk | حیاط و انبار روباز | Yard and open store
+sm.st.class.food | غذا | Food
+sm.st.class.goods | کالا | Goods
+sm.st.class.ore | سنگ معدن | Ore
+sm.st.stores | انبارها و انباردارها | Stores and storekeepers
+sm.st.kept | انباردار دارد؛ روزی {wage} | Has a storekeeper; {wage} a day
+sm.st.unkept | انباردار ندارد؛ جایش حساب نمی‌شود | No storekeeper; its room does not count
+sm.st.unkept_why | خزانه باید دستمزد انباردار را بدهد و یک نفر بیکار هم لازم است. | The treasury must pay a keeper and someone in the pool must be free.
+sm.st.spoil | غذای انبار هر روز {p} خراب می‌شود. | The food in the store spoils {p} a day.
+sm.st.reserved | {n} جا برای شیفت‌های در جریان کنار است | {n} space is set aside for running shifts
+sm.st.fix_full | یک انبار بسازید یا انباردار بگذارید تا جا بیشتر شود. | Build a storehouse or put a keeper in to get more room.
+sm.st.donate | کمک به انبار | Give to the store
+sm.st.donate_hint | از آنچه همراه دارید به انبار شهر بدهید. | Give some of what you carry to the city store.
+sm.st.donate_none | چیزی همراهتان نیست که بشود داد. | You carry nothing to give.
+sm.st.donate_done | به انبار شهر دادید. | Given to the city store.
+sm.st.take | برداشتن از انبار | Take from the store
+sm.st.take_head | فقط شهردار از انبار شهر برمی‌دارد. | Only the head takes from the city store.
+sm.st.take_done | برداشتید. | Taken.
+sm.st.qty | چند عدد؟ | How many?
+sm.st.procure | تدارکات شهرداری | City hall procurement
+sm.st.procure_hint | شهردار از {city} با پول خزانه مصالح می‌خرد؛ بازار اهالی جای دیگری است. | The head buys materials from {city} with the treasury; the residents' market is elsewhere.
+sm.st.empty | انبار خالی است. | The store is empty.
+sm.mk.source.all | همه | All
+sm.mk.source.shop | از دکان | From the shop
+sm.mk.source.people | از اهالی | From residents
+sm.mk.shop_empty | دکان امروز چیزی ندارد. | The shop has nothing today.
+sm.mk.shop_left | {n} مانده | {n} left
+sm.mk.shop_price | {p} | {p}
+sm.mk.stalls | غرفه‌ها: {used} از {n} پر است؛ شما {mine} از {per} | Stalls: {used} of {n} taken; you hold {mine} of {per}
+sm.mk.rates | عوارض هر معامله {d} و هزینهٔ گذاشتن سفارش {l}؛ هر دو به خزانهٔ شهر | Dues on a trade {d}, listing fee {l}; both to the city treasury
+sm.mk.day | امروز روز بازار است: هزینهٔ گذاشتن سفارش ندارد و عوارض نصف است. | Market day: no listing fee and half the dues.
+sm.mk.away | غرفهٔ فروش فقط وقتی خودتان در شهر هستید می‌فروشد. | A selling stall sells only while you are in the settlement.
+sm.mk.fee_paid | هزینهٔ غرفه: {fee} | Stall fee: {fee}
+sm.mk.closed_title | اینجا بازار نیست | There is no market here
+sm.mk.closed_hint | شهردار باید یک بازارچه بسازد. نزدیک‌ترین بازار در {city} است. | The head must build a market post. The nearest market is in {city}.
+sm.mk.refused.stalls_full | همهٔ غرفه‌های بازار پر است ({count} غرفه). | Every stall is taken ({count}).
+sm.mk.refused.stall_limit | هر نفر فقط {count} غرفه می‌تواند داشته باشد؛ یکی را لغو کنید. | One person may hold only {count} stalls; cancel one.
+sm.shop.title | دکان شهر | City shop
+sm.shop.open | دکان | Shop
+sm.shop.closed.no_shopkeeper | دکان امروز بسته است: دکان‌داری نیست. | Closed today: no shopkeeper.
+sm.shop.closed.unpaid | دکان امروز بسته است: خزانه دستمزد دکان‌دار را نداد. | Closed today: the treasury could not pay the shopkeeper.
+sm.shop.closed.not_yet | هنوز بار صبح نیامده است. | The morning delivery has not come yet.
+sm.shop.next | بار بعدی: {t} | Next delivery: {t}
+sm.shop.left_today | {n} مانده | {n} left
+sm.shop.buy | خرید | Buy
+sm.shop.fits | جای {n} عدد دارید | Room for {n}
+sm.shop.nofit | جا ندارید | No room
+sm.shop.sold_out | تمام شد | Sold out
+sm.shop.player_cap | سهم امروز شما تمام شد | Your share for today is used
+sm.shop.not_resident | فقط ساکنان می‌خرند | Only residents buy
+sm.shop.locked | چه چیزی اضافه می‌شود | What would be added
+sm.shop.needs_building | ساختمان: {list} | Building: {list}
+sm.shop.needs_knowledge | دانش: {list} | Knowledge: {list}
+sm.shop.checkout | خرید از دکان | Buying at the shop
+sm.shop.checkout_line | {qty} عدد {name}، هر عدد {unit} | {qty} x {name} at {unit}
+sm.shop.tax | مالیات فروش {p} | Sales tax {p}
+sm.shop.total | جمع | Total
+sm.shop.space | فضا: {need} از {free} | Space: {need} of {free}
+sm.shop.pay_cash | نقد | Cash
+sm.shop.pay_card | کارت | Card
+sm.shop.bought | خریدید: {qty} عدد {name} | Bought {qty} x {name}
+sm.shop.mended | دوختید: {name}، {cost} | Mended {name} for {cost}
+sm.shop.repair | دوخت کوله | Bag mending
+sm.shop.repair_btn | دوختن، {cost} | Mend, {cost}
+sm.shop.levers | تصمیم شهردار | The head's levers
+sm.shop.cap | سقف قیمت: {p} | Price ceiling: {p}
+sm.shop.cap_hint | دکان بالاتر از این درصد قیمت مرجع نمی‌فروشد. | The shop sells no higher than this share of the reference price.
+sm.shop.tax_lever | مالیات فروش دکان | Shop sales tax
+sm.shop.wage | دستمزد روزانهٔ دکان‌دار: {w} | Shopkeeper's daily wage: {w}
+sm.shop.refused.closed | دکان بسته است. | The shop is closed.
+sm.shop.refused.not_there | این کالا در دکان نیست. | The shop does not sell that.
+sm.shop.refused.sold_out | این کالا تمام شده است. | Sold out.
+sm.shop.refused.player_cap | امروز بیشتر از این به شما نمی‌فروشند. | No more for you today.
+sm.shop.refused.no_space | جا ندارید. | No room.
+sm.shop.refused.too_heavy | این بار زیادی سنگین است. | Too heavy.
+sm.shop.refused.not_here | برای خرید باید در شهر باشید. | You must be in the settlement to buy.
+sm.money.title | پول شهر | City money
+sm.money.currency | پول شهر: {name} | City money: {name}
+sm.money.no_book | هنوز دفتر بازار و ذخیره‌ای برای پول شهر نیست. | The city money has no market book or reserve yet.
+sm.money.nil | نیل فقط یک مقیاس برای نمایش است؛ چیزی تبدیل یا جابه‌جا نمی‌شود. | Nil is only a yardstick to look at; nothing is converted or moved.
+sm.money.nil_unit | هر {u} ساپ ≈ {n} نیل | Every {u} money ≈ {n} Nil
+sm.money.treasury | خزانه: {a} ≈ {n} نیل | Treasury: {a} ≈ {n} Nil
+sm.money.output | تولید {d} روز اخیر: {a} ≈ {n} نیل | Output of the last {d} days: {a} ≈ {n} Nil
+sm.money.basket | سبد خرید روستا | The basket
+sm.money.index | شاخص قیمت سبد: {p}٪ | Basket price index: {p}%
+sm.money.cover | پوشش سبد روی دکان: {p}٪ | Basket on the shelf: {p}%
+sm.money.examples | نمونه‌ها | Examples
+sm.money.shelf | در دکان هست | On the shelf
+sm.money.not_shelf | در دکان نیست | Not on the shelf
+sm.shop.lbl_wage | دستمزد دکان‌دار | Shopkeeper's wage
+sm.shop.lbl_tax | مالیات فروش | Sales tax
+sm.shop.lbl_cap | سقف قیمت | Price ceiling
+sm.shop.lbl_price | قیمت | Price
+sm.shop.lbl_fits | جا برای | Room for
+sm.shop.torn | پاره | Torn
+sm.money.lbl_treasury | خزانه | Treasury
+sm.money.lbl_unit | نیل هر {u} ساپ | Nil per {u} money
+sm.money.lbl_output | تولید {d} روز | Output, {d} days
+v6.ring.market | بازار | Market

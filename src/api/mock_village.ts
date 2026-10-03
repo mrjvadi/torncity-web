@@ -481,7 +481,7 @@ function menuView() {
     const miss = unmet(e)
     const short = materialNeeds(e)
     return {
-      building: nameOf(e.code), role: e.role, state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time,
+      building: nameOf(e.code), role: e.role, category: ({ '': 'public', security: 'security', craft: 'production', water_infra: 'farming', food: 'farming', market: 'shops', housing: 'housing', storage: 'construction' } as Record<string, string>)[e.role] ?? 'other', state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time,
       missing: miss.length ? miss.map(kn) : null, missing_buildings: null, materials: matLines(e),
       short: short.length ? short.map((n) => ({ component: n.item, quantity: n.need - n.have })) : null,
     }
@@ -1240,7 +1240,7 @@ function buildingView(args: Record<string, unknown>) {
   const view: BuildingView = {
     id: b.id, building: nameOf(b.type), role, tier: 1, kind, state: going ? 'building' : 'complete', mode, x: b.x, y: b.y, w: b.w, h: b.h, rotated: b.rotated,
     upkeep: b.type === 'road' ? 2 : 20, effects: EFFECTS[b.type] ?? null, can_manage: !b.priv || !!b.mine, started_at: null, finish_at: null, left_seconds: 0, progress_percent: 0,
-    stock: null, stock_used: 0, stock_capacity: 0, literacy_percent: 0, teaching: false, treasury: 0, population: 0, research: null, has_upgrade: false, upgrades: null,
+    stock: null, stock_used: 0, stock_capacity: 0, literacy_percent: 0, teaching: false, treasury: 0, population: 0, research: null, has_upgrade: false, upgrades: null, shop: null,
   }
   if (going) {
     const started = b.started ?? Date.now(), finish = b.finish ?? Date.now()
@@ -1318,7 +1318,9 @@ const MAT_BASE_CAP = 100
 function materialsView(bought?: { item: Named; qty: number; total: number }) {
   const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
   const stock = Object.keys(MAT_STOCK).sort().map((c) => ({ item: goods(c), qty: MAT_STOCK[c] }))
-  const view: MaterialsView = { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: MAT_BASE_CAP, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
+  const view: MaterialsView = { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: MAT_BASE_CAP,
+    classes: [{ class: 'bulk', used, capacity: 60, reserved: 4 }, { class: 'food', used: 0, capacity: 20, reserved: 0 }, { class: 'goods', used: 0, capacity: 20, reserved: 0 }],
+    stores: [{ building: goods('granary'), kept: false }], wage: 40, spoil_bps: 30, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
   const acts: MockAct[] = []
   if (IS_HEAD) for (const l of MARKET) for (const q of [5, 10, 25]) acts.push(A('materials.buy', 'settlement.materials.buy', { item: l.item.code, qty: String(q) }, { subject: l.item.code }))
   return mockOk('village_materials', view, [...acts, A('village.work', 'settlement.work'), A('village.build', 'settlement.build'), back('settlement.overview'), refreshA('settlement.materials')])

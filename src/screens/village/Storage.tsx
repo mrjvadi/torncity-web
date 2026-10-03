@@ -5,14 +5,19 @@
 // from the civic hall and the granary, so a village with no granary can still
 // see its stock. Also the server screen `village_materials`.
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { GoodsTools, useGoodsFilter } from '../../ui/v6/goodsFilter'
+import { FillBar, ItemGrid, itemIconName } from '../../ui/v6/ItemGrid'
+import GoodsCard from '../../ui/v6/GoodsCard'
+import { CardGrid, PCard, PTabs } from '../../ui/v6/panel'
+import type { InventoryView } from '../../api/views.gen'
 import Popup, { ActionButton, ActionRow, CostSummary, Hero, Medallion, RequirementList } from '../../ui/Popup'
 import { Slab } from '../../kit'
-import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
+import { Note } from '../../ui/Popup'
+import { Card, Empty, Header, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
 import { money } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
-import { t } from '../../i18n'
+import { t, type Key } from '../../i18n'
 import type { ScreenProps } from '../types'
 import type { MaterialBuyConfirmView, MaterialMarketLineView, VillageMaterialsView } from '../../api/types'
 import { useContentNames, useVillageCommand } from '../../village/useVillage'
@@ -49,36 +54,74 @@ export default function Storage({ response, openLocal }: ScreenProps) {
   }
 
   const stock = v?.stock ?? []
-  // the store's goods: search, the catalogue's categories, sorting (the market is a screen of its own)
+  // the store's goods: search, the shelf groups, sorting (the market is a screen of its own)
   const rows = useMemo(() => stock.map((s) => ({ item: s.item, name: goods(s.item), category: names.category(['component', 'item'], s.item.code), qty: s.qty })), [stock, names]) // eslint-disable-line react-hooks/exhaustive-deps
   const f = useGoodsFilter(rows, ['name', 'qty'])
+  const [tab, setTab] = useState<'city' | 'mine'>('city')
+  const [mine, setMine] = useState<InventoryView | null>(null)
+  useEffect(() => {
+    if (tab !== 'mine') return
+    void cmd('inventory.show', {}, { silent: true }).then((r) => { if (r.ok && r.res?.view) setMine(r.res.view as unknown as InventoryView) })
+  }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
+  const [pick, setPick] = useState<{ code: string; name: string; qty: number } | null>(null)
   if (loading && !v) return <ScreenScroll><Header title={t('storage.title')} tone="sapphire" onBack={back} /></ScreenScroll>
   const market = v?.market ?? []
-  const frac = v && v.capacity > 0 ? Math.min(1, v.used / v.capacity) : 0
-  const full = !!v && v.capacity > 0 && v.used >= v.capacity
+  const reserved = (v?.classes ?? []).reduce((n, c) => n + c.reserved, 0)
+  const full = !!v && v.capacity > 0 && v.used + reserved >= v.capacity
+
+  async function move(command: 'settlement.stock.donate' | 'settlement.stock.take', qty: number) {
+    if (!pick) return
+    setBusy(true)
+    const r = await cmd(command, { item: pick.code, qty: String(qty) }, { write: true })
+    setBusy(false)
+    setPick(null)
+    if (r.ok && r.res?.view) setLocal({ view: r.res.view as unknown as VillageMaterialsView, base: fetched })
+    else void refresh()
+  }
 
   return (
     <ScreenScroll>
       <Header title={t('storage.title')} tone="sapphire" onBack={back} onRefresh={() => { setLocal(null); void refresh() }} />
-      {v && (
+      <PTabs tabs={[{ key: 'city', label: t('sm.tab.city') }, { key: 'mine', label: t('sm.tab.home') }]} value={tab} onChange={(k) => setTab(k as 'city' | 'mine')} />
+
+      {tab === 'mine' && (
+        <>
+          {!mine?.home && <Notice>{t('sm.home.none')}</Notice>}
+          {mine?.home && (
+            <>
+              <FillBar used={mine.home.used} capacity={mine.home.capacity} label={t('sm.home.title')} figures={`${formatNumber(mine.home.used)} / ${formatNumber(mine.home.capacity)}`} />
+              {!mine.home.here && <Notice>{t('sm.home.away')}</Notice>}
+              {(mine.home.lines ?? []).length === 0 ? <Note>{t('sm.home.empty')}</Note>
+                : <ItemGrid cells={(mine.home.lines ?? []).map((l, i) => ({ key: `${l.item.code}${i}`, name: goods(l.item), icon: itemIconName(l.item.code, l.shelf?.group), qty: l.qty }))} label={t('sm.home.title')} />}
+            </>
+          )}
+        </>
+      )}
+
+      {tab === 'city' && v && (
         <>
           {v.bought && (
             <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: goods(v.bought.item), total: money(v.bought.total) })}</Notice>
           )}
-          <Card tone="sapphire">
-            <div className="vs-grid">
-              <div>
-                <div className="nx-stat-label">{t('storage.capacity')}</div>
-                <div className="display" style={{ fontSize: 20 }}><span className="vs-ltr">{formatNumber(v.used)} / {formatNumber(v.capacity)}</span></div>
-              </div>
-              <div>
-                <div className="nx-stat-label">{t('storage.treasury')}</div>
-                <div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div>
-              </div>
-            </div>
-            <Bar frac={frac} color={full ? '#e5484d' : '#5aa0f0'} label={t('storage.used', { p: Math.round(frac * 100) })} />
-            {full && <div className="vh-hint">{t('storage.full')}</div>}
-          </Card>
+          <FillBar used={v.used} reserved={reserved} capacity={v.capacity} label={t('storage.capacity')} figures={`${formatNumber(v.used + reserved)} / ${formatNumber(v.capacity)}`} />
+          {full && <Notice>{t('storage.full')} {t('sm.st.fix_full')}</Notice>}
+          {(v.classes ?? []).map((c) => (
+            <FillBar key={c.class} used={c.used} reserved={c.reserved} capacity={c.capacity} label={t(`sm.st.class.${c.class}` as Key)}
+              figures={`${formatNumber(c.used + c.reserved)} / ${formatNumber(c.capacity)}`} />
+          ))}
+          {(v.stores ?? []).length > 0 && (
+            <>
+              <SectionTitle>{t('sm.st.stores')}</SectionTitle>
+              <CardGrid>
+                {(v.stores ?? []).map((st, i) => (
+                  <PCard key={i} icon="box" title={names.name('building', st.building.code, st.building.name)}
+                    sub={st.kept ? t('sm.st.kept', { wage: money(v.wage) }) : t('sm.st.unkept')} tone={st.kept ? 'good' : 'danger'}
+                    facts={st.kept ? undefined : t('sm.st.unkept_why')} />
+                ))}
+              </CardGrid>
+            </>
+          )}
+          {v.spoil_bps > 0 && <div className="gc-note">{t('sm.st.spoil', { p: `${formatNumber(Math.round(v.spoil_bps) / 100)}٪` })}</div>}
 
           <SectionTitle>{t('storage.stock')}</SectionTitle>
           {stock.length === 0
@@ -87,34 +130,42 @@ export default function Storage({ response, openLocal }: ScreenProps) {
               <>
                 <GoodsTools f={f as never} />
                 {f.shown.length === 0 && <p className="pn-hint">{t('goods.none')}</p>}
-                <div className="gf-list">
-                  {f.shown.map((r) => (
-                    <div key={r.item.code} className="gf-row"><span className="gf-name">{r.name}</span><span className="gf-price">{formatNumber(r.qty ?? 0)}</span></div>
-                  ))}
-                </div>
+                <ItemGrid label={t('storage.stock')}
+                  cells={f.shown.map((r) => ({ key: r.item.code, name: r.name, icon: itemIconName(r.item.code, r.category), qty: r.qty, onClick: () => setPick({ code: r.item.code, name: r.name, qty: r.qty ?? 0 }) }))} />
               </>
             )}
 
-          <SectionTitle>{t('storage.market')}</SectionTitle>
-          <div className="vh-hint" style={{ textAlign: 'start' }}>{t('storage.market_hint', { city })}</div>
+          <SectionTitle>{t('sm.st.procure')}</SectionTitle>
+          <div className="vh-hint" style={{ textAlign: 'start' }}>{t('sm.st.procure_hint', { city })}</div>
           {market.length === 0 && <Empty>{t('storage.market_empty')}</Empty>}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <CardGrid>
             {market.map((m) => (
-              <Card key={m.item.code}>
-                <ListRow icon="box" palette="steel" title={goods(m.item)} sub={t('storage.unit_price', { p: money(m.price) })} right={<Chip>{t('storage.source', { city })}</Chip>} />
-                {v.can_buy && (
-                  <div className="vd-presets">
-                    {(v.presets ?? []).map((q) => (
-                      <Slab key={q} tone="gold" radius={12} lip={3} disabled={busy} onClick={() => void prepare(m, q)}>{t('storage.buy_qty', { q: formatNumber(q) })}</Slab>
-                    ))}
-                  </div>
-                )}
-              </Card>
+              <GoodsCard key={m.item.code} code={m.item.code} name={goods(m.item)} price={t('storage.unit_price', { p: money(m.price) })} source={t('storage.source', { city })}
+                foot={v.can_buy ? (
+                  <span className="ig-src">
+                    {(v.presets ?? []).map((q) => <Slab key={q} tone="gold" radius={12} lip={3} disabled={busy} onClick={() => void prepare(m, q)}>{formatNumber(q)}</Slab>)}
+                  </span>
+                ) : undefined} />
             ))}
-          </div>
+          </CardGrid>
           {!v.can_buy && market.length > 0 && <div className="vh-hint">{t('storage.head_only')}</div>}
         </>
       )}
+
+      <Popup open={!!pick} onClose={() => setPick(null)} title={pick?.name} tone="gold" dismissible={!busy}>
+        {pick && (
+          <>
+            <Note>{t('sm.pop.qty', { n: formatNumber(pick.qty) })}</Note>
+            <Note>{t('sm.st.donate_hint')}</Note>
+            <ActionRow>
+              {[1, 5, 10].map((q) => <ActionButton key={q} tone="green" small busy={busy} onClick={() => void move('settlement.stock.donate', q)}>{t('sm.st.donate')} {formatNumber(q)}</ActionButton>)}
+            </ActionRow>
+            {v?.can_buy
+              ? <ActionRow>{[1, 5, 10].map((q) => <ActionButton key={q} tone="steel" small busy={busy} disabled={pick.qty < q} onClick={() => void move('settlement.stock.take', q)}>{t('sm.st.take')} {formatNumber(q)}</ActionButton>)}</ActionRow>
+              : <Note>{t('sm.st.take_head')}</Note>}
+          </>
+        )}
+      </Popup>
 
       <Popup
         open={!!ask} onClose={() => setAsk(null)} title={t('storage.confirm.title')} tone="green" dismissible={!busy}

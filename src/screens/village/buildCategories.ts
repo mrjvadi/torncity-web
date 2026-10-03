@@ -1,10 +1,11 @@
-// The build catalogue's categories. The content carries each building's `role` (settlement_buildings.yml) and the
-// build menu line passes it on, but no category field exists yet, so the grouping is derived from the role here.
-// Server follow-up: a `build_category` on each settlement building (and function) so content owns this table.
+// The build catalogue's categories. The server owns the grouping (storage and market audit; ADR 0046 build menu): each
+// menu line carries `category` (and the catalogue's `build_category`), one of the codes below, and the content's table
+// `build_category` words them. This file only orders the groups and words them for the tab strip; a code the server
+// adds that is not listed here still shows, at the end, under «سایر».
 
 import type { Key } from '../../i18n'
 
-export type BuildCat = 'housing' | 'shops' | 'construction' | 'production' | 'farming' | 'public' | 'security' | 'other'
+export type BuildCat = string
 
 export const BUILD_CATS: { code: BuildCat; label: Key }[] = [
   { code: 'housing', label: 'build.cat.housing' },
@@ -17,14 +18,7 @@ export const BUILD_CATS: { code: BuildCat; label: Key }[] = [
   { code: 'other', label: 'build.cat.other' },
 ]
 
-const BY_ROLE: Record<string, BuildCat> = {
-  housing: 'housing',
-  market: 'shops', finance: 'shops',
-  infrastructure: 'construction', forestry: 'construction', extraction: 'construction', storage: 'construction',
-  craft: 'production',
-  food: 'farming', water_infra: 'farming',
-  governance: 'public', health: 'public', education: 'public', recreation: 'public', transport: 'public',
-  security: 'security', military: 'security',
-}
+const KNOWN = new Set(BUILD_CATS.map((c) => c.code))
 
-export const buildCatOf = (role: string | undefined): BuildCat => BY_ROLE[role ?? ''] ?? 'other'
+/** The tab of a menu line: the server's own category (an unknown one is «سایر»). */
+export const buildCatOf = (category: string | undefined): BuildCat => (category && KNOWN.has(category) ? category : 'other')
