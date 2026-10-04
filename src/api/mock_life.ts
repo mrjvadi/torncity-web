@@ -40,7 +40,7 @@ export const LIFE_CONTENT: Record<string, { code: string; name: { en: string; fa
   ],
   achievement: [
     { code: 'first_journey', name: { en: 'First journey', fa: 'نخستین سفر' } }, { code: 'first_shift', name: { en: 'First shift', fa: 'نخستین شیفت' } },
-    { code: 'homeowner', name: { en: 'Homeowner', fa: 'صاحب‌خانه' } }, { code: 'graduate', name: { en: 'Graduate', fa: 'فارغ‌التحصیل' } },
+    { code: 'homeowner', name: { en: 'Homeowner', fa: 'صاحب‌خانه' } }, { code: 'graduate', name: { en: 'Graduate', fa: 'دانش‌آموخته' } },
   ],
   avatar: [{ code: 'fox', name: { en: 'Fox', fa: 'روباه' } }, { code: 'wolf', name: { en: 'Wolf', fa: 'گرگ' } }, { code: 'owl', name: { en: 'Owl', fa: 'جغد' } }],
   career_tier: [{ code: 'retail.senior', name: { en: 'Senior seller', fa: 'فروشندهٔ ارشد' } }],
