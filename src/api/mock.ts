@@ -84,7 +84,7 @@ const MOCK_CITY_MAP = {
 const MOCK_PROFILE_ACTIONS = [
   { label: 'بیمارستان', command: 'health.hospital', row: 0, kind: 'secondary', icon: 'hospital' },
   { label: 'شغل من', command: 'job.status', row: 0, kind: 'secondary', icon: 'work' },
-  { label: 'تحصیل', command: 'education.list', row: 1, kind: 'secondary', icon: 'study' },
+  { label: 'آموزش', command: 'education.list', row: 1, kind: 'secondary', icon: 'study' },
   { label: 'بانک', command: 'bank.show', row: 1, kind: 'secondary', icon: 'bank' },
   { label: 'ملک من', command: 'property.mine', row: 2, kind: 'secondary', icon: 'house' },
   { label: 'مغازه‌ها', command: 'shop.list', row: 2, kind: 'secondary', icon: 'cart' },

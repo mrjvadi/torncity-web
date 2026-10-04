@@ -65,7 +65,7 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
   }),
 
   'education.list': () => ({
-    screen: 'education', text: 'تحصیل',
+    screen: 'education', text: 'آموزش',
     view: {
       current: { course: { code: 'mgmt101', name: 'مدیریت پایه' }, percent: 62, remaining_seconds: 5340, paused: false },
       certificates: [{ code: 'first_aid', name: 'کمک‌های اولیه' }, { code: 'english', name: 'زبان انگلیسی' }],
