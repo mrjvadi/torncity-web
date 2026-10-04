@@ -832,7 +832,7 @@ export const uiFa = {
   'crime.until_end': '{t} تا پایان',
   'crime.nerve_left': 'جسارت باقی‌مانده: {a}/{b}',
   'crime.result_later': 'نتیجه وقتی جرم تمام شد، در همین‌جا اعلام می‌شود.',
-  'profile.title': 'پروفایل',
+  'profile.title': 'من',
   'profile.code': 'کد بازیکن',
   'profile.settings': 'تنظیمات',
   'profile.avatar': 'ویرایش آواتار',

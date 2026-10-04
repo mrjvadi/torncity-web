@@ -869,7 +869,7 @@ crime.until_end | {t} تا پایان | {t} to go
 crime.nerve_left | جسارت باقی‌مانده: {a}/{b} | Nerve left: {a}/{b}
 crime.result_later | نتیجه وقتی جرم تمام شد، در همین‌جا اعلام می‌شود. | The result will appear here when the crime ends.
 # -- profile -------------------------------------------------------------------------
-profile.title | پروفایل | Profile
+profile.title | من | Me
 profile.code | کد بازیکن | Player code
 profile.settings | تنظیمات | Settings
 profile.avatar | ویرایش آواتار | Edit avatar

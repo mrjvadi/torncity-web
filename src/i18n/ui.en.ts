@@ -834,7 +834,7 @@ export const uiEn: Record<UiKey, string> = {
   'crime.until_end': '{t} to go',
   'crime.nerve_left': 'Nerve left: {a}/{b}',
   'crime.result_later': 'The result will appear here when the crime ends.',
-  'profile.title': 'Profile',
+  'profile.title': 'Me',
   'profile.code': 'Player code',
   'profile.settings': 'Settings',
   'profile.avatar': 'Edit avatar',
