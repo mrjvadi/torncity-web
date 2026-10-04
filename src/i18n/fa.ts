@@ -306,7 +306,7 @@ export const fa = {
   'event.member_left': '{name} شهر را ترک کرد.',
 
   'refusal.village_no_settlement': 'تو عضو هیچ شهری نیستی.',
-  'refusal.village_not_office_holder': 'فقط شهردار می‌تواند این کار را انجام دهد.',
+  'refusal.village_not_office_holder': 'برای این کار باید منصبی با اجازهٔ لازم داشته باشی.',
   'refusal.village_unbuildable': 'روی این قطعه نمی‌توان ساخت: آب، رودخانه یا شیب زیاد.',
   'refusal.village_occupied': 'این قطعه پیش‌تر ساخته شده است.',
   'refusal.village_out_of_bounds': 'ساختمان از محدودهٔ شهر بیرون می‌زند.',

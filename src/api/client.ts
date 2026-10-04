@@ -206,7 +206,7 @@ export function onView(fn: (view: Record<string, unknown>, screen: string) => vo
 /** Command arguments: strings, except where the contract names a number or a
  * bool (settlement.build.place takes x and y as numbers, rotated as a bool),
  * or a list of lots (settlement.build.place_many takes lots: [{x, y}]). */
-export type CommandArgs = Record<string, string | number | boolean | { x: number; y: number }[]>
+export type CommandArgs = Record<string, string | number | boolean | { x: number; y: number }[] | { permission: string; limit?: number }[]>
 
 export async function runCommand(
   command: string,

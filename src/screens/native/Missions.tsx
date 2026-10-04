@@ -69,7 +69,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
           ))}
         </div>
       )}
-      {!v.board && boards.length === 0 && <Empty>{t(v.tier === 'village' ? 'missions.no_boards_village' : 'missions.no_boards')}</Empty>}
+      {!v.board && boards.length === 0 && <Empty>{t('missions.no_boards')}</Empty>}
 
       {v.board && !v.here && <Notice>{t('missions.need_board')}</Notice>}
       {v.board && (v.missions ?? []).length === 0 && <Empty>{t('missions.empty')}</Empty>}

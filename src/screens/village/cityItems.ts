@@ -2,6 +2,7 @@
 // lists them; the desktop rail shows the same list under «شهر». Nothing here is a ring verb.
 
 import type { Key } from '../../i18n'
+import { holds } from '../../lib/permissions'
 
 export interface CityItem {
   key: string
@@ -12,8 +13,8 @@ export interface CityItem {
   /** ...or a server command whose screen opens */
   command?: string
   icon: string
-  /** only for the holder of the head office (the server's `is_head`) */
-  head?: boolean
+  /** only for a holder of this charter permission (bootstrap `permissions`, owner rule P28) */
+  perm?: string
   /** not for the head: the head cannot leave while holding the office */
   notHead?: boolean
   /** only for a resident */
@@ -27,11 +28,12 @@ export const CITY_ITEMS: CityItem[] = [
   { key: 'progress', label: 'village.btn.progress', local: 'village_progress', icon: 'hammer' },
   { key: 'treasury', label: 'city.treasury', local: 'village_overview', icon: 'coin' },
   { key: 'storage', label: 'storage.open', local: 'village_storage', icon: 'chest' },
-  { key: 'terms', label: 'menu.terms', command: 'settlement.terms', icon: 'scroll', head: true },
+  { key: 'terms', label: 'menu.terms', command: 'settlement.terms', icon: 'scroll', perm: 'lot.sell' },
+  { key: 'charter', label: 'city.charter', command: 'settlement.charter.view', icon: 'banner', resident: true },
   { key: 'leave', label: 'menu.leave', command: 'settlement.leave', icon: 'cross', resident: true, notHead: true },
 ]
 
 /** The entries a viewer sees: head-only ones for the head, resident-only ones for a resident (the server's flags). */
-export function cityItemsFor(s: { is_head?: boolean; resident?: boolean }): CityItem[] {
-  return CITY_ITEMS.filter((it) => !(it.head && !s.is_head) && !(it.notHead && s.is_head) && !(it.resident && s.resident === false))
+export function cityItemsFor(s: { is_head?: boolean; resident?: boolean; permissions?: string[] }): CityItem[] {
+  return CITY_ITEMS.filter((it) => !(it.perm && !holds(s.permissions, it.perm)) && !(it.notHead && s.is_head) && !(it.resident && s.resident === false))
 }

@@ -4,6 +4,7 @@ import VillageCall from './VillageCall'
 import { Knowledge, Overview, Progress, Who } from './Status'
 import Storage from './Storage'
 import CityPanel from './CityPanel'
+import Charter, { CharterChanged } from './Charter'
 import { LaborBoard, LaborMine, LaborSiteScreen } from './Labor'
 import { FlowHost, NATIVE } from './flow'
 import { FLOW_SCREENS } from './screens'
@@ -23,6 +24,9 @@ const screens: ScreenSet = {
     labor_board: LaborBoard,
     labor_site: LaborSiteScreen,
     labor_mine: LaborMine,
+    village_development: CityPanel,
+    village_charter: Charter,
+    village_charter_changed: CharterChanged,
   },
   LOCAL: {
     village_home: VillageHome,

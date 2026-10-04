@@ -124,12 +124,6 @@ eco.service.stocks | بورس | The stock exchange
 eco.service.gold | خرید و فروش طلا | The gold dealer
 eco.service.auction_house | حراج | The auction house
 eco.service.unknown | این خدمت | This service
-eco.stage.village | شهر | city
-eco.stage.town | شهر | city
-eco.stage.city | شهر | city
-eco.stage.country | کشور | country
-eco.stage.support | شهر مرکزی | central city
-eco.stage.unknown | جای دیگر | somewhere else
 eco.someone | یک بازیکن | a player
 eco.walk_there | رفتن به {place} ({t}) | Walk to {place} ({t})
 eco.trade_line | {qty} عدد به {price} | {qty} at {price}
@@ -667,8 +661,7 @@ hub.inbox | پیام‌ها | Messages
 hub.faction | جناح | Faction
 hub.friends | دوستان | Friends
 hub.elections | انتخابات | Elections
-hub.government | دولت شهر | City government
-hub.government_village | شهرداری | City council
+hub.government | شهرداری | City hall
 hub.war | ارتش و جنگ | Army and war
 hub.family | خانواده | Family
 hub.village | شهر من | My city
@@ -1707,8 +1700,6 @@ profile.travel | سفر بین‌شهری | Intercity travel
 common.prev | قبلی | Previous
 common.next | بعدی | Next
 toast.unnamed | یک مورد | An item
-shell.tab.village | شهر | City
-shell.tab.town | شهر | City
 # -- the labour market (hiring board, construction sites) ---------------------
 labor.board.title | تابلوی استخدام | Hiring board
 labor.board.empty | فعلاً آگهی استخدامی نیست. هر ساختمانِ در حال ساخت برای کارگر آگهی می‌دهد. | No jobs are posted right now. Every building going up posts one.
@@ -1824,19 +1815,6 @@ vx.need.knowledge_any | یکی از این دانش‌ها لازم است: {nam
 vx.need.building | یکی از این ساختمان‌ها باید باشد: {names}. اول آن را بساز. | One of these buildings must stand: {names}. Build it first.
 vx.donate.cash_after | پولت بعد از کمک | Your cash afterwards
 vx.donate.treasury_after | خزانه بعد از کمک | Treasury afterwards
-vx.goal.residents | ساکنان: {cur} از {req} | Residents: {cur} of {req}
-vx.goal.literacy | سواد شهر: {cur}% از {req}% | Literacy: {cur}% of {req}%
-vx.goal.buildings | ساختمان‌های ساخته‌شده (بی‌جاده): {cur} از {req} | Buildings built (no roads): {cur} of {req}
-vx.goal.knowledge | دانشی که شهر خودش یاد گرفته: {cur} از {req} | Knowledge the city learned itself: {cur} of {req}
-vx.goal.treasury | خزانه: {cur} از {req} | Treasury: {cur} of {req}
-vx.goal.role_any | یک ساختمان از نوع «{role}» | A building of the kind "{role}"
-vx.goal.role.food.1 | یک ساختمان تأمین خوراک (مزرعه یا دامداری) | A food building (a farm or a stockyard)
-vx.goal.role.education.1 | یک ساختمان آموزشی (کلاس درس) | A teaching building (a classroom)
-vx.goal.role.education.2 | مدرسه | A school
-vx.goal.role.health.1 | یک ساختمان درمانی (خانهٔ بهداشت) | A health building (a health house)
-vx.goal.role.health.2 | درمانگاه | A clinic
-vx.goal.role.market.2 | بازار | A market
-vx.goal.role.security.1 | یک ساختمان امنیتی (دیده‌بانی یا پاسگاه) | A security building (a watch hut or a post)
 vx.res.join_title | ساکن «{village}» می‌شوی؟ | Live in {village}?
 vx.res.join_body | «{village}» خانهٔ تو می‌شود: از خزانه و ساخت‌وساز و دانش مشترکش سهم می‌بری و می‌توانی زمین بخری و خانه بسازی. | {village} becomes your home: you share its treasury, building and knowledge, and you can buy land and build a house.
 vx.res.join_yes | بله، ساکن می‌شوم | Yes, I will live here
@@ -2152,8 +2130,7 @@ soc.act.social.friend_remove | حذف از دوستان | Remove friend
 soc.act.social.friend_remove_yes | بله، حذفش کن | Yes, remove
 soc.act.social.friend_view | دیدن پروفایل | View profile
 # governance
-soc.gov.title | دولت شهر {place} | {place} government
-soc.gov.title_village | شهرداری {place} | {place} city council
+soc.gov.title | شهرداری {place} | {place} city hall
 soc.gov.title_plain | دولت شهر | City government
 soc.gov.no_city | هنوز در شهری نیستی؛ دولت همان جایی است که در آن زندگی می‌کنی. | You are not in a city yet; government belongs to the place you live in.
 soc.gov.no_offices | منصبی اینجا تعریف نشده است. | No offices are set up here.
@@ -2243,7 +2220,6 @@ soc.election.title_plain | انتخابات | Elections
 soc.election.no_city | هنوز در شهری نیستی. هر کس در انتخابات جایی رأی می‌دهد که در آن زندگی می‌کند. | You are not in a city yet. People vote where they live.
 soc.election.none | الان انتخاباتی در جریان نیست. | No election is running right now.
 soc.election.hint | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at city hall and each resident votes once, in secret.
-soc.election.hint_village | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at the city office and each resident votes once, in secret.
 soc.election.of | انتخابات {office} {place} | {office} election in {place}
 soc.election.this | این انتخابات | this election
 soc.election.name.mayor | انتخابات شهرداری {place} | Mayoral election in {place}
@@ -2302,7 +2278,6 @@ soc.refusal.election.none | چنین انتخاباتی پیدا نشد. | No su
 soc.refusal.election.not_candidacy | الان ثبت‌نام نامزدهای {election} باز نیست. | Registration for {election} is not open now.
 soc.refusal.election.not_voting | الان رأی‌گیری {election} باز نیست. | Voting in {election} is not open now.
 soc.refusal.election.away | نامزدی را باید در شهرداریِ همان شهری ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city hall of the city the election is for.
-soc.refusal.election.away_village | نامزدی را باید در شهرداریِ همان شهر ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city office of the city the election is for.
 soc.refusal.election.no_candidate | این نامزد در فهرست نیست. | That candidate is not on the list.
 soc.refusal.election.not_resident | در {election} فقط ساکنان همان‌جا شرکت می‌کنند. | Only residents take part in {election}.
 soc.refusal.election.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که در {election} شرکت کنی. | You have not lived here long enough to take part in {election}.
@@ -4317,7 +4292,6 @@ missions.reward | پاداش: {r} | Reward: {r}
 missions.reward_item | {qty} {item} | {qty} {item}
 missions.open | {n} کار روی تابلو | {n} jobs on the board
 missions.empty | فعلاً کاری روی تابلو نیست. | There are no jobs on the board right now.
-missions.no_boards_village | تابلوی شهر فعلاً خالی است. | The city board is empty for now.
 missions.no_boards | اینجا فعلاً مأموریتی نیست. | There are no missions here for now.
 missions.repeat | هر روز تازه می‌شود | Comes back every day
 missions.wait | {t} دیگر | {t} more
@@ -4742,12 +4716,6 @@ v6.tip.build_idle | چیزی در حال ساخت نیست. بزن تا بساز
 v6.tip.research | پژوهش: {t} دیگر | Research: {t} left
 v6.tip.quest | برو و انجامش بده | Go and do it
 v6.tip.ticker | آخرین پیام | Latest message
-v6.q.residents | ساکن‌ها را به {req} نفر برسان | Reach {req} residents
-v6.q.literacy | سواد را به {req}٪ برسان | Raise literacy to {req}%
-v6.q.buildings | {req} ساختمان بساز | Build {req} buildings
-v6.q.knowledge | {req} دانش پژوهش کن | Research {req} kinds of knowledge
-v6.q.treasury | خزانه را پر کن | Fill the treasury
-v6.q.build_what | {what} بساز | Build: {what}
 v6.ring.info | اطلاعات | Info
 v6.ring.up | ارتقا | Upgrade
 v6.ring.help_build | کمک به ساخت | Help build
@@ -4841,7 +4809,6 @@ soc.friends.pay | پرداخت پول | Send money
 soc.friends.invite | دعوت به جناح من | Invite to my faction
 soc.friends.invite_note | دعوت را فقط کسی می‌تواند بفرستد که در جناح اجازهٔ دعوت دارد. | Only a member who may invite in the faction can send an invitation.
 soc.friends.answer | پاسخ بده | Answer
-v6.q.ready_head | همهٔ هدف‌های پیش‌رو انجام شد | Every goal ahead is done
 build.cat.all | همه | All
 build.cat.housing | مسکن | Housing
 build.cat.shops | فروشگاه و بازار | Shops and markets
@@ -5039,7 +5006,7 @@ training.venue.gym | باشگاه | Gym
 training.efficiency | بازده {p}٪ | {p}% efficiency
 training.fee | هر جلسه {fee} | {fee} a session
 training.free | رایگان | Free
-training.missing | شهردار باید «{name}» بسازد | The head must build a {name}
+training.missing | ساختمان لازم: «{name}» | Building needed: {name}
 training.start | تمرین کن | Train
 training.again | تمرین دوباره | Train again
 training.bonus | تمرین تا حالا {n} واحد (از سقف {cap}) به سقف انرژی‌ات اضافه کرده. | Training has added {n} (of at most {cap}) to your energy bar.
@@ -5054,3 +5021,118 @@ education.open | باز است | Open
 education.not_here_title | اینجا درس داده نمی‌شود | Elsewhere
 ac.work.openings.not_here | کارهایی که در {city} نیست | Jobs {city} does not have
 ac.work.openings.had_in | در {place} هست | Available in {place}
+v6.q.growth_research | پژوهش کن: {what} | Research: {what}
+v6.q.growth_build | بساز: {what} | Build: {what}
+city.next.research | پژوهش | Research
+city.next.build | ساخت | Build
+labor.market.reserved | {n} نفر از مردم شهر مغازه و انبارها را نگه می‌دارند و برای کار روزمزد آزاد نیستند. | {n} of the people keep the shop and the stores, so they are not free for hire.
+labor.market.reserved_from | تا {t} دیگر هنوز در شمار آزادها هستند. | They still count as free for another {t}.
+training.unkept | امروز مربی ندارد؛ مثل زمین باز تمرین می‌شود، رایگان. | No trainer today: it trains like open ground, free.
+# -- charter (offices the players create) -------------------------------------
+charter.title | منشور و منصب‌ها | Charter and offices
+charter.offices | منصب‌ها | Offices
+charter.none | هنوز منصبی نوشته نشده. | No office has been written yet.
+charter.seats | {filled} از {seats} کرسی | {filled} of {seats} seats
+charter.mine_badge | منصب من | My office
+charter.founder | بنیان‌گذار | Founder
+charter.vacant | خالی | Vacant
+charter.new | منصب تازه | New office
+charter.mine | اجازه‌های من | My permissions
+charter.mine_none | تو در هیچ منصبی نیستی. | You hold no office.
+charter.audit | دفتر ثبت | Register
+charter.audit_none | هنوز چیزی ثبت نشده. | Nothing is recorded yet.
+charter.perm_limit | {name} (تا {limit}) | {name} (up to {limit})
+charter.resign | کناره‌گیری | Resign
+charter.close_office | بستن منصب | Close office
+charter.edit | ویرایش | Edit
+charter.office_line | {how}، {filled} از {seats} کرسی پر است | {how}, {filled} of {seats} seats filled
+charter.holders | صاحبان منصب | Holders
+charter.dismiss | برکنار کن | Dismiss
+charter.player_code | کد بازیکن | Player code
+charter.appoint | منصوب کن | Appoint
+charter.may | چه کارهایی از دستش برمی‌آید | What it may do
+charter.edit_title | ویرایش منصب | Edit office
+charter.new_title | منصب تازه | New office
+charter.save | ذخیره | Save
+charter.field.title | نام منصب | Office name
+charter.field.seats | تعداد کرسی | Seats
+charter.field.perms | اجازه‌ها | Permissions
+charter.title_range | نام منصب باید بین {min} تا {max} حرف باشد. | The name must be {min} to {max} characters.
+charter.founder_note | منصب بنیان‌گذار همهٔ اجازه‌ها را دارد؛ فقط نامش را می‌شود عوض کرد. | The founder's office holds every permission; only its name can change.
+charter.not_used | هنوز جایی لازم نیست | not asked for anywhere yet
+charter.not_held | این اجازه را خودت نداری | You do not hold this permission
+charter.no_ceiling | بدون سقف | No ceiling
+charter.ceiling | سقف هر بار | Ceiling per act
+charter.summary | خلاصه | Summary
+charter.untitled | (بدون نام) | (no name)
+charter.sum_seats | {n} کرسی | {n} seats
+charter.sum_none | هنوز اجازه‌ای انتخاب نشده. | No permission chosen yet.
+charter.how.head | منصب بنیان‌گذار | Founder's office
+charter.how.appointment | با انتصاب | By appointment
+charter.how.election | با انتخابات | By election
+charter.action.charter_written | منشور نوشته شد | The charter was written
+charter.action.office_created | منصب «{title}» ساخته شد | Office “{title}” was created
+charter.action.office_changed | منصب «{title}» تغییر کرد | Office “{title}” was changed
+charter.action.office_closed | منصب «{title}» بسته شد | Office “{title}” was closed
+charter.action.seat_filled | یک نفر به «{title}» منصوب شد | Someone was appointed to “{title}”
+charter.action.seat_dismissed | یک نفر از «{title}» برکنار شد | Someone was dismissed from “{title}”
+charter.action.seat_resigned | یک نفر از «{title}» کناره گرفت | Someone resigned from “{title}”
+charter.action.seat_ended | دورهٔ یک نفر در «{title}» تمام شد | Someone's term in “{title}” ended
+charter.action.other | تغییری در منشور ثبت شد | A change was recorded
+charter.group.treasury | خزانه و انبار | Treasury and stock
+charter.group.fiscal | مالیات و قیمت‌ها | Taxes and prices
+charter.group.land | زمین و ساخت‌وساز | Land and building
+charter.group.people | مردم و کار | People and work
+charter.group.knowledge | پژوهش | Research
+charter.group.order | نظم و قانون | Order and law
+charter.group.politics | منصب‌ها و سیاست | Offices and politics
+charter.group.foreign | روابط بیرونی | Foreign affairs
+charter.group.info | اعلان‌ها | Notices
+charter.group.other | سایر | Other
+charter.perm.treasury.spend | خرج از خزانه | Spend from the treasury
+charter.perm.payroll.set | تعیین مزد | Set wages
+charter.perm.budget.allocate | تقسیم بودجه | Split the budget
+charter.perm.storage.take | برداشت از انبار شهر | Take from the city stock
+charter.perm.fiscal.set.sales_tax | تعیین مالیات فروش | Set the sales tax
+charter.perm.fiscal.set.shop_price | تعیین سقف قیمت مغازه | Set the shop price ceiling
+charter.perm.fiscal.set.market_fee | تعیین عوارض بازار | Set the market fee
+charter.perm.fiscal.set.levy | تعیین عوارض شهر | Set the levy
+charter.perm.road.draw | کشیدن جاده | Draw roads
+charter.perm.zone.open | باز کردن محدوده | Open zones
+charter.perm.zone.close | بستن محدوده | Close zones
+charter.perm.lot.sell | فروش زمین و تعیین شرط‌هایش | Sell land and set its terms
+charter.perm.public.build | ساخت ساختمان‌های شهر | Build city buildings
+charter.perm.public.demolish | خراب کردن ساختمان‌های شهر | Demolish city buildings
+charter.perm.citizen.admit | پذیرفتن ساکن | Admit residents
+charter.perm.citizen.ban | بیرون کردن از شهر | Ban from the city
+charter.perm.staff.hire | استخدام کارمند | Hire staff
+charter.perm.staff.fire | اخراج کارمند | Dismiss staff
+charter.perm.jobs.post | آگهی کار گذاشتن | Post jobs
+charter.perm.research.start | شروع پژوهش | Start research
+charter.perm.police.patrol | گشت‌زنی | Patrol
+charter.perm.police.fine | جریمه کردن | Fine
+charter.perm.court.judge | قضاوت | Judge
+charter.perm.election.call | برگزار کردن انتخابات | Call elections
+charter.perm.office.create | ساختن منصب | Create offices
+charter.perm.office.edit | ویرایش منصب | Edit offices
+charter.perm.office.appoint | منصوب کردن | Appoint
+charter.perm.office.dismiss | برکنار کردن | Dismiss
+charter.perm.charter.amend | تغییر منشور | Amend the charter
+charter.perm.treaty.propose | پیشنهاد پیمان | Propose treaties
+charter.perm.union.propose | پیشنهاد اتحاد | Propose unions
+charter.perm.raid.declare | اعلام یورش | Declare raids
+charter.perm.notice.post | زدن اعلان | Post notices
+charter.perm.other | اجازهٔ ویژه | A special permission
+refusal.village_charter_title | نام منصب جور نیست؛ باید چند حرف باشد و کلمهٔ ممنوع نباشد. | That office name does not fit: a few characters and not a reserved word.
+refusal.village_charter_title_taken | منصب دیگری همین نام را دارد. | Another office has that name.
+refusal.village_charter_caps | از سقف تعداد منصب، کرسی یا اجازه بیشتر شده است. | That is over the cap of offices, seats or permissions.
+refusal.village_charter_grant | این اجازه معتبر نیست. | That permission is not valid.
+refusal.village_charter_not_held | اجازه‌ای را که خودت نداری نمی‌توانی به کسی بدهی. | You cannot give a permission you do not hold.
+refusal.village_charter_last_manager | شهر همیشه باید یک صاحب منصبِ دارای حق ویرایش منشور داشته باشد. | The city must always keep an office holder who can edit the charter.
+refusal.village_charter_founder_office | منصب بنیان‌گذار را نمی‌شود بست یا کوچک کرد. | The founder's office cannot be closed or reduced.
+refusal.village_charter_acquisition | این روش پر کردن منصب هنوز باز نشده است. | That way of filling an office is not open yet.
+refusal.village_charter_seats_full | این منصب کرسی خالی ندارد. | That office has no free seat.
+refusal.village_charter_already_seated | این بازیکن همین حالا در این منصب است. | That player already holds this office.
+refusal.village_charter_over_limit | این خرج از سقفِ منصبت بیشتر است. | That costs more than your office may spend at once.
+charter.group_count | {on} از {total} | {on} of {total}
+soc.act.gov.charter | منشور و منصب‌ها | Charter and offices

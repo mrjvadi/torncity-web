@@ -101,10 +101,11 @@ function cityGov(args: Record<string, unknown>) {
     act('gov.history', 'gov.history', { city: place.code }), act('gov.elections', 'election.list'),
     ...(village ? [] : [act('gov.budget', 'city.budget', { city: place.code }), act('gov.laws', 'law.list')]),
     act('gov.my_office', 'gov.office'),
+    act('gov.charter', 'settlement.charter.view'),
     ...(village ? [] : [act('military.ministry', 'military.ministry', { country: COUNTRY.code }, { subject: COUNTRY.code })]),
     back('map.list'), refreshA('gov.city', { city: place.code }),
   ]
-  return mockOk('city_governance', { city: place, sections, holds_office: true, no_city: false, tier: village ? 'village' : 'city', military_open: !village }, acts)
+  return mockOk('city_governance', { city: place, sections, holds_office: true, charter: true, no_city: false, tier: 'city', military_open: !village }, acts)
 }
 
 const AS_VILLAGE_OFFICE = false

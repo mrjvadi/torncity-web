@@ -189,10 +189,14 @@ export interface BootstrapSettlement {
   id: string
   code: string
   name: string
-  tier: 'village' | 'town' | 'city' | string
+  /** always "city" since the promotion ladder was retired: kept for the layout hash, never used for text */
+  tier: string
   world_cell: number
   centre: PlaceRef
+  /** holds any office of the charter */
   is_head: boolean
+  /** the permissions the player holds here (the charter's atomic codes, `fiscal.set:sales_tax` style for a scoped one) */
+  permissions?: string[]
   resident: boolean
   grid_lots: number
   layout_path: string

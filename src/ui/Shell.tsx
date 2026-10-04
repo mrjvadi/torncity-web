@@ -51,18 +51,9 @@ const TAB_HUB: Partial<Record<TabKey, string>> = {
 
 const TAB_ICON: Record<TabKey, string> = { profile: 'user', activity: 'tool', city: 'house', market: 'bag', society: 'banner' }
 const TAB_LABEL: Record<TabKey, Key> = { profile: 'shell.tab.profile', activity: 'shell.tab.activity', city: 'shell.tab.city', market: 'shell.tab.market', society: 'shell.tab.society' }
-const PLACE_LABEL: Record<string, Key> = { village: 'shell.tab.village', town: 'shell.tab.town', city: 'shell.tab.city' }
 
 /** Screens that fill the area edge to edge (3D views), without the screen frame. */
 const FULL_BLEED = new Set(['village_home', 'support_home', 'support_journey', 'village_visit'])
-
-/** Where the player is, for the place tab: a `location` of the bootstrap when the
- * server sends one, else the settlement they live in (a player without one still sees the village call, so
- * the tab reads village). */
-function placeTier(b: unknown): string | undefined {
-  const x = b as { location?: { tier?: string }; settlement?: { tier?: string } } | null | undefined
-  return x?.location?.tier ?? x?.settlement?.tier ?? (x ? 'village' : undefined)
-}
 
 type ScreenKey = { command: string; args?: Record<string, string>; local?: string }
 
@@ -86,7 +77,6 @@ function tabOfScreen(k: ScreenKey): TabKey | null {
  * per hub, again when the place changes. The client holds no rule about which exist. */
 function useHubEntries(enabled: boolean, placeKey: string) {
   const [hubs, setHubs] = useState<Record<string, { code: string; command: string }[]>>({})
-  const [tier, setTier] = useState('')
   useEffect(() => {
     if (!enabled) return
     let cancelled = false
@@ -95,12 +85,11 @@ function useHubEntries(enabled: boolean, placeKey: string) {
       const v = r && r.ok !== false ? (r.view as unknown as HubView | ActivitiesHubView | undefined) : undefined
       if (cancelled || !v) return
       setHubs((h) => ({ ...h, [name]: (v.entries ?? []).map((e) => ({ code: e.code, command: e.command })) }))
-      if (name === 'society') setTier(v.place?.tier ?? '')
     }
     void one('activity', 'activities.hub'); void one('market', 'economy.hub'); void one('society', 'society.hub')
     return () => { cancelled = true }
   }, [enabled, placeKey])
-  return { hubs, tier }
+  return { hubs }
 }
 
 function LiveBoundary({ view, onDone, children }: { view: unknown; onDone: () => void; children: () => ReactNode }) {
@@ -281,7 +270,6 @@ export default function Shell() {
   const events = useEvents()
   const quest = useQuest()
   const ticker = useTicker()
-  const place = placeTier(bootstrap) ?? 'village'
 
   function openWip(s: { key: string; idle: boolean }) {
     if (s.key === 'shift') run('job.status')
@@ -318,9 +306,9 @@ export default function Shell() {
   }, [wipCount, evCount, hasQ, hasT, desktop, ownVillageHome])
 
   // -- desktop: the rail's sections, the keyboard -------------------------------------------------------------------
-  const { hubs, tier } = useHubEntries(desktop, `${locKey}|${settlementId ?? ''}`)
+  const { hubs } = useHubEntries(desktop, `${locKey}|${settlementId ?? ''}`)
   const care = useCare()
-  const placeWord = t(PLACE_LABEL[place] ?? 'shell.tab.city')
+  const placeWord = t('shell.tab.city')
   const tabLabel = (k: TabKey) => (k === 'city' ? placeWord : t(TAB_LABEL[k]))
 
   const sections: RailSection[] = TAB_ORDER.map((k, i) => {
@@ -342,7 +330,7 @@ export default function Shell() {
     } else if (k === 'market') {
       hubItems(ECONOMY_ENTRIES, 'market')
     } else if (k === 'society') {
-      hubItems(SOCIETY_ENTRIES, 'society', (c) => (c === 'government' && tier === 'village' ? 'hub.government_village' : undefined))
+      hubItems(SOCIETY_ENTRIES, 'society')
     } else if (bootstrap?.settlement) {
       const s = bootstrap.settlement
       if (layout?.viewer.can_place && homeIsWorld) items.push({ key: 'build', label: t('v6.rail.build'), onClick: () => openLocal('village_home', { build: '1' }) })
@@ -438,7 +426,7 @@ export default function Shell() {
           {showWorldChrome && (
             <QuestStrip
               quest={quest} ticker={ticker}
-              onQuest={() => run(quest?.command ?? 'settlement.promotion.view')} onTicker={() => run('inbox.show')}
+              onQuest={() => { const c = quest?.command ?? 'settlement.development.view'; if (c === 'settlement.development.view') openLocal('city_panel'); else run(c) }} onTicker={() => run('inbox.show')}
               ownRef={(e) => { els.current.info = e }}
             />
           )}

@@ -17,7 +17,7 @@ import type { ScreenProps } from '../types'
 import type { LaborBoardView, LaborJobView, LaborMarketView, LaborMineView, LaborShiftView, LaborSiteView } from '../../api/laborTypes'
 import * as api from '../../api/client'
 import { buildingName, useBuildingCatalogue, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
-import { iconForRole, RowCard, ROLE_TONE, useVillageView } from './common'
+import { durationText, iconForRole, RowCard, ROLE_TONE, useVillageView } from './common'
 import { useToast } from '../../state/ToastContext'
 import './labor.css'
 
@@ -29,6 +29,7 @@ const hours = (minutes: number) => (Math.max(0, minutes) / 60).toFixed(1)
 // -- the market -----------------------------------------------------------------------------------------
 
 function MarketCard({ m }: { m: LaborMarketView }) {
+  const now = useNow()
   const frac = Math.max(0.04, Math.min(1, m.tightness_bps / 20000))
   return (
     <Card tone={MARKET_TONE[m.level]}>
@@ -41,6 +42,8 @@ function MarketCard({ m }: { m: LaborMarketView }) {
         <span>{t('labor.market.wage', { w: money(m.npc_wage) })}</span>
         <span>{t('labor.market.min', { w: money(m.min_wage) })}</span>
       </div>
+      {m.reserved > 0 && <div className="lb-hint">{t('labor.market.reserved', { n: formatNumber(m.reserved) })}</div>}
+      {m.reserved > 0 && m.reserved_from && <div className="lb-hint">{t('labor.market.reserved_from', { t: durationText(Math.max(0, (Date.parse(m.reserved_from) - now) / 1000)) })}</div>}
       <div className="lb-hint">{t('labor.market.hint')}</div>
     </Card>
   )
@@ -49,7 +52,7 @@ function MarketCard({ m }: { m: LaborMarketView }) {
 // -- one worker on a site ----------------------------------------------------------------------------------
 
 function ShiftRow({ s, now }: { s: LaborShiftView; now: number }) {
-  const left = (Date.parse(s.finish_at) - now) / 1000
+  const left = (Date.parse(s.finish_at ?? "") - now) / 1000
   return (
     <div className="lb-worker">
       <span className="lb-worker-name">{s.worker_npc ? t('labor.npc') : s.worker}</span>
@@ -109,7 +112,7 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
         )}
 
       {v.working && (
-        <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at) - now) / 1000)) })}</Notice>
+        <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })}</Notice>
       )}
       {!done && job && v.can_work && (
         <Slab tone="gold" radius={16} lip={5} onClick={() => void act('settlement.labor.take', { id: job.id })} disabled={busy}>
@@ -275,7 +278,7 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
       {v && (
         <>
           {v.working && (
-            <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at) - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
+            <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
           )}
           {!v.resident && <div className="lb-hint">{t('labor.not_resident')}</div>}
           {jobs.length === 0 && <Empty>{t('labor.board.empty')}</Empty>}
@@ -340,7 +343,7 @@ export function LaborMine({ response, openLocal, run }: ScreenProps) {
             {v.next_level && <div className="lb-hint">{t('labor.mine.next', { n: v.next_shifts, l: t(`labor.level.${v.next_level}` as Key) })}</div>}
           </Card>
           {v.working
-            ? <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at) - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
+            ? <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
             : <Empty>{t('labor.mine.idle')}</Empty>}
           <MarketCard m={v.market} />
           <div className="lb-btns">

@@ -12,7 +12,6 @@ import { Unavailable as UnavailableBlock } from '../../ui/Popup'
 import { t } from '../../i18n'
 import { Btns, isBack, type FlowCtx } from '../village/flow'
 import { Do, backOf, byId, find, nameOf, Facts, Hint, Lead, Page, Panel } from '../economy/kit'
-import { stageName } from '../economy/wording'
 import { MAX_STARS, TABLES, namedOf, skillLevel } from './wording'
 import './companies.css'
 
@@ -81,7 +80,7 @@ export function typeReason(ctx: FlowCtx, u: Unavailable): string {
     const place = u.nearest ? ctx.names.name(TABLES.city, u.nearest.code, u.nearest.name) : t('eco.na.somewhere')
     return t('co.na.only_support', { type, place })
   }
-  return t('co.na.from', { type, stage: stageName(u.stage), here: stageName(u.here) })
+  return t('co.na.from', { type })
 }
 
 /** The buildings a settlement needs for it, as one list ("a workshop, a clinic (level 2)"). */
