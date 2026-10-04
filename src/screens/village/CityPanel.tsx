@@ -92,7 +92,6 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
             onClick={() => (it.command ? run(it.command) : openLocal(it.local!, it.args))}
           />
         ))}
-        <PTile icon="banner" title={t('city.charter')} onClick={() => run('settlement.charter.view')} />
       </div>
     </ScreenScroll>
   )

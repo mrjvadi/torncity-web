@@ -22,6 +22,7 @@ import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIV
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 import * as landMock from './mock_village_land'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
+import { ALL_PERMISSIONS, mockCharter } from './mock_charter'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
   BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, KnowledgeListView, LandCell, LotCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
@@ -260,7 +261,7 @@ export function mockBootstrapSettlement(): BootstrapSettlement {
   const place = mockVillagePlace(GRID)
   return {
     id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'city', world_cell: 18211,
-    centre: place.centre, is_head: IS_HEAD, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: size(), layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
+    centre: place.centre, is_head: IS_HEAD, permissions: IS_HEAD ? ALL_PERMISSIONS : [], resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: size(), layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
   }
 }
 
@@ -1571,6 +1572,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.private.lots': return privateLots(args)
     case 'settlement.tax.pay': return taxPay()
     case 'settlement.terms': return termsView(args)
+    case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': return mockCharter(command, args, IS_HEAD)
     case 'settlement.development.view': return developmentView()
     case 'settlement.promotion.view': case 'settlement.promote': return developmentView()
     case 'settlement.join': return residence(false, args)

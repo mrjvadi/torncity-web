@@ -272,7 +272,7 @@ export const en: Partial<Record<Key, string>> = {
   'event.member_left': '{name} left the city.',
 
   'refusal.village_no_settlement': 'You are not in any city.',
-  'refusal.village_not_office_holder': 'Only the mayor can do this.',
+  'refusal.village_not_office_holder': 'You need an office with the right permission for this.',
   'refusal.village_unbuildable': 'You cannot build on this lot: water, river or a steep slope.',
   'refusal.village_occupied': 'This lot is already built on.',
   'refusal.village_out_of_bounds': 'The building sticks out of the city.',
