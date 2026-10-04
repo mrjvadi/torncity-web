@@ -169,7 +169,7 @@ eco.pay.card_fee | کارمزد کارت در {city} {p} است. | The card fee 
 eco.pay.card_free | پرداخت با کارت در {city} کارمزد ندارد. | Card payments in {city} have no fee.
 eco.pay.by_cash | پرداخت نقد | In cash
 eco.pay.by_card | پرداخت با کارت | By card
-eco.pay.hint | مبلغ را از دکمه‌ها انتخاب کن یا مبلغ دلخواه را بنویس. | Pick an amount or type your own.
+eco.pay.hint | یک مبلغ را انتخاب کن یا مبلغ دلخواه را بنویس. | Pick an amount or type your own.
 eco.pay.cannot_afford | با موجودی فعلی نمی‌توانی چیزی بپردازی. | You cannot pay anything with what you hold.
 eco.pay.confirm_title | تأیید پرداخت به {player} | Confirm paying {player}
 eco.pay.method_cash | از پول نقدت پرداخت می‌شود. | It is paid from your cash.
@@ -2920,14 +2920,14 @@ lf.err.error.not_friends | با این بازیکن دوست نیستی و در�
 lf.err.error.already_friends | از قبل با این بازیکن دوستی؛ او را در بخش دوستان پیدا می‌کنی. | You are already friends with this player; find them under Friends.
 lf.err.error.player_not_found | بازیکن پیدا نشد. | The player was not found.
 lf.err.error.unsupported_language | این زبان در بازی نیست؛ یکی از زبان‌های موجود را در تنظیمات بردار. | That language is not in the game; pick one of the available ones in Settings.
-lf.err.payment.not_accepted | این روش پرداخت اینجا پذیرفته نمی‌شود؛ قیمت را دوباره باز کن و از دکمه‌های همان صفحه بپرداز. | That way of paying is not accepted here; open the price again and pay with the buttons on that page.
+lf.err.payment.not_accepted | این روش پرداخت اینجا پذیرفته نمی‌شود؛ قیمت را دوباره باز کن و از روش‌های همان صفحه بپرداز. | That way of paying is not accepted here; open the price again and pay with a method listed there.
 lf.err.error.not_enough_energy_later | انرژی کافی نداری؛ انرژی کم‌کم پر می‌شود، کمی بعد دوباره امتحان کن. | You do not have enough energy; it refills slowly, try again a little later.
 lf.err.error.not_enough_energy | این کار {needed} انرژی می‌خواهد و تو {current} داری؛ انرژی کم‌کم پر می‌شود، کمی صبر کن. | This takes {needed} energy and you have {current}; it refills slowly, wait a little.
 lf.err.travel.same_city | همین حالا در این شهری؛ مقصد دیگری از نقشه انتخاب کن. | You are already in this city; pick another destination on the map.
 lf.err.travel.no_route | از اینجا راهی به آنجا نیست؛ یکی از مقصدهای نقشه را انتخاب کن. | There is no way there from here; pick one of the destinations on the map.
 lf.err.travel.mode_unavailable | این وسیله در این مسیر رفت‌وآمد نمی‌کند؛ مقصد را دوباره باز کن تا وسیله‌های همین مسیر را ببینی. | This vehicle does not run on this route; open the destination again to see the ones that do.
 lf.err.error.not_found | چیزی که دنبالش بودی پیدا نشد. | What you were looking for was not found.
-lf.err.error.invalid_input | این درخواست را متوجه نشدم؛ از دکمه‌ها استفاده کن. | I did not understand that request; use the buttons.
+lf.err.error.invalid_input | این درخواست را متوجه نشدم؛ دوباره امتحان کن. | I did not understand that request; try again.
 lf.err.error.conflict | این کار همین حالا ممکن نیست؛ چند لحظهٔ دیگر دوباره امتحان کن. | That cannot be done right now; try again in a moment.
 lf.err.error.rate_limited | در زمان کوتاهی درخواست‌های زیادی فرستادی؛ چند ثانیه صبر کن و دوباره امتحان کن. | You sent too many requests in a short time; wait a few seconds and try again.
 lf.err.error.cooldown | کمی صبر کن؛ {time} دیگر می‌توانی دوباره این کار را بکنی. | Wait a little; you can do this again in {time}.
