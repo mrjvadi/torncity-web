@@ -5135,3 +5135,4 @@ refusal.village_charter_seats_full | این منصب کرسی خالی ندار�
 refusal.village_charter_already_seated | این بازیکن همین حالا در این منصب است. | That player already holds this office.
 refusal.village_charter_over_limit | این خرج از سقفِ منصبت بیشتر است. | That costs more than your office may spend at once.
 charter.group_count | {on} از {total} | {on} of {total}
+soc.act.gov.charter | منشور و منصب‌ها | Charter and offices

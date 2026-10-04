@@ -130,7 +130,7 @@ function OfficePopup({ o, v, busy, onClose, onEdit, onClose_, onAppoint, onDismi
 }) {
   const [who, setWho] = useState('')
   const holders = o.holders ?? []
-  const canEdit = v.can_edit && (!o.founder || o.id !== '')
+  const canEdit = v.can_edit
   return (
     <Popup
       onClose={onClose} title={o.title} tone="navy" dismissible={!busy}
@@ -220,13 +220,13 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
             <input className="vd-input" value={title} maxLength={lim.title_max} onChange={(e) => setTitle(e.target.value)} aria-label={t('charter.field.title')} />
           </label>
           {!titleOk && title.length > 0 && <p className="pn-hint pn-bad">{t('charter.title_range', { min: formatNumber(lim.title_min), max: formatNumber(lim.title_max) })}</p>}
-          {!founder && (
+          {(
             <div className="ch-field">
               <span>{t('charter.field.seats')}</span>
               <div className="ch-step">
-                <button type="button" aria-label="-" disabled={seats <= Math.max(1, (office?.holders ?? []).length)} onClick={() => setSeats((n) => n - 1)}>−</button>
+                <button type="button" aria-label="-" disabled={founder || seats <= Math.max(1, (office?.holders ?? []).length)} onClick={() => setSeats((n) => n - 1)}>−</button>
                 <b>{formatNumber(seats)}</b>
-                <button type="button" aria-label="+" disabled={seats >= lim.max_seats} onClick={() => setSeats((n) => n + 1)}>+</button>
+                <button type="button" aria-label="+" disabled={founder || seats >= lim.max_seats} onClick={() => setSeats((n) => n + 1)}>+</button>
               </div>
             </div>
           )}

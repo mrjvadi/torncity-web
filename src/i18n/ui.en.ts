@@ -5039,4 +5039,5 @@ export const uiEn: Record<UiKey, string> = {
   'refusal.village_charter_already_seated': 'That player already holds this office.',
   'refusal.village_charter_over_limit': 'That costs more than your office may spend at once.',
   'charter.group_count': '{on} of {total}',
+  'soc.act.gov.charter': 'Charter and offices',
 }

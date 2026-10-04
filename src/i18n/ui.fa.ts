@@ -5037,6 +5037,7 @@ export const uiFa = {
   'refusal.village_charter_already_seated': 'این بازیکن همین حالا در این منصب است.',
   'refusal.village_charter_over_limit': 'این خرج از سقفِ منصبت بیشتر است.',
   'charter.group_count': '{on} از {total}',
+  'soc.act.gov.charter': 'منشور و منصب‌ها',
 } as const
 
 export type UiKey = keyof typeof uiFa

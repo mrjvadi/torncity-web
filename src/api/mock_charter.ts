@@ -31,7 +31,7 @@ function init(isHead: boolean): State {
   state = {
     seq: 1,
     offices: [
-      { id: '', title: 'شهردار', seats: 1, open: isHead ? 0 : 0, acquisition: 'head', term_days: 0, founder: true, manager: true, mine: isHead, grants: ALL, holders: [isHead ? ME : { name: 'کاوه', code: 'KAV7M3X' }] },
+      { id: 'founder', title: 'شهردار', seats: 1, open: isHead ? 0 : 0, acquisition: 'head', term_days: 0, founder: true, manager: true, mine: isHead, grants: ALL, holders: [isHead ? ME : { name: 'کاوه', code: 'KAV7M3X' }] },
       { id: 'o-sheriff', title: 'کلانتر', seats: 2, open: 1, acquisition: 'appointment', term_days: 0, founder: false, manager: false, mine: false,
         grants: [{ permission: 'police.fine', limit: 500000 }, { permission: 'police.patrol', limit: 0 }, { permission: 'notice.post', limit: 0 }], holders: [{ name: 'نیلو', code: 'NIL4R8D' }] },
     ],
@@ -87,11 +87,11 @@ export function mockCharter(command: string, args: Args, isHead: boolean) {
         const seats = Math.max(1, Number(args.seats ?? 1))
         const o: CharterOfficeView = { id: `o-${++s.seq}`, title, seats, open: seats, acquisition: 'appointment', term_days: Number(args.term_days ?? 0), founder: false, manager: grants.some((g) => g.permission === 'office.edit') && grants.some((g) => g.permission === 'charter.amend'), mine: false, grants, holders: [] }
         s.offices.push(o); log('office_created', o)
-        const f = s.offices[0]; if (f.id === '') f.id = 'o-founder'
+        const f = s.offices[0]; if (f.id === 'founder') f.id = 'o-founder'
         return changed('office_created', title)
       }
       const o = office(); if (!o) return refuse('not_found')
-      if (o.founder) o.title = title
+      if (o.founder) { o.title = title; if (o.id === 'founder') o.id = 'o-founder' }
       else {
         const seats = Math.max(1, Number(args.seats ?? o.seats))
         if (seats < (o.holders ?? []).length) return refuse('charter_seats_full')
