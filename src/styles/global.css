@@ -461,31 +461,11 @@ input {
    centred in the space under the header instead of stranding a slab of
    emptiness below it. */
 .nx-hub-body { display: flex; flex-direction: column; padding-top: 4px; }
-.nx-tilegrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.nx-tile {
-  position: relative; min-width: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-  background-image: var(--girih), linear-gradient(180deg, var(--panel), var(--panel-2));
-  background-size: 46px 46px, auto;
-  background-blend-mode: overlay, normal;
-  border: 1.5px solid var(--gold-soft); border-radius: 14px; padding: 12px 4px 10px;
-  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.14), inset 0 -8px 12px -10px rgba(0,0,0,0.5);
-}
-.nx-tile:active { transform: scale(0.97); }
-.nx-tile-title { font-size: 13px; font-weight: 700; text-align: center; color: var(--text); }
-.nx-tile-sub { font-size: 10.5px; color: var(--text-dim); text-align: center; }
-.nx-tile-badge {
-  position: absolute; top: -6px; left: -6px; background: var(--anar); color: #fff;
-  font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center; padding: 0 4px;
-  border: 1px solid #2a0a0a;
-}
-.nx-tile-ruby { border-color: rgba(229,72,77,0.5); }
 
 .nx-seg { display: flex; flex: none; gap: 8px; overflow-x: auto; padding: 2px 2px 5px; }
 .nx-seg.nx-seg-wrap { flex-wrap: wrap; overflow-x: visible; }
 .nx-seg-opt {
-  flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border-radius: 18px; font-size: 12.5px;
+  flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 6px 14px; border-radius: 18px; font-size: 12.5px;
   background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim);
 }
 .nx-seg-opt.active { background: linear-gradient(180deg, #1c6b4a, #0e3d2a); border-color: var(--leaf); color: #fff; }

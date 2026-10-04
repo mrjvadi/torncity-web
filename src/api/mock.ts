@@ -70,7 +70,7 @@ const MOCK_CITY_MAP = {
     { id: 'company:Q7M2K9B', x: 8, y: 3, w: 2, h: 2, kind: 'company', model: 'company:factory', rot: 90, ref: { table: 'company_type', code: 'factory', company_id: 'Q7M2K9B', owner: 'سارا' }, name: { fa: 'استودیو دانا', en: 'Dana Studio' } },
     { id: 'place:harbour', x: 2, y: 8, w: 2, h: 2, kind: 'place', model: 'place:harbour', rot: 0, ref: { table: 'place', code: 'harbour' }, name: { fa: 'باغ آسمان', en: 'Harbour' } },
     // matches job.status's mock workplace, so the shift-ready world bubble
-    // (CityView) has a real building to anchor itself over
+    // (the world view) has a real building to anchor itself over
     { id: 'place:business_district', x: 6, y: 8, w: 2, h: 2, kind: 'place', model: 'place:bazaar', rot: 0, ref: { table: 'place', code: 'business_district' }, name: { fa: 'فروشگاه‌های البرز', en: 'Alborz Shops' } },
   ],
 }
@@ -84,7 +84,7 @@ const MOCK_CITY_MAP = {
 const MOCK_PROFILE_ACTIONS = [
   { label: 'بیمارستان', command: 'health.hospital', row: 0, kind: 'secondary', icon: 'hospital' },
   { label: 'شغل من', command: 'job.status', row: 0, kind: 'secondary', icon: 'work' },
-  { label: 'تحصیل', command: 'education.list', row: 1, kind: 'secondary', icon: 'study' },
+  { label: 'آموزش', command: 'education.list', row: 1, kind: 'secondary', icon: 'study' },
   { label: 'بانک', command: 'bank.show', row: 1, kind: 'secondary', icon: 'bank' },
   { label: 'ملک من', command: 'property.mine', row: 2, kind: 'secondary', icon: 'house' },
   { label: 'مغازه‌ها', command: 'shop.list', row: 2, kind: 'secondary', icon: 'cart' },

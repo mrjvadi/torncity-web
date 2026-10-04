@@ -138,31 +138,6 @@ export function ListRow({ icon, palette, title, sub, right, tone, onClick }: {
   )
 }
 
-/** A hub grid tile (activity/economy/society hubs): icon, title,
- * subtitle and an optional unread-style badge. */
-export function Tile({ icon, palette, title, sub, badge, tone, onClick }: {
-  icon: string
-  palette?: IconPalette
-  title: string
-  sub?: string
-  badge?: number
-  tone?: Tone
-  onClick: () => void
-}) {
-  return (
-    <button className={`nx-tile${tone ? ` nx-tile-${tone}` : ''}`} onClick={onClick}>
-      {!!badge && <span className="nx-tile-badge">{badge < 100 ? badge : '99+'}</span>}
-      <Icon name={icon} palette={palette ?? 'gold'} size={30} />
-      <span className="nx-tile-title">{title}</span>
-      {sub && <span className="nx-tile-sub">{sub}</span>}
-    </button>
-  )
-}
-
-export function TileGrid({ children }: { children: ReactNode }) {
-  return <div className="nx-tilegrid">{children}</div>
-}
-
 /** Filter chips (crime categories, inbox categories, leaderboard boards…). */
 export function Segmented({ options, value, onChange, wrap }: {
   options: { key: string; label: string }[]

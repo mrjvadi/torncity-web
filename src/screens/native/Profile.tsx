@@ -103,7 +103,6 @@ export default function Profile({ response, loading, run }: ScreenProps) {
 
       <PSec>{t('profile.wealth')}</PSec>
       <div className="pf2-grid">
-        <Fig icon="coin" label={t('profile.cash')} value={money(v.cash)} />
         <Fig icon="bank" label={t('profile.bank')} value={money(v.bank)} />
         <Fig icon="chest" label={t('profile.net_worth')} value={life?.worth?.total !== undefined ? money(life.worth.total) : '—'} />
         <Fig icon="trophy" label={t('profile.wealth_rank')} value={rankName || '—'} />
