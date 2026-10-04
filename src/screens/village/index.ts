@@ -24,6 +24,7 @@ const screens: ScreenSet = {
     labor_board: LaborBoard,
     labor_site: LaborSiteScreen,
     labor_mine: LaborMine,
+    village_development: CityPanel,
     village_charter: Charter,
     village_charter_changed: CharterChanged,
   },

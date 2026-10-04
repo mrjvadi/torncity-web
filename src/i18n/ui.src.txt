@@ -5045,7 +5045,7 @@ charter.perm_limit | {name} (تا {limit}) | {name} (up to {limit})
 charter.resign | کناره‌گیری | Resign
 charter.close_office | بستن منصب | Close office
 charter.edit | ویرایش | Edit
-charter.office_line | {how} · {filled} از {seats} کرسی پر است | {how} · {filled} of {seats} seats filled
+charter.office_line | {how}، {filled} از {seats} کرسی پر است | {how}, {filled} of {seats} seats filled
 charter.holders | صاحبان منصب | Holders
 charter.dismiss | برکنار کن | Dismiss
 charter.player_code | کد بازیکن | Player code
@@ -5134,3 +5134,4 @@ refusal.village_charter_acquisition | این روش پر کردن منصب هن�
 refusal.village_charter_seats_full | این منصب کرسی خالی ندارد. | That office has no free seat.
 refusal.village_charter_already_seated | این بازیکن همین حالا در این منصب است. | That player already holds this office.
 refusal.village_charter_over_limit | این خرج از سقفِ منصبت بیشتر است. | That costs more than your office may spend at once.
+charter.group_count | {on} از {total} | {on} of {total}

@@ -4949,7 +4949,7 @@ export const uiEn: Record<UiKey, string> = {
   'charter.resign': 'Resign',
   'charter.close_office': 'Close office',
   'charter.edit': 'Edit',
-  'charter.office_line': '{how} · {filled} of {seats} seats filled',
+  'charter.office_line': '{how}, {filled} of {seats} seats filled',
   'charter.holders': 'Holders',
   'charter.dismiss': 'Dismiss',
   'charter.player_code': 'Player code',
@@ -5038,4 +5038,5 @@ export const uiEn: Record<UiKey, string> = {
   'refusal.village_charter_seats_full': 'That office has no free seat.',
   'refusal.village_charter_already_seated': 'That player already holds this office.',
   'refusal.village_charter_over_limit': 'That costs more than your office may spend at once.',
+  'charter.group_count': '{on} of {total}',
 }

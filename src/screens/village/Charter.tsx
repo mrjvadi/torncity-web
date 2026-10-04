@@ -239,7 +239,7 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
               return (
                 <div key={g} className="ch-group">
                   <button type="button" className="ch-ghead" aria-expanded={isOpen} onClick={() => setOpenGroup(isOpen ? null : g)}>
-                    <span>{groupName(g)}</span><em>{formatNumber(on)} / {formatNumber(list.length)}</em>
+                    <span>{groupName(g)}</span><em>{t("charter.group_count", { on: formatNumber(on), total: formatNumber(list.length) })}</em>
                   </button>
                   {isOpen && list.map((p) => {
                     const can = !founder && holds(mine.map((x) => x.permission), p.code)

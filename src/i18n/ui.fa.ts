@@ -4947,7 +4947,7 @@ export const uiFa = {
   'charter.resign': 'کناره‌گیری',
   'charter.close_office': 'بستن منصب',
   'charter.edit': 'ویرایش',
-  'charter.office_line': '{how} · {filled} از {seats} کرسی پر است',
+  'charter.office_line': '{how}، {filled} از {seats} کرسی پر است',
   'charter.holders': 'صاحبان منصب',
   'charter.dismiss': 'برکنار کن',
   'charter.player_code': 'کد بازیکن',
@@ -5036,6 +5036,7 @@ export const uiFa = {
   'refusal.village_charter_seats_full': 'این منصب کرسی خالی ندارد.',
   'refusal.village_charter_already_seated': 'این بازیکن همین حالا در این منصب است.',
   'refusal.village_charter_over_limit': 'این خرج از سقفِ منصبت بیشتر است.',
+  'charter.group_count': '{on} از {total}',
 } as const
 
 export type UiKey = keyof typeof uiFa
