@@ -34,7 +34,7 @@ export default function TrainingHome({ response, run }: ScreenProps) {
             badge={t('training.efficiency', { p: formatNumber(Math.round(venue.efficiency_bps / 100)) })}
             facts={
               <>
-                <Lines lines={[venue.fee > 0 ? t('training.fee', { fee: moneyIn(venue.fee) }) : t('training.free')]} />
+                <Lines lines={[venue.unkept ? t('training.unkept') : venue.fee > 0 ? t('training.fee', { fee: moneyIn(venue.fee) }) : t('training.free')]} />
                 {!venue.available && venue.missing && <Need lines={[t('training.missing', { name: buildingName(cat, venue.missing.code, venue.missing.name) })]} />}
               </>
             }

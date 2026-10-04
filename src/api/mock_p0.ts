@@ -83,9 +83,9 @@ export function mockP0Command(command: string, args?: Args) {
     return ok('training_home', {
       place: AS_CITY ? { code: 'support', name: 'شهر مرکزی' } : { code: VILLAGE.code, name: 'آمل' }, energy: 70, max_energy: 100, stamina: 112, strength_level: 2, energy_cost: 10, max_energy_cap: 30,
       venues: [
-        { code: 'yard', efficiency_bps: 4000, fee: 0, available: true, missing: null },
-        ...(AS_CITY ? [{ code: 'gym', efficiency_bps: 10000, fee: 60, available: true, missing: null }]
-          : [{ code: 'ground', efficiency_bps: 6000, fee: 20, available: false, missing: { code: 'training_ground', name: 'زمین تمرین' } }]),
+        { code: 'yard', efficiency_bps: 4000, fee: 0, available: true, missing: null, unkept: false },
+        ...(AS_CITY ? [{ code: 'gym', efficiency_bps: 10000, fee: 60, available: true, missing: null, unkept: false }]
+          : [{ code: 'ground', efficiency_bps: 4000, fee: 0, available: true, missing: null, unkept: true }]),
       ],
     })
   }

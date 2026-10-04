@@ -4911,7 +4911,7 @@ export const uiEn: Record<UiKey, string> = {
   'training.efficiency': '{p}% efficiency',
   'training.fee': '{fee} a session',
   'training.free': 'Free',
-  'training.missing': 'The head must build a {name}',
+  'training.missing': 'Building needed: {name}',
   'training.start': 'Train',
   'training.again': 'Train again',
   'training.bonus': 'Training has added {n} (of at most {cap}) to your energy bar.',
@@ -4932,4 +4932,5 @@ export const uiEn: Record<UiKey, string> = {
   'city.next.build': 'Build',
   'labor.market.reserved': '{n} of the people keep the shop and the stores, so they are not free for hire.',
   'labor.market.reserved_from': 'They still count as free for another {t}.',
+  'training.unkept': 'No trainer today: it trains like open ground, free.',
 }

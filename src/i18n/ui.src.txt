@@ -5006,7 +5006,7 @@ training.venue.gym | باشگاه | Gym
 training.efficiency | بازده {p}٪ | {p}% efficiency
 training.fee | هر جلسه {fee} | {fee} a session
 training.free | رایگان | Free
-training.missing | شهردار باید «{name}» بسازد | The head must build a {name}
+training.missing | ساختمان لازم: «{name}» | Building needed: {name}
 training.start | تمرین کن | Train
 training.again | تمرین دوباره | Train again
 training.bonus | تمرین تا حالا {n} واحد (از سقف {cap}) به سقف انرژی‌ات اضافه کرده. | Training has added {n} (of at most {cap}) to your energy bar.
@@ -5027,3 +5027,4 @@ city.next.research | پژوهش | Research
 city.next.build | ساخت | Build
 labor.market.reserved | {n} نفر از مردم شهر مغازه و انبارها را نگه می‌دارند و برای کار روزمزد آزاد نیستند. | {n} of the people keep the shop and the stores, so they are not free for hire.
 labor.market.reserved_from | تا {t} دیگر هنوز در شمار آزادها هستند. | They still count as free for another {t}.
+training.unkept | امروز مربی ندارد؛ مثل زمین باز تمرین می‌شود، رایگان. | No trainer today: it trains like open ground, free.

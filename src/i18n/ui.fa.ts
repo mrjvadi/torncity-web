@@ -4909,7 +4909,7 @@ export const uiFa = {
   'training.efficiency': 'بازده {p}٪',
   'training.fee': 'هر جلسه {fee}',
   'training.free': 'رایگان',
-  'training.missing': 'شهردار باید «{name}» بسازد',
+  'training.missing': 'ساختمان لازم: «{name}»',
   'training.start': 'تمرین کن',
   'training.again': 'تمرین دوباره',
   'training.bonus': 'تمرین تا حالا {n} واحد (از سقف {cap}) به سقف انرژی‌ات اضافه کرده.',
@@ -4930,6 +4930,7 @@ export const uiFa = {
   'city.next.build': 'ساخت',
   'labor.market.reserved': '{n} نفر از مردم شهر مغازه و انبارها را نگه می‌دارند و برای کار روزمزد آزاد نیستند.',
   'labor.market.reserved_from': 'تا {t} دیگر هنوز در شمار آزادها هستند.',
+  'training.unkept': 'امروز مربی ندارد؛ مثل زمین باز تمرین می‌شود، رایگان.',
 } as const
 
 export type UiKey = keyof typeof uiFa
