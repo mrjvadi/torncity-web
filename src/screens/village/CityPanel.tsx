@@ -8,12 +8,13 @@
 
 import type { ScreenProps } from '../types'
 import { Empty, Header, ScreenScroll } from '../native/kit/Parts'
-import { PBar, PRow, PSec, PTile } from '../../ui/v6/panel'
+import { CardGrid, PBar, PCard, PSec, PTile } from '../../ui/v6/panel'
 import { hasKey, t, type Key } from '../../i18n'
 import { formatNumber } from '../../lib/persian'
 import { useSession } from '../../state/SessionContext'
 import { useVillageView } from './common'
-import { goalLine } from './goals'
+import { useCan } from '../../lib/permissions'
+import { useContentNames } from '../../village/useVillage'
 import { cityItemsFor } from './cityItems'
 import type { DevelopmentDimension, DevelopmentView } from '../../api/views.gen'
 import './village.css'
@@ -38,12 +39,14 @@ function Dimension({ d }: { d: DevelopmentDimension }) {
 }
 
 export default function CityPanel({ run, openLocal }: ScreenProps) {
+  const can = useCan()
+  const names = useContentNames()
   const { bootstrap } = useSession()
   const s = bootstrap?.settlement
   const { view: v, loading } = useVillageView<DevelopmentView>('settlement.development.view', null)
   const name = v?.village ?? s?.name ?? t('city.title')
   const items = cityItemsFor(s ?? {}).filter((it) => it.key !== 'status')
-  const goals = (v?.next ?? []).filter((c) => !c.met)
+  const next = v?.next ?? []
 
   return (
     <ScreenScroll>
@@ -64,16 +67,21 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
             </>
           )}
           <PSec>{t('city.next.title')}</PSec>
-          {goals.length === 0 && <p className="pn-hint">{t('city.next.none')}</p>}
-          {goals.map((c, i) => {
-            const g = goalLine(c)
-            return (
-              <div key={i} className="cp-goal">
-                <div className="pn-kv"><span>{g.text}</span></div>
-                {c.kind !== 'role' && <PBar frac={g.frac} />}
-              </div>
-            )
-          })}
+          {next.length === 0 && <p className="pn-hint">{t('city.next.none')}</p>}
+          <CardGrid>
+            {next.map((c) => {
+              const research = c.kind === 'research'
+              const what = research ? names.name('knowledge', c.code, c.name) : names.name('settlement_building', c.code, c.name)
+              // only the holder of the permission gets the door (P28); others read the suggestion
+              const ok = research ? can('research.start') : can('public.build')
+              return (
+                <PCard
+                  key={`${c.kind}:${c.code}`} icon={research ? 'book' : 'hammer'} title={what} sub={t(research ? 'city.next.research' : 'city.next.build')}
+                  onClick={ok ? () => (research ? openLocal('village_knowledge') : openLocal('village_home', { build: '1' })) : undefined}
+                />
+              )
+            })}
+          </CardGrid>
         </div>
       )}
       <PSec>{t('city.affairs')}</PSec>
@@ -84,7 +92,7 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
             onClick={() => (it.command ? run(it.command) : openLocal(it.local!, it.args))}
           />
         ))}
-        <PTile icon="banner" title={t('city.charter')} onClick={() => run('gov.city')} />
+        <PTile icon="banner" title={t('city.charter')} onClick={() => run('settlement.charter.view')} />
       </div>
     </ScreenScroll>
   )

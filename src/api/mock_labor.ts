@@ -27,6 +27,9 @@ const S = {
   seq: 1,
 }
 
+const RESERVED = 2
+const RESERVED_FROM: string | null = new Date(Date.now() + 36 * 3600_000).toISOString()
+
 function init() {
   if (S.ready) return
   S.ready = true
@@ -70,7 +73,7 @@ function market(): LaborMarketView {
   }
   const level = tight < 4000 ? 'slack' : tight < 10000 ? 'balanced' : tight < 20000 ? 'tight' : 'short'
   return {
-    housing: S.housing, pool, available: Math.max(0, pool - npcWorking), working: S.shifts.length, vacancies, tightness_bps: tight,
+    housing: S.housing, pool, available: Math.max(0, pool - npcWorking - RESERVED), reserved: RESERVED, reserved_from: RESERVED_FROM, working: S.shifts.length, vacancies, tightness_bps: tight,
     level, npc_wage: Math.max(MIN_WAGE, Math.floor((BASE_WAGE * mult) / 10000)), min_wage: MIN_WAGE,
   }
 }

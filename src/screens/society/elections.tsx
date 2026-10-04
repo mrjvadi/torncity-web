@@ -46,7 +46,7 @@ const Elections = screen<ElectionsView>(({ view: v, ctx }) => {
           )
         })}
       </CardGrid>
-      <Hint>{t(v.place.kind === 'village' ? 'soc.election.hint_village' : 'soc.election.hint')}</Hint>
+      <Hint>{t('soc.election.hint')}</Hint>
       <Rest ctx={ctx} skip={(a) => a.id === 'election.open'} />
     </Page>
   )
@@ -150,7 +150,7 @@ const Voted = screen<VotedView>(({ view: v, ctx }) => (
 const ElectionRefusal = screen<ElectionRefusalView>(({ view: v, ctx }) => (
   <Page title={t('soc.refused.title')} tone="ruby">
     <Panel tone="ruby">
-      <Lead tone="bad">{word(`soc.refusal.election.${v.kind === 'away' && v.place.kind === 'village' ? 'away_village' : v.kind}`, t('soc.refusal.unknown'), {
+      <Lead tone="bad">{word(`soc.refusal.election.${v.kind}`, t('soc.refusal.unknown'), {
         election: v.office ? electionTitle(ctx.names, v.office, v.place) : t('soc.election.this'), office: officeName(ctx.names, v.office),
       })}</Lead>
     </Panel>

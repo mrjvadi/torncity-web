@@ -240,7 +240,7 @@ const gap = (code: string, needs: CourseNeed[]): CourseGap => ({ course: cref(co
 function education(page: number, mode: string) {
   const city = AS_CITY || mode === 'city'
   const base: EducationView = {
-    current: null, certificates: null, place: city ? { code: '', name: '' } : VILLAGE, tier: city ? '' : 'village', currency: city ? null : MONEY,
+    current: null, certificates: null, place: city ? { code: '', name: '' } : VILLAGE, tier: city ? '' : 'city', currency: city ? null : MONEY,
     literacy: city ? null : { share_bps: 1800 }, courses: null, elsewhere: null, empty: '', build: null, page: 1, pages: 1,
   }
   let v: EducationView

@@ -247,7 +247,7 @@ function layoutFor(id: string): VillageLayout {
   return {
     version: ver, detail,
     viewer: { member: own, can_place: own && IS_HEAD, ...(own ? { resident: true } : {}) },
-    settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'village', world_cell: own ? 18211 : 18990, centre },
+    settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'city', world_cell: own ? 18211 : 18990, centre },
     grid: { lots: own ? size() : GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
     lots: own ? st.lots : st.otherLots,
     buildings,
@@ -255,16 +255,11 @@ function layoutFor(id: string): VillageLayout {
   }
 }
 
-/** ?tier=city (or town, country) shows the world as a player of that stage sees it; a village by default. */
-function mockTier(): string {
-  try { return new URLSearchParams(location.search).get('tier') || 'village' } catch { return 'village' }
-}
-
 export function mockBootstrapSettlement(): BootstrapSettlement {
   init()
   const place = mockVillagePlace(GRID)
   return {
-    id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: mockTier(), world_cell: 18211,
+    id: OWN_ID, code: 'v-k3x9', name: 'آمل', tier: 'city', world_cell: 18211,
     centre: place.centre, is_head: IS_HEAD, resident: true, emblem: { shape: 'shield', color_a: 'crimson', color_b: 'gold', icon: 'wheat' }, grid_lots: size(), layout_path: `/api/v1/settlements/${OWN_ID}/layout`,
   }
 }
@@ -438,19 +433,6 @@ function knowledgeView() {
   return mockOk('settlement_knowledge_list', view, [...acts, back('settlement.overview'), refreshA('settlement.knowledge')])
 }
 
-/** `?promo=met` shows a village that has taken every step to the next tier. */
-const PROMO_MET = (() => { try { return new URLSearchParams(location.search).get('promo') === 'met' } catch { return false } })()
-
-function promotionView(): PromotionView {
-  const met = PROMO_MET
-  const crit = (kind: string, current: number, required: number, role = '') => ({ kind, role, current: met ? required : current, required, met: met || current >= required })
-  const criteria = [
-    crit('residents', 2, 12), crit('literacy', st.literacy * 100, 5000), crit('buildings', st.buildings.filter((b) => b.state === 'built' && b.type !== 'road').length, 6),
-    crit('knowledge', 2, 4), crit('role', 1, 1, 'education'), crit('role', 0, 1, 'health'), crit('treasury', st.treasury, 20000),
-  ]
-  return { village: 'آمل', from: 'village', to: 'town', criteria, met: criteria.every((c) => c.met), can_promote: IS_HEAD, office: '', settlement_id: OWN_ID }
-}
-
 /** The development readout (G1, `settlement.development.view` -> `village_development`): what the city carries against what
  * it can carry, the service buildings it has, and what could be added next. No stage word, no act. */
 function developmentView() {
@@ -468,18 +450,17 @@ function developmentView() {
       { code: 'knowledge', load: st.know.filter((k) => k.state === 'held').length, capacity: 0 },
     ],
     roles: [...roles.entries()].map(([role, level]) => ({ role, level })),
-    next: promotionView().criteria,
+    next: [{ kind: 'research', code: 'irrigation', name: 'Irrigation' }, { kind: 'build', code: 'school', name: 'School' }],
   }
   return mockOk('village_development', view, [back('settlement.overview'), refreshA('settlement.development.view')])
 }
 
 function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
-  const promo = promotionView()
   const view: VillageOverviewView = {
-    name: 'آمل', tier: 'village', development: false, population: 2, population_cap: 8,
-    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy,
-    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) }, promotion: promo,
+    name: 'آمل', tier: 'city', development: true, population: 2, population_cap: 8,
+    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy, promotion: null,
+    resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) },
     buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
   }
   const acts: MockAct[] = [
@@ -1249,16 +1230,7 @@ function termsView(args: Record<string, unknown>) {
   ])
 }
 
-// -- promotion, residence ---------------------------------------------------------------------------------------
-function promotionScreen(kind: 'view' | 'ask' | 'done') {
-  const v = promotionView()
-  if (kind === 'view') return mockOk('village_promotion', v, [...(v.met && v.can_promote ? [A('village.promote', 'settlement.promote')] : []), back('settlement.overview'), refreshA('settlement.promotion.view')])
-  if (!v.met) return refusal('not_available')
-  if (!v.can_promote) return refusal('not_office_holder')
-  if (kind === 'ask') return mockOk('village_promote_confirm', v, [confirmA('settlement.promote'), back('settlement.overview')])
-  return mockOk('village_promoted', { ...v, from: 'town', to: 'town' }, [A('village.build', 'settlement.build'), A('village.knowledge', 'settlement.knowledge'), back('settlement.overview'), refreshA('settlement.overview')])
-}
-
+// -- residence ---------------------------------------------------------------------------------------------------
 function residence(leaving: boolean, args: Record<string, unknown>) {
   const view: ResidenceView = { leaving, village: 'آمل', home: 'شهر مرکزی', home_code: 'support', cooldown_seconds: 86400, population: 3, settlement_id: OWN_ID }
   const cmd = leaving ? 'settlement.leave' : 'settlement.join'
@@ -1600,8 +1572,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.tax.pay': return taxPay()
     case 'settlement.terms': return termsView(args)
     case 'settlement.development.view': return developmentView()
-    case 'settlement.promotion.view': return promotionScreen('view')
-    case 'settlement.promote': return promotionScreen(args.confirm === 'confirm' ? 'done' : 'ask')
+    case 'settlement.promotion.view': case 'settlement.promote': return developmentView()
     case 'settlement.join': return residence(false, args)
     case 'settlement.leave': return residence(true, args)
     case 'settlement.work': return workView(args)
@@ -1746,13 +1717,12 @@ export function mockElection(): ElectionData | null {
   return { office: 'village_head', opens_at: new Date(MOCK_T0 - 86_400_000).toISOString(), candidacy_ends_at: new Date(MOCK_T0 + 40 * 60_000).toISOString(), voting_ends_at: new Date(MOCK_T0 + 2 * 3_600_000).toISOString() }
 }
 
-/** The next goal the server would send: the first unmet promotion goal (a mission would come first when one is running). */
+/** The next goal the server would send: for the head, the first suggestion of the development readout (a mission would come first
+ * when one is running); residents get none. */
 export function mockGoal(): GoalData | null {
   init()
-  const p = promotionView()
-  const c = (p.criteria ?? []).find((x) => !x.met)
-  if (!c) return p.can_promote ? { code: 'promotion.ready', args: { from: p.from, to: p.to }, progress: 1, target: 1, go_to: 'settlement:promotion.view' } : null
-  return { code: `promotion.${c.kind}`, args: { from: p.from, to: p.to, ...(c.role ? { role: c.role } : {}) }, progress: c.current, target: c.required, go_to: 'settlement:promotion.view' }
+  if (!IS_HEAD) return null
+  return { code: 'growth.build', args: { code: 'school' }, progress: 0, target: 1, go_to: 'settlement:development.view' }
 }
 
 /** A change the settlement channel never announced (its publication was lost): only the

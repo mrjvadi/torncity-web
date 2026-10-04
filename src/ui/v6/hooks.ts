@@ -165,36 +165,24 @@ export function useEvents(): EventSlot[] {
 /** `command` is the screen the goal points at (the server's `go_to` address, ':' read as '.'). */
 export interface Quest { text: string; prog: string; done: boolean; command: string }
 
-/** The quest strip's sentence: the server's next goal (the `goal` entity of state sync: a mission I took, else the
- * village's next unmet promotion goal), one imperative sentence with its progress; green when ready. Nothing when the
- * server sends no goal. */
+/** The quest strip's sentence: the server's next goal (the `goal` entity of state sync: a mission I took, else, for the
+ * head, a next step of the city's growth: `growth.research` or `growth.build` with the content code in `args.code`),
+ * one imperative sentence with its progress. Nothing when the server sends no goal. */
 export function useQuest(): Quest | null {
   const view = useStoreView()
+  const names = useContentNames()
   const g = entityOf(view, 'goal', 'self')
   if (!g) return null
   const [source, kind = ''] = g.code.split('.')
   const command = g.go_to.replace(':', '.')
-  if (source === 'promotion' && kind === 'ready') return { text: t('v6.q.ready_head'), prog: '', done: true, command }
-  if (source === 'promotion') return { ...questOf({ kind, role: g.args.role ?? '', current: g.progress, required: g.target }), command }
+  if (source === 'growth') {
+    const code = g.args.code ?? ''
+    const what = kind === 'research' ? names.name('knowledge', code, '') : names.name('settlement_building', code, '')
+    return { text: t(kind === 'research' ? 'v6.q.growth_research' : 'v6.q.growth_build', { what }), prog: '', done: false, command }
+  }
   const k = `v6.q.mission.${kind}`
   const text = hasKey(k) ? t(k as Key, { req: faNum(g.target) }) : t('v6.q.mission')
   return { text, prog: `${fa(g.progress)}/${fa(g.target)}`, done: false, command }
-}
-
-function questOf(c: { kind: string; role: string; current: number; required: number }): Omit<Quest, 'command'> {
-  const pct = c.required > 0 ? Math.min(100, Math.floor((c.current / c.required) * 100)) : 0
-  switch (c.kind) {
-    case 'residents': return { text: t('v6.q.residents', { req: faNum(c.required) }), prog: `${fa(c.current)}/${fa(c.required)}`, done: false }
-    case 'literacy': return { text: t('v6.q.literacy', { req: faNum(c.required / 100) }), prog: `${fa(pct)}٪`, done: false }
-    case 'buildings': return { text: t('v6.q.buildings', { req: faNum(c.required) }), prog: `${fa(c.current)}/${fa(c.required)}`, done: false }
-    case 'knowledge': return { text: t('v6.q.knowledge', { req: faNum(c.required) }), prog: `${fa(c.current)}/${fa(c.required)}`, done: false }
-    case 'treasury': return { text: t('v6.q.treasury'), prog: `${fa(pct)}٪`, done: false }
-    default: {
-      const k = `vx.goal.role.${c.role}.${c.required}`
-      const what = hasKey(k) ? t(k as Key) : t('vx.goal.role_any', { role: hasKey(`role.${c.role}`) ? t(`role.${c.role}` as Key) : c.role })
-      return { text: t('v6.q.build_what', { what }), prog: '۰/۱', done: false }
-    }
-  }
 }
 
 /** The ticker: the newest notice, worded by the same web wording the toasts use. */

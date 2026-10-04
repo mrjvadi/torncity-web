@@ -124,12 +124,6 @@ eco.service.stocks | بورس | The stock exchange
 eco.service.gold | خرید و فروش طلا | The gold dealer
 eco.service.auction_house | حراج | The auction house
 eco.service.unknown | این خدمت | This service
-eco.stage.village | شهر | city
-eco.stage.town | شهر | city
-eco.stage.city | شهر | city
-eco.stage.country | کشور | country
-eco.stage.support | شهر مرکزی | central city
-eco.stage.unknown | جای دیگر | somewhere else
 eco.someone | یک بازیکن | a player
 eco.walk_there | رفتن به {place} ({t}) | Walk to {place} ({t})
 eco.trade_line | {qty} عدد به {price} | {qty} at {price}
@@ -667,8 +661,7 @@ hub.inbox | پیام‌ها | Messages
 hub.faction | جناح | Faction
 hub.friends | دوستان | Friends
 hub.elections | انتخابات | Elections
-hub.government | دولت شهر | City government
-hub.government_village | شهرداری | City council
+hub.government | شهرداری | City hall
 hub.war | ارتش و جنگ | Army and war
 hub.family | خانواده | Family
 hub.village | شهر من | My city
@@ -1707,8 +1700,6 @@ profile.travel | سفر بین‌شهری | Intercity travel
 common.prev | قبلی | Previous
 common.next | بعدی | Next
 toast.unnamed | یک مورد | An item
-shell.tab.village | شهر | City
-shell.tab.town | شهر | City
 # -- the labour market (hiring board, construction sites) ---------------------
 labor.board.title | تابلوی استخدام | Hiring board
 labor.board.empty | فعلاً آگهی استخدامی نیست. هر ساختمانِ در حال ساخت برای کارگر آگهی می‌دهد. | No jobs are posted right now. Every building going up posts one.
@@ -1824,19 +1815,6 @@ vx.need.knowledge_any | یکی از این دانش‌ها لازم است: {nam
 vx.need.building | یکی از این ساختمان‌ها باید باشد: {names}. اول آن را بساز. | One of these buildings must stand: {names}. Build it first.
 vx.donate.cash_after | پولت بعد از کمک | Your cash afterwards
 vx.donate.treasury_after | خزانه بعد از کمک | Treasury afterwards
-vx.goal.residents | ساکنان: {cur} از {req} | Residents: {cur} of {req}
-vx.goal.literacy | سواد شهر: {cur}% از {req}% | Literacy: {cur}% of {req}%
-vx.goal.buildings | ساختمان‌های ساخته‌شده (بی‌جاده): {cur} از {req} | Buildings built (no roads): {cur} of {req}
-vx.goal.knowledge | دانشی که شهر خودش یاد گرفته: {cur} از {req} | Knowledge the city learned itself: {cur} of {req}
-vx.goal.treasury | خزانه: {cur} از {req} | Treasury: {cur} of {req}
-vx.goal.role_any | یک ساختمان از نوع «{role}» | A building of the kind "{role}"
-vx.goal.role.food.1 | یک ساختمان تأمین خوراک (مزرعه یا دامداری) | A food building (a farm or a stockyard)
-vx.goal.role.education.1 | یک ساختمان آموزشی (کلاس درس) | A teaching building (a classroom)
-vx.goal.role.education.2 | مدرسه | A school
-vx.goal.role.health.1 | یک ساختمان درمانی (خانهٔ بهداشت) | A health building (a health house)
-vx.goal.role.health.2 | درمانگاه | A clinic
-vx.goal.role.market.2 | بازار | A market
-vx.goal.role.security.1 | یک ساختمان امنیتی (دیده‌بانی یا پاسگاه) | A security building (a watch hut or a post)
 vx.res.join_title | ساکن «{village}» می‌شوی؟ | Live in {village}?
 vx.res.join_body | «{village}» خانهٔ تو می‌شود: از خزانه و ساخت‌وساز و دانش مشترکش سهم می‌بری و می‌توانی زمین بخری و خانه بسازی. | {village} becomes your home: you share its treasury, building and knowledge, and you can buy land and build a house.
 vx.res.join_yes | بله، ساکن می‌شوم | Yes, I will live here
@@ -2152,8 +2130,7 @@ soc.act.social.friend_remove | حذف از دوستان | Remove friend
 soc.act.social.friend_remove_yes | بله، حذفش کن | Yes, remove
 soc.act.social.friend_view | دیدن پروفایل | View profile
 # governance
-soc.gov.title | دولت شهر {place} | {place} government
-soc.gov.title_village | شهرداری {place} | {place} city council
+soc.gov.title | شهرداری {place} | {place} city hall
 soc.gov.title_plain | دولت شهر | City government
 soc.gov.no_city | هنوز در شهری نیستی؛ دولت همان جایی است که در آن زندگی می‌کنی. | You are not in a city yet; government belongs to the place you live in.
 soc.gov.no_offices | منصبی اینجا تعریف نشده است. | No offices are set up here.
@@ -2243,7 +2220,6 @@ soc.election.title_plain | انتخابات | Elections
 soc.election.no_city | هنوز در شهری نیستی. هر کس در انتخابات جایی رأی می‌دهد که در آن زندگی می‌کند. | You are not in a city yet. People vote where they live.
 soc.election.none | الان انتخاباتی در جریان نیست. | No election is running right now.
 soc.election.hint | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at city hall and each resident votes once, in secret.
-soc.election.hint_village | نامزدها در شهرداری ثبت‌نام می‌کنند و هر ساکن یک بار و مخفیانه رأی می‌دهد. | Candidates register at the city office and each resident votes once, in secret.
 soc.election.of | انتخابات {office} {place} | {office} election in {place}
 soc.election.this | این انتخابات | this election
 soc.election.name.mayor | انتخابات شهرداری {place} | Mayoral election in {place}
@@ -2302,7 +2278,6 @@ soc.refusal.election.none | چنین انتخاباتی پیدا نشد. | No su
 soc.refusal.election.not_candidacy | الان ثبت‌نام نامزدهای {election} باز نیست. | Registration for {election} is not open now.
 soc.refusal.election.not_voting | الان رأی‌گیری {election} باز نیست. | Voting in {election} is not open now.
 soc.refusal.election.away | نامزدی را باید در شهرداریِ همان شهری ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city hall of the city the election is for.
-soc.refusal.election.away_village | نامزدی را باید در شهرداریِ همان شهر ثبت کنی که انتخابات برای آن است. | You register as a candidate at the city office of the city the election is for.
 soc.refusal.election.no_candidate | این نامزد در فهرست نیست. | That candidate is not on the list.
 soc.refusal.election.not_resident | در {election} فقط ساکنان همان‌جا شرکت می‌کنند. | Only residents take part in {election}.
 soc.refusal.election.too_new | هنوز آن‌قدر اینجا زندگی نکرده‌ای که در {election} شرکت کنی. | You have not lived here long enough to take part in {election}.
@@ -4317,7 +4292,6 @@ missions.reward | پاداش: {r} | Reward: {r}
 missions.reward_item | {qty} {item} | {qty} {item}
 missions.open | {n} کار روی تابلو | {n} jobs on the board
 missions.empty | فعلاً کاری روی تابلو نیست. | There are no jobs on the board right now.
-missions.no_boards_village | تابلوی شهر فعلاً خالی است. | The city board is empty for now.
 missions.no_boards | اینجا فعلاً مأموریتی نیست. | There are no missions here for now.
 missions.repeat | هر روز تازه می‌شود | Comes back every day
 missions.wait | {t} دیگر | {t} more
@@ -4742,12 +4716,6 @@ v6.tip.build_idle | چیزی در حال ساخت نیست. بزن تا بساز
 v6.tip.research | پژوهش: {t} دیگر | Research: {t} left
 v6.tip.quest | برو و انجامش بده | Go and do it
 v6.tip.ticker | آخرین پیام | Latest message
-v6.q.residents | ساکن‌ها را به {req} نفر برسان | Reach {req} residents
-v6.q.literacy | سواد را به {req}٪ برسان | Raise literacy to {req}%
-v6.q.buildings | {req} ساختمان بساز | Build {req} buildings
-v6.q.knowledge | {req} دانش پژوهش کن | Research {req} kinds of knowledge
-v6.q.treasury | خزانه را پر کن | Fill the treasury
-v6.q.build_what | {what} بساز | Build: {what}
 v6.ring.info | اطلاعات | Info
 v6.ring.up | ارتقا | Upgrade
 v6.ring.help_build | کمک به ساخت | Help build
@@ -4841,7 +4809,6 @@ soc.friends.pay | پرداخت پول | Send money
 soc.friends.invite | دعوت به جناح من | Invite to my faction
 soc.friends.invite_note | دعوت را فقط کسی می‌تواند بفرستد که در جناح اجازهٔ دعوت دارد. | Only a member who may invite in the faction can send an invitation.
 soc.friends.answer | پاسخ بده | Answer
-v6.q.ready_head | همهٔ هدف‌های پیش‌رو انجام شد | Every goal ahead is done
 build.cat.all | همه | All
 build.cat.housing | مسکن | Housing
 build.cat.shops | فروشگاه و بازار | Shops and markets
@@ -5054,3 +5021,9 @@ education.open | باز است | Open
 education.not_here_title | اینجا درس داده نمی‌شود | Elsewhere
 ac.work.openings.not_here | کارهایی که در {city} نیست | Jobs {city} does not have
 ac.work.openings.had_in | در {place} هست | Available in {place}
+v6.q.growth_research | پژوهش کن: {what} | Research: {what}
+v6.q.growth_build | بساز: {what} | Build: {what}
+city.next.research | پژوهش | Research
+city.next.build | ساخت | Build
+labor.market.reserved | {n} نفر از مردم شهر مغازه و انبارها را نگه می‌دارند و برای کار روزمزد آزاد نیستند. | {n} of the people keep the shop and the stores, so they are not free for hire.
+labor.market.reserved_from | تا {t} دیگر هنوز در شمار آزادها هستند. | They still count as free for another {t}.

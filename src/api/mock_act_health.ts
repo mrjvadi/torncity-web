@@ -174,7 +174,7 @@ const lineOf = (d: Def): MissionLine => {
 function missionBoard(code: string) {
   seed()
   const board = BOARDS.find((b) => b.code === code)
-  const base = { city: AS_CITY ? 'شهر مرکزی' : 'آمل', city_code: AS_CITY ? 'support' : 'v-k3x9', tier: AS_CITY ? 'city' : 'village', currency: AS_CITY ? null : MONEY }
+  const base = { city: AS_CITY ? 'شهر مرکزی' : 'آمل', city_code: AS_CITY ? 'support' : 'v-k3x9', tier: 'city', currency: AS_CITY ? null : MONEY }
   if (!board) {
     return mockOk('mission_board', { ...base, boards: BOARDS, board: null, here: true, missions: null }, [
       ...BOARDS.map((b) => A('mission.board', 'mission.board', { board: b.code }, { subject: b.code })),

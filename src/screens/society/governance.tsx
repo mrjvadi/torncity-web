@@ -50,7 +50,7 @@ const CityGovernance = screen<CityGovView>(({ view: v, ctx }) => {
     )
   }
   return (
-    <Page title={t(v.tier === 'village' ? 'soc.gov.title_village' : 'soc.gov.title', { place })} tone="gold">
+    <Page title={t('soc.gov.title', { place })} tone="gold">
       {(v.sections ?? []).map((s, i) => (
         <Panel key={i} tone="gold">
           <SectionTitle>{placeName(ctx.names, s.place)}</SectionTitle>

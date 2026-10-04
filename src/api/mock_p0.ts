@@ -13,7 +13,7 @@ const ok = (screen: string, view: unknown) => ({ ok: true, screen, view, actions
 export const AS_CITY = (() => { try { return new URLSearchParams(location.search).get('as') === 'city' } catch { return false } })()
 
 const VILLAGE = { code: 'v-k3x9', name: 'آمل' }
-const PLACE = AS_CITY ? { code: 'support', name: 'شهر مرکزی', tier: 'city', neutral: true } : { ...VILLAGE, tier: 'village', neutral: false }
+const PLACE = AS_CITY ? { code: 'support', name: 'شهر مرکزی', tier: 'city', neutral: true } : { ...VILLAGE, tier: 'city', neutral: false }
 const MONEY = AS_CITY ? null : { code: 'AML', name: 'سکهٔ آمل', symbol: '' }
 
 type Entry = { code: string; name: { en: string; fa: string } }
@@ -39,7 +39,7 @@ function education() {
     })
   }
   return ok('education', {
-    current: null, certificates: null, place: VILLAGE, tier: 'village', currency: MONEY,
+    current: null, certificates: null, place: VILLAGE, tier: 'city', currency: MONEY,
     literacy: { share_bps: 1800 },
     courses: [],
     elsewhere: [{ course: { code: 'first_aid', name: 'First Aid' }, fee: 4200, duration_seconds: 7200, nearest: { code: 'support', name: 'شهر مرکزی' },
@@ -65,9 +65,9 @@ function missions(args: Args) {
   }
   const boards = [{ code: 'village_works', name: 'تابلوی کارهای شهر', place: { code: '', name: '' }, open: 3 }]
   const code = String(args?.board ?? '')
-  if (!code) return ok('mission_board', { city: 'آمل', city_code: VILLAGE.code, tier: 'village', currency: MONEY, boards, board: null, here: true, missions: null })
+  if (!code) return ok('mission_board', { city: 'آمل', city_code: VILLAGE.code, tier: 'city', currency: MONEY, boards, board: null, here: true, missions: null })
   return ok('mission_board', {
-    city: 'آمل', city_code: VILLAGE.code, tier: 'village', currency: MONEY, boards, board: boards[0], here: true,
+    city: 'آمل', city_code: VILLAGE.code, tier: 'city', currency: MONEY, boards, board: boards[0], here: true,
     missions: [
       { mission: { code: 'village_first_lesson', name: 'اولین درس' }, blocked: '', repeatable: false, wait_seconds: 0, reward: { cash: 200, xp: 30, items: null }, objectives: [OBJ('course', 1)] },
       { mission: { code: 'village_bread_run', name: 'نان برای انبار' }, blocked: '', repeatable: true, wait_seconds: 0, reward: { cash: 300, xp: 25, items: null },
@@ -107,7 +107,7 @@ export function mockP0Command(command: string, args?: Args) {
     // what exists where the mock player stands: a village (no bank, no exchange, no property market, a smallholding
     // possible) or the central city (everything the city has)
     const city = mockStandsIn() === 'city'
-    const place = city ? { code: 'support', name: 'شهر مرکزی', tier: 'city', neutral: true } : { code: 'v-k3x9', name: 'آمل', tier: 'village', neutral: false }
+    const place = city ? { code: 'support', name: 'شهر مرکزی', tier: 'city', neutral: true } : { code: 'v-k3x9', name: 'آمل', tier: 'city', neutral: false }
     const e = (code: string, cmd: string) => ({ code, command: cmd })
     if (command === 'economy.hub') {
       return ok('economy_hub', {
@@ -129,7 +129,7 @@ export function mockP0Command(command: string, args?: Args) {
   if (command === 'work.home') {
     const labor = (mockLaborCommand('settlement.labor.board') as { view?: { jobs?: unknown[] | null; working?: unknown } } | null)?.view
     return ok('work_home', {
-      place: { code: 'v-k3x9', name: 'آمل', tier: 'village' }, resident: true, energy: 72, max_energy: 100, working: labor?.working ?? null, is_head: false,
+      place: { code: 'v-k3x9', name: 'آمل', tier: 'city' }, resident: true, energy: 72, max_energy: 100, working: labor?.working ?? null, is_head: false,
       // the jobs are the labour mock's own, so taking one finds it on the board
       jobs: labor?.jobs?.length ? labor.jobs : [{ id: 'j1', building_id: 'b1', building: { code: 'cottage', name: 'Cottage' }, kind: 'construction', employer_kind: 'settlement', employer: '', wage: 21, left: 6, total: 8, progress_bps: 3000, left_minutes: 300, workers: 1, npc_crew: 0, can_take: true, mine: false, points: 60, lot_x: 12, lot_y: 7 }],
       workplaces: [{ id: 'w1', building: { code: 'woodcutter_camp', name: 'Woodcutter camp' }, produces: [{ component: { code: 'timber', name: 'Timber' }, quantity: 4 }], consumes: [], wage: 18, shift_seconds: 600, workers: 2, busy: 0, ready: true }],

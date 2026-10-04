@@ -83,16 +83,11 @@ export function serviceName(code: string): string {
   return hasKey(other) ? t(key(other)) : t('eco.service.unknown')
 }
 
-export function stageName(stage: string): string {
-  const k = `eco.stage.${stage}`
-  return hasKey(k) ? t(key(k)) : t('eco.stage.unknown')
-}
-
 /** Why a service is not here, in a sentence (the stage it starts at, or the neutral city only). */
 export function unavailableReason(u: Unavailable, city?: string): string {
   const service = serviceName(u.service)
   if (u.stage === 'support') return t('eco.na.only_support', { service, place: city ?? t('eco.na.somewhere') })
-  return t('eco.na.from', { service, stage: stageName(u.stage), here: stageName(u.here) })
+  return t('eco.na.from', { service })
 }
 
 /** The wording of a coded notice a screen carries (`notice` + `notice_args`), or '' for none. */
