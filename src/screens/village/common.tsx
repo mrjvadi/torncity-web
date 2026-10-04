@@ -14,6 +14,7 @@ import { useSettlementId, useVillage } from '../../village/useVillage'
 import { Card, type Tone } from '../native/kit/Parts'
 import Icon from '../../ui/Icon'
 import type { ReactNode } from 'react'
+import { words } from '../../lib/duration'
 
 export const ROLE_ICON: Record<string, string> = {
   '': 'house', security: 'shield', craft: 'gears', extraction: 'ore', water_infra: 'world',
@@ -36,14 +37,7 @@ export function iconForRole(role: string | undefined) {
 
 /** "3 ساعت" / "45 دقیقه", the coarsest useful unit, Western digits. */
 export function durationText(seconds: number): string {
-  const s = Math.max(0, Math.round(seconds))
-  if (s >= 86400) return t('time.d', { n: Math.round(s / 86400) })
-  if (s >= 3600) {
-    const h = Math.floor(s / 3600), m = Math.round((s % 3600) / 60)
-    return m ? `${t('time.h', { n: h })} و ${t('time.m', { n: m })}` : t('time.h', { n: h })
-  }
-  if (s >= 60) return t('time.m', { n: Math.round(s / 60) })
-  return t('time.s', { n: s })
+  return words(seconds)
 }
 
 /** A live countdown text "MM:SS" / "H:MM" to an instant, from the server clock. */

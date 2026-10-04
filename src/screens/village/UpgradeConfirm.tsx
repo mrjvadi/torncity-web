@@ -3,6 +3,7 @@
 // clearly greyed out, with its reason, while a requirement is unmet. All of it is the server's own answer
 // (settlement.building.view, mode up); the button starts the same build the old upgrade list started.
 
+import { workText } from '../../lib/duration'
 import { useEffect, useState } from 'react'
 import type { BuildingPanelView, CatalogueBuilding, LayoutBuilding } from '../../api/types'
 import { t } from '../../i18n'
@@ -38,7 +39,7 @@ export default function UpgradeConfirm({ building: b, cat, onBuild, onOpen, onCl
 
   const rows: ConfirmRow[] = [
     { kind: 'info', label: t('v6.up.cost'), value: money(u.cost_money) },
-    { kind: 'info', label: t('v6.up.time'), value: durationText(u.build_time_seconds) },
+    { kind: 'info', label: t('v6.up.time'), value: workText(u.build_time_seconds) },
   ]
   for (const m of u.missing ?? []) rows.push({ kind: 'bad', label: names.name('knowledge', m.code, m.name), fixLabel: t('v6.fix'), onFix: () => { onClose(); onOpen('village_knowledge') } })
   if (!u.available && (u.missing ?? []).length === 0) rows.push({ kind: 'bad', label: t('building.upgrade.locked') })

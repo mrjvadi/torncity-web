@@ -1,4 +1,5 @@
 import type { ScreenProps } from '../types'
+import { endNote } from '../../lib/duration'
 import { Bar, Card, Empty, Header, ScreenScroll } from './kit/Parts'
 import { CardGrid, PCard, PSec } from '../../ui/v6/panel'
 import { Lines, Need } from './kit/cardparts'
@@ -70,6 +71,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
           <div className="display" style={{ fontSize: 18, color: '#fff', margin: '4px 0 8px' }}>{course(v.current.course)}</div>
           <Bar frac={clamp01((v.current.percent ?? 0) / 100)} color="var(--violet)"
             label={v.current.paused ? t('education.paused') : t('common.left', { t: hms(v.current.remaining_seconds) })} />
+          {!v.current.paused && endNote(v.current.remaining_seconds) && <div className="nx-bar-sub">{endNote(v.current.remaining_seconds)}</div>}
         </Card>
       )}
 

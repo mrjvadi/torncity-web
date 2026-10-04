@@ -250,3 +250,6 @@
   .ch-sum { position: sticky; top: 0; align-self: start; padding: 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); }
   .pp-panel:has(.ch-edit) { max-width: 860px; width: min(860px, 92vw); }
 }
+.ch-zone { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 8px; }
+.ch-zone p { margin: 0; }
+.ch-select { height: 48px; width: 100%; }

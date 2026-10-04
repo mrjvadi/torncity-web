@@ -5,6 +5,7 @@
 // each answer a bill first and only pay when sent `confirm`), so nothing is
 // spent by opening a sheet. All render at the document body (Popup).
 
+import { workText } from '../../lib/duration'
 import { useEffect, useState } from 'react'
 import Popup, { ActionButton, ActionRow, CostSummary, Hero, RequirementList, Medallion, Note, Section, type RequirementLine } from '../../ui/Popup'
 import { Emboss } from '../../kit'
@@ -369,7 +370,7 @@ export function HouseSheet({ lot, cat, onClose, store, onNoRoad }: {
                 <Emboss name="house" palette={l.home ? 'gold' : 'amber'} size={34} />
                 <span className="vc-line-text">
                   <span className="vc-line-name">{buildingName(cat, l.building.code, l.building.name)}</span>
-                  <span className="vc-line-sub">{durationText(l.build_time_seconds)} · {l.footprint_w}×{l.footprint_h}</span>
+                  <span className="vc-line-sub">{workText(l.build_time_seconds)} · {l.footprint_w}×{l.footprint_h}</span>
                   {!l.affordable && <span className="vc-line-sub bad">{t('citizen.build.short')}</span>}
                 </span>
                 <span className="vc-line-price">{money(l.total)}</span>
@@ -385,7 +386,7 @@ export function HouseSheet({ lot, cat, onClose, store, onNoRoad }: {
           <Hero><Medallion icon="house" palette="gold" ring="#d99a1f" chip={buildingName(cat, bill.building.code, bill.building.name)} /></Hero>
           <RequirementList lines={[
             { icon: 'money', palette: 'emerald', label: t('citizen.buy.cash'), state: bill.cash >= bill.total ? 'met' : 'missing', detail: t('citizen.buy.need_d', { have: money(bill.cash), need: money(bill.total) }) },
-            { icon: 'stopwatch', palette: 'sapphire', label: t('citizen.build.time'), state: 'info', price: durationText(bill.build_time_seconds) },
+            { icon: 'stopwatch', palette: 'sapphire', label: t('citizen.build.time'), state: 'info', price: workText(bill.build_time_seconds) },
           ]} />
           <CostSummary
             lines={[

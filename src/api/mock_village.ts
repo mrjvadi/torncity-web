@@ -22,7 +22,7 @@ import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIV
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 import * as landMock from './mock_village_land'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
-import { ALL_PERMISSIONS, mockCharter } from './mock_charter'
+import { ALL_PERMISSIONS, MOCK_ZONE, mockCharter } from './mock_charter'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
   BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, KnowledgeListView, LandCell, LotCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
@@ -460,7 +460,7 @@ function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
   const view: VillageOverviewView = {
     name: 'آمل', tier: 'city', development: true, population: 2, population_cap: 8,
-    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy, promotion: null,
+    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy, promotion: null, zone_minutes: MOCK_ZONE,
     resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) },
     buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
   }
@@ -1502,7 +1502,7 @@ function materialsBuy(args: Record<string, unknown>) {
 const SHOP_SH = { code: 'food.staples', group: 'food', label: 'خوراک پایه', group_label: 'item_shelf_group.food' }
 function shopView() {
   const view: Record<string, unknown> = {
-    village: 'آمل', building: true, closed: '', next_delivery: new Date(Date.now() + 3 * 3600_000).toISOString(), delivery_hour: 6, wage: 40,
+    village: 'آمل', building: true, closed: '', next_delivery: new Date(Date.now() + 3 * 3600_000).toISOString(), delivery_hour: 6, zone_minutes: MOCK_ZONE, wage: 40,
     tax_bps: 300, tax_max_bps: 1000, tax_presets: [0, 300, 500, 1000], price_cap_bps: 12000, cap_min_bps: 10000, cap_max_bps: 15000, cap_presets: [10500, 12000, 15000],
     can_set_cap: IS_HEAD, presets: [1, 5, 10], resident: true,
     lines: [
@@ -1572,7 +1572,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.private.lots': return privateLots(args)
     case 'settlement.tax.pay': return taxPay()
     case 'settlement.terms': return termsView(args)
-    case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': return mockCharter(command, args, IS_HEAD)
+    case 'settlement.timezone.set': case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': return mockCharter(command, args, IS_HEAD)
     case 'settlement.development.view': return developmentView()
     case 'settlement.promotion.view': case 'settlement.promote': return developmentView()
     case 'settlement.join': return residence(false, args)

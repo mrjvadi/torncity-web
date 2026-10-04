@@ -4,6 +4,7 @@
 // head's two levers (price ceiling, sales tax) and the mending counter are sections of the same screen.
 // Nothing here moves money by itself: the server's `settlement.shop.*` commands do, and every refusal says what is missing.
 
+import { atText, cityHour, words } from '../../lib/duration'
 import { useState } from 'react'
 import type { ScreenProps } from '../types'
 import type { MoneyView, NoRoomView, VillageShopCheckoutView, VillageShopLine, VillageShopRefusalView, VillageShopView } from '../../api/views.gen'
@@ -43,7 +44,8 @@ function ShopBody({ v, names, onBuy, onWrite, onMoney }: {
   return (
     <>
       {!open && <Notice alert>{closedText}</Notice>}
-      {next > 0 && <Hint>{t('sm.shop.next', { t: hms(next) })}</Hint>}
+      {next > 0 && <Hint>{t('sm.shop.next', { t: words(next), at: atText(v.next_delivery) })}</Hint>}
+      <Hint>{t('sm.shop.daily', { at: cityHour(v.delivery_hour) })}</Hint>
       <PStats items={[
         { label: t('sm.shop.lbl_wage'), value: money(v.wage), gold: true },
         { label: t('sm.shop.lbl_tax'), value: pct(v.tax_bps) },
@@ -193,7 +195,7 @@ const Refusal = flow<VillageShopRefusalView>(({ view: v, ctx }) => {
         {(v.kind === 'no_space' || v.kind === 'too_heavy') && (
           <Facts rows={[{ label: t('sm.noroom.title'), value: t('sm.noroom.space', { qty: '', item: ctx.names.name(['component', 'item'], v.item.code, v.item.name), need: formatNumber(v.need_space), free: formatNumber(v.free_space), short: formatNumber(Math.max(v.need_space - v.free_space, 0)) }) }]} />
         )}
-        {v.kind === 'closed' && v.next_delivery && <Hint>{t('sm.shop.next', { t: hms(Math.max(0, Math.floor((new Date(v.next_delivery).getTime() - serverNow()) / 1000))) })}</Hint>}
+        {v.kind === 'closed' && v.next_delivery && <Hint>{t('sm.shop.next', { t: words(Math.max(0, Math.floor((new Date(v.next_delivery).getTime() - serverNow()) / 1000))), at: atText(v.next_delivery) })}</Hint>}
       </Panel>
       <Btns ctx={ctx} list={ctx.acts.filter((a) => !isBack(a) && a.id !== 'refresh')} />
       <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />

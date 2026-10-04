@@ -2,6 +2,7 @@
 // numbers and times; the words and the formats are this client's. Content names are read from the catalogue
 // by code; the authored name the view carries is the last resort.
 
+import { atText } from '../../lib/duration'
 import { getLang, hasKey, t, type Key } from '../../i18n'
 import { formatNumber } from '../../lib/persian'
 import type { FlowCtx } from '../village/flow'
@@ -17,10 +18,7 @@ export const nameOf = (ctx: FlowCtx, table: string | string[], n: Coded | null |
 
 /** A clock time of an instant (RFC 3339), in the player's language, Western digits. */
 export function clockText(iso: string | null | undefined): string {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return ''
-  return d.toLocaleTimeString(getLang() === 'en' ? 'en-GB' : 'fa-IR-u-nu-latn', { hour: '2-digit', minute: '2-digit' })
+  return atText(iso)
 }
 
 /** A date of an instant, in the player's language, Western digits. */

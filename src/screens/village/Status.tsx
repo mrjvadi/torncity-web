@@ -4,6 +4,7 @@
 // dots. Each keeps its command answer fresh and re-reads it when the
 // settlement channel reports a change.
 
+import { atText } from '../../lib/duration'
 import { useEffect, useState } from 'react'
 import DonateSheet from './Donate'
 import type { ScreenProps } from '../types'
@@ -237,6 +238,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
               <div style={{ marginTop: 10 }}>
                 <div className="nx-stat-label">{t('know.running')}: {kname(v.running.knowledge)}</div>
                 <Bar frac={runFrac(v, now)} color="#8e6cf0" label={countdown(v.running.finish_at, now)} />
+                {v.running.finish_at && <div className="nx-bar-sub">{t('time.until', { at: atText(v.running.finish_at, now) })}</div>}
               </div>
             )}
           </Card>

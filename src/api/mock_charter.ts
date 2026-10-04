@@ -15,12 +15,17 @@ const CATALOGUE: [string, string, boolean, boolean][] = [
   ['police.patrol', 'order', false, false], ['police.fine', 'order', true, false], ['court.judge', 'order', false, false],
   ['election.call', 'politics', false, false], ['office.create', 'politics', false, true], ['office.edit', 'politics', false, true], ['office.appoint', 'politics', false, true], ['office.dismiss', 'politics', false, true], ['charter.amend', 'politics', false, true],
   ['treaty.propose', 'foreign', false, false], ['union.propose', 'foreign', false, false], ['raid.declare', 'foreign', false, false],
-  ['notice.post', 'info', false, false],
+  ['notice.post', 'info', false, false], ['settings.timezone', 'settings', false, true],
 ]
 export const ALL_PERMISSIONS = CATALOGUE.map((c) => c[0])
 const ALL: CharterGrantView[] = CATALOGUE.map(([permission]) => ({ permission, limit: 0 }))
 const LIMITS = { max_offices: 12, max_seats: 20, max_permissions: 40, title_min: 2, title_max: 24 }
 const ME = { name: 'سارا', code: 'K7Q2M9A' }
+
+/** ?zone=330 puts the mock settlement five and a half hours east of UTC (default: Tehran, UTC+3:30). */
+export const MOCK_ZONE = (() => { try { const z = Number(new URLSearchParams(location.search).get('zone')); return Number.isFinite(z) && new URLSearchParams(location.search).has('zone') ? z : 210 } catch { return 210 } })()
+let zone = MOCK_ZONE
+let zoneNext: string | null = null
 
 interface State { offices: CharterOfficeView[]; audit: CharterAuditView[]; seq: number }
 let state: State | null = null
@@ -54,6 +59,7 @@ function view(isHead: boolean): CharterView {
   return {
     village: 'آمل', settlement_id: 'mock-own', offices: s.offices, mine, can_create: holds(mine, 'office.create'), can_edit: holds(mine, 'office.edit'),
     can_appoint: holds(mine, 'office.appoint'), can_dismiss: holds(mine, 'office.dismiss'), permissions, audit: s.audit, limits: LIMITS,
+    zone_minutes: zone, can_set_zone: holds(mine, 'settings.timezone') && !zoneNext, zone_next_change: zoneNext,
   }
 }
 
@@ -64,13 +70,22 @@ type Args = Record<string, unknown>
 
 /** The answer of a charter command, or null when the command is not a charter one. */
 export function mockCharter(command: string, args: Args, isHead: boolean) {
-  if (!command.startsWith('settlement.charter.')) return null
+  if (!command.startsWith('settlement.charter.') && command !== 'settlement.timezone.set') return null
   const s = init(isHead)
   const mine = mineOf(s, isHead)
   const log = (action: string, o: CharterOfficeView) => s.audit.unshift({ action, actor: ME.name, office: o.id, title: o.title, at: new Date().toISOString() })
   const office = () => s.offices.find((o) => o.id === String(args.office ?? ''))
   switch (command) {
     case 'settlement.charter.view': return mockOk('village_charter', view(isHead))
+    case 'settlement.timezone.set': {
+      if (!holds(mine, 'settings.timezone')) return refuse('not_office_holder')
+      const off = Number(args.offset_minutes)
+      if (!Number.isInteger(off) || off % 15 !== 0 || off < -720 || off > 840) return refuse('charter_zone_invalid')
+      if (zoneNext && Date.parse(zoneNext) > Date.now()) return refuse('charter_zone_cooldown')
+      zone = off; zoneNext = new Date(Date.now() + 7 * 86_400_000).toISOString()
+      s.audit.unshift({ action: 'timezone_changed', actor: ME.name, office: '', title: '', at: new Date().toISOString() })
+      return changed('timezone_changed', '')
+    }
     case 'settlement.charter.office.save': {
       const id = String(args.office ?? '').trim()
       const creating = id === ''

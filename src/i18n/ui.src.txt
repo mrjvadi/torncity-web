@@ -1538,7 +1538,7 @@ citizen.build.cost | هزینهٔ ساختمان | Building cost
 citizen.build.permit | مجوز ساخت (به خزانه) | Building permit (to the treasury)
 citizen.build.materials | مصالح خریداری‌شده | Materials bought
 citizen.build.total | جمع نقدی | Cash total
-citizen.build.time | زمان ساخت | Build time
+citizen.build.time | کار لازم | Work needed
 citizen.build.start | تأیید و ساخت - {p} | Confirm and build - {p}
 citizen.build.started | ساخت شروع شد. | Construction started.
 citizen.build.short | پولت کافی نیست | Not enough cash
@@ -4748,7 +4748,7 @@ v6.q.mission.deliver | {req} کالا تحویل بده | Hand in {req} goods
 v6.up.title | ارتقای {name} | Upgrade {name}
 v6.up.go | ارتقا بده | Upgrade
 v6.up.cost | هزینه | Cost
-v6.up.time | زمان | Time
+v6.up.time | کار لازم | Work needed
 v6.up.ready | همه‌چیز آماده است | Everything is ready
 v6.up.blocked | اول موارد قرمز را درست کن | Fix the red rows first
 v6.fix | برو و درستش کن | Go and fix it
@@ -4910,7 +4910,7 @@ sm.shop.open | دکان | Shop
 sm.shop.closed.no_shopkeeper | دکان امروز بسته است: دکان‌داری نیست. | Closed today: no shopkeeper.
 sm.shop.closed.unpaid | دکان امروز بسته است: خزانه دستمزد دکان‌دار را نداد. | Closed today: the treasury could not pay the shopkeeper.
 sm.shop.closed.not_yet | هنوز بار صبح نیامده است. | The morning delivery has not come yet.
-sm.shop.next | بار بعدی: {t} | Next delivery: {t}
+sm.shop.next | بار بعدی: {t} دیگر (ساعت {at}) | Next delivery in {t} (at {at})
 sm.shop.left_today | {n} مانده | {n} left
 sm.shop.buy | خرید | Buy
 sm.shop.fits | جای {n} عدد دارید | Room for {n}
@@ -5136,3 +5136,25 @@ refusal.village_charter_already_seated | این بازیکن همین حالا �
 refusal.village_charter_over_limit | این خرج از سقفِ منصبت بیشتر است. | That costs more than your office may spend at once.
 charter.group_count | {on} از {total} | {on} of {total}
 soc.act.gov.charter | منشور و منصب‌ها | Charter and offices
+# -- real time (a game day is a real day) -------------------------------------
+common.and | و | and
+time.tomorrow | فردا | tomorrow
+time.yesterday | دیروز | yesterday
+time.until | تا {at} | until {at}
+time.city_clock | {at} به وقت شهر | {at} city time
+time.work_hours | {n} نفر-ساعت کار | {n} worker-hours of work
+time.work_minutes | {n} نفر-دقیقه کار | {n} worker-minutes of work
+time.d_short | روز | d
+sm.shop.daily | بار مغازه هر روز ساعت {at} می‌رسد. | The shop is restocked every day at {at}.
+charter.zone | ساعت شهر | City time zone
+charter.zone_now | الان ساعت شهر {at} است | The city clock reads {at}
+charter.zone_device | ساعت دستگاه تو: {zone} | Your device: {zone}
+charter.zone_what | بار مغازه، روز بازار و انتخابات‌ها به وقت شهر هستند؛ ساعت‌ها در همه‌جا به وقت دستگاه خودت نشان داده می‌شود. | Shop deliveries, the market day and elections follow city time; times everywhere else show in your device's time. 
+charter.zone_change | تغییر ساعت شهر | Change the city time zone
+charter.zone_cooldown | تا {at} دوباره نمی‌شود عوضش کرد. | It cannot be changed again until {at}.
+charter.zone_warn | همهٔ ساکنان این تغییر را می‌بینند و تا مدتی نمی‌شود دوباره عوضش کرد. | Every resident sees the change, and it cannot be changed again for a while.
+charter.action.timezone_changed | ساعت شهر عوض شد | The city time zone was changed
+charter.group.settings | تنظیم‌های شهر | City settings
+charter.perm.settings.timezone | تعیین ساعت شهر | Set the city time zone
+refusal.village_charter_zone_invalid | این ساعت درست نیست؛ باید مضرب ربع ساعت و در بازهٔ مجاز باشد. | That offset is not valid: a multiple of 15 minutes within the allowed range.
+refusal.village_charter_zone_cooldown | ساعت شهر را به تازگی عوض کرده‌اند؛ کمی صبر کن. | The time zone was changed recently; wait a while.

@@ -143,7 +143,7 @@ export const fa = {
   'build.start': 'شروع ساخت',
   'build.back': 'بازگشت',
   'build.cost': 'هزینه',
-  'build.time': 'زمان ساخت',
+  'build.time': 'کار لازم',
   'build.treasury': 'خزانه',
   'build.materials': 'مصالح',
   'build.footprint': '{w}×{h} قطعه',

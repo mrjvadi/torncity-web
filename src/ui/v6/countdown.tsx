@@ -8,6 +8,7 @@ import { useServerNow } from '../../lib/ticker'
 import { syncStore } from '../../state/store'
 import { clock } from './format'
 import { t } from '../../i18n'
+import { words } from '../../lib/duration'
 
 /** Seconds left until `endsAt` (ISO string or epoch ms), 0 once past; null when there is no end. Fires `onDone` once on the crossing to zero. */
 export function useCountdown(endsAt: string | number | null | undefined, onDone?: () => void): number | null {
@@ -28,14 +29,7 @@ export function useCountdown(endsAt: string | number | null | undefined, onDone?
 
 /** "3 ساعت و ۱۵ دقیقه" / "۴۵ دقیقه" / "۳۰ ثانیه": the coarsest useful words, Persian digits. */
 export function wordsLeft(s: number): string {
-  const sec = Math.max(0, Math.round(s))
-  if (sec >= 86400) return t('time.d', { n: Math.round(sec / 86400) })
-  if (sec >= 3600) {
-    const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60)
-    return m ? `${t('time.h', { n: h })} و ${t('time.m', { n: m })}` : t('time.h', { n: h })
-  }
-  if (sec >= 60) return t('time.m', { n: Math.round(sec / 60) })
-  return t('time.s', { n: sec })
+  return words(s)
 }
 
 export function Countdown({ endsAt, onDone, format = 'clock', done }: { endsAt: string | number | null | undefined; onDone?: () => void; format?: 'clock' | 'words'; done?: string }) {

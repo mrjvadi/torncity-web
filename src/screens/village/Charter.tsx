@@ -12,7 +12,10 @@ import { Empty, Header, ScreenScroll } from '../native/kit/Parts'
 import { money } from '../native/kit/format'
 import { hasKey, t, type Key } from '../../i18n'
 import { formatNumber } from '../../lib/persian'
+import { fa } from '../../ui/v6/format'
 import { holds } from '../../lib/permissions'
+import { atText, deviceZone, zoneClock, zoneLabel } from '../../lib/duration'
+import { useNow } from '../../village/useVillage'
 import { useToast } from '../../state/ToastContext'
 import { useVillageCommand } from '../../village/useVillage'
 import type { ScreenProps } from '../types'
@@ -44,6 +47,8 @@ export default function Charter({ response }: ScreenProps) {
   const [open, setOpen] = useState<string | null>(null) // an office's key
   const [edit, setEdit] = useState<CharterOfficeView | 'new' | null>(null)
   const [busy, setBusy] = useState(false)
+  const [zoneOpen, setZoneOpen] = useState(false)
+  const now = useNow(30_000)
 
   const offices = v?.offices ?? []
   const mine = v?.mine ?? []
@@ -86,6 +91,19 @@ export default function Charter({ response }: ScreenProps) {
             </div>
           )}
 
+          <PSec>{t('charter.zone')}</PSec>
+          <div className="ch-zone">
+            <p><b>{zoneLabel(v.zone_minutes)}</b> · {t('charter.zone_now', { at: fa(zoneClock(now, v.zone_minutes)) })}</p>
+            {v.zone_minutes !== deviceZone() && <p className="pn-hint">{t('charter.zone_device', { zone: zoneLabel(deviceZone()) })}</p>}
+            <p className="pn-hint">{t('charter.zone_what')}</p>
+            {holds(mine.map((g) => g.permission), 'settings.timezone') && (
+              <>
+                <ActionButton tone="gold" disabled={!v.can_set_zone} onClick={() => setZoneOpen(true)}>{t('charter.zone_change')}</ActionButton>
+                {!v.can_set_zone && v.zone_next_change && <p className="pn-hint">{t('charter.zone_cooldown', { at: atText(v.zone_next_change, now) })}</p>}
+              </>
+            )}
+          </div>
+
           <PSec>{t('charter.mine')}</PSec>
           {mine.length === 0 ? <p className="pn-hint">{t('charter.mine_none')}</p> : (
             <div className="ch-chips">{mine.map((g) => <span key={g.permission} className="nx-chip nx-chip-gold">{grantText(g)}</span>)}</div>
@@ -107,6 +125,12 @@ export default function Charter({ response }: ScreenProps) {
               onAppoint={async (player) => { await act('settlement.charter.appoint', { office: current.id, player }) }}
               onDismiss={async (player) => { await act('settlement.charter.dismiss', { office: current.id, player }) }}
               onResign={async () => { if (await act('settlement.charter.resign', { office: current.id })) setOpen(null) }}
+            />
+          )}
+          {zoneOpen && (
+            <ZonePopup
+              current={v.zone_minutes} busy={busy} onClose={() => setZoneOpen(false)}
+              onSave={async (offset) => { if (await act('settlement.timezone.set', { offset_minutes: offset })) setZoneOpen(false) }}
             />
           )}
           {edit && (
@@ -276,6 +300,27 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
           {selected.length === 0 && <p className="pn-hint">{t('charter.sum_none')}</p>}
         </div>
       </div>
+    </Popup>
+  )
+}
+
+/** The time zone picker: a list of UTC offsets in 15-minute steps, with the local clock each one would give. */
+function ZonePopup({ current, busy, onClose, onSave }: { current: number; busy: boolean; onClose: () => void; onSave: (offset: number) => void }) {
+  const [offset, setOffset] = useState(current)
+  const now = Date.now()
+  const options = useMemo(() => Array.from({ length: (840 + 720) / 15 + 1 }, (_, i) => -720 + i * 15), [])
+  return (
+    <Popup
+      onClose={onClose} title={t('charter.zone_change')} tone="navy" dismissible={!busy}
+      footer={<ActionButton tone="green" busy={busy} disabled={offset === current} onClick={() => onSave(offset)}>{t('charter.save')}</ActionButton>}
+    >
+      <Note>{t('charter.zone_warn')}</Note>
+      <label className="ch-field">
+        <span>{t('charter.zone')}</span>
+        <select className="vd-input ch-select" dir="ltr" value={offset} onChange={(e) => setOffset(Number(e.target.value))} aria-label={t('charter.zone')}>
+          {options.map((o) => <option key={o} value={o}>{zoneLabel(o)} · {zoneClock(now, o)}</option>)}
+        </select>
+      </label>
     </Popup>
   )
 }
