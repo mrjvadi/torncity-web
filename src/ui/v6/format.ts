@@ -31,8 +31,10 @@ export function cashCompact(n: number, unit: { thousand: string; million: string
 /** A countdown: m:ss under an hour, h:mm:ss above. */
 export function clock(totalSeconds: number): string {
   const s = Math.max(0, Math.round(totalSeconds))
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60
+  const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60
   const p = (v: number) => String(v).padStart(2, '0')
+  // from a day on: whole days first, then the clock («۲ روز ۰۴:۱۲:۰۰»); the days word is the app's own
+  if (d) return `${fa(d)} ${isRtl() ? 'روز' : 'd'} ${fa(`${p(h)}:${p(m)}:${p(ss)}`)}`
   return fa(h ? `${h}:${p(m)}:${p(ss)}` : `${p(m)}:${p(ss)}`)
 }
 

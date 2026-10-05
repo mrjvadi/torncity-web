@@ -22,7 +22,7 @@ import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIV
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 import * as landMock from './mock_village_land'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
-import { ALL_PERMISSIONS, mockCharter } from './mock_charter'
+import { ALL_PERMISSIONS, MOCK_ZONE, mockCharter } from './mock_charter'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
   BatchLotFailure, BuildMenuView, BuildingView, ConstructionProgressView, DonateView, KnowledgeListView, LandCell, LotCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
@@ -175,11 +175,11 @@ function init() {
   st.know = [
     { code: 'fire_making', state: 'held', cost: 0, time: 0, buy: 0, missing: [], terrain: true },
     { code: 'archery', state: 'held', cost: 0, time: 0, buy: 0, missing: [], terrain: true },
-    { code: 'irrigation', state: 'researching', cost: 3200, time: 5400, buy: 8000, missing: [], terrain: true, finish: now + 41 * 60000 },
-    { code: 'masonry', state: 'available', cost: 28000, time: 3600, buy: 224000, missing: [], terrain: true },
-    { code: 'writing', state: 'available', cost: 2600, time: 4200, buy: 7200, missing: [], terrain: true },
-    { code: 'metallurgy', state: 'locked', cost: 7000, time: 9000, buy: 0, missing: ['masonry'], terrain: true },
-    { code: 'geometry', state: 'locked', cost: 6000, time: 7200, buy: 0, missing: [], terrain: false },
+    { code: 'irrigation', state: 'researching', cost: 3200, time: 172800, buy: 8000, missing: [], terrain: true, finish: now + 53 * 3600000 },
+    { code: 'masonry', state: 'available', cost: 28000, time: 86400, buy: 224000, missing: [], terrain: true },
+    { code: 'writing', state: 'available', cost: 2600, time: 43200, buy: 7200, missing: [], terrain: true },
+    { code: 'metallurgy', state: 'locked', cost: 7000, time: 345600, buy: 0, missing: ['masonry'], terrain: true },
+    { code: 'geometry', state: 'locked', cost: 6000, time: 129600, buy: 0, missing: [], terrain: false },
   ]
   for (const b of st.buildings) if (b.state === 'under_construction') schedule(b)
   // ?plan=1 opens the mock with a road already drawn out of the grid (the land tool's demo for a resident)
@@ -286,6 +286,8 @@ function roster(): SettlementPlayers {
 function nameOf(code: string): Named { const e = CAT.find((c) => c.code === code) ?? citizenEntry(code); return { code, name: e?.en ?? code } }
 function kn(code: string): Named { return { code, name: KNOW_EN[code] ?? code } }
 const GOODS_EN: Record<string, string> = { timber: 'Timber', stone: 'Stone', iron_bar: 'Iron bar', wheat: 'Wheat' }
+/** The server's estimate of the wait for a build of this much worker effort (a crew of two). */
+const waitOf = (effort: number) => { const shifts = Math.ceil(effort / 60), crew = 2; return { seconds: Math.ceil(shifts / crew) * 60, shifts, crew, shift_seconds: 60 } }
 const goods = (code: string): Named => ({ code, name: GOODS_EN[code] ?? code })
 
 function refusal(kind: string, o: Parameters<typeof mockRefusal>[1] = {}) {
@@ -460,7 +462,7 @@ function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
   const view: VillageOverviewView = {
     name: 'آمل', tier: 'city', development: true, population: 2, population_cap: 8,
-    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy, promotion: null,
+    food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy, promotion: null, zone_minutes: MOCK_ZONE,
     resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) },
     buildings: stands.map((b) => ({ role: CAT.find((c) => c.code === b.type)?.role ?? '', building: nameOf(b.type), tier: 1 })),
   }
@@ -480,7 +482,7 @@ function menuView() {
     const miss = unmet(e)
     const short = materialNeeds(e)
     return {
-      building: nameOf(e.code), role: e.role, category: ({ '': 'public', security: 'security', craft: 'production', water_infra: 'farming', food: 'farming', market: 'shops', housing: 'housing', storage: 'construction' } as Record<string, string>)[e.role] ?? 'other', state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time,
+      building: nameOf(e.code), role: e.role, category: ({ '': 'public', security: 'security', craft: 'production', water_infra: 'farming', food: 'farming', market: 'shops', housing: 'housing', storage: 'construction' } as Record<string, string>)[e.role] ?? 'other', state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time, expected_wait: waitOf(e.time),
       missing: miss.length ? miss.map(kn) : null, missing_buildings: null, materials: matLines(e),
       short: short.length ? short.map((n) => ({ component: n.item, quantity: n.need - n.have })) : null,
     }
@@ -539,7 +541,7 @@ function place(args: Record<string, unknown>) {
   if (args.confirm !== 'confirm') {
     const view: LotConfirmView = {
       settlement_name: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost + fee, auto_roads: street.length,
-      materials: matLines(e), build_time_seconds: e.time,
+      materials: matLines(e), build_time_seconds: e.time, expected_wait: waitOf(e.time),
     }
     return mockOk('settlement_build_confirm', view, [confirmA('settlement.build.place', { code, lot: token(x, y, rotated) }), back('settlement.build.lots', { code })])
   }
@@ -1073,7 +1075,7 @@ function privateMenu() {
     const b = bill(e)
     return {
       building: nameOf(e.code), home: HOMES.has(e.code), class: e.role || 'residential', cost_money: e.cost, permit_fee: PERMIT_FEE,
-      materials: b.mats, build_time_seconds: e.time, footprint_w: e.fp[0], footprint_h: e.fp[1], total: b.total, affordable: cz.cash >= b.total,
+      materials: b.mats, build_time_seconds: e.time, expected_wait: waitOf(e.time), footprint_w: e.fp[0], footprint_h: e.fp[1], total: b.total, affordable: cz.cash >= b.total,
     }
   })
   const view: PrivateMenuView = { village: 'آمل', settlement_id: OWN_ID, cash: cz.cash, owned_lots: owned.length, free_lots: freeOwn, lines }
@@ -1152,7 +1154,7 @@ function privatePlace(args: Record<string, unknown>) {
   const b = bill(e)
   if (cz.cash < b.total) return refusal('citizen_no_cash', { back: { command: 'settlement.private', args: null } })
   if (args.confirm !== 'confirm') {
-    const view: PrivateConfirmView = { village: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time }
+    const view: PrivateConfirmView = { village: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time, expected_wait: waitOf(e.time) }
     return mockOk('settlement_private_confirm', view, [confirmA('settlement.private.place', { code, lot: token(x, y, rotated) }), back('settlement.private.lots', { code })])
   }
   cz.cash -= b.total
@@ -1431,7 +1433,7 @@ function buildingView(args: Record<string, unknown>) {
       view.treasury = st.treasury; view.population = 2
       // the hall can be upgraded once the village knows irrigation (a requirement left unmet, for the confirm popup)
       view.tier = 2; view.has_upgrade = true
-      if (mode === 'up') view.upgrades = [{ building: nameOf('civic_hall'), tier: 3, cost_money: 480, build_time_seconds: 3600, available: false, missing: [kn('irrigation')], needs_tier: '' }]
+      if (mode === 'up') view.upgrades = [{ building: nameOf('civic_hall'), tier: 3, cost_money: 480, build_time_seconds: 3600, expected_wait: waitOf(3600), available: false, missing: [kn('irrigation')], needs_tier: '' }]
       const run = st.know.find((k) => k.state === 'researching')
       view.research = run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? Date.now()).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? Date.now()) - Date.now()) / 1000)) } : null
     }
@@ -1440,7 +1442,7 @@ function buildingView(args: Record<string, unknown>) {
       if (mode === 'up') {
         const sc = CAT.find((c) => c.code === 'school')!
         const miss = unmet(sc)
-        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, available: miss.length === 0, missing: miss.length ? miss.map(kn) : null, needs_tier: '' }]
+        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, expected_wait: waitOf(sc.time), available: miss.length === 0, missing: miss.length ? miss.map(kn) : null, needs_tier: '' }]
       }
     }
   }
@@ -1502,7 +1504,7 @@ function materialsBuy(args: Record<string, unknown>) {
 const SHOP_SH = { code: 'food.staples', group: 'food', label: 'خوراک پایه', group_label: 'item_shelf_group.food' }
 function shopView() {
   const view: Record<string, unknown> = {
-    village: 'آمل', building: true, closed: '', next_delivery: new Date(Date.now() + 3 * 3600_000).toISOString(), delivery_hour: 6, wage: 40,
+    village: 'آمل', building: true, closed: '', next_delivery: new Date(Date.now() + 3 * 3600_000).toISOString(), delivery_hour: 6, zone_minutes: MOCK_ZONE, wage: 40,
     tax_bps: 300, tax_max_bps: 1000, tax_presets: [0, 300, 500, 1000], price_cap_bps: 12000, cap_min_bps: 10000, cap_max_bps: 15000, cap_presets: [10500, 12000, 15000],
     can_set_cap: IS_HEAD, presets: [1, 5, 10], resident: true,
     lines: [
@@ -1572,7 +1574,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.private.lots': return privateLots(args)
     case 'settlement.tax.pay': return taxPay()
     case 'settlement.terms': return termsView(args)
-    case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': return mockCharter(command, args, IS_HEAD)
+    case 'settlement.timezone.set': case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': case 'settlement.charter.election.open': case 'settlement.charter.stand': case 'settlement.charter.vote': case 'settlement.charter.recall.start': case 'settlement.charter.recall.sign': return mockCharter(command, args, IS_HEAD)
     case 'settlement.development.view': return developmentView()
     case 'settlement.promotion.view': case 'settlement.promote': return developmentView()
     case 'settlement.join': return residence(false, args)
@@ -1597,7 +1599,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
         place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
         component: [{ code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
-        item: [{ code: 'bag_sack', name: { en: 'Sack', fa: 'کیسه' } }, { code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
+        item: [{ code: 'tea', name: { en: 'Tea', fa: 'چای' } }, { code: 'bag_sack', name: { en: 'Sack', fa: 'کیسه' } }, { code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
         item_shelf_group: [['food', 'خوراک', 'Food'], ['medicine', 'دارو و کمک‌های اولیه', 'Medicine'], ['materials', 'مصالح و مواد', 'Materials'], ['tools', 'ابزار', 'Tools'], ['bags', 'کیف و بار', 'Bags']].map(([code, fa, en]) => ({ code, name: { en, fa } })),
         shop: ECONOMY_CONTENT.shop, budget_line: ECONOMY_CONTENT.budget_line, company_type: ECONOMY_CONTENT.company_type,
         // what the pushed notices name (api/client-api.md section 4.1)

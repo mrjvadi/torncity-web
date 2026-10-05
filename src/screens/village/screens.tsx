@@ -4,6 +4,7 @@
 // the build menu, grid and confirms, a building's own page. Words are the web's own
 // (src/i18n/ui.src.txt); content names come from the catalogue.
 
+import { buildText, workText } from '../../lib/duration'
 import { useState, type ReactNode } from 'react'
 import type {
   BatchConfirmView, BuildMenuView, RoadCancelledView, RoadQuoteView, BuildingPanelView, DonateView, LandView, LotAccessView, LotBuyView, LotConfirmView, LotGridView, LotRepairView,
@@ -435,7 +436,7 @@ const PrivateMenu = flow<PrivateMenuView>(({ view: v, ctx }) => {
           return (
             <Panel key={l.building.code}>
               <ListRow icon="house" palette={l.home ? 'gold' : 'amber'} title={name}
-                sub={`${durationText(l.build_time_seconds)} · ${l.footprint_w}×${l.footprint_h}`}
+                sub={`${buildText(l)} · ${l.footprint_w}×${l.footprint_h}`}
                 right={<span className="vc-line-price">{money(l.total)}</span>} />
               <Facts rows={[
                 { label: t('citizen.build.cost'), value: money(l.cost_money) },
@@ -479,7 +480,7 @@ const PrivateConfirm = flow<PrivateConfirmView>(({ view: v, ctx }) => (
         ...(v.materials_cost > 0 ? [{ label: t('citizen.build.materials'), value: money(v.materials_cost) }] : []),
         { label: t('citizen.build.total'), value: money(v.total), gold: true },
         { label: t('citizen.buy.cash'), value: money(v.cash) },
-        { label: t('citizen.build.time'), value: durationText(v.build_time_seconds) },
+        { label: t('citizen.build.time'), value: buildText(v) },
       ]} />
       {(v.materials ?? []).map((m) => <Hint key={m.component.code}>{matLine(m, ctx)}</Hint>)}
       {v.cash < v.total && <Hint tone="bad">{t('citizen.build.short')}</Hint>}
@@ -658,7 +659,7 @@ const BuildMenu = flow<BuildMenuView>(({ view: v, ctx }) => {
           return (
             <Panel key={l.building.code}>
               <ListRow icon={locked ? 'm_lock' : icon} palette={locked ? 'steel' : palette} title={ctx.bname(l.building.code, l.building.name)}
-                sub={`${durationText(l.build_time_seconds)}${l.role ? ` · ${t(key(`role.${l.role}`))}` : ''}`}
+                sub={`${buildText(l)}${l.role ? ` · ${t(key(`role.${l.role}`))}` : ''}`}
                 right={<span className="vc-line-price">{money(l.cost_money)}</span>} />
               {mats(ctx, l.materials)}
               {!locked && (l.short ?? []).length > 0 && <Hint tone="bad">{t('vx.build.short', { list: (l.short ?? []).map((m) => `${formatNumber(m.quantity)} ${ctx.names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ') })}</Hint>}
@@ -700,7 +701,7 @@ const BuildConfirm = flow<LotConfirmView>(({ view: v, ctx }) => (
       <Lead>{t('citizen.buy.lot', { x: v.x + 1, y: v.y + 1 })}</Lead>
       <Facts rows={[
         { label: t('citizen.build.cost'), value: money(v.cost_money), gold: true },
-        { label: t('citizen.build.time'), value: durationText(v.build_time_seconds) },
+        { label: t('citizen.build.time'), value: buildText(v) },
         ...(v.auto_roads > 0 ? [{ label: t('vx.build.roads'), value: formatNumber(v.auto_roads) }] : []),
       ]} />
       {mats(ctx, v.materials)}
@@ -717,7 +718,7 @@ const BatchConfirm = flow<BatchConfirmView>(({ view: v, ctx }) => (
       <Lead>{t('vx.batch.count', { n: v.count })}</Lead>
       <Facts rows={[
         { label: t('citizen.build.cost'), value: money(v.cost_money), gold: true },
-        { label: t('citizen.build.time'), value: durationText(v.build_time_seconds) },
+        { label: t('citizen.build.time'), value: buildText(v) },
       ]} />
       {mats(ctx, v.materials)}
     </Panel>

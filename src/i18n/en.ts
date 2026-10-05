@@ -109,7 +109,7 @@ export const en: Partial<Record<Key, string>> = {
   'build.start': 'Start building',
   'build.back': 'Back',
   'build.cost': 'Cost',
-  'build.time': 'Build time',
+  'build.time': 'Work needed',
   'build.treasury': 'Treasury',
   'build.materials': 'Materials',
   'build.footprint': '{w}×{h} lots',

@@ -12,6 +12,7 @@
 import type * as V from '../api/views.gen'
 import { t, hasKey, type Key } from '../i18n'
 import { formatNumber } from '../lib/persian'
+import { words } from '../lib/duration'
 
 export type NoticeTone = 'success' | 'info' | 'warning'
 
@@ -29,11 +30,7 @@ const money = (n: number | undefined | null): string => `${formatNumber(n ?? 0)}
 const num = (n: number | undefined | null): string => formatNumber(n ?? 0)
 
 function span(seconds: number | undefined | null): string {
-  const s = Math.max(0, Math.floor(seconds ?? 0))
-  if (s >= 86400) return t('time.d', { n: Math.round(s / 86400) })
-  if (s >= 3600) return t('time.h', { n: Math.round(s / 3600) })
-  if (s >= 60) return t('time.m', { n: Math.max(1, Math.round(s / 60)) })
-  return t('time.s', { n: s })
+  return words(seconds)
 }
 
 function line(key: string, params: Params, tone: NoticeTone): NoticeLine {

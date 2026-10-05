@@ -4,6 +4,7 @@
 import { formatNumber } from '../../../lib/persian'
 import { t } from '../../../i18n'
 import { fa } from '../../../ui/v6/format'
+import { words } from '../../../lib/duration'
 
 export { formatNumber }
 
@@ -25,9 +26,11 @@ export function moneyIn(n: number | undefined | null, currency?: PlaceCurrency |
  * an hour), the prototype's own countdown format. */
 export function hms(seconds: number | undefined | null): string {
   const s = Math.max(0, Math.floor(seconds ?? 0))
-  const h = Math.floor(s / 3600)
+  const d = Math.floor(s / 86400)
+  const h = Math.floor((s % 86400) / 3600)
   const m = Math.floor((s % 3600) / 60)
   const sec = s % 60
+  if (d > 0) return `${fa(d)} ${t('time.d_short')} ${fa(`${h}:${String(m).padStart(2, '0')}`)}`
   if (h > 0) return fa(`${h}:${String(m).padStart(2, '0')}`)
   return fa(`${m}:${String(sec).padStart(2, '0')}`)
 }
@@ -37,11 +40,7 @@ export function hms(seconds: number | undefined | null): string {
 export function roughDuration(seconds: number | undefined | null): string {
   const s = Math.max(0, Math.floor(seconds ?? 0))
   if (s <= 0) return '0'
-  const day = 86400, hour = 3600, min = 60
-  if (s >= day) return t('time.d', { n: Math.round(s / day) })
-  if (s >= hour) return t('time.h', { n: Math.round(s / hour) })
-  if (s >= min) return t('time.m', { n: Math.round(s / min) })
-  return t('time.s', { n: s })
+  return words(s)
 }
 
 /** How long ago, from a whole-second age. */
