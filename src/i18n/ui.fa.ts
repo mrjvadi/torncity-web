@@ -5168,7 +5168,7 @@ export const uiFa = {
   'sc.mode.car': 'ماشین',
   'sc.mode.walk': 'پیاده',
   'sc.confirm.arrive': 'می‌رسی',
-  'sc.confirm.arrive_at': 'ساعت {at}',
+  'sc.confirm.arrive_at': 'رسیدن {at}',
   'sc.journey.arrive_at': 'ساعت رسیدن: {at}',
   'sc.journey.rules': 'تا نرسیده‌ای نمی‌توانی در شهر کار کنی، از بازارچه بخری یا به انبار دست بزنی. پروفایل، پیام‌ها و بقیهٔ بخش‌ها باز است.',
   'lf.travelling.here': 'در سفری؛ {at} می‌رسی. تا آن موقع این کار ممکن نیست.',

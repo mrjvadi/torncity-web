@@ -5268,7 +5268,7 @@ sc.mode.bicycle | دوچرخه | Bicycle
 sc.mode.car | ماشین | Car
 sc.mode.walk | پیاده | On foot
 sc.confirm.arrive | می‌رسی | Arrive
-sc.confirm.arrive_at | ساعت {at} | {at}
+sc.confirm.arrive_at | رسیدن {at} | arrive {at}
 sc.journey.arrive_at | ساعت رسیدن: {at} | Arrival: {at}
 sc.journey.rules | تا نرسیده‌ای نمی‌توانی در شهر کار کنی، از بازارچه بخری یا به انبار دست بزنی. پروفایل، پیام‌ها و بقیهٔ بخش‌ها باز است. | Until you arrive you cannot work in town, shop at the market or touch the stock. Your profile, messages and the other sections stay open.
 lf.travelling.here | در سفری؛ {at} می‌رسی. تا آن موقع این کار ممکن نیست. | You are travelling; you arrive {at}. This is not possible until then.

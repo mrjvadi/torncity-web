@@ -5170,7 +5170,7 @@ export const uiEn: Record<UiKey, string> = {
   'sc.mode.car': 'Car',
   'sc.mode.walk': 'On foot',
   'sc.confirm.arrive': 'Arrive',
-  'sc.confirm.arrive_at': '{at}',
+  'sc.confirm.arrive_at': 'arrive {at}',
   'sc.journey.arrive_at': 'Arrival: {at}',
   'sc.journey.rules': 'Until you arrive you cannot work in town, shop at the market or touch the stock. Your profile, messages and the other sections stay open.',
   'lf.travelling.here': 'You are travelling; you arrive {at}. This is not possible until then.',
