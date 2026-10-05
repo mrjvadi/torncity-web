@@ -377,3 +377,7 @@
 
 /* touch targets (owner rule, 44px): the money chip and the ticker are drawn small but tap like a full-size control */
 .v6-chip-hit::before, .v6-ticker::before { content: ""; position: absolute; inset: -8px 0; }
+
+/* the village's name pill and the visitor's note sit under the HUD, never behind it */
+.v6 .vh-top { top: calc(var(--safe-t) + var(--v6-top) + var(--v6-hud-h) + 12px); left: 70px; right: 70px; align-items: center; }
+.v6 .vh-note { max-width: 100%; text-align: center; }

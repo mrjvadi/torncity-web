@@ -113,7 +113,7 @@ eco.act.auction.house | حراجی | The auction house
 eco.na.from | {service} اینجا هنوز راه نیفتاده است. | {service} has not been set up here yet.
 eco.na.only_support | {service} فقط در {place} هست. | {service} is only in {place}.
 eco.na.somewhere | شهر مرکزی | the central city
-eco.na.hint | ساختمان لازم: {buildings}. شهردار می‌تواند آن را بسازد. | Building needed: {buildings}. The mayor can build it.
+eco.na.hint | ساختمان لازم: {buildings}. هر کس اجازهٔ ساخت دارد می‌تواند آن را بسازد. | Building needed: {buildings}. Whoever may build can build it.
 eco.na.go | سفر به {city} | Travel to {city}
 eco.service.bank | بانک | The bank
 eco.service.credit | امتیاز اعتبار | The credit score
@@ -1771,7 +1771,7 @@ storage.full | انبار پر است. برای جا باز کردن، مصال�
 storage.stock | موجودی انبار | In stock
 storage.stock_empty | انبار فعلاً خالی است. | The store is empty for now.
 storage.market | بازار مصالح | Materials market
-storage.market_hint | مصالحی که شهردار می‌تواند با پول خزانه از بازار {city} بخرد؛ جنس به انبار شهر می‌رسد. | Materials the head can buy with treasury money from the {city} market; the goods arrive in the city store.
+storage.market_hint | مصالحی که کسی که اجازهٔ خرج از خزانه دارد می‌تواند با پول خزانه از بازار {city} بخرد؛ جنس به انبار شهر می‌رسد. | Materials the head can buy with treasury money from the {city} market; the goods arrive in the city store.
 storage.market_empty | فعلاً چیزی برای خرید نیست. | Nothing to buy right now.
 storage.unit_price | هر واحد {p} | {p} each
 storage.source | بازار {city} | {city} market
@@ -1978,7 +1978,7 @@ refusal.village_not_cancellable | این ساختمان دیگر در حال س�
 refusal.village_already_resident | تو همین حالا ساکن این شهری. | You already live in this city.
 refusal.village_not_resident | تو ساکن این شهر نیستی. | You do not live in this city.
 refusal.village_residence_cooldown | تازه جابه‌جا شده‌ای؛ {time} دیگر می‌توانی دوباره جابه‌جا شوی. | You moved only just now; you can move again in {time}.
-refusal.village_holds_office | تا وقتی شهردار هستی نمی‌توانی شهر را ترک کنی. | You cannot leave the city while you are its head.
+refusal.village_holds_office | تا وقتی منصب داری نمی‌توانی شهر را ترک کنی. | You cannot leave the city while you hold an office.
 refusal.village_no_home | هنوز شهرِ برگشتت مشخص نیست. | The city you would return to is not set yet.
 refusal.village_donate_range | مبلغ کمک باید بین {min} و {max} باشد. | A gift must be between {min} and {max}.
 refusal.village_storage_full | انبار شهر جا ندارد؛ انبار غله ظرفیتش را بیشتر می‌کند. | The city store is full; a granary adds room.
@@ -3172,7 +3172,7 @@ refusal.settlement_group_only | تأسیس شهر فقط در گروه بازی 
 refusal.settlement_no_world | نقشهٔ جهان هنوز آماده نیست؛ کمی بعد دوباره امتحان کن. | The world map is not ready yet; try again shortly.
 refusal.settlement_already | این گروه پیش‌تر شهر «{name}» را ساخته است. | This group has already founded “{name}”.
 founded.title | شهر «{name}» ساخته شد | “{name}” is founded
-founded.body | شما شهردار این شهر هستید. | You are the mayor of this city.
+founded.body | شما بنیان‌گذار این شهر هستید. | You are the founder of this city.
 act.inbox.open | دیدن پیام‌ها | See messages
 act.inbox.read_all | خواندن همه | Mark all read
 act.inbox.open_item | باز کردن | Open
@@ -3200,7 +3200,7 @@ work.empty.no_jobs | فعلاً آگهی کاری نیست و کارگاهی ه�
 work.empty.not_resident | برای کار کردن باید ساکن این شهر باشی. | You have to live in this city to work here.
 work.empty.no_settlement | اینجا کار همان شغل‌های شهر است. | Here, work means the careers of the city.
 work.next.build | رفتن به شهر و ساختن کارگاه | Go to the city and build a workplace
-work.next.ask_head | از شهردار بخواه کارگاه بسازد یا آگهی کار بگذارد. | Ask the mayor to build a workplace or post a job.
+work.next.ask_head | از کسی که اجازهٔ ساخت دارد بخواه کارگاه بسازد یا آگهی کار بگذارد. | Ask someone who may build to build a workplace or post a job.
 work.next.join | اول باید به این شهر نقل‌مکان کنی. | Move to this city first.
 work.career | شغل من | My career
 work.not_here | برای شروع باید همین‌جا در شهر باشی. | You have to be in the city to start.
@@ -4274,13 +4274,13 @@ pn.war.report | گزارش عملیات شمارهٔ {no} دربارهٔ {city} 
 # -- activities P1: education, missions, knowledge, rankings (the settlement's own offer) ------------------------
 education.here_not | اینجا نیست | Not here
 education.empty.no_class | اینجا هنوز کلاسی نیست، برای همین درسی هم داده نمی‌شود. | There is no class here yet, so nothing is taught.
-education.empty.build | شهردار می‌تواند «{name}» را بسازد. | The mayor can build “{name}”.
+education.empty.build | با ساختن «{name}» این آموزش راه می‌افتد. | Building “{name}” would start this teaching.
 education.empty.nothing | فعلاً درسی در {place} داده نمی‌شود. | Nothing is taught in {place} for now.
 education.empty.where | درس‌ها را می‌شود در شهر مرکزی خواند. | Courses can be taken in the central city.
 education.gap.taught_in | در {place} درس داده می‌شود | Taught in {place}
 education.gap.go | سفر به {place} | Travel to {place}
-education.gap.need.knowledge | شهردار می‌تواند «{name}» را پژوهش کند | The head can research “{name}”
-education.gap.need.building | شهردار می‌تواند «{name}» را بسازد | The head can build “{name}”
+education.gap.need.knowledge | با پژوهش «{name}» ممکن می‌شود | Possible once “{name}” is researched
+education.gap.need.building | با ساختن «{name}» ممکن می‌شود | Possible once “{name}” is built
 education.gap.need.teacher | برای درس دادن «{name}» لازم است | “{name}” is needed to teach it
 education.gap.fee | {fee} · {time} | {fee} · {time}
 education.literacy.title | خواندن و نوشتن | Reading and writing
@@ -4884,11 +4884,11 @@ sm.st.donate_hint | از آنچه همراه دارید به انبار شهر �
 sm.st.donate_none | چیزی همراهتان نیست که بشود داد. | You carry nothing to give.
 sm.st.donate_done | به انبار شهر دادید. | Given to the city store.
 sm.st.take | برداشتن از انبار | Take from the store
-sm.st.take_head | فقط شهردار از انبار شهر برمی‌دارد. | Only the head takes from the city store.
+sm.st.take_head | فقط کسی که اجازهٔ برداشت دارد از انبار شهر برمی‌دارد. | Only someone with the right to take from the city store does.
 sm.st.take_done | برداشتید. | Taken.
 sm.st.qty | چند عدد؟ | How many?
 sm.st.procure | تدارکات شهرداری | City hall procurement
-sm.st.procure_hint | شهردار از {city} با پول خزانه مصالح می‌خرد؛ بازار اهالی جای دیگری است. | The head buys materials from {city} with the treasury; the residents' market is elsewhere.
+sm.st.procure_hint | خزانه از {city} مصالح می‌خرد (با اجازهٔ خرج از خزانه)؛ بازار اهالی جای دیگری است. | The head buys materials from {city} with the treasury; the residents' market is elsewhere.
 sm.st.empty | انبار خالی است. | The store is empty.
 sm.mk.source.all | همه | All
 sm.mk.source.shop | از دکان | From the shop
@@ -4902,7 +4902,7 @@ sm.mk.day | امروز روز بازار است: هزینهٔ گذاشتن سف�
 sm.mk.away | غرفهٔ فروش فقط وقتی خودتان در شهر هستید می‌فروشد. | A selling stall sells only while you are in the settlement.
 sm.mk.fee_paid | هزینهٔ غرفه: {fee} | Stall fee: {fee}
 sm.mk.closed_title | اینجا بازار نیست | There is no market here
-sm.mk.closed_hint | شهردار باید یک بازارچه بسازد. نزدیک‌ترین بازار در {city} است. | The head must build a market post. The nearest market is in {city}.
+sm.mk.closed_hint | باید یک بازارچه ساخته شود. نزدیک‌ترین بازار در {city} است. | A market post must be built. The nearest market is in {city}.
 sm.mk.refused.stalls_full | همهٔ غرفه‌های بازار پر است ({count} غرفه). | Every stall is taken ({count}).
 sm.mk.refused.stall_limit | هر نفر فقط {count} غرفه می‌تواند داشته باشد؛ یکی را لغو کنید. | One person may hold only {count} stalls; cancel one.
 sm.shop.title | دکان شهر | City shop
@@ -4932,7 +4932,7 @@ sm.shop.bought | خریدید: {qty} عدد {name} | Bought {qty} x {name}
 sm.shop.mended | دوختید: {name}، {cost} | Mended {name} for {cost}
 sm.shop.repair | دوخت کوله | Bag mending
 sm.shop.repair_btn | دوختن، {cost} | Mend, {cost}
-sm.shop.levers | تصمیم شهردار | The head's levers
+sm.shop.levers | تصمیم‌های مغازه | Shop settings
 sm.shop.cap | سقف قیمت: {p} | Price ceiling: {p}
 sm.shop.cap_hint | دکان بالاتر از این درصد قیمت مرجع نمی‌فروشد. | The shop sells no higher than this share of the reference price.
 sm.shop.tax_lever | مالیات فروش دکان | Shop sales tax
@@ -4973,7 +4973,7 @@ hub.training | تمرین | Training
 trip.hint | کرایه {fare} · {wait} راه | Fare {fare} · {wait} away
 education.gap.need.teacher_post | برای این درس باید معلم استخدام شود یا کسی که مدرکش را دارد درس بدهد | A teacher must be hired, or someone holding its certificate must teach it
 lf.req.course_teacher | برای این درس اینجا هنوز معلمی نیست. | Nobody teaches this course here yet.
-lf.req.not_head | فقط شهردار می‌تواند معلم مدرسه بگیرد یا کنار بگذارد. | Only the head can hire or dismiss a school teacher.
+lf.req.not_head | فقط کسی که اجازهٔ استخدام دارد می‌تواند معلم مدرسه بگیرد یا کنار بگذارد. | Only someone who may hire can take on or dismiss a school teacher.
 lf.req.teacher_no_pool | در شهر کسی بیکار نیست که معلم شود. | Nobody in town is free to become a teacher.
 lf.req.already_teaching | برای این درس همین حالا معلمی هست. | This course already has that teacher.
 lf.req.not_teaching | چنین معلمی در این شهر نیست یا جایگاهش از آنِ شما نیست. | No such teacher here, or the post is not yours.
@@ -5200,7 +5200,7 @@ charter.tally | موافق {yes}، مخالف {no} | Yes {yes}, no {no}
 charter.proposal | پیشنهاد | The proposal
 charter.proposal.close | بستن منصب | Close the office
 charter.proposal.save | منصب «{title}» با {seats} کرسی، {how}{deputy} | Office “{title}” with {seats} seats, {how}{deputy}
-charter.proposal.deputy | ، جانشین شهردار | , acts for the head
+charter.proposal.deputy | ، جانشین منصب بنیان‌گذار | , acts for the founder's office
 charter.petitions | طومار برکناری | Recall petitions
 charter.petition_line | برکناری {target} از «{office}» | Recall {target} from “{office}”
 charter.petition_progress | {n} از {needed} امضا | {n} of {needed} signatures
@@ -5220,8 +5220,8 @@ charter.rule.acting | اگر کرسی «{head}» خالی بماند، تا {a} 
 charter.field.how | پر شدن منصب | Filled by
 charter.how_opt.appointment | انتصاب | Appointment
 charter.how_opt.election | انتخابات | Election
-charter.field.deputy | جانشین شهردار | Acts for the head
-charter.deputy_hint | وقتی کرسی شهردار خالی بماند، قدیمی‌ترین صاحب این منصب کارها را می‌چرخاند. | While the head's seat is empty, the longest-serving holder of this office keeps things running.
+charter.field.deputy | جانشین «{head}» | Acts for “{head}”
+charter.deputy_hint | وقتی کرسی «{head}» خالی بماند، قدیمی‌ترین صاحب این منصب کارها را می‌چرخاند. | While the seat of “{head}” is empty, the longest-serving holder of this office keeps things running.
 charter.vote_note | تغییر اجازه‌های کلیدی، شیوهٔ پر شدن یا جانشینِ یک منصب، در شهرهای بزرگ‌تر به رأی ساکنان گذاشته می‌شود. | A change to key permissions, how an office is filled or who acts for the head goes to the residents' vote in larger cities.
 charter.action.election_opened | انتخابات «{title}» باز شد | The election for “{title}” opened
 charter.action.election_cancelled | انتخابات «{title}» لغو شد | The election for “{title}” was cancelled
@@ -5241,7 +5241,7 @@ charter.action.amendment_passed | تغییر «{title}» تصویب شد | The c
 charter.action.amendment_failed | تغییر «{title}» تصویب نشد | The change to “{title}” did not pass
 charter.action.amendment_void | رأی‌گیری تغییر «{title}» باطل شد | The vote on “{title}” was voided
 refusal.village_charter_no_ballot | این رأی‌گیری پیدا نشد. | That vote was not found.
-refusal.village_charter_deputy_taken | منصب دیگری همین حالا جانشین شهردار است. | Another office already acts for the head.
+refusal.village_charter_deputy_taken | منصب دیگری همین حالا جانشین منصب بنیان‌گذار است. | Another office already acts for the founder's office.
 refusal.village_charter_not_candidacy | وقت ثبت‌نام نامزدها گذشته است. | The registration of candidates is over.
 refusal.village_charter_not_voting | هنوز وقت رأی‌گیری نشده یا تمام شده است. | It is not the time to vote, or voting is over.
 refusal.village_charter_not_eligible | هنوز مدت لازم در این شهر نمانده‌ای که بتوانی در این کار شرکت کنی. | You have not lived here long enough to take part.
@@ -5259,6 +5259,6 @@ refusal.village_charter_not_holder | این بازیکن صاحب این منص�
 refusal.village_charter_recalled_recently | او به‌تازگی از این منصب برکنار شده و فعلاً نمی‌شود دوباره منصوبش کرد. | They were recently removed from this office and cannot be appointed back yet.
 refusal.village_charter_vote_pending | یک تغییر دیگر همین حالا در رأی‌گیری است. | Another change is already being voted on.
 refusal.village_charter_target_cannot_vote | کسی که دربارهٔ او رأی می‌گیرند نمی‌تواند امضا یا رأی بدهد. | The person in question cannot sign or vote.
-refusal.village_charter_acting_forbidden | کسی که جای شهردار کار می‌کند این کار را نمی‌تواند بکند. | Someone acting for the head cannot do this.
+refusal.village_charter_acting_forbidden | کسی که جای منصب بنیان‌گذار کار می‌کند این کار را نمی‌تواند بکند. | Someone acting for the founder's office cannot do this.
 time.about | حدود {t} | about {t}
 build.wait | زمان ساخت | Build time
