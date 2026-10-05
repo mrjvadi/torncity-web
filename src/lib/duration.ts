@@ -4,6 +4,7 @@
 // settlement-level hour (shop delivery, market day, elections) via `zoneClock`.
 
 import { getLang, isRtl, t } from '../i18n'
+import type { BuildWaitView } from '../api/views.gen'
 import { fa } from '../ui/v6/format'
 
 /** "۲ روز و ۴ ساعت" / "۳ ساعت و ۱۵ دقیقه" / "۴۵ دقیقه" / "۳۰ ثانیه": two parts at most, the coarse one first. */
@@ -75,4 +76,9 @@ export function workText(seconds: number | undefined | null): string {
     return t('time.work_hours', { n: fa(String(h).replace('.', isRtl() ? '٫' : '.')) })
   }
   return t('time.work_minutes', { n: fa(Math.max(1, Math.round(s / 60))) })
+}
+
+/** What a build costs in time: the server's estimate of the wait («حدود ۱۲ دقیقه») when it sends one, else the worker effort. */
+export function buildText(b: { build_time_seconds: number; expected_wait?: BuildWaitView | null }): string {
+  return b.expected_wait && b.expected_wait.seconds > 0 ? t('time.about', { t: words(b.expected_wait.seconds) }) : workText(b.build_time_seconds)
 }

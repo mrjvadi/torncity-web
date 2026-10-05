@@ -286,6 +286,8 @@ function roster(): SettlementPlayers {
 function nameOf(code: string): Named { const e = CAT.find((c) => c.code === code) ?? citizenEntry(code); return { code, name: e?.en ?? code } }
 function kn(code: string): Named { return { code, name: KNOW_EN[code] ?? code } }
 const GOODS_EN: Record<string, string> = { timber: 'Timber', stone: 'Stone', iron_bar: 'Iron bar', wheat: 'Wheat' }
+/** The server's estimate of the wait for a build of this much worker effort (a crew of two). */
+const waitOf = (effort: number) => { const shifts = Math.ceil(effort / 60), crew = 2; return { seconds: Math.ceil(shifts / crew) * 60, shifts, crew, shift_seconds: 60 } }
 const goods = (code: string): Named => ({ code, name: GOODS_EN[code] ?? code })
 
 function refusal(kind: string, o: Parameters<typeof mockRefusal>[1] = {}) {
@@ -480,7 +482,7 @@ function menuView() {
     const miss = unmet(e)
     const short = materialNeeds(e)
     return {
-      building: nameOf(e.code), role: e.role, category: ({ '': 'public', security: 'security', craft: 'production', water_infra: 'farming', food: 'farming', market: 'shops', housing: 'housing', storage: 'construction' } as Record<string, string>)[e.role] ?? 'other', state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time,
+      building: nameOf(e.code), role: e.role, category: ({ '': 'public', security: 'security', craft: 'production', water_infra: 'farming', food: 'farming', market: 'shops', housing: 'housing', storage: 'construction' } as Record<string, string>)[e.role] ?? 'other', state: miss.length ? 'locked' : 'available', cost_money: e.cost, build_time_seconds: e.time, expected_wait: waitOf(e.time),
       missing: miss.length ? miss.map(kn) : null, missing_buildings: null, materials: matLines(e),
       short: short.length ? short.map((n) => ({ component: n.item, quantity: n.need - n.have })) : null,
     }
@@ -539,7 +541,7 @@ function place(args: Record<string, unknown>) {
   if (args.confirm !== 'confirm') {
     const view: LotConfirmView = {
       settlement_name: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost + fee, auto_roads: street.length,
-      materials: matLines(e), build_time_seconds: e.time,
+      materials: matLines(e), build_time_seconds: e.time, expected_wait: waitOf(e.time),
     }
     return mockOk('settlement_build_confirm', view, [confirmA('settlement.build.place', { code, lot: token(x, y, rotated) }), back('settlement.build.lots', { code })])
   }
@@ -1073,7 +1075,7 @@ function privateMenu() {
     const b = bill(e)
     return {
       building: nameOf(e.code), home: HOMES.has(e.code), class: e.role || 'residential', cost_money: e.cost, permit_fee: PERMIT_FEE,
-      materials: b.mats, build_time_seconds: e.time, footprint_w: e.fp[0], footprint_h: e.fp[1], total: b.total, affordable: cz.cash >= b.total,
+      materials: b.mats, build_time_seconds: e.time, expected_wait: waitOf(e.time), footprint_w: e.fp[0], footprint_h: e.fp[1], total: b.total, affordable: cz.cash >= b.total,
     }
   })
   const view: PrivateMenuView = { village: 'آمل', settlement_id: OWN_ID, cash: cz.cash, owned_lots: owned.length, free_lots: freeOwn, lines }
@@ -1152,7 +1154,7 @@ function privatePlace(args: Record<string, unknown>) {
   const b = bill(e)
   if (cz.cash < b.total) return refusal('citizen_no_cash', { back: { command: 'settlement.private', args: null } })
   if (args.confirm !== 'confirm') {
-    const view: PrivateConfirmView = { village: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time }
+    const view: PrivateConfirmView = { village: 'آمل', building: nameOf(code), x, y, rotated, cost_money: e.cost, permit_fee: PERMIT_FEE, materials: b.mats, materials_cost: b.materials_cost, total: b.total, cash: cz.cash, build_time_seconds: e.time, expected_wait: waitOf(e.time) }
     return mockOk('settlement_private_confirm', view, [confirmA('settlement.private.place', { code, lot: token(x, y, rotated) }), back('settlement.private.lots', { code })])
   }
   cz.cash -= b.total
@@ -1431,7 +1433,7 @@ function buildingView(args: Record<string, unknown>) {
       view.treasury = st.treasury; view.population = 2
       // the hall can be upgraded once the village knows irrigation (a requirement left unmet, for the confirm popup)
       view.tier = 2; view.has_upgrade = true
-      if (mode === 'up') view.upgrades = [{ building: nameOf('civic_hall'), tier: 3, cost_money: 480, build_time_seconds: 3600, available: false, missing: [kn('irrigation')], needs_tier: '' }]
+      if (mode === 'up') view.upgrades = [{ building: nameOf('civic_hall'), tier: 3, cost_money: 480, build_time_seconds: 3600, expected_wait: waitOf(3600), available: false, missing: [kn('irrigation')], needs_tier: '' }]
       const run = st.know.find((k) => k.state === 'researching')
       view.research = run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? Date.now()).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? Date.now()) - Date.now()) / 1000)) } : null
     }
@@ -1440,7 +1442,7 @@ function buildingView(args: Record<string, unknown>) {
       if (mode === 'up') {
         const sc = CAT.find((c) => c.code === 'school')!
         const miss = unmet(sc)
-        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, available: miss.length === 0, missing: miss.length ? miss.map(kn) : null, needs_tier: '' }]
+        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, expected_wait: waitOf(sc.time), available: miss.length === 0, missing: miss.length ? miss.map(kn) : null, needs_tier: '' }]
       }
     }
   }

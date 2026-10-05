@@ -1496,7 +1496,7 @@ export const uiFa = {
   'citizen.build.permit': 'مجوز ساخت (به خزانه)',
   'citizen.build.materials': 'مصالح خریداری‌شده',
   'citizen.build.total': 'جمع نقدی',
-  'citizen.build.time': 'کار لازم',
+  'citizen.build.time': 'زمان ساخت',
   'citizen.build.start': 'تأیید و ساخت - {p}',
   'citizen.build.started': 'ساخت شروع شد.',
   'citizen.build.short': 'پولت کافی نیست',
@@ -4655,7 +4655,7 @@ export const uiFa = {
   'v6.up.title': 'ارتقای {name}',
   'v6.up.go': 'ارتقا بده',
   'v6.up.cost': 'هزینه',
-  'v6.up.time': 'کار لازم',
+  'v6.up.time': 'زمان ساخت',
   'v6.up.ready': 'همه‌چیز آماده است',
   'v6.up.blocked': 'اول موارد قرمز را درست کن',
   'v6.fix': 'برو و درستش کن',
@@ -5160,6 +5160,8 @@ export const uiFa = {
   'refusal.village_charter_vote_pending': 'یک تغییر دیگر همین حالا در رأی‌گیری است.',
   'refusal.village_charter_target_cannot_vote': 'کسی که دربارهٔ او رأی می‌گیرند نمی‌تواند امضا یا رأی بدهد.',
   'refusal.village_charter_acting_forbidden': 'کسی که جای شهردار کار می‌کند این کار را نمی‌تواند بکند.',
+  'time.about': 'حدود {t}',
+  'build.wait': 'زمان ساخت',
 } as const
 
 export type UiKey = keyof typeof uiFa

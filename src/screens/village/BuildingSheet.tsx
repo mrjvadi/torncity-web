@@ -9,7 +9,7 @@
 // call), the sheet falls back to what the layout itself says.
 
 import { endNote } from '../../lib/duration'
-import { workText } from '../../lib/duration'
+import { buildText, workText } from '../../lib/duration'
 import { CardGrid } from '../../ui/v6/panel'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -255,7 +255,7 @@ function UpgradeList({ panel, cat, names, onBuild }: { panel: BuildingPanelView 
       {ups.map((u) => (
         <div key={u.building.code} className={`vh-upgrade${u.available ? '' : ' locked'}`}>
           <div className="vh-upgrade-name">{buildingName(cat, u.building.code, u.building.name)}</div>
-          <div className="vh-hint">{money(u.cost_money)} · {workText(u.build_time_seconds)}</div>
+          <div className="vh-hint">{money(u.cost_money)} · {buildText(u)}</div>
           {u.available
             ? <ActionButton tone="gold" small onClick={() => onBuild(u.building.code)}>{t('building.upgrade.build')}</ActionButton>
             : <div className="vh-hint bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') }) : t('building.upgrade.locked')}</div>}

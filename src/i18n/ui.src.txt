@@ -1538,7 +1538,7 @@ citizen.build.cost | هزینهٔ ساختمان | Building cost
 citizen.build.permit | مجوز ساخت (به خزانه) | Building permit (to the treasury)
 citizen.build.materials | مصالح خریداری‌شده | Materials bought
 citizen.build.total | جمع نقدی | Cash total
-citizen.build.time | کار لازم | Work needed
+citizen.build.time | زمان ساخت | Build time
 citizen.build.start | تأیید و ساخت - {p} | Confirm and build - {p}
 citizen.build.started | ساخت شروع شد. | Construction started.
 citizen.build.short | پولت کافی نیست | Not enough cash
@@ -4748,7 +4748,7 @@ v6.q.mission.deliver | {req} کالا تحویل بده | Hand in {req} goods
 v6.up.title | ارتقای {name} | Upgrade {name}
 v6.up.go | ارتقا بده | Upgrade
 v6.up.cost | هزینه | Cost
-v6.up.time | کار لازم | Work needed
+v6.up.time | زمان ساخت | Build time
 v6.up.ready | همه‌چیز آماده است | Everything is ready
 v6.up.blocked | اول موارد قرمز را درست کن | Fix the red rows first
 v6.fix | برو و درستش کن | Go and fix it
@@ -5260,3 +5260,5 @@ refusal.village_charter_recalled_recently | او به‌تازگی از این �
 refusal.village_charter_vote_pending | یک تغییر دیگر همین حالا در رأی‌گیری است. | Another change is already being voted on.
 refusal.village_charter_target_cannot_vote | کسی که دربارهٔ او رأی می‌گیرند نمی‌تواند امضا یا رأی بدهد. | The person in question cannot sign or vote.
 refusal.village_charter_acting_forbidden | کسی که جای شهردار کار می‌کند این کار را نمی‌تواند بکند. | Someone acting for the head cannot do this.
+time.about | حدود {t} | about {t}
+build.wait | زمان ساخت | Build time
