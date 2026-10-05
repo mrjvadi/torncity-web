@@ -80,5 +80,5 @@ export function workText(seconds: number | undefined | null): string {
 
 /** What a build costs in time: the server's estimate of the wait («حدود ۱۲ دقیقه») when it sends one, else the worker effort. */
 export function buildText(b: { build_time_seconds: number; expected_wait?: BuildWaitView | null }): string {
-  return b.expected_wait && b.expected_wait.seconds > 0 ? t('time.about', { t: words(b.expected_wait.seconds) }) : workText(b.build_time_seconds)
+  return b.expected_wait && b.expected_wait.seconds > 0 ? `${t('time.about', { t: words(b.expected_wait.seconds) })} (${workText(b.build_time_seconds)})` : workText(b.build_time_seconds)
 }
