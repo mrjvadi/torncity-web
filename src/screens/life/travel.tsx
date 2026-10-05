@@ -8,8 +8,9 @@ import type {
   CityMapView, MapView, NotHereView, TravelArrivedView, TravelCheckoutView, TravelHereView, TravelOptionsView, TravelStartedView, TravelStatusView, WalkStartedView,
 } from '../../api/views.gen'
 import { Empty, ListRow, SectionTitle } from '../native/kit/Parts'
-import { hms, money } from '../native/kit/format'
+import { hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
+import { atText } from '../../lib/duration'
 import Popup, { ActionButton, ActionRow, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { t } from '../../i18n'
 import { useSession } from '../../state/SessionContext'
@@ -23,7 +24,7 @@ import { CardGrid } from '../../ui/v6/panel'
 /** The name of a city place by its code. */
 const tx2 = (ctx: Parameters<Parameters<typeof flow>[0]>[0]['ctx'], code?: string): string => (code ? ctx.names.name('place', code, code) : '')
 
-const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane', bicycle: 'x_car', walk: 'walk', cart: 'x_car' }
+const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane', bicycle: 'x_car', walk: 'walk', cart: 'cart', ship: 'x_car' }
 
 // -- the map of where the player is ---------------------------------------------------------------
 
@@ -148,7 +149,7 @@ export const Cities = flow<MapView>(({ view: v, ctx }) => {
                 <ListRow
                   key={d.code} icon={d.village ? 'house' : 'city'} palette={d.village ? 'emerald' : 'gold'}
                   title={cityName(ctx, d.code, d.name)}
-                  sub={[t('sc.dest.km', { n: formatNumber(d.distance_km) }), d.wait_seconds > 0 ? hms(d.wait_seconds) : ''].filter(Boolean).join(' · ')}
+                  sub={[t('sc.dest.km', { n: formatNumber(d.distance_km) }), d.wait_seconds > 0 ? roughDuration(d.wait_seconds) : ''].filter(Boolean).join(' · ')}
                   right={d.wait_seconds > 0 ? (d.fare > 0 ? money(d.fare) : t('common.free')) : undefined}
                   onClick={go ? () => ctx.go(go) : undefined}
                 />
@@ -187,7 +188,7 @@ export const TravelOptions = flow<TravelOptionsView>(({ view: v, ctx }) => {
             <ListRow
               key={o.mode_code} icon={MODE_ICON[o.mode_code] ?? 'plane'} palette="teal"
               title={own || ctx.names.name('mode', o.mode_code, o.mode_name)}
-              sub={[hms(o.wait_seconds), t('lf.options.energy', { n: formatNumber(o.energy) }), o.busy ? t('travel.busy') : '', o.vehicle ? t('lf.options.condition', { n: bps(o.condition) }) : ''].filter(Boolean).join(' · ')}
+              sub={[roughDuration(o.wait_seconds), o.wait_seconds >= 3600 ? t('sc.confirm.arrive_at', { at: atText(Date.now() + o.wait_seconds * 1000) }) : '', t('lf.options.energy', { n: formatNumber(o.energy) }), o.busy ? t('travel.busy') : '', o.vehicle ? t('lf.options.condition', { n: bps(o.condition) }) : ''].filter(Boolean).join(' · ')}
               right={o.fare > 0 ? (o.vehicle ? t('lf.options.fuel', { n: money(o.fare) }) : money(o.fare)) : t('common.free')}
               onClick={go ? () => ctx.go(go) : undefined}
             />
@@ -228,7 +229,8 @@ export const TravelCheckout = flow<TravelCheckoutView>(({ view: v, ctx }) => {
         <StatGrid>
           <StatCard icon={MODE_ICON[v.mode_code] ?? 'plane'} palette="teal" label={t('lf.checkout.by')} value={mode} />
           <StatCard icon="coins" palette="gold" label={t('lf.fare')} value={v.fare > 0 ? money(v.fare) : t('common.free')} />
-          <StatCard icon="stopwatch" palette="amber" label={t('lf.time')} value={hms(v.wait_seconds)} />
+          <StatCard icon="stopwatch" palette="amber" label={t('lf.time')} value={roughDuration(v.wait_seconds)} />
+          {v.wait_seconds > 0 && <StatCard icon="clock" palette="emerald" label={t('sc.confirm.arrive')} value={atText(Date.now() + v.wait_seconds * 1000)} />}
           <StatCard icon="energy" palette="emerald" label={t('lf.energy')} value={formatNumber(v.energy)} />
         </StatGrid>
         <Note>{t('lf.checkout.route', { from, to })}{v.busy ? ` · ${t('lf.checkout.busy')}` : ''}</Note>
@@ -250,7 +252,7 @@ export const TravelStarted = flow<TravelStartedView>(({ view: v, ctx }) => {
         <Lead tone="good">{t('lf.started.lead', { to: cityName(ctx, v.to_code, v.to), mode: ctx.names.name('mode', v.mode_code, v.mode_name) })}</Lead>
         <Facts rows={[
           { label: t('lf.checkout.route_label'), value: `${cityName(ctx, v.from_code, v.from)} ← ${cityName(ctx, v.to_code, v.to)}` },
-          { label: t('lf.time'), value: hms(v.duration_seconds) },
+          { label: t('lf.time'), value: roughDuration(v.duration_seconds) },
           ...(v.arrives_at ? [{ label: t('lf.arrives_at'), value: clockText(v.arrives_at) }] : []),
           { label: t('lf.energy'), value: formatNumber(v.energy) },
           ...(v.fare > 0 ? [{ label: t('lf.fare'), value: money(v.fare), gold: true }] : []),
@@ -270,6 +272,7 @@ export const TravelStatus = flow<TravelStatusView>(({ view: v, ctx }) => (
         ...(v.mode_code || v.mode_name ? [{ label: t('lf.checkout.by'), value: ctx.names.name('mode', v.mode_code, v.mode_name) }] : []),
         ...(v.remaining_seconds >= 60 && v.arrives_at ? [{ label: t('lf.arrives_at'), value: clockText(v.arrives_at) }] : []),
       ]} />
+      <Hint>{t('sc.journey.rules')}</Hint>
     </Panel>
   </Page>
 ))

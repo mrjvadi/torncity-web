@@ -18,6 +18,8 @@ import { hasKey, t, type Key } from '../../i18n'
 import { useContentNames, useVillageCommand, type ContentNames } from '../../village/useVillage'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerWrite, type FlowCtx } from './flow'
 import { useVillageView } from './common'
+import { useSession } from '../../state/SessionContext'
+import { locationOf } from '../../support/location'
 import { serverNow } from '../../village/clock'
 
 const key = (k: string) => k as Key
@@ -37,6 +39,9 @@ function ShopBody({ v, names, onBuy, onWrite, onMoney }: {
   onMoney: () => void
 }) {
   const [pick, setPick] = useState<VillageShopLine | null>(null)
+  const { bootstrap } = useSession()
+  const loc = locationOf(bootstrap)
+  const travelNote = loc?.kind === 'travelling' ? (loc.arrives_at ? t('lf.travelling.here', { at: atText(loc.arrives_at) }) : t('lf.travelling.here_no_time')) : null
   const open = v.closed === ''
   const closedText = v.closed ? t(key(`sm.shop.closed.${v.closed}`)) : ''
   const next = v.next_delivery ? Math.max(0, Math.floor((new Date(v.next_delivery).getTime() - serverNow()) / 1000)) : 0
@@ -54,7 +59,7 @@ function ShopBody({ v, names, onBuy, onWrite, onMoney }: {
       {v.resident && v.capacity > 0 && (
         <FillBar used={Math.max(v.capacity - v.free_space, 0)} capacity={v.capacity} label={t('sm.fill.space')} figures={`${formatNumber(Math.max(v.capacity - v.free_space, 0))} / ${formatNumber(v.capacity)}`} />
       )}
-      {!v.resident && <Notice>{t('sm.shop.not_resident')}</Notice>}
+      {!v.resident && <Notice>{travelNote ?? t('sm.shop.not_resident')}</Notice>}
 
       {lines.length === 0 && open && <Notice>{t('sm.mk.shop_empty')}</Notice>}
       <CardGrid>

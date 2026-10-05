@@ -105,7 +105,7 @@ const BRANCHES: BranchForces[] = [
 /** What an outsider reads: bands only. */
 const bands = (b: BranchForces[]): BranchForces[] => b.map((x) => ({ ...x, classes: (x.classes ?? []).map((c) => ({ ...c, count: 0 })) }))
 
-const office = (code: string, holders: GovPlayer[] | null, acting: GovPlayer[] | null = null): GovOffice => ({ code, seats: 1, holders, acting_code: acting ? 'president' : '', acting })
+const office = (code: string, holders: GovPlayer[] | null, acting: GovPlayer[] | null = null): GovOffice => ({ code, title: '', acting_title: '', seats: 1, holders, acting_code: acting ? 'president' : '', acting })
 
 function ministry(args: Record<string, unknown>) {
   const un = gate('armed_forces', args)

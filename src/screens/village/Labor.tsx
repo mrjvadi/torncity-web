@@ -18,6 +18,8 @@ import type { LaborBoardView, LaborJobView, LaborMarketView, LaborMineView, Labo
 import * as api from '../../api/client'
 import { buildingName, useBuildingCatalogue, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
 import { durationText, iconForRole, RowCard, ROLE_TONE, useVillageView } from './common'
+import { useSession } from '../../state/SessionContext'
+import { locationOf } from '../../support/location'
 import { useToast } from '../../state/ToastContext'
 import './labor.css'
 
@@ -249,6 +251,7 @@ function JobCard({ j, now, onOpen, onTake, busy }: { j: LaborJobView; now: numbe
 
 export function LaborBoard({ response, openLocal, run }: ScreenProps) {
   const now = useNow(1000)
+  const travelling = locationOf(useSession().bootstrap)?.kind === 'travelling'
   const cat = useBuildingCatalogue()
   const cmd = useVillageCommand()
   const toast = useToast()
@@ -280,7 +283,7 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
           {v.working && (
             <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
           )}
-          {!v.resident && <div className="lb-hint">{t('labor.not_resident')}</div>}
+          {!v.resident && <div className="lb-hint">{travelling ? t('lf.travelling.here_no_time') : t('labor.not_resident')}</div>}
           {jobs.length === 0 && <Empty>{t('labor.board.empty')}</Empty>}
           <div className="lb-list">
             {jobs.map((j) => (
