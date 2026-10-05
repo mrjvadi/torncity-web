@@ -1477,9 +1477,22 @@ const MAT_BASE_CAP = 60
 function materialsView(bought?: { item: Named; qty: number; total: number }) {
   const used = Object.values(MAT_STOCK).reduce((a, b) => a + b, 0)
   const stock = Object.keys(MAT_STOCK).sort().map((c) => ({ item: goods(c), qty: MAT_STOCK[c] }))
-  const view: MaterialsView = { village: 'آمل', treasury: st.treasury, stock: stock.length ? stock : null, used, capacity: MAT_BASE_CAP,
-    classes: [{ class: 'bulk', used, capacity: 60, reserved: 0 }, { class: 'food', used: 0, capacity: 20, reserved: 0 }, { class: 'goods', used: 0, capacity: 20, reserved: 0 }],
-    stores: [{ building: goods('granary'), kept: false, grace_until: '2026-10-17T00:00:00Z' }, { building: goods('storehouse'), kept: false, grace_until: null }], wage: 40, spoil_bps: 5, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
+  // ?stor=grace (default, Marco Polo during the grace), after (the grace is over), fresh (a new city: communal room only)
+  const mode = (() => { try { return new URLSearchParams(location.search).get('stor') ?? 'grace' } catch { return 'grace' } })()
+  const bulkB = goods('storehouse'), stack = [goods('storehouse')]
+  const view: MaterialsView = mode === 'fresh'
+    ? { village: 'آمل', treasury: 0, stock: [{ item: goods('wheat'), qty: 30 }], used: 30, capacity: 120, over: 0, transition: null,
+      classes: [{ class: 'bulk', used: 0, capacity: 20, reserved: 0, over: 0, borrowed: 0, build: null }, { class: 'food', used: 30, capacity: 120, reserved: 0, over: 0, borrowed: 0, build: null }, { class: 'goods', used: 0, capacity: 20, reserved: 0, over: 0, borrowed: 0, build: null }],
+      stores: [{ building: goods('granary'), kept: false, communal_room: 100, grace_until: null }, { building: goods('storehouse'), kept: false, communal_room: 100, grace_until: null }], wage: 40, spoil_bps: 5, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null }
+    : (() => {
+      const after = mode === 'after'
+      const cls = after
+        ? [{ class: 'bulk', used: 156, capacity: 60, reserved: 0, over: 96, borrowed: 0, build: [bulkB] }, { class: 'food', used: 40, capacity: 100, reserved: 0, over: 0, borrowed: 0, build: null }, { class: 'goods', used: 25, capacity: 20, reserved: 0, over: 5, borrowed: 0, build: stack }]
+        : [{ class: 'bulk', used: 156, capacity: 156, reserved: 0, over: 0, borrowed: 96, build: null }, { class: 'food', used: 40, capacity: 100, reserved: 0, over: 0, borrowed: 0, build: null }, { class: 'goods', used: 25, capacity: 25, reserved: 0, over: 0, borrowed: 5, build: null }]
+      return { village: 'مارکو پلو', treasury: st.treasury, stock: [{ item: goods('timber'), qty: 53 }, { item: goods('stone'), qty: 25 }, { item: goods('wool'), qty: 25 }, { item: goods('wheat'), qty: 40 }], used: 221, capacity: after ? 180 : 281, over: after ? 101 : 0,
+        transition: after ? null : { until: '2026-10-17T00:00:00Z' }, classes: cls,
+        stores: [{ building: goods('granary'), kept: true, communal_room: 0, grace_until: null }, { building: goods('granary'), kept: false, communal_room: 100, grace_until: null }], wage: 40, spoil_bps: 5, market: MARKET, can_buy: IS_HEAD, presets: [5, 10, 25], bought: bought ?? null } as MaterialsView
+    })()
   const acts: MockAct[] = []
   if (IS_HEAD) for (const l of MARKET) for (const q of [5, 10, 25]) acts.push(A('materials.buy', 'settlement.materials.buy', { item: l.item.code, qty: String(q) }, { subject: l.item.code }))
   return mockOk('village_materials', view, [...acts, A('village.work', 'settlement.work'), A('village.build', 'settlement.build'), back('settlement.overview'), refreshA('settlement.materials')])

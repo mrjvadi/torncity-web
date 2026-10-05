@@ -12,7 +12,7 @@ import type { ScreenProps } from '../types'
 import { Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
 import { hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
-import { atText } from '../../lib/duration'
+import { atText, thereText } from '../../lib/duration'
 import { Emboss, Slab } from '../../kit'
 import Emblem from '../../lib/emblem'
 import { emblemHex } from '../../lib/emblemPalette'
@@ -204,7 +204,8 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
 // -- the journey -------------------------------------------------------------
 
 export function SupportJourney({ openLocal }: ScreenProps) {
-  const { bootstrap, refreshBootstrap } = useSession()
+  const { bootstrap, refreshBootstrap, profile } = useSession()
+  const zone = Number((profile as { travel_zone_minutes?: number } | null)?.travel_zone_minutes ?? 0)
   const loc = locationOf(bootstrap)
   // one countdown from the arrival instant on the server's clock; at zero the bootstrap is read ONCE (the server moves the player on arrival)
   const fromRemaining = useRef(Date.now() + (loc?.remaining_seconds ?? 0) * 1000)
@@ -237,6 +238,7 @@ export function SupportJourney({ openLocal }: ScreenProps) {
           <div className="sc-timer display">{hms(left)}</div>
           <div style={{ fontSize: 13, color: '#dfe4ff' }}>{t('sc.journey.left')}</div>
           <div style={{ fontSize: 13, color: '#dfe4ff' }}>{t('sc.journey.arrive_at', { at: atText(endsAt) })}</div>
+          {thereText(endsAt, zone) && <div style={{ fontSize: 13, color: '#dfe4ff' }}>{thereText(endsAt, zone)}</div>}
           <div style={{ fontSize: 12.5, color: '#c3cbf0', maxWidth: 360, lineHeight: 1.6 }}>{t('sc.journey.rules')}</div>
         </>
       )}

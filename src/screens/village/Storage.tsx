@@ -74,9 +74,6 @@ export default function Storage({ response, openLocal }: ScreenProps) {
   if (loading && !v) return <ScreenScroll><Header title={t('storage.title')} tone="sapphire" onBack={back} /></ScreenScroll>
   const market = v?.market ?? []
   const reserved = (v?.classes ?? []).reduce((n, c) => n + c.reserved, 0)
-  const full = !!v && v.capacity > 0 && v.used + reserved >= v.capacity
-  // more is stored than the room holds (a store lost its keeper): nothing is lost, nothing new fits
-  const over = v ? Math.max(0, v.used - v.capacity) : 0
 
   async function move(command: 'settlement.stock.donate' | 'settlement.stock.take', qty: number) {
     if (!pick) return
@@ -112,21 +109,29 @@ export default function Storage({ response, openLocal }: ScreenProps) {
           {v.bought && (
             <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: goods(v.bought.item), total: money(v.bought.total) })}</Notice>
           )}
-          <FillBar used={v.used} reserved={reserved} capacity={v.capacity} label={t('storage.capacity')} figures={`${formatNumber(v.used + reserved)} / ${formatNumber(v.capacity)}`} />
-          {over > 0 && <Notice>{t('sm.st.over', { n: formatNumber(over) })}</Notice>}
-          {full && over === 0 && <Notice>{t('storage.full')}</Notice>}
+          {v.transition?.until && <Notice>{t('sm.st.transition', { date: dateText(v.transition.until) })}</Notice>}
           {(v.classes ?? []).map((c) => (
-            <FillBar key={c.class} used={c.used} reserved={c.reserved} capacity={c.capacity} label={t(`sm.st.class.${c.class}` as Key)}
-              figures={`${formatNumber(c.used + c.reserved)} / ${formatNumber(c.capacity)}`} />
+            <div key={c.class} className="st-class">
+              <FillBar used={c.used} reserved={c.reserved} capacity={c.capacity} label={t(`sm.st.class.${c.class}` as Key)}
+                figures={`${formatNumber(c.used + c.reserved)} / ${formatNumber(c.capacity)}`} />
+              {c.borrowed > 0 && <div className="gc-note">{t('sm.st.borrowed', { n: formatNumber(c.borrowed) })}</div>}
+              {c.over > 0 && (
+                <Notice alert>
+                  {t('sm.st.class_over', { n: formatNumber(c.over) })}
+                  {(c.build ?? []).length > 0 && <> {t('sm.st.class_build', { names: (c.build ?? []).map((b) => names.name('settlement_building', b.code, b.name)).join('، ') })}</>}
+                </Notice>
+              )}
+            </div>
           ))}
+          <div className="gc-note">{t('sm.st.total', { used: formatNumber(v.used + reserved), cap: formatNumber(v.capacity) })}</div>
           {(v.stores ?? []).length > 0 && (
             <>
               <SectionTitle>{t('sm.st.stores')}</SectionTitle>
               <CardGrid>
                 {(v.stores ?? []).map((st, i) => (
                   <PCard key={i} icon="chest" title={names.name('settlement_building', st.building.code, st.building.name)}
-                    sub={st.kept ? t('sm.st.kept', { wage: money(v.wage) }) : st.grace_until ? t('sm.st.grace', { date: dateText(st.grace_until) }) : t('sm.st.unkept')} tone={st.kept ? 'good' : st.grace_until ? 'busy' : 'danger'}
-                    facts={st.kept ? undefined : t('sm.st.unkept_why')} />
+                    sub={st.kept ? t('sm.st.kept', { wage: money(v.wage) }) : st.communal_room > 0 ? t('sm.st.communal', { n: formatNumber(st.communal_room) }) : st.grace_until ? t('sm.st.grace', { date: dateText(st.grace_until) }) : t('sm.st.unkept')} tone={st.kept ? 'good' : st.communal_room > 0 || st.grace_until ? 'busy' : 'danger'}
+                    facts={st.kept ? undefined : st.communal_room > 0 ? t('sm.st.communal_why') : t('sm.st.unkept_why')} />
                 ))}
               </CardGrid>
             </>
