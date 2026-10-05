@@ -12,6 +12,7 @@ import type { ScreenProps } from '../types'
 import { Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll } from '../native/kit/Parts'
 import { hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
+import { atText } from '../../lib/duration'
 import { Emboss, Slab } from '../../kit'
 import Emblem from '../../lib/emblem'
 import { emblemHex } from '../../lib/emblemPalette'
@@ -27,8 +28,9 @@ import VillageHome from '../village/VillageHome'
 import './support.css'
 import { CardGrid } from '../../ui/v6/panel'
 
-const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane' }
-const modeName = (code: string | undefined, fallback?: string) => (code && `sc.mode.${code}` in { 'sc.mode.bus': 1, 'sc.mode.train': 1, 'sc.mode.flight': 1 } ? t(`sc.mode.${code}` as Key) : fallback ?? code ?? '')
+const MODE_ICON: Record<string, string> = { bus: 'bus', car: 'x_car', train: 'train', flight: 'plane', ship: 'x_car', cart: 'cart', bicycle: 'x_car', walk: 'walk' }
+const MODE_NAMES = new Set(['bus', 'train', 'flight', 'ship', 'cart', 'bicycle', 'car', 'walk'])
+const modeName = (code: string | undefined, fallback?: string) => (code && MODE_NAMES.has(code) ? t(`sc.mode.${code}` as Key) : fallback ?? code ?? '')
 
 // -- destinations ------------------------------------------------------------
 
@@ -176,6 +178,7 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
       <StatGrid>
         <StatCard icon="x_map" palette="sapphire" label={t('sc.confirm.distance')} value={t('sc.dest.km', { n: formatNumber(Math.round(dest.distance_km)) })} />
         {dest.duration_seconds ? <StatCard icon="stopwatch" palette="amber" label={t('sc.confirm.time')} value={roughDuration(dest.duration_seconds)} /> : null}
+        {chosen && (chosen.wait_seconds ?? 0) > 0 ? <StatCard icon="clock" palette="emerald" label={t('sc.confirm.arrive')} value={atText(Date.now() + (chosen.wait_seconds ?? 0) * 1000)} /> : null}
       </StatGrid>
       {options === null && <Note>{t('sc.confirm.loading')}</Note>}
       {options?.length === 0 && <Note tone="bad">{t('sc.confirm.no_mode')}</Note>}
@@ -188,7 +191,7 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
             palette={o.mode_code === mode ? 'gold' : 'teal'}
             tone={o.mode_code === mode ? 'gold' : undefined}
             title={modeLabel(o)}
-            sub={`${roughDuration(o.wait_seconds)}${o.busy ? ` · ${t('sc.confirm.busy')}` : ''}`}
+            sub={`${roughDuration(o.wait_seconds)}${(o.wait_seconds ?? 0) >= 3600 ? ` · ${t('sc.confirm.arrive_at', { at: atText(Date.now() + (o.wait_seconds ?? 0) * 1000) })}` : ''}${o.busy ? ` · ${t('sc.confirm.busy')}` : ''}`}
             right={money(o.fare)}
             onClick={o.busy ? undefined : () => setMode(o.mode_code)}
           />
@@ -233,6 +236,8 @@ export function SupportJourney({ openLocal }: ScreenProps) {
         <>
           <div className="sc-timer display">{hms(left)}</div>
           <div style={{ fontSize: 13, color: '#dfe4ff' }}>{t('sc.journey.left')}</div>
+          <div style={{ fontSize: 13, color: '#dfe4ff' }}>{t('sc.journey.arrive_at', { at: atText(endsAt) })}</div>
+          <div style={{ fontSize: 12.5, color: '#c3cbf0', maxWidth: 360, lineHeight: 1.6 }}>{t('sc.journey.rules')}</div>
         </>
       )}
     </div>

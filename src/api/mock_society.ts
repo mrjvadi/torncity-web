@@ -90,12 +90,12 @@ function cityGov(args: Record<string, unknown>) {
   const village = args.city === 'talvanro'
   const place = village ? city('talvanro', 'Talvanro') : city()
   const sections = village
-    ? [{ place, offices: [{ code: 'village_head', seats: 1, holders: [ME], acting_code: '', acting: null }], levers: [LEVY] }]
+    ? [{ place, offices: [{ code: 'founder', title: 'شهردار', acting_title: '', seats: 1, holders: [ME], acting_code: '', acting: null }], levers: [LEVY] }]
     : [
-      { place, offices: [{ code: 'mayor', seats: 1, holders: [ME], acting_code: '', acting: null }, { code: 'deputy_mayor', seats: 1, holders: null, acting_code: '', acting: null },
-        { code: 'city_council', seats: 5, holders: [KAVEH, NILOO], acting_code: '', acting: null }],
+      { place, offices: [{ code: 'founder', title: 'کدخدا', acting_title: '', seats: 1, holders: [ME], acting_code: '', acting: null }, { code: 'deputy', title: 'یاور کدخدا', acting_title: '', seats: 1, holders: null, acting_code: '', acting: null },
+        { code: '', title: 'بزرگان ده', acting_title: '', seats: 5, holders: [KAVEH, NILOO], acting_code: '', acting: null }],
       levers: [TAX, WAGE, { ...BUDGET, pending: { value: 0, allocation: { police: 4000, hospital: 2500, education: 2500, infrastructure: 1000 }, in_seconds: 43200, by: ME } }] },
-      { place: COUNTRY, offices: [{ code: 'president', seats: 1, holders: [KAVEH], acting_code: '', acting: null }], levers: [ARMS] },
+      { place: COUNTRY, offices: [{ code: 'president', title: '', acting_title: '', seats: 1, holders: [KAVEH], acting_code: '', acting: null }], levers: [ARMS] },
     ]
   const acts = [
     act('gov.history', 'gov.history', { city: place.code }), act('gov.elections', 'election.list'),

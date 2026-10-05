@@ -16,10 +16,10 @@ const OTHER = { kind: 'village' as const, code: 'v-q7m2', name: 'سرخه', sett
 const FAR = { kind: 'village' as const, code: 'v-z1p8', name: 'کوهدشت', settlement_id: 'mock-village-3', emblem: { shape: 'hexagon', color_a: 'green', color_b: 'gold', icon: 'wheat' }, motto: '' }
 
 const DEST: TravelDestination[] = [
-  { ...SUPPORT, distance_km: 42, duration_seconds: 900, fare: 6300 },
-  { ...OWN, distance_km: 42, duration_seconds: 900, fare: 6300 },
-  { ...OTHER, distance_km: 118, duration_seconds: 1800, fare: 9100 },
-  { ...FAR, distance_km: 460, duration_seconds: 5400, fare: 24800 },
+  { ...SUPPORT, distance_km: 42, duration_seconds: 3600, fare: 6300 },
+  { ...OWN, distance_km: 42, duration_seconds: 3600, fare: 6300 },
+  { ...OTHER, distance_km: 118, duration_seconds: 9000, fare: 9100 },
+  { ...FAR, distance_km: 460, duration_seconds: 27600, fare: 24800 },
 ]
 
 let where: 'support' | 'own' | 'foreign' | 'travel' | null = (() => {
@@ -27,9 +27,9 @@ let where: 'support' | 'own' | 'foreign' | 'travel' | null = (() => {
   return v === 'support' ? 'support' : v === 'village' ? 'own' : v === 'foreign' ? 'foreign' : v === 'travel' ? 'travel' : null
 })()
 let trip: { to: TravelDestination; mode: string; started: number; total: number } | null =
-  where === 'travel' ? { to: DEST[0], mode: 'train', started: Date.now() - 20000, total: 60000 } : null
+  where === 'travel' ? { to: DEST[0], mode: 'train', started: Date.now() - 2 * 3600_000, total: 28 * 3600_000 + 15 * 60_000 } : null
 
-const MODE_NAME: Record<string, string> = { bus: 'اتوبوس', car: 'خودرو', train: 'قطار', flight: 'هواپیما' }
+const MODE_NAME: Record<string, string> = { bus: 'اتوبوس', car: 'خودرو', train: 'قطار', flight: 'هواپیما', ship: 'کشتی', cart: 'گاری' }
 
 function tick() {
   if (trip && Date.now() >= trip.started + trip.total) {

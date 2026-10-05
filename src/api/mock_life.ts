@@ -105,9 +105,9 @@ const placeAt = (km: number, bearingDeg: number) => {
 function cities(page: number) {
   const p1 = placeAt(42, 70), p2 = placeAt(118, 200), p3 = placeAt(460, 320)
   const dests = [
-    { code: 'support', name: 'Support', distance_km: 42, emblem: '', village: false, settlement_id: '', lat: p1.lat, lon: p1.lon, fare: 6300, wait_seconds: 900 },
-    { code: 'v-q7m2', name: 'سرخه', distance_km: 118, emblem: '🌳', village: true, settlement_id: 'mock-village-2', lat: p2.lat, lon: p2.lon, fare: 9100, wait_seconds: 1800 },
-    { code: 'v-z1p8', name: 'کوهدشت', distance_km: 460, emblem: '🌾', village: true, settlement_id: 'mock-village-3', lat: p3.lat, lon: p3.lon, fare: 24800, wait_seconds: 5400 },
+    { code: 'support', name: 'Support', distance_km: 42, emblem: '', village: false, settlement_id: '', lat: p1.lat, lon: p1.lon, fare: 6300, wait_seconds: 3600 },
+    { code: 'v-q7m2', name: 'سرخه', distance_km: 118, emblem: '🌳', village: true, settlement_id: 'mock-village-2', lat: p2.lat, lon: p2.lon, fare: 9100, wait_seconds: 9000 },
+    { code: 'v-z1p8', name: 'کوهدشت', distance_km: 460, emblem: '🌾', village: true, settlement_id: 'mock-village-3', lat: p3.lat, lon: p3.lon, fare: 24800, wait_seconds: 27600 },
   ]
   return mockOk('cities', { destinations: dests, page, pages: 2, origin_code: 'calderis', origin: 'Calderis', travelling: false, travelling_to_code: '', travelling_to: '' }, [
     ...dests.map((d) => A('travel.to', 'travel.options', { city: d.code }, { subject: d.code })),
@@ -117,9 +117,10 @@ function cities(page: number) {
 }
 
 const MODES = [
-  { mode_code: 'bus', mode_name: 'Bus', fare: 31785, wait_seconds: 900, energy: 4, busy: false, vehicle: null, condition: 0 },
-  { mode_code: 'train', mode_name: 'Train', fare: 9800, wait_seconds: 600, energy: 3, busy: true, vehicle: null, condition: 0 },
-  { mode_code: 'bicycle', mode_name: 'Bicycle', fare: 0, wait_seconds: 3000, energy: 12, busy: false, vehicle: N('bicycle', 'Bicycle'), condition: 8200 },
+  { mode_code: 'bus', mode_name: 'Bus', fare: 31785, wait_seconds: 27600, energy: 4, busy: false, vehicle: null, condition: 0 },
+  { mode_code: 'train', mode_name: 'Train', fare: 9800, wait_seconds: 19800, energy: 3, busy: true, vehicle: null, condition: 0 },
+  { mode_code: 'ship', mode_name: 'کشتی', fare: 21000, wait_seconds: 46800, energy: 3, busy: false, vehicle: null, condition: 0 },
+  { mode_code: 'bicycle', mode_name: 'Bicycle', fare: 0, wait_seconds: 90000, energy: 12, busy: false, vehicle: N('bicycle', 'Bicycle'), condition: 8200 },
 ]
 
 function travelOptions(to: string) {
@@ -142,7 +143,7 @@ function started(to: string, mode: string) {
   return mockOk('travel_started', { from_code: 'calderis', from: 'Calderis', to_code: to, to: to === 'support' ? 'Support' : to, mode_code: m.mode_code, mode_name: m.mode_name, duration_seconds: m.wait_seconds, arrives_at: iso(m.wait_seconds / 60), energy: m.energy, fare: m.fare }, [back('player.profile.get'), refreshA('travel.status')])
 }
 
-const mockStatus = () => mockOk('travel_status', { from_code: 'calderis', from: 'Calderis', to_code: 'support', to: 'Support', mode_code: 'train', mode_name: 'Train', remaining_seconds: 540, arrives_at: iso(9) }, [back('player.profile.get'), refreshA('travel.status')])
+const mockStatus = () => mockOk('travel_status', { from_code: 'calderis', from: 'Calderis', to_code: 'support', to: 'Support', mode_code: 'train', mode_name: 'Train', remaining_seconds: 97200, arrives_at: iso(1620) }, [back('player.profile.get'), refreshA('travel.status')])
 
 const arrived = () => mockOk('travel_arrived', { city_code: 'support', city: 'Support', xp: 12 }, [A('profile', 'player.profile.get'), A('profile.map', 'map.list')])
 const travelHere = () => mockOk('travel_here', { reason: 'already_there', village: 'آمل', village_code: 'v-k3x9' }, [A('travel.elsewhere', 'map.cities')])

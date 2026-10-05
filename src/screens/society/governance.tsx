@@ -60,8 +60,10 @@ const CityGovernance = screen<CityGovView>(({ view: v, ctx }) => {
               const holders = o.holders ?? []
               const end = holders.length
                 ? (o.seats > 1 ? t('soc.gov.seats', { held: holders.length, seats: o.seats, players: playersText(holders) }) : playersText(holders))
-                : (o.acting_code && (o.acting ?? []).length ? t('soc.gov.acting', { deputy: officeName(ctx.names, o.acting_code), players: playersText(o.acting) }) : t('soc.gov.vacant'))
-              return <Line key={o.code} title={officeName(ctx.names, o.code) || t('soc.unnamed_office')} end={end} />
+                : (o.acting_code && (o.acting ?? []).length ? t('soc.gov.acting', { deputy: o.acting_title || officeName(ctx.names, o.acting_code) || t('soc.unnamed_office'), players: playersText(o.acting) }) : t('soc.gov.vacant'))
+              // the players' own title leads; the catalogue name only stands in when a place has no charter title
+              const title = o.title || officeName(ctx.names, o.code) || t('soc.unnamed_office')
+              return <Line key={o.code || title} title={title} end={end} />
             })}
           </div>
           {(s.levers ?? []).length > 0 && <SectionTitle>{t('soc.gov.policies')}</SectionTitle>}

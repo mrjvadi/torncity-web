@@ -5162,6 +5162,17 @@ export const uiFa = {
   'refusal.village_charter_acting_forbidden': 'کسی که جای منصب بنیان‌گذار کار می‌کند این کار را نمی‌تواند بکند.',
   'time.about': 'حدود {t}',
   'build.wait': 'زمان ساخت',
+  'sc.mode.ship': 'کشتی',
+  'sc.mode.cart': 'گاری',
+  'sc.mode.bicycle': 'دوچرخه',
+  'sc.mode.car': 'ماشین',
+  'sc.mode.walk': 'پیاده',
+  'sc.confirm.arrive': 'می‌رسی',
+  'sc.confirm.arrive_at': 'رسیدن {at}',
+  'sc.journey.arrive_at': 'ساعت رسیدن: {at}',
+  'sc.journey.rules': 'تا نرسیده‌ای نمی‌توانی در شهر کار کنی، از بازارچه بخری یا به انبار دست بزنی. پروفایل، پیام‌ها و بقیهٔ بخش‌ها باز است.',
+  'lf.travelling.here': 'در سفری؛ {at} می‌رسی. تا آن موقع این کار ممکن نیست.',
+  'lf.travelling.here_no_time': 'در سفری؛ تا نرسیده‌ای این کار ممکن نیست.',
 } as const
 
 export type UiKey = keyof typeof uiFa
