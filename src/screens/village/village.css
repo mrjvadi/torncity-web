@@ -253,3 +253,12 @@
 .ch-zone { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 8px; }
 .ch-zone p { margin: 0; }
 .ch-select { height: 48px; width: 100%; }
+.ch-cand { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.07); border: 2px solid transparent; color: inherit; text-align: start; }
+.ch-cand:disabled { opacity: 1; cursor: default; }
+.ch-cand.on { border-color: #f4c441; background: rgba(244, 196, 65, 0.14); }
+.ch-cand.win { border-color: #3fa35c; }
+.ch-win { color: #7fe39a; }
+.ch-rules p { margin: 0 0 8px; font: 500 14px/1.7 Vazirmatn; opacity: 0.85; }
+.ch-seg { display: flex; gap: 8px; }
+.ch-seg button { flex: 1; min-height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); color: inherit; font: 700 14px Vazirmatn; border: 2px solid transparent; }
+.ch-seg button.on { border-color: #f4c441; background: rgba(244, 196, 65, 0.16); }

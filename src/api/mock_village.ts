@@ -1572,7 +1572,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.private.lots': return privateLots(args)
     case 'settlement.tax.pay': return taxPay()
     case 'settlement.terms': return termsView(args)
-    case 'settlement.timezone.set': case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': return mockCharter(command, args, IS_HEAD)
+    case 'settlement.timezone.set': case 'settlement.charter.view': case 'settlement.charter.office.save': case 'settlement.charter.office.close': case 'settlement.charter.appoint': case 'settlement.charter.dismiss': case 'settlement.charter.resign': case 'settlement.charter.election.open': case 'settlement.charter.stand': case 'settlement.charter.vote': case 'settlement.charter.recall.start': case 'settlement.charter.recall.sign': return mockCharter(command, args, IS_HEAD)
     case 'settlement.development.view': return developmentView()
     case 'settlement.promotion.view': case 'settlement.promote': return developmentView()
     case 'settlement.join': return residence(false, args)

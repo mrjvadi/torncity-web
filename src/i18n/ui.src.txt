@@ -5158,3 +5158,105 @@ charter.group.settings | تنظیم‌های شهر | City settings
 charter.perm.settings.timezone | تعیین ساعت شهر | Set the city time zone
 refusal.village_charter_zone_invalid | این ساعت درست نیست؛ باید مضرب ربع ساعت و در بازهٔ مجاز باشد. | That offset is not valid: a multiple of 15 minutes within the allowed range.
 refusal.village_charter_zone_cooldown | ساعت شهر را به تازگی عوض کرده‌اند؛ کمی صبر کن. | The time zone was changed recently; wait a while.
+# -- charter phase 2: elections, recall, amendments, the acting head ------------
+charter.ballots | رأی‌گیری‌ها | Votes
+charter.ballots_none | الان رأی‌گیری‌ای در کار نیست. | No vote is running now.
+charter.ballots_done | رأی‌گیری‌های تمام‌شده | Finished votes
+charter.kind.election | انتخابات «{office}» | Election for “{office}”
+charter.kind.recall | برکناری {target} از «{office}» | Recall of {target} from “{office}”
+charter.kind.amendment | تغییر منصب «{office}» | Change to the office “{office}”
+charter.phase.candidacy | ثبت‌نام نامزدها | Candidates register
+charter.phase.voting | رأی‌گیری | Voting
+charter.phase.closed | تمام شد | Finished
+charter.candidacy_left | ثبت‌نام {left} دیگر تمام می‌شود (تا {at}) | Registration ends in {left} (at {at})
+charter.voting_left | رأی‌گیری {left} دیگر تمام می‌شود (تا {at}) | Voting ends in {left} (at {at})
+charter.eligible | {n} نفر حق رأی دارند | {n} people may vote
+charter.needed_recall | برای اثرگذاری دست‌کم {n} رأی لازم است و باید موافق‌ها بیشتر باشند. | At least {n} votes must be cast, and yes must outnumber no.
+charter.needed_amend | حد نصاب {n} رأی است و اکثریت آرا تصمیم می‌گیرد. | The quorum is {n} votes and the majority decides.
+charter.secret | رأی‌ها مخفی است؛ شمارش بعد از پایان نشان داده می‌شود. | Votes are secret; counts show once it is over.
+charter.stand | نامزد می‌شوم | I stand as a candidate
+charter.standing | نامزد شدی | You are a candidate
+charter.vote | رأی بده | Vote
+charter.voted | رأی دادی | You voted
+charter.yes | موافقم | In favour
+charter.no | مخالفم | Against
+charter.pick_candidate | یکی را انتخاب کن | Pick one
+charter.candidates | نامزدها | Candidates
+charter.no_candidates | هنوز نامزدی نیست. | No candidate yet.
+charter.votes_n | {n} رأی | {n} votes
+charter.winners | برنده | Winner
+charter.result.election.passed | برنده: {names} | Winner: {names}
+charter.result.election.no_result | کسی رأی نیاورد؛ انتخابات دوباره برگزار می‌شود. | Nobody got a vote; the election is called again.
+charter.result.election.cancelled | انتخابات لغو شد. | The election was cancelled.
+charter.result.election.failed | انتخابات بی‌نتیجه ماند. | The election had no result.
+charter.result.recall.passed | برکنار شد. | Removed from office.
+charter.result.recall.failed | در منصبش ماند. | Stays in office.
+charter.result.amendment.passed | تغییر تصویب شد. | The change passed.
+charter.result.amendment.failed | تغییر تصویب نشد. | The change did not pass.
+charter.result.void | این رأی‌گیری باطل شد. | This vote was voided.
+charter.result.cancelled | این رأی‌گیری لغو شد. | This vote was cancelled.
+charter.result.no_result | این رأی‌گیری نتیجه‌ای نداشت. | This vote had no result.
+charter.tally | موافق {yes}، مخالف {no} | Yes {yes}, no {no}
+charter.proposal | پیشنهاد | The proposal
+charter.proposal.close | بستن منصب | Close the office
+charter.proposal.save | منصب «{title}» با {seats} کرسی، {how}{deputy} | Office “{title}” with {seats} seats, {how}{deputy}
+charter.proposal.deputy | ، جانشین شهردار | , acts for the head
+charter.petitions | طومار برکناری | Recall petitions
+charter.petition_line | برکناری {target} از «{office}» | Recall {target} from “{office}”
+charter.petition_progress | {n} از {needed} امضا | {n} of {needed} signatures
+charter.sign | امضا می‌کنم | I sign
+charter.signed | امضا کردی | You signed
+charter.recall_start | طومار برکناری | Start a recall petition
+charter.recall_hint | صاحب منصب چند روز اول در امان است؛ طومار امضای کافی لازم دارد و بعد رأی‌گیری می‌شود. | A holder is safe for the first days; a petition needs enough signatures, then a vote follows.
+charter.call_election | برگزاری انتخابات | Call an election
+charter.term_ends | پایان دوره: {at} | Term ends: {at}
+charter.acting | {name} ({office}) تا {at} جای {head} را پر می‌کند؛ هر خرج تا {cap} است. تغییر منشور، انتخابات، ساعت شهر، پیمان‌ها، اتحادها و یورش از او برنمی‌آید. | {name} ({office}) acts for the {head} until {at}; each spend is capped at {cap}. Charter changes, elections, the time zone, treaties, unions and raids are out of reach.
+charter.vacant_head | کرسی «{head}» خالی است و کسی جایش را نگرفته؛ برایش انتخابات باز می‌شود. | The seat of “{head}” is empty and nobody acts for it; an election opens for it.
+charter.rules | قاعده‌ها | The rules
+charter.rule.election | انتخابات: {c} ساعت ثبت‌نام و {v} ساعت رأی‌گیری؛ هر دوره {d} روز است. ساکنی که چند روز در شهر مانده باشد می‌تواند نامزد شود و رأی بدهد. | Elections: {c} hours to register and {v} hours to vote; a term is {d} days. A resident of a few days may stand and vote.
+charter.rule.recall | برکناری: {t} روز اول در امان است؛ طومار {p}٪ از رأی‌دهنده‌ها (دست‌کم {m} نفر) می‌خواهد و بعد {h} ساعت رأی‌گیری می‌شود. | Recall: safe for the first {t} days; a petition needs {p}% of voters (at least {m}) and then {h} hours of voting.
+charter.rule.amend | تغییر ساختاری منصب‌ها از رأی ساکنان می‌گذرد: {h} ساعت، با حد نصاب. | Structural changes to offices go to the residents' vote: {h} hours, with a quorum.
+charter.rule.acting | اگر کرسی «{head}» خالی بماند، تا {a} روز یک نفر کارها را می‌چرخاند. | If the seat of “{head}” stays empty, someone keeps things running for up to {a} days.
+charter.field.how | پر شدن منصب | Filled by
+charter.how_opt.appointment | انتصاب | Appointment
+charter.how_opt.election | انتخابات | Election
+charter.field.deputy | جانشین شهردار | Acts for the head
+charter.deputy_hint | وقتی کرسی شهردار خالی بماند، قدیمی‌ترین صاحب این منصب کارها را می‌چرخاند. | While the head's seat is empty, the longest-serving holder of this office keeps things running.
+charter.vote_note | تغییر اجازه‌های کلیدی، شیوهٔ پر شدن یا جانشینِ یک منصب، در شهرهای بزرگ‌تر به رأی ساکنان گذاشته می‌شود. | A change to key permissions, how an office is filled or who acts for the head goes to the residents' vote in larger cities.
+charter.action.election_opened | انتخابات «{title}» باز شد | The election for “{title}” opened
+charter.action.election_cancelled | انتخابات «{title}» لغو شد | The election for “{title}” was cancelled
+charter.action.election_no_result | انتخابات «{title}» بی‌نتیجه ماند | The election for “{title}” had no result
+charter.action.election_settled | انتخابات «{title}» تمام شد | The election for “{title}” is settled
+charter.action.election_blocked | انتخابات «{title}» عقب افتاد | The election for “{title}” was held up
+charter.action.seat_elected | یک نفر برای «{title}» انتخاب شد | Someone was elected to “{title}”
+charter.action.seat_term_ended | دورهٔ یک نفر در «{title}» تمام شد | Someone's term in “{title}” ended
+charter.action.candidate_stood | نامزدی برای «{title}» ثبت شد | A candidacy for “{title}” was filed
+charter.action.vote_cast | یک نفر برای «{title}» رأی داد | Someone voted on “{title}”
+charter.action.recall_petition_started | طومار برکناری در «{title}» شروع شد | A recall petition began in “{title}”
+charter.action.recall_signed | امضای تو به طومار «{title}» اضافه شد | Your signature was added to the “{title}” petition
+charter.action.recall_vote_opened | رأی‌گیری برکناری در «{title}» باز شد | The recall vote in “{title}” opened
+charter.action.recall_settled | رأی‌گیری برکناری در «{title}» تمام شد | The recall vote in “{title}” is settled
+charter.action.amendment_proposed | تغییر «{title}» به رأی گذاشته شد | The change to “{title}” was put to a vote
+charter.action.amendment_passed | تغییر «{title}» تصویب شد | The change to “{title}” passed
+charter.action.amendment_failed | تغییر «{title}» تصویب نشد | The change to “{title}” did not pass
+charter.action.amendment_void | رأی‌گیری تغییر «{title}» باطل شد | The vote on “{title}” was voided
+refusal.village_charter_no_ballot | این رأی‌گیری پیدا نشد. | That vote was not found.
+refusal.village_charter_deputy_taken | منصب دیگری همین حالا جانشین شهردار است. | Another office already acts for the head.
+refusal.village_charter_not_candidacy | وقت ثبت‌نام نامزدها گذشته است. | The registration of candidates is over.
+refusal.village_charter_not_voting | هنوز وقت رأی‌گیری نشده یا تمام شده است. | It is not the time to vote, or voting is over.
+refusal.village_charter_not_eligible | هنوز مدت لازم در این شهر نمانده‌ای که بتوانی در این کار شرکت کنی. | You have not lived here long enough to take part.
+refusal.village_charter_already_voted | تو قبلاً رأی داده‌ای. | You already voted.
+refusal.village_charter_already_standing | تو قبلاً نامزد شده‌ای. | You are already a candidate.
+refusal.village_charter_bad_choice | این گزینه درست نیست. | That choice is not valid.
+refusal.village_charter_election_open | برای این منصب انتخاباتی باز است. | An election for this office is already open.
+refusal.village_charter_not_elected | این منصب با انتخابات پر نمی‌شود. | This office is not filled by election.
+refusal.village_charter_no_vacancy | این منصب کرسی خالی ندارد. | This office has no empty seat.
+refusal.village_charter_recall_too_early | صاحب منصب هنوز در روزهای اول امان است. | The holder is still in the first days of safety.
+refusal.village_charter_recall_cooling | به‌تازگی دربارهٔ او رأی‌گیری شده؛ کمی صبر کن. | A recall vote on this person just ended; wait a while.
+refusal.village_charter_recall_open | دربارهٔ او همین حالا طومار یا رأی‌گیری باز است. | A petition or vote about this person is already open.
+refusal.village_charter_recall_self | دربارهٔ خودت نمی‌شود طومار نوشت. | You cannot petition about yourself.
+refusal.village_charter_not_holder | این بازیکن صاحب این منصب نیست. | That player does not hold this office.
+refusal.village_charter_recalled_recently | او به‌تازگی از این منصب برکنار شده و فعلاً نمی‌شود دوباره منصوبش کرد. | They were recently removed from this office and cannot be appointed back yet.
+refusal.village_charter_vote_pending | یک تغییر دیگر همین حالا در رأی‌گیری است. | Another change is already being voted on.
+refusal.village_charter_target_cannot_vote | کسی که دربارهٔ او رأی می‌گیرند نمی‌تواند امضا یا رأی بدهد. | The person in question cannot sign or vote.
+refusal.village_charter_acting_forbidden | کسی که جای شهردار کار می‌کند این کار را نمی‌تواند بکند. | Someone acting for the head cannot do this.

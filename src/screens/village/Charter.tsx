@@ -22,6 +22,7 @@ import type { ScreenProps } from '../types'
 import type { CommandArgs } from '../../api/client'
 import type { CharterGrantView, CharterOfficeView, CharterPermissionView, CharterView } from '../../api/views.gen'
 import { useVillageView } from './common'
+import { ActingBanner, BallotCards, BallotPopup, PetitionCards, RulesHelp } from './CharterVotes'
 import './village.css'
 
 const permKey = (code: string) => `charter.perm.${code.replace(':', '.')}`
@@ -48,12 +49,18 @@ export default function Charter({ response }: ScreenProps) {
   const [edit, setEdit] = useState<CharterOfficeView | 'new' | null>(null)
   const [busy, setBusy] = useState(false)
   const [zoneOpen, setZoneOpen] = useState(false)
+  const [ballotId, setBallotId] = useState<string | null>(null)
   const now = useNow(30_000)
 
   const offices = v?.offices ?? []
   const mine = v?.mine ?? []
   const officeOf = (key: string | null) => (key === null ? undefined : offices.find((o) => (o.id || 'founder') === key))
   const current = officeOf(open)
+  const head = offices.find((o) => o.founder)?.title ?? ''
+  const ballots = v?.ballots ?? []
+  const openBallots = ballots.filter((b) => b.status === 'open')
+  const doneBallots = ballots.filter((b) => b.status !== 'open')
+  const ballot = ballots.find((b) => b.id === ballotId)
 
   async function act(command: string, args: CommandArgs): Promise<boolean> {
     setBusy(true)
@@ -72,6 +79,7 @@ export default function Charter({ response }: ScreenProps) {
       {loading && !v && <Empty>{t('common.loading')}</Empty>}
       {v && (
         <>
+          <ActingBanner acting={v.acting} vacant={v.head_vacant} head={head} />
           <PSec>{t('charter.offices')}</PSec>
           {offices.length === 0 && <Empty>{t('charter.none')}</Empty>}
           <CardGrid>
@@ -89,6 +97,21 @@ export default function Charter({ response }: ScreenProps) {
             <div className="ch-new">
               <ActionButton tone="gold" onClick={() => setEdit('new')}>{t('charter.new')}</ActionButton>
             </div>
+          )}
+
+          <PSec>{t('charter.ballots')}</PSec>
+          {openBallots.length === 0 ? <p className="pn-hint">{t('charter.ballots_none')}</p> : <BallotCards ballots={openBallots} onOpen={setBallotId} />}
+          {(v.petitions ?? []).length > 0 && (
+            <>
+              <PSec>{t('charter.petitions')}</PSec>
+              <PetitionCards petitions={v.petitions ?? []} busy={busy} onSign={(id) => void act('settlement.charter.recall.sign', { petition: id })} />
+            </>
+          )}
+          {doneBallots.length > 0 && (
+            <>
+              <PSec>{t('charter.ballots_done')}</PSec>
+              <BallotCards ballots={doneBallots} onOpen={setBallotId} />
+            </>
           )}
 
           <PSec>{t('charter.zone')}</PSec>
@@ -109,6 +132,9 @@ export default function Charter({ response }: ScreenProps) {
             <div className="ch-chips">{mine.map((g) => <span key={g.permission} className="nx-chip nx-chip-gold">{grantText(g)}</span>)}</div>
           )}
 
+          <PSec>{t('charter.rules')}</PSec>
+          <RulesHelp r={v.rules} head={head} />
+
           <PSec>{t('charter.audit')}</PSec>
           {(v.audit ?? []).length === 0 && <p className="pn-hint">{t('charter.audit_none')}</p>}
           <div className="ch-audit">
@@ -125,6 +151,15 @@ export default function Charter({ response }: ScreenProps) {
               onAppoint={async (player) => { await act('settlement.charter.appoint', { office: current.id, player }) }}
               onDismiss={async (player) => { await act('settlement.charter.dismiss', { office: current.id, player }) }}
               onResign={async () => { if (await act('settlement.charter.resign', { office: current.id })) setOpen(null) }}
+              onCall={async () => { if (await act('settlement.charter.election.open', { office: current.id })) setOpen(null) }}
+              onRecall={async (player) => { if (await act('settlement.charter.recall.start', { office: current.id, player })) setOpen(null) }}
+            />
+          )}
+          {ballot && (
+            <BallotPopup
+              b={ballot} busy={busy} onClose={() => setBallotId(null)}
+              onStand={async () => { if (await act('settlement.charter.stand', { ballot: ballot.id })) setBallotId(null) }}
+              onVote={async (choice) => { if (await act('settlement.charter.vote', { ballot: ballot.id, choice })) setBallotId(null) }}
             />
           )}
           {zoneOpen && (
@@ -148,9 +183,9 @@ export default function Charter({ response }: ScreenProps) {
 
 // -- one office: who holds it, what it may do, and the acts the viewer's permissions allow -------------------------------
 
-function OfficePopup({ o, v, busy, onClose, onEdit, onClose_, onAppoint, onDismiss, onResign }: {
+function OfficePopup({ o, v, busy, onClose, onEdit, onClose_, onAppoint, onDismiss, onResign, onCall, onRecall }: {
   o: CharterOfficeView; v: CharterView; busy: boolean; onClose: () => void; onEdit: () => void; onClose_: () => void
-  onAppoint: (player: string) => void; onDismiss: (player: string) => void; onResign: () => void
+  onAppoint: (player: string) => void; onDismiss: (player: string) => void; onResign: () => void; onCall: () => void; onRecall: (player: string) => void
 }) {
   const [who, setWho] = useState('')
   const holders = o.holders ?? []
@@ -167,13 +202,18 @@ function OfficePopup({ o, v, busy, onClose, onEdit, onClose_, onAppoint, onDismi
       ) : undefined}
     >
       <Note>{t('charter.office_line', { how: howName(o.acquisition), filled: formatNumber(o.seats - o.open), seats: formatNumber(o.seats) })}</Note>
+      {o.term_ends && <p className="pn-hint">{t('charter.term_ends', { at: atText(o.term_ends) })}</p>}
+      {v.can_call_election && o.acquisition === 'election' && o.open > 0 && (
+        <ActionButton tone="gold" small disabled={busy} onClick={onCall}>{t('charter.call_election')}</ActionButton>
+      )}
       <Section>{t('charter.holders')}</Section>
       {holders.length === 0 && <p className="pn-hint">{t('charter.vacant')}</p>}
       <div className="ch-list">
         {holders.map((h) => (
           <div key={h.code} className="ch-holder">
             <span className="ch-name">{h.name}<small dir="ltr" data-latin>{h.code}</small></span>
-            {v.can_dismiss && <ActionButton tone="red" small disabled={busy} onClick={() => onDismiss(h.code)}>{t('charter.dismiss')}</ActionButton>}
+            {v.can_dismiss && o.acquisition !== 'election' && <ActionButton tone="red" small disabled={busy} onClick={() => onDismiss(h.code)}>{t('charter.dismiss')}</ActionButton>}
+            {o.can_recall && !o.founder && <ActionButton tone="steel" small disabled={busy} onClick={() => onRecall(h.code)}>{t('charter.recall_start')}</ActionButton>}
           </div>
         ))}
       </div>
@@ -183,6 +223,7 @@ function OfficePopup({ o, v, busy, onClose, onEdit, onClose_, onAppoint, onDismi
           <ActionButton tone="green" disabled={busy || who.trim().length < 3} onClick={() => { onAppoint(who.trim()); setWho('') }}>{t('charter.appoint')}</ActionButton>
         </div>
       )}
+      {o.can_recall && (o.holders ?? []).length > 0 && <p className="pn-hint">{t('charter.recall_hint')}</p>}
       <Section>{t('charter.may')}</Section>
       <div className="ch-chips">
         {(o.grants ?? []).map((g) => <span key={g.permission} className="nx-chip nx-chip-gold">{grantText(g)}</span>)}
@@ -203,6 +244,8 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
   const [seats, setSeats] = useState(office?.seats ?? 1)
   const [grants, setGrants] = useState<Record<string, number>>(() => Object.fromEntries((office?.grants ?? []).map((g) => [g.permission, g.limit])))
   const [openGroup, setOpenGroup] = useState<string | null>(null)
+  const [how, setHow] = useState(office?.acquisition === 'election' ? 'election' : 'appointment')
+  const [deputy, setDeputy] = useState(office?.deputy ?? false)
   const groups = useMemo(() => {
     const m = new Map<string, CharterPermissionView[]>()
     for (const p of v.permissions ?? []) m.set(p.group, [...(m.get(p.group) ?? []), p])
@@ -232,7 +275,7 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
       onClose={onClose} title={t(office ? 'charter.edit_title' : 'charter.new_title')} tone="navy" dismissible={!busy}
       footer={
         <ActionButton tone="green" busy={busy} disabled={!valid} onClick={() => onSave({
-          office: office?.id ?? '', title: title.trim(), seats, acquisition: 'appointment',
+          office: office?.id ?? '', title: title.trim(), seats, acquisition: founder ? 'head' : how, deputy: founder ? false : deputy,
           grants: Object.entries(grants).map(([permission, limit]) => (limit > 0 ? { permission, limit } : { permission })),
         })}>{t('charter.save')}</ActionButton>
       }
@@ -254,6 +297,25 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
               </div>
             </div>
           )}
+          {!founder && (
+            <div className="ch-field">
+              <span>{t('charter.field.how')}</span>
+              <div className="ch-seg" role="radiogroup">
+                {(['appointment', 'election'] as const).map((k) => (
+                  <button key={k} type="button" role="radio" aria-checked={how === k} className={how === k ? 'on' : ''} onClick={() => setHow(k)}>{t(`charter.how_opt.${k}` as Key)}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          {!founder && (
+            <div className="ch-perm">
+              <button type="button" role="switch" aria-checked={deputy} onClick={() => setDeputy((d) => !d)}>
+                <i className={deputy ? 'on' : ''} />
+                <span>{t('charter.field.deputy')}<small>{t('charter.deputy_hint')}</small></span>
+              </button>
+            </div>
+          )}
+          {office && !founder && <p className="pn-hint">{t('charter.vote_note')}</p>}
           <Section>{t('charter.field.perms')}</Section>
           {founder && <p className="pn-hint">{t('charter.founder_note')}</p>}
           <div className="ch-groups">
