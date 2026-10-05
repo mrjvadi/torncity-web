@@ -6,7 +6,7 @@ import type { Key } from './fa'
 
 export const en: Partial<Record<Key, string>> = {
   'village.title': 'My city',
-  'village.head': 'Mayor',
+  'village.head': 'Office holder',
   'village.member': 'Resident',
   'village.visitor': 'Visitor',
   'village.literacy': 'Literacy {p}%',
@@ -125,7 +125,7 @@ export const en: Partial<Record<Key, string>> = {
   'build.legend.ok': 'Buildable',
   'build.legend.bad': 'Unsuitable',
   'build.legend.taken': 'Built',
-  'build.not_head': 'Only the mayor can build.',
+  'build.not_head': 'Only someone who may build can build.',
   'build.reason.water': 'Water or river',
   'build.reason.steep': 'Too steep',
   'build.reason.occupied': 'Built',
@@ -228,7 +228,7 @@ export const en: Partial<Record<Key, string>> = {
   'know.confirm_buy': 'Buy "{name}" for {price}?',
   'know.confirm_research': 'Start researching "{name}" for {cost}?',
   'know.done': 'Done.',
-  'know.only_head': 'Only the mayor can research or buy.',
+  'know.only_head': 'Only someone who may research can research or buy.',
 
   'who.title': 'City residents',
   'who.online': 'Online',
@@ -267,7 +267,7 @@ export const en: Partial<Record<Key, string>> = {
   'event.build_salvaged': '"{name}" was demolished.',
   'event.research_finished': 'Research "{name}" finished.',
   'event.knowledge_bought': '"{name}" was bought.',
-  'event.head_changed': 'The mayor changed.',
+  'event.head_changed': 'The city\'s office holder changed.',
   'event.member_joined': '{name} joined the city.',
   'event.member_left': '{name} left the city.',
 

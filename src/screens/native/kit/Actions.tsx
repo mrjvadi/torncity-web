@@ -55,7 +55,7 @@ export default function Actions({ response, onAction, only, refreshCommand }: {
   const { rows, pager } = useMemo(() => {
     const all = (response?.actions ?? [])
       .filter((a) => !only || only(a))
-      .filter((a) => a.kind !== 'back' && !(a.kind === 'navigation' && (a.id === 'refresh' || REFRESH.test(L(a)))))
+      .filter((a) => a.kind !== 'back' && a.id !== 'back' && !/^back[._]/.test(a.id ?? '') && L(a).replace(/[^\p{L}]/gu, '') !== 'بازگشت' && !(a.kind === 'navigation' && (a.id === 'refresh' || REFRESH.test(L(a)))))
     const pager: { prev?: Action; next?: Action } = {}
     const byRow = new Map<number, Action[]>()
     for (const a of all) {

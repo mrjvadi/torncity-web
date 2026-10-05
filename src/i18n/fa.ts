@@ -4,7 +4,7 @@
 
 export const fa = {
   'village.title': 'شهر من',
-  'village.head': 'شهردار',
+  'village.head': 'صاحب منصب',
   'village.member': 'عضو شهر',
   'village.visitor': 'بازدیدکننده',
   'village.literacy': 'سواد {p}%',
@@ -159,7 +159,7 @@ export const fa = {
   'build.legend.ok': 'قابل ساخت',
   'build.legend.bad': 'نامناسب',
   'build.legend.taken': 'ساخته‌شده',
-  'build.not_head': 'فقط شهردار می‌تواند بسازد.',
+  'build.not_head': 'فقط کسی که اجازهٔ ساخت دارد می‌تواند بسازد.',
   'build.reason.water': 'آب یا رودخانه',
   'build.reason.steep': 'شیب زیاد',
   'build.reason.occupied': 'ساخته‌شده',
@@ -262,7 +262,7 @@ export const fa = {
   'know.confirm_buy': '«{name}» به قیمت {price} خریده شود؟',
   'know.confirm_research': 'پژوهش «{name}» با هزینهٔ {cost} آغاز شود؟',
   'know.done': 'انجام شد.',
-  'know.only_head': 'فقط شهردار می‌تواند پژوهش یا خرید کند.',
+  'know.only_head': 'فقط کسی که اجازهٔ پژوهش دارد می‌تواند پژوهش یا خرید کند.',
 
   'who.title': 'ساکنان شهر',
   'who.online': 'آنلاین',
@@ -301,7 +301,7 @@ export const fa = {
   'event.build_salvaged': '«{name}» تخریب شد.',
   'event.research_finished': 'پژوهش «{name}» تمام شد.',
   'event.knowledge_bought': '«{name}» خریداری شد.',
-  'event.head_changed': 'شهردار شهر تغییر کرد.',
+  'event.head_changed': 'صاحب منصبِ شهر تغییر کرد.',
   'event.member_joined': '{name} به شهر آمد.',
   'event.member_left': '{name} شهر را ترک کرد.',
 

@@ -83,13 +83,15 @@ export function isWrite(a: Action): boolean {
   return !when || when(a)
 }
 
-export const isBack = (a: Action) => a.kind === 'back' || a.id === 'back'
+export const isBack = (a: Action) => a.kind === 'back' || a.id === 'back' || /^back[._]/.test(a.id ?? '')
 export const isRefresh = (a: Action) => a.id === 'refresh'
 
 const TONE: Record<string, 'gold' | 'green' | 'red' | 'blue' | 'steel'> = { primary: 'gold', confirm: 'green', danger: 'red', secondary: 'steel', navigation: 'steel', back: 'steel' }
 
 /** Buttons for a list of actions. */
 export function Btns({ ctx, list, row, yes, tone }: { ctx: FlowCtx; list: Action[]; row?: boolean; yes?: string; tone?: 'gold' | 'green' | 'red' | 'blue' | 'steel' }) {
+  // the header's back button is the one way back (P18): a second back row is never drawn
+  list = list.filter((a) => !isBack(a))
   if (!list.length) return null
   return (
     <div className={`vf-btns${row ? ' row' : ''}`}>

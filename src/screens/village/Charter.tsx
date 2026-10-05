@@ -238,6 +238,7 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
   v: CharterView; office: CharterOfficeView | null; busy: boolean; onClose: () => void; onSave: (args: CommandArgs) => void
 }) {
   const lim = v.limits
+  const head = (v.offices ?? []).find((o) => o.founder)?.title ?? ''
   const mine = v.mine ?? []
   const founder = !!office?.founder
   const [title, setTitle] = useState(office?.title ?? '')
@@ -311,7 +312,7 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
             <div className="ch-perm">
               <button type="button" role="switch" aria-checked={deputy} onClick={() => setDeputy((d) => !d)}>
                 <i className={deputy ? 'on' : ''} />
-                <span>{t('charter.field.deputy')}<small>{t('charter.deputy_hint')}</small></span>
+                <span>{t('charter.field.deputy', { head })}<small>{t('charter.deputy_hint', { head })}</small></span>
               </button>
             </div>
           )}
