@@ -5282,3 +5282,44 @@ sm.st.borrowed | {n} جایش از انبارهای قدیمی قرض است. | 
 sm.st.transition | انبارهای قدیمی تا {date} هنوز برای هر جنس جا حساب می‌شوند؛ بعد از آن هر جنس انبار خودش را می‌خواهد. | Old stores count for every kind of goods until {date}; after that each kind needs its own store.
 time.there | {at} به وقت آنجا | {at} local time there
 lf.arrives_there | رسیدن در مقصد | Arrival there
+work.title | کار این ساختمان | What this building does
+work.none | فعلاً برای این ساختمان کاری تعریف نشده؛ فقط سرجایش ایستاده است. | The game gives this building no work yet; it just stands here.
+work.status.working | کار می‌کند | Working
+work.status.idle | بیکار است | Idle
+work.status.paused | ایستاده | Stopped
+work.kind.production | تولید | Production
+work.kind.extraction | برداشت از زمین | Extraction
+work.kind.service | خدمات | Service
+work.kind.storage | انبار | Storage
+work.kind.housing | سکونت | Housing
+work.kind.infrastructure | زیرساخت | Infrastructure
+work.kind.other | کار | Work
+work.seats | {filled} از {max} جای کار پُر است | {filled} of {max} posts filled
+work.role.worker | کارگر | Worker
+work.empty | خالی | Empty
+work.npc | کارگر روزمزد | Day labourer
+work.player | یک نفر از اهالی | A resident
+work.shift | هر نوبت | One shift
+work.nothing | چیزی | nothing
+work.wage | دستمزد {n} | wage {n}
+work.goes_to | محصول به {class} می‌رود؛ {free} جا خالی است. | The output goes to {class}; {free} spaces free.
+work.class.other | انبار | Store
+work.crew | گروه کارگر روزمزد: {n} نفر، دستمزد {wage}، {left} نوبت مانده | Day-labour crew: {n}, wage {wage}, {left} shifts left
+work.paused | گروه کارگر ایستاده است. | The crew has stopped.
+work.reason.other | چیزی جلوی کار را گرفته است. | Something is holding the work back.
+work.reason.no_staff | هیچ‌کس اینجا نوبت کار ندارد. | Nobody works a shift here.
+work.reason.no_input | مواد کم است: {have} از {need} {item} برای هر نوبت. | Short of {item}: {have} of {need} per shift.
+work.reason.storage_full | جا برای محصول نیست: {have} جا خالی، {need} جا لازم در {class}. | No room for the output: {have} free, {need} needed in {class}.
+work.reason.employer_broke | خزانه دستمزد را ندارد: {have} از {need}. | The treasury cannot pay the wage: {have} of {need}.
+work.reason.no_keeper | انباردار ندارد؛ فقط جای مشترک اهالی حساب می‌شود. | No keeper; only the residents' shared room counts.
+work.reason.budget_spent | بودجه یا نوبت‌های امروز تمام شده است. | The budget or today's shifts are used up.
+work.fix.no_staff | رفتن به بازار کار | Go to the labour board
+work.fix.no_input | خرید مواد | Buy the materials
+work.fix.storage_full | انبار و جا | Store and room
+work.fix.employer_broke | خزانه | Treasury
+work.fix.no_keeper | انبار | Store
+work.fix.budget_spent | بازار کار | Labour board
+work.unstaffed.idle | بدون کارگر چیزی تولید نمی‌شود. | With nobody working, nothing is made.
+work.unstaffed.base_room | بدون کارگر فقط جای پایه‌اش حساب می‌شود. | With nobody working, only its base room counts.
+work.unstaffed.decays | بدون کارگر کم‌کم از بین می‌رود. | With nobody working, it slowly decays.
+work.unstaffed.unheld | بدون کارگر کسی آن را در دست ندارد. | With nobody working, nobody holds it.

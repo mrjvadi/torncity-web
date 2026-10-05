@@ -262,3 +262,14 @@
 .ch-seg { display: flex; gap: 8px; }
 .ch-seg button { flex: 1; min-height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); color: inherit; font: 700 14px Vazirmatn; border: 2px solid transparent; }
 .ch-seg button.on { border-color: #f4c441; background: rgba(244, 196, 65, 0.16); }
+
+/* the work block of a building panel */
+.wk { display: flex; flex-direction: column; gap: 8px; }
+.wk-seats { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.wk-seat { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 12px; border: 1px dashed color-mix(in srgb, currentColor 25%, transparent); font-size: 12.5px; opacity: .75; min-height: 44px; }
+.wk-seat b { font-size: 13px; }
+.wk-seat.on { opacity: 1; border-style: solid; border-color: #9be88d; background: color-mix(in srgb, #9be88d 12%, transparent); }
+.wk-seat.npc { border-color: #9fcdff; background: color-mix(in srgb, #9fcdff 12%, transparent); }
+.wk-shift { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 7%, transparent); }
+.wk-shift small { opacity: .7; }
+.wk-reason { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, #ffb02e 12%, transparent); font-size: 13.5px; line-height: 1.6; }
