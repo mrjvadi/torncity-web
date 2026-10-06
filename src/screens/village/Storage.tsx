@@ -112,7 +112,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
           {v.transition?.until && <Notice>{t('sm.st.transition', { date: dateText(v.transition.until) })}</Notice>}
           {(v.classes ?? []).map((c) => (
             <div key={c.class} className="st-class">
-              <FillBar used={c.used} reserved={c.reserved} capacity={c.capacity} label={t(`sm.st.class.${c.class}` as Key)}
+              <FillBar over={c.over} used={c.used} reserved={c.reserved} capacity={c.capacity} label={t(`sm.st.class.${c.class}` as Key)}
                 figures={`${formatNumber(c.used + c.reserved)} / ${formatNumber(c.capacity)}`} />
               {c.borrowed > 0 && <div className="gc-note">{t('sm.st.borrowed', { n: formatNumber(c.borrowed) })}</div>}
               {c.over > 0 && (

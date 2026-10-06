@@ -5183,7 +5183,7 @@ export const uiFa = {
   'time.there': '{at} به وقت آنجا',
   'lf.arrives_there': 'رسیدن در مقصد',
   'work.title': 'کار این ساختمان',
-  'work.none': 'فعلاً برای این ساختمان کاری تعریف نشده؛ فقط سرجایش ایستاده است.',
+  'work.none': 'این ساختمان کارگر و تولیدی ندارد.',
   'work.status.working': 'کار می‌کند',
   'work.status.idle': 'بیکار است',
   'work.status.paused': 'ایستاده',

@@ -57,7 +57,9 @@ export function ItemGrid({ cells, label }: { cells: GridCell[]; label?: string }
 
 /** The fill of a storage above its grid: the share held (green; amber near full, red full), the share reserved
  * for running shifts and open bids (a darker part), and the figures. */
-export function FillBar({ used, capacity, reserved = 0, label, figures }: {
+export function FillBar({ used, capacity, reserved = 0, label, figures, over }: {
+  /** per-class bars: red only when something is held beyond the room; a full bar that fits is amber */
+  over?: number
   used: number
   capacity: number
   reserved?: number
@@ -65,7 +67,7 @@ export function FillBar({ used, capacity, reserved = 0, label, figures }: {
   figures: ReactNode
 }) {
   const frac = capacity > 0 ? (used + reserved) / capacity : 0
-  const tone = frac >= 1 ? 'bad' : frac >= 0.85 ? 'low' : undefined
+  const tone = over !== undefined ? (over > 0 ? 'bad' : frac >= 0.9 ? 'low' : undefined) : frac >= 1 ? 'bad' : frac >= 0.85 ? 'low' : undefined
   return (
     <div className="ig-fill">
       <div className="ig-fill-head"><span>{label}</span><b>{figures}</b></div>

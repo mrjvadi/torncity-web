@@ -5283,7 +5283,7 @@ sm.st.transition | انبارهای قدیمی تا {date} هنوز برای ه�
 time.there | {at} به وقت آنجا | {at} local time there
 lf.arrives_there | رسیدن در مقصد | Arrival there
 work.title | کار این ساختمان | What this building does
-work.none | فعلاً برای این ساختمان کاری تعریف نشده؛ فقط سرجایش ایستاده است. | The game gives this building no work yet; it just stands here.
+work.none | این ساختمان کارگر و تولیدی ندارد. | The game gives this building no work yet; it just stands here.
 work.status.working | کار می‌کند | Working
 work.status.idle | بیکار است | Idle
 work.status.paused | ایستاده | Stopped
