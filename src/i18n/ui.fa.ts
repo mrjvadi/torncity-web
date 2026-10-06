@@ -1700,13 +1700,13 @@ export const uiFa = {
   'labor.level.apprentice': 'شاگرد',
   'labor.level.journeyman': 'کارگر ماهر',
   'labor.level.master': 'استادکار',
-  'labor.crew': 'خدمه: {n} کارگر روزمزد نگه داشته می‌شود',
+  'labor.crew': '{n} کارگر روزمزد سر کار نگه داشته می‌شوند',
   'labor.no_job': 'برای این کارگاه آگهی استخدامی نیست.',
   'labor.post': 'ثبت آگهی استخدام',
   'labor.hire': 'استخدام کارگر',
   'labor.hire_hint': 'کارگر آزاد: {a} · مزد هر شیفت: {w}',
   'labor.hire_n': '{n} کارگر',
-  'labor.hire_none': 'مرخص کردن خدمه',
+  'labor.hire_none': 'مرخص کردن کارگرها',
   'labor.wage_set': 'دستمزد بازیکن‌ها',
   'labor.close': 'بستن آگهی',
   'labor.not_resident': 'شما ساکن این شهر نیستید؛ تا وقتی اینجا هستید می‌توانید روزمزد کار کنید.',
@@ -5243,7 +5243,7 @@ export const uiFa = {
   'work.repair_post': 'تعمیر',
   'work.repair_head': 'تعمیر را شهردار آگهی می‌کند.',
   'work.repair_job': 'تعمیر در جریان است: {left} نوبت مانده، دستمزد {wage}، {n} کارگر روزمزد',
-  'work.repair_take': 'کار در تعمیر',
+  'work.repair_take': 'تعمیر می‌کنم',
 } as const
 
 export type UiKey = keyof typeof uiFa

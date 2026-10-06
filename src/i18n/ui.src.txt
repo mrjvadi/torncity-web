@@ -1744,13 +1744,13 @@ labor.npc | کارگر روزمزد | Day labourer
 labor.level.apprentice | شاگرد | Apprentice
 labor.level.journeyman | کارگر ماهر | Journeyman
 labor.level.master | استادکار | Master
-labor.crew | خدمه: {n} کارگر روزمزد نگه داشته می‌شود | Crew: {n} day labourers kept on site
+labor.crew | {n} کارگر روزمزد سر کار نگه داشته می‌شوند | Crew: {n} day labourers kept on site
 labor.no_job | برای این کارگاه آگهی استخدامی نیست. | There is no job posted for this site.
 labor.post | ثبت آگهی استخدام | Post a job
 labor.hire | استخدام کارگر | Hire workers
 labor.hire_hint | کارگر آزاد: {a} · مزد هر شیفت: {w} | Free labourers: {a} · wage per shift: {w}
 labor.hire_n | {n} کارگر | Hire {n}
-labor.hire_none | مرخص کردن خدمه | Release the crew
+labor.hire_none | مرخص کردن کارگرها | Release the crew
 labor.wage_set | دستمزد بازیکن‌ها | Wage for players
 labor.close | بستن آگهی | Close the job
 labor.not_resident | شما ساکن این شهر نیستید؛ تا وقتی اینجا هستید می‌توانید روزمزد کار کنید. | You do not live here, but you can work by the day while you are in the city.
@@ -5343,4 +5343,4 @@ work.repair_mats | مواد: {list}. | Materials: {list}.
 work.repair_post | تعمیر | Repair
 work.repair_head | تعمیر را شهردار آگهی می‌کند. | The head posts the repair.
 work.repair_job | تعمیر در جریان است: {left} نوبت مانده، دستمزد {wage}، {n} کارگر روزمزد | Repair under way: {left} shifts left, wage {wage}, {n} day labourers
-work.repair_take | کار در تعمیر | Work on the repair
+work.repair_take | تعمیر می‌کنم | Work on the repair
