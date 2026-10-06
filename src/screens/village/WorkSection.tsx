@@ -13,7 +13,7 @@ type Door = 'village_labor' | 'village_storage' | 'village_overview'
 const tone = (s: string) => (s === 'working' ? 'good' : s === 'paused' ? 'bad' : 'warn')
 const FIX: Record<string, Door | undefined> = { no_food: 'village_storage', no_staff: 'village_labor', no_input: 'village_storage', storage_full: 'village_storage', employer_broke: 'village_overview', no_keeper: 'village_storage', budget_spent: 'village_labor' }
 
-const pct = (bps: number, dec = 0) => `${formatNumber(Number((bps / 100).toFixed(dec)))}٪`
+const pct = (bps: number, dec = 0) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: dec }).format(bps / 100)}٪`
 const word = (key: string, fallback: string, args?: Record<string, string | number>) => (hasKey(key) ? t(key as Key, args) : fallback)
 
 export default function WorkSection({ work: w, names, onOpen, onClose, act, manage = false, buildingId = '' }: {
@@ -37,7 +37,7 @@ export default function WorkSection({ work: w, names, onOpen, onClose, act, mana
     )
   }
   const slots = w.slots ?? []
-  const reasons = (w.reasons ?? []).filter((r) => r.code !== 'no_function')
+  const reasons = (w.reasons ?? []).filter((r) => r.code !== 'no_function' && r.code !== 'needs_repair' && r.code !== w.job?.paused)
   const job = w.job
   const line = (items: WorkNode['inputs']) => (items ?? []).map((l) => `${formatNumber(l.qty)} ${goods(l.item)}`).join('، ')
   const shift = [
