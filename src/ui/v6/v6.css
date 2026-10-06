@@ -302,9 +302,9 @@
   .v6-money { margin-inline-start: auto; width: auto; height: auto; flex-direction: row; align-items: center; gap: 16px; margin-top: 4px; order: 9; }
   .v6-chip { width: 142px; height: 36px; border-radius: 18px; }
   /* three purses must always fit: they shrink together before anything is cut at the screen edge */
-  .v6-money { gap: 10px; flex: 0 1 auto; min-width: 0; }
-  .v6-money .v6-chip { width: auto; flex: 0 1 142px; min-width: 88px; }
-  .v6-money .v6-chip[data-k="local"] { flex-basis: 112px; }
+  .v6-money { gap: 16px; flex: 0 1 auto; min-width: 0; }
+  .v6-money .v6-chip { width: auto; flex: 0 1 128px; min-width: 84px; padding-inline-start: 6px; }
+  .v6-money .v6-chip[data-k="local"], .v6-money .v6-chip[data-k="gem"] { flex-basis: 108px; }
   .v6-chip > img { width: 42px; height: 42px; }
   .v6-chip > b { font-size: 16px; line-height: 38px; }
   .v6-plus { top: 6px; left: 5px; }
