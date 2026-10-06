@@ -5347,5 +5347,5 @@ work.repair_take | تعمیر می‌کنم | Work on the repair
 work.road_group | جاده‌سازی: {n} قطعه | Road building: {n} segments
 work.road_best | بهترین دستمزد: {w} | Best wage: {w}
 work.road_hint | هر قطعه شیفت جدا دارد؛ «کار کن» پردرآمدترین قطعهٔ آزاد را برمی‌دارد. | Each segment has its own shifts; the button takes the best-paid free one.
-work.road_show | دیدن همهٔ قطعه‌ها | See all segments
+work.road_show | همهٔ قطعه‌ها | See all segments
 work.road_hide | جمع کردن | Collapse

@@ -5247,7 +5247,7 @@ export const uiFa = {
   'work.road_group': 'جاده‌سازی: {n} قطعه',
   'work.road_best': 'بهترین دستمزد: {w}',
   'work.road_hint': 'هر قطعه شیفت جدا دارد؛ «کار کن» پردرآمدترین قطعهٔ آزاد را برمی‌دارد.',
-  'work.road_show': 'دیدن همهٔ قطعه‌ها',
+  'work.road_show': 'همهٔ قطعه‌ها',
   'work.road_hide': 'جمع کردن',
 } as const
 
