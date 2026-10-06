@@ -23,6 +23,7 @@ import {
   Btns, Cancel, Facts, flow, Hint, Lead, Page, Panel, registerFlow, Rest, isBack, isRefresh, type FlowCtx,
 } from './flow'
 import { CardGrid } from '../../ui/v6/panel'
+import WorkSection from './WorkSection'
 
 const Empt = Empty
 
@@ -811,6 +812,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
             {v.stock_capacity > 0 && <Hint>{t('vx.bld.stock_used', { used: formatNumber(v.stock_used), cap: formatNumber(v.stock_capacity) })}</Hint>}
           </div>
         )}
+        {!going && v.work && <WorkSection work={v.work} names={ctx.names} onOpen={(d) => ctx.openLocal(d)} onClose={() => undefined} />}
         {!going && v.kind === 'school' && <Hint>{v.teaching ? t('building.school.teaching') : t('building.school.idle')}</Hint>}
         {!going && v.kind === 'civic_hall' && (
           <Facts rows={[
