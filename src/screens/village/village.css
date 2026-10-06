@@ -136,7 +136,8 @@
 .vc-line-name { font-size: 14.5px; }
 .vc-line-sub { font-size: 11.5px; color: var(--text-dim); }
 .vc-line-sub.bad { color: #ff9a9e; }
-.vc-line-price { font-size: 14px; color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vc-line-price { font-size: 14px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.vc-line-price .m-sup, .hub-cards .nx-row-right .m-sup { display: block; }
 .vc-hub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
 .vc-hub .k-slab { padding: 10px 6px; font-size: 14px; }
 /* building panels (contract 1.4) */

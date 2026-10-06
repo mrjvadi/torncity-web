@@ -1,7 +1,7 @@
 import type { CourseNeed, TripHint } from '../../../api/views.gen'
 import type { ContentNames } from '../../../village/useVillage'
 import { t } from '../../../i18n'
-import { moneyIn, roughDuration } from './format'
+import { money, roughDuration } from './format'
 
 /** What a place still lacks for something it does not offer, one line each, in everyday words: research the head can
  * do, a building the head can raise, a teacher. Names come from the catalogue, the server's authored name last. */
@@ -20,5 +20,5 @@ export function needLines(needs: CourseNeed[] | null | undefined, names: Content
 
 /** How far the nearest place is, from the travel quote the server attached (fare and wait); empty when it is not known. */
 export function tripLine(trip: TripHint | null | undefined): string {
-  return trip ? t('trip.hint', { fare: moneyIn(trip.fare), wait: roughDuration(trip.wait_seconds) }) : ''
+  return trip ? t('trip.hint', { fare: money(trip.fare), wait: roughDuration(trip.wait_seconds) }) : ''
 }

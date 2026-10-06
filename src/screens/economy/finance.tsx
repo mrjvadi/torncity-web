@@ -2,6 +2,7 @@
 // actions of the answer (docs/adr/0039-presentation-split.md). A service the settlement does not
 // offer arrives as `unavailable` and is drawn as the "not available here" card.
 
+import { short } from '../../ui/v6/short'
 import type {
   FinanceHubView, FinanceRefusalView, GoldTradeView, GoldView, InsuranceView, InsureConfirmView, LoanConfirmView,
   LoanDetailView, LoanOfferView, LoanLine, PledgeLine, SavingsView,
@@ -67,14 +68,14 @@ const Gold = flow<GoldView>(({ view: v, ctx }) => {
         <div className="vf-btns row">
           {options.map((g) => {
             const a = find(ctx, 'gold.buy', { grams: g })
-            return a && <button key={g} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.gold.grams', { n: formatNumber(g) })}</b><small>{money(g * v.buy)}</small></button>
+            return a && <button key={g} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<><b>{t('eco.gold.grams', { n: formatNumber(g) })}</b><small>{money(g * v.buy)}</small></>)}</button>
           })}
         </div>
         {options.some((g) => g <= v.grams) && <Lead>{t('eco.gold.sell')}</Lead>}
         <div className="vf-btns row">
           {options.filter((g) => g <= v.grams).map((g) => {
             const a = find(ctx, 'gold.sell', { grams: g })
-            return a && <button key={g} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.gold.grams', { n: formatNumber(g) })}</b><small>{money(g * v.sell)}</small></button>
+            return a && <button key={g} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<><b>{t('eco.gold.grams', { n: formatNumber(g) })}</b><small>{money(g * v.sell)}</small></>)}</button>
           })}
         </div>
       </Panel>
@@ -308,12 +309,12 @@ const Savings = flow<SavingsView>(({ view: v, ctx }) => {
       <Panel>
         <Lead>{t('eco.savings.put')}</Lead>
         <div className="vf-btns row">
-          {(v.deposits ?? []).map((n) => { const a = find(ctx, 'savings.deposit', { amount: n }); return a && <button key={n} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{money(n)}</button> })}
+          {(v.deposits ?? []).map((n) => { const a = find(ctx, 'savings.deposit', { amount: n }); return a && <button key={n} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<>{money(n)}</>)}</button> })}
           {typedIn && <button className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(typedIn)}>{ctx.label(typedIn)}</button>}
         </div>
         <Lead>{t('eco.savings.take')}</Lead>
         <div className="vf-btns row">
-          {(v.withdrawals ?? []).map((n) => { const a = find(ctx, 'savings.withdraw', { amount: n }); return a && <button key={n} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{money(n)}</button> })}
+          {(v.withdrawals ?? []).map((n) => { const a = find(ctx, 'savings.withdraw', { amount: n }); return a && <button key={n} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<>{money(n)}</>)}</button> })}
           {typedOut && <button className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(typedOut)}>{ctx.label(typedOut)}</button>}
         </div>
       </Panel>

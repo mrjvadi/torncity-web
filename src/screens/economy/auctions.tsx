@@ -2,6 +2,7 @@
 // auctions and bids. Drawn from the view and the actions of the answer (docs/adr/0039-presentation-split.md);
 // a city without an auction house arrives as `unavailable`.
 
+import { short } from '../../ui/v6/short'
 import type {
   AuctionLine, AuctionNewView, AuctionOpenedView, AuctionRefusalView, AuctionDetailView, AuctionsView, BidPlacedView, MyAuctionsView, Way,
 } from '../../api/views.gen'
@@ -106,7 +107,7 @@ const AuctionNew = flow<AuctionNewView>(({ view: v, ctx }) => (
           <div className="vf-btns row">
             {(v.reserves ?? []).map((r) => {
               const a = ctx.acts.find((x) => x.id === 'auction.terms' && String(x.args?.reserve) === String(r) && String(x.args?.duration) === String(i))
-              return a && <button key={r} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{t('eco.auction.reserve_option', { n: money(r) })}</button>
+              return a && <button key={r} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<>{t('eco.auction.reserve_option', { n: money(r) })}</>)}</button>
             })}
           </div>
         </div>

@@ -53,17 +53,17 @@ function fullIn(seconds: number): string {
 }
 
 /** One money figure in the HUD: a coin or gem badge on the pill's start edge, the value, an optional gold plus. */
-export function CurrencyPill({ kind, value, onClick, onPlus, pending }: { kind: 'cash' | 'gem'; value: string; onClick?: () => void; onPlus?: () => void; pending?: boolean }) {
-  const tip = kind === 'cash' ? t('v6.tip.cash', { v: value }) : t('v6.tip.gem', { v: value })
+export function CurrencyPill({ kind, value, name, onClick, onPlus, pending }: { kind: 'cash' | 'gem' | 'local'; value: string; name?: string; onClick?: () => void; onPlus?: () => void; pending?: boolean }) {
+  const tip = kind === 'cash' ? t('v6.tip.cash', { v: value }) : kind === 'local' ? t('v6.tip.local', { name: name ?? '', v: value }) : t('v6.tip.gem', { v: value })
   const cls = `v6-chip v6-${kind}${pending ? ' pending' : ''}`
   const inner = (
     <>
-      <Ic name={kind === 'cash' ? 'coin' : 'gem'} />
+      {kind === 'local' ? <span className="v6-coin-l" aria-hidden="true">{[...(name ?? '')][0] ?? ''}</span> : <Ic name={kind === 'gem' ? 'gem' : 'coin'} />}
       <b>{value}</b>
     </>
   )
   return (
-    <div className={cls} data-k={kind} data-tip={tip}>
+    <div className={cls} data-k={kind} data-tip={tip} title={tip}>
       {onClick ? <button className="v6-chip-hit" onClick={onClick} aria-label={tip} style={{ position: 'absolute', inset: 0, borderRadius: 15 }} /> : null}
       {inner}
       {onPlus && <button className="v6-plus" onClick={onPlus} aria-label={t('v6.gem.add')} data-tip={t('v6.gem.add')}><i /></button>}
@@ -86,6 +86,7 @@ export function HudBar({ hud, name, portrait, onAvatar, onBank, children, innerR
       {children}
       <div className="v6-money">
         <CurrencyPill kind="cash" value={cashCompact(hud.cash, { thousand: t('v6.unit.thousand'), million: t('v6.unit.million') })} onClick={onBank} pending={hud.pending} />
+        {hud.local && <CurrencyPill kind="local" name={hud.local.name} value={cashCompact(hud.local.value, { thousand: t('v6.unit.thousand'), million: t('v6.unit.million') })} onClick={onBank} />}
         {hud.gem !== null && <CurrencyPill kind="gem" value={faNum(hud.gem)} onPlus={onBank} />}
       </div>
     </header>

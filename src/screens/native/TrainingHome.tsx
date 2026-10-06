@@ -2,7 +2,7 @@ import type { ScreenProps } from '../types'
 import { Empty, Header, ScreenScroll } from './kit/Parts'
 import { CardGrid, PCard, PSec, PStats } from '../../ui/v6/panel'
 import { Lines, Need } from './kit/cardparts'
-import { moneyIn } from './kit/format'
+import { money } from './kit/format'
 import { formatNumber } from '../../lib/persian'
 import type { TrainedView, TrainingHomeView } from '../../api/views.gen'
 import { buildingName, useBuildingCatalogue } from '../../village/useVillage'
@@ -34,7 +34,7 @@ export default function TrainingHome({ response, run }: ScreenProps) {
             badge={t('training.efficiency', { p: formatNumber(Math.round(venue.efficiency_bps / 100)) })}
             facts={
               <>
-                <Lines lines={[venue.unkept ? t('training.unkept') : venue.fee > 0 ? t('training.fee', { fee: moneyIn(venue.fee) }) : t('training.free')]} />
+                <Lines lines={[venue.unkept ? t('training.unkept') : venue.fee > 0 ? t('training.fee', { fee: money(venue.fee) }) : t('training.free')]} />
                 {!venue.available && venue.missing && <Need lines={[t('training.missing', { name: buildingName(cat, venue.missing.code, venue.missing.name) })]} />}
               </>
             }
@@ -58,7 +58,7 @@ export function Trained({ response, run }: ScreenProps) {
         { label: t('training.stamina'), value: `+${formatNumber(v.stamina)}` },
         { label: t('training.strength'), value: t('training.xp', { n: formatNumber(v.strength_xp) }) },
         ...(v.max_energy_added > 0 ? [{ label: t('training.max_energy'), value: `+${formatNumber(v.max_energy_added)}`, gold: true }] : []),
-        ...(v.fee > 0 ? [{ label: t('training.paid'), value: moneyIn(v.fee) }] : []),
+        ...(v.fee > 0 ? [{ label: t('training.paid'), value: money(v.fee) }] : []),
       ]} />
       {v.strength_level > 0 && <Empty>{t('training.level_up', { n: formatNumber(v.strength_level) })}</Empty>}
       <div style={{ padding: '0 16px 16px' }}><button className="pn-btn" onClick={() => run('training.home')}>{t('training.again')}</button></div>

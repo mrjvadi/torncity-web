@@ -10,6 +10,7 @@
 // never an error: red is for a refusal of something the player just did.
 
 import type * as V from '../api/views.gen'
+import { money as fmtMoney } from '../screens/native/kit/format'
 import { t, hasKey, type Key } from '../i18n'
 import { formatNumber } from '../lib/persian'
 import { words } from '../lib/duration'
@@ -26,7 +27,7 @@ export type Namer = (tables: string | string[], code: string, authored?: string)
 
 type Params = Record<string, string | number>
 
-const money = (n: number | undefined | null): string => `${formatNumber(n ?? 0)} ${t('unit.money')}`
+const money = (n: number | undefined | null): string => fmtMoney(n ?? 0)
 const num = (n: number | undefined | null): string => formatNumber(n ?? 0)
 
 function span(seconds: number | undefined | null): string {

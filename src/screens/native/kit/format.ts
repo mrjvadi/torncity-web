@@ -5,22 +5,28 @@ import { formatNumber } from '../../../lib/persian'
 import { t } from '../../../i18n'
 import { fa } from '../../../ui/v6/format'
 import { words } from '../../../lib/duration'
+import { getDisplayMoney, localOf, SUP_MARK } from '../../../lib/money'
 
 export { formatNumber }
 
-/** Money in minor units, with the currency word after it (ساپ, matching
- * the bot's own rendering). Negative values keep their sign. */
+/** Money in minor units. Without a chartered money of the viewer's own: «۲۵ ساپ». With one, the local figure first and the SUP
+ * amount beside it: «۲۵۰ مارک پولو (۲۵ ساپ)» (lib/money.ts converts at the live rate). */
 export function money(n: number | undefined | null): string {
   if (n === undefined || n === null) return '0'
-  return `${formatNumber(n)} ${t('unit.money')}`
+  const m = getDisplayMoney()
+  const sup = `${formatNumber(n)} ${t('unit.money')}`
+  if (!m) return sup
+  return `${formatNumber(localOf(n, m))} ${m.name}${SUP_MARK} (${sup})`
 }
 
-/** The money a place prices things in: its own currency when it has one, else the neutral money. */
-export interface PlaceCurrency { code?: string; name?: string; symbol?: string }
-export function moneyIn(n: number | undefined | null, currency?: PlaceCurrency | null): string {
-  if (n === undefined || n === null) return '0'
-  return `${formatNumber(n)} ${currency?.name || t('unit.money')}`
+/** The SUP part of a money string made by `money()`, split from the local part, or null for a plain one. */
+export function splitMoney(s: string): [string, string] | null {
+  const i = s.indexOf(SUP_MARK)
+  return i > 0 ? [s.slice(0, i), s.slice(i + 1).trim()] : null
 }
+
+/** A chartered money's name for the viewer, or «ساپ». */
+export function moneyName(): string { return getDisplayMoney()?.name || t('unit.money') }
 
 /** A whole-second duration as "H:MM" (an hour or more) or "MM:SS" (under
  * an hour), the prototype's own countdown format. */

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { short } from '../../ui/v6/short'
 import type { ScreenProps } from '../types'
 import { Card, Empty, Header, Notice, ScreenScroll, SectionTitle } from './kit/Parts'
 import { CardGrid, PCard, PTile } from '../../ui/v6/panel'
@@ -64,7 +65,7 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
                   {!j.can_take && <Need lines={[t('work.not_here')]} />}
                 </>}
                 foot={j.can_take
-                  ? <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</button>
+                  ? <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{short(<>{t('labor.work', { w: money(j.wage) })}</>)}</button>
                   : undefined} />
             ))}
           </CardGrid>
@@ -113,7 +114,7 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
                     <Lines lines={[makes && t('work.makes', { list: makes }), t('work.shift_len', { t: roughDuration(w.shift_seconds) })]} />
                     <Need lines={[!w.ready ? t('work.needs_inputs') : '', w.ready && full ? t('work.full') : ''].filter(Boolean)} />
                   </>}
-                  foot={<button className={`pn-btn${off ? ' dis' : ''}`} disabled={off} onClick={() => void act('settlement.work', { id: w.id })}>{t('work.start', { w: money(w.wage) })}</button>} />
+                  foot={<button className={`pn-btn${off ? ' dis' : ''}`} disabled={off} onClick={() => void act('settlement.work', { id: w.id })}>{short(<>{t('work.start', { w: money(w.wage) })}</>)}</button>} />
               )
             })}
           </CardGrid>
@@ -126,7 +127,7 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
                 facts={<Lines lines={[t('work.road_hint')]} />}
                 foot={(
                   <>
-                    {best && <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: best.id })}>{t('labor.work', { w: money(best.wage) })}</button>}
+                    {best && <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: best.id })}>{short(<>{t('labor.work', { w: money(best.wage) })}</>)}</button>}
                     <button className="pn-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>{open ? t('work.road_hide') : t('work.road_show')}</button>
                   </>
                 )} />

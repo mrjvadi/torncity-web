@@ -1,6 +1,7 @@
 // The item market and the city shops, drawn from the view and the actions of the answer
 // (docs/adr/0039-presentation-split.md). Item, shop and place names come from the content catalogue.
 
+import { short } from '../../ui/v6/short'
 import type {
   BookView, MarketCheckoutView, MarketRefusalView, MarketView, MyOrdersView, OrderCancelledView, OrderPlacedView,
   SellOffersView, ShopBoughtView, ShopCheckoutView, ShopRefusalView, ShopSoldView, ShopView, ShopsView, Way,
@@ -117,7 +118,7 @@ const Book = flow<BookView>(({ view: v, ctx }) => {
         <Panel>
           <Lead>{t('eco.market.buy')}</Lead>
           <div className="vf-btns row">
-            {buys.map((a) => <button key={`${a.id}${a.args?.price}`} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{t(a.id === 'market.buy_at' ? 'eco.market.buy_at' : 'eco.market.bid_at', { price: money(Number(a.args?.price)) })}</button>)}
+            {buys.map((a) => <button key={`${a.id}${a.args?.price}`} className="bk-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<>{t(a.id === 'market.buy_at' ? 'eco.market.buy_at' : 'eco.market.bid_at', { price: money(Number(a.args?.price)) })}</>)}</button>)}
           </div>
           {sells.length > 0 && <Lead>{t('eco.market.sell')}</Lead>}
           <div className="vf-btns row">

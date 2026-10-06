@@ -4,7 +4,7 @@ import { Empty, Header, Notice, ScreenScroll } from './kit/Parts'
 import { CardGrid, PCard, PTile } from '../../ui/v6/panel'
 import { Lines } from './kit/cardparts'
 import Actions from './kit/Actions'
-import { moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
+import { money, roughDuration } from './kit/format'
 import { useContentNames, type ContentNames } from '../../village/useVillage'
 import { hasKey, t, type Key } from '../../i18n'
 
@@ -15,7 +15,7 @@ interface Reward { cash?: number; xp?: number; items?: { item?: Named; qty?: num
 interface MissionLine { mission?: Named; blocked?: string; repeatable?: boolean; reward?: Reward; wait_seconds?: number; objectives?: Objective[] | null }
 interface Board { code?: string; name?: string; place?: Named; open?: number }
 interface MissionBoardView {
-  city?: string; tier?: string; currency?: PlaceCurrency | null
+  city?: string; tier?: string
   boards?: Board[] | null; board?: Board | null; here?: boolean; missions?: MissionLine[] | null
 }
 
@@ -51,7 +51,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
   const boardName = (b?: Board | null) => (b?.code ? names.name('mission_board', b.code, b.name) : b?.name ?? '—')
   const rewardText = (r?: Reward): string => {
     const parts: string[] = []
-    if (r?.cash) parts.push(moneyIn(r.cash, v.currency))
+    if (r?.cash) parts.push(money(r.cash))
     if (r?.xp) parts.push(t('missions.xp', { n: r.xp }))
     for (const it of r?.items ?? []) if (it.item) parts.push(t('missions.reward_item', { qty: it.qty ?? 1, item: names.name('item', it.item.code ?? '', it.item.name) }))
     return parts.join(' · ')

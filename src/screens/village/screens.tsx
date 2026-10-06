@@ -23,6 +23,7 @@ import {
   Btns, Cancel, Facts, flow, Hint, Lead, Page, Panel, registerFlow, Rest, isBack, isRefresh, type FlowCtx,
 } from './flow'
 import { CardGrid } from '../../ui/v6/panel'
+import { rich } from '../../ui/v6/rich'
 import WorkSection from './WorkSection'
 
 const Empt = Empty
@@ -438,7 +439,7 @@ const PrivateMenu = flow<PrivateMenuView>(({ view: v, ctx }) => {
             <Panel key={l.building.code}>
               <ListRow icon="house" palette={l.home ? 'gold' : 'amber'} title={name}
                 sub={`${buildText(l)} · ${l.footprint_w}×${l.footprint_h}`}
-                right={<span className="vc-line-price">{money(l.total)}</span>} />
+                right={<span className="vc-line-price">{rich(money(l.total))}</span>} />
               <Facts rows={[
                 { label: t('citizen.build.cost'), value: money(l.cost_money) },
                 { label: t('citizen.build.permit'), value: money(l.permit_fee) },
@@ -661,7 +662,7 @@ const BuildMenu = flow<BuildMenuView>(({ view: v, ctx }) => {
             <Panel key={l.building.code}>
               <ListRow icon={locked ? 'm_lock' : icon} palette={locked ? 'steel' : palette} title={ctx.bname(l.building.code, l.building.name)}
                 sub={`${buildText(l)}${l.role ? ` · ${t(key(`role.${l.role}`))}` : ''}`}
-                right={<span className="vc-line-price">{money(l.cost_money)}</span>} />
+                right={<span className="vc-line-price">{rich(money(l.cost_money))}</span>} />
               {mats(ctx, l.materials)}
               {!locked && (l.short ?? []).length > 0 && <Hint tone="bad">{t('vx.build.short', { list: (l.short ?? []).map((m) => `${formatNumber(m.quantity)} ${ctx.names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ') })}</Hint>}
               {locked && missing.length > 0 && <Hint tone="bad">{t('build.needs', { list: missing.join('، ') })}</Hint>}

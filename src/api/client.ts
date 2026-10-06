@@ -1,4 +1,5 @@
 import { liveView } from '../lib/live'
+import { setDisplayMoney, type DisplayMoney } from '../lib/money'
 import { observeServerTime } from '../village/clock'
 import type { AuthResponse, Bootstrap, CommandResponse, CityMap, AssetManifest, ModelLibrary, RealtimeToken, WorldInfo, VillageLayout, SettlementPlayers, PlayerStatus } from './types'
 import { report } from '../lib/reporter'
@@ -227,6 +228,8 @@ export async function runCommand(
     if (idempotencyKey) syncStore.dropOverlay(idempotencyKey)
     throw e
   }
+  // the viewer's display money rides on every neutral answer (lib/money.ts); an answer without it means SUP only
+  if (res && typeof res === 'object' && res.screen) setDisplayMoney((res as { money?: DisplayMoney | null }).money ?? null)
   if (res?.updates) syncStore.commandUpdates(res.updates)
   if (idempotencyKey) {
     if (res?.ok === false) syncStore.dropOverlay(idempotencyKey)
