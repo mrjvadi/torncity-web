@@ -301,6 +301,8 @@
   .v6-bar { height: 11px; }
   .v6-money { margin-inline-start: auto; width: auto; height: auto; flex-direction: row; align-items: center; gap: 16px; margin-top: 4px; order: 9; }
   .v6-chip { width: 142px; height: 36px; border-radius: 18px; }
+  .v6-money { gap: 10px; }
+  .v6-money .v6-chip[data-k="local"] { width: 124px; }
   .v6-chip > img { width: 42px; height: 42px; }
   .v6-chip > b { font-size: 16px; line-height: 38px; }
   .v6-plus { top: 6px; left: 5px; }
