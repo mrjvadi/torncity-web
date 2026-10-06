@@ -812,7 +812,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
             {v.stock_capacity > 0 && <Hint>{t('vx.bld.stock_used', { used: formatNumber(v.stock_used), cap: formatNumber(v.stock_capacity) })}</Hint>}
           </div>
         )}
-        {!going && v.work && <WorkSection work={v.work} names={ctx.names} onOpen={(d) => ctx.openLocal(d)} onClose={() => undefined} />}
+        {!going && v.work && <WorkSection work={v.work} names={ctx.names} onOpen={(d) => ctx.openLocal(d)} onClose={() => undefined} manage={v.can_manage} buildingId={v.id} act={(c, a) => ctx.run(c, a)} />}
         {!going && v.kind === 'school' && <Hint>{v.teaching ? t('building.school.teaching') : t('building.school.idle')}</Hint>}
         {!going && v.kind === 'civic_hall' && (
           <Facts rows={[
@@ -826,7 +826,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
             {effects.map((e) => <span key={e.target} className="vh-effect">{t(key(`building.effect.${e.target}`), { v: formatNumber(e.target === 'housing_capacity' ? e.value : Math.round(e.value / 100)) })}</span>)}
           </div>
         )}
-        {v.upkeep > 0 && v.kind !== 'road' && <Hint>{t('building.upkeep', { amount: money(v.upkeep) })}</Hint>}
+        {v.upkeep > 0 && v.kind !== 'road' && !v.work?.condition && <Hint>{t('building.upkeep', { amount: money(v.upkeep) })}</Hint>}
         {confirming && <Lead tone="bad">{t(v.mode === 'dm' ? 'building.confirm_demolish' : 'building.confirm_cancel')}</Lead>}
         {v.mode === 'up' && (
           <>

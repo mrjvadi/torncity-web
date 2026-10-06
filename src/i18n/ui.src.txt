@@ -1865,7 +1865,7 @@ vx.work.capacity | جای انبار: {used} از {cap} | Store room: {used} of 
 vx.who.head | {n} نفر از اهالی «{village}» الان آنلاین هستند. | {n} residents of {village} are online now.
 vx.who.nobody | الان کسی آنلاین نیست. | Nobody is online now.
 vx.who.offline | {n} نفر دیگر آنلاین نیستند. | {n} more are offline.
-vx.build.running | ساخت‌های در جریان | Builds in progress
+vx.build.running | تیم‌های ساختمان‌سازی | Building crews
 vx.build.empty | فعلاً ساختمانی برای ساختن باز نشده. | Nothing is open to build yet.
 vx.build.short | در انبار شهر کم است: {list} | Short in the city store: {list}
 vx.build.roads | جاده‌ای که خودکار کشیده می‌شود | Road laid along with it
@@ -1972,7 +1972,7 @@ refusal.village_prerequisite | پیش‌نیازهای این کار هنوز آ
 refusal.village_literacy | سواد شهر هنوز به اندازهٔ کافی نیست. | The city is not literate enough yet.
 refusal.village_not_found | این پیدا نشد. | That was not found.
 refusal.village_out_of_bounds | این جا بیرون از شهر است. | That spot is outside the city.
-refusal.village_concurrent_cap | صف ساخت شهر پُر است؛ صبر کن یکی از ساخت‌ها تمام شود. | The city building queue is full; wait for one to finish.
+refusal.village_concurrent_cap | همهٔ تیم‌های ساختمان‌سازی شهر سرگرم‌اند؛ صبر کن یکی تمام شود، یا کارگاهی (نجاری، سنگ‌تراشی) راه بینداز و کارگر بگذار تا تیم تازه بیاید. | The city building queue is full; wait for one to finish.
 refusal.village_not_demolishable | این ساختمان را الان نمی‌شود خراب کرد. | This building cannot be pulled down now.
 refusal.village_not_cancellable | این ساختمان دیگر در حال ساخت نیست و لغو نمی‌شود. | This building is no longer going up, so it cannot be cancelled.
 refusal.village_already_resident | تو همین حالا ساکن این شهری. | You already live in this city.
@@ -5323,3 +5323,24 @@ work.unstaffed.idle | بدون کارگر چیزی تولید نمی‌شود. |
 work.unstaffed.base_room | بدون کارگر فقط جای پایه‌اش حساب می‌شود. | With nobody working, only its base room counts.
 work.unstaffed.decays | بدون کارگر کم‌کم از بین می‌رود. | With nobody working, it slowly decays.
 work.unstaffed.unheld | بدون کارگر کسی آن را در دست ندارد. | With nobody working, nobody holds it.
+work.status.closed | بسته است | Closed
+work.food | هر نوبت {n} واحد غذا؛ غذای موجود برای {m} نوبت | {n} food points a shift; the food in stock feeds {m} shifts
+work.hungry | غذایی نیست؛ اگر الان نوبت بگیری گرسنه کار می‌کنی و نصف تولید را درمی‌آوری. کارگر روزمزد بدون غذا اصلاً شروع نمی‌کند. | There is no food; if you take a shift now you work hungry at half output. A day labourer does not start without food.
+work.reason.no_food | غذا برای نوبت نیست؛ کارگر روزمزد بدون غذا شروع نمی‌کند. | No food for a shift; a day labourer does not start without it.
+work.reason.needs_repair | ساختمان فرسوده است؛ تا تعمیر نشود کار نمی‌کند. | The building is worn out; it will not work until repaired.
+work.fix.no_food | خرید گندم | Buy wheat
+work.cond | وضعیت ساختمان | Condition
+work.cond_aria | وضعیت ساختمان {p} | Condition {p}
+work.band.closed | زیر ۲۵٪ بسته | under 25% closed
+work.band.worn | زیر ۵۰٪ کم‌کار | under 50% slow
+work.band.ok | از ۵۰٪ سالم | 50% and up sound
+work.output | تولید {p} | Output {p}
+work.decay | فرسایش روزی {p} | wear {p} a day
+work.closed | ساختمان بسته است؛ چیزی از دست نرفته، ولی تا تعمیر نشود کار نمی‌کند. | The building is closed; nothing is lost, but it does not work until repaired.
+work.repair | تعمیر | Repair
+work.repair_need | تعمیر به {n} نوبت کار نیاز دارد. | Repair needs {n} shifts of work.
+work.repair_mats | مواد: {list}. | Materials: {list}.
+work.repair_post | تعمیر | Repair
+work.repair_head | تعمیر را شهردار آگهی می‌کند. | The head posts the repair.
+work.repair_job | تعمیر در جریان است: {left} نوبت مانده، دستمزد {wage}، {n} کارگر روزمزد | Repair under way: {left} shifts left, wage {wage}, {n} day labourers
+work.repair_take | کار در تعمیر | Work on the repair

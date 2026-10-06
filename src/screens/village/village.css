@@ -275,3 +275,12 @@
 .wk-reason { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, #ffb02e 12%, transparent); font-size: 13.5px; line-height: 1.6; }
 .wk-reason > span { flex: 1 1 12em; }
 .wk-reason > :not(span) { flex: 0 0 auto; white-space: nowrap; }
+.wk-cond { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 7%, transparent); }
+.wk-cond-head { display: flex; justify-content: space-between; font-size: 13.5px; }
+.wk-cond-bar { position: relative; height: 12px; border-radius: 6px; background: color-mix(in srgb, currentColor 14%, transparent); overflow: hidden; }
+.wk-cond-bar i { position: absolute; inset-block: 0; inset-inline-start: 0; background: #7ed957; border-radius: 6px; }
+.wk-cond-bar.worn i { background: #ffb02e; } .wk-cond-bar.closed i { background: #ff7a6b; }
+.wk-cond-bar u { position: absolute; inset-block: 0; width: 2px; background: color-mix(in srgb, #fff 55%, transparent); }
+.wk-cond-legend { display: flex; justify-content: space-between; gap: 6px; font-size: 11.5px; opacity: .7; }
+.wk-repair, .wk-btns { display: flex; flex-direction: column; gap: 8px; }
+.wk-btns { flex-direction: row; flex-wrap: wrap; }

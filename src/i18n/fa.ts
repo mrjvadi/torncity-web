@@ -151,7 +151,7 @@ export const fa = {
   'build.needs': 'پیش‌نیاز: {list}',
   'build.fits': 'می‌توان اینجا ساخت',
   'build.no_fit': 'اینجا جا نیست',
-  'build.queue': 'در حال ساخت: {n} از {cap}',
+  'build.queue': 'تیم‌های ساختمان‌سازی: {n} از {cap}',
   'build.started': 'ساخت آغاز شد.',
   'build.empty': 'ساختمانی برای ساخت در دسترس نیست.',
   'build.mode_on': 'حالت ساخت',
