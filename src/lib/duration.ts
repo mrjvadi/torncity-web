@@ -82,3 +82,18 @@ export function workText(seconds: number | undefined | null): string {
 export function buildText(b: { build_time_seconds: number; expected_wait?: BuildWaitView | null }): string {
   return b.expected_wait && b.expected_wait.seconds > 0 ? `${t('time.about', { t: words(b.expected_wait.seconds) })} (${workText(b.build_time_seconds)})` : workText(b.build_time_seconds)
 }
+
+/** The arrival in the DESTINATION's own time ("ساعت ۱۴:۳۰ به وقت آنجا"), from its fixed zone offset (minutes east of UTC).
+ * '' when the zone is unknown (0) or equals the device's own, so the same hour is never printed twice. */
+export function thereText(at: string | number | null | undefined, zoneMinutes: number | null | undefined): string {
+  if (at === null || at === undefined || at === '' || !zoneMinutes) return ''
+  const ms = typeof at === 'number' ? at : Date.parse(at)
+  if (!Number.isFinite(ms)) return ''
+  if (zoneMinutes === -new Date(ms).getTimezoneOffset()) return ''
+  const day = (x: number) => Math.floor((x + zoneMinutes * 60_000) / 86_400_000)
+  const diff = day(ms) - day(Date.now())
+  const clock = zoneClock(ms, zoneMinutes)
+  const when = diff === 1 ? `${t('time.tomorrow')} ${clock}` : diff === -1 ? `${t('time.yesterday')} ${clock}` : diff > 1 || diff < -1
+    ? `${new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(ms + zoneMinutes * 60_000))} ${clock}` : clock
+  return t('time.there', { at: fa(when) })
+}

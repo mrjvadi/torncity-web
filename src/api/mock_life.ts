@@ -65,7 +65,7 @@ export function mockProfile() {
   return mockOk('profile', {
     name: 'سارا', code: 'K7Q2M9A', city_code: 'calderis', city: 'Calderis', place: N('old_town', 'Old Town'), walk: null, level: 7, xp: 5400, next_level_xp: 6500,
     energy: 72, max_energy: 100, energy_full_in_seconds: 720, health: 88, max_health: 100, cash: 12450, bank: 86300, travelling: false, travel_to_code: '', travel_to: '',
-    travel_remaining_seconds: 0, work: {
+    travel_remaining_seconds: 0, travel_zone_minutes: 0, work: {
       job: { job: { career_code: 'retail', career_name: 'Retail', rank: 'senior', title: 'Senior seller' }, city_code: 'calderis', city: 'Calderis', pay: 1850, shift_ends_in_seconds: 0 },
       course: { course: N('mgmt101', 'Basic management'), remaining_seconds: 5400, paused: false }, certificates: 2,
     }, jail: null, hospital: null, achievements: 4, avatar: '🦊', rank: RANK, age: 27, stage: N('adult', 'Adult'), needs: NEEDS, village: null,
@@ -140,10 +140,10 @@ function checkout(to: string, mode: string, afford: boolean) {
 
 function started(to: string, mode: string) {
   const m = MODES.find((x) => x.mode_code === mode) ?? MODES[0]
-  return mockOk('travel_started', { from_code: 'calderis', from: 'Calderis', to_code: to, to: to === 'support' ? 'Support' : to, mode_code: m.mode_code, mode_name: m.mode_name, duration_seconds: m.wait_seconds, arrives_at: iso(m.wait_seconds / 60), energy: m.energy, fare: m.fare }, [back('player.profile.get'), refreshA('travel.status')])
+  return mockOk('travel_started', { from_code: 'calderis', from: 'Calderis', to_code: to, to: to === 'support' ? 'Support' : to, mode_code: m.mode_code, mode_name: m.mode_name, duration_seconds: m.wait_seconds, arrives_at: iso(m.wait_seconds / 60), zone_minutes: 540, energy: m.energy, fare: m.fare }, [back('player.profile.get'), refreshA('travel.status')])
 }
 
-const mockStatus = () => mockOk('travel_status', { from_code: 'calderis', from: 'Calderis', to_code: 'support', to: 'Support', mode_code: 'train', mode_name: 'Train', remaining_seconds: 97200, arrives_at: iso(1620) }, [back('player.profile.get'), refreshA('travel.status')])
+const mockStatus = () => mockOk('travel_status', { from_code: 'calderis', from: 'Calderis', to_code: 'support', to: 'Support', mode_code: 'train', mode_name: 'Train', remaining_seconds: 97200, arrives_at: iso(1620), zone_minutes: 540 }, [back('player.profile.get'), refreshA('travel.status')])
 
 const arrived = () => mockOk('travel_arrived', { city_code: 'support', city: 'Support', xp: 12 }, [A('profile', 'player.profile.get'), A('profile.map', 'map.list')])
 const travelHere = () => mockOk('travel_here', { reason: 'already_there', village: 'آمل', village_code: 'v-k3x9' }, [A('travel.elsewhere', 'map.cities')])

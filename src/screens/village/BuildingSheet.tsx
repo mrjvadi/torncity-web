@@ -26,6 +26,7 @@ import { countdown, durationText, iconForRole } from './common'
 import { useToast } from '../../state/ToastContext'
 import type { VillageStore } from '../../village/villageStore'
 import { SiteSheet } from './Labor'
+import WorkSection from './WorkSection'
 
 interface Props {
   building: LayoutBuilding | null
@@ -33,7 +34,7 @@ interface Props {
   cat: Map<string, CatalogueBuilding>
   store: VillageStore | null
   /** Opens one of the village's own screens (the civic hall's doors). */
-  onOpen?: (screen: 'village_overview' | 'village_knowledge' | 'village_progress' | 'village_storage' | 'village_shop') => void
+  onOpen?: (screen: 'village_overview' | 'village_knowledge' | 'village_progress' | 'village_storage' | 'village_shop' | 'village_labor') => void
   /** Starts build mode on a building code (an upgrade line's button). */
   onBuild?: (code: string) => void
   onClose: () => void
@@ -233,6 +234,7 @@ function TypePanel({ kind, panel, names, onOpen, onClose }: {
           )}
         </>
       )}
+      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onClose={onClose} />}
       {effects.length > 0 && (
         <EffectRow>
           {effects.map((e) => (

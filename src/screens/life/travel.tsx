@@ -10,7 +10,7 @@ import type {
 import { Empty, ListRow, SectionTitle } from '../native/kit/Parts'
 import { hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
-import { atText } from '../../lib/duration'
+import { atText, thereText } from '../../lib/duration'
 import Popup, { ActionButton, ActionRow, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { t } from '../../i18n'
 import { useSession } from '../../state/SessionContext'
@@ -254,6 +254,7 @@ export const TravelStarted = flow<TravelStartedView>(({ view: v, ctx }) => {
           { label: t('lf.checkout.route_label'), value: `${cityName(ctx, v.from_code, v.from)} ← ${cityName(ctx, v.to_code, v.to)}` },
           { label: t('lf.time'), value: roughDuration(v.duration_seconds) },
           ...(v.arrives_at ? [{ label: t('lf.arrives_at'), value: clockText(v.arrives_at) }] : []),
+          ...(thereText(v.arrives_at, v.zone_minutes) ? [{ label: t('lf.arrives_there'), value: thereText(v.arrives_at, v.zone_minutes) }] : []),
           { label: t('lf.energy'), value: formatNumber(v.energy) },
           ...(v.fare > 0 ? [{ label: t('lf.fare'), value: money(v.fare), gold: true }] : []),
         ]} />
@@ -271,6 +272,7 @@ export const TravelStatus = flow<TravelStatusView>(({ view: v, ctx }) => (
       <Facts rows={[
         ...(v.mode_code || v.mode_name ? [{ label: t('lf.checkout.by'), value: ctx.names.name('mode', v.mode_code, v.mode_name) }] : []),
         ...(v.remaining_seconds >= 60 && v.arrives_at ? [{ label: t('lf.arrives_at'), value: clockText(v.arrives_at) }] : []),
+        ...(v.remaining_seconds >= 60 && thereText(v.arrives_at, v.zone_minutes) ? [{ label: t('lf.arrives_there'), value: thereText(v.arrives_at, v.zone_minutes) }] : []),
       ]} />
       <Hint>{t('sc.journey.rules')}</Hint>
     </Panel>
