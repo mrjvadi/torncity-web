@@ -524,7 +524,7 @@ function board(args: Record<string, unknown>) {
     workers: [{ position: 1, code: 'W1', name: NILOO.name, tag: '', tag_name: '', city: named('', ''), value: 5200, extra: 0, extra2: 0, mine: false }],
     investors: [{ position: 1, code: 'I1', name: KAVEH.name, tag: '', tag_name: '', city: named('', ''), value: 3100, extra: 0, extra2: 0, mine: false }],
   }[b] ?? []
-  const acts = [...(home ? ['village'] : []), 'richest', 'companies', 'cities', 'workers', 'investors'].filter((x) => x !== b).map((x) => act('board.tab', 'life.top', { board: x }, { subject: x }))
+  const acts = [...(home ? ['village'] : []), 'richest', 'companies', 'cities', 'workers', 'investors'].filter((x) => x !== b).map((x) => act('board.tab', 'life.top', {}, { subject: x }))
   return mockOk('leaderboard', { board: b, lines, at: null, village: home ? named(home.code, home.name) : null, ranks: { tycoon: named('tycoon', 'Tycoon'), trader: named('trader', 'Trader') } }, [...acts, back('player.profile.get'), refreshA('life.top', { board: b })])
 }
 

@@ -161,11 +161,15 @@ const FriendAccepted = screen<FriendAcceptedView>(({ view: v, ctx }) => (
 const BOARDS = ['richest', 'companies', 'cities', 'workers', 'investors']
 
 const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
-  const tabs = ctx.acts.filter((a) => a.id === 'board.tab')
+  // the other boards: the server names them `board.tab`, with the board as the subject or the argument; every other
+  // `life.top` action is the same screen again (refresh) and is never drawn as a button of its own
+  const isTop = (a: { command?: string }) => a.command === 'life.top'
+  const tabs = ctx.acts.filter((a) => a.id === 'board.tab' || (isTop(a) && !!(a.subject || a.args?.board)))
+  const boardOf = (a: { subject?: string; args?: Record<string, string> }) => a.args?.board ?? a.subject
   // a player who lives in a settlement sees their neighbours' board first
   const boards = v.village ? ['village', ...BOARDS] : BOARDS
   const open = (b: string) => {
-    const a = tabs.find((x) => x.args?.board === b)
+    const a = tabs.find((x) => boardOf(x) === b)
     if (a) ctx.go(a)
   }
   const label = (l: BoardView['lines'] extends (infer U)[] | null ? U : never): string => {
@@ -194,7 +198,7 @@ const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
         ))}
       </div>
       <Hint>{t(key(`soc.board.hint.${v.board}`))}</Hint>
-      <Rest ctx={ctx} skip={(a) => a.id === 'board.tab'} />
+      <Rest ctx={ctx} skip={(a) => a.id === 'board.tab' || isTop(a)} />
     </Page>
   )
 })

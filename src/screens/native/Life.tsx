@@ -1,4 +1,5 @@
 import type { ScreenProps } from '../types'
+import { NeedBar, NEED_SPEC } from './Profile'
 import { Card, Header, ListRow, Notice, ScreenScroll } from './kit/Parts'
 import { CardGrid, PStats } from '../../ui/v6/panel'
 import Actions from './kit/Actions'
@@ -25,12 +26,6 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
   if (loading && !response) return <ScreenScroll><Header title={t('life.title')} tone="violet" /></ScreenScroll>
 
   const needs = v.needs
-  const items: { key: keyof Needs; label: string; color: string; icon: string }[] = [
-    { key: 'sleep', label: t('need.sleep'), color: 'var(--violet)', icon: 'moon' },
-    { key: 'hunger', label: t('need.hunger'), color: 'var(--saffron)', icon: 'bread' },
-    { key: 'happiness', label: t('need.happiness'), color: 'var(--leaf)', icon: 'sun' },
-    { key: 'stress', label: t('need.stress'), color: 'var(--anar)', icon: 'x_flame' },
-  ]
 
   return (
     <ScreenScroll>
@@ -46,14 +41,9 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
           {v.rank?.name && <span className="nx-chip">{names.name('rank', v.rank.code ?? '', v.rank.name)}</span>}
         </div>
         {needs && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {items.filter((i) => needs[i.key] !== undefined).map((i) => (
-              <div key={i.key} className="nx-bar-wrap">
-                <div className="nx-bar" style={{ borderColor: i.color, height: 22 }}>
-                  <div className="nx-bar-fill" style={{ width: `${clamp01((needs[i.key] as number) / 100) * 100}%`, background: i.color }} />
-                  <span className="nx-bar-label display" style={{ lineHeight: '18px', fontSize: 12 }}>{i.label} {formatNumber(needs[i.key] as number)}</span>
-                </div>
-              </div>
+          <div className="pf2-needs">
+            {(['sleep', 'hunger', 'happiness', 'stress'] as const).filter((k) => needs[k] !== undefined).map((k) => (
+              <NeedBar key={k} {...NEED_SPEC[k]} label={t(`need.${k}`)} value={needs[k]} />
             ))}
           </div>
         )}

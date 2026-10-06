@@ -796,9 +796,9 @@ achievements.rewarded | {n} پاداش گرفتی | You received {n} as a reward
 card.title | کارت بازیکن | Player card
 card.mine | کارت من | My card
 card.code | کد: {code} | Code: {code}
-card.no_bio | هنوز بیوگرافی ننوشته‌ای. | You have not written a bio yet.
+card.no_bio | هنوز زندگی‌نامه ننوشته‌ای. | You have not written a bio yet.
 card.level | سطح | Level
-card.achievements | دستاورد | Achievements
+card.achievements | دستاوردها | Achievements
 card.entries | خاطرات | Memories
 card.joined | عضویت | Joined
 # -- shops -----------------------------------------------------------------------
@@ -865,7 +865,7 @@ crime.result_later | نتیجه وقتی جرم تمام شد، در همین‌
 profile.title | من | Me
 profile.code | کد بازیکن | Player code
 profile.settings | تنظیمات | Settings
-profile.avatar | ویرایش آواتار | Edit avatar
+profile.avatar | ویرایش چهره | Edit avatar
 profile.cash | پول نقد | Cash
 profile.bank | موجودی بانک | Bank balance
 profile.net_worth | ارزش خالص | Net worth
@@ -873,8 +873,8 @@ profile.wealth_rank | رتبه‌ی ثروت | Wealth rank
 profile.energy | انرژی | Energy
 profile.health | سلامت | Health
 profile.needs | نیازها | Needs
-profile.achievements | دستاوردها · {a} از {b} | Achievements · {a} of {b}
-profile.achievements_n | دستاوردها · {a} | Achievements · {a}
+profile.achievements | دستاوردها: {a} از {b} | Achievements · {a} of {b}
+profile.achievements_n | دستاوردها: {a} | Achievements · {a}
 profile.no_achievements | هنوز دستاوردی نداری. | No achievements yet.
 profile.work | شغل | Job
 profile.study | آموزش | Studying
@@ -983,7 +983,7 @@ screen.recruit_hub | جذب نیرو | Recruitment
 screen.specialists | متخصصان | Specialists
 screen.devices | دستگاه‌های متصل | Linked devices
 screen.device_link | اتصال دستگاه | Link a device
-screen.avatars | آواتار | Avatar
+screen.avatars | چهره | Avatar
 screen.history | تاریخچه | History
 screen.pay | پرداخت | Payment
 screen.sleep_pay | پرداخت هزینه‌ی خواب | Pay for a bed
@@ -2694,10 +2694,10 @@ lf.history.rank_up | رسیدن به رتبهٔ {what} | Reached the rank of {wh
 lf.history.rank_down | افت به رتبهٔ {what} | Fell to the rank of {what}
 lf.history.big_trade | معاملهٔ بزرگ {what} در {place} به ارزش {amount} | A big trade of {what} in {place} worth {amount}
 lf.history.big_trade_nowhere | معاملهٔ بزرگ {what} به ارزش {amount} | A big trade of {what} worth {amount}
-lf.avatar.current | آواتار فعلی: {avatar} | Current avatar: {avatar}
+lf.avatar.current | چهره فعلی: {avatar} | Current avatar: {avatar}
 lf.avatar.photo | عکس پروفایل | Profile photo
-lf.avatar.none | بدون آواتار | No avatar
-lf.avatar.hint | یکی از آواتارها را بردار، یا عکس پروفایلت را بگذار. | Pick one of the avatars, or use your profile photo.
+lf.avatar.none | بدون چهره | No avatar
+lf.avatar.hint | یکی از چهره‌ها را بردار، یا عکس پروفایلت را بگذار. | Pick one of the avatars, or use your profile photo.
 lf.sleep.title | خواب در {spot} | Sleep at {spot}
 lf.sleep.rest | کم شدن خستگی | Less tiredness
 lf.sleep.relief | کم شدن استرس | Less stress
@@ -2717,20 +2717,20 @@ lf.link.lead | این کد را در دستگاه دیگر وارد کن: | Ente
 lf.link.valid | مدت اعتبار | Valid for
 lf.link.until | تا ساعت | Until
 lf.link.help | کد یک‌بار مصرف است و فقط یک دستگاه را وارد حسابت می‌کند. | The code works once and signs in a single device.
-refusal.life_bio_length | بیوگرافی باید بین {min_chars} تا {max_chars} حرف باشد. | A bio must be between {min_chars} and {max_chars} characters.
-refusal.life_bio_link | بیوگرافی نمی‌تواند لینک، نشانی سایت یا نام کاربری داشته باشد. | A bio cannot hold a link, a web address or a username.
-refusal.life_bio_blocked | این متن کلمه‌ای دارد که در بیوگرافی مجاز نیست؛ مؤدبانه بنویس. | This text has a word that is not allowed in a bio; please write politely.
-refusal.life_bio_chars | بیوگرافی نویسه‌هایی دارد که نمی‌شود نشان داد؛ ساده‌تر بنویس. | The bio has characters that cannot be shown; write it simpler.
+refusal.life_bio_length | زندگی‌نامه باید بین {min_chars} تا {max_chars} حرف باشد. | A bio must be between {min_chars} and {max_chars} characters.
+refusal.life_bio_link | زندگی‌نامه نمی‌تواند لینک، نشانی سایت یا نام کاربری داشته باشد. | A bio cannot hold a link, a web address or a username.
+refusal.life_bio_blocked | این متن کلمه‌ای دارد که در زندگی‌نامه مجاز نیست؛ مؤدبانه بنویس. | This text has a word that is not allowed in a bio; please write politely.
+refusal.life_bio_chars | زندگی‌نامه نویسه‌هایی دارد که نمی‌شود نشان داد؛ ساده‌تر بنویس. | The bio has characters that cannot be shown; write it simpler.
 refusal.life_too_soon | تازه خوابیده‌ای؛ تا خواب بعدی {time} مانده. | You just slept; {time} until the next sleep.
 refusal.life_no_spot | این جای خواب در این شهر نیست. | That place to sleep is not in this city.
-refusal.life_no_avatar | این آواتار در فهرست نیست؛ یکی از فهرست را بردار. | That avatar is not on the list; pick one from it.
+refusal.life_no_avatar | این چهره در فهرست نیست؛ یکی از فهرست را بردار. | That avatar is not on the list; pick one from it.
 refusal.life_no_player | بازیکنی با این کد یا نام کاربری پیدا نشد. | No player was found with that code or username.
 refusal.life_no_city | برای خوابیدن باید در یک شهر باشی، نه در راه. | To sleep you must be in a city, not on the road.
 refusal.life_rested | تازه استراحت کرده‌ای؛ کمی بعد دوباره امتحان کن. | You have just rested; try again a little later.
 lf.life.notice.slept | خوب خوابیدی ({spot}) و {rest} واحد از خستگی‌ات کم شد. | You slept well ({spot}) and {rest} points of tiredness went.
-lf.life.notice.bio | بیوگرافیت ذخیره شد. | Your bio is saved.
-lf.life.notice.bio_gone | بیوگرافیت پاک شد. | Your bio was cleared.
-lf.life.notice.avatar | آواتارت عوض شد. | Your avatar was changed.
+lf.life.notice.bio | زندگی‌نامه‌ات ذخیره شد. | Your bio is saved.
+lf.life.notice.bio_gone | زندگی‌نامه‌ات پاک شد. | Your bio was cleared.
+lf.life.notice.avatar | چهره‌ات عوض شد. | Your avatar was changed.
 lf.item.category | دسته | Category
 lf.item.quality | کیفیت | Quality
 lf.item.durability | دوام | Durability
@@ -2986,13 +2986,13 @@ act.life.sleep_walk | برو و بخواب | Walk there and sleep
 act.life.home_rest | استراحت در خانه | Rest at home
 act.life.history | سرگذشت | Story
 act.life.card | کارت من | My card
-act.life.bio | بیوگرافی | Bio
-act.life.bio_clear | پاک کردن بیوگرافی | Clear the bio
+act.life.bio | زندگی‌نامه | Bio
+act.life.bio_clear | پاک کردن زندگی‌نامه | Clear the bio
 act.life.bio_again | دوباره بنویس | Write it again
-act.life.avatar | آواتار | Avatar
+act.life.avatar | چهره | Avatar
 act.life.their_history | سرگذشت او | Their story
 act.avatar.photo | عکس پروفایل | Profile photo
-act.avatar.none | بدون آواتار | No avatar
+act.avatar.none | بدون چهره | No avatar
 act.find_player | جست‌وجوی بازیکن | Find a player
 act.settings.language | زبان: {name} | Language: {name}
 act.settings.presence | آخرین حضور: {name} | Last seen: {name}
@@ -5344,3 +5344,8 @@ work.repair_post | تعمیر | Repair
 work.repair_head | تعمیر را شهردار آگهی می‌کند. | The head posts the repair.
 work.repair_job | تعمیر در جریان است: {left} نوبت مانده، دستمزد {wage}، {n} کارگر روزمزد | Repair under way: {left} shifts left, wage {wage}, {n} day labourers
 work.repair_take | تعمیر می‌کنم | Work on the repair
+work.road_group | جاده‌سازی: {n} قطعه | Road building: {n} segments
+work.road_best | بهترین دستمزد: {w} | Best wage: {w}
+work.road_hint | هر قطعه شیفت جدا دارد؛ «کار کن» پردرآمدترین قطعهٔ آزاد را برمی‌دارد. | Each segment has its own shifts; the button takes the best-paid free one.
+work.road_show | همهٔ قطعه‌ها | See all segments
+work.road_hide | جمع کردن | Collapse

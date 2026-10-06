@@ -50,7 +50,7 @@ export const LIFE_CONTENT: Record<string, { code: string; name: { en: string; fa
 }
 
 const RANK = { code: 'breadwinner', name: 'Breadwinner', emoji: '🏅' }
-const NEEDS = { hunger: 34, sleep: 52, stress: 22, happiness: 71, body_bps: 10000, xpbps: 10000, pressing: null }
+const NEEDS = { hunger: 100, sleep: 52, stress: 22, happiness: 71, body_bps: 10000, xpbps: 10000, pressing: null }
 
 function hubActions(): MockAct[] {
   return [

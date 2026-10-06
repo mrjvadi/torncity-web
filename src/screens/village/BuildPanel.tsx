@@ -3,7 +3,7 @@
 // slabs, plates and chips.
 
 import { buildText, workText } from '../../lib/duration'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Frame, Slab, Plate, Emboss, GLabel } from '../../kit'
 import type { CatalogueBuilding, LayoutRoadPlan } from '../../api/types'
@@ -60,6 +60,19 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
   const needle = searching ? q.trim() : ''
   const shown = needle ? pool.filter((l) => nameOf(l).includes(needle)) : pool.filter((l) => buildCatOf(l.category) === active)
   const host = document.querySelector('.v6-app') ?? document.body
+  // Esc: back one step (the lot grid, the road tool), then close the bar; a popup or the ring above it answers first
+  const stepRef = useRef(s.step); stepRef.current = s.step
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return
+      const tg = e.target as HTMLElement | null
+      if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA')) return
+      if (document.querySelector('.v6-scrim, .v6-ring, .pp-overlay')) return
+      if (stepRef.current === 'menu') onExit(); else onBack()
+    }
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  }, [onExit, onBack])
   return createPortal(
     <div className={`v6-build step-${s.step}`}>
     <Frame radius={20}>

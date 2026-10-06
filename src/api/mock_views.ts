@@ -286,7 +286,7 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
   'life.me': () => ({
     screen: 'life', text: 'زندگی',
     view: {
-      needs: { hunger: 22, sleep: 35, stress: 12, happiness: 68 }, age: 20, stage: { name: 'جوانی' },
+      needs: { hunger: 100, sleep: 35, stress: 12, happiness: 68 }, age: 20, stage: { name: 'جوانی' },
       rank: { name: 'نان‌آور', emoji: '🍞' }, next: { name: 'تاجر', emoji: '🛍' }, next_need: 18500,
       worth: { cash: 4200, bank: 21000, property: 0, goods: 2800, savings: 5000, total: 38100 },
       spots: [{ spot: { name: 'تخت هاستل' }, place: { name: 'محله‌ی مسکونی' }, price: 150, rest: 55, relief: 8 }],
