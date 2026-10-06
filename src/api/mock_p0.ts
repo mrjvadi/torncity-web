@@ -131,7 +131,9 @@ export function mockP0Command(command: string, args?: Args) {
     return ok('work_home', {
       place: { code: 'v-k3x9', name: 'آمل', tier: 'city' }, resident: true, energy: 72, max_energy: 100, working: labor?.working ?? null, is_head: false,
       // the jobs are the labour mock's own, so taking one finds it on the board
-      jobs: labor?.jobs?.length ? labor.jobs : [{ id: 'j1', building_id: 'b1', building: { code: 'cottage', name: 'Cottage' }, kind: 'construction', employer_kind: 'settlement', employer: '', wage: 21, left: 6, total: 8, progress_bps: 3000, left_minutes: 300, workers: 1, npc_crew: 0, can_take: true, mine: false, points: 60, lot_x: 12, lot_y: 7 }],
+      jobs: [...(labor?.jobs?.length ? labor.jobs : [{ id: 'j1', building_id: 'b1', building: { code: 'cottage', name: 'Cottage' }, kind: 'construction', employer_kind: 'settlement', employer: '', wage: 21, left: 6, total: 8, progress_bps: 3000, left_minutes: 300, workers: 1, npc_crew: 0, can_take: true, mine: false, points: 60, lot_x: 12, lot_y: 7 }]),
+        // a road is built segment by segment: dozens of jobs of the same kind
+        ...Array.from({ length: 14 }, (_, i) => ({ id: `road-${i}`, building_id: `r${i}`, building: { code: 'road', name: 'Road' }, kind: 'construction', employer_kind: 'settlement', employer: '', wage: 27 + (i % 5) * 8, left: 2, total: 2, progress_bps: i * 500, left_minutes: 120, workers: 0, npc_crew: 0, can_take: true, mine: false, points: 60, lot_x: i, lot_y: 3 }))],
       workplaces: [{ id: 'w1', building: { code: 'woodcutter_camp', name: 'Woodcutter camp' }, produces: [{ component: { code: 'timber', name: 'Timber' }, quantity: 4 }], consumes: [], wage: 18, shift_seconds: 600, workers: 2, busy: 0, ready: true }],
       market: { housing: 4, pool: 21, available: 21, working: 0, vacancies: 6, tightness_bps: 3000, level: 'slack', npc_wage: 21, min_wage: 15 }, empty: '', next: '',
     })
