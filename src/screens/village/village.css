@@ -273,3 +273,5 @@
 .wk-shift { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 7%, transparent); }
 .wk-shift small { opacity: .7; }
 .wk-reason { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, #ffb02e 12%, transparent); font-size: 13.5px; line-height: 1.6; }
+.wk-reason > span { flex: 1 1 12em; }
+.wk-reason > :not(span) { flex: 0 0 auto; white-space: nowrap; }
