@@ -206,6 +206,8 @@
 @media (min-width: 900px) {
   /* desktop: the same slim bar, centred at the bottom of the world (left of the rail), like a city builder's toolbar */
   .v6-build { left: 16px; right: calc(var(--v6-rail-w) + 16px); bottom: 16px; max-width: 880px; margin-inline: auto; max-height: calc(100% - 120px); }
+  /* the docked panel keeps its place: the bar sits in the world beside it, never over it */
+  .v6-app[data-panel="open"] .v6-build { left: calc(var(--v6-panel-w) + 16px); margin-inline: 0; }
   .v6-build.step-menu .vh-card { width: 112px; }
   .v6-build.step-menu .vh-card:hover:not(:disabled) { border-color: var(--v6-gold-hi, #ffd76a); }
 }

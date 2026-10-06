@@ -361,7 +361,7 @@ export default function Shell() {
       if (e.code === 'KeyM') { selectTabRef.current('city'); return }
       if (e.code === 'KeyB' && stateRef.current.canPlace && stateRef.current.homeIsWorld) { openLocalRef.current('village_home', { build: '1' }); return }
       // Escape closes the popup first (it handles itself), then the ring (the village view handles that), then the panel
-      if (e.key === 'Escape' && !document.querySelector('.v6-scrim, .v6-ring, .pp-overlay')) {
+      if (e.key === 'Escape' && !document.querySelector('.v6-scrim, .v6-ring, .pp-overlay, .v6-build')) {
         if (stateRef.current.panelOpen) selectTabRef.current('city')
         else stateRef.current.sideClose?.()
       }
