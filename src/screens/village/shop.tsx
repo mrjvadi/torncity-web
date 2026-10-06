@@ -7,9 +7,9 @@
 import { atText, cityHour, words } from '../../lib/duration'
 import { useState } from 'react'
 import type { ScreenProps } from '../types'
-import type { MoneyView, NoRoomView, VillageShopCheckoutView, VillageShopLine, VillageShopRefusalView, VillageShopView } from '../../api/views.gen'
+import type { CurrencyCharterView, MoneyView, NoRoomView, VillageShopCheckoutView, VillageShopLine, VillageShopRefusalView, VillageShopView } from '../../api/views.gen'
 import { Header, Notice, ScreenScroll, SectionTitle } from '../native/kit/Parts'
-import Popup, { ActionButton, ActionRow, CostSummary, Note } from '../../ui/Popup'
+import Popup, { ActionButton, ActionRow, CostSummary, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { CardGrid, PCard, PStats, PTabs } from '../../ui/v6/panel'
 import GoodsCard from '../../ui/v6/GoodsCard'
 import { FillBar } from '../../ui/v6/ItemGrid'
@@ -18,6 +18,7 @@ import { hasKey, t, type Key } from '../../i18n'
 import { useContentNames, useVillageCommand, type ContentNames } from '../../village/useVillage'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerWrite, type FlowCtx } from './flow'
 import { useVillageView } from './common'
+import { getDisplayMoney } from '../../lib/money'
 import { useSession } from '../../state/SessionContext'
 import { locationOf } from '../../support/location'
 import { serverNow } from '../../village/clock'
@@ -211,13 +212,29 @@ const Refusal = flow<VillageShopRefusalView>(({ view: v, ctx }) => {
 /** «پول شهر»: the settlement's money and its Nil quote. The Nil figures are a display only; nothing converts. */
 const Money = flow<MoneyView>(({ view: v, ctx }) => {
   const nil = (micro: number) => formatNumber(Math.round(micro / 10_000) / 100)
+  const live = getDisplayMoney()
+  const rate = (x: number) => new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 }).format(x)
   return (
     <Page title={t('sm.money.title')} tone="gold">
       <Panel tone="gold">
         <Lead>{t('sm.money.currency', { name: v.currency?.name || t('unit.money') })}</Lead>
+        {v.chartered && live && <Hint>{t('sm.money.rate', { rate: rate(live.rate_num / live.rate_den), name: live.name })}</Hint>}
         {(v.market === 'none' || v.reserve === 'none') && <Hint>{t('sm.money.no_book')}</Hint>}
         <Hint>{t('sm.money.nil')}</Hint>
       </Panel>
+      {v.chartered && live && (
+        <PStats items={[
+          { label: t('sm.money.lbl_supply'), value: `${formatNumber(v.chartered.supply)} ${live.name}` },
+          { label: t('sm.money.lbl_pot'), value: money(v.chartered.pot_sup) },
+          { label: t('sm.money.lbl_units'), value: `${formatNumber(v.chartered.treasury_units)} ${live.name}`, gold: true },
+        ]} />
+      )}
+      {v.can_charter && !v.chartered && (
+        <Panel tone="gold">
+          <Lead>{t('sm.money.offer')}</Lead>
+          <Btns ctx={ctx} list={ctx.by('currency.charter')} />
+        </Panel>
+      )}
       <PStats items={[
         { label: t('sm.money.lbl_treasury'), value: money(v.treasury), gold: true },
         { label: t('sm.money.lbl_unit', { u: formatNumber(v.nil_unit_sup) }), value: `${nil(v.nil_per_unit_micro * v.nil_unit_sup)} Nil` },
@@ -249,6 +266,58 @@ const Money = flow<MoneyView>(({ view: v, ctx }) => {
   )
 })
 
+/** The head's charter of the settlement's own money (when the automatic one could not be paid): a centred confirm with the fee and
+ * the first deposit, the result, or the live state of a money that already exists. */
+const CurrencyCharter = flow<CurrencyCharterView>(({ view: v, ctx }) => {
+  const ok = ctx.acts.find((a) => a.id === 'confirm')
+  const back = ctx.acts.find(isBack)
+  const rate = (x: number) => new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 }).format(x)
+  if (v.stage === 'ask') {
+    return (
+      <Page title={t('sm.charter.title')} tone="gold">
+        <Popup open onClose={() => back && ctx.go(back)} tone="gold" dismissible={!ctx.busy} title={t('sm.charter.title')}
+          footer={<ActionRow>
+            {back && <ActionButton tone="steel" small onClick={() => ctx.go(back)} disabled={ctx.busy}>{t('building.no')}</ActionButton>}
+            {ok && <ActionButton tone="gold" busy={ctx.busy} disabled={!v.can_pay} reason={!v.can_pay ? t('sm.charter.cannot') : undefined} onClick={() => ctx.go(ok)}>{t('sm.charter.yes', { total: money(v.fee + v.deposit) })}</ActionButton>}
+          </ActionRow>}>
+          <Note>{t('sm.charter.intro', { name: v.name })}</Note>
+          <StatGrid>
+            <StatCard icon="coins" palette="amber" label={t('sm.charter.fee')} value={money(v.fee)} />
+            <StatCard icon="box" palette="sapphire" label={t('sm.charter.deposit')} value={money(v.deposit)} />
+            <StatCard icon="coins" palette="gold" label={t('sm.charter.units')} value={`${formatNumber(v.units)} ${v.name}`} />
+            <StatCard icon="coins" palette="steel" label={t('sm.charter.treasury')} value={money(v.treasury)} />
+          </StatGrid>
+          {(v.r0_options ?? []).length > 1 && (
+            <>
+              <Note>{t('sm.charter.scale')}</Note>
+              <ActionRow>
+                {(v.r0_options ?? []).map((r) => (
+                  <ActionButton key={r} tone={r === v.r0 ? 'gold' : 'steel'} small disabled={ctx.busy} onClick={() => ctx.run('settlement.currency.charter', { r0: String(r), deposit: String(v.deposit) })}>{t('sm.charter.per_sup', { n: formatNumber(r) })}</ActionButton>
+                ))}
+              </ActionRow>
+            </>
+          )}
+          {!v.can_pay && <Note tone="bad">{t('sm.charter.cannot')}</Note>}
+          <Note>{t('sm.charter.floating')}</Note>
+        </Popup>
+      </Page>
+    )
+  }
+  return (
+    <Page title={t('sm.charter.title')} tone="gold">
+      <Panel tone={v.stage === 'done' ? 'emerald' : 'gold'}>
+        <Lead tone={v.stage === 'done' ? 'good' : undefined}>{t(v.stage === 'done' ? 'sm.charter.done' : 'sm.charter.exists', { name: v.name })}</Lead>
+        <Facts rows={[
+          { label: t('sm.money.lbl_supply'), value: `${formatNumber(v.supply)} ${v.name}` },
+          { label: t('sm.money.lbl_pot'), value: money(v.pot_sup) },
+          ...(v.x_ref_ppm > 0 ? [{ label: t('sm.charter.rate'), value: t('sm.money.rate', { rate: rate((v.r0 * 1_000_000) / v.x_ref_ppm), name: v.name }) }] : []),
+        ]} />
+      </Panel>
+      <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
+    </Page>
+  )
+})
+
 /** «جا ندارید»: a purchase, an order or a claim refused for lack of room; what is missing and how to make room. */
 const NoRoom = flow<NoRoomView>(({ view: v, ctx }) => (
   <Page title={t('sm.noroom.title')} tone="ruby">
@@ -263,6 +332,6 @@ const NoRoom = flow<NoRoomView>(({ view: v, ctx }) => (
   </Page>
 ))
 
-export const SHOP_FLOWS = { village_shop: Shop, village_shop_checkout: Checkout, village_shop_refusal: Refusal, village_money: Money, no_room: NoRoom }
+export const SHOP_FLOWS = { village_shop: Shop, village_shop_checkout: Checkout, village_shop_refusal: Refusal, village_money: Money, village_currency_charter: CurrencyCharter, no_room: NoRoom }
 export const SHOP_SCREENS = Object.keys(SHOP_FLOWS)
 export type { FlowCtx }

@@ -89,6 +89,7 @@ function init(): void {
     health: { value: 88, max: 100, as_of: iso(now - 20 * 60000) },
   })
   put('wallet', 'SUP', { currency: 'SUP', cash: 12450, bank: 86300, premium: false, primary: true })
+  if (new URLSearchParams(location.search).get('cur') !== 'none') put('wallet', 'MKP', { currency: 'MKP', cash: 320, bank: 0, premium: false, primary: false, local: true, name: 'مارک پولو' })
   put('wallet', 'NIL', { currency: 'NIL', cash: 40, bank: 0, premium: true, primary: false })
   const inv = (item: string, qty: number): Inv => ({ item, qty, holdings: { carried: qty }, pieces: [] })
   put('inventory', 'bread', inv('bread', 6))

@@ -69,7 +69,7 @@ export interface Regen { amount: number; every_seconds: number; bps: number }
 export interface Meter { value: number; max: number; as_of: string | null; regen?: Regen }
 export interface VitalsData { energy: Meter; nerve: Meter; health: Meter }
 
-export interface WalletData { currency: string; cash: number; bank: number; premium: boolean; primary: boolean }
+export interface WalletData { currency: string; cash: number; bank: number; premium: boolean; primary: boolean; /** a settlement's own money: its authored name, and true */ name?: string; local?: boolean }
 
 export interface PieceData { id: string; holding: string; quality: number; uses_left: number | null }
 export interface InventoryData { item: string; qty: number; holdings: Record<string, number>; pieces: PieceData[] }

@@ -523,5 +523,5 @@ export function entitiesOf<K extends SyncKind>(v: StoreView, kind: K): [string, 
 /** The player's main wallet: the one the server marks as the game's money. */
 export function primaryWallet(v: StoreView): KindData['wallet'] | undefined {
   const all = entitiesOf(v, 'wallet')
-  return (all.find(([, w]) => w.primary) ?? all.find(([, w]) => !w.premium))?.[1]
+  return (all.find(([, w]) => w.primary) ?? all.find(([, w]) => !w.premium && !w.local))?.[1]
 }

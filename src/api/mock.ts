@@ -98,6 +98,9 @@ const MOCK_PROFILE_ACTIONS = [
   { label: 'تازه‌سازی', command: 'player.profile.get', row: 6, kind: 'navigation', icon: 'clock' },
 ]
 
+/** ?cur=none: SUP only. Default: a chartered Marco Polo (r0 10, reference rate 1.00). */
+export const MOCK_MONEY = (() => { try { return new URLSearchParams(location.search).get('cur') === 'none' ? null : { code: 'MKP', name: 'مارک پولو', symbol: 'MKP', r0: 10, x_ref_ppm: 1_000_000, rate_num: 10_000_000, rate_den: 1_000_000 } } catch { return null } })()
+
 function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.language.set') mockLang = args?.lang === 'en' ? 'en' : 'fa'
   // the companies, production and recruitment area: neutral answers of every screen of it (src/api/mock_companies.ts)
@@ -204,7 +207,10 @@ export function installMockApi(): void {
       if (OPTIMISTIC_WRITES.has(body.command)) await new Promise((r) => setTimeout(r, 700))
       const res = mockCommand(body.command, body.args)
       // the command's effect on the player's state and its own records (state sync)
-      return json(mockSyncCommand(body.command, body.args, await res.json()), res.status)
+      const out = mockSyncCommand(body.command, body.args, await res.json()) as Record<string, unknown>
+      // the viewer's display money rides on every neutral answer (?cur=none: a city with no money of its own, SUP only)
+      if (out && typeof out === 'object' && out.screen && MOCK_MONEY) out.money = MOCK_MONEY
+      return json(out, res.status)
     }
     if (path === '/api/v1/auth/logout') {
       return json({ ok: true })

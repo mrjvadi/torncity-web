@@ -67,6 +67,8 @@ export interface HudData {
   nerve: { v: number; max: number; fullIn: number } | null
   cash: number
   gem: number | null
+  /** the holder's balance of their settlement's own money (units of it, not SUP), shown beside the SUP purse when above zero */
+  local: { value: number; name: string } | null
   pending: boolean
 }
 
@@ -75,6 +77,7 @@ export function useHud(profile: ProfileView | null): HudData {
   const view = useStoreView()
   const wallets = entitiesOf(view, 'wallet')
   const gem = wallets.find(([, w]) => w.premium)?.[1]
+  const loc = wallets.find(([, w]) => w.local && w.cash > 0)?.[1]
   const tgt = useTick(5000)
   void tgt
   const hasNerve = typeof profile?.nerve === 'number' && typeof profile?.max_nerve === 'number'
@@ -86,6 +89,7 @@ export function useHud(profile: ProfileView | null): HudData {
     nerve: hasNerve ? { v: profile!.nerve as number, max: profile!.max_nerve as number, fullIn: (profile!.nerve_full_in_seconds as number) ?? 0 } : null,
     cash: profile?.cash ?? 0,
     gem: gem ? gem.cash : null,
+    local: loc ? { value: loc.cash, name: loc.name || '' } : null,
     pending: !!profile?.pending_money,
   }
 }

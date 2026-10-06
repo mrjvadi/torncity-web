@@ -79,7 +79,7 @@ const Bank = flow<BankView>(({ view: v, ctx }) => {
         {/* cash is on the HUD; the bank shows only what is in the bank */}
         <PStats items={[{ label: t('bank.balance'), value: money(bank), gold: true }]} />
         {purses.map(([id, w]) => (
-          <div key={id} className="bk-branch">{t('bank.village_purse', { currency: ctx.names.name(['currency'], w.currency, w.currency), cash: formatNumber(w.cash), bank: formatNumber(w.bank) })}</div>
+          <div key={id} className="bk-branch">{t('bank.village_purse', { currency: w.name || ctx.names.name(['currency'], w.currency, w.currency), cash: formatNumber(w.cash), bank: formatNumber(w.bank) })}</div>
         ))}
         {v.city && !closed && <div className="bk-branch">{t('bank.branch', { city: ctx.names.name(['city'], v.city_code, v.city) })}</div>}
       </Card>

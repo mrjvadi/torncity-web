@@ -1569,11 +1569,18 @@ function shopBuy(args: Record<string, unknown>) {
     A('shop.pay', 'settlement.shop.buy', { item: String(args.item ?? 'rice'), qty: String(qty), method: 'card', nonce: 'sn1' }, { kind: 'confirm' }), back('settlement.shop')])
 }
 function moneyView() {
+  const none = (() => { try { return new URLSearchParams(location.search).get('cur') === 'none' } catch { return false } })()
   return mockOk('village_money', {
-    village: 'آمل', currency: { code: 'SUP', name: 'ساپ', symbol: '', issued: false }, market: 'none', reserve: 'none', nil_unit_sup: 1000, nil_per_unit_micro: 2400,
+    village: 'آمل', chartered: none ? null : { r0: 10, x_ref_ppm: 1_000_000, supply: 49750, pot_sup: 5000, treasury_units: 40000 }, can_charter: none && IS_HEAD,
+    currency: { code: none ? 'SUP' : 'MKP', name: none ? 'ساپ' : 'مارک پولو', symbol: '', issued: !none }, market: 'none', reserve: 'none', nil_unit_sup: 1000, nil_per_unit_micro: 2400,
     examples: [{ amount: 100, nil_micro: 240 }, { amount: 1000, nil_micro: 2400 }], treasury: st.treasury, treasury_nil_micro: st.treasury * 2400, output: 1800, output_nil_micro: 4320000, output_days: 7,
     residents: 9, basket: [{ item: goods('rice'), kind: 'item', week_milli: 1400, reference: 12, price: 13, on_shelf: true }, { item: goods('tea'), kind: 'item', week_milli: 200, reference: 8, price: 9, on_shelf: false }], index_bps: 10800, cover_bps: 7500,
-  }, [back('settlement.shop'), refreshA('settlement.money')])
+  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : [])])
+}
+function charterView(args: Record<string, unknown>) {
+  const r0 = Number(args.r0 ?? 10)
+  const view = { village: 'آمل', name: 'مارک پولو', symbol: 'MKP', stage: 'ask', treasury: st.treasury, fee: 1000, min_deposit: 5000, deposit: 5000, r0, r0_options: [1, 10, 100], mint_fee_bps: 50, units: Math.floor(5000 * r0 * 0.995), can_pay: st.treasury >= 6000, supply: 0, pot_sup: 0, x_ref_ppm: 1_000_000 }
+  return mockOk('village_currency_charter', view, [confirmA('settlement.currency.charter', { r0: String(r0), deposit: '5000' }), back('settlement.money')])
 }
 
 export function mockVillageCommand(command: string, args: Record<string, unknown> = {}): unknown | null {
@@ -1588,6 +1595,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.shop.buy': return shopBuy(args)
     case 'settlement.shop.cap': case 'settlement.shop.tax': return shopView()
     case 'settlement.money': return moneyView()
+    case 'settlement.currency.charter': return charterView(args)
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true, String(args.from ?? ''))
     case 'settlement.build.place': return place(args)
