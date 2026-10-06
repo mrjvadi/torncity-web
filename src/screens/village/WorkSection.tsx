@@ -36,7 +36,7 @@ export default function WorkSection({ work: w, names, onOpen, onClose }: {
   const job = w.job
   const line = (items: WorkNode['inputs']) => (items ?? []).map((l) => `${formatNumber(l.qty)} ${goods(l.item)}`).join('، ')
   const shift = [
-    (w.inputs ?? []).length || (w.outputs ?? []).length ? `${line(w.inputs) || t('work.nothing')} ← ${line(w.outputs) || t('work.nothing')}` : '',
+    (w.inputs ?? []).length || (w.outputs ?? []).length ? (w.inputs ?? []).length ? `${line(w.inputs)} ← ${line(w.outputs) || t('work.nothing')}` : line(w.outputs) : '',
     w.shift_seconds > 0 ? words(w.shift_seconds) : '',
     w.wage > 0 ? t('work.wage', { n: money(w.wage) }) : '',
   ].filter(Boolean)
