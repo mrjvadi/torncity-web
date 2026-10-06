@@ -1,6 +1,7 @@
 // The v6 parts of a re-hosted screen or panel (building panel, city panel, storehouse, hubs). Pure presentation:
 // data comes in as props, events go out as callbacks. Styles: inner.css (`.hub-*`, `.pn-*`). Icons are the v6 set.
 
+import { rich } from './rich'
 import type { CSSProperties, ReactNode } from 'react'
 import { Ic } from './parts'
 
@@ -86,7 +87,7 @@ export function PCard({ icon, lead, title, sub, facts, badge, tone, off, foot, o
 }) {
   const body = (
     <>
-      {badge && <span className={`hub-badge${tone ? ' ' + tone : ''}`}>{badge}</span>}
+      {badge && <span className={`hub-badge${tone ? ' ' + tone : ''}`}>{rich(badge)}</span>}
       <span className="hub-ico">{lead ?? (icon ? <Ic name={icon} /> : null)}</span>
       <span className="pc-title">{title}</span>
       {sub && <span className="pc-sub">{sub}</span>}
@@ -103,7 +104,7 @@ export function PStats({ items }: { items: { label: ReactNode; value: ReactNode;
   return (
     <div className="pn-stats">
       {items.map((x, i) => (
-        <div key={i} className={`pn-stat${x.bad ? ' bad' : ''}${x.gold ? ' gold' : ''}`}><b>{x.value}</b><span>{x.label}</span></div>
+        <div key={i} className={`pn-stat${x.bad ? ' bad' : ''}${x.gold ? ' gold' : ''}`}><b>{rich(x.value)}</b><span>{x.label}</span></div>
       ))}
     </div>
   )

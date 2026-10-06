@@ -3,6 +3,7 @@
 // cards, pill progress bars, a percent ring, list rows and hub tiles.
 // CSS lives in src/styles/global.css under the `/* screens */` block.
 
+import { rich } from '../../../ui/v6/rich'
 import type { ReactNode } from 'react'
 import Icon, { type IconPalette } from '../../../ui/Icon'
 import './header.css'
@@ -133,7 +134,7 @@ export function ListRow({ icon, palette, title, sub, right, tone, onClick }: {
         <span className="nx-row-title">{title}</span>
         {sub && <span className="nx-row-sub">{sub}</span>}
       </span>
-      {right && <span className="nx-row-right">{right}</span>}
+      {right && <span className="nx-row-right">{rich(right)}</span>}
     </Comp>
   )
 }

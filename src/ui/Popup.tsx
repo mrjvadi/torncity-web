@@ -10,6 +10,7 @@
 // Building blocks for the inside: Hero, Gauge, Medallion, StatGrid/StatCard,
 // EffectRow/EffectChip, ProgressRow, ActionButton (with a cost badge), Note,
 // Section. See popup.css.
+import { rich } from './v6/rich'
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Icon, { type IconPalette } from './Icon'
@@ -208,7 +209,7 @@ export function StatCard({ icon, palette = 'steel', label, value }: StatCardProp
       <span className="pp-stat-ic"><Icon name={icon} palette={palette} size={38} /></span>
       <span className="pp-stat-tx">
         <span className="pp-stat-l">{label}</span>
-        <span className="pp-stat-v display">{value}</span>
+        <span className="pp-stat-v display">{rich(value)}</span>
       </span>
     </div>
   )

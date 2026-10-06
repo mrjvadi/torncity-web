@@ -12,7 +12,7 @@ import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionT
 import { Slab } from '../../kit'
 import { PBtn, CardGrid } from '../../ui/v6/panel'
 import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
-import { hms, money, moneyIn } from '../native/kit/format'
+import { hms, money } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import { hasKey, t, type Key } from '../../i18n'
 import type {
@@ -231,7 +231,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
         <>
           <Card tone="violet">
             <div className="vs-grid">
-              <div><div className="nx-stat-label">{t('know.treasury')}</div><div className="display" style={{ fontSize: 18, color: 'var(--gold)' }}>{moneyIn(v.treasury, v.currency)}</div></div>
+              <div><div className="nx-stat-label">{t('know.treasury')}</div><div className="display" style={{ fontSize: 18, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
               <div><div className="nx-stat-label">{t('know.literacy')}</div><div className="display" style={{ fontSize: 18 }}>{v.literacy_percent}%</div></div>
             </div>
             {v.running && (
@@ -250,12 +250,11 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
               const held = l.state === 'held'
               const locked = l.state === 'locked'
               const missing = (l.missing ?? []).map(kname).join('، ')
-              const cur = v.currency
               const short = l.research_cost - v.treasury
               const buyShort = l.buy_price - v.treasury
               const sub = held ? t('know.state.held')
                 : locked ? (missing ? t('know.missing', { list: missing }) : t('know.state.locked'))
-                  : `${t('know.cost', { n: moneyIn(l.research_cost, cur) })} · ${t('know.time', { t: durationText(l.research_time_seconds) })}`
+                  : `${t('know.cost', { n: money(l.research_cost) })} · ${t('know.time', { t: durationText(l.research_time_seconds) })}`
               const opens = (l.unlocks ?? []).map((u) => t(`know.unlock.${u.kind}` as Key, {
                 name: u.kind === 'building' ? buildingName(cat, u.item.code, u.item.name) : u.kind === 'course' ? names.name('course', u.item.code, u.item.name) : kname(u.item),
               }))
@@ -268,11 +267,11 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
                   right={<Chip tone={held ? 'emerald' : l.state === 'researching' ? 'gold' : undefined}>{t(`know.state.${l.state}` as Key)}</Chip>}
                 >
                   {!held && opens.length > 0 && <div className="nx-bar-sub">{t('know.unlocks', { list: opens.join('، ') })}</div>}
-                  {l.state === 'available' && short > 0 && <div className="nx-bar-sub">{t('know.short', { n: moneyIn(short, cur) })}</div>}
+                  {l.state === 'available' && short > 0 && <div className="nx-bar-sub">{t('know.short', { n: money(short) })}</div>}
                   {canAct && l.state === 'available' && (
                     <div className="vs-btns">
                       <Slab tone="gold" radius={12} lip={3} disabled={short > 0} onClick={() => setAsk({ kind: 'research', line: l })}>{t('know.research')}</Slab>
-                      {l.buy_price > 0 && <Slab tone="blue" radius={12} lip={3} disabled={buyShort > 0} onClick={() => setAsk({ kind: 'buy', line: l })}>{t('know.buy')} · {moneyIn(l.buy_price, cur)}</Slab>}
+                      {l.buy_price > 0 && <Slab tone="blue" radius={12} lip={3} disabled={buyShort > 0} onClick={() => setAsk({ kind: 'buy', line: l })}>{t('know.buy')} · {money(l.buy_price)}</Slab>}
                     </div>
                   )}
                 </RowCard>
@@ -295,12 +294,12 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
           <>
             <Hero><Medallion icon="book" palette="violet" ring="#8e6cf0" /></Hero>
             <StatGrid>
-              <StatCard icon="coins" palette="gold" label={t(ask.kind === 'buy' ? 'know.stat.buy' : 'know.stat.research')} value={moneyIn(ask.kind === 'buy' ? ask.line.buy_price : ask.line.research_cost, v?.currency)} />
+              <StatCard icon="coins" palette="gold" label={t(ask.kind === 'buy' ? 'know.stat.buy' : 'know.stat.research')} value={money(ask.kind === 'buy' ? ask.line.buy_price : ask.line.research_cost)} />
             </StatGrid>
             <Note>
               {ask.kind === 'buy'
-                ? t('know.confirm_buy', { name: kname(ask.line.knowledge), price: moneyIn(ask.line.buy_price, v?.currency) })
-                : t('know.confirm_research', { name: kname(ask.line.knowledge), cost: moneyIn(ask.line.research_cost, v?.currency) })}
+                ? t('know.confirm_buy', { name: kname(ask.line.knowledge), price: money(ask.line.buy_price) })
+                : t('know.confirm_research', { name: kname(ask.line.knowledge), cost: money(ask.line.research_cost) })}
             </Note>
           </>
         )}

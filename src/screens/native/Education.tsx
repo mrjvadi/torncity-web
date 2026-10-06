@@ -6,7 +6,7 @@ import { Lines, Need } from './kit/cardparts'
 import { tripLine } from './kit/needs'
 import type { TripHint } from '../../api/views.gen'
 import Actions from './kit/Actions'
-import { clamp01, hms, moneyIn, roughDuration, type PlaceCurrency } from './kit/format'
+import { clamp01, hms, money, roughDuration } from './kit/format'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
 import { t, type Key } from '../../i18n'
 
@@ -21,7 +21,6 @@ interface EducationView {
   certificates?: Named[] | null
   place?: Named | null
   tier?: string
-  currency?: PlaceCurrency | null
   literacy?: Literacy | null
   courses?: CourseLine[] | null
   elsewhere?: Gap[] | null
@@ -94,7 +93,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
                 title={course(c.course)}
                 badge={c.eligible ? t('education.open') : t('common.of_level', { n: c.min_level ?? 0 })}
                 tone={c.eligible ? 'good' : 'off'}
-                facts={<Lines lines={[`${c.fee ? moneyIn(c.fee, v.currency) : t('common.free')} · ${roughDuration(c.duration_seconds)}`]} />}
+                facts={<Lines lines={[`${c.fee ? money(c.fee) : t('common.free')} · ${roughDuration(c.duration_seconds)}`]} />}
                 onClick={c.eligible && c.course?.code ? () => run('education.view', { course: c.course!.code! }) : undefined}
               />
             ))}
@@ -111,7 +110,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
               const needs = (g.needs ?? []).map(needText).filter((x): x is string => !!x)
               return (
                 <PCard key={g.course?.code} off icon="book" title={course(g.course)} badge={t('education.here_not')} tone="off"
-                  facts={<><Lines lines={[`${g.fee ? moneyIn(g.fee, v.currency) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '', tripLine(g.nearest_trip)]} /><Need lines={needs} /></>}
+                  facts={<><Lines lines={[`${g.fee ? money(g.fee) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '', tripLine(g.nearest_trip)]} /><Need lines={needs} /></>}
                   foot={near && g.nearest?.code ? <button className="pn-btn sec" onClick={() => run('travel.options', { city: g.nearest!.code! })}>{t('education.gap.go', { place: near })}</button> : undefined} />
               )
             })}

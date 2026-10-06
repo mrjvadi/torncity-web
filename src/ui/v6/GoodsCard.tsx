@@ -2,6 +2,7 @@
 // inside a `CardGrid` (2 per row on a phone, 3 to 4 on desktop), so it looks like every other list of choices.
 // The server's `shelf` words the group tabs and the source says whose it is; the price is the card's own line.
 
+import { rich } from './rich'
 import type { ReactNode } from 'react'
 import { PCard } from './panel'
 import { itemIconName } from './ItemGrid'
@@ -31,7 +32,7 @@ export default function GoodsCard({ code, name, group, price, price2, badge, sou
       lead={<Icon name={itemIconName(code, group)} palette="gold" size={40} />}
       title={name}
       sub={source}
-      facts={(price != null || price2 != null) ? <>{price != null && <b className="gc-price">{price}</b>}{price2 != null && <span>{price2}</span>}</> : undefined}
+      facts={(price != null || price2 != null) ? <>{price != null && <b className="gc-price">{rich(price)}</b>}{price2 != null && <span>{rich(price2)}</span>}</> : undefined}
       badge={badge}
       tone={tone}
       off={off}
