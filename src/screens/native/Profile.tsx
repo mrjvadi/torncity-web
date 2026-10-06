@@ -114,10 +114,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
       {needs && <>
       <PSec>{t('profile.needs')}</PSec>
       <div className="pf2-needs">
-          <NeedBar icon="timer" color="blue" label={t('need.sleep')} value={needs.sleep} bad />
-          <NeedBar icon="bread" color="green" label={t('need.hunger')} value={needs.hunger} bad />
-          <NeedBar icon="people" color="green" label={t('need.happiness')} value={needs.happiness} />
-          <NeedBar icon="nerve" color="orange" label={t('need.stress')} value={needs.stress} bad />
+          {(['sleep', 'hunger', 'happiness', 'stress'] as const).map((k) => <NeedBar key={k} {...NEED_SPEC[k]} label={t(`need.${k}`)} value={needs[k]} />)}
       </div>
       </>}
 
@@ -181,9 +178,18 @@ function Fig({ icon, label, value }: { icon: string; label: string; value: strin
   )
 }
 
+/** One meaning and one colour per need, everywhere (Me and Life): sleepiness, hunger and stress rise when it is WORSE
+ * (0 is fine, 100 is the worst, so a full hunger bar is red); happiness is better when higher. */
+export const NEED_SPEC = {
+  sleep: { icon: 'timer', color: 'blue', bad: true },
+  hunger: { icon: 'bread', color: 'green', bad: true },
+  happiness: { icon: 'people', color: 'green', bad: false },
+  stress: { icon: 'nerve', color: 'orange', bad: true },
+} as const
+
 /** A need or a vital as a thin bar: green is fine, amber low, red blocked; energy is blue, nerve orange (owner). `bad` marks a
  * need that is worse when HIGHER (sleepiness, hunger, stress). */
-function NeedBar({ icon, color, label, value, max = 100, bad }: { icon: string; color: 'blue' | 'green' | 'orange'; label: string; value?: number; max?: number; bad?: boolean }) {
+export function NeedBar({ icon, color, label, value, max = 100, bad }: { icon: string; color: 'blue' | 'green' | 'orange'; label: string; value?: number; max?: number; bad?: boolean }) {
   if (value === undefined) return null
   const f = clamp01(value / (max || 100))
   const level = (bad ? 1 - f : f)
