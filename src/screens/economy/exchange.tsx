@@ -2,6 +2,7 @@
 // player's portfolio, a company's listing and its dividend. Drawn from the view and the actions of the
 // answer (docs/adr/0039-presentation-split.md); a city without an exchange arrives as `unavailable`.
 
+import { short } from '../../ui/v6/short'
 import type {
   BookLevel, DividendView, ExchangeView, ListingView, PortfolioView, StockOrderView, StockPageView, TradeLine,
 } from '../../api/views.gen'
@@ -124,11 +125,11 @@ const Stock = flow<StockPageView>(({ view: v, ctx }) => {
         <Panel>
           <Lead>{t('eco.stock.buy')}</Lead>
           <div className="vf-btns row">
-            {(v.buys ?? []).map((o) => { const a = find(ctx, 'stock.buy', { qty: o.qty, price: o.price }); return a && <button key={`b${o.qty}-${o.price}`} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.stock.shares', { n: formatNumber(o.qty) })}</b><small>{money(o.price)}</small></button> })}
+            {(v.buys ?? []).map((o) => { const a = find(ctx, 'stock.buy', { qty: o.qty, price: o.price }); return a && <button key={`b${o.qty}-${o.price}`} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<><b>{t('eco.stock.shares', { n: formatNumber(o.qty) })}</b><small>{money(o.price)}</small></>)}</button> })}
           </div>
           {(v.sells ?? []).length > 0 && <Lead>{t('eco.stock.sell')}</Lead>}
           <div className="vf-btns row">
-            {(v.sells ?? []).map((o) => { const a = find(ctx, 'stock.sell', { qty: o.qty, price: o.price }); return a && <button key={`s${o.qty}-${o.price}`} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}><b>{t('eco.stock.shares', { n: formatNumber(o.qty) })}</b><small>{money(o.price)}</small></button> })}
+            {(v.sells ?? []).map((o) => { const a = find(ctx, 'stock.sell', { qty: o.qty, price: o.price }); return a && <button key={`s${o.qty}-${o.price}`} className="bk-chip eco-chip" disabled={ctx.busy} onClick={() => ctx.go(a)}>{short(<><b>{t('eco.stock.shares', { n: formatNumber(o.qty) })}</b><small>{money(o.price)}</small></>)}</button> })}
           </div>
           <Hint>{t('eco.stock.fee', { p: pct(v.fee_bps / 10000) })}</Hint>
         </Panel>

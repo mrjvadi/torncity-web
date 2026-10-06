@@ -3,6 +3,7 @@
 // here is deliberately small and composable — the chrome (Hud/Dock/…) and
 // the 54 feature screens are built on top of it. See kit.css for the visual
 // rules; this file is only markup + typed props.
+import { short } from '../ui/v6/short'
 import type { CSSProperties, ReactNode } from 'react'
 import Icon from '../ui/Icon'
 import { shade } from './color'
@@ -103,7 +104,7 @@ export function Slab({ children, tone = 'gold', radius = 16, lip, onClick, disab
       onClick={onClick}
       disabled={disabled}
     >
-      {children}
+      {short(children)}
     </button>
   )
 }

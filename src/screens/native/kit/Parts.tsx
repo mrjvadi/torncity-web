@@ -3,6 +3,7 @@
 // cards, pill progress bars, a percent ring, list rows and hub tiles.
 // CSS lives in src/styles/global.css under the `/* screens */` block.
 
+import { short } from '../../../ui/v6/short'
 import { rich } from '../../../ui/v6/rich'
 import type { ReactNode } from 'react'
 import Icon, { type IconPalette } from '../../../ui/Icon'
@@ -163,7 +164,7 @@ export function PrimaryButton({ children, onClick, disabled }: { children: React
 }
 
 export function Chip({ children, tone }: { children: ReactNode; tone?: Tone }) {
-  return <span className={`nx-chip${tone ? ` nx-chip-${tone}` : ''}`}>{children}</span>
+  return <span className={`nx-chip${tone ? ` nx-chip-${tone}` : ''}`}>{short(children)}</span>
 }
 
 export function Empty({ children }: { children: ReactNode }) {

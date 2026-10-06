@@ -58,12 +58,12 @@ export function CurrencyPill({ kind, value, name, onClick, onPlus, pending }: { 
   const cls = `v6-chip v6-${kind}${pending ? ' pending' : ''}`
   const inner = (
     <>
-      <Ic name={kind === 'gem' ? 'gem' : 'coin'} />
+      {kind === 'local' ? <span className="v6-coin-l" aria-hidden="true">{[...(name ?? '')][0] ?? ''}</span> : <Ic name={kind === 'gem' ? 'gem' : 'coin'} />}
       <b>{value}</b>
     </>
   )
   return (
-    <div className={cls} data-k={kind} data-tip={tip}>
+    <div className={cls} data-k={kind} data-tip={tip} title={tip}>
       {onClick ? <button className="v6-chip-hit" onClick={onClick} aria-label={tip} style={{ position: 'absolute', inset: 0, borderRadius: 15 }} /> : null}
       {inner}
       {onPlus && <button className="v6-plus" onClick={onPlus} aria-label={t('v6.gem.add')} data-tip={t('v6.gem.add')}><i /></button>}

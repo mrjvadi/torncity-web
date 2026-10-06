@@ -237,15 +237,15 @@ const Money = flow<MoneyView>(({ view: v, ctx }) => {
       )}
       <PStats items={[
         { label: t('sm.money.lbl_treasury'), value: money(v.treasury), gold: true },
-        { label: t('sm.money.lbl_unit', { u: formatNumber(v.nil_unit_sup) }), value: `${nil(v.nil_per_unit_micro * v.nil_unit_sup)} Nil` },
+        { label: t('sm.money.lbl_unit', { u: formatNumber(v.nil_unit_sup) }), value: `${nil(v.nil_per_unit_micro * v.nil_unit_sup)} ${t('unit.gem')}` },
         { label: t('sm.money.lbl_output', { d: formatNumber(v.output_days) }), value: money(v.output) },
-        { label: 'Nil', value: nil(v.treasury_nil_micro) },
+        { label: t('unit.gem'), value: nil(v.treasury_nil_micro) },
       ]} />
       {(v.examples ?? []).length > 0 && (
         <>
           <SectionTitle>{t('sm.money.examples')}</SectionTitle>
           <CardGrid>
-            {(v.examples ?? []).map((e) => <PCard key={e.amount} icon="coins" title={money(e.amount)} facts={`${nil(e.nil_micro)} Nil`} />)}
+            {(v.examples ?? []).map((e) => <PCard key={e.amount} icon="coins" title={money(e.amount)} facts={`${nil(e.nil_micro)} ${t('unit.gem')}`} />)}
           </CardGrid>
         </>
       )}
