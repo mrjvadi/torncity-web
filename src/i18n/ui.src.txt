@@ -798,7 +798,7 @@ card.mine | کارت من | My card
 card.code | کد: {code} | Code: {code}
 card.no_bio | هنوز زندگی‌نامه ننوشته‌ای. | You have not written a bio yet.
 card.level | سطح | Level
-card.achievements | دستاورد | Achievements
+card.achievements | دستاوردها | Achievements
 card.entries | خاطرات | Memories
 card.joined | عضویت | Joined
 # -- shops -----------------------------------------------------------------------
@@ -873,8 +873,8 @@ profile.wealth_rank | رتبه‌ی ثروت | Wealth rank
 profile.energy | انرژی | Energy
 profile.health | سلامت | Health
 profile.needs | نیازها | Needs
-profile.achievements | دستاوردها · {a} از {b} | Achievements · {a} of {b}
-profile.achievements_n | دستاوردها · {a} | Achievements · {a}
+profile.achievements | دستاوردها: {a} از {b} | Achievements · {a} of {b}
+profile.achievements_n | دستاوردها: {a} | Achievements · {a}
 profile.no_achievements | هنوز دستاوردی نداری. | No achievements yet.
 profile.work | شغل | Job
 profile.study | آموزش | Studying
