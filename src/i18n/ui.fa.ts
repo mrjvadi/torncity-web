@@ -5244,6 +5244,11 @@ export const uiFa = {
   'work.repair_head': 'تعمیر را شهردار آگهی می‌کند.',
   'work.repair_job': 'تعمیر در جریان است: {left} نوبت مانده، دستمزد {wage}، {n} کارگر روزمزد',
   'work.repair_take': 'تعمیر می‌کنم',
+  'work.road_group': 'جاده‌سازی: {n} قطعه',
+  'work.road_best': 'بهترین دستمزد: {w}',
+  'work.road_hint': 'هر قطعه شیفت جدا دارد؛ «کار کن» پردرآمدترین قطعهٔ آزاد را برمی‌دارد.',
+  'work.road_show': 'دیدن همهٔ قطعه‌ها',
+  'work.road_hide': 'جمع کردن',
 } as const
 
 export type UiKey = keyof typeof uiFa

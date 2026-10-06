@@ -5344,3 +5344,8 @@ work.repair_post | تعمیر | Repair
 work.repair_head | تعمیر را شهردار آگهی می‌کند. | The head posts the repair.
 work.repair_job | تعمیر در جریان است: {left} نوبت مانده، دستمزد {wage}، {n} کارگر روزمزد | Repair under way: {left} shifts left, wage {wage}, {n} day labourers
 work.repair_take | تعمیر می‌کنم | Work on the repair
+work.road_group | جاده‌سازی: {n} قطعه | Road building: {n} segments
+work.road_best | بهترین دستمزد: {w} | Best wage: {w}
+work.road_hint | هر قطعه شیفت جدا دارد؛ «کار کن» پردرآمدترین قطعهٔ آزاد را برمی‌دارد. | Each segment has its own shifts; the button takes the best-paid free one.
+work.road_show | دیدن همهٔ قطعه‌ها | See all segments
+work.road_hide | جمع کردن | Collapse

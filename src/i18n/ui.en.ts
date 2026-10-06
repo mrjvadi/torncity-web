@@ -5246,4 +5246,9 @@ export const uiEn: Record<UiKey, string> = {
   'work.repair_head': 'The head posts the repair.',
   'work.repair_job': 'Repair under way: {left} shifts left, wage {wage}, {n} day labourers',
   'work.repair_take': 'Work on the repair',
+  'work.road_group': 'Road building: {n} segments',
+  'work.road_best': 'Best wage: {w}',
+  'work.road_hint': 'Each segment has its own shifts; the button takes the best-paid free one.',
+  'work.road_show': 'See all segments',
+  'work.road_hide': 'Collapse',
 }

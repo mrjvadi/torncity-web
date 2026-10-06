@@ -22,6 +22,7 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
   const toast = useToast()
   const now = useNow(1000)
   const [busy, setBusy] = useState(false)
+  const [open, setOpen] = useState(false)
 
   const reload = useCallback(async () => {
     try {
@@ -39,9 +40,35 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
 
   if (!v) return <ScreenScroll><Header title={t('job.title')} tone="gold" /><Empty>{t('common.loading')}</Empty></ScreenScroll>
 
-  const jobs = v.jobs ?? []
+  const allJobs = v.jobs ?? []
+  // road segments come as dozens of identical cards: one group card, expandable
+  const roadJobs = allJobs.filter((j) => j.building.code === 'road')
+  const grouped = roadJobs.length >= 3
+  const jobs = grouped ? allJobs.filter((j) => j.building.code !== 'road') : allJobs
+  const takeable = roadJobs.filter((j) => j.can_take).sort((a, b) => b.wage - a.wage)
+  const best = takeable[0]
   const places = v.workplaces ?? []
   const left = v.working?.finish_at ? Math.max(0, (Date.parse(v.working.finish_at) - now) / 1000) : 0
+
+  const JobCards = ({ list }: { list: typeof allJobs }) => (
+    <CardGrid>
+            {list.map((j) => (
+              <PCard key={j.id} icon="tool" title={buildingName(cat, j.building.code, j.building.name)}
+                badge={t('labor.per_shift', { w: money(j.wage) })} tone="busy" off={!j.can_take}
+                facts={<>
+                  <Lines lines={[
+                    j.kind === 'construction' ? t('labor.job.site', { x: formatNumber(j.lot_x), y: formatNumber(j.lot_y), p: formatNumber(Math.floor(j.progress_bps / 100)) }) : t('labor.job.production'),
+                    j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village'),
+                    t('labor.shifts_left', { n: j.left }),
+                  ]} />
+                  {!j.can_take && <Need lines={[t('work.not_here')]} />}
+                </>}
+                foot={j.can_take
+                  ? <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</button>
+                  : undefined} />
+            ))}
+          </CardGrid>
+  )
 
   return (
     <ScreenScroll>
@@ -67,25 +94,12 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
             </Card>
           )}
 
-          {jobs.length > 0 && <SectionTitle>{t('work.jobs')}</SectionTitle>}
-          <CardGrid>
-            {jobs.map((j) => (
-              <PCard key={j.id} icon="tool" title={buildingName(cat, j.building.code, j.building.name)}
-                badge={t('labor.per_shift', { w: money(j.wage) })} tone="busy" off={!j.can_take}
-                facts={<>
-                  <Lines lines={[
-                    j.kind === 'construction' ? t('labor.job.site', { x: formatNumber(j.lot_x), y: formatNumber(j.lot_y), p: formatNumber(Math.floor(j.progress_bps / 100)) }) : t('labor.job.production'),
-                    j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village'),
-                    t('labor.shifts_left', { n: j.left }),
-                  ]} />
-                  {!j.can_take && <Need lines={[t('work.not_here')]} />}
-                </>}
-                foot={j.can_take
-                  ? <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: j.id })}>{t('labor.work', { w: money(j.wage) })}</button>
-                  : undefined} />
-            ))}
-          </CardGrid>
-
+          <div className="hub-grid">
+            <PTile icon="tool" title={t('labor.btn.board')} onClick={() => run('settlement.labor.board')} />
+            <PTile icon="info" title={t('labor.btn.mine')} onClick={() => run('settlement.labor.mine')} />
+            <PTile icon="book" title={t('ac.work.openings.title')} onClick={() => run('job.list')} />
+            <PTile icon="person" title={t('work.career')} onClick={() => run('job.status')} />
+          </div>
           {places.length > 0 && <SectionTitle>{t('work.workplaces')}</SectionTitle>}
           <CardGrid>
             {places.map((w) => {
@@ -104,12 +118,22 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
             })}
           </CardGrid>
 
-          <div className="hub-grid">
-            <PTile icon="tool" title={t('labor.btn.board')} onClick={() => run('settlement.labor.board')} />
-            <PTile icon="info" title={t('labor.btn.mine')} onClick={() => run('settlement.labor.mine')} />
-            <PTile icon="book" title={t('ac.work.openings.title')} onClick={() => run('job.list')} />
-            <PTile icon="person" title={t('work.career')} onClick={() => run('job.status')} />
-          </div>
+          {(jobs.length > 0 || grouped) && <SectionTitle>{t('work.jobs')}</SectionTitle>}
+          {grouped && (
+            <CardGrid>
+              <PCard icon="tool" title={t('work.road_group', { n: formatNumber(roadJobs.length) })}
+                badge={best ? t('work.road_best', { w: money(best.wage) }) : undefined} tone="busy" off={!best}
+                facts={<Lines lines={[t('work.road_hint')]} />}
+                foot={(
+                  <>
+                    {best && <button className={`pn-btn${busy || v.working ? ' dis' : ''}`} disabled={busy || !!v.working} onClick={() => void act('settlement.labor.take', { id: best.id })}>{t('labor.work', { w: money(best.wage) })}</button>}
+                    <button className="pn-btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>{open ? t('work.road_hide') : t('work.road_show')}</button>
+                  </>
+                )} />
+            </CardGrid>
+          )}
+          {grouped && open && <JobCards list={roadJobs} />}
+          {jobs.length > 0 && <JobCards list={jobs} />}
         </>
       )}
     </ScreenScroll>
