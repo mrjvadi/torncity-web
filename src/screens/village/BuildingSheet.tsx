@@ -140,13 +140,13 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
         <StatCard icon="x_map" palette="sapphire" label={t('building.stat.spot')} value={t('building.at', { x: b.x + 1, y: b.y + 1 })} />
         <StatCard icon="box" palette="steel" label={t('building.stat.size')} value={`${b.w}×${b.h}`} />
         {b.private && <StatCard icon="person" palette={b.mine ? 'gold' : 'steel'} label={t('building.stat.owner')} value={b.mine ? t('building.stat.you') : (b.owner ?? '')} />}
-        {!going && (panel?.upkeep ?? 0) > 0 && kind !== 'road' && <StatCard icon="coins" palette="amber" label={t('building.stat.upkeep')} value={money(panel?.upkeep ?? 0)} />}
+        {!going && (panel?.upkeep ?? 0) > 0 && kind !== 'road' && !panel?.work?.condition && <StatCard icon="coins" palette="amber" label={t('building.stat.upkeep')} value={money(panel?.upkeep ?? 0)} />}
       </StatGrid>
 
       {going ? (
         !b.finish_at && <Note>{t('labor.by_work_hint')}</Note>
       ) : (
-        <TypePanel kind={kind} panel={panel} names={names} onOpen={onOpen} onClose={onClose} />
+        <TypePanel kind={kind} panel={panel} names={names} onOpen={onOpen} onClose={onClose} manage={canAct} onAct={(c, a) => { void cmd(c, a, { write: true }).then((r) => { if (r.ok) void load(false) }) }} />
       )}
       {site && b.id && <SiteSheet buildingId={b.id} title={name} onClose={() => setSite(false)} />}
 
@@ -170,7 +170,9 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
   return <Popup open onClose={closeAll} title={name} tone="gold" footer={footer}>{content}</Popup>
 }
 
-function TypePanel({ kind, panel, names, onOpen, onClose }: {
+function TypePanel({ kind, panel, names, onOpen, onClose, manage, onAct }: {
+  manage: boolean
+  onAct: (command: string, args: Record<string, string>) => void
   kind: string
   panel: BuildingPanelView | null
   names: ContentNames
@@ -234,7 +236,7 @@ function TypePanel({ kind, panel, names, onOpen, onClose }: {
           )}
         </>
       )}
-      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onClose={onClose} />}
+      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onClose={onClose} manage={manage} act={onAct} buildingId={panel.id} />}
       {effects.length > 0 && (
         <EffectRow>
           {effects.map((e) => (

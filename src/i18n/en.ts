@@ -117,7 +117,7 @@ export const en: Partial<Record<Key, string>> = {
   'build.needs': 'Requires: {list}',
   'build.fits': 'You can build here',
   'build.no_fit': 'No room here',
-  'build.queue': 'Building: {n} of {cap}',
+  'build.queue': 'Building crews: {n} of {cap}',
   'build.started': 'Construction started.',
   'build.empty': 'No building is available to build.',
   'build.mode_on': 'Build mode',

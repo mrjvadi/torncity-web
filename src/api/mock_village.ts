@@ -1405,11 +1405,22 @@ function panelKind(type: string, role: string): string {
 
 // W1 fixtures: fx-woodcutter-idle (no crew, nobody), fx-woodcutter-crew (2 labourers + 1 resident), fx-woodcutter-paused (budget spent), a granary, a road
 function workNode(type: string, id: string): WorkNode {
+  const n = workNode0(type, id)
+  return { ...n, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null }
+}
+function workNode0(type: string, id: string): Omit<WorkNode, 'meal_points' | 'food_shifts' | 'condition'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
   const timber = goods('timber')
   if (type === 'road') return { kind: 'none', status: 'idle', reasons: [{ code: 'no_function', item: null, class: '', have: 0, need: 0 }], slots: null, filled: 0, max: 0, shift_seconds: 0, wage: 0, inputs: null, outputs: null, storage_class: '', storage_free: 0, job: null, if_unstaffed: '' }
   if (type === 'granary' || type === 'storehouse') return { kind: 'storage', status: 'idle', reasons: [{ code: 'no_keeper', item: null, class: 'food', have: 0, need: 0 }], slots: [{ role: 'storekeeper', worker: 'empty', name: '' }], filled: 0, max: 1, shift_seconds: 0, wage: 40, inputs: null, outputs: null, storage_class: 'food', storage_free: 62, job: null, if_unstaffed: 'base_room' }
-  const base = { kind: 'production', shift_seconds: 3600 * 2, wage: 30, inputs: null, outputs: [{ item: timber, qty: 4 }], storage_class: 'bulk', storage_free: 24, if_unstaffed: 'idle', max: 3 }
+  const food = id.includes('nofood') ? 0 : 12
+  const base = { meal_points: 2, food_shifts: food, kind: 'production', shift_seconds: 3600 * 2, wage: 30, inputs: null, outputs: [{ item: timber, qty: 4 }], storage_class: 'bulk', storage_free: 24, if_unstaffed: 'idle', max: 3 }
   const seat = (worker: string, name = ''): WorkSlot => ({ role: 'woodcutter', worker, name })
+  const cd = (bps: number, extra: Partial<NonNullable<WorkNode['condition']>> = {}): WorkNode['condition'] => ({ bps, decay_bps_per_day: 50, output_bps: bps >= 5000 ? 10000 : bps >= 2500 ? 7500 : 0, closed: bps < 2500, can_repair: bps < 7000, repair_shifts: Math.ceil((10000 - bps) / 1000), repair_materials: [{ item: timber, qty: 4 }, { item: goods('stone'), qty: 2 }], repair_job: null, ...extra })
+  const idle = { ...base, status: 'idle', reasons: [{ code: 'no_staff', item: null, class: '', have: 0, need: 3 }], slots: [seat('empty'), seat('empty'), seat('empty')], filled: 0, job: null }
+  if (id.includes('worn')) return { ...idle, condition: cd(4000) }
+  if (id.includes('closed')) return { ...idle, reasons: [{ code: 'needs_repair', item: null, class: '', have: 0, need: 0 }], condition: cd(1800) }
+  if (id.includes('repairing')) return { ...idle, condition: cd(3000, { repair_job: { id: 'job-rep', wage: 30, npc_crew: 2, shifts_left: 5, priority: 4, paused: '' } }) }
+  if (id.includes('nofood')) return { ...idle, status: 'paused', reasons: [{ code: 'no_food', item: null, class: '', have: 0, need: 2 }], job: { id: 'job-1', wage: 30, npc_crew: 2, shifts_left: 9, priority: 4, paused: 'no_food' } }
   if (id.includes('paused')) return { ...base, status: 'paused', reasons: [{ code: 'budget_spent', item: null, class: '', have: 0, need: 0 }, { code: 'storage_full', item: null, class: 'bulk', have: 1, need: 4 }], slots: [seat('empty'), seat('empty'), seat('empty')], filled: 0, job: { id: 'job-1', wage: 30, npc_crew: 2, shifts_left: 0, priority: 4, paused: 'budget_spent' } }
   if (id.includes('crew')) return { ...base, status: 'working', reasons: null, slots: [seat('npc'), seat('npc'), seat('player', 'کاوه')], filled: 3, job: { id: 'job-1', wage: 30, npc_crew: 2, shifts_left: 14, priority: 4, paused: '' } }
   return { ...base, status: 'idle', reasons: [{ code: 'no_staff', item: null, class: '', have: 0, need: 3 }], slots: [seat('empty'), seat('empty'), seat('empty')], filled: 0, job: null }
@@ -1486,6 +1497,7 @@ const MARKET = [
   { item: goods('timber'), price: 22 },
   { item: goods('stone'), price: 30 },
   { item: goods('iron_bar'), price: 64 },
+  { item: goods('wheat'), price: 9 },
 ]
 const MAT_STOCK: Record<string, number> = { timber: 95, stone: 48 }
 const MAT_BASE_CAP = 60
