@@ -301,10 +301,10 @@
   .v6-bar { height: 11px; }
   .v6-money { margin-inline-start: auto; width: auto; height: auto; flex-direction: row; align-items: center; gap: 16px; margin-top: 4px; order: 9; }
   .v6-chip { width: 142px; height: 36px; border-radius: 18px; }
-  /* three purses must always fit: they shrink together before anything is cut at the screen edge */
-  .v6-money { gap: 16px; flex: 0 1 auto; min-width: 0; }
-  .v6-money .v6-chip { width: auto; flex: 0 1 128px; min-width: 84px; padding-inline-start: 6px; }
-  .v6-money .v6-chip[data-k="local"], .v6-money .v6-chip[data-k="gem"] { flex-basis: 108px; }
+  /* three purses must always fit beside the events: fixed widths wide enough for their figures; under 1360px they stack two by two */
+  .v6-money { gap: 16px; flex: none; }
+  .v6-money .v6-chip { flex: none; width: 124px; }
+  .v6-money .v6-chip[data-k="local"], .v6-money .v6-chip[data-k="gem"] { width: 108px; }
   .v6-chip > img { width: 42px; height: 42px; }
   .v6-chip > b { font-size: 16px; line-height: 38px; }
   .v6-plus { top: 6px; left: 5px; }
@@ -391,3 +391,10 @@
 
 /* the local money's coin: the city's own letter on a teal disc, so it is never mistaken for the SUP coin */
 .v6-coin-l { position: absolute; right: -4px; top: -3px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 800 17px/1 Vazirmatn; color: #04323a; background: radial-gradient(circle at 35% 30%, #aef2ea, #2bb6a8 70%); border: 2px solid #0b5f58; box-shadow: 0 2px 2px #0009; }
+
+@media (min-width: 900px) and (max-width: 1360px) {
+  .v6-money { display: grid; grid-template-columns: 124px 108px; gap: 4px 14px; margin-top: 0; }
+  .v6-money .v6-chip { height: 26px; border-radius: 13px; }
+  .v6-money .v6-chip > img, .v6-money .v6-coin-l { transform: scale(.72); transform-origin: right center; }
+  .v6-money .v6-chip > b { font-size: 13px; line-height: 26px; }
+}
