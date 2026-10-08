@@ -135,7 +135,7 @@ void main() {
   float d0 = max(dot(normalize(vN), uLight), 0.0);
   float amb = mix(0.82, 0.46, uStyle);
   float kk = mix(0.26, 0.74, uStyle);
-  land *= (amb + kk * d0) * (1.0 + grain * mix(0.07, 0.12, uStyle));
+  land *= (amb + kk * d0) * (1.0 + grain * mix(0.05, 0.12, uStyle));
   // rivers: a thin ribbon where the stream mask is high; gone when a tile is under 2 px
   float riv = smoothstep(0.30, 0.44, d.a + disp * 0.5) * smoothstep(1.2, 3.0, uTile / pxKm);
   land = mix(land, mix(vec3(0.56, 0.75, 0.93), vec3(0.29, 0.52, 0.72), uStyle), riv * 0.9);
@@ -654,7 +654,7 @@ export class PlanetTerrain {
     } else {
       // a light cartographic land: the biome's colour softened towards a warm paper tone, rock and snow above the trees
       const base = this.biomeRgb[biome] ?? [160, 170, 150]
-      r = base[0] * 0.62 + 238 * 0.38; g = base[1] * 0.62 + 232 * 0.38; b = base[2] * 0.62 + 214 * 0.38
+      r = base[0] * 0.5 + 240 * 0.5; g = base[1] * 0.5 + 236 * 0.5; b = base[2] * 0.5 + 218 * 0.5
       const rock = s01((elev - 1600) / 1700)
       r += (206 - r) * rock; g += (199 - g) * rock; b += (186 - b) * rock
       const snow = s01((elev - 3300) / 900)
