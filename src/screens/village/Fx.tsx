@@ -11,7 +11,7 @@ import { formatNumber } from '../native/kit/format'
 import { t } from '../../i18n'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, type FlowCtx } from './flow'
 
-const fa = (x: number, max = 3) => new Intl.NumberFormat('fa-IR', { minimumFractionDigits: 2, maximumFractionDigits: max }).format(x)
+const fa = (x: number, max = 3) => new Intl.NumberFormat('fa-IR', { minimumFractionDigits: Math.min(2, max), maximumFractionDigits: max }).format(x)
 const sup = (n: number) => `${formatNumber(n)} ${t('unit.money')}`
 const units = (n: number, name: string) => `${formatNumber(n)} ${name}`
 /** a price (micro-SUP per unit) as «۰٫۱۰ ساپ برای هر مارک پولو» */
