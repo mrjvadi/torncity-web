@@ -15,6 +15,7 @@ export const MAP_MIN_ALT = 6
 const SPACE = new Color('#070b18')
 const HAZE = new Color('#bcd2e8')
 const OCEAN = '#1d5a86'
+const OCEAN_MAP = '#aad3f5'
 const s01 = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t))
 
 export interface MapCamState { lat: number; lon: number; alt: number; oblique: boolean; bearing: number }
@@ -476,16 +477,17 @@ export class WorldMapView {
     // a sun above the camera's left shoulder: the relief reads the same wherever you look
     const light = (u.uLight.value as Vector3)
     light.copy(this.f).multiplyScalar(0.62).addScaledVector(this.n, 0.45).addScaledVector(this.tmpA.set(this.camera.matrixWorld.elements[0], this.camera.matrixWorld.elements[1], this.camera.matrixWorld.elements[2]), -0.5).normalize()
+    ;(this.base.material as MeshBasicMaterial).color.set(terrainLook ? OCEAN : OCEAN_MAP)
     this.atmo.visible = this.alt > 500
     this.base.visible = true
   }
 
   /** Frame time (ms, CPU side of a frame) and what the renderer and terrain hold. */
-  stats(): { frameMs: number; frameMax: number; calls: number; tris: number; geometries: number; textures: number; terrain: TerrainStats; alt: number } {
+  stats(): { frameMs: number; frameMax: number; calls: number; tris: number; geometries: number; textures: number; terrain: TerrainStats; alt: number; idle: boolean } {
     const ft = this.frameTimes
     const avg = ft.length ? ft.reduce((a, b) => a + b, 0) / ft.length : 0
     const i = this.renderer.info
-    return { frameMs: avg, frameMax: ft.length ? Math.max(...ft) : 0, calls: i.render.calls, tris: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, terrain: this.terrain.stats(), alt: this.alt }
+    return { frameMs: avg, frameMax: ft.length ? Math.max(...ft) : 0, calls: i.render.calls, tris: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, terrain: this.terrain.stats(), alt: this.alt, idle: !this.terrain.busy() && !this.raf }
   }
 
   dispose() {

@@ -86,6 +86,11 @@ interface Props {
   leaveRef: { current: (() => void) | null }
 }
 
+/** the chosen place never folds into a bubble */
+const p2 = (p: { id: string }, sel: string | null) => p.id === sel
+const CLUSTER_PX = 34
+const MAP_MIN_ALT_UI = 20
+
 export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef }: Props) {
   const chrome = useChrome()
   const desktop = !!chrome?.desktop
@@ -118,7 +123,11 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
   const scaleTxt = useRef<HTMLSpanElement | null>(null)
   const spotMk = useRef<HTMLDivElement | null>(null)
   const insetsRef = useRef({ top: 0, bottom: 0 })
+  const clusterRefs = useRef<HTMLButtonElement[]>([])
+  const clusterInfo = useRef<{ x: number; y: number; n: number; lat: number; lon: number; members: Place[] }[]>([])
+  const selRef = useRef<string | null>(null)
   const atHomeRef = useRef(true)
+  selRef.current = sel
   const readyRef = useRef(false)
 
   const homePlace = useMemo<Place>(() => ({ id: 'home:' + home.id, code: 'home', name: home.name, lat: home.lat, lon: home.lon, kind: 'home', sid: home.id, located: true }), [home.id, home.name, home.lat, home.lon])
@@ -189,20 +198,49 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
         const st = v.state()
         // markers follow the globe; far out only the own city and the chosen one keep a name
         rootRef.current?.classList.toggle('wm-far', st.alt > LABEL_ALT)
-        const taken: { x: number; y: number }[] = []
-        const order = [...placesRef.current].sort((a, b) => (a.kind === 'home' ? 0 : 1) - (b.kind === 'home' ? 0 : 1))
+        // markers: the own city and the chosen one always stand alone; cities that would pile up within a thumb's width
+        // fold into one count bubble (a tap opens it); the labels that remain avoid each other
+        const taken: { x: number; y: number; w: number }[] = []
+        const order = [...placesRef.current].sort((a, b) => (a.kind === 'home' ? 0 : p2(a, selRef.current) ? 1 : 2) - (b.kind === 'home' ? 0 : p2(b, selRef.current) ? 1 : 2))
+        const groups: { x: number; y: number; n: number; lat: number; lon: number; members: Place[] }[] = []
+        const shown: { p: Place; pt: { x: number; y: number } }[] = []
         for (const p of order) {
           const el = markerRefs.current.get(p.id)
           if (!el) continue
           if (!p.located) { el.style.display = 'none'; continue }
           const pt = v.project(p.lat, p.lon)
           if (!pt.visible) { el.style.display = 'none'; continue }
+          const alone = p.kind === 'home' || p2(p, selRef.current)
+          // a city right under the own city or the chosen one is folded into it: no bubble on top of the marker that matters
+          if (!alone && shown.some((q) => (q.p.kind === 'home' || p2(q.p, selRef.current)) && Math.hypot(q.pt.x - pt.x, q.pt.y - pt.y) < CLUSTER_PX)) { el.style.display = 'none'; continue }
+          const g = alone ? null : groups.find((q) => Math.hypot(q.x - pt.x, q.y - pt.y) < CLUSTER_PX)
+          if (g) { g.members.push(p); g.n++; g.x = (g.x * (g.n - 1) + pt.x) / g.n; g.y = (g.y * (g.n - 1) + pt.y) / g.n; g.lat = (g.lat * (g.n - 1) + p.lat) / g.n; g.lon = (g.lon * (g.n - 1) + p.lon) / g.n; el.style.display = 'none'; continue }
+          if (!alone) groups.push({ x: pt.x, y: pt.y, n: 1, lat: p.lat, lon: p.lon, members: [p] })
+          shown.push({ p, pt })
+        }
+        // a lone city is a marker; a group of two or more is a bubble and its members stay hidden
+        const bubbles = groups.filter((g) => g.n > 1)
+        const folded = new Set(bubbles.flatMap((g) => g.members.map((m) => m.id)))
+        for (const { p, pt } of shown) {
+          const el = markerRefs.current.get(p.id)!
+          if (folded.has(p.id)) { el.style.display = 'none'; continue }
           el.style.display = ''
           el.style.transform = `translate(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px)`
-          const clash = taken.some((o) => Math.abs(o.x - pt.x) < 78 && Math.abs(o.y - pt.y) < 20)
+          const w = Math.max(60, Math.min(190, p.name.length * 7.5 + 22))
+          const clash = taken.some((o) => Math.abs(o.x - pt.x) < (o.w + w) / 2 && Math.abs(o.y - pt.y) < 24)
           el.classList.toggle('wm-nolbl', clash)
-          if (!clash) taken.push(pt)
+          if (!clash) taken.push({ x: pt.x, y: pt.y, w })
         }
+        clusterInfo.current = bubbles
+        clusterRefs.current.forEach((el, i) => {
+          const g = bubbles[i]
+          if (!g) { el.style.display = 'none'; return }
+          el.style.display = ''
+          el.style.transform = `translate(${g.x.toFixed(1)}px, ${g.y.toFixed(1)}px)`
+          const n = String(g.n)
+          const c = el.firstElementChild as HTMLElement | null
+          if (c && c.textContent !== n) c.textContent = n
+        })
         // compass and scale bar follow the camera
         const cp = v.compass()
         if (compassRef.current) compassRef.current.style.transform = `rotate(${(-cp.deg).toFixed(1)}deg)`
@@ -403,6 +441,16 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
             <span className="wm-dot">{p.kind === 'home' && <Emboss name="house" palette="gold" size={18} />}</span>
             <span className="wm-lbl">{p.kind === 'home' ? t('wm.you_here') + ' · ' + p.name : p.name}</span>
           </button>
+        ))}
+      </div>
+
+      <div className="wm-clusters">
+        {Array.from({ length: 12 }, (_, i) => (
+          <button
+            key={i} type="button" className="wm-cl" style={{ display: 'none' }} ref={(el) => { if (el) clusterRefs.current[i] = el }}
+            aria-label={t('wm.cluster')}
+            onClick={(e) => { e.stopPropagation(); const g = clusterInfo.current[i]; const v = viewRef.current; if (g && v) v.flyTo(g.lat, g.lon, Math.max(MAP_MIN_ALT_UI, v.state().alt * 0.3)) }}
+          ><span /></button>
         ))}
       </div>
 
