@@ -5423,3 +5423,99 @@ pn.payment.local | {player} {amount} برایت فرستاد؛ به موجودی
 eco.act.pay.local | {n} | {n}
 eco.act.pay.local_all | همه ({n}) | All ({n})
 eco.act.pay.local_custom | مبلغ دلخواه | Another amount
+fx.price | {p} ساپ برای هر {name} | {p} SUP per {name}
+fx.title | بازار {name} | {name} market
+fx.ref | نرخ مرجع | Reference rate
+fx.band | بازهٔ مجاز قیمت | Allowed price band
+fx.band_line | از {lo} تا {hi} ساپ برای هر واحد | {lo} to {hi} SUP a unit
+fx.band_hint | قیمت باید بین {lo} و {hi} ساپ برای هر واحد باشد. | The price must stay between {lo} and {hi} SUP a unit.
+fx.last | آخرین معامله | Last trade
+fx.you_sup | ساپ تو | Your SUP
+fx.you_units | {name} تو | Your {name}
+fx.held | در سفارش‌های باز | Held in open orders
+fx.slow | نرخ مرجع یک‌شبه عوض نمی‌شود: میانگین {d} دورهٔ اخیر است و تا وقتی دست‌کم {n} معامله نشده تکان نمی‌خورد. | The reference rate does not jump: it averages the last {d} periods and waits for at least {n} trades.
+fx.empty | هنوز سفارشی در بازار نیست. | The book has no orders yet.
+fx.empty_hint | اولین سفارش را خودت بگذار؛ قیمت پیش‌فرض همان نرخ مرجع است. | Place the first order; the price starts at the reference.
+fx.bids | خریدارها (می‌خرند) | Buyers
+fx.asks | فروشنده‌ها (می‌فروشند) | Sellers
+fx.side_empty | کسی نیست. | Nobody.
+fx.orders_n | {n} سفارش | {n} orders
+fx.form_title | سفارش تازه | New order
+fx.buy | بخر | Buy
+fx.sell | بفروش | Sell
+fx.field_units | چند واحد {name}؟ | How many {name}?
+fx.field_price | قیمت هر واحد (به ساپ) | Price per unit (SUP)
+fx.ref_chip | نرخ مرجع | Reference
+fx.review | دیدن و تأیید | Review
+fx.problem.units | تعداد را بنویس. | Enter an amount.
+fx.problem.price | قیمت را بنویس. | Enter a price.
+fx.problem.band | قیمت باید بین {lo} و {hi} ساپ باشد. | The price must be between {lo} and {hi}.
+fx.problem.have_units | بیشتر از موجودی‌ات است؛ {have} داری. | More than you hold: {have}.
+fx.problem.have_sup | ساپ کافی نداری؛ {have} ساپ داری. | Not enough SUP: you hold {have}.
+fx.problem.small | سفارش دست‌کم باید {min} ساپ بیارزد. | An order must be worth at least {min} SUP.
+fx.problem.have_conv | بیشتر از موجودی‌ات است. | More than you hold.
+fx.mine | سفارش‌های باز من | My open orders
+fx.my_buy | خرید شمارهٔ {n} | Buy no. {n}
+fx.my_sell | فروش شمارهٔ {n} | Sell no. {n}
+fx.filled | {a} از {b} انجام شده | {a} of {b} filled
+fx.left | {n} مانده | {n} left
+fx.cancel | لغو سفارش | Cancel order
+fx.cancelled | سفارش لغو شد و موجودی‌اش برگشت. | The order was cancelled and what it held came back.
+fx.recent | معامله‌های اخیر | Recent trades
+fx.history | تاریخچهٔ نرخ | Rate history
+fx.convert | تبدیل بین پول‌ها | Convert between moneys
+fx.confirm_buy | تأیید سفارش خرید | Confirm the buy order
+fx.confirm_sell | تأیید سفارش فروش | Confirm the sell order
+fx.you_buy | می‌خری | You buy
+fx.you_sell | می‌فروشی | You sell
+fx.price_each | قیمت هر واحد | Price per unit
+fx.worth | ارزش | Worth
+fx.escrow_sup | کنار گذاشته می‌شود | Set aside
+fx.escrow_units | کنار گذاشته می‌شود | Set aside
+fx.fee_buy | کارمزد خرید {p} روی قیمت اضافه شده است؛ جمعاً {total} از ساپت کنار می‌رود. | A buy fee of {p} is on top; {total} of your SUP is set aside.
+fx.fee_sell | کارمزد فروش {p} از واحدهای فروخته‌شده کم می‌شود و به خزانهٔ شهر می‌رود. | A sell fee of {p} comes off the units sold and goes to the city treasury.
+fx.crosses | این سفارش با سفارش روبه‌رو جور می‌شود و همین الان، به قیمت سفارشِ منتظر، دست‌کم بخشی از آن انجام می‌شود. | It matches an order on the book and at least part fills now, at the resting price.
+fx.refund_note | تا وقتی لغو نکنی یا انجام نشود، همین مقدار کنار می‌ماند؛ هر وقت خواستی لغو کن و برمی‌گردد. | It stays set aside until it fills or you cancel it; cancel any time and it comes back.
+fx.cannot | موجودی برای این سفارش کافی نیست. | Not enough to place this order.
+fx.place | بگذار | Place
+fx.done_filled | {a} انجام شد؛ {b} جابه‌جا شد. | {a} filled for {b}.
+fx.done_rested | سفارش در بازار نشست و منتظر مانده است. | The order is on the book, waiting.
+fx.filled_of | انجام‌شده | Filled
+fx.on_book | مانده در بازار | Left on the book
+fx.rested_hint | باقی‌مانده در بازار می‌ماند تا کسی بپذیرد؛ از «سفارش‌های باز من» لغوش کن. | The rest stays until someone takes it; cancel it from your open orders.
+fx.hist_title | تاریخچهٔ نرخ {name} | {name} rate history
+fx.hist_now | نرخ مرجع: هر ۱ ساپ = {rate} {name} | Reference: 1 SUP = {rate} {name}
+fx.hist_none | هنوز دوره‌ای بسته نشده. | No period has closed yet.
+fx.spark | نمودار نرخ مرجع | Reference rate chart
+fx.period | دورهٔ {n} | Period {n}
+fx.hist_row | {t} معامله، {v} واحد، میانگین قیمت {p} ساپ | {t} trades, {v} units, average {p} SUP
+fx.hist_ref | نرخ مرجع: {a} به {b} | Reference: {a} to {b}
+fx.conv_title | تبدیل بین پول‌ها | Convert between moneys
+fx.conv_lead | هر پول را به ساپ و ساپ را به هر پول تبدیل کن؛ بین دو پول شهری از راه ساپ می‌گذرد. | Swap any money for SUP and back; between two city moneys it goes through SUP.
+fx.conv_hint | هر مرحله کارمزد خودش را دارد و آخر کار یک‌جا تأیید می‌شود. | Each step has its own fee and one confirm settles it all.
+fx.from | از | From
+fx.to | به | To
+fx.amount | چند واحد {name}؟ | How many {name}?
+fx.you_have | موجودی تو: {n} | You hold: {n}
+fx.same | دو طرف یکی است. | Both sides are the same.
+fx.conv_quote | قیمت بگیر | Get a quote
+fx.conv_yes | تأیید و تبدیل | Confirm and convert
+fx.leg_sell | مرحلهٔ ۱: {a} فروخته می‌شود، {b} می‌آید (کارمزد {fee}). | Step: sell {a}, get {b} (fee {fee}).
+fx.leg_buy | مرحلهٔ بعد: با {a}، {b} خریده می‌شود (کارمزد {fee}). | Step: {a} buys {b} (fee {fee}).
+fx.conv_protect | اگر قیمت تا لحظهٔ تأیید طوری عوض شود که کمتر از {n} به دستت برسد (حدود {p} کمتر)، چیزی انجام نمی‌شود. | If the price moves so that you would get less than {n} (about {p} less), nothing happens.
+fx.no_liquidity | بازار برای این مقدار سفارش کافی ندارد؛ مقدار کمتری را امتحان کن. | The book cannot fill this amount; try less.
+fx.conv_done | {a} دادی و {b} گرفتی. | You gave {a} and got {b}.
+fx.refused_title | انجام نشد | Not done
+fx.requote | دوباره قیمت بگیر | Get a fresh quote
+fx.back | برگشت | Back
+fx.refused.fx_moved | قیمت عوض شد؛ دوباره قیمت بگیر. | The price moved; get a fresh quote.
+fx.refused.fx_no_liquidity | بازار برای این مقدار سفارش کافی ندارد؛ مقدار کمتری را امتحان کن. | The book cannot fill this amount.
+fx.refused.fx_out_of_band | قیمت باید بین {min} و {max} ساپ برای هر واحد باشد. | The price must be between {min} and {max} SUP a unit.
+fx.refused.fx_too_small | سفارش دست‌کم باید {smin} ساپ بیارزد. | An order must be worth at least {smin} SUP.
+fx.refused.fx_funds | موجودی کافی نداری. | You do not have enough.
+fx.refused.fx_too_many | سفارش باز زیادی داری؛ یکی را لغو کن. | Too many open orders; cancel one.
+fx.refused.fx_no_market | پول این شهر هنوز بازار ندارد. | This city's money has no market yet.
+fx.refused.fx_invalid | سفارش درست نیست؛ تعداد و قیمت را دوباره بنویس. | The order is not valid; check the amount and the price.
+fx.refused.fx_not_yours | این سفارش مال تو نیست. | This order is not yours.
+fx.refused.fx_not_found | چنین سفارشی پیدا نشد. | No such order.
+fx.market | بازار | Market

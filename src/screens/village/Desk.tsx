@@ -141,6 +141,7 @@ export const Desk = flow<DeskView>(({ view: v, ctx }) => {
         <Side v={v} ctx={ctx} side="buy" />
         <Side v={v} ctx={ctx} side="sell" />
       </CardGrid>
+      <ActionButton tone="steel" small onClick={() => ctx.run('fx.book', {})}>{t('fx.market')}</ActionButton>
       <Hint>{t('sm.desk.desk_has', { u: units(v.desk_units, v), s: sup(v.desk_sup) })}</Hint>
       <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
     </Page>

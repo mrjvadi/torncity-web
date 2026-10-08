@@ -427,6 +427,7 @@ export default function Shell() {
             <Popup open onClose={() => setPurseOpen(false)} tone="gold" title={t('sm.desk.pill_title')}>
               <ActionRow>
                 <ActionButton tone="gold" onClick={toDesk}>{t('sm.desk.pill')}</ActionButton>
+                <ActionButton tone="steel" onClick={() => { setPurseOpen(false); void onAction({ label: '', command: 'fx.book', row: 0, kind: 'navigation' }) }}>{t('fx.market')}</ActionButton>
                 <ActionButton tone="steel" onClick={() => { setPurseOpen(false); onBank() }}>{t('sm.desk.pill_bank')}</ActionButton>
               </ActionRow>
             </Popup>
