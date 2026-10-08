@@ -656,11 +656,13 @@ export class VillageScene {
     const p = this.pickGround(e.clientX, e.clientY)
     if (p) this.opts.onGround?.(this.ground.lotAtAny(p.x, p.z))
     const lot = p ? this.ground.lotAt(p.x, p.z) : null
+    // a building stands wherever its lot is, also on land beyond the first grid (lotAt is null there): look it up by the lot at any place
+    const any = p ? this.ground.lotAtAny(p.x, p.z) : null
     let id: string | null = null
-    if (lot) {
+    if (any) {
       for (const [key, pose] of this.poses) {
         const b = pose.building
-        if (lot.x >= b.x && lot.x < b.x + b.w && lot.y >= b.y && lot.y < b.y + b.h) { id = b.id ?? key; break }
+        if (any.x >= b.x && any.x < b.x + b.w && any.y >= b.y && any.y < b.y + b.h) { id = b.id ?? key; break }
       }
     }
     if (new URLSearchParams(location.search).has('dbg')) console.log('DBG tap', JSON.stringify(lot), id)
