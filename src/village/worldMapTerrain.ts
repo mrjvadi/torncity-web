@@ -143,14 +143,14 @@ void main() {
   // a calm grey outline round snow and ice, a faint one round the mountains, so a white area never reads as missing data
   float dN = abs(cw.b + ed - 0.5) / max(fwidth(cw.b), 1e-4);
   float dM = abs(cw.a + ed - 0.5) / max(fwidth(cw.a), 1e-4);
-  flatLand = mix(flatLand, vec3(0.745, 0.788, 0.820), (1.0 - smoothstep(0.35, 1.3, dN)) * 0.95);
+  flatLand = mix(flatLand, vec3(0.62, 0.68, 0.74), (1.0 - smoothstep(0.4, 1.6, dN)) * 1.0);
   flatLand = mix(flatLand, vec3(0.735, 0.700, 0.650), (1.0 - smoothstep(0.35, 1.3, dM)) * 0.55);
   // the terrain look: the natural colours, relief and a little grain
   float wp = smoothstep(0.8, 3.0, uTile / pxKm);
   vec2 warp = vec2(vnoise(vDirW * (uR / (uTile * 1.3)) + uSeed * 1.7), vnoise(vDirW * (uR / (uTile * 1.3)) + uSeed * 2.9)) - 0.5;
   vec3 natural = bicubic(uColT, vUv + warp * (0.9 / 34.0) * wp).rgb;
   float d0 = max(dot(normalize(vN), uLight), 0.0);
-  natural *= (0.46 + 0.74 * d0) * (1.0 + grain * 0.12);
+  natural *= (0.46 + 0.74 * d0) * (1.0 + grain * 0.04);
   vec3 land = mix(flatLand, natural, uStyle);
   // rivers: a thin ribbon where the stream mask is high; gone when a tile is under 2 px
   float riv = smoothstep(0.30, 0.44, d.a + disp * 0.5) * smoothstep(1.2, 3.0, uTile / pxKm);
