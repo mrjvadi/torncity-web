@@ -234,7 +234,7 @@ const Money = flow<MoneyView>(({ view: v, ctx }) => {
       )}
       {v.chartered && (
         <>
-          <Btns ctx={ctx} list={ctx.by('currency.desk')} />
+          <Btns ctx={ctx} list={[...ctx.by('currency.desk'), ...ctx.by('fx.book')]} />
           <MoneyFee />
         </>
       )}

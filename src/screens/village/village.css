@@ -300,3 +300,33 @@
 .dk-chip:disabled { opacity: .4; }
 .dk-why { color: #ff9a8c; }
 .dk-panelfee { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 7%, transparent); }
+
+/* the money market («بازار پول»): phone = stacked cards, desktop = the two sides as columns */
+.fx-book { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.fx-side { background: color-mix(in srgb, currentColor 6%, transparent); border-radius: 14px; padding: 10px 12px; }
+.fx-h { margin: 10px 2px 6px; font: 800 14px/1.4 Vazirmatn; opacity: .9; }
+.fx-side .fx-h { margin-top: 0; }
+.fx-none { margin: 4px 0; opacity: .6; font-size: 13px; }
+.fx-levels, .fx-trades, .fx-hist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.fx-levels li { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; overflow: hidden; font-size: 13.5px; background: linear-gradient(to left, var(--fx-c, #56d447) 0, var(--fx-c, #56d447) var(--fx-w), transparent var(--fx-w)); background-color: color-mix(in srgb, currentColor 5%, transparent); background-blend-mode: soft-light; }
+.fx-buy .fx-levels li { --fx-c: #56d44755; } .fx-sell .fx-levels li { --fx-c: #ff5a4755; }
+.fx-levels b { font-variant-numeric: tabular-nums; }
+.fx-levels small, .fx-hist small { opacity: .65; font-size: 11.5px; }
+.fx-levels small { grid-column: 1 / -1; }
+.fx-field { display: flex; flex-direction: column; gap: 4px; margin: 8px 0 4px; font-size: 13px; }
+.fx-field input, .fx-field select { height: 44px; border-radius: 12px; border: 1px solid #ffffff40; background: #0b1424; color: #fff; padding: 0 12px; font: 600 15px Vazirmatn; text-align: end; }
+.fx-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.fx-orders { display: grid; gap: 8px; grid-template-columns: 1fr; }
+.fx-order { padding: 10px 12px; border-radius: 14px; background: color-mix(in srgb, currentColor 7%, transparent); display: flex; flex-direction: column; gap: 6px; border-inline-start: 4px solid #56d447; }
+.fx-order.fx-sell { border-inline-start-color: #ff5a47; }
+.fx-order-top, .fx-order-sub { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.fx-bar { height: 8px; border-radius: 4px; background: color-mix(in srgb, currentColor 14%, transparent); overflow: hidden; }
+.fx-bar i { display: block; height: 100%; background: #f4c441; }
+.fx-trades li, .fx-hist li { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 6px 10px; border-radius: 10px; background: color-mix(in srgb, currentColor 5%, transparent); font-size: 13px; }
+.fx-hist li { flex-direction: column; }
+.fx-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.fx-spark-box { margin-top: 8px; color: #f4c441; } .fx-spark { width: 100%; height: 80px; display: block; }
+@media (min-width: 900px) {
+  .fx-orders { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 900px) { .fx-book { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

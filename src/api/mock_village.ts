@@ -1575,7 +1575,7 @@ function moneyView() {
     currency: { code: none ? 'SUP' : 'MKP', name: none ? 'ساپ' : 'مارک پولو', symbol: '', issued: !none }, market: 'none', reserve: 'none', nil_unit_sup: 1000, nil_per_unit_micro: 2400,
     examples: [{ amount: 100, nil_micro: 240 }, { amount: 1000, nil_micro: 2400 }], treasury: st.treasury, treasury_nil_micro: st.treasury * 2400, output: 1800, output_nil_micro: 4320000, output_days: 7,
     residents: 9, basket: [{ item: goods('rice'), kind: 'item', week_milli: 1400, reference: 12, price: 13, on_shelf: true }, { item: goods('tea'), kind: 'item', week_milli: 200, reference: 8, price: 9, on_shelf: false }], index_bps: 10800, cover_bps: 7500,
-  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : []), ...(none ? [] : [A('currency.desk', 'settlement.currency.desk')])])
+  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : []), ...(none ? [] : [A('currency.desk', 'settlement.currency.desk'), A('fx.book', 'fx.book')])])
 }
 // the desk: ?desk=empty for a treasury with no units; the head (default) may set the fee, ?role=resident may not
 let deskFeeBps = 30
