@@ -25,7 +25,7 @@ export type FetchChunk = (face: number, lod: number, x: number, y: number) => Pr
 const LOD_PX = 360
 const G = 33 // vertices along a chunk's side (tiles + 1)
 const MAX_INFLIGHT = 6
-const BUILDS_PER_FRAME = 2
+const BUILDS_PER_FRAME = 3
 const MESH_IDLE_MS = 5000
 const CHUNK_CAP = 900
 const RETRY_MS = 12000
@@ -312,10 +312,11 @@ export class PlanetTerrain {
     // drawn until the fade is over, so there is never a hole, a pop or a rectangle of a different colour.
     const prev = this.shown
     const next = new Set<Entry>()
+    let skipped = 0
     let tris = 0
     for (const e of draw) {
       if (!e.mesh) {
-        if (builds <= 0) { this.onChange(); continue }
+        if (builds <= 0) { skipped++; this.onChange(); continue }
         builds--
         e.mesh = this.buildMesh(e)
         this.group.add(e.mesh)
@@ -327,7 +328,7 @@ export class PlanetTerrain {
     }
     for (const e of prev) if (!next.has(e) && !e.leaveAt) e.leaveAt = now
     const leaving = new Set<Entry>()
-    for (const e of [...prev, ...this.leaving]) if (!next.has(e) && e.leaveAt && now - e.leaveAt < FADE_MS + 40) leaving.add(e)
+    for (const e of [...prev, ...this.leaving]) if (!next.has(e) && e.leaveAt && (skipped > 0 || now - e.leaveAt < FADE_MS + 40)) leaving.add(e)
     let fading = leaving.size > 0
     for (const e of this.group.children as Mesh[]) e.visible = false
     for (const e of next) {
