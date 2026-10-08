@@ -5420,6 +5420,7 @@ export const uiFa = {
   'fx.refused.fx_not_found': 'چنین سفارشی پیدا نشد.',
   'fx.market': 'بازار',
   'fx.back_book': 'برگشت به بازار',
+  'wm.cluster': 'چند شهر نزدیک هم؛ برای دیدنشان بزن',
 } as const
 
 export type UiKey = keyof typeof uiFa

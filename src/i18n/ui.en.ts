@@ -5422,4 +5422,5 @@ export const uiEn: Record<UiKey, string> = {
   'fx.refused.fx_not_found': 'No such order.',
   'fx.market': 'Market',
   'fx.back_book': 'Back to the market',
+  'wm.cluster': 'Several cities close together; tap to open',
 }
