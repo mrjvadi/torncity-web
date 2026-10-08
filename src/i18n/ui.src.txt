@@ -5489,7 +5489,7 @@ fx.hist_none | هنوز دوره‌ای بسته نشده. | No period has close
 fx.spark | نمودار نرخ مرجع | Reference rate chart
 fx.period | دورهٔ {n} | Period {n}
 fx.hist_row | {t} معامله، {v} واحد، میانگین قیمت {p} ساپ | {t} trades, {v} units, average {p} SUP
-fx.hist_ref | نرخ مرجع: {a} به {b} | Reference: {a} to {b}
+fx.hist_ref | نرخ مرجع نسبت به شروع: {a}٪ به {b}٪ | Reference: {a} to {b}
 fx.conv_title | تبدیل بین پول‌ها | Convert between moneys
 fx.conv_lead | هر پول را به ساپ و ساپ را به هر پول تبدیل کن؛ بین دو پول شهری از راه ساپ می‌گذرد. | Swap any money for SUP and back; between two city moneys it goes through SUP.
 fx.conv_hint | هر مرحله کارمزد خودش را دارد و آخر کار یک‌جا تأیید می‌شود. | Each step has its own fee and one confirm settles it all.
