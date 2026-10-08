@@ -11,11 +11,12 @@
 // neighbours of different LOD.
 
 import {
-  BufferAttribute, BufferGeometry, Color, Frustum, Group, Matrix4, Mesh, ShaderMaterial, Sphere, Vector3,
+  BufferAttribute, BufferGeometry, ClampToEdgeWrapping, Color, DataTexture, DataUtils, Frustum, Group, HalfFloatType, LinearFilter, Matrix4, Mesh,
+  RGBAFormat, ShaderMaterial, Sphere, UnsignedByteType, Vector3,
   type PerspectiveCamera,
 } from 'three'
 import type { WorldInfo } from '../api/types'
-import { TILE_LAKE, TILE_OCEAN, type Chunk } from './chunk'
+import { TILE_LAKE, TILE_OCEAN, TILE_STREAM, type Chunk } from './chunk'
 import { faceDirection, latLonToTile, type Face } from './geo'
 
 export type FetchChunk = (face: number, lod: number, x: number, y: number) => Promise<Chunk>
@@ -28,56 +29,130 @@ const BUILDS_PER_FRAME = 2
 const MESH_IDLE_MS = 5000
 const CHUNK_CAP = 900
 const RETRY_MS = 12000
+const FADE_MS = 260
 
 const VERT = /* glsl */ `
 attribute float aElev;
 attribute vec3 aDir;
 attribute vec3 aGrad;
 attribute float aSkirt;
-attribute vec3 aCol;
-attribute vec3 aColM;
-attribute float aWater;
+attribute vec2 aTile;
 uniform float uExag;
 uniform float uShade;
-uniform float uStyle;
-varying vec3 vCol;
 varying vec3 vN;
 varying float vDist;
-varying float vWater;
+varying vec2 vUv;
+varying vec3 vDirW;
 void main() {
   vec3 p = position + aDir * (aElev * uExag - aSkirt);
   vN = normalize(aDir - uShade * aGrad);
-  vCol = mix(aColM, aCol, uStyle);
-  vWater = aWater;
+  vUv = (aTile + 1.0) / 34.0;
+  vDirW = aDir;
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   vDist = length(mv.xyz);
   gl_Position = projectionMatrix * mv;
 }`
 
+// The picture is drawn per pixel from a small data texture of the chunk (water share, height, lake, stream), so the coast is an
+// iso-line of a smooth field: one crisp line at every zoom, never a magnified raster. Beyond what the data knows, a seeded
+// value noise that depends only on the world position and the world seed adds the finer shape (the same for every player).
 const FRAG = /* glsl */ `
 precision highp float;
+uniform sampler2D uData;
+uniform sampler2D uColM;
+uniform sampler2D uColT;
 uniform vec3 uLight;
 uniform vec3 uFogColor;
+uniform vec3 uSeed;
 uniform float uFogNear;
 uniform float uFogFar;
 uniform float uStyle;
-varying vec3 vCol;
+uniform float uFade;
+uniform float uTile;
+uniform float uR;
 varying vec3 vN;
 varying float vDist;
-varying float vWater;
+varying vec2 vUv;
+varying vec3 vDirW;
+
+// cubic B-spline of a texture with four bilinear fetches
+vec4 bicubic(sampler2D t, vec2 uv) {
+  vec2 sz = vec2(34.0);
+  vec2 p = uv * sz - 0.5;
+  vec2 f = fract(p);
+  vec2 i = floor(p);
+  vec2 f2 = f * f, f3 = f2 * f;
+  vec2 w0 = (1.0 - 3.0 * f + 3.0 * f2 - f3) / 6.0;
+  vec2 w1 = (4.0 - 6.0 * f2 + 3.0 * f3) / 6.0;
+  vec2 w2 = (1.0 + 3.0 * f + 3.0 * f2 - 3.0 * f3) / 6.0;
+  vec2 w3 = f3 / 6.0;
+  vec2 g0 = w0 + w1, g1 = w2 + w3;
+  vec2 h0 = (i - 0.5 + w1 / g0) / sz;
+  vec2 h1 = (i + 1.5 + w3 / g1) / sz;
+  vec4 a = texture2D(t, vec2(h0.x, h0.y));
+  vec4 b = texture2D(t, vec2(h1.x, h0.y));
+  vec4 c = texture2D(t, vec2(h0.x, h1.y));
+  vec4 d = texture2D(t, vec2(h1.x, h1.y));
+  return mix(mix(a, b, g1.x / (g0.x + g1.x)), mix(c, d, g1.x / (g0.x + g1.x)), g1.y / (g0.y + g1.y));
+}
+float hash3(vec3 p) {
+  p = fract(p * 0.3183099 + 0.1);
+  p *= 17.0;
+  return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+float vnoise(vec3 x) {
+  vec3 i = floor(x), f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(hash3(i), hash3(i + vec3(1, 0, 0)), f.x), mix(hash3(i + vec3(0, 1, 0)), hash3(i + vec3(1, 1, 0)), f.x), f.y),
+             mix(mix(hash3(i + vec3(0, 0, 1)), hash3(i + vec3(1, 0, 1)), f.x), mix(hash3(i + vec3(0, 1, 1)), hash3(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+}
 void main() {
-  float d = max(dot(normalize(vN), uLight), 0.0);
-  float amb = mix(0.80, 0.46, uStyle);
-  float k = mix(0.30, 0.74, uStyle);
-  vec3 c = vCol * (amb + k * d);
-  if (uStyle < 0.5) {
-    // the coast: a thin darker-blue line where the water share crosses one half, about 1.5 px wide at any zoom
-    float e = abs(vWater - 0.5) / (fwidth(vWater) + 1e-5);
-    float line = 1.0 - smoothstep(0.4, 1.4, e);
-    c = mix(c, vec3(0.42, 0.58, 0.72), line * 0.85);
+  vec4 d = bicubic(uData, vUv);
+  float pxKm = max(length(fwidth(vDirW)) * uR, 1e-6);
+  // seeded detail the data lacks: wavelengths from large to tiny (km), kept only where the data is coarser than the feature
+  // and the feature is wider than a pixel; the amplitude follows the wavelength so the coast keeps one character at every level
+  float disp = 0.0, grain = 0.0;
+  float lam = 96.0;
+  for (int o = 0; o < 9; o++) {
+    float wData = 1.0 - smoothstep(uTile * 0.9, uTile * 2.4, lam);
+    float wPix = smoothstep(0.8, 3.0, lam / pxKm);
+    float n = vnoise(vDirW * (uR / lam) + uSeed + float(o) * 7.31) * 2.0 - 1.0;
+    disp += n * wData * wPix * lam * 0.11 / uTile;
+    float wG = wPix * (1.0 - smoothstep(uTile * 0.15, uTile * 0.9, lam)) ;
+    grain += n * wG * 0.35;
+    lam *= 0.5;
   }
+  float fc = d.r + disp;
+  float aa = max(fwidth(fc), 1e-4);
+  float dist = abs(fc - 0.5) / aa;               // pixels from the coast line
+  float wm = clamp((fc - 0.5) / aa + 0.5, 0.0, 1.0); // 1 = water
+  // ---- land
+  vec3 land = mix(texture2D(uColM, vUv).rgb, texture2D(uColT, vUv).rgb, uStyle);
+  float d0 = max(dot(normalize(vN), uLight), 0.0);
+  float amb = mix(0.82, 0.46, uStyle);
+  float kk = mix(0.26, 0.74, uStyle);
+  land *= (amb + kk * d0) * (1.0 + grain * mix(0.07, 0.12, uStyle));
+  // rivers: a thin ribbon where the stream mask is high; gone when a tile is under 2 px
+  float riv = smoothstep(0.30, 0.44, d.a + disp * 0.5) * smoothstep(1.2, 3.0, uTile / pxKm);
+  land = mix(land, mix(vec3(0.56, 0.75, 0.93), vec3(0.29, 0.52, 0.72), uStyle), riv * 0.9);
+  // ---- water
+  float depth = clamp(-d.g * 1000.0 / 4500.0, 0.0, 1.0);
+  vec3 shallowM = vec3(0.71, 0.86, 0.96), deepM = vec3(0.40, 0.62, 0.84);
+  vec3 shallowT = vec3(0.17, 0.49, 0.67), deepT = vec3(0.055, 0.165, 0.345);
+  vec3 sea = mix(mix(shallowM, deepM, depth), mix(shallowT, deepT, depth), uStyle);
+  vec3 lake = mix(vec3(0.62, 0.81, 1.0), vec3(0.24, 0.53, 0.70), uStyle);
+  float lk = smoothstep(0.35, 0.65, d.b + disp);
+  vec3 water = mix(sea, lake, lk);
+  water *= 1.0 + grain * 0.02;
+  // a light band along the shore, fading over about eight pixels
+  float shore = (1.0 - smoothstep(0.0, 8.0, dist)) * 0.55;
+  water = mix(water, mix(vec3(0.88, 0.95, 0.99), vec3(0.45, 0.78, 0.82), uStyle), shore * wm);
+  vec3 c = mix(land, water, wm);
+  // the coast line: a crisp stroke about 1.3 px at any zoom
+  float line = 1.0 - smoothstep(0.35, 1.25, dist);
+  c = mix(c, mix(vec3(0.40, 0.62, 0.82), vec3(0.78, 0.90, 0.92), uStyle), line * 0.85);
   c = mix(c, uFogColor, smoothstep(uFogNear, uFogFar, vDist));
-  gl_FragColor = vec4(c, 1.0);
+  gl_FragColor = vec4(c, uFade);
 }`
 
 interface Entry {
@@ -92,20 +167,34 @@ interface Entry {
   mesh: Mesh | null
   seen: number
   touched: number
+  /** when it last came into view (it fades in over FADE_MS) and when it last left it */
+  arriveAt: number
+  leaveAt: number
+  tex: DataTexture[]
 }
 
 export interface TileInfo { elev: number; biome: number; biomeCode: string; ocean: boolean; lake: boolean; coast: boolean; lod: number; tileKm: number; rgb: [number, number, number] }
 
 export interface TerrainStats { loaded: number; loading: number; shown: number; tris: number; meshes: number }
 
+/** the world seed (a decimal string) as a point in noise space: the same world gives the same detail for everyone */
+function seedVec(seed: string): Vector3 {
+  let h = 2166136261 >>> 0
+  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0 }
+  const f = (k: number) => ((Math.imul(h ^ k, 2654435761) >>> 0) % 4096) + 0.37
+  return new Vector3(f(1), f(2), f(3))
+}
+
 const s01 = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t))
 
 export class PlanetTerrain {
   readonly group = new Group()
-  readonly material: ShaderMaterial
+  private shared: Record<string, { value: unknown }>
   private R: number
   private entries = new Map<string, Entry>()
   private shown = new Set<Entry>()
+  private leaving = new Set<Entry>()
+  private fading = false
   private pending: { e: Entry; pri: number }[] = []
   private inflight = 0
   private biomeRgb: [number, number, number][] = []
@@ -121,19 +210,18 @@ export class PlanetTerrain {
 
   constructor(private world: WorldInfo, private fetchChunk: FetchChunk) {
     this.R = world.planet_radius_km
-    this.material = new ShaderMaterial({
-      vertexShader: VERT,
-      fragmentShader: FRAG,
-      uniforms: {
-        uExag: { value: 8 },
-        uShade: { value: 8 },
-        uStyle: { value: 0 },
-        uLight: { value: new Vector3(0.4, 0.5, 0.77).normalize() },
-        uFogColor: { value: new Color('#b8d0e6') },
-        uFogNear: { value: 1e9 },
-        uFogFar: { value: 2e9 },
-      },
-    })
+    // the uniforms every chunk shares (one object each: setting a value here sets it for every mesh)
+    this.shared = {
+      uExag: { value: 8 },
+      uShade: { value: 8 },
+      uStyle: { value: 0 },
+      uLight: { value: new Vector3(0.4, 0.5, 0.77).normalize() },
+      uFogColor: { value: new Color('#b8d0e6') },
+      uFogNear: { value: 1e9 },
+      uFogFar: { value: 2e9 },
+      uR: { value: this.R },
+      uSeed: { value: seedVec(world.seed) },
+    }
     for (const b of world.biomes) {
       const hex = b.color ?? '808080'
       // the colour is written to the framebuffer as it is: the sRGB numbers, not linear ones
@@ -142,13 +230,13 @@ export class PlanetTerrain {
     }
   }
 
-  uniforms() { return this.material.uniforms }
+  uniforms() { return this.shared as Record<string, { value: any }> } // eslint-disable-line @typescript-eslint/no-explicit-any
 
   private entry(face: number, lod: number, x: number, y: number): Entry {
     const key = `${face}/${lod}/${x}/${y}`
     let e = this.entries.get(key)
     if (!e) {
-      e = { key, face, lod, x, y, state: 'idle', failedAt: 0, chunk: null, mesh: null, seen: 0, touched: 0 }
+      e = { key, face, lod, x, y, state: 'idle', failedAt: 0, chunk: null, mesh: null, seen: 0, touched: 0, arriveAt: 0, leaveAt: 0, tex: [] }
       this.entries.set(key, e)
     }
     return e
@@ -216,9 +304,10 @@ export class PlanetTerrain {
       }
     }
 
-    // meshes for what is to be drawn
-    for (const e of this.shown) e.mesh && (e.mesh.visible = false)
-    this.shown.clear()
+    // meshes for what is to be drawn. A node that comes into view fades in over the one it replaces; the one it replaces stays
+    // drawn until the fade is over, so there is never a hole, a pop or a rectangle of a different colour.
+    const prev = this.shown
+    const next = new Set<Entry>()
     let tris = 0
     for (const e of draw) {
       if (!e.mesh) {
@@ -227,11 +316,36 @@ export class PlanetTerrain {
         e.mesh = this.buildMesh(e)
         this.group.add(e.mesh)
       }
-      e.mesh.visible = true
+      if (!prev.has(e) && !(e.leaveAt && now - e.leaveAt < FADE_MS)) e.arriveAt = now
+      e.leaveAt = 0
       e.seen = now
-      this.shown.add(e)
-      tris += (e.mesh.geometry.index?.count ?? 0) / 3
+      next.add(e)
     }
+    for (const e of prev) if (!next.has(e) && !e.leaveAt) e.leaveAt = now
+    const leaving = new Set<Entry>()
+    for (const e of [...prev, ...this.leaving]) if (!next.has(e) && e.leaveAt && now - e.leaveAt < FADE_MS + 40) leaving.add(e)
+    let fading = leaving.size > 0
+    for (const e of this.group.children as Mesh[]) e.visible = false
+    for (const e of next) {
+      const m = e.mesh!, mat = m.material as ShaderMaterial
+      const f = Math.min(1, (now - e.arriveAt) / FADE_MS)
+      const arriving = f < 1
+      if (arriving) fading = true
+      mat.uniforms.uFade.value = f * f * (3 - 2 * f)
+      mat.depthTest = !arriving; mat.depthWrite = !arriving
+      m.renderOrder = arriving ? 1000 + e.lod : e.lod
+      m.visible = true
+      e.seen = now
+      tris += (m.geometry.index?.count ?? 0) / 3
+    }
+    for (const e of leaving) {
+      const m = e.mesh!, mat = m.material as ShaderMaterial
+      mat.uniforms.uFade.value = 1; mat.depthTest = true; mat.depthWrite = true; m.renderOrder = e.lod
+      m.visible = true; e.seen = now
+    }
+    this.shown = next
+    this.leaving = leaving
+    this.fading = fading
     this.lastTris = tris
     want.sort((a, b) => a.pri - b.pri)
     this.pending = want
@@ -309,9 +423,7 @@ export class PlanetTerrain {
   private trim(now: number) {
     for (const e of this.entries.values()) {
       if (e.mesh && !this.shown.has(e) && now - e.seen > MESH_IDLE_MS) {
-        this.group.remove(e.mesh)
-        e.mesh.geometry.dispose()
-        e.mesh = null
+        this.freeMesh(e)
       }
     }
     if (this.entries.size > CHUNK_CAP) {
@@ -327,9 +439,72 @@ export class PlanetTerrain {
   }
 
   /** True while chunks are still on their way for the current cut. */
-  busy() { return this.inflight > 0 || this.pending.length > 0 }
+  busy() { return this.inflight > 0 || this.pending.length > 0 || this.fading }
 
   // -- one chunk's mesh ----------------------------------------------------------------
+
+  /** The tile at (i, j) of a chunk, reaching into the neighbouring chunk of the same level for the border ring (clamped when it is not held). */
+  private tileOf(e: Entry, i: number, j: number): { biome: number; elev: number; flags: number } {
+    const E = e.chunk!.edge
+    let c = e.chunk!
+    let ii = i, jj = j
+    if (i < 0 || j < 0 || i >= E || j >= E) {
+      const dx = i < 0 ? -1 : i >= E ? 1 : 0, dy = j < 0 ? -1 : j >= E ? 1 : 0
+      const n = this.entries.get(`${e.face}/${e.lod}/${e.x + dx}/${e.y + dy}`)?.chunk
+      if (n) { c = n; ii = (i + E) % E; jj = (j + E) % E } else { ii = Math.min(E - 1, Math.max(0, i)); jj = Math.min(E - 1, Math.max(0, j)) }
+    }
+    const k = jj * E + ii
+    return { biome: c.biome[k], elev: c.elevation[k], flags: c.flags[k] }
+  }
+
+  /** The three small textures of a chunk (E + 2 tiles on a side, the border ring from the neighbours): the data field and two palettes. */
+  private buildTextures(e: Entry): DataTexture[] {
+    const E = e.chunk!.edge, T = E + 2
+    const data = new Uint16Array(T * T * 4)
+    const colM = new Uint8Array(T * T * 4)
+    const colT = new Uint8Array(T * T * 4)
+    const water = new Uint8Array(T * T)
+    const tmp = new Uint8Array(3)
+    const one = DataUtils.toHalfFloat(1), zero = DataUtils.toHalfFloat(0)
+    for (let j = 0; j < T; j++) {
+      for (let i = 0; i < T; i++) {
+        const t = this.tileOf(e, i - 1, j - 1)
+        const k = j * T + i
+        const w = this.isWater(t.biome, t.elev, t.flags)
+        water[k] = w ? 1 : 0
+        data[k * 4] = w ? one : zero
+        data[k * 4 + 1] = DataUtils.toHalfFloat(Math.max(-12, Math.min(12, t.elev / 1000)))
+        data[k * 4 + 2] = (t.flags & TILE_LAKE) !== 0 ? one : zero
+        data[k * 4 + 3] = !w && (t.flags & TILE_STREAM) !== 0 ? one : zero
+        this.colourMap(t.biome, t.elev, t.flags, tmp); colM[k * 4] = tmp[0]; colM[k * 4 + 1] = tmp[1]; colM[k * 4 + 2] = tmp[2]; colM[k * 4 + 3] = 255
+        this.colour(t.biome, t.elev, t.flags, tmp, 0); colT[k * 4] = tmp[0]; colT[k * 4 + 1] = tmp[1]; colT[k * 4 + 2] = tmp[2]; colT[k * 4 + 3] = 255
+      }
+    }
+    // a water tile carries the colour of the land beside it, so the land colour never bleeds blue across the coast
+    for (const col of [colM, colT]) {
+      const src = col.slice()
+      for (let j = 0; j < T; j++) for (let i = 0; i < T; i++) {
+        const k = j * T + i
+        if (!water[k]) continue
+        let r = 0, g = 0, b = 0, n = 0
+        for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+          const ii = i + di, jj = j + dj
+          if (ii < 0 || jj < 0 || ii >= T || jj >= T) continue
+          const q = jj * T + ii
+          if (water[q]) continue
+          r += src[q * 4]; g += src[q * 4 + 1]; b += src[q * 4 + 2]; n++
+        }
+        if (n) { col[k * 4] = r / n; col[k * 4 + 1] = g / n; col[k * 4 + 2] = b / n }
+      }
+    }
+    const mk = (arr: Uint16Array | Uint8Array, type: typeof HalfFloatType | typeof UnsignedByteType) => {
+      const t = new DataTexture(arr, T, T, RGBAFormat, type)
+      t.minFilter = LinearFilter; t.magFilter = LinearFilter; t.wrapS = ClampToEdgeWrapping; t.wrapT = ClampToEdgeWrapping
+      t.generateMipmaps = false; t.needsUpdate = true
+      return t
+    }
+    return [mk(data, HalfFloatType), mk(colM, UnsignedByteType), mk(colT, UnsignedByteType)]
+  }
 
   private buildMesh(e: Entry): Mesh {
     const c = e.chunk!
@@ -345,10 +520,6 @@ export class PlanetTerrain {
     const dirs = new Float32Array(NV * 3)
     const base = new Float32Array(NV * 3) // sea-level position, chunk-local
     const baseW = new Float32Array(NV * 3) // sea-level position, world (for the gradient)
-    const rgb = new Uint8Array(NV * 3)
-    const tmpRgb = new Uint8Array(3)
-    const rgbM = new Uint8Array(NV * 3)
-    const water = new Float32Array(NV)
 
     for (let j = 0; j < G; j++) {
       for (let i = 0; i < G; i++) {
@@ -368,30 +539,6 @@ export class PlanetTerrain {
           }
         }
         hk[k] = n ? sum / n / 1000 : 0
-        // colour: the mean of the tiles around the corner, so coasts and biomes blend instead of stepping
-        let cr = 0, cg = 0, cb = 0, cn = 0
-        for (let tj = j - 1; tj <= j; tj++) {
-          for (let ti = i - 1; ti <= i; ti++) {
-            if (ti < 0 || tj < 0 || ti >= E || tj >= E) continue
-            const t2 = tj * E + ti
-            this.colour(c.biome[t2], c.elevation[t2], c.flags[t2], tmpRgb, 0)
-            cr += tmpRgb[0]; cg += tmpRgb[1]; cb += tmpRgb[2]; cn++
-          }
-        }
-        rgb[k * 3] = cr / cn; rgb[k * 3 + 1] = cg / cn; rgb[k * 3 + 2] = cb / cn
-        // the same for the flat cartographic palette, and how much of the corner is water
-        let mr = 0, mg = 0, mb = 0, wt = 0
-        for (let tj = j - 1; tj <= j; tj++) {
-          for (let ti = i - 1; ti <= i; ti++) {
-            if (ti < 0 || tj < 0 || ti >= E || tj >= E) continue
-            const t2 = tj * E + ti
-            this.colourMap(c.biome[t2], c.elevation[t2], c.flags[t2], tmpRgb)
-            mr += tmpRgb[0]; mg += tmpRgb[1]; mb += tmpRgb[2]
-            if (this.isWater(c.biome[t2], c.elevation[t2], c.flags[t2])) wt++
-          }
-        }
-        rgbM[k * 3] = mr / cn; rgbM[k * 3 + 1] = mg / cn; rgbM[k * 3 + 2] = mb / cn
-        water[k] = wt / cn
       }
     }
 
@@ -410,9 +557,7 @@ export class PlanetTerrain {
     const dir = new Float32Array(NT * 3)
     const grad = new Float32Array(NT * 3)
     const skirt = new Float32Array(NT)
-    const col = new Uint8Array(NT * 3)
-    const colM = new Uint8Array(NT * 3)
-    const wat = new Float32Array(NT)
+    const tile = new Float32Array(NT * 2)
 
     const idx = (i: number, j: number) => Math.min(G - 1, Math.max(0, j)) * G + Math.min(G - 1, Math.max(0, i))
     for (let j = 0; j < G; j++) {
@@ -429,18 +574,14 @@ export class PlanetTerrain {
         pos[k * 3] = base[k * 3]; pos[k * 3 + 1] = base[k * 3 + 1]; pos[k * 3 + 2] = base[k * 3 + 2]
         elev[k] = hk[k]
         dir[k * 3] = dirs[k * 3]; dir[k * 3 + 1] = dirs[k * 3 + 1]; dir[k * 3 + 2] = dirs[k * 3 + 2]
-        col[k * 3] = rgb[k * 3]; col[k * 3 + 1] = rgb[k * 3 + 1]; col[k * 3 + 2] = rgb[k * 3 + 2]
-        colM[k * 3] = rgbM[k * 3]; colM[k * 3 + 1] = rgbM[k * 3 + 1]; colM[k * 3 + 2] = rgbM[k * 3 + 2]
-        wat[k] = water[k]
+        tile[k * 2] = i; tile[k * 2 + 1] = j
       }
     }
     for (let b = 0; b < NB; b++) {
       const s = border[b], t = NV + b
-      for (let q = 0; q < 3; q++) {
-        pos[t * 3 + q] = pos[s * 3 + q]; dir[t * 3 + q] = dir[s * 3 + q]; grad[t * 3 + q] = grad[s * 3 + q]; col[t * 3 + q] = col[s * 3 + q]; colM[t * 3 + q] = colM[s * 3 + q]
-      }
+      for (let q = 0; q < 3; q++) { pos[t * 3 + q] = pos[s * 3 + q]; dir[t * 3 + q] = dir[s * 3 + q]; grad[t * 3 + q] = grad[s * 3 + q] }
       elev[t] = elev[s]
-      wat[t] = wat[s]
+      tile[t * 2] = tile[s * 2]; tile[t * 2 + 1] = tile[s * 2 + 1]
       skirt[t] = skirtKm
     }
 
@@ -465,14 +606,34 @@ export class PlanetTerrain {
     geo.setAttribute('aDir', new BufferAttribute(dir, 3))
     geo.setAttribute('aGrad', new BufferAttribute(grad, 3))
     geo.setAttribute('aSkirt', new BufferAttribute(skirt, 1))
-    geo.setAttribute('aCol', new BufferAttribute(col, 3, true))
-    geo.setAttribute('aColM', new BufferAttribute(colM, 3, true))
-    geo.setAttribute('aWater', new BufferAttribute(wat, 1))
+    geo.setAttribute('aTile', new BufferAttribute(tile, 2))
     geo.setIndex(new BufferAttribute(index, 1))
-    const mesh = new Mesh(geo, this.material)
+    e.tex = this.buildTextures(e)
+    const tileKm = (R * Math.PI) / 2 / per
+    const mat = new ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      transparent: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -(e.lod + 1) * 2,
+      uniforms: { ...this.shared, uData: { value: e.tex[0] }, uColM: { value: e.tex[1] }, uColT: { value: e.tex[2] }, uFade: { value: 1 }, uTile: { value: tileKm } },
+    })
+    const mesh = new Mesh(geo, mat)
+    mesh.renderOrder = e.lod
     mesh.position.set(cx, cy, cz)
     mesh.frustumCulled = false // the cut already culled it (the shader moves the vertices)
     return mesh
+  }
+
+  private freeMesh(e: Entry) {
+    if (!e.mesh) return
+    this.group.remove(e.mesh)
+    e.mesh.geometry.dispose();
+    (e.mesh.material as ShaderMaterial).dispose()
+    for (const t of e.tex) t.dispose()
+    e.tex = []
+    e.mesh = null
   }
 
   private isWater(biome: number, elev: number, flags: number) {
@@ -486,12 +647,13 @@ export class PlanetTerrain {
       const t = Math.min(1, Math.max(0, -elev / 4500))
       r = 190 + (150 - 190) * t; g = 224 + (196 - 224) * t; b = 246 + (232 - 246) * t
     } else {
+      // a light cartographic land: the biome's colour softened towards a warm paper tone, rock and snow above the trees
       const base = this.biomeRgb[biome] ?? [160, 170, 150]
-      r = base[0] * 0.55 + 250 * 0.45; g = base[1] * 0.55 + 246 * 0.45; b = base[2] * 0.55 + 232 * 0.45
-      const rock = s01((elev - 1500) / 1800)
-      r += (214 - r) * rock; g += (208 - g) * rock; b += (196 - b) * rock
+      r = base[0] * 0.62 + 238 * 0.38; g = base[1] * 0.62 + 232 * 0.38; b = base[2] * 0.62 + 214 * 0.38
+      const rock = s01((elev - 1600) / 1700)
+      r += (206 - r) * rock; g += (199 - g) * rock; b += (186 - b) * rock
       const snow = s01((elev - 3300) / 900)
-      r += (248 - r) * snow; g += (248 - g) * snow; b += (250 - b) * snow
+      r += (250 - r) * snow; g += (250 - g) * snow; b += (252 - b) * snow
     }
     out[0] = r; out[1] = g; out[2] = b
   }
@@ -515,11 +677,10 @@ export class PlanetTerrain {
 
   dispose() {
     this.disposed = true
-    for (const e of this.entries.values()) e.mesh?.geometry.dispose()
+    for (const e of this.entries.values()) this.freeMesh(e)
     this.entries.clear()
     this.shown.clear()
     this.pending = []
     this.group.clear()
-    this.material.dispose()
   }
 }
