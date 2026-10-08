@@ -5319,6 +5319,10 @@ export const uiFa = {
   'eco.pay.after_local': 'بعد از پرداخت از این پول می‌ماند: {n}',
   'eco.pay.sent_local': '{amount} برای {player} فرستاده شد.',
   'eco.notice.pay.short_local': 'از «{name}» کافی نداری؛ {needed} لازم است و {available} داری.',
+  'pn.payment.local': '{player} {amount} برایت فرستاد؛ به موجودی پولِ شهرت اضافه شد.',
+  'eco.act.pay.local': '{n}',
+  'eco.act.pay.local_all': 'همه ({n})',
+  'eco.act.pay.local_custom': 'مبلغ دلخواه',
 } as const
 
 export type UiKey = keyof typeof uiFa

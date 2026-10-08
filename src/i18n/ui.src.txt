@@ -5420,3 +5420,6 @@ eco.pay.after_local | بعد از پرداخت از این پول می‌مان�
 eco.pay.sent_local | {amount} برای {player} فرستاده شد. | {amount} was sent to {player}.
 eco.notice.pay.short_local | از «{name}» کافی نداری؛ {needed} لازم است و {available} داری. | You do not hold enough {name}: {needed} needed, {available} held.
 pn.payment.local | {player} {amount} برایت فرستاد؛ به موجودی پولِ شهرت اضافه شد. | {player} sent you {amount}; it went into your city money.
+eco.act.pay.local | {n} | {n}
+eco.act.pay.local_all | همه ({n}) | All ({n})
+eco.act.pay.local_custom | مبلغ دلخواه | Another amount

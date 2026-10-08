@@ -5321,4 +5321,8 @@ export const uiEn: Record<UiKey, string> = {
   'eco.pay.after_local': 'You will have {n} left.',
   'eco.pay.sent_local': '{amount} was sent to {player}.',
   'eco.notice.pay.short_local': 'You do not hold enough {name}: {needed} needed, {available} held.',
+  'pn.payment.local': '{player} sent you {amount}; it went into your city money.',
+  'eco.act.pay.local': '{n}',
+  'eco.act.pay.local_all': 'All ({n})',
+  'eco.act.pay.local_custom': 'Another amount',
 }
