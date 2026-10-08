@@ -211,6 +211,8 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
           const pt = v.project(p.lat, p.lon)
           if (!pt.visible) { el.style.display = 'none'; continue }
           const alone = p.kind === 'home' || p2(p, selRef.current)
+          // a city right under the own city or the chosen one is folded into it: no bubble on top of the marker that matters
+          if (!alone && shown.some((q) => (q.p.kind === 'home' || p2(q.p, selRef.current)) && Math.hypot(q.pt.x - pt.x, q.pt.y - pt.y) < CLUSTER_PX)) { el.style.display = 'none'; continue }
           const g = alone ? null : groups.find((q) => Math.hypot(q.x - pt.x, q.y - pt.y) < CLUSTER_PX)
           if (g) { g.members.push(p); g.n++; g.x = (g.x * (g.n - 1) + pt.x) / g.n; g.y = (g.y * (g.n - 1) + pt.y) / g.n; g.lat = (g.lat * (g.n - 1) + p.lat) / g.n; g.lon = (g.lon * (g.n - 1) + p.lon) / g.n; el.style.display = 'none'; continue }
           if (!alone) groups.push({ x: pt.x, y: pt.y, n: 1, lat: p.lat, lon: p.lon, members: [p] })
