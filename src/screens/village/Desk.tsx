@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { DeskView } from '../../api/views.gen'
 import Popup, { ActionButton, ActionRow, Note, StatCard, StatGrid } from '../../ui/Popup'
 import { CardGrid, PCard } from '../../ui/v6/panel'
-import { formatNumber, money } from '../native/kit/format'
+import { formatNumber } from '../native/kit/format'
 import { t } from '../../i18n'
 import * as api from '../../api/client'
 import { useVillageCommand } from '../../village/useVillage'
@@ -15,6 +15,8 @@ import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, type FlowCtx } from
 const pctOf = (bps: number) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 }).format(bps / 100)}٪`
 const rateOf = (v: DeskView) => (v.x_ref_ppm > 0 ? (v.r0 * 1_000_000) / v.x_ref_ppm : 0)
 const rateText = (v: DeskView) => new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 }).format(rateOf(v))
+/** SUP exactly as it is paid at the desk: plain, never shown through the local-money formatter */
+const sup = (n: number) => `${formatNumber(n)} ${t('unit.money')}`
 const units = (n: number, v: { name: string }) => `${formatNumber(n)} ${v.name}`
 
 /** The head's fee: the current fee and a stepper inside the bounds. A resident sees the fee only. */
@@ -65,13 +67,13 @@ function Side({ v, ctx, side }: { v: DeskView; ctx: FlowCtx; side: 'buy' | 'sell
   const presets = (buy ? v.presets_sup : v.presets_units) ?? []
   const have = buy ? v.cash_sup : v.cash_units
   const can = buy ? v.can_buy : v.can_sell
-  const show = (n: number) => (buy ? money(n) : units(n, v))
+  const show = (n: number) => (buy ? sup(n) : units(n, v))
   const go = (amount: number) => ctx.run('settlement.currency.desk', { side, amount: String(amount) })
   const why = !can ? (buy ? t('sm.desk.empty') : t('sm.desk.nothing_to_sell')) : have <= 0 ? t('sm.desk.no_funds') : ''
   return (
-    <PCard icon="coins" tone={can ? 'busy' : 'off'} off={!can}
+    <PCard icon="coin" tone={can ? 'busy' : 'off'} off={!can}
       title={buy ? t('sm.desk.buy', { name: v.name }) : t('sm.desk.sell', { name: v.name })}
-      sub={buy ? t('sm.desk.you_hold_sup', { n: money(have) }) : t('sm.desk.you_hold_units', { n: units(have, v) })}
+      sub={buy ? t('sm.desk.you_hold_sup', { n: sup(have) }) : t('sm.desk.you_hold_units', { n: units(have, v) })}
       facts={why ? <span className="dk-why">{why}</span> : <span>{t('sm.desk.pick')}</span>}
       foot={can ? (
         <span className="dk-chips">
@@ -89,9 +91,9 @@ export const Desk = flow<DeskView>(({ view: v, ctx }) => {
   const ok = ctx.acts.find((a) => a.id === 'confirm')
   const buy = v.side === 'buy'
   if (v.stage === 'ask') {
-    const pay = buy ? money(v.amount) : units(v.amount, v)
-    const get = buy ? units(v.units, v) : money(v.sup)
-    const feeText = buy ? money(v.fee) : units(v.fee, v)
+    const pay = buy ? sup(v.amount) : units(v.amount, v)
+    const get = buy ? units(v.units, v) : sup(v.sup)
+    const feeText = buy ? sup(v.fee) : units(v.fee, v)
     const confirm = () => (ok ? ctx.go(ok) : ctx.run('settlement.currency.desk', { side: v.side, amount: String(v.amount), quote: String(buy ? v.units : v.sup), confirm: 'confirm' }))
     return (
       <Page title={t('sm.desk.title')} tone="gold">
@@ -115,10 +117,10 @@ export const Desk = flow<DeskView>(({ view: v, ctx }) => {
     return (
       <Page title={t('sm.desk.title')} tone="emerald">
         <Panel tone="emerald">
-          <Lead tone="good">{buy ? t('sm.desk.done_buy', { get: units(v.units, v), pay: money(v.amount) }) : t('sm.desk.done_sell', { get: money(v.sup), pay: units(v.amount, v) })}</Lead>
+          <Lead tone="good">{buy ? t('sm.desk.done_buy', { get: units(v.units, v), pay: sup(v.amount) }) : t('sm.desk.done_sell', { get: sup(v.sup), pay: units(v.amount, v) })}</Lead>
           <Facts rows={[
-            { label: t('sm.desk.fee_taken', { p: pctOf(v.fee_bps) }), value: buy ? money(v.fee) : units(v.fee, v) },
-            { label: t('sm.desk.left_sup'), value: money(v.cash_sup) },
+            { label: t('sm.desk.fee_taken', { p: pctOf(v.fee_bps) }), value: buy ? sup(v.fee) : units(v.fee, v) },
+            { label: t('sm.desk.left_sup'), value: sup(v.cash_sup) },
             { label: v.name, value: formatNumber(v.cash_units) },
           ]} />
         </Panel>
@@ -139,7 +141,7 @@ export const Desk = flow<DeskView>(({ view: v, ctx }) => {
         <Side v={v} ctx={ctx} side="buy" />
         <Side v={v} ctx={ctx} side="sell" />
       </CardGrid>
-      <Hint>{t('sm.desk.desk_has', { u: units(v.desk_units, v), s: money(v.desk_sup) })}</Hint>
+      <Hint>{t('sm.desk.desk_has', { u: units(v.desk_units, v), s: sup(v.desk_sup) })}</Hint>
       <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
     </Page>
   )
