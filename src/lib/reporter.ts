@@ -18,6 +18,7 @@ const SILENT = location.hostname === 'localhost' || location.hostname === '127.0
   || new URLSearchParams(location.search).get('mock') === '1'
 
 export function report(kind: string, message: string, extra?: Record<string, unknown>): void {
+  if (new URLSearchParams(location.search).get('mock') === '1') console.warn('[report]', kind, message)
   if (SILENT) return
   try {
     const body = JSON.stringify({

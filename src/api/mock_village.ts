@@ -188,6 +188,21 @@ function init() {
       const dr = landMock.draft(landHost, { x: -9, y: 8 }, 'path')
       if (!dr.error) landMock.store(dr)
     }
+    // ?live=1: the shape of the real Marco Polo: a built road column north out of the grid (x 10, y 16..29), a store and a watch hut
+    // on it, and open lots along it
+    if (new URLSearchParams(location.search).get('live') === '1') {
+      const id = `plan-${landMock.land.next++}`
+      const cells = Array.from({ length: 14 }, (_, i) => ({ x: 10, y: 16 + i, plan: id, built: true, height_m: 3 }))
+      const plan = { id, cls: 'path', to: { x: 10, y: 29 }, cells }
+      landMock.land.plans.push(plan)
+      for (const c of cells) landMock.land.cells.set(landMock.keyOf(c.x, c.y), c)
+      for (let y = 16; y <= 29; y++) for (const x of [9, 11, 8, 12]) {
+        if ((x === 8 && y === 29) || (x === 11 && y === 28)) continue
+        landMock.land.open.set(landMock.keyOf(x, y), { x, y, plan: id, serves: { x: 10, y }, dist: Math.abs(x - 10), buildable: true, height_m: 3, slope_m: 0.2 })
+      }
+      st.buildings.push(mk('watch_hut', 11, 28, 'built'))
+      st.buildings.push(mk('health_house', 7, 29, 'built', { w: 2, h: 1 }))
+    }
   } catch { /* no window */ }
 }
 
@@ -238,7 +253,8 @@ function layoutFor(id: string): VillageLayout {
   const origin = own ? place.origin : offsetLatLon(place.origin.lat, place.origin.lon, 9 * lot, 5 * lot, MOCK_WORLD.planet_radius_km)
   const centre = own ? place.centre : { ...offsetLatLon(place.centre.lat, place.centre.lon, 9 * lot, 5 * lot, MOCK_WORLD.planet_radius_km), chunk: place.centre.chunk }
   const list = own ? st.buildings : st.otherBuildings.filter((b) => b.state === 'built')
-  const roads = own ? st.roads : []
+  // a laid road beyond the first grid is in `roads` and `buildings` like any road (the real layout does the same)
+  const roads = own ? [...st.roads, ...[...landMock.land.cells.values()].filter((c) => c.built).map((c) => ({ x: c.x, y: c.y }))] : []
   const detail = own ? 'full' : 'coarse'
   seedCitizen()
   const ver = own ? `${IS_HEAD ? 'h' : 'm'}${st.ver}` : `p${st.ver}`
