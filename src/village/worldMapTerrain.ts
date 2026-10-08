@@ -139,7 +139,7 @@ void main() {
   flatLand = mix(flatLand, vec3(0.827, 0.918, 0.784), mG);
   flatLand = mix(flatLand, vec3(0.945, 0.902, 0.784), mS);
   flatLand = mix(flatLand, vec3(0.847, 0.816, 0.769), mM);
-  flatLand = mix(flatLand, vec3(0.973, 0.980, 0.984), mN);
+  flatLand = mix(flatLand, vec3(0.905, 0.929, 0.953), mN); // snow and ice: a cool pale blue-grey, never the white of missing data
   // a calm grey outline round snow and ice, a faint one round the mountains, so a white area never reads as missing data
   float dN = abs(cw.b + ed - 0.5) / max(fwidth(cw.b), 1e-4);
   float dM = abs(cw.a + ed - 0.5) / max(fwidth(cw.a), 1e-4);
