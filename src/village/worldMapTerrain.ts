@@ -126,35 +126,48 @@ void main() {
   float aa = max(fwidth(fc), 1e-4);
   float dist = abs(fc - 0.5) / aa;               // pixels from the coast line
   float wm = clamp((fc - 0.5) / aa + 0.5, 0.0, 1.0); // 1 = water
-  // ---- land
-  // the biome edges wander a little (a seeded warp as wide as a tile), and the colours are smoothed, so a tile is never a square
+  // ---- land. The map look is flat cartography: a few broad classes (open land, green, sand, mountain, snow), each a flat fill with a
+  // clean 1 to 2 px edge; the seeded detail only shapes the edges, it is never a fill texture. The terrain look keeps the natural
+  // colours with relief.
+  vec4 cw = bicubic(uColM, vUv);
+  float ed = disp * 0.8;
+  vec3 flatLand = vec3(0.949, 0.937, 0.914);
+  float mG = clamp((cw.r + ed - 0.5) / max(fwidth(cw.r), 1e-4) + 0.5, 0.0, 1.0);
+  float mS = clamp((cw.g + ed - 0.5) / max(fwidth(cw.g), 1e-4) + 0.5, 0.0, 1.0);
+  float mM = clamp((cw.a + ed - 0.5) / max(fwidth(cw.a), 1e-4) + 0.5, 0.0, 1.0);
+  float mN = clamp((cw.b + ed - 0.5) / max(fwidth(cw.b), 1e-4) + 0.5, 0.0, 1.0);
+  flatLand = mix(flatLand, vec3(0.827, 0.918, 0.784), mG);
+  flatLand = mix(flatLand, vec3(0.945, 0.902, 0.784), mS);
+  flatLand = mix(flatLand, vec3(0.847, 0.816, 0.769), mM);
+  flatLand = mix(flatLand, vec3(0.973, 0.980, 0.984), mN);
+  // a calm grey outline round snow and ice, a faint one round the mountains, so a white area never reads as missing data
+  float dN = abs(cw.b + ed - 0.5) / max(fwidth(cw.b), 1e-4);
+  float dM = abs(cw.a + ed - 0.5) / max(fwidth(cw.a), 1e-4);
+  flatLand = mix(flatLand, vec3(0.745, 0.788, 0.820), (1.0 - smoothstep(0.35, 1.3, dN)) * 0.95);
+  flatLand = mix(flatLand, vec3(0.735, 0.700, 0.650), (1.0 - smoothstep(0.35, 1.3, dM)) * 0.55);
+  // the terrain look: the natural colours, relief and a little grain
   float wp = smoothstep(0.8, 3.0, uTile / pxKm);
   vec2 warp = vec2(vnoise(vDirW * (uR / (uTile * 1.3)) + uSeed * 1.7), vnoise(vDirW * (uR / (uTile * 1.3)) + uSeed * 2.9)) - 0.5;
-  vec2 uvw = vUv + warp * (0.9 / 34.0) * wp;
-  vec3 land = mix(bicubic(uColM, uvw).rgb, bicubic(uColT, uvw).rgb, uStyle);
+  vec3 natural = bicubic(uColT, vUv + warp * (0.9 / 34.0) * wp).rgb;
   float d0 = max(dot(normalize(vN), uLight), 0.0);
-  float amb = mix(0.82, 0.46, uStyle);
-  float kk = mix(0.26, 0.74, uStyle);
-  land *= (amb + kk * d0) * (1.0 + grain * mix(0.05, 0.12, uStyle));
+  natural *= (0.46 + 0.74 * d0) * (1.0 + grain * 0.12);
+  vec3 land = mix(flatLand, natural, uStyle);
   // rivers: a thin ribbon where the stream mask is high; gone when a tile is under 2 px
   float riv = smoothstep(0.30, 0.44, d.a + disp * 0.5) * smoothstep(1.2, 3.0, uTile / pxKm);
-  land = mix(land, mix(vec3(0.56, 0.75, 0.93), vec3(0.29, 0.52, 0.72), uStyle), riv * 0.9);
-  // ---- water
+  land = mix(land, mix(vec3(0.667, 0.827, 0.961), vec3(0.29, 0.52, 0.72), uStyle), riv * 0.95);
+  // ---- water: flat blue, darker only gently with depth
   float depth = clamp(-d.g * 1000.0 / 4500.0, 0.0, 1.0);
-  vec3 shallowM = vec3(0.69, 0.85, 0.96), deepM = vec3(0.52, 0.73, 0.91);
-  vec3 shallowT = vec3(0.17, 0.49, 0.67), deepT = vec3(0.055, 0.165, 0.345);
-  vec3 sea = mix(mix(shallowM, deepM, depth), mix(shallowT, deepT, depth), uStyle);
-  vec3 lake = mix(vec3(0.62, 0.81, 1.0), vec3(0.24, 0.53, 0.70), uStyle);
+  vec3 sea = mix(mix(vec3(0.667, 0.827, 0.961), vec3(0.576, 0.745, 0.925), depth), mix(vec3(0.17, 0.49, 0.67), vec3(0.055, 0.165, 0.345), depth), uStyle);
+  vec3 lake = mix(vec3(0.667, 0.827, 0.961), vec3(0.24, 0.53, 0.70), uStyle);
   float lk = smoothstep(0.35, 0.65, d.b + disp);
   vec3 water = mix(sea, lake, lk);
-  water *= 1.0 + grain * 0.02;
-  // a light band along the shore, fading over about eight pixels
-  float shore = (1.0 - smoothstep(0.0, 8.0, dist)) * 0.55;
-  water = mix(water, mix(vec3(0.88, 0.95, 0.99), vec3(0.45, 0.78, 0.82), uStyle), shore * wm);
+  // the terrain look keeps a light band along the shore; the map look is flat
+  float shore = (1.0 - smoothstep(0.0, 8.0, dist)) * 0.55 * uStyle;
+  water = mix(water, vec3(0.45, 0.78, 0.82), shore * wm);
   vec3 c = mix(land, water, wm);
   // the coast line: a crisp stroke about 1.3 px at any zoom
   float line = 1.0 - smoothstep(0.35, 1.25, dist);
-  c = mix(c, mix(vec3(0.40, 0.62, 0.82), vec3(0.78, 0.90, 0.92), uStyle), line * 0.85);
+  c = mix(c, mix(vec3(0.43, 0.64, 0.84), vec3(0.78, 0.90, 0.92), uStyle), line * 0.9);
   c = mix(c, uFogColor, smoothstep(uFogNear, uFogFar, vDist));
   gl_FragColor = vec4(c, uFade);
 }`
@@ -203,6 +216,7 @@ export class PlanetTerrain {
   private inflight = 0
   private biomeRgb: [number, number, number][] = []
   private biomeWater: boolean[] = []
+  private biomeCode: string[] = []
   private frustum = new Frustum()
   private pv = new Matrix4()
   private sph = new Sphere()
@@ -231,6 +245,7 @@ export class PlanetTerrain {
       // the colour is written to the framebuffer as it is: the sRGB numbers, not linear ones
       this.biomeRgb[b.index] = [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)]
       this.biomeWater[b.index] = !!b.water
+      this.biomeCode[b.index] = b.code
     }
   }
 
@@ -469,7 +484,7 @@ export class PlanetTerrain {
     const colM = new Uint8Array(T * T * 4)
     const colT = new Uint8Array(T * T * 4)
     const water = new Uint8Array(T * T)
-    const tmp = new Uint8Array(3)
+    const tmp = new Uint8Array(4)
     const one = DataUtils.toHalfFloat(1), zero = DataUtils.toHalfFloat(0)
     for (let j = 0; j < T; j++) {
       for (let i = 0; i < T; i++) {
@@ -481,7 +496,7 @@ export class PlanetTerrain {
         data[k * 4 + 1] = DataUtils.toHalfFloat(Math.max(-12, Math.min(12, t.elev / 1000)))
         data[k * 4 + 2] = (t.flags & TILE_LAKE) !== 0 ? one : zero
         data[k * 4 + 3] = !w && (t.flags & TILE_STREAM) !== 0 ? one : zero
-        this.colourMap(t.biome, t.elev, t.flags, tmp); colM[k * 4] = tmp[0]; colM[k * 4 + 1] = tmp[1]; colM[k * 4 + 2] = tmp[2]; colM[k * 4 + 3] = 255
+        this.colourMap(t.biome, t.elev, t.flags, tmp); colM[k * 4] = tmp[0]; colM[k * 4 + 1] = tmp[1]; colM[k * 4 + 2] = tmp[2]; colM[k * 4 + 3] = tmp[3]
         this.colour(t.biome, t.elev, t.flags, tmp, 0); colT[k * 4] = tmp[0]; colT[k * 4 + 1] = tmp[1]; colT[k * 4 + 2] = tmp[2]; colT[k * 4 + 3] = 255
       }
     }
@@ -491,15 +506,15 @@ export class PlanetTerrain {
       for (let j = 0; j < T; j++) for (let i = 0; i < T; i++) {
         const k = j * T + i
         if (!water[k]) continue
-        let r = 0, g = 0, b = 0, n = 0
+        let r = 0, g = 0, b = 0, a = 0, n = 0
         for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
           const ii = i + di, jj = j + dj
           if (ii < 0 || jj < 0 || ii >= T || jj >= T) continue
           const q = jj * T + ii
           if (water[q]) continue
-          r += src[q * 4]; g += src[q * 4 + 1]; b += src[q * 4 + 2]; n++
+          r += src[q * 4]; g += src[q * 4 + 1]; b += src[q * 4 + 2]; a += src[q * 4 + 3]; n++
         }
-        if (n) { col[k * 4] = r / n; col[k * 4 + 1] = g / n; col[k * 4 + 2] = b / n }
+        if (n) { col[k * 4] = r / n; col[k * 4 + 1] = g / n; col[k * 4 + 2] = b / n; col[k * 4 + 3] = a / n }
       }
     }
     const mk = (arr: Uint16Array | Uint8Array, type: typeof HalfFloatType | typeof UnsignedByteType) => {
@@ -645,22 +660,15 @@ export class PlanetTerrain {
     return (flags & (TILE_OCEAN | TILE_LAKE)) !== 0 || (elev <= 0 && this.biomeWater[biome])
   }
 
-  /** The flat cartographic palette: pale land by biome, soft blue water, grey rock, white ice. */
+  /** The map look's class of a land tile, as weights in the four channels: green (forest, grass), sand, snow and ice, mountain; none = open land. */
   private colourMap(biome: number, elev: number, flags: number, out: Uint8Array) {
-    let r: number, g: number, b: number
-    if ((flags & TILE_LAKE) !== 0) { r = 168; g = 210; b = 238 } else if (this.isWater(biome, elev, flags)) {
-      const t = Math.min(1, Math.max(0, -elev / 4500))
-      r = 190 + (150 - 190) * t; g = 224 + (196 - 224) * t; b = 246 + (232 - 246) * t
-    } else {
-      // a light cartographic land: the biome's colour softened towards a warm paper tone, rock and snow above the trees
-      const base = this.biomeRgb[biome] ?? [160, 170, 150]
-      r = base[0] * 0.5 + 240 * 0.5; g = base[1] * 0.5 + 236 * 0.5; b = base[2] * 0.5 + 218 * 0.5
-      const rock = s01((elev - 1600) / 1700)
-      r += (206 - r) * rock; g += (199 - g) * rock; b += (186 - b) * rock
-      const snow = s01((elev - 3300) / 900)
-      r += (250 - r) * snow; g += (250 - g) * snow; b += (252 - b) * snow
-    }
-    out[0] = r; out[1] = g; out[2] = b
+    out[0] = 0; out[1] = 0; out[2] = 0; out[3] = 0
+    if (this.isWater(biome, elev, flags)) return
+    const code = this.biomeCode[biome] ?? ''
+    if (/ice|snow|glaci/.test(code) || elev > 3500) { out[2] = 255; return }
+    if (elev > 1800) { out[3] = 255; return }
+    if (/desert|dune|arid|badland/.test(code)) { out[1] = 255; return }
+    if (/forest|grass|jungle|taiga|woodland|meadow|rain|swamp|marsh|plain/.test(code)) out[0] = 255
   }
 
   private colour(biome: number, elev: number, flags: number, out: Uint8Array, at: number) {
