@@ -189,8 +189,7 @@ export const FxOrder = flow<FXOrderView>(({ view: v, ctx }) => {
         ]} />
         {v.rested && <Hint>{t('fx.rested_hint')}</Hint>}
       </Panel>
-      <Btns ctx={ctx} list={ctx.acts.filter((a) => !isBack(a))} />
-      <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
+      <ActionButton tone="gold" onClick={() => ctx.run('fx.book', {})}>{t('fx.back_book')}</ActionButton>
     </Page>
   )
 })

@@ -5421,4 +5421,5 @@ export const uiEn: Record<UiKey, string> = {
   'fx.refused.fx_not_yours': 'This order is not yours.',
   'fx.refused.fx_not_found': 'No such order.',
   'fx.market': 'Market',
+  'fx.back_book': 'Back to the market',
 }

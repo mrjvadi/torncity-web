@@ -5519,3 +5519,4 @@ fx.refused.fx_invalid | سفارش درست نیست؛ تعداد و قیمت ر
 fx.refused.fx_not_yours | این سفارش مال تو نیست. | This order is not yours.
 fx.refused.fx_not_found | چنین سفارشی پیدا نشد. | No such order.
 fx.market | بازار | Market
+fx.back_book | برگشت به بازار | Back to the market

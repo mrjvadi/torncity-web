@@ -5419,6 +5419,7 @@ export const uiFa = {
   'fx.refused.fx_not_yours': 'این سفارش مال تو نیست.',
   'fx.refused.fx_not_found': 'چنین سفارشی پیدا نشد.',
   'fx.market': 'بازار',
+  'fx.back_book': 'برگشت به بازار',
 } as const
 
 export type UiKey = keyof typeof uiFa
