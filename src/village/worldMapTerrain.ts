@@ -119,7 +119,7 @@ void main() {
     float n = vnoise(vDirW * (uR / lam) + uSeed + float(o) * 7.31) * 2.0 - 1.0;
     disp += n * wData * wPix * lam * 0.11 / uTile;
     float wG = wPix * (1.0 - smoothstep(uTile * 0.15, uTile * 0.9, lam)) ;
-    grain += n * wG * 0.35;
+    grain += n * wG * 0.55;
     lam *= 0.5;
   }
   float fc = d.r + disp;
@@ -127,7 +127,11 @@ void main() {
   float dist = abs(fc - 0.5) / aa;               // pixels from the coast line
   float wm = clamp((fc - 0.5) / aa + 0.5, 0.0, 1.0); // 1 = water
   // ---- land
-  vec3 land = mix(texture2D(uColM, vUv).rgb, texture2D(uColT, vUv).rgb, uStyle);
+  // the biome edges wander a little (a seeded warp as wide as a tile), and the colours are smoothed, so a tile is never a square
+  float wp = smoothstep(0.8, 3.0, uTile / pxKm);
+  vec2 warp = vec2(vnoise(vDirW * (uR / (uTile * 1.3)) + uSeed * 1.7), vnoise(vDirW * (uR / (uTile * 1.3)) + uSeed * 2.9)) - 0.5;
+  vec2 uvw = vUv + warp * (0.9 / 34.0) * wp;
+  vec3 land = mix(bicubic(uColM, uvw).rgb, bicubic(uColT, uvw).rgb, uStyle);
   float d0 = max(dot(normalize(vN), uLight), 0.0);
   float amb = mix(0.82, 0.46, uStyle);
   float kk = mix(0.26, 0.74, uStyle);
@@ -137,7 +141,7 @@ void main() {
   land = mix(land, mix(vec3(0.56, 0.75, 0.93), vec3(0.29, 0.52, 0.72), uStyle), riv * 0.9);
   // ---- water
   float depth = clamp(-d.g * 1000.0 / 4500.0, 0.0, 1.0);
-  vec3 shallowM = vec3(0.71, 0.86, 0.96), deepM = vec3(0.40, 0.62, 0.84);
+  vec3 shallowM = vec3(0.69, 0.85, 0.96), deepM = vec3(0.52, 0.73, 0.91);
   vec3 shallowT = vec3(0.17, 0.49, 0.67), deepT = vec3(0.055, 0.165, 0.345);
   vec3 sea = mix(mix(shallowM, deepM, depth), mix(shallowT, deepT, depth), uStyle);
   vec3 lake = mix(vec3(0.62, 0.81, 1.0), vec3(0.24, 0.53, 0.70), uStyle);

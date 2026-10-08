@@ -15,7 +15,7 @@ export const MAP_MIN_ALT = 6
 const SPACE = new Color('#070b18')
 const HAZE = new Color('#bcd2e8')
 const OCEAN = '#1d5a86'
-const OCEAN_MAP = '#8bb9e4'
+const OCEAN_MAP = '#a4cbee'
 const s01 = (t: number) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t))
 
 export interface MapCamState { lat: number; lon: number; alt: number; oblique: boolean; bearing: number }
