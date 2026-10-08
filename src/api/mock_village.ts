@@ -1575,7 +1575,21 @@ function moneyView() {
     currency: { code: none ? 'SUP' : 'MKP', name: none ? 'ساپ' : 'مارک پولو', symbol: '', issued: !none }, market: 'none', reserve: 'none', nil_unit_sup: 1000, nil_per_unit_micro: 2400,
     examples: [{ amount: 100, nil_micro: 240 }, { amount: 1000, nil_micro: 2400 }], treasury: st.treasury, treasury_nil_micro: st.treasury * 2400, output: 1800, output_nil_micro: 4320000, output_days: 7,
     residents: 9, basket: [{ item: goods('rice'), kind: 'item', week_milli: 1400, reference: 12, price: 13, on_shelf: true }, { item: goods('tea'), kind: 'item', week_milli: 200, reference: 8, price: 9, on_shelf: false }], index_bps: 10800, cover_bps: 7500,
-  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : [])])
+  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : []), ...(none ? [] : [A('currency.desk', 'settlement.currency.desk')])])
+}
+// the desk: ?desk=empty for a treasury with no units; the head (default) may set the fee, ?role=resident may not
+let deskFeeBps = 30
+function deskView(args: Record<string, unknown>, stage: 'menu' | 'ask' | 'done' = 'menu') {
+  const empty = (() => { try { return new URLSearchParams(location.search).get('desk') === 'empty' } catch { return false } })()
+  const rate = 10, cashSup = 12450, cashUnits = 320, deskUnits = empty ? 0 : 40000, deskSup = 9000
+  const side = String(args.side ?? 'buy') === 'sell' ? 'sell' : 'buy'
+  const amount = Number(args.amount ?? 0)
+  let fee = 0, units = 0, sup = 0
+  if (side === 'buy') { fee = Math.ceil(amount * deskFeeBps / 10000); units = Math.floor((amount - fee) * rate) } else { fee = Math.ceil(amount * deskFeeBps / 10000); sup = Math.floor((amount - fee) / rate) }
+  const view = { village: 'آمل', name: 'مارک پولو', symbol: 'MKP', stage, side, amount, sup, units, fee, fee_bps: deskFeeBps, r0: 10, x_ref_ppm: 1_000_000, cash_sup: cashSup, cash_units: cashUnits, desk_units: deskUnits, desk_sup: deskSup, slippage_bps: 100,
+    presets_sup: [100, 1000, 10000], presets_units: [1000, 10000, 100000], can_set_fee: IS_HEAD, can_buy: !empty, can_sell: deskSup > 0, min_fee_bps: 10, max_fee_bps: 300 }
+  if (stage === 'ask') return mockOk('village_currency_desk', view, [confirmA('settlement.currency.desk', { side, amount: String(amount), quote: String(side === 'buy' ? units : sup) }), back('settlement.currency.desk')])
+  return mockOk('village_currency_desk', view, [back('settlement.money'), refreshA('settlement.currency.desk')])
 }
 function charterView(args: Record<string, unknown>) {
   const r0 = Number(args.r0 ?? 10)
@@ -1596,6 +1610,8 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.shop.cap': case 'settlement.shop.tax': return shopView()
     case 'settlement.money': return moneyView()
     case 'settlement.currency.charter': return charterView(args)
+    case 'settlement.currency.desk': return args.confirm ? deskView(args, 'done') : args.amount ? deskView(args, 'ask') : deskView(args)
+    case 'settlement.currency.fee': { deskFeeBps = Math.max(10, Math.min(300, Number(args.bps ?? 30))); return deskView({}) }
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true, String(args.from ?? ''))
     case 'settlement.build.place': return place(args)
