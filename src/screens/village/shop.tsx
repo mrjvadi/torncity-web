@@ -18,6 +18,7 @@ import { hasKey, t, type Key } from '../../i18n'
 import { useContentNames, useVillageCommand, type ContentNames } from '../../village/useVillage'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerWrite, type FlowCtx } from './flow'
 import { useVillageView } from './common'
+import { Desk, MoneyFee } from './Desk'
 import { getDisplayMoney } from '../../lib/money'
 import { useSession } from '../../state/SessionContext'
 import { locationOf } from '../../support/location'
@@ -229,6 +230,12 @@ const Money = flow<MoneyView>(({ view: v, ctx }) => {
           { label: t('sm.money.lbl_units'), value: `${formatNumber(v.chartered.treasury_units)} ${live.name}`, gold: true },
         ]} />
       )}
+      {v.chartered && (
+        <>
+          <Btns ctx={ctx} list={ctx.by('currency.desk')} />
+          <MoneyFee />
+        </>
+      )}
       {v.can_charter && !v.chartered && (
         <Panel tone="gold">
           <Lead>{t('sm.money.offer')}</Lead>
@@ -332,6 +339,6 @@ const NoRoom = flow<NoRoomView>(({ view: v, ctx }) => (
   </Page>
 ))
 
-export const SHOP_FLOWS = { village_shop: Shop, village_shop_checkout: Checkout, village_shop_refusal: Refusal, village_money: Money, village_currency_charter: CurrencyCharter, no_room: NoRoom }
+export const SHOP_FLOWS = { village_shop: Shop, village_shop_checkout: Checkout, village_shop_refusal: Refusal, village_money: Money, village_currency_desk: Desk, village_currency_charter: CurrencyCharter, no_room: NoRoom }
 export const SHOP_SCREENS = Object.keys(SHOP_FLOWS)
 export type { FlowCtx }

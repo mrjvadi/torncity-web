@@ -5369,3 +5369,43 @@ sm.charter.yes | تأیید و پرداخت {total} | Confirm and pay {total}
 sm.charter.done | پول «{name}» راه افتاد. | {name} is now the city's money.
 sm.charter.exists | پول «{name}» از قبل در شهر هست. | {name} already exists in this city.
 sm.charter.rate | نرخ امروز | Rate today
+sm.desk.title | باجهٔ تبدیل | Exchange desk
+sm.desk.lead | اینجا ساپ را به «{name}» و «{name}» را به ساپ تبدیل می‌کنی. | Swap SUP for {name} and back here.
+sm.desk.rate_live | نرخ امروز: هر ۱ ساپ = {rate} {name}؛ شناور است. | Today: 1 SUP = {rate} {name}; it floats.
+sm.desk.buy | خرید {name} با ساپ | Buy {name} with SUP
+sm.desk.sell | فروش {name} | Sell {name}
+sm.desk.you_hold_sup | ساپ تو: {n} | Your SUP: {n}
+sm.desk.you_hold_units | موجودی تو: {n} | You hold: {n}
+sm.desk.pick | چه مقدار؟ | How much?
+sm.desk.all | همه | All
+sm.desk.empty | باجه فعلاً واحدی برای فروش ندارد؛ خزانهٔ شهر پول کافی در دست ندارد. | The desk has no units to sell; the treasury holds none.
+sm.desk.empty_hint | شهردار باید با سپرده، پول بیشتری راه بیندازد. تا آن موقع دستمزدها به ساپ می‌ماند. | The head must issue more against a deposit. Until then wages stay in SUP.
+sm.desk.nothing_to_sell | چیزی برای فروش نداری یا باجه ساپ ندارد. | You have nothing to sell, or the desk has no SUP.
+sm.desk.no_funds | موجودی کافی نداری. | Not enough balance.
+sm.desk.desk_has | خزانه در باجه دارد: {u} و {s}. | The desk holds {u} and {s}.
+sm.desk.you_pay | می‌دهی | You pay
+sm.desk.you_get | می‌گیری | You get
+sm.desk.fee_taken | کارمزد باجه ({p}) | Desk fee ({p})
+sm.desk.rate | نرخ | Rate
+sm.desk.rate_line | هر ۱ ساپ = {rate} {name} | 1 SUP = {rate} {name}
+sm.desk.protect | اگر تا لحظهٔ تأیید نرخ بیش از {p} به ضرر تو عوض شود، تبدیل انجام نمی‌شود و پولت سرجایش می‌ماند. | If the rate moves against you by more than {p} before it settles, nothing happens and your money stays.
+sm.desk.confirm | تأیید و تبدیل | Confirm and swap
+sm.desk.done_buy | {get} گرفتی؛ {pay} دادی. | You got {get} for {pay}.
+sm.desk.done_sell | {get} گرفتی؛ {pay} دادی. | You got {get} for {pay}.
+sm.desk.fee_now | کارمزد باجه: {p} | Desk fee: {p}
+sm.desk.fee_set | کارمزد باجه | Desk fee
+sm.desk.fee_less | کمتر | Lower
+sm.desk.fee_more | بیشتر | Higher
+sm.desk.fee_hint | شهردار کارمزد باجه را بین ۰٫۱٪ و ۳٪ تعیین می‌کند. | The head sets the desk fee between 0.1% and 3%.
+sm.desk.pill | تبدیل | Swap
+sm.desk.pill_title | پول من | My money
+sm.desk.pill_bank | حساب بانکی | Bank account
+refusal.desk_empty | باجه واحدی برای فروش ندارد؛ شهردار باید پول بیشتری راه بیندازد. | The desk has no units to sell.
+refusal.desk_no_sup | باجه ساپ کافی برای خرید ندارد. | The desk has not enough SUP.
+refusal.desk_funds | موجودی کافی برای این تبدیل نداری. | You do not have enough for this swap.
+refusal.desk_moved | نرخ در همین فاصله عوض شد؛ دوباره قیمت بگیر. | The rate moved; ask for the price again.
+refusal.village_desk_empty | باجه واحدی برای فروش ندارد؛ شهردار باید پول بیشتری راه بیندازد. | The desk has no units to sell.
+refusal.village_desk_no_sup | باجه ساپ کافی برای خرید ندارد. | The desk has not enough SUP.
+refusal.village_desk_funds | موجودی کافی برای این تبدیل نداری. | You do not have enough for this swap.
+refusal.village_desk_moved | نرخ در همین فاصله عوض شد؛ دوباره قیمت بگیر. | The rate moved; ask for the price again.
+sm.desk.left_sup | ساپ تو الان | Your SUP now

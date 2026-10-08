@@ -71,7 +71,9 @@ export function CurrencyPill({ kind, value, name, onClick, onPlus, pending }: { 
   )
 }
 
-export function HudBar({ hud, name, portrait, onAvatar, onBank, children, innerRef }: {
+export function HudBar({ hud, name, portrait, onAvatar, onBank, onPurse, children, innerRef }: {
+  /** a tap on a purse when the settlement has its own money: opens the «تبدیل» choice (the desk or the bank) */
+  onPurse?: () => void
   hud: HudData; name: string
   portrait: { src: string | null; initials: string; hue: number }
   onAvatar: () => void; onBank: () => void
@@ -85,8 +87,8 @@ export function HudBar({ hud, name, portrait, onAvatar, onBank, children, innerR
       <VitalsBar hud={hud} />
       {children}
       <div className="v6-money">
-        <CurrencyPill kind="cash" value={cashCompact(hud.cash, { thousand: t('v6.unit.thousand'), million: t('v6.unit.million') })} onClick={onBank} pending={hud.pending} />
-        {hud.local && <CurrencyPill kind="local" name={hud.local.name} value={cashCompact(hud.local.value, { thousand: t('v6.unit.thousand'), million: t('v6.unit.million') })} onClick={onBank} />}
+        <CurrencyPill kind="cash" value={cashCompact(hud.cash, { thousand: t('v6.unit.thousand'), million: t('v6.unit.million') })} onClick={onPurse ?? onBank} pending={hud.pending} />
+        {hud.local && <CurrencyPill kind="local" name={hud.local.name} value={cashCompact(hud.local.value, { thousand: t('v6.unit.thousand'), million: t('v6.unit.million') })} onClick={onPurse ?? onBank} />}
         {hud.gem !== null && <CurrencyPill kind="gem" value={faNum(hud.gem)} onPlus={onBank} />}
       </div>
     </header>

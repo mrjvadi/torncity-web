@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import Popup, { ActionButton, ActionRow } from './Popup'
+import { getDisplayMoney } from '../lib/money'
 import { takeResume, saveResume } from '../i18n/resume'
 import { Screen } from '../kit'
 import GenericScreen from './GenericScreen'
@@ -399,6 +401,10 @@ export default function Shell() {
   const showWorldChrome = ownVillageHome
   const kind = worldShown ? 'world' : 'screen'
   const onBank = () => void onAction({ label: '', command: 'bank.show', row: 0, kind: 'navigation' })
+  // a settlement with its own money: a tap on a purse offers the exchange desk or the bank
+  const [purseOpen, setPurseOpen] = useState(false)
+  const chartered = !!getDisplayMoney() && !!bootstrap?.settlement
+  const toDesk = () => { setPurseOpen(false); void onAction({ label: '', command: 'settlement.currency.desk', row: 0, kind: 'navigation' }) }
 
   return (
     <NavCtx.Provider value={{ back: atRoot ? null : goBack, hideBack: nativeBack || (desktop && hist.length < 2) }}>
@@ -412,10 +418,19 @@ export default function Shell() {
 
           <HudBar
             hud={hud} name={profile?.name ?? ''} portrait={portrait}
-            onAvatar={() => selectTab('profile')} onBank={onBank} innerRef={(e) => { els.current.hud = e }}
+            onAvatar={() => selectTab('profile')} onBank={onBank} onPurse={chartered ? () => setPurseOpen(true) : undefined} innerRef={(e) => { els.current.hud = e }}
           >
             {desktop && showWorldChrome && <EventsColumn events={events} desktop onOpen={openEvent} />}
           </HudBar>
+
+          {purseOpen && (
+            <Popup open onClose={() => setPurseOpen(false)} tone="gold" title={t('sm.desk.pill_title')}>
+              <ActionRow>
+                <ActionButton tone="gold" onClick={toDesk}>{t('sm.desk.pill')}</ActionButton>
+                <ActionButton tone="steel" onClick={() => { setPurseOpen(false); onBank() }}>{t('sm.desk.pill_bank')}</ActionButton>
+              </ActionRow>
+            </Popup>
+          )}
 
           {showWorldChrome && !desktop && (
             <>
