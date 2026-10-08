@@ -105,7 +105,7 @@ function init(): void {
     put('timed_action', 'ta-study', { kind: 'education', ref_type: 'course', ref_id: 'accounting', state: 'running', started_at: iso(now - 600000), finish_at: iso(now + 4325000) })
   }
   put('location', 'self', { city: 'calderis', place: 'old_town', settlement: '', travel: null, walk: null })
-  put('notice', 'n-1', { kind: 'bank.payment_received', category: 'finance', screen: 'payment_notice', view: { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 12500 }, created_at: iso(now - 300000), read: false, instant: false } as Notice)
+  put('notice', 'n-1', { kind: 'bank.payment_received', category: 'finance', screen: 'payment_notice', view: { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 12500, currency: '' }, created_at: iso(now - 300000), read: false, instant: false } as Notice)
   put('inbox', 'self', { unread: 1, latest: ['n-1'] } as Inbox)
   const s = mockVillageSummary()
   put('residence', 'self', { settlement: s.id, code: s.code, name: s.name, tier: s.tier, is_head: s.viewer === 'head', resident: true })
@@ -254,7 +254,7 @@ export function mockTick(kind?: Tick): void {
       add(patch<Wallet>('wallet', 'SUP', (w) => ({ ...w, bank: w.bank + 350 })))
       const id = `n-${pts + 1}`
       add(put('notice', id, { kind: 'bank.payment_received', category: 'finance', screen: 'payment_notice',
-        view: { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 350 }, created_at: iso(now), read: true, instant: true } as Notice))
+        view: { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 350, currency: '' }, created_at: iso(now), read: true, instant: true } as Notice))
       add(patch<Inbox>('inbox', 'self', (b) => ({ ...b, latest: [id, ...b.latest].slice(0, 50) })))
       break
     }

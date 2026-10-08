@@ -22,7 +22,8 @@ function item<K extends Key>(category: string, kind: string, screen: K, view: Sc
 }
 
 export const MOCK_NOTICES: MockNotice[] = [
-  item('finance', 'bank.payment_received', 'payment_notice', { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 12500 }, 300),
+  item('finance', 'bank.payment_received', 'payment_notice', { payer_name: 'کاوه', payer_code: 'B3C4D5F', method: 'card', amount: 12500, currency: '' }, 300),
+  item('finance', 'bank.payment_received', 'payment_notice', { payer_name: 'مینا', payer_code: 'M1N4B2C', method: 'local', amount: 800, currency: 'مارک پولو' }, 330),
   item('achievements', 'achievement.awarded', 'achievement_notice', { achievement: n('first_job'), cash: 500, withheld: 0 }, 900),
   item('government', 'governance.appointed', 'office_notice', { office: 'deputy_mayor', place: city, by: { name: 'مینا', code: 'M1' }, by_office: 'mayor', dismissed: false }, 1500),
   item('market', 'auction.outbid', 'auction_notice', { kind: 'outbid', no: 14, item: n('bread'), amount: 900, fee: 0 }, 2100),

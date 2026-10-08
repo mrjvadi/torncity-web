@@ -5403,9 +5403,23 @@ sm.desk.pill_bank | حساب بانکی | Bank account
 refusal.desk_empty | باجه واحدی برای فروش ندارد؛ شهردار باید پول بیشتری راه بیندازد. | The desk has no units to sell.
 refusal.desk_no_sup | باجه ساپ کافی برای خرید ندارد. | The desk has not enough SUP.
 refusal.desk_funds | موجودی کافی برای این تبدیل نداری. | You do not have enough for this swap.
-refusal.desk_moved | نرخ در همین فاصله عوض شد؛ دوباره قیمت بگیر. | The rate moved; ask for the price again.
+refusal.desk_moved | قیمت عوض شد؛ دوباره ببین. | The price moved; look again.
 refusal.village_desk_empty | باجه واحدی برای فروش ندارد؛ شهردار باید پول بیشتری راه بیندازد. | The desk has no units to sell.
 refusal.village_desk_no_sup | باجه ساپ کافی برای خرید ندارد. | The desk has not enough SUP.
 refusal.village_desk_funds | موجودی کافی برای این تبدیل نداری. | You do not have enough for this swap.
-refusal.village_desk_moved | نرخ در همین فاصله عوض شد؛ دوباره قیمت بگیر. | The rate moved; ask for the price again.
+refusal.village_desk_moved | قیمت عوض شد؛ دوباره ببین. | The price moved; look again.
 sm.desk.left_sup | ساپ تو الان | Your SUP now
+offer.line | {have} داری؛ {gap} کم است. با {sup} (کارمزد {fee}) از باجه تبدیل و پرداخت کن. | You hold {have}; {gap} short. Convert at the desk for {sup} (fee {fee}) and pay.
+offer.convert | تبدیل و پرداخت | Convert and pay
+offer.local | از موجودی «{name}» پرداخت می‌شود: {n} | Paid from your {name}: {n}
+refusal.short_local | «{name}» کافی نداری؛ {needed} لازم است و {available} داری. | You do not hold enough {name}.
+eco.pay.by_local | با «{name}» | With {name}
+eco.pay.local_note | همشهری‌ات را بدون کارمزد و بدون نیاز به هم‌مکانی پرداخت می‌کنی؛ چیزی خودکار تبدیل نمی‌شود. | A neighbour is paid with no fee and no need to stand together; nothing is converted for you.
+eco.pay.method_local | پرداخت با «{name}»؛ بدون کارمزد. | Paid in {name}; no fee.
+eco.pay.after_local | بعد از پرداخت از این پول می‌ماند: {n} | You will have {n} left.
+eco.pay.sent_local | {amount} برای {player} فرستاده شد. | {amount} was sent to {player}.
+eco.notice.pay.short_local | از «{name}» کافی نداری؛ {needed} لازم است و {available} داری. | You do not hold enough {name}: {needed} needed, {available} held.
+pn.payment.local | {player} {amount} برایت فرستاد؛ به موجودی پولِ شهرت اضافه شد. | {player} sent you {amount}; it went into your city money.
+eco.act.pay.local | {n} | {n}
+eco.act.pay.local_all | همه ({n}) | All ({n})
+eco.act.pay.local_custom | مبلغ دلخواه | Another amount

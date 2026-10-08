@@ -33,6 +33,8 @@ export interface Action {
   subject?: string
   command?: string
   args?: Record<string, string>
+  /** named arguments the server sends beside the positional ones (the convert action of an offer) */
+  params?: Record<string, string>
   input?: ActionInput
   url?: string
   /** Keyboard row of the legacy contract; absent for a migrated screen. */
@@ -57,7 +59,18 @@ export interface ApiErrorBody {
   args?: Record<string, unknown>
 }
 
+/** (client-api: «Paying in a settlement's own money») the village desk offered inside a confirm. Units are of the money; sup and convert_* are SUP. */
+export interface LocalOffer {
+  settlement: string; code: string; name: string
+  sup: number; units: number; holds: number
+  local: boolean; can_convert: boolean
+  convert_sup: number; convert_fee: number; convert_units: number; fee_bps: number
+  convert?: Action
+}
+
 export interface CommandResponse {
+  /** an obligation to a settlement with its own money: paid in it, or the desk offered inline */
+  offer?: LocalOffer | null
   ok: boolean
   request_id?: string
   screen: string

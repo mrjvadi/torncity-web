@@ -5,6 +5,8 @@
 // each answer a bill first and only pay when sent `confirm`), so nothing is
 // spent by opening a sheet. All render at the document body (Popup).
 
+import { OfferBox } from './Offer'
+import type { LocalOffer } from '../../api/types'
 import { buildText, workText } from '../../lib/duration'
 import { useEffect, useState } from 'react'
 import Popup, { ActionButton, ActionRow, CostSummary, Hero, RequirementList, Medallion, Note, Section, type RequirementLine } from '../../ui/Popup'
@@ -312,6 +314,7 @@ export function HouseSheet({ lot, cat, onClose, store, onNoRoad }: {
   const toast = useToast()
   const [menu, setMenu] = useState<PrivateMenuView | null>(null)
   const [bill, setBill] = useState<PrivateConfirmView | null>(null)
+  const [offer, setOffer] = useState<LocalOffer | null>(null)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -332,15 +335,16 @@ export function HouseSheet({ lot, cat, onClose, store, onNoRoad }: {
     setBusy(true)
     const r = await cmd('settlement.private.place', { code: l.building.code, x: lot.x, y: lot.y })
     setBusy(false)
-    if (r.ok && r.res?.screen === 'settlement_private_confirm' && r.res.view) setBill(r.res.view as unknown as PrivateConfirmView)
+    if (r.ok && r.res?.screen === 'settlement_private_confirm' && r.res.view) { setBill(r.res.view as unknown as PrivateConfirmView); setOffer(r.res.offer ?? null) }
     // no road reaches the lot: the answer is the lot's own fixes (docs/adr/0043), never a dead end
     if (r.ok && r.res?.screen === 'settlement_lot_access' && r.res.view) onNoRoad?.(r.res.view as unknown as LotAccessView)
   }
 
-  async function build() {
+  async function build(convert?: LocalOffer) {
     if (!lot || !bill) return
     setBusy(true)
-    const r = await cmd('settlement.private.place', { code: bill.building.code, x: lot.x, y: lot.y, confirm: 'confirm' }, { write: true })
+    const conv: Record<string, string> = convert ? { convert: '1', max_sup: String(convert.convert_sup) } : {}
+    const r = await cmd('settlement.private.place', { code: bill.building.code, x: lot.x, y: lot.y, confirm: 'confirm', ...conv }, { write: true })
     setBusy(false)
     if (r.ok) {
       toast.push(t('citizen.build.started'), { kind: 'success' })
@@ -359,6 +363,7 @@ export function HouseSheet({ lot, cat, onClose, store, onNoRoad }: {
         </ActionRow>
       )}
     >
+      {lot && bill && <OfferBox offer={offer} busy={busy} onConvert={() => offer && void build(offer)} />}
       {lot && !bill && (
         <>
           <Hero><Medallion icon="house" palette="gold" ring="#d99a1f" chip={t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 })} /></Hero>

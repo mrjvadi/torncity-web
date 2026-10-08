@@ -161,7 +161,13 @@ const PayHelp = flow<PayHelpView>(({ ctx }) => (
 ))
 
 const PayScreen = flow<PayView>(({ view: v, ctx }) => {
-  const notice = noticeLine('pay', v.notice, v.notice_args, v.payee_name)
+  // a payer short of units comes back here: the amounts are units of the money, never SUP
+  const na = (v.notice_args ?? {}) as Record<string, unknown>
+  const notice = v.notice === 'short_local'
+    ? t('eco.notice.pay.short_local', { name: String(na.name ?? v.local_name), needed: formatNumber(Number(na.needed ?? 0)), available: formatNumber(Number(na.available ?? 0)) })
+    : noticeLine('pay', v.notice, v.notice_args, v.payee_name)
+  const localActs = byId(ctx, 'pay.local', 'pay.local_all')
+  const localOwn = find(ctx, 'pay.local_custom')
   const who = v.payee_name || t('eco.someone')
   const cashActs = byId(ctx, 'pay.cash', 'pay.cash_all')
   const cardActs = byId(ctx, 'pay.card', 'pay.card_all')
@@ -169,7 +175,7 @@ const PayScreen = flow<PayView>(({ view: v, ctx }) => {
   const cardOwn = find(ctx, 'pay.card_custom')
   const city = v.payer_city ? ctx.names.name(['city'], v.payer_city_code, v.payer_city) : ''
   const where = v.together ? t('eco.pay.together', { city: ctx.names.name(['city'], v.city_code, v.city) }) : t('eco.pay.apart')
-  const cannot = !v.can_card && !(v.together && v.can_cash)
+  const cannot = !v.can_card && !v.can_local && !(v.together && v.can_cash)
   return (
     <Page title={t('eco.pay.title', { player: who })} tone="gold">
       {notice && <Notice alert>{notice}</Notice>}
@@ -179,6 +185,7 @@ const PayScreen = flow<PayView>(({ view: v, ctx }) => {
           { label: t('eco.pay.cash'), value: money(v.cash) },
           { label: t('eco.pay.bank'), value: money(v.bank) },
         ]} />
+        {v.can_local && <Facts rows={[{ label: v.local_name, value: formatNumber(v.local) }]} />}
         <Hint>{where}</Hint>
         {city && <Hint>{v.card_fee_bps > 0 ? t('eco.pay.card_fee', { city, p: pct(v.card_fee_bps / 10000) }) : t('eco.pay.card_free', { city })}</Hint>}
       </Panel>
@@ -187,6 +194,14 @@ const PayScreen = flow<PayView>(({ view: v, ctx }) => {
           <Lead>{t('eco.pay.by_cash')}</Lead>
           <Btns ctx={ctx} list={cashActs} row tone="green" />
           {cashOwn && <Btns ctx={ctx} list={[cashOwn]} tone="steel" />}
+        </Panel>
+      )}
+      {v.can_local && (
+        <Panel>
+          <Lead>{t('eco.pay.by_local', { name: v.local_name })}</Lead>
+          <Hint>{t('eco.pay.local_note')}</Hint>
+          <Btns ctx={ctx} list={localActs} row tone="green" />
+          {localOwn && <Btns ctx={ctx} list={[localOwn]} tone="steel" />}
         </Panel>
       )}
       {v.can_card && (
@@ -205,6 +220,8 @@ const PayScreen = flow<PayView>(({ view: v, ctx }) => {
 const PayConfirm = flow<PayConfirmView>(({ view: v, ctx }) => {
   const who = v.payee_name || t('eco.someone')
   const confirm = byId(ctx, 'pay.confirm')[0]
+  // a local payment is in units of the money (named by `currency`), with no fee; the others are SUP
+  const amt = (n: number) => (v.method === 'local' ? `${formatNumber(n)} ${v.currency}` : money(n))
   const cancel = byId(ctx, 'pay.cancel')[0]
   return (
     <ConfirmPopup title={t('eco.pay.confirm_title', { player: who })} ctx={ctx} tone="gold"
@@ -214,22 +231,24 @@ const PayConfirm = flow<PayConfirmView>(({ view: v, ctx }) => {
           {confirm && <ActionButton tone="green" disabled={ctx.busy} onClick={() => ctx.go(confirm)}>{ctx.label(confirm)}</ActionButton>}
         </ActionRow>
       )}>
-      <Note>{t(v.method === 'cash' ? 'eco.pay.method_cash' : 'eco.pay.method_card')}</Note>
+      <Note>{t(v.method === 'local' ? 'eco.pay.method_local' : v.method === 'cash' ? 'eco.pay.method_cash' : 'eco.pay.method_card', { name: v.currency })}</Note>
       <CostSummary
-        lines={[{ label: t('eco.pay.amount'), amount: money(v.amount) }, ...(v.fee > 0 ? [{ label: t('eco.pay.fee'), amount: money(v.fee) }] : [])]}
-        total={{ amount: money(v.total) }} />
-      <Hint>{t(v.method === 'cash' ? 'eco.pay.after_cash' : 'eco.pay.after_bank', { n: money(v.after) })}</Hint>
+        lines={[{ label: t('eco.pay.amount'), amount: amt(v.amount) }, ...(v.fee > 0 ? [{ label: t('eco.pay.fee'), amount: amt(v.fee) }] : [])]}
+        total={{ amount: amt(v.total) }} />
+      <Hint>{v.method === 'local' ? t('eco.pay.after_local', { n: amt(v.after) }) : t(v.method === 'cash' ? 'eco.pay.after_cash' : 'eco.pay.after_bank', { n: money(v.after) })}</Hint>
     </ConfirmPopup>
   )
 })
 
 const PaySent = flow<PaySentView>(({ view: v, ctx }) => {
   const who = v.payee_name || t('eco.someone')
+  const amt = (n: number) => (v.method === 'local' ? `${formatNumber(n)} ${v.currency}` : money(n))
   return (
     <Page title={t('eco.pay.sent_title')} tone="gold">
       <Panel tone="gold">
         <Lead tone="good">
           {v.held ? t('eco.pay.held', { player: who, amount: money(v.amount) })
+            : v.method === 'local' ? t('eco.pay.sent_local', { player: who, amount: amt(v.amount) })
             : v.method === 'cash' ? t('eco.pay.sent_cash', { player: who, amount: money(v.amount) })
               : t('eco.pay.sent_card', { player: who, amount: money(v.amount) })}
         </Lead>

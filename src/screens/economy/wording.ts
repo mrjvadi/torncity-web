@@ -2,6 +2,7 @@
 // sends ids, codes and numbers, never a sentence. An action is worded by its `id`, a notice or a
 // refusal by its code, a kind of service by its code; content names come from the catalogue.
 
+import { getDisplayMoney } from '../../lib/money'
 import type { Action } from '../../api/types'
 import type { Unavailable } from '../../api/views.gen'
 import { formatNumber } from '../../lib/persian'
@@ -24,7 +25,7 @@ export function num(a: Action, name: string): number | undefined {
 const IDS = new Set([
   'bank.deposit', 'bank.deposit_all', 'bank.deposit_custom', 'bank.withdraw', 'bank.withdraw_all', 'bank.withdraw_custom',
   'bank.pay', 'bank.finance', 'bank.show',
-  'pay.cash', 'pay.cash_all', 'pay.cash_custom', 'pay.card', 'pay.card_all', 'pay.card_custom', 'pay.confirm', 'pay.cancel', 'pay.again',
+  'pay.cash', 'pay.cash_all', 'pay.cash_custom', 'pay.card', 'pay.card_all', 'pay.card_custom', 'pay.local', 'pay.local_all', 'pay.local_custom', 'pay.confirm', 'pay.cancel', 'pay.again',
   'payment.cash', 'payment.card', 'payment.back', 'social.search', 'budget.change', 'budget.bills',
   'gold.buy', 'gold.sell', 'gold.sell_yes', 'finance.portfolio', 'finance.exchange', 'finance.gold', 'finance.savings', 'finance.insurance',
   'finance.product', 'finance.loan', 'finance.pledge', 'finance.option', 'finance.take', 'finance.payoff', 'finance.payoff_yes',
@@ -47,7 +48,8 @@ function params(a: Action, names?: ContentNames): Record<string, string | number
   const subject = a.subject ?? ''
   const name = subject && names ? names.name(['loan_product', 'insurance_product', 'item', 'shop', 'city', 'place', 'component'], subject) : subject
   return {
-    n: amount !== undefined ? money(amount) : grams !== undefined ? formatNumber(grams) : qty !== undefined ? formatNumber(qty) : '',
+    // a local payment's amount is in units of the money, never SUP
+    n: amount !== undefined && String(a.id ?? '').startsWith('pay.local') ? `${formatNumber(amount)} ${getDisplayMoney()?.name ?? ''}` : amount !== undefined ? money(amount) : grams !== undefined ? formatNumber(grams) : qty !== undefined ? formatNumber(qty) : '',
     qty: qty !== undefined ? formatNumber(qty) : '',
     price: price !== undefined ? money(price) : '',
     term: formatNumber(num(a, 'term') ?? 0),
@@ -65,7 +67,7 @@ registerLabeler((a, names) => {
 /** Which of an economy screen's actions change the world (never twice: the host asks for each once). */
 const WRITE_IDS = new Set([
   'savings.deposit', 'savings.withdraw', 'savings.deposit_custom', 'savings.withdraw_custom', 'stock.cancel', 'market.cancel', 'shop.sell_to',
-  'bank.deposit_custom', 'bank.withdraw_custom', 'pay.cash_custom', 'pay.card_custom',
+  'bank.deposit_custom', 'bank.withdraw_custom', 'pay.cash_custom', 'pay.card_custom', 'pay.local_custom',
 ])
 
 export function isEcoWrite(a: Action): boolean {
