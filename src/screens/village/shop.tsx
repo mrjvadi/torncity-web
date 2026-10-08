@@ -18,6 +18,7 @@ import { hasKey, t, type Key } from '../../i18n'
 import { useContentNames, useVillageCommand, type ContentNames } from '../../village/useVillage'
 import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack, registerWrite, type FlowCtx } from './flow'
 import { useVillageView } from './common'
+import { FlowOffer } from './Offer'
 import { Desk, MoneyFee } from './Desk'
 import { getDisplayMoney } from '../../lib/money'
 import { useSession } from '../../state/SessionContext'
@@ -188,6 +189,7 @@ const Checkout = flow<VillageShopCheckoutView>(({ view: v, ctx }) => {
           lines={[{ label: t('sm.shop.buy'), amount: money(v.total) }, ...(v.tax > 0 ? [{ label: t('sm.shop.tax', { p: pct(v.tax_bps) }), amount: money(v.tax) }] : [])]}
           total={{ label: t('sm.shop.total'), amount: money(v.total + v.tax) }} />
         <Hint>{t('sm.shop.space', { need: formatNumber(v.space), free: formatNumber(v.free_space) })}</Hint>
+        <FlowOffer ctx={ctx} />
       </Popup>
     </>
   )

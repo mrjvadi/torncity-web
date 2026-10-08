@@ -97,7 +97,7 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
       if (args.amount && args.method) {
         return mockOk('pay_confirm', {
           payee_name: 'کاوه', payee_code: 'K7Q2M9A', method: a('method'), amount: Number(args.amount), fee: a('method') === 'card' ? 50 : 0,
-          total: Number(args.amount) + (a('method') === 'card' ? 50 : 0), after: 7000, nonce: 'pn1', origin: '',
+          total: Number(args.amount) + (a('method') === 'card' ? 50 : 0), after: a('method') === 'local' ? 320 - Number(args.amount) : 7000, nonce: 'pn1', origin: '', currency: a('method') === 'local' ? 'مارک پولو' : '',
         }, [
           confirmA('pay.confirm', 'bank.pay.send', { to: 'K7Q2M9A', amount: a('amount'), method: a('method'), nonce: 'pn1' }),
           goA('pay.cancel', 'bank.pay', { to: 'K7Q2M9A' }), back('bank.show'),
@@ -106,16 +106,18 @@ export function mockEconomyCommand(command: string, args: Record<string, unknown
       return mockOk('pay', {
         payee_name: 'کاوه', payee_code: 'K7Q2M9A', together: true, city_code: 'calderis', city: city.name, payer_city_code: 'calderis', payer_city: city.name,
         card_fee_bps: 100, cash: bank.cash, bank: bank.bank, cash_options: quick('p1', 1000, 5000), card_options: quick('p2', 1000, 5000, 20000),
-        can_cash: true, can_card: true, origin: '', notice: args.refused ? 'short_cash' : '', notice_args: args.refused ? { available: 850, needed: 5000 } : null,
+        can_cash: true, can_card: true, origin: '', notice: args.refused === 'local' ? 'short_local' : args.refused ? 'short_cash' : '', notice_args: args.refused === 'local' ? { available: 320, needed: 1000, name: 'مارک پولو' } : args.refused ? { available: 850, needed: 5000 } : null,
+        local_name: 'مارک پولو', local: 320, local_options: quick('p3', 100, 250), can_local: true,
       }, [
         goA('pay.cash', 'bank.pay', { to: 'K7Q2M9A', amount: '1000', method: 'cash' }), goA('pay.cash', 'bank.pay', { to: 'K7Q2M9A', amount: '5000', method: 'cash' }),
         { ...A('pay.cash_custom', 'bank.pay', { to: 'K7Q2M9A', method: 'cash' }, { kind: 'secondary' }), input: { field: 'amount' } },
+        goA('pay.local', 'bank.pay', { to: 'K7Q2M9A', amount: '100', method: 'local' }), goA('pay.local', 'bank.pay', { to: 'K7Q2M9A', amount: '250', method: 'local' }), goA('pay.local_all', 'bank.pay', { to: 'K7Q2M9A', amount: '320', method: 'local' }),
         goA('pay.card', 'bank.pay', { to: 'K7Q2M9A', amount: '1000', method: 'card' }), goA('pay.card', 'bank.pay', { to: 'K7Q2M9A', amount: '20000', method: 'card' }),
         { ...A('pay.card_custom', 'bank.pay', { to: 'K7Q2M9A', method: 'card' }, { kind: 'secondary' }), input: { field: 'amount' } },
         back('bank.show'), refreshA('bank.pay', { to: 'K7Q2M9A' }),
       ])
     case 'bank.pay.send':
-      return mockOk('pay_sent', { payee_name: 'کاوه', payee_code: 'K7Q2M9A', method: a('method') || 'card', amount: Number(args.amount ?? 5000), fee: 50, held: false }, [
+      return mockOk('pay_sent', { payee_name: 'کاوه', payee_code: 'K7Q2M9A', method: a('method') || 'card', amount: Number(args.amount ?? 5000), fee: a('method') === 'local' ? 0 : 50, held: false, currency: a('method') === 'local' ? 'مارک پولو' : '' }, [
         goA('bank.show', 'bank.show'), goA('pay.again', 'bank.pay', { to: 'K7Q2M9A' }), back('player.profile.get'),
       ])
     case 'payment.declined':

@@ -74,6 +74,7 @@ export function noticeLine(screen: string, view: unknown, n: Namer): NoticeLine 
   switch (screen) {
     case 'payment_notice': {
       const v = view as V.PaymentView
+      if (v.method === 'local') return line('pn.payment.local', { player: person({ name: v.payer_name }), amount: `${formatNumber(v.amount)} ${v.currency}` }, 'success')
       return line(v.method === 'cash' ? 'pn.payment.cash' : 'pn.payment.card', { player: person({ name: v.payer_name }), amount: money(v.amount) }, 'success')
     }
     case 'achievement_notice': {

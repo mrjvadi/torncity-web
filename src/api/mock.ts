@@ -101,6 +101,8 @@ const MOCK_PROFILE_ACTIONS = [
 /** ?cur=none: SUP only. Default: a chartered Marco Polo (r0 10, reference rate 1.00). */
 export const MOCK_MONEY = (() => { try { return new URLSearchParams(location.search).get('cur') === 'none' ? null : { code: 'MKP', name: 'مارک پولو', symbol: 'MKP', r0: 10, x_ref_ppm: 1_000_000, rate_num: 10_000_000, rate_den: 1_000_000 } } catch { return null } })()
 
+const OFFER_SCREENS = new Set(['village_donate_confirm', 'settlement_lot_buy_confirm', 'settlement_private_confirm', 'village_shop_checkout', 'course_detail', 'sleep_pay'])
+
 function mockCommand(command: string, args?: Record<string, unknown>) {
   if (command === 'player.language.set') mockLang = args?.lang === 'en' ? 'en' : 'fa'
   // the companies, production and recruitment area: neutral answers of every screen of it (src/api/mock_companies.ts)
@@ -207,9 +209,19 @@ export function installMockApi(): void {
       if (OPTIMISTIC_WRITES.has(body.command)) await new Promise((r) => setTimeout(r, 700))
       const res = mockCommand(body.command, body.args)
       // the command's effect on the player's state and its own records (state sync)
+      // ?offer=convert (default) | local | none | moved: the village desk offered inside a confirm (response.offer)
+      const scen = new URLSearchParams(location.search).get('offer') ?? 'convert'
+      if (body.args?.convert && scen === 'moved') return json({ ok: false, request_id: 'mock', screen: 'error', error: { code: 'desk_moved', message: '' }, actions: [] })
       const out = mockSyncCommand(body.command, body.args, await res.json()) as Record<string, unknown>
       // the viewer's display money rides on every neutral answer (?cur=none: a city with no money of its own, SUP only)
       if (out && typeof out === 'object' && out.screen && MOCK_MONEY) out.money = MOCK_MONEY
+      if (MOCK_MONEY && scen !== 'none' && OFFER_SCREENS.has(String(out.screen))) {
+        const acts = (out.actions ?? []) as { id?: string; command?: string; args?: Record<string, string>; kind?: string }[]
+        const a = acts.find((x) => x.id === 'confirm' || x.id?.startsWith('pay.') || x.id === 'shop.pay' || x.id === 'education.enrol')
+        const local = scen === 'local'
+        out.offer = { settlement: 'mock-village', code: 'MKP', name: 'مارک پولو', sup: 100, units: 1000, holds: local ? 1500 : 320, local, can_convert: !local, convert_sup: 1011, convert_fee: 4, convert_units: 680, fee_bps: 30,
+          convert: a ? { id: 'convert', command: a.command, args: { ...(a.args ?? {}), convert: '1', max_sup: '1011' }, params: { ...(a.args ?? {}), convert: '1', max_sup: '1011' }, kind: 'primary' } : undefined }
+      }
       return json(out, res.status)
     }
     if (path === '/api/v1/auth/logout') {

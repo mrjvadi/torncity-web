@@ -196,7 +196,13 @@ export const FlowHost: ScreenComponent = (props: ScreenProps) => {
     try {
       const r = await api.runCommand(a.command, a.args ?? {}, `web-v-${Date.now().toString(36)}-${++keySeq}`)
       // a refusal that has a screen of its own (what is missing, the way on) is shown; any other is a toast
-      if (r.ok === false && !FLOW[r.screen] && !NATIVE[r.screen]) toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args), { kind: 'error' })
+      if (r.ok === false && a.id === 'convert' && String(r.error?.code ?? '').startsWith('desk_')) {
+        // the desk's price moved (or it ran dry) while converting: say so calmly and ask again for a fresh quote and offer
+        toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args), { kind: 'warning' })
+        const again = { ...(a.args ?? {}) }
+        for (const k of ['convert', 'max_sup', 'confirm', 'method', 'nonce']) delete again[k]
+        run(a.command, again)
+      } else if (r.ok === false && !FLOW[r.screen] && !NATIVE[r.screen]) toast.push(refusalText(r.error?.code, r.error?.message, r.error?.args), { kind: 'error' })
       else {
         setRes(r)
         const note = r.notice ? noticeText(r.notice) : ''

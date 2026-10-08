@@ -24,6 +24,7 @@ import {
 } from './flow'
 import { CardGrid } from '../../ui/v6/panel'
 import { rich } from '../../ui/v6/rich'
+import { FlowOffer } from './Offer'
 import WorkSection from './WorkSection'
 
 const Empt = Empty
@@ -152,6 +153,7 @@ const DonateConfirm = flow<DonateView>(({ view: v, ctx }) => (
       <Lead>{t('donate.ask', { amount: money(v.amount) })}</Lead>
       <Hint>{t('donate.ask_hint')}</Hint>
       <Facts rows={[{ label: t('vx.donate.cash_after'), value: money(v.cash - v.amount) }, { label: t('vx.donate.treasury_after'), value: money(v.treasury + v.amount), gold: true }]} />
+      <FlowOffer ctx={ctx} />
     </Panel>
     <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')} yes={t('donate.yes')} />
     <Cancel ctx={ctx} />
@@ -333,6 +335,7 @@ const LotBuyConfirm = flow<LotBuyView>(({ view: v, ctx }) => {
         {none
           ? <Hint tone="bad">{t('citizen.access.none_note')}</Hint>
           : <Hint>{v.access.cost > 0 ? (v.road === 'carve' ? t('citizen.access.carve_chosen', { n: v.access.carved?.length ?? 0 }) : t('citizen.access.road_note')) : t('citizen.buy.note')}</Hint>}
+        <FlowOffer ctx={ctx} />
       </Panel>
       {none && v.carve && carve && (
         <Panel tone="gold">
@@ -486,6 +489,7 @@ const PrivateConfirm = flow<PrivateConfirmView>(({ view: v, ctx }) => (
       ]} />
       {(v.materials ?? []).map((m) => <Hint key={m.component.code}>{matLine(m, ctx)}</Hint>)}
       {v.cash < v.total && <Hint tone="bad">{t('citizen.build.short')}</Hint>}
+      <FlowOffer ctx={ctx} />
     </Panel>
     <Btns ctx={ctx} list={ctx.acts.filter((a) => a.id === 'confirm')} yes={t('citizen.build.start', { p: money(v.total) })} />
     <Cancel ctx={ctx} />

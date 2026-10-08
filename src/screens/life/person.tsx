@@ -2,6 +2,7 @@
 // life, the choice of an avatar, a night to pay for, a refused request of life, the linked devices and the
 // code that links one. Words are the web's own; names of content come from the catalogue.
 
+import { FlowOffer } from '../village/Offer'
 import type { AvatarsView, DeviceLinkView, DevicesView, HistoryView, LifeRefusalView, SleepPayView } from '../../api/views.gen'
 import { CardGrid } from '../../ui/v6/panel'
 import { Empty, ListRow } from '../native/kit/Parts'
@@ -91,6 +92,7 @@ export const SleepPay = flow<SleepPayView>(({ view: v, ctx }) => {
           <StatCard icon="moon" palette="violet" label={t('lf.sleep.rest')} value={formatNumber(v.rest)} />
           {v.relief > 0 && <StatCard icon="sun" palette="emerald" label={t('lf.sleep.relief')} value={formatNumber(v.relief)} />}
         </StatGrid>
+        <FlowOffer ctx={ctx} />
         {afford
           ? <Note>{t('lf.pay.balances', { cash: money(v.payment.cash), bank: money(v.payment.bank) })}</Note>
           : <Note tone="bad">{t('lf.pay.cannot', { cash: money(v.payment.cash), bank: money(v.payment.bank) })}</Note>}

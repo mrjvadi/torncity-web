@@ -1,6 +1,7 @@
 // Screens of the activities area: work, study and skills. Neutral views only (docs/adr/0039-presentation-split.md):
 // the server sends codes, numbers and times; the words are the web's own and every name comes from the catalogue.
 
+import { FlowOffer } from '../village/Offer'
 import type {
   CourseCompletedView, CourseDetailView, EnrolledView, JobDetailView, JobHiredView, JobOpeningsView, JobPromotedView, JobQuitView, JobRef,
   Requirement, ShiftStartedView, ShiftWorkedView, SkillGain, SkillsView,
@@ -327,6 +328,7 @@ export const CourseDetail = flow<CourseDetailView>(({ view: v, ctx }) => {
           {v.limited && <StatCard icon="x_map" palette="steel" label={t('ac.work.course.seats')} value={formatNumber(v.seats_left)} />}
           <StatCard icon="study" palette="emerald" label={t('ac.work.course.certificate')} value={v.certifies ? t('ac.work.course.yes') : t('ac.work.course.no')} />
         </StatGrid>
+        <FlowOffer ctx={ctx} />
         {v.city && !elsewhere && <Note>{t('ac.work.course.where', { city: cityName(ctx, v.city_code, v.city) })}</Note>}
         {(v.skills ?? []).length > 0 && (
           <>
