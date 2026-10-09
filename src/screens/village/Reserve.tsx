@@ -15,7 +15,7 @@ import { Btns, Facts, Hint, Lead, Page, Panel, flow, isBack } from './flow'
 import { parseNum } from './Fx'
 
 const sup = (n: number) => `${formatNumber(n)} ${t('unit.money')}`
-const pct = (bps: number) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(bps / 100)}٪`
+const pct = (bps: number) => `\u2066${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(bps / 100)}٪\u2069`
 const idx = (ppm: number) => new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(ppm / 10000)
 
 function Trend({ list }: { list: MoneyMacro[] }) {
@@ -76,7 +76,7 @@ export const ReserveScreen = flow<ReserveView>(({ view: v0, ctx }) => {
           <StatCard icon="chart" palette="emerald" label={t('rs.excess')} value={sup(v.excess)} />
           <StatCard icon="people" palette="sapphire" label={t('rs.supply')} value={units(v.supply)} />
         </StatGrid>
-        {v.coverage_known ? <ProgressRow frac={Math.min(1, v.coverage_bps / 20000)} label={t('rs.coverage', { p: pct(v.coverage_bps) })} color="#56d447" /> : <Hint>{t('rs.coverage_none')}</Hint>}
+        {v.coverage_known ? <ProgressRow frac={Math.min(1, v.coverage_bps / 20000)} label={<span dir="auto">{t('rs.coverage', { p: pct(v.coverage_bps) })}</span>} color="#56d447" /> : <Hint>{t('rs.coverage_none')}</Hint>}
         <Hint>{t('rs.coverage_note')}</Hint>
         <Facts rows={[
           { label: t('rs.stab'), value: units(v.stabilisation) },
