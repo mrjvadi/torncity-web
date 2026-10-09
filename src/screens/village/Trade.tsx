@@ -7,6 +7,7 @@ import type { TradeDeskView, TradeItemLine } from '../../api/views.gen'
 import Popup, { ActionButton, ActionRow, Note, Section } from '../../ui/Popup'
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { formatNumber, money, splitMoney } from '../native/kit/format'
+import { itemIconName } from '../../ui/v6/ItemGrid'
 import { rich } from '../../ui/v6/rich'
 import { atText } from '../../lib/duration'
 import { hasKey, t, type Key } from '../../i18n'
@@ -20,7 +21,7 @@ function ItemCard({ it, v, name, busy, onAct }: { it: TradeItemLine; v: TradeDes
   const [keep, setKeep] = useState(it.on ? it.keep : Math.max(0, Math.min(it.stock, v.keep_presets?.[1] ?? 0)))
   const step = Math.max(1, Math.round(((v.keep_presets ?? [10])[0] || 10) / 2))
   return (
-    <PCard icon="crate" title={name} tone={it.on ? 'good' : 'busy'}
+    <PCard icon={itemIconName(it.item.code)} title={name} tone={it.on ? 'good' : 'busy'}
       sub={t('tr.stock', { n: formatNumber(it.stock) })}
       badge={it.on ? t('tr.on') : undefined}
       facts={(
@@ -48,9 +49,6 @@ function ItemCard({ it, v, name, busy, onAct }: { it: TradeItemLine; v: TradeDes
       ) : it.on ? <span className="rd-notes">{t('tr.kept', { n: formatNumber(it.keep) })}</span> : undefined} />
   )
 }
-
-/** What the server will add: the next visit and the clerk's seat (`next_at`, `clerk {seat, filled, wage}`); a clean slot that lights up when they arrive. */
-type TradeX = TradeDeskView & { next_at?: string | null; clerk?: { seat: string; filled: boolean; wage: number } | null }
 
 export const TradeDesk = flow<TradeDeskView>(({ view: v0, ctx }) => {
   const cmd = useVillageCommand()
@@ -90,7 +88,7 @@ export const TradeDesk = flow<TradeDeskView>(({ view: v0, ctx }) => {
       <Panel tone="gold">
         <Lead>{t('tr.lead')}</Lead>
         <Facts rows={[
-          { label: t('tr.when'), value: (v as TradeX).next_at ? atText((v as TradeX).next_at) : t('tr.when_v') },
+          { label: t('tr.when'), value: v.next_at ? t('tr.next', { at: atText(v.next_at) }) : t('tr.when_v') },
           { label: t('tr.cap'), value: t('tr.cap_v', { n: formatNumber(v.cap) }) },
           { label: t('tr.prospect'), value: t('tr.prospect_v', { n: formatNumber(v.prospect) }) },
           { label: t('tr.price'), value: t('tr.price_v', { p: pct(v.price_bps) }) },
@@ -98,10 +96,13 @@ export const TradeDesk = flow<TradeDeskView>(({ view: v0, ctx }) => {
         {!v.may_order && <Hint>{t('tr.read_only')}</Hint>}
       </Panel>
 
-      {(v as TradeX).clerk && (
-        <CardGrid><PCard icon="people" tone={(v as TradeX).clerk!.filled ? 'good' : 'off'} off={!(v as TradeX).clerk!.filled} title={t('tr.clerk')} sub={(v as TradeX).clerk!.filled ? t('tr.clerk_in') : t('tr.clerk_empty')}
-          facts={t('tr.clerk_wage', { w: money((v as TradeX).clerk!.wage) })}
-          foot={!(v as TradeX).clerk!.filled ? <button type="button" className="dk-chip all" onClick={() => ctx.run('settlement.labor.board', {})}>{t('tr.fix_board')}</button> : undefined} /></CardGrid>
+      {v.clerk && (
+        <CardGrid>
+          <PCard icon="people" tone={v.clerk.filled ? 'good' : 'off'} off={!v.clerk.filled} title={t('tr.clerk')}
+            sub={v.clerk.seat_building.name ? ctx.bname(v.clerk.seat_building.code, v.clerk.seat_building.name) : undefined}
+            facts={<span>{v.clerk.filled ? (v.clerk.staffed_by === 'npc' ? t('tr.clerk_npc') : t('tr.clerk_in')) : t('tr.clerk_empty')}<br />{t('tr.clerk_wage', { w: money(v.clerk.wage) })}</span>}
+            foot={!v.clerk.filled ? <button type="button" className="dk-chip all" onClick={() => ctx.run('settlement.labor.board', {})}>{t('tr.fix_board')}</button> : undefined} />
+        </CardGrid>
       )}
       {stop && (
         <Panel tone="ruby">

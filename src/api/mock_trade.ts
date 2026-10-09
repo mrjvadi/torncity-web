@@ -20,7 +20,7 @@ function desk(): TradeDeskView {
   const sold = { outcome: 'sold', gross: 117 + 540, wage: 120, at: iso(-20), lines: [{ item: N('timber', 'چوب'), qty: 9, unit: 13 }, { item: N('wheat', 'گندم'), qty: 60, unit: 8 }] }
   const last = m === 'none' ? null : m === 'noclerk' ? { outcome: 'no_clerk', gross: 0, wage: 0, at: iso(-20), lines: null } : m === 'wage' ? { outcome: 'no_wage', gross: 0, wage: 0, at: iso(-20), lines: null } : sold
   return { name: 'آمل', has_post: m !== 'nopost', cap: 80, price_bps: 9000, prospect: [...on].reduce((a, [c, k]) => a + Math.max(0, (items.find((i) => i.item.code === c)?.stock ?? 0) - k), 0), items, last, may_order: head(), keep_presets: [0, 10, 30, 100],
-    ...(new URLSearchParams(location.search).has('clerkfield') ? { next_at: iso(6), clerk: { seat: 'b-post', filled: m !== 'noclerk', wage: 120 } } : {}) } as TradeDeskView
+    next_at: m === 'nopost' ? null : iso(6), clerk: m === 'nopost' ? null : { seat_building: N('barter_post', 'بازارچه'), filled: m !== 'noclerk', wage: 120, staffed_by: m !== 'noclerk' ? 'npc' : '' } } as TradeDeskView
 }
 
 export function mockTradeCommand(command: string, args: Record<string, unknown>) {

@@ -9,7 +9,8 @@ import Icon from '../Icon'
 import { PBar } from './panel'
 
 /** The icon of a good: its own glyph when it has one, else its shelf's or category's, else a box. */
-const ITEM_ICON: Record<string, string> = { bread: 'bread', bandage: 'pill', phone: 'phone', lockpick_set: 'keys' }
+// the village goods of ADR 0050 use the closest icon of the kit: firewood = logs, clay = stone, pots = flask, hide = bag, rag = cloth, paper = scroll, tools = tool
+const ITEM_ICON: Record<string, string> = { bread: 'bread', bandage: 'pill', phone: 'phone', lockpick_set: 'keys', firewood: 'logs', clay: 'stone', pots: 'flask', hide: 'bag', rag: 'cloth', paper: 'scroll', tools: 'tool', timber: 'wood', plank: 'plank', stone: 'stone', cloth: 'cloth', wheat: 'wheat' }
 const GROUP_ICON: Record<string, string> = {
   food: 'bread', medicine: 'pill', gear: 'gears', electronics: 'phone', defence: 'shield',
   mineral: 'ore', metal_ore: 'ore', vehicles: 'x_car', wood: 'x_field', bags: 'm_backpack', clothing: 'box', tools: 'gears',

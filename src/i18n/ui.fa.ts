@@ -5791,6 +5791,17 @@ export const uiFa = {
   'tr.clerk_in': 'پر است',
   'tr.clerk_empty': 'خالی است؛ بدون منشی بازرگان نمی‌خرد',
   'tr.clerk_wage': 'دستمزد هر روز: {w}',
+  'tr.next': 'بازار بعدی: {at} به وقت شهر',
+  'tr.clerk_npc': 'منشی شهر پشت میز است',
+  'work.tool_wear': 'یک ابزار تقریباً هر {n} نوبت فرسوده می‌شود؛ ابزار در انبار: {have}',
+  'work.bare': 'ابزار فرسوده شده و ابزاری در انبار نیست؛ بدون ابزار: {p} تولید. ابزار از کارگاه ابزارسازی یا بازارچه می‌آید.',
+  'work.tool_workshop': 'ساخت کارگاه ابزارسازی',
+  'work.tool_buy': 'خرید ابزار',
+  'mt.standin': 'تا {at} هنوز {stand} جای {item} حساب می‌شود؛ بعد از آن خود {item} لازم است.',
+  'mt.standin_title': 'جایگزین موقت',
+  'rd.standin': 'یا {stand} (در انبار: {n}) تا {at}',
+  'rd.standin_note': 'تا {at} هنوز جایگزین‌ها قبول است؛ بعد از آن خود ماده لازم است.',
+  'rd.upkeep_missing': '{item} کم است؛ از بازار بخر یا بساز.',
 } as const
 
 export type UiKey = keyof typeof uiFa
