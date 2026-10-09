@@ -90,7 +90,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
   const cmd = useVillageCommand()
   const names = useContentNames()
   const [v, setV] = useState<LotManageView>(init)
-  const [ask, setAsk] = useState<{ v: LotManageView; offer: LocalOffer | null; args: Record<string, string> } | null>(null)
+  const [ask, setAsk] = useState<{ v: LotManageView; offer: LocalOffer | null; args: Record<string, string> } | null>(() => (init.stage === 'ask' ? { v: init, offer: (ctx.res as { offer?: LocalOffer | null }).offer ?? null, args: { action: init.action, ...(init.code ? { code: init.code } : {}), ...(init.n ? { n: String(init.n) } : {}) } } : null))
   const [tab, setTab] = useState<Tab>('function')
   const [busy, setBusy] = useState(false)
   const [tplName, setTplName] = useState('')
@@ -179,10 +179,10 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
         {tab === 'function' && (
           <>
             {v.upgrade && (
-              <PCard icon="hammer" title={t('lm.upgrade', { n: formatNumber(v.upgrade.to) })} tone={v.upgrade.can ? 'busy' : 'off'} off={!v.upgrade.can}
+              <CardGrid><PCard icon="hammer" title={t('lm.upgrade', { n: formatNumber(v.upgrade.to) })} tone={v.upgrade.can ? 'busy' : 'off'} off={!v.upgrade.can}
                 sub={`${money(v.upgrade.cost_money)} · ${t('lm.q.shifts')}: ${formatNumber(v.upgrade.shifts)}`}
                 facts={!v.upgrade.can ? t(`lm.reason.${v.upgrade.reason}` as Key) : (v.upgrade.adds ?? []).map((a) => a.name).join('، ')}
-                onClick={manage && v.upgrade.can ? () => void quote({ action: 'level' }) : undefined} />
+                onClick={manage && v.upgrade.can ? () => void quote({ action: 'level' }) : undefined} /></CardGrid>
             )}
             {(v.functions ?? []).length > 0 && <Section>{t('lm.change_use')}</Section>}
             <CardGrid>
@@ -202,7 +202,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             <Section>{t('lm.rooms')}</Section>
             <CardGrid>
               {(v.modules ?? []).map((m) => (
-                <PCard key={m.module.code} icon="box" title={`${m.module.name} × ${formatNumber(m.count)}`} tone="busy"
+                <PCard key={m.module.code} icon="crate" title={`${m.module.name} × ${formatNumber(m.count)}`} tone="busy"
                   sub={m.effect ? (hasKey(`lm.effect.${m.effect}`) ? t(`lm.effect.${m.effect}` as Key, { n: formatNumber(m.housing_capacity || m.personal_storage || m.stall_slots) }) : m.effect) : undefined}
                   facts={t('lm.slots', { a: formatNumber(m.count), b: formatNumber(m.max) })}
                   foot={manage && m.removable && m.count > m.included ? <button type="button" className="dk-chip" onClick={() => void quote({ action: 'remove', code: m.module.code, n: '1' })}>{t('lm.remove')}</button> : undefined} />
@@ -219,10 +219,10 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             </CardGrid>
             {(v.additions ?? []).filter((a) => !a.can).flatMap((a) => a.needs ?? []).slice(0, 3).map((n, i) => <NeedLine key={i} ctx={ctx} n={n} />)}
             {v.storey_up && (
-              <PCard icon="hammer" title={t('lm.storey_up', { n: formatNumber(v.storey_up.to) })} tone={v.storey_up.can ? 'busy' : 'off'} off={!v.storey_up.can}
+              <CardGrid><PCard icon="hammer" title={t('lm.storey_up', { n: formatNumber(v.storey_up.to) })} tone={v.storey_up.can ? 'busy' : 'off'} off={!v.storey_up.can}
                 sub={`${t('lm.q.shifts')}: ${formatNumber(v.storey_up.shifts)}`}
                 facts={v.storey_up.can ? <Items list={v.storey_up.materials} names={names} /> : <span className="dk-why">{hasKey(`lm.reason.${v.storey_up.reason}`) ? t(`lm.reason.${v.storey_up.reason}` as Key) : t('lm.not_here')}</span>}
-                onClick={manage && v.storey_up.can ? () => void quote({ action: 'storey' }) : undefined} />
+                onClick={manage && v.storey_up.can ? () => void quote({ action: 'storey' }) : undefined} /></CardGrid>
             )}
             <ProgressRow frac={1 - v.stability_bps / 10000} label={t('lm.stability', { p: formatNumber(Math.round(v.stability_bps / 100)) })} color={v.stability_bps > 6000 ? '#56d447' : v.stability_bps > 3000 ? '#ffb02e' : '#ff5a47'} />
           </>

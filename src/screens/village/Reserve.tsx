@@ -60,9 +60,9 @@ export const ReserveScreen = flow<ReserveView>(({ view: v0, ctx }) => {
 
   const wind = v.status === 'wind_down', retired = v.status === 'retired'
   const tools: { key: NonNullable<typeof pick>; icon: string; unit: 'sup' | 'units' | 'none'; show: boolean }[] = [
-    { key: 'issue', icon: 'coins', unit: 'sup', show: v.can_issue }, { key: 'burn', icon: 'flame', unit: 'units', show: v.can_issue },
-    { key: 'buy', icon: 'cart', unit: 'units', show: v.can_policy }, { key: 'sell', icon: 'cart', unit: 'units', show: v.can_policy },
-    { key: 'withdraw', icon: 'coins', unit: 'sup', show: v.can_policy }, { key: 'retire', icon: 'x_cross', unit: 'none', show: v.can_issue && v.status === 'chartered' },
+    { key: 'issue', icon: 'coin', unit: 'sup', show: v.can_issue }, { key: 'burn', icon: 'chest', unit: 'units', show: v.can_issue },
+    { key: 'buy', icon: 'plus', unit: 'units', show: v.can_policy }, { key: 'sell', icon: 'crate', unit: 'units', show: v.can_policy },
+    { key: 'withdraw', icon: 'coin', unit: 'sup', show: v.can_policy }, { key: 'retire', icon: 'scroll', unit: 'none', show: v.can_issue && v.status === 'chartered' },
   ]
   const when = (a: string | null) => (a ? atText(a) : '')
 
