@@ -243,6 +243,8 @@ const achievements = () => mockOk('achievements', { lines: [
 const BAG = [
   { item: N('bread', 'Bread'), category: 'food', shelf: { code: 'food.bakery', group: 'food', label: 'نان', group_label: 'item_shelf_group.food' }, qty: 3, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
   { item: N('bandage', 'Bandage'), category: 'medicine', shelf: { code: 'medicine.first_aid', group: 'medicine', label: 'کمک‌های اولیه', group_label: 'item_shelf_group.medicine' }, qty: 2, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
+  { item: N('rice', 'Rice'), category: 'food', shelf: { code: 'food.grain', group: 'food', label: 'غله', group_label: 'item_shelf_group.food' }, qty: 5, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
+  { item: N('water_bottle', 'Water'), category: 'drink', shelf: { code: 'drink.water', group: 'drink', label: 'آب', group_label: 'item_shelf_group.drink' }, qty: 3, serial: '', quality: 0, uses_left: 0, durability: 0, design: '' },
   { item: N('phone', 'Phone'), category: 'electronics', shelf: { code: 'tools.devices', group: 'tools', label: 'دستگاه', group_label: 'item_shelf_group.tools' }, qty: 1, serial: 'ph-7f3a', quality: 74, uses_left: 18, durability: 80, design: '' },
 ]
 

@@ -16,11 +16,22 @@ const ITEM_PNG: Record<string, string> = { firewood: 'logs', clay: 'stone', pots
 export const itemPngName = (code: string): string => ITEM_PNG[code] ?? 'crate'
 const GROUP_ICON: Record<string, string> = {
   food: 'bread', medicine: 'pill', gear: 'gears', electronics: 'phone', defence: 'shield',
-  mineral: 'ore', metal_ore: 'ore', vehicles: 'x_car', wood: 'x_field', bags: 'm_backpack', clothing: 'box', tools: 'gears',
+  mineral: 'ore', metal_ore: 'ore', vehicles: 'x_car', wood: 'x_field', bags: 'm_backpack', clothing: 'tent', tools: 'gears',
 }
+
+/** a good whose code is not listed gets the icon of the word it is made of (rice_bag, bag_sack, water_bottle...) */
+const WORD_ICON: [RegExp, string][] = [
+  [/bread|bun|cake|biscuit|flour/, 'bread'], [/rice|wheat|grain|oat|barley|seed|bean|lentil|veg|fruit|apple|date/, 'x_sprout'],
+  [/water|juice|milk|tea|drink|bottle|soda|cola/, 'soda'], [/ring|jewel|necklace/, 'ring'], [/gem|diamond/, 'x_gem'], [/cash|money|coin/, 'coins'], [/meat|fish|egg|soup|meal|cheese|food/, 'm_meal'],
+  [/bandage|pill|medic|drug|syringe|aid|herb/, 'pill'], [/bag|sack|pouch|backpack|satchel|basket/, 'm_backpack'],
+  [/wood|log|timber|plank/, 'x_field'], [/ore|stone|coal|iron|bloom|clay|brick|sand/, 'ore'],
+  [/tool|axe|pick|saw|hammer|knife|gear/, 'gears'], [/key|lock/, 'keys'], [/phone|radio/, 'phone'],
+  [/cloth|rag|shirt|coat|shoe|boot|hat/, 'tent'], [/book|paper|scroll|map/, 'x_scroll'], [/gun|pistol|rifle|ammo/, 'pistol'],
+]
 
 export function itemIconName(code: string, ...groups: (string | undefined)[]): string {
   if (ITEM_ICON[code]) return ITEM_ICON[code]
+  for (const [re, name] of WORD_ICON) if (re.test(code)) return name
   for (const g of groups) if (g && GROUP_ICON[g]) return GROUP_ICON[g]
   return 'box'
 }

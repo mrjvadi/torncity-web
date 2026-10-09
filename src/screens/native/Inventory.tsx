@@ -167,7 +167,8 @@ export default function Inventory({ response, loading, run }: ScreenProps) {
         </>
       )}
 
-      <Actions response={response} onAction={() => undefined} refreshCommand="inventory.show" />
+      {/* the grid cells already open each good: the server's one «open» button per good would only repeat them, unlabelled */}
+      <Actions response={response} only={(a) => a.id !== 'item.open'} onAction={() => undefined} refreshCommand="inventory.show" />
 
       {open && (
         <ItemPopup
