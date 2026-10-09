@@ -361,3 +361,6 @@
 .tr-facts small { opacity: .7; font-size: 12px; } .tr-facts b.good { color: #9be88d; }
 .tr-ctl { display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; }
 .tr-lbl { font-weight: 500; opacity: .75; font-size: 12px; }
+.tr-ctl .dk-step { width: 100%; justify-content: space-between; }
+.tr-ctl .dk-step button { width: 40px; height: 44px; flex: none; }
+.tr-ctl .dk-step b { min-width: 0; flex: 1; font-size: 13px; white-space: nowrap; }
