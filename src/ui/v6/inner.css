@@ -413,3 +413,10 @@ button.ig-cell:hover { border-color: var(--v6-gold); }
 .ig-src { display: flex; gap: 6px; }
 .gc-price { color: var(--v6-gold); font-variant-numeric: tabular-nums; }
 .gc-note { font: 500 12.5px/1.4 Vazirmatn; color: var(--v6-mut); }
+
+/* the docked panel is about 440 px wide: two cards per row, whatever the page's own breakpoint says, and a card's quantity chips wrap instead of spilling */
+@media (min-width: 900px) {
+  .v6-side .hub-cards:not(.wide), .v6-side .hub-cards:has(> .nx-card, > .sc-block, > .mil-block, > .vh-upgrade, > .sc-cand) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.hub-cards .pc-foot .ig-src { flex-wrap: wrap; justify-content: center; width: 100%; }
+.hub-cards .pc-foot .ig-src .k-slab { flex: 1 1 44px; min-width: 44px; }

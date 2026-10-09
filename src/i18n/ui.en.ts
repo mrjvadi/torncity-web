@@ -5806,4 +5806,5 @@ export const uiEn: Record<UiKey, string> = {
   'rd.upkeep_missing': '{item} is short; buy it or make it.',
   'rd.fix_buy': 'Buy',
   'rd.fix_build': 'Build: {name}',
+  'common.retry': 'Try again',
 }

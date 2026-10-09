@@ -5904,3 +5904,4 @@ rd.standin_note | تا {at} هنوز جایگزین‌ها قبول است؛ ب�
 rd.upkeep_missing | {item} کم است؛ از بازار بخر یا بساز. | {item} is short; buy it or make it.
 rd.fix_buy | بخر | Buy
 rd.fix_build | بساز: {name} | Build: {name}
+common.retry | دوباره تلاش کن | Try again
