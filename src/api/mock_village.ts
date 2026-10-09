@@ -445,7 +445,7 @@ function knowledgeView() {
     lines: st.know.filter((k) => k.terrain || k.state === 'held').map((k) => ({
       knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy,
       missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain, unlocks: KNOW_UNLOCKS[k.code] ?? null,
-      needs: k.missing.length ? [...k.missing.map((m) => ({ kind: 'knowledge', item: kn(m), role: '', tier: 0, have: 0, need: 1, how: 'research', where: '', options: [kn(m)], makers: null, price: 0 })), { kind: 'building', item: nameOf('masonry_workshop'), role: 'craft', tier: 0, have: 0, need: 1, how: 'build', where: '', options: [nameOf('masonry_workshop')], makers: null, price: 0 }] : null, speed_bps: k.code === 'masonry' ? 11300 : 10000, ahead_bps: k.code === 'masonry' ? 13000 : k.code === 'writing' ? 10000 : 10000, discount_bps: k.code === 'masonry' ? 1200 : 0, share_bps: k.code === 'masonry' && new URLSearchParams(location.search).get('res') === 'pact' ? 2000 : 0, slot: 'free', field: 'craft',
+      needs: k.missing.length ? [...k.missing.map((m) => ({ kind: 'knowledge', item: kn(m), role: '', tier: 0, have: 0, need: 1, how: 'research', where: '', options: [kn(m)], makers: null, price: 0 })), { kind: 'building', item: nameOf('carpentry_workshop'), role: 'craft', tier: 0, have: 0, need: 1, how: 'build', where: '', options: [nameOf('carpentry_workshop')], makers: null, price: 0 }] : null, speed_bps: k.code === 'masonry' ? 11300 : 10000, ahead_bps: k.code === 'masonry' ? 13000 : k.code === 'writing' ? 10000 : 10000, discount_bps: k.code === 'masonry' ? 1200 : 0, share_bps: k.code === 'masonry' && new URLSearchParams(location.search).get('res') === 'pact' ? 2000 : 0, slot: 'free', field: 'craft',
     })),
     currency: { code: 'AML', name: 'سکهٔ آمل', symbol: '' },
     hidden: 3,
@@ -1455,7 +1455,7 @@ function upgradeLine(code: string, tier: number, secs: number) {
   const needs: Prerequisite[] = []
   if (m === 'know' || all) needs.push(P('knowledge', kn('irrigation'), { how: 'research', options: [kn('irrigation')] }), P('knowledge', kn('masonry'), { how: 'research', options: [kn('masonry')] }))
   else needs.push(P('knowledge', kn('irrigation'), { have: 1, how: 'research' }))
-  if (m === 'bld' || all) needs.push(P('building', nameOf('carpentry_workshop'), { how: 'build', role: 'craft', options: [nameOf('carpentry_workshop'), nameOf('masonry_workshop')] }))
+  if (m === 'bld' || all) needs.push(P('building', nameOf('carpentry_workshop'), { how: 'build', role: 'craft', options: [nameOf('carpentry_workshop')] }))
   needs.push(P('item', goods('timber'), { have: m === 'mat' || all ? 4 : 12, need: 12, how: 'buy', price: 22, makers: [{ building: nameOf('woodcutter_camp'), built: true }] }))
   needs.push(P('item', goods('stone'), { have: 6, need: 6, how: 'buy', price: 30 }))
   if (m === 'learn' || all) needs.push(P('literacy', { code: 'literacy', name: 'سواد' }, { have: 3400, need: 5000, how: 'train' }))
@@ -1466,7 +1466,7 @@ function upgradeLine(code: string, tier: number, secs: number) {
   return {
     building: nameOf(code), tier, cost_money: 4800, build_time_seconds: secs, expected_wait: waitOf(secs), available: ok, ready: ok, missing: null,
     materials: [{ item: goods('timber'), qty: 12 }, { item: goods('stone'), qty: 6 }], shifts: 9, needs,
-    staff: [{ role: { code: 'clerk', name: 'منشی' }, slots: 2, wage_bps: 10000, shift_hours: 2 }], upkeep_money: 90, consumes: [{ item: goods('wood_fuel'), qty: 2 }],
+    staff: [{ role: { code: 'clerk', name: 'منشی' }, slots: 2, wage_bps: 10000, shift_hours: 2 }], upkeep_money: 90, consumes: [{ item: goods('timber'), qty: 2 }],
     effects: [{ target: 'housing_capacity', value: 4 }, { target: 'happiness_bps', value: 300 }], capacity: [{ kind: 'research_slots', code: '', value: 1 }, { kind: 'storage', code: 'food', value: 80 }],
   }
 }

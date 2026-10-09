@@ -99,9 +99,9 @@ export const TradeDesk = flow<TradeDeskView>(({ view: v0, ctx }) => {
       </Panel>
 
       {(v as TradeX).clerk && (
-        <PCard icon="people" tone={(v as TradeX).clerk!.filled ? 'good' : 'off'} off={!(v as TradeX).clerk!.filled} title={t('tr.clerk')} sub={(v as TradeX).clerk!.filled ? t('tr.clerk_in') : t('tr.clerk_empty')}
+        <CardGrid><PCard icon="people" tone={(v as TradeX).clerk!.filled ? 'good' : 'off'} off={!(v as TradeX).clerk!.filled} title={t('tr.clerk')} sub={(v as TradeX).clerk!.filled ? t('tr.clerk_in') : t('tr.clerk_empty')}
           facts={t('tr.clerk_wage', { w: money((v as TradeX).clerk!.wage) })}
-          foot={!(v as TradeX).clerk!.filled ? <button type="button" className="dk-chip all" onClick={() => ctx.run('settlement.labor.board', {})}>{t('tr.fix_board')}</button> : undefined} />
+          foot={!(v as TradeX).clerk!.filled ? <button type="button" className="dk-chip all" onClick={() => ctx.run('settlement.labor.board', {})}>{t('tr.fix_board')}</button> : undefined} /></CardGrid>
       )}
       {stop && (
         <Panel tone="ruby">
