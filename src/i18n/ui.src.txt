@@ -5296,6 +5296,40 @@ work.kind.infrastructure | زیرساخت | Infrastructure
 work.kind.other | کار | Work
 work.seats | {filled} از {max} جای کار پُر است | {filled} of {max} posts filled
 work.role.worker | کارگر | Worker
+work.role.teacher | معلم | Teacher
+work.role.trainer | مربی | Trainer
+work.role.health_worker | بهورز | Health worker
+work.role.nurse | پرستار | Nurse
+work.role.watchman | نگهبان | Watchman
+work.role.scholar | پژوهشگر | Scholar
+work.role.labourer | کارگر | Labourer
+work.role.woodcutter | هیزم‌شکن | Woodcutter
+work.role.carpenter | نجار | Carpenter
+work.role.mason | بنّا | Mason
+work.role.smith | آهنگر | Smith
+work.role.weaver | بافنده | Weaver
+work.role.potter | کوزه‌گر | Potter
+work.role.miller | آسیابان | Miller
+work.role.baker | نانوا | Baker
+work.role.storekeeper | انباردار | Storekeeper
+work.role.beacon_keeper | آتشبان | Beacon keeper
+work.role.stall_keeper | دکه‌دار | Stall keeper
+work.role.shopkeeper | دکان‌دار | Shopkeeper
+work.role.miner | معدنچی | Miner
+work.role.mine_hauler | باربر معدن | Mine hauler
+work.role.timberman | چوب‌بند معدن | Timberman
+work.role.banksman | متصدی دهانهٔ چاه | Banksman
+work.role.innkeeper | مسافرخانه‌دار | Innkeeper
+work.role.tea_server | چایچی | Tea server
+work.role.housekeeper | خدمتکار اتاق | Housekeeper
+work.role.hotel_manager | مدیر هتل | Hotel manager
+work.role.registrar | مسئول دفتر ثبت | Registrar
+work.role.surveyor | نقشه‌بردار | Surveyor
+work.role.moneychanger | صراف | Moneychanger
+work.role.teller | صندوقدار بانک | Teller
+work.role.loan_officer | کارشناس وام | Loan officer
+work.role.bank_manager | مدیر شعبهٔ بانک | Bank manager
+work.role.clerk | کارمند | Clerk
 work.empty | خالی | Empty
 work.npc | کارگر روزمزد | Day labourer
 work.player | یک نفر از اهالی | A resident
@@ -5764,3 +5798,27 @@ refusal.village_research_pact_open | پیشنهاد پیمان از قبل با�
 refusal.village_research_pact_self | با خودت پیمان نمی‌بندی. | You cannot pact with yourself.
 refusal.village_research_pact_not_found | آن پیمان پیدا نشد. | No such pact.
 refusal.village_research_no_slot | همهٔ جایگاه‌ها پر است؛ صبر کن یکی تمام شود یا ساختمان پژوهشی بساز. | All slots are full; wait or build a research building.
+ug.title | ارتقای {name} | Upgrade {name}
+ug.materials | مصالح | Materials
+ug.gives | چه چیزی می‌دهد | What it gives
+ug.gives_add | {name} | {name}
+ug.reqs | پیش‌نیازها | Requirements
+ug.missing | ندارد | Missing
+ug.know | دانش «{name}» | Knowledge: {name}
+ug.know_any | یکی از این دانش‌ها: {list} | One of these: {list}
+ug.build_req | ساختمان {names} | Building: {names}
+ug.mat | مصالح: {name} | Material: {name}
+ug.money | پول خزانه {n} کم است | The treasury is {n} short
+ug.fix.research | پژوهش کن | Research it
+ug.fix.build | بساز | Build it
+ug.fix.store | انبار | Store
+ug.fix.buy | بخر ({price}) | Buy ({price})
+ug.fix.treasury | خزانه | Treasury
+ug.made_in | ساخته می‌شود در: {list} | Made in: {list}
+ug.not_built | ساخته نشده | not built
+ug.unknown | شرط این ارتقا هنوز برقرار نیست؛ سرور دلیلش را نگفته. | A requirement is unmet; the server did not say which.
+ug.blocked | هنوز {n} مورد کم است؛ اول آن‌ها را درست کن. | {n} item(s) still missing; fix them first.
+ug.upkeep | هزینهٔ نگهداری | Upkeep
+ug.staff | کارکنان | Staff
+ug.blocked_short | شرطی کم است؛ برای دیدنش بزن | Something is missing; tap to see
+ug.not_now | الان نمی‌توانی سفارش بدهی (سفارشی در جریان است یا ساختمان مال تو نیست). | You cannot order now (an order is running or it is not yours).

@@ -4,6 +4,7 @@
 // the build menu, grid and confirms, a building's own page. Words are the web's own
 // (src/i18n/ui.src.txt); content names come from the catalogue.
 
+import { UpgradeCard, fromBuildingUpgrade, type UpgradeHandlers, type UpgradeX } from './UpgradeDetail'
 import { buildText, workText } from '../../lib/duration'
 import { useState, type ReactNode } from 'react'
 import type {
@@ -22,7 +23,7 @@ import { buildingBlurb } from './wording'
 import {
   Btns, Cancel, Facts, flow, Hint, Lead, Page, Panel, registerFlow, Rest, isBack, isRefresh, type FlowCtx,
 } from './flow'
-import { CardGrid } from '../../ui/v6/panel'
+import { CardGrid, PCard } from '../../ui/v6/panel'
 import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
 import WorkSection from './WorkSection'
@@ -790,6 +791,28 @@ const MaterialBuyConfirm = flow<MaterialBuyConfirmView>(({ view: v, ctx }) => (
 
 const EFFECT_KEYS = ['local_security_bps', 'food_coverage_bps', 'job_coverage_bps', 'service_coverage_bps', 'happiness_bps', 'housing_capacity']
 
+/** The upgrades of the building page: a card each (cost, time, state); a tap opens the full card with every requirement. */
+function FlowUpgrades({ v, ctx }: { v: BuildingPanelView; ctx: FlowCtx }) {
+  const [open, setOpen] = useState<string | null>(null)
+  const h: UpgradeHandlers = {
+    names: ctx.names, bname: (c, n) => ctx.bname(c, n), openKnowledge: () => ctx.openLocal('village_knowledge'), openStorage: () => ctx.openLocal('village_storage'),
+    openTreasury: () => ctx.openLocal('village_overview'), openBuild: () => ctx.openLocal('village_home', { build: '1' }), go: () => ctx.openLocal('village_home', { build: '1' }),
+  }
+  const models = ((v.upgrades ?? []) as UpgradeX[]).map((u) => ({ u, m: fromBuildingUpgrade(u, h, { treasury: v.treasury || undefined }) }))
+  const sel = models.find((x) => x.u.building.code === open)
+  return (
+    <>
+      <CardGrid>
+        {models.map(({ u, m }) => (
+          <PCard key={u.building.code} icon={m.available ? 'up' : 'scroll'} title={m.title} tone={m.available ? 'busy' : 'off'} off={!m.available} sub={`${money(u.cost_money)} · ${buildText(u)}`}
+            facts={m.available ? t('v6.up.ready') : <span className="dk-why">{t('ug.blocked', { n: formatNumber(m.reqs.filter((r) => !r.ok).length) })}</span>} onClick={() => setOpen(u.building.code)} />
+        ))}
+      </CardGrid>
+      {sel && <UpgradeCard m={sel.m} onClose={() => setOpen(null)} />}
+    </>
+  )
+}
+
 const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
   const name = ctx.bname(v.building.code, v.building.name)
   const { icon, palette } = iconForRole(v.role)
@@ -837,13 +860,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
           <>
             <SectionTitle>{t('building.upgrade.intro')}</SectionTitle>
             {(v.upgrades ?? []).length === 0 && <Hint>{t('building.upgrade.none')}</Hint>}
-            {(v.upgrades ?? []).map((u) => (
-              <div key={u.building.code} className="vf-line">
-                <span>{ctx.bname(u.building.code, u.building.name)}</span>
-                <b>{money(u.cost_money)}</b>
-                {!u.available && <Hint tone="bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => ctx.names.name(['knowledge'], m.code, m.name)).join('، ') }) : t('building.upgrade.locked')}</Hint>}
-              </div>
-            ))}
+            <FlowUpgrades v={v} ctx={ctx} />
           </>
         )}
       </Panel>

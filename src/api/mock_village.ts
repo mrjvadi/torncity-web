@@ -1448,6 +1448,21 @@ function workNode0(type: string, id: string): Omit<WorkNode, 'meal_points' | 'fo
   return { ...base, status: 'idle', reasons: [{ code: 'no_staff', item: null, class: '', have: 0, need: 3 }], slots: [seat('empty'), seat('empty'), seat('empty')], filled: 0, job: null }
 }
 
+/** ?up=ok | know | bld | mat | money | all: an upgrade line with the richer fields the server is adding (materials, shifts, what it gives, needs with codes) */
+function upgradeLine(code: string, tier: number, secs: number) {
+  const m = (() => { try { return new URLSearchParams(location.search).get('up') ?? 'know' } catch { return 'know' } })()
+  const mats = [{ item: goods('timber'), need: 12, have: m === 'mat' || m === 'all' ? 4 : 12 }, { item: goods('stone'), need: 6, have: 6 }]
+  const missK = m === 'know' || m === 'all' ? [kn('irrigation'), kn('masonry')] : null
+  const missB = m === 'bld' || m === 'all' ? [nameOf('carpentry_workshop')] : null
+  const short = m === 'money' || m === 'all'
+  return {
+    building: nameOf(code), tier, cost_money: 4800, build_time_seconds: secs, expected_wait: waitOf(secs), available: m === 'ok', missing: missK, needs_tier: '',
+    materials: mats, shifts: 9, adds: [{ code: 'bedroom', name: 'اتاق خواب' }, { code: 'storeroom', name: 'انبارک' }], gives: [{ target: 'housing_capacity', value: 4 }, { target: 'happiness_bps', value: 300 }],
+    missing_buildings: missB, needs: missB ? [{ kind: 'building', item: missB[0], options: missB, have: 0, need: 1, makers: null, price: 0 }] : null,
+    staff: [{ role: 'clerk', slots: 2 }], upkeep: 90, treasury: short ? 1500 : 12000,
+  }
+}
+
 function buildingView(args: Record<string, unknown>) {
   const id = String(args.building_id ?? '')
   const b = st.buildings.find((x) => x.id === id) ?? (() => {
@@ -1481,7 +1496,7 @@ function buildingView(args: Record<string, unknown>) {
       view.treasury = st.treasury; view.population = 2
       // the hall can be upgraded once the village knows irrigation (a requirement left unmet, for the confirm popup)
       view.tier = 2; view.has_upgrade = true
-      if (mode === 'up') view.upgrades = [{ building: nameOf('civic_hall'), tier: 3, cost_money: 480, build_time_seconds: 3600, expected_wait: waitOf(3600), available: false, missing: [kn('irrigation')], needs_tier: '' }]
+      if (mode === 'up') view.upgrades = [upgradeLine('civic_hall', 3, 3600)]
       const run = st.know.find((k) => k.state === 'researching')
       view.research = run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? Date.now()).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? Date.now()) - Date.now()) / 1000)) } : null
     }
@@ -1490,7 +1505,7 @@ function buildingView(args: Record<string, unknown>) {
       if (mode === 'up') {
         const sc = CAT.find((c) => c.code === 'school')!
         const miss = unmet(sc)
-        view.upgrades = [{ building: nameOf('school'), tier: 2, cost_money: sc.cost, build_time_seconds: sc.time, expected_wait: waitOf(sc.time), available: miss.length === 0, missing: miss.length ? miss.map(kn) : null, needs_tier: '' }]
+        view.upgrades = [upgradeLine('school', 2, sc.time)]
       }
     }
   }
