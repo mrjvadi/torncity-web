@@ -242,7 +242,7 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
               <div><div className="nx-stat-label">{t('know.literacy')}</div><div className="display" style={{ fontSize: 18 }}>{v.literacy_percent}%</div></div>
             </div>
             <div className="vs-grid" style={{ marginTop: 8 }}>
-              <div><div className="nx-stat-label">{t('know.projects')}</div><div className="display" style={{ fontSize: 18 }}>{formatNumber((v.projects ?? []).length || (v.running ? 1 : 0))} / {formatNumber(v.capacity || 1)}</div></div>
+              <div><div className="nx-stat-label">{t('know.projects')}</div><div className="display" style={{ fontSize: 18 }}><span dir="ltr">{formatNumber((v.projects ?? []).length || (v.running ? 1 : 0))} / {formatNumber(v.capacity || 1)}</span></div></div>
               <div><Slab tone="blue" radius={12} lip={3} onClick={() => run('settlement.research')}>{t('know.desk')}</Slab></div>
             </div>
             {(v.projects ?? []).map((p) => (

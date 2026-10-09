@@ -344,3 +344,4 @@
 .rs-levers li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 10px; background: color-mix(in srgb, currentColor 6%, transparent); font-size: 13.5px; }
 .rd-notes { display: block; font-size: 12.5px; line-height: 1.6; color: var(--v6-gold-hi, #ffe9a0); }
 .rd-quote { display: flex; flex-direction: column; gap: 2px; }
+.rd-rules { margin: 6px 0 0; padding-inline-start: 18px; font-size: 13px; line-height: 1.8; opacity: .85; }

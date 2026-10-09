@@ -67,7 +67,7 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
     <Page title={t('rd.title')} tone="violet">
       <Panel tone="violet">
         <Lead>{t('rd.lead', { a: formatNumber(v.running), b: formatNumber(v.capacity) })}</Lead>
-        <Hint>{t('rd.rules')}</Hint>
+        <ul className="rd-rules">{(['r1', 'r2', 'r3', 'r4'] as const).map((k) => <li key={k}>{t(`rd.rules.${k}` as Key)}</li>)}</ul>
       </Panel>
 
       <Section>{t('rd.slots')}</Section>

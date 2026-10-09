@@ -5693,7 +5693,10 @@ rs.lv_notice | اعلام برداشت | Withdrawal notice
 rs.hours | {n} ساعت قبل | {n} h ahead
 rd.title | میز پژوهش | Research desk
 rd.lead | پروژه‌های هم‌زمان: {a} از {b} | Projects at once: {a} of {b}
-rd.rules | هر شهر یک جایگاه رایگان دارد. جایگاه‌های کتابخانه و آزمایشگاه فقط در روزی کار می‌کنند که پژوهشگر کافی دارند، خزانه دستمزدشان را می‌دهد و انبار مواد همان روز را دارد. هرچه جلوتر از زمانه باشد گران‌تر و کندتر است؛ هرچه دنیا بلد باشد زودتر یاد گرفته می‌شود. پروژه‌ای که شروع شده باشد هیچ‌وقت وسط کار نمی‌ایستد. | Every city has one free slot. A library or laboratory gives slots only on a day it works. What is ahead of the world costs more and takes longer. A started project never stops.
+rd.rules.r1 | هر شهر یک جایگاه رایگان دارد؛ کتابخانه و آزمایشگاه جایگاه‌های بیشتری می‌دهند. | Every city has a free slot; libraries and laboratories add more.
+rd.rules.r2 | ساختمان پژوهشی فقط در روزی کار می‌کند که پژوهشگر کافی دارد، خزانه دستمزد می‌دهد و مواد همان روز در انبار است. | A research building works only on a day with enough scholars, wages paid and the day's materials in stock.
+rd.rules.r3 | هرچه جلوتر از زمانه باشد گران‌تر و کندتر است؛ هرچه دنیا بلد باشد زودتر یاد گرفته می‌شود. | What is ahead of the world costs more and takes longer.
+rd.rules.r4 | پروژه‌ای که شروع شده، هیچ‌وقت وسط کار نمی‌ایستد. | A started project never stops.
 rd.slots | جایگاه‌ها | Slots
 rd.slot_free | جایگاه خالی | Free slot
 rd.slot_ready | آمادهٔ پروژهٔ تازه | Ready for a project
