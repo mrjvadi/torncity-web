@@ -34,7 +34,7 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
   const cat = useBuildingCatalogue()
   const id = useSettlementId()
   const { players, store, status } = useVillage(id)
-  const { res, view: v, loading, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
+  const { res, view: v, loading, failed, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
   const [donate, setDonate] = useState(!!localArgs?.donate)
   useEffect(() => { void store?.refetchPlayers() }, [store, status])
   if (loading && !v) return <ScreenScroll><Header title={t('overview.title')} tone="emerald" onBack={back(openLocal)} /></ScreenScroll>
@@ -101,7 +101,7 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
   const now = useNow(1000)
   const cmd = useVillageCommand()
   const toast = useToast()
-  const { res, view: v, loading, refresh } = useVillageView<ConstructionProgressView>('settlement.build.progress', response)
+  const { res, view: v, loading, failed, refresh } = useVillageView<ConstructionProgressView>('settlement.build.progress', response)
   const [ask, setAsk] = useState<string | null>(null)
   // a finished build drops out of the list the moment its timer ends and the
   // server confirms (channel event -> re-read); until then it shows "finishing"
@@ -121,7 +121,7 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
   return (
     <ScreenScroll>
       <Header title={t('progress.title')} tone="gold" onBack={back(openLocal)} onRefresh={() => void refresh()} />
-      {loading && !v && <Empty>…</Empty>}
+      <LoadState loading={loading} failed={failed} v={!!v} retry={() => void refresh()} />
       {!loading && lines.length === 0 && <Empty>{t('progress.empty')}</Empty>}
       <CardGrid>
         {lines.map((l, i) => {
@@ -199,6 +199,13 @@ function projFrac(v: KnowledgeListView, p: { knowledge: { code: string }; finish
 
 const STATE_TONE: Record<string, 'emerald' | 'gold' | 'ruby' | undefined> = { held: 'emerald', researching: 'gold', locked: undefined, available: undefined }
 
+/** «…» while the answer is on its way; if it did not come, the way to try again. */
+function LoadState({ loading, failed, v, retry }: { loading: boolean; failed: boolean; v: boolean; retry: () => void }) {
+  if (v) return null
+  if (failed || !loading) return <Empty><div>{t('common.load_failed')}</div><Slab tone="gold" radius={12} lip={3} onClick={retry}>{t('common.retry')}</Slab></Empty>
+  return <Empty>…</Empty>
+}
+
 export function Knowledge({ response, openLocal, run }: ScreenProps) {
   const names = useContentNames()
   const cat = useBuildingCatalogue()
@@ -208,7 +215,7 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
   const now = useNow(1000)
   const cmd = useVillageCommand()
   const toast = useToast()
-  const { view: v, loading, refresh } = useVillageView<KnowledgeListView>('settlement.knowledge', response)
+  const { view: v, loading, failed, refresh } = useVillageView<KnowledgeListView>('settlement.knowledge', response)
   const [ask, setAsk] = useState<{ kind: 'buy' | 'research'; line: KnowledgeLineView } | null>(null)
   const [busy, setBusy] = useState(false)
   const canAct = !!layout?.viewer.can_place
@@ -234,7 +241,7 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
   return (
     <ScreenScroll>
       <Header title={t('know.title')} tone="violet" onBack={back(openLocal)} onRefresh={() => void refresh()} />
-      {loading && !v && <Empty>…</Empty>}
+      <LoadState loading={loading} failed={failed} v={!!v} retry={() => void refresh()} />
       {v && (
         <>
           <Card tone="violet">

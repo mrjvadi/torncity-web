@@ -5804,6 +5804,7 @@ export const uiFa = {
   'rd.upkeep_missing': '{item} کم است؛ از بازار بخر یا بساز.',
   'rd.fix_buy': 'بخر',
   'rd.fix_build': 'بساز: {name}',
+  'common.retry': 'دوباره تلاش کن',
 } as const
 
 export type UiKey = keyof typeof uiFa

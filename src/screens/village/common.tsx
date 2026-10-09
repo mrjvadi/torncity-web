@@ -54,22 +54,26 @@ export function useVillageView<V>(command: string, initial: CommandResponse | nu
   const { tick } = useVillage(id)
   const [res, setRes] = useState<CommandResponse | null>(initial)
   const [loading, setLoading] = useState(!initial)
+  const [failed, setFailed] = useState(false)
   const argsRef = useRef(args)
   argsRef.current = args
   const run = useCallback(async () => {
     if (!enabled) return
     try {
-      const r = await api.runCommand(command, argsRef.current)
+      // an answer that never comes must not leave «…» on the screen for ever: after 20 s it is a failure the player can retry
+      const r = await Promise.race([api.runCommand(command, argsRef.current), new Promise<never>((_, no) => window.setTimeout(() => no(new Error('timeout')), 20_000))])
       setRes(r)
+      setFailed(r.ok === false && !r.view)
     } catch {
-      // keep the last answer
+      // keep the last answer; with none, the screen says it did not load
+      setFailed(true)
     } finally {
       setLoading(false)
     }
   }, [command, enabled])
   useEffect(() => { void run() }, [run, tick])
   useLive(res?.view, () => void run())
-  return { res, view: (res?.view ?? null) as V | null, loading, refresh: run }
+  return { res, view: (res?.view ?? null) as V | null, loading, failed: failed && !res?.view, refresh: run }
 }
 
 /** A card with a header line (icon plate, title and subtitle, something at the
