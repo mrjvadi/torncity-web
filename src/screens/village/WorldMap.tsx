@@ -124,6 +124,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
   const spotMk = useRef<HTMLDivElement | null>(null)
   const insetsRef = useRef({ top: 0, bottom: 0 })
   const clusterRefs = useRef<HTMLButtonElement[]>([])
+  const markerPos = useRef(new Map<string, { x: number; y: number }>())
   const clusterInfo = useRef<{ x: number; y: number; n: number; lat: number; lon: number; members: Place[] }[]>([])
   const selRef = useRef<string | null>(null)
   const atHomeRef = useRef(true)
@@ -226,6 +227,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
           if (folded.has(p.id)) { el.style.display = 'none'; continue }
           el.style.display = ''
           el.style.transform = `translate(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px)`
+          markerPos.current.set(p.id, pt)
           const w = Math.max(60, Math.min(190, p.name.length * 7.5 + 22))
           const clash = taken.some((o) => Math.abs(o.x - pt.x) < (o.w + w) / 2 && Math.abs(o.y - pt.y) < 24)
           el.classList.toggle('wm-nolbl', clash)
@@ -285,6 +287,21 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
         if (!readyRef.current && v.terrain.stats().shown > 0) { readyRef.current = true; setReady(true) }
       }
       view.onTap = (x, y) => {
+        // markers and bubbles do not catch the pointer (they would swallow wheel, drag and pinch started on them): a tap is matched to them here
+        let hit: { el: HTMLElement; d: number } | null = null
+        for (const [id, pt] of markerPos.current) {
+          const el = markerRefs.current.get(id)
+          if (!el || el.style.display === 'none') continue
+          const d = Math.hypot(pt.x - x, pt.y - y)
+          if (d < 24 && (!hit || d < hit.d)) hit = { el, d }
+        }
+        clusterRefs.current.forEach((el, i) => {
+          const g = clusterInfo.current[i]
+          if (!g || el.style.display === 'none') return
+          const d = Math.hypot(g.x - x, g.y - y)
+          if (d < 24 && (!hit || d < hit.d)) hit = { el, d }
+        })
+        if (hit) { (hit as { el: HTMLElement }).el.click(); return }
         setSel(null); setSearchOpen(false)
         const p = view!.pick(x, y)
         if (p) setSpot(readAt(p.lat, p.lon))
