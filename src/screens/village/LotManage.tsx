@@ -160,8 +160,8 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
         {!v.built && <Note>{t('lm.not_built')}</Note>}
         <StatGrid>
           <StatCard icon="house" palette="gold" label={t('lm.function')} value={`${f.name} · ${t('lm.level', { n: formatNumber(f.level) })}`} />
-          <StatCard icon="box" palette="sapphire" label={t('lm.storeys')} value={`${formatNumber(v.storeys)} / ${formatNumber(v.max_storeys)}`} />
-          <StatCard icon="chart" palette="emerald" label={t('lm.area')} value={`${formatNumber(v.area_used)} / ${formatNumber(v.area_capacity)}`} />
+          <StatCard icon="box" palette="sapphire" label={t('lm.storeys')} value={<span dir="ltr">{formatNumber(v.storeys)} / {formatNumber(v.max_storeys)}</span>} />
+          <StatCard icon="chart" palette="emerald" label={t('lm.area')} value={<span dir="ltr">{formatNumber(v.area_used)} / {formatNumber(v.area_capacity)}</span>} />
         </StatGrid>
         {order && (
           <div className="lm-order">
@@ -179,7 +179,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
         {tab === 'function' && (
           <>
             {v.upgrade && (
-              <PCard icon="up" title={t('lm.upgrade', { n: formatNumber(v.upgrade.to) })} tone={v.upgrade.can ? 'busy' : 'off'} off={!v.upgrade.can}
+              <PCard icon="hammer" title={t('lm.upgrade', { n: formatNumber(v.upgrade.to) })} tone={v.upgrade.can ? 'busy' : 'off'} off={!v.upgrade.can}
                 sub={`${money(v.upgrade.cost_money)} · ${t('lm.q.shifts')}: ${formatNumber(v.upgrade.shifts)}`}
                 facts={!v.upgrade.can ? t(`lm.reason.${v.upgrade.reason}` as Key) : (v.upgrade.adds ?? []).map((a) => a.name).join('، ')}
                 onClick={manage && v.upgrade.can ? () => void quote({ action: 'level' }) : undefined} />
@@ -219,7 +219,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             </CardGrid>
             {(v.additions ?? []).filter((a) => !a.can).flatMap((a) => a.needs ?? []).slice(0, 3).map((n, i) => <NeedLine key={i} ctx={ctx} n={n} />)}
             {v.storey_up && (
-              <PCard icon="up" title={t('lm.storey_up', { n: formatNumber(v.storey_up.to) })} tone={v.storey_up.can ? 'busy' : 'off'} off={!v.storey_up.can}
+              <PCard icon="hammer" title={t('lm.storey_up', { n: formatNumber(v.storey_up.to) })} tone={v.storey_up.can ? 'busy' : 'off'} off={!v.storey_up.can}
                 sub={`${t('lm.q.shifts')}: ${formatNumber(v.storey_up.shifts)}`}
                 facts={v.storey_up.can ? <Items list={v.storey_up.materials} names={names} /> : <span className="dk-why">{hasKey(`lm.reason.${v.storey_up.reason}`) ? t(`lm.reason.${v.storey_up.reason}` as Key) : t('lm.not_here')}</span>}
                 onClick={manage && v.storey_up.can ? () => void quote({ action: 'storey' }) : undefined} />
