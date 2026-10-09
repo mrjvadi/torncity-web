@@ -314,7 +314,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     open: (screen, args) => openLocal(screen, args),
     civic: b.type === 'civic_hall' || cat.get(b.type)?.category === 'governance',
     mine: () => { setSelectedId(null); run('settlement.mine') },
-    run: (command) => run(command),
+    run: (command, args) => run(command, args),
     manage: (b.private ? b.mine : canPublicBuild) ? () => { setSelectedId(null); run('settlement.lot.manage', { building: b.id ?? '' }) } : undefined,
   })
   const ring: RingModel | null = useRing && !inBuildNow(build.state.step) && selected && selected.type !== 'road' && selectedId && labelOf(selectedId)

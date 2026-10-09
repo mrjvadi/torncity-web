@@ -342,3 +342,5 @@
 .lm-sub { text-align: center; font: 700 14px/1.4 Vazirmatn; color: var(--v6-gold-hi, #ffe9a0); margin: -4px 0 8px; }
 .rs-levers { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .rs-levers li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 10px; background: color-mix(in srgb, currentColor 6%, transparent); font-size: 13.5px; }
+.rd-notes { display: block; font-size: 12.5px; line-height: 1.6; color: var(--v6-gold-hi, #ffe9a0); }
+.rd-quote { display: flex; flex-direction: column; gap: 2px; }

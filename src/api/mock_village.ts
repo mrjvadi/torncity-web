@@ -439,11 +439,13 @@ function knowledgeView() {
   const run = st.know.find((k) => k.state === 'researching')
   const view: KnowledgeListView = {
     name: 'آمل', treasury: st.treasury, literacy_percent: st.literacy,
-    running: run ? { knowledge: kn(run.code), finish_at: new Date(run.finish ?? now).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? now) - now) / 1000)) } : null,
+    projects: run ? [{ knowledge: kn(run.code), slot: 'free', speed_bps: 10000, finish_at: new Date(run.finish ?? now).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? now) - now) / 1000)) }] : null, capacity: 2,
+    running: run ? { slot: 'free', speed_bps: 10000, knowledge: kn(run.code), finish_at: new Date(run.finish ?? now).toISOString(), left_seconds: Math.max(0, Math.round(((run.finish ?? now) - now) / 1000)) } : null,
     // what this land can never allow is never listed (ADR 0033 5.2)
     lines: st.know.filter((k) => k.terrain || k.state === 'held').map((k) => ({
       knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy,
       missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain, unlocks: KNOW_UNLOCKS[k.code] ?? null,
+      speed_bps: k.code === 'masonry' ? 11300 : 10000, ahead_bps: k.code === 'masonry' ? 13000 : k.code === 'writing' ? 10000 : 10000, discount_bps: k.code === 'masonry' ? 1200 : 0, share_bps: k.code === 'masonry' && new URLSearchParams(location.search).get('res') === 'pact' ? 2000 : 0, slot: 'free', field: 'craft',
     })),
     currency: { code: 'AML', name: 'سکهٔ آمل', symbol: '' },
     hidden: 3,

@@ -18,6 +18,7 @@ import { mockBasicCommand } from './mock_basic'
 import { mockLocation, mockSupportCommand } from '../support/mock'
 import { mockFxCommand } from './mock_fx'
 import { mockReserveCommand } from './mock_reserve'
+import { mockResearchCommand } from './mock_research'
 import { mockLotCommand } from './mock_lot'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 import { mockSocietyCommand } from './mock_society'
@@ -144,6 +145,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   if (founding) return json(founding)
   const society = mockSocietyCommand(command, args)
   if (society) return json(society)
+  const rsd = mockResearchCommand(command, args ?? {})
+  if (rsd) return json(rsd)
   const lot = mockLotCommand(command, args ?? {})
   if (lot) return json(lot)
   const fx = mockFxCommand(command, args)

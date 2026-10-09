@@ -11,7 +11,7 @@ const CATALOGUE: [string, string, boolean, boolean][] = [
   ['fiscal.set:sales_tax', 'fiscal', false, true], ['fiscal.set:shop_price', 'fiscal', false, true], ['fiscal.set:market_fee', 'fiscal', false, false], ['fiscal.set:levy', 'fiscal', false, false],
   ['road.draw', 'land', false, true], ['zone.open', 'land', false, false], ['zone.close', 'land', false, false], ['lot.sell', 'land', false, true], ['public.build', 'land', false, true], ['public.demolish', 'land', false, true],
   ['citizen.admit', 'people', false, false], ['citizen.ban', 'people', false, false], ['staff.hire', 'people', false, true], ['staff.fire', 'people', false, true], ['jobs.post', 'people', false, true],
-  ['research.start', 'knowledge', false, true],
+  ['research.start', 'knowledge', false, true], ['research.share', 'knowledge', false, false],
   ['police.patrol', 'order', false, false], ['police.fine', 'order', true, false], ['court.judge', 'order', false, false],
   ['election.call', 'politics', false, false], ['office.create', 'politics', false, true], ['office.edit', 'politics', false, true], ['office.appoint', 'politics', false, true], ['office.dismiss', 'politics', false, true], ['charter.amend', 'politics', false, true],
   ['treaty.propose', 'foreign', false, false], ['union.propose', 'foreign', false, false], ['raid.declare', 'foreign', false, false],
