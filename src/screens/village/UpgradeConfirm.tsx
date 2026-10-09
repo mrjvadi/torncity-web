@@ -7,25 +7,27 @@ import type { BuildingPanelView, CatalogueBuilding, LayoutBuilding } from '../..
 import { t } from '../../i18n'
 import { ConfirmPopup } from '../../ui/v6/parts'
 import { buildingName, useContentNames, useVillageCommand } from '../../village/useVillage'
-import { UpgradeCard, fromBuildingUpgrade, type UpgradeHandlers, type UpgradeX } from './UpgradeDetail'
+import { UpgradeCard, fromBuildingUpgrade, type UpgradeHandlers } from './UpgradeDetail'
 
 export type UpgradeScreen = 'village_knowledge' | 'village_storage' | 'village_overview'
 
-export function useUpgradeHandlers(cat: Map<string, CatalogueBuilding>, onOpen: (s: UpgradeScreen) => void, onBuild: (code?: string) => void, onClose: () => void, go: (code: string) => void): UpgradeHandlers {
+export function useUpgradeHandlers(cat: Map<string, CatalogueBuilding>, onOpen: (s: UpgradeScreen) => void, onBuild: (code?: string) => void, onClose: () => void, go: (code: string) => void, onRun?: (command: string) => void): UpgradeHandlers {
   const names = useContentNames()
   const leave = (fn: () => void) => () => { onClose(); fn() }
   return {
     names, bname: (code, name) => buildingName(cat, code, name),
     openKnowledge: leave(() => onOpen('village_knowledge')), openStorage: leave(() => onOpen('village_storage')), openTreasury: leave(() => onOpen('village_overview')),
     openBuild: (code) => leave(() => onBuild(code))(), go,
+    openLearn: leave(() => onRun?.('education.list')), openTravel: leave(() => onRun?.('travel.destinations')),
   }
 }
 
-export default function UpgradeConfirm({ building: b, cat, onBuild, onOpen, onClose }: {
+export default function UpgradeConfirm({ building: b, cat, onBuild, onOpen, onRun, onClose }: {
   building: LayoutBuilding
   cat: Map<string, CatalogueBuilding>
   onBuild: (code: string) => void
   onOpen: (screen: UpgradeScreen) => void
+  onRun?: (command: string) => void
   onClose: () => void
 }) {
   const cmd = useVillageCommand()
@@ -37,12 +39,12 @@ export default function UpgradeConfirm({ building: b, cat, onBuild, onOpen, onCl
     })
     return () => { cancelled = true }
   }, [b.id, cmd])
-  const h = useUpgradeHandlers(cat, onOpen, (c) => c && onBuild(c), onClose, (c) => onBuild(c))
+  const h = useUpgradeHandlers(cat, onOpen, (c) => c && onBuild(c), onClose, (c) => onBuild(c), onRun)
   const name = buildingName(cat, b.type, panel?.building.name)
-  const ups = (panel?.upgrades ?? []) as UpgradeX[]
+  const ups = panel?.upgrades ?? []
   // the first upgrade this viewer can start now, else the first one (its unmet requirements are the rows)
   const u = ups.find((x) => x.available) ?? ups[0]
   if (!panel) return <ConfirmPopup title={t('v6.up.title', { name })} primary={t('v6.up.go')} disabledReason={t('common.loading')} onPrimary={onClose} onClose={onClose} />
   if (!u) return <ConfirmPopup title={t('v6.up.title', { name })} note={t('building.upgrade.none')} primary={t('v6.up.go')} disabledReason={t('building.upgrade.none')} onPrimary={onClose} onClose={onClose} />
-  return <UpgradeCard m={fromBuildingUpgrade(u, h, { treasury: panel.treasury || undefined })} onClose={onClose} />
+  return <UpgradeCard m={fromBuildingUpgrade(u, h)} onClose={onClose} />
 }

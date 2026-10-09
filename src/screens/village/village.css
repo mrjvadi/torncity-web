@@ -356,3 +356,12 @@
 .ug-req.ok .ug-mark { color: #9be88d; } .ug-req.bad .ug-mark { color: #ff9a8c; }
 .ug-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 13.5px; line-height: 1.5; }
 .ug-txt small { opacity: .7; font-size: 12px; }
+.tr-door { display: flex; justify-content: flex-end; margin: 4px 0 8px; }
+.tr-facts { display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.tr-facts small { opacity: .7; font-size: 12px; } .tr-facts b.good { color: #9be88d; }
+.tr-ctl { display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; }
+.tr-lbl { font-weight: 500; opacity: .75; font-size: 12px; }
+.tr-ctl .dk-step { width: 100%; justify-content: space-between; }
+.tr-ctl .dk-step button { width: 40px; height: 44px; flex: none; }
+.tr-ctl .dk-step b { min-width: 0; flex: 1; font-size: 13px; white-space: nowrap; }
+.tr-price { font-size: 14px; } .tr-facts .m-sup { display: block; }

@@ -5,6 +5,7 @@
 // settlement channel reports a change.
 
 import { quoteNotes, bp } from './Research'
+import { ReqList, needRows } from './UpgradeDetail'
 import { atText } from '../../lib/duration'
 import { useEffect, useState } from 'react'
 import DonateSheet from './Donate'
@@ -283,6 +284,9 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
                   title={kname(l.knowledge)} sub={sub}
                   right={<Chip tone={held ? 'emerald' : l.state === 'researching' ? 'gold' : undefined}>{t(`know.state.${l.state}` as Key)}</Chip>}
                 >
+                  {l.state !== 'held' && (l.needs ?? []).length > 0 && (
+                    <ReqList rows={needRows({ names, bname: (c, n) => buildingName(cat, c, n), openKnowledge: () => undefined, openBuild: () => openLocal('village_home', { build: '1' }), openStorage: () => openLocal('village_storage'), openTreasury: () => openLocal('village_overview'), openLearn: () => run('education.list'), openTravel: () => run('travel.destinations'), go: () => undefined }, l.needs)} />
+                  )}
                   {l.state === 'available' && quoteNotes(l).length > 0 && <div className="nx-bar-sub rd-notes">{quoteNotes(l).join(' · ')}</div>}
                   {!held && opens.length > 0 && <div className="nx-bar-sub">{t('know.unlocks', { list: opens.join('، ') })}</div>}
                   {l.state === 'available' && short > 0 && <div className="nx-bar-sub">{t('know.short', { n: money(short) })}</div>}

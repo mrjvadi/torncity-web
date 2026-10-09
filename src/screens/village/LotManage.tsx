@@ -292,6 +292,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
         <UpgradeCard onClose={() => setUpCard(false)} busy={busy} m={fromLotUpgrade(v.upgrade, {
           names, bname: (c, n) => ctx.bname(c, n), openKnowledge: () => ctx.openLocal('village_knowledge'), openStorage: () => ctx.openLocal('village_storage'), openTreasury: () => ctx.openLocal('village_overview'),
           openBuild: () => ctx.openLocal('village_home', { build: '1' }), go: () => undefined,
+          openLearn: () => ctx.run('education.list'), openTravel: () => ctx.run('travel.destinations'),
         }, v.cash, manage ? () => void quote({ action: 'level' }) : undefined)} />
       )}
       {ask && (
