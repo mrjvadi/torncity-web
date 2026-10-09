@@ -1964,7 +1964,7 @@ bld.desc.code.airport | این بنا وقتی به کار می‌آید که ش
 bld.desc.generic | یکی از ساختمان‌های شهر. | One of the city's buildings.
 # -- refusals of the village area, by code (the core sends a code and data, never a sentence) ----
 refusal.village_insufficient_funds | خزانهٔ شهر برای این کار کافی نیست. | The city treasury cannot pay for this.
-refusal.village_busy | همهٔ جایگاه‌های پژوهش پر است؛ صبر کن یکی تمام شود یا ساختمان پژوهشی (کتابخانه، آزمایشگاه) بساز. | All research slots are full; wait for one to finish or build a research building.
+refusal.village_busy | همهٔ جایگاه‌ها پر است؛ صبر کن یکی تمام شود. برای پژوهش بیشتر ساختمان پژوهشی (کتابخانه، آزمایشگاه) بساز. | All slots are busy; wait for one to finish. For more research build a research building.
 refusal.village_already_owned | شهر این را از قبل یاد گرفته. | The city already learned this.
 refusal.village_not_available | این یکی الان نه پژوهش می‌شود نه خریدنی است. | This cannot be researched or bought right now.
 refusal.village_terrain | زمین این شهر برای این کار جور نیست. | The ground of this city does not suit it.

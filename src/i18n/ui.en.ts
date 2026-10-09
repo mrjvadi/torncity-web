@@ -1917,7 +1917,7 @@ export const uiEn: Record<UiKey, string> = {
   'bld.desc.code.airport': 'This building becomes useful once the city has grown and learned more.',
   'bld.desc.generic': 'One of the city\'s buildings.',
   'refusal.village_insufficient_funds': 'The city treasury cannot pay for this.',
-  'refusal.village_busy': 'All research slots are full; wait for one to finish or build a research building.',
+  'refusal.village_busy': 'All slots are busy; wait for one to finish. For more research build a research building.',
   'refusal.village_already_owned': 'The city already learned this.',
   'refusal.village_not_available': 'This cannot be researched or bought right now.',
   'refusal.village_terrain': 'The ground of this city does not suit it.',
