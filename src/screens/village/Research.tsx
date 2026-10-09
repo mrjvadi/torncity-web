@@ -8,6 +8,7 @@ import Popup, { ActionButton, ActionRow, Note, ProgressRow, Section } from '../.
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { formatNumber, money } from '../native/kit/format'
 import { atText, words } from '../../lib/duration'
+import { PersonalList, personalUntilText } from './Personal'
 import { hasKey, t, type Key } from '../../i18n'
 import { useVillageCommand, useContentNames } from '../../village/useVillage'
 import { Btns, Hint, Lead, Page, Panel, flow, isBack } from './flow'
@@ -73,6 +74,8 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
         <ul className="rd-rules">{(['r1', 'r2', 'r3', 'r4'] as const).map((k) => <li key={k}>{t(`rd.rules.${k}` as Key)}</li>)}</ul>
       </Panel>
 
+      {v.personal_until && <Note>{personalUntilText(v.personal_until, 'research')}</Note>}
+      {(v.personal ?? []).length > 0 && <Panel tone="gold"><PersonalList names={names} list={v.personal} title={t('vx.pn.lack_research')} onCourses={() => ctx.run('education.list')} /></Panel>}
       {v.stand_in_until && <Note>{t('rd.standin_note', { at: atText(v.stand_in_until) })}</Note>}
       <Section>{t('rd.slots')}</Section>
       <CardGrid>

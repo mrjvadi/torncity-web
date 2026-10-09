@@ -343,7 +343,8 @@ export function mockLifeCommand(command: string, a: Args): unknown | null {
     case 'mock.not_here': return notHere(false)
     case 'mock.not_here_walking': return notHere(true)
     case 'life.me': return life('')
-    case 'life.sleep': return args.method || args.spot === 'bench' ? life('slept') : sleepPay()
+    case 'life.sleep': if (args.spot === 'hostel' && new URLSearchParams(location.search).get('closed') === '1') return { ok: false, request_id: 'mock', screen: 'life_refusal', view: { kind: 'closed', wait_seconds: 0, min: 0, max: 0 }, error: { code: 'life_closed', args: {} }, actions: [back('life.me')] }
+      return args.method || args.spot === 'bench' ? life('slept') : sleepPay()
     case 'life.card': return card('')
     case 'life.bio': return card(args.clear ? 'bio_gone' : 'bio')
     case 'life.history': return history(Number(args.page ?? 1) || 1)

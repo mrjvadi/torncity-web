@@ -105,7 +105,7 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
   return (
     <div className="lb-site">
       {done
-        ? <Notice>{t('labor.done')}</Notice>
+        ? <Notice>{job ? t('labor.done_work') : t('labor.standing')}</Notice>
         : (
           <Card tone="gold">
             <Bar frac={frac} color="#f5a11f" label={t('labor.progress', { p: Math.floor(v.progress_bps / 100) })} />
@@ -116,15 +116,15 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
       {v.working && (
         <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })}</Notice>
       )}
-      {!done && job && v.can_work && (
+      {job && v.can_work && (
         <Slab tone="gold" radius={16} lip={5} onClick={() => void act('settlement.labor.take', { id: job.id })} disabled={busy}>
           {t('labor.work', { w: money(v.work_wage) })}
         </Slab>
       )}
-      {!done && job && !v.can_work && !v.working && <div className="lb-hint">{t('labor.cannot_work')}</div>}
-      {!done && v.can_work && <div className="lb-hint">{t('labor.points', { m: v.work_points })}</div>}
+      {job && !v.can_work && !v.working && <div className="lb-hint">{t('labor.cannot_work')}</div>}
+      {job && v.can_work && <div className="lb-hint">{t('labor.points', { m: v.work_points })}</div>}
 
-      {!done && (
+      {(!done || !!job) && (
         <>
           <SectionTitle>{t('labor.workers')}</SectionTitle>
           {workers.length === 0
@@ -142,11 +142,11 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
       )}
       {!done && !job && <Empty>{t('labor.no_job')}</Empty>}
 
-      {v.can_post && !done && (
+      {v.can_post && !job && (
         <Slab tone="steel" radius={14} lip={4} onClick={() => void act('settlement.labor.post', { id: v.id })} disabled={busy}>{t('labor.post')}</Slab>
       )}
 
-      {v.can_employ && job && !done && (
+      {v.can_employ && job && (
         <Card tone="sapphire">
           <SectionTitle>{t('labor.hire')}</SectionTitle>
           <div className="lb-hint">{t('labor.hire_hint', { a: formatNumber(v.npc_available), w: money(v.npc_wage) })}</div>
@@ -300,7 +300,7 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
                   const { icon, palette } = iconForRole(cat.get(s.building.code)?.category)
                   return (
                     <RowCard key={s.id} icon={icon} palette={palette} title={buildingName(cat, s.building.code, s.building.name)}
-                      sub={t('labor.progress', { p: Math.floor(s.progress_bps / 100) })}>
+                      sub={s.standing ? t('labor.standing') : t('labor.progress', { p: Math.floor(s.progress_bps / 100) })}>
                       <div className="lb-btns">
                         <Slab tone="gold" radius={12} lip={3} onClick={() => void post(s.id)}>{t('labor.post')}</Slab>
                       </div>

@@ -1703,7 +1703,7 @@ toast.unnamed | یک مورد | An item
 # -- the labour market (hiring board, construction sites) ---------------------
 labor.board.title | تابلوی استخدام | Hiring board
 labor.board.empty | فعلاً آگهی استخدامی نیست. هر ساختمانِ در حال ساخت برای کارگر آگهی می‌دهد. | No jobs are posted right now. Every building going up posts one.
-labor.board.sites | کارگاه‌های بدون آگهی | Sites with no job posted
+labor.board.sites | کارگاه‌های بدون آگهی استخدام | Workplaces with no job posted
 labor.open_board | تابلوی استخدام | Hiring board
 labor.site.title | کارگاه ساخت | Building site
 labor.mine.title | کار من | My work
@@ -5905,3 +5905,41 @@ rd.upkeep_missing | {item} کم است؛ از بازار بخر یا بساز. |
 rd.fix_buy | بخر | Buy
 rd.fix_build | بساز: {name} | Build: {name}
 common.retry | دوباره تلاش کن | Try again
+vx.pn.until_work | تا {at} همین‌طور می‌توانی کار کنی؛ از آن روز آنچه زیر هر کارگاه نوشته شده را لازم داری. | Until {at} you may work as you are; from then on you need what is listed under each workshop.
+vx.pn.until_research | تا {at} همین‌طور می‌توانی پژوهشگر باشی؛ از آن روز آنچه زیر نوشته شده را لازم داری. | Until {at} you may be a scholar as you are; from then on you need what is listed below.
+vx.pn.lack | برای کار اینجا این‌ها را کم داری: | For work here you still lack:
+vx.pn.lack_research | برای پژوهشگری این‌ها را کم داری: | To be a scholar you still lack:
+vx.pn.level | سطح {need} (سطح تو: {have}) | Level {need} (yours: {have})
+vx.pn.skill | مهارت «{skill}» در سطح {need} (سطح تو: {have}) | {skill} at level {need} (yours: {have})
+vx.pn.certificate | مدرک «{course}» | The {course} certificate
+vx.pn.literacy | خواندن و نوشتن (مدرک کلاس سواد) | Reading and writing (the literacy class certificate)
+vx.pn.rank | درجهٔ «{name}» | The rank {name}
+vx.pn.other | یک شرط دیگر هم هست. | There is one more condition.
+vx.pn.how.train | راهش: آموزش | The way: training
+vx.pn.how.course | راهش: یک دورهٔ آموزشی | The way: a course
+vx.pn.go | آموزش‌ها | Courses
+vx.rf.screen.village_personal | حالا که مهلت تمام شده، برای این کار چیزهایی را کم داری. | The grace is over, and you lack some things for this.
+ac.work.req.until | تا {at} هنوز بدون آن هم می‌شود؛ بعد از آن لازم است. | Until {at} you can still do without it; after that it is needed.
+ac.work.req.nearest | کلاسش اینجا نیست؛ نزدیک‌ترین جا: {city}. | Its class is not held here; the nearest place is {city}.
+lf.req.literacy | خواندن و نوشتن (مدرک کلاس سواد) | Reading and writing (the literacy class certificate)
+lf.req.literacy_met | خواندن و نوشتن را بلدی | You can read and write
+vx.svc.title | خدمات روزانهٔ شهر | The city's daily services
+vx.svc.kind.local_security | نگهبانی و امنیت | Watch and safety
+vx.svc.kind.primary_care | کمک‌های اولیه و مراقبت | First aid and care
+vx.svc.kind.lodging_and_tea | جای خواب و چای | A bed and tea
+vx.svc.open | امروز باز بود | Open today
+vx.svc.closed | امروز بسته است | Closed today
+vx.svc.idle.no_staff | کارگر ندارد؛ جایی برای کار در آن خالی است و کسی آن را پر نکرده. | It has no staff; its posts are empty.
+vx.svc.idle.no_wage | دستمزد کارگرش داده نشد؛ خزانهٔ شهر خالی بود. | Its worker was not paid; the treasury was empty.
+vx.svc.idle.no_supplies | مصالح روزانه‌اش تمام شده؛ چیزهایی که هر روز لازم دارد در انبار نیست. | Its daily supplies ran out; what it needs each day is not in the store.
+vx.svc.grace | تا {at} همین‌طور باز می‌ماند؛ از آن روز هر روز این‌ها را می‌خواهد: {needs}. | It stays open as it is until {at}; from then on it needs this each day: {needs}.
+vx.svc.needs | هر روز این‌ها را می‌خواهد: {needs}. | It needs this each day: {needs}.
+refusal.life_closed | مسافرخانه امروز بسته است؛ کارگر ندارد یا نان، آب و هیزمش تمام شده. | The inn is closed today; it has no staff, or it is out of bread, water or firewood.
+labor.standing | ساخته شده، کسی آنجا کار نمی‌کند. | It is built, and nobody works there.
+labor.done_work | این کارگاه ساخته شده و کار می‌کند. | This workshop is built and running.
+work.fix.no_staff_here | همین‌جا استخدام کن | Hire here
+work.standing | ساخته شده، کسی آنجا کار نمی‌کند. | It is built, and nobody works there.
+work.post | ثبت آگهی استخدام | Post a job
+work.hire | استخدام گروه کارگر | Hire a crew
+work.wage_set | دستمزد هر شیفت | Wage per shift
+work.wage_pct | {p}٪ | {p}%

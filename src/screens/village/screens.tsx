@@ -26,6 +26,7 @@ import {
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
+import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
 
 const Empt = Empty
@@ -107,6 +108,7 @@ const Refusal = flow<VillageRefusalView>(({ view: v, ctx }) => {
             ))}
           </ul>
         )}
+        <PersonalList names={ctx.names} list={v.personal} onCourses={() => ctx.run('education.list')} />
         {needs.length > 0 && (
           <>
             <SectionTitle>{subject ? t(key(`vx.needs.${v.action || 'build'}`), { name: subject }) : t('vx.needs.any')}</SectionTitle>
@@ -577,6 +579,7 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
         </Panel>
       )}
       {!v.resident && <Panel><Lead>{t('vx.work.not_resident')}</Lead></Panel>}
+      {v.personal_until && <Panel tone="gold"><Hint>{personalUntilText(v.personal_until, 'work')}</Hint></Panel>}
       {(v.places ?? []).length === 0 && <Empt>{t('vx.work.none')}</Empt>}
       {(v.places ?? []).length === 0 && (v.suggest ?? []).length > 0 && (
         <Hint>{t('vx.work.suggest', { names: (v.suggest ?? []).slice(0, 3).map((n) => ctx.bname(n.code, n.name)).join('، ') })}</Hint>
@@ -592,6 +595,7 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
                 right={<Chip>{t('vx.work.busy', { busy: p.busy, total: p.workers })}</Chip>} />
               {(p.consumes ?? []).length > 0 && <Hint>{t('vx.work.uses', { list: goods(p.consumes) })}</Hint>}
               {(p.produces ?? []).length > 0 && <Hint>{t('vx.work.makes', { list: goods(p.produces) })}</Hint>}
+              <PersonalList names={ctx.names} list={p.personal} title={t('vx.pn.lack')} onCourses={() => ctx.run('education.list')} />
               {act && <Btns ctx={ctx} list={[act]} />}
             </Panel>
           )

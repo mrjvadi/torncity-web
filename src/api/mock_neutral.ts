@@ -4,7 +4,7 @@
 // with a code and data, and its view still says what is missing. The mock answers like the real server
 // does once the operator has emptied `client.legacy_text_screens`, so `?mock=1` exercises the real thing.
 
-import type { BatchLotFailure, Named, Ref, ScreenViews, VillageNeed, VillageRefusalView } from './views.gen'
+import type { BatchLotFailure, Named, PersonalNeed, Ref, ScreenViews, VillageNeed, VillageRefusalView } from './views.gen'
 
 export interface MockAct {
   id?: string
@@ -35,6 +35,7 @@ interface RefusalOptions {
   back?: Ref
   args?: Record<string, unknown>
   needs?: VillageNeed[]
+  personal?: PersonalNeed[]
   action?: string
   subject?: Named
   lots?: BatchLotFailure[]
@@ -70,7 +71,7 @@ export function mockRefusal(kind: string, o: RefusalOptions = {}) {
   const needs = o.needs ?? []
   const view: VillageRefusalView = {
     kind, back: o.back ?? { command: 'settlement.overview', args: null }, remaining_seconds: o.remaining ?? 0, min: o.min ?? 0, max: o.max ?? 0,
-    lots: o.lots ?? null, missing: 0, action: o.action ?? '', subject: o.subject ?? { code: '', name: '' }, needs: needs.length ? needs : null,
+    lots: o.lots ?? null, missing: 0, action: o.action ?? '', subject: o.subject ?? { code: '', name: '' }, needs: needs.length ? needs : null, personal: o.personal ?? null,
   }
   const args: Record<string, unknown> = { ...(o.min || o.max ? { min: o.min ?? 0, max: o.max ?? 0 } : {}), ...(o.remaining ? { remaining_seconds: o.remaining } : {}), ...(o.args ?? {}) }
   return {

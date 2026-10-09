@@ -20,6 +20,7 @@ import { hasKey, t, type Key } from '../../i18n'
 import type {
   ConstructionProgressView, KnowledgeLineView, KnowledgeListView, VillageOverviewView,
 } from '../../api/types'
+import type { ServiceLine } from '../../api/views.gen'
 import { buildingName, useBuildingCatalogue, useContentNames, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
 import { constructionProgress } from '../../village/progress'
 import { countdown, durationText, iconForRole, RowCard, ROLE_TONE, useVillageView } from './common'
@@ -30,8 +31,29 @@ const back = (openLocal: ScreenProps['openLocal']) => () => openLocal('village_h
 
 // -- overview ----------------------------------------------------------------------------------
 
+/** A daily service post (watch post, health house, inn): held today or closed and why, and the calm note of the grace. */
+const SERVICE_ICON: Record<string, { icon: string; palette: 'ruby' | 'teal' | 'amber' }> = {
+  local_security: { icon: 'shield', palette: 'ruby' }, primary_care: { icon: 'hospital', palette: 'teal' }, lodging_and_tea: { icon: 'bed', palette: 'amber' },
+}
+function ServiceCard({ sv, names, name }: { sv: ServiceLine; names: ReturnType<typeof useContentNames>; name: string }) {
+  const ic = SERVICE_ICON[sv.service] ?? { icon: 'house', palette: 'amber' as const }
+  const needs = (sv.needs ?? []).map((m) => `${formatNumber(m.quantity)} ${names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ')
+  const why = !sv.held && sv.idle && hasKey(`vx.svc.idle.${sv.idle}`) ? t(`vx.svc.idle.${sv.idle}` as Key) : ''
+  return (
+    <Card className="vs-svc">
+      <ListRow icon={ic.icon} palette={ic.palette} title={name}
+        sub={hasKey(`vx.svc.kind.${sv.service}`) ? t(`vx.svc.kind.${sv.service}` as Key) : undefined}
+        right={<Chip>{sv.held ? t('vx.svc.open') : t('vx.svc.closed')}</Chip>} />
+      {why && <div className="vs-svc-why">{why}</div>}
+      {sv.grace && sv.grace_until && needs && <div className="vs-svc-note">{t('vx.svc.grace', { at: atText(sv.grace_until), needs })}</div>}
+      {!sv.grace && !sv.held && needs && <div className="vs-svc-note">{t('vx.svc.needs', { needs })}</div>}
+    </Card>
+  )
+}
+
 export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
   const cat = useBuildingCatalogue()
+  const names = useContentNames()
   const id = useSettlementId()
   const { players, store, status } = useVillage(id)
   const { res, view: v, loading, failed, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
@@ -77,6 +99,14 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
               ))}
             </div>
           </Card>
+          {(v.services ?? []).length > 0 && (
+            <>
+              <SectionTitle>{t('vx.svc.title')}</SectionTitle>
+              <div className="vs-svc-list">
+                {(v.services ?? []).map((sv, i) => <ServiceCard key={i} sv={sv} names={names} name={buildingName(cat, sv.building.code, sv.building.name)} />)}
+              </div>
+            </>
+          )}
           <SectionTitle>{t('overview.buildings')}</SectionTitle>
           {(v.buildings ?? []).length === 0 && <Empty>{t('overview.no_buildings')}</Empty>}
           <CardGrid>

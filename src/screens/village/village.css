@@ -366,3 +366,12 @@
 .tr-ctl .dk-step b { min-width: 0; flex: 1; font-size: 13px; white-space: nowrap; }
 .tr-price { font-size: 14px; } .tr-facts .m-sup { display: block; }
 .rd-up > span { display: flex; flex-direction: column; gap: 2px; } .wk-fixes { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+/* a daily service post: the row, why it is closed, the calm note of the grace */
+.vs-svc { display: flex; flex-direction: column; gap: 4px; }
+.vs-svc-why, .vs-svc-note { font-size: 12.5px; line-height: 1.6; color: var(--text-dim); padding: 0 6px 2px; }
+.vs-svc-why { color: var(--ruby, #e5484d); }
+.pn-lack { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.pn-lack-t { font-size: 13px; font-weight: 700; color: var(--gold, #ffd45c); }
+.pn-how { color: var(--text-dim); }
+.vs-svc-list { display: flex; flex-direction: column; gap: 8px; }
