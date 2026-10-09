@@ -83,7 +83,7 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
               foot={busyOne && prj ? <span className="rd-notes">{quoteNotes(prj).join(' · ') || t('rd.q.plain')}</span> : undefined} />
           )
         }))}
-        {locked && <PCard icon="m_lock" off title={t('rd.slot_locked')} sub={t('rd.locked_sub')} facts={<span className="dk-why">{t('rd.not_here')}</span>} />}
+        {locked && <PCard icon="chest" off title={t('rd.slot_locked')} sub={t('rd.locked_sub')} facts={<span className="dk-why">{t('rd.not_here')}</span>} />}
       </CardGrid>
       {free.length === 0 && used >= v.capacity && <Note tone="bad">{t('rd.full')}</Note>}
       {locked && <Hint>{t('rd.locked_hint')}</Hint>}
@@ -115,7 +115,7 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
       {(v.experience ?? []).length === 0 ? <Hint>{t('rd.exp_none')}</Hint> : (
         <CardGrid>
           {(v.experience ?? []).map((e) => (
-            <PCard key={e.field} icon="chart" title={hasKey(`rd.field.${e.field}`) ? t(`rd.field.${e.field}` as Key) : e.field} tone="busy"
+            <PCard key={e.field} icon="scroll" title={hasKey(`rd.field.${e.field}`) ? t(`rd.field.${e.field}` as Key) : e.field} tone="busy"
               sub={t('rd.exp_pts', { a: formatNumber(e.points), b: formatNumber(e.per) })}
               foot={<span className="rd-notes"><ProgressRow frac={Math.min(1, e.points / Math.max(1, e.per))} label={t('rd.exp_max', { p: bp(e.max_bps) })} color="#8e6cf0" /></span>} />
           ))}
