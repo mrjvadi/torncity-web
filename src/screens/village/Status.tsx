@@ -4,6 +4,7 @@
 // dots. Each keeps its command answer fresh and re-reads it when the
 // settlement channel reports a change.
 
+import { quoteNotes, bp } from './Research'
 import { atText } from '../../lib/duration'
 import { useEffect, useState } from 'react'
 import DonateSheet from './Donate'
@@ -189,9 +190,15 @@ function runFrac(v: KnowledgeListView, now: number): number {
   return Math.max(0, Math.min(1, 1 - (Date.parse(run.finish_at) - now) / 1000 / total))
 }
 
+function projFrac(v: KnowledgeListView, p: { knowledge: { code: string }; finish_at: string | null }, now: number): number {
+  const total = (v.lines ?? []).find((l) => l.knowledge.code === p.knowledge.code)?.research_time_seconds ?? 0
+  if (!p.finish_at || total <= 0) return 0
+  return Math.max(0, Math.min(1, 1 - (Date.parse(p.finish_at) - now) / 1000 / total))
+}
+
 const STATE_TONE: Record<string, 'emerald' | 'gold' | 'ruby' | undefined> = { held: 'emerald', researching: 'gold', locked: undefined, available: undefined }
 
-export function Knowledge({ response, openLocal }: ScreenProps) {
+export function Knowledge({ response, openLocal, run }: ScreenProps) {
   const names = useContentNames()
   const cat = useBuildingCatalogue()
   const kname = (n: { code: string; name: string }) => names.name('knowledge', n.code, n.name)
@@ -208,7 +215,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
   async function go() {
     if (!ask) return
     setBusy(true)
-    const r = await cmd(ask.kind === 'buy' ? 'settlement.knowledge.buy' : 'settlement.knowledge.research', { code: ask.line.knowledge.code }, { write: true })
+    const r = await cmd(ask.kind === 'buy' ? 'settlement.knowledge.buy' : 'settlement.knowledge.research', { code: ask.line.knowledge.code, ...(ask.kind === 'research' && ask.line.slot ? { slot: ask.line.slot } : {}) }, { write: true })
     setBusy(false)
     setAsk(null)
     if (r.ok) { toast.push(t('know.done')); void refresh() }
@@ -234,7 +241,17 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
               <div><div className="nx-stat-label">{t('know.treasury')}</div><div className="display" style={{ fontSize: 18, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
               <div><div className="nx-stat-label">{t('know.literacy')}</div><div className="display" style={{ fontSize: 18 }}>{v.literacy_percent}%</div></div>
             </div>
-            {v.running && (
+            <div className="vs-grid" style={{ marginTop: 8 }}>
+              <div><div className="nx-stat-label">{t('know.projects')}</div><div className="display" style={{ fontSize: 18 }}><span dir="ltr">{formatNumber((v.projects ?? []).length || (v.running ? 1 : 0))} / {formatNumber(v.capacity || 1)}</span></div></div>
+              <div><Slab tone="blue" radius={12} lip={3} onClick={() => run('settlement.research')}>{t('know.desk')}</Slab></div>
+            </div>
+            {(v.projects ?? []).map((p) => (
+              <div key={p.knowledge.code} style={{ marginTop: 8 }}>
+                <div className="nx-stat-label">{kname(p.knowledge)} · {p.slot === 'free' || !p.slot ? t('rd.slot_of_town') : t('rd.slot_building')} · {bp(p.speed_bps)}</div>
+                <Bar frac={projFrac(v, p, now)} color="#8e6cf0" label={countdown(p.finish_at, now)} />
+              </div>
+            ))}
+            {v.running && !(v.projects ?? []).length && (
               <div style={{ marginTop: 10 }}>
                 <div className="nx-stat-label">{t('know.running')}: {kname(v.running.knowledge)}</div>
                 <Bar frac={runFrac(v, now)} color="#8e6cf0" label={countdown(v.running.finish_at, now)} />
@@ -266,6 +283,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
                   title={kname(l.knowledge)} sub={sub}
                   right={<Chip tone={held ? 'emerald' : l.state === 'researching' ? 'gold' : undefined}>{t(`know.state.${l.state}` as Key)}</Chip>}
                 >
+                  {l.state === 'available' && quoteNotes(l).length > 0 && <div className="nx-bar-sub rd-notes">{quoteNotes(l).join(' · ')}</div>}
                   {!held && opens.length > 0 && <div className="nx-bar-sub">{t('know.unlocks', { list: opens.join('، ') })}</div>}
                   {l.state === 'available' && short > 0 && <div className="nx-bar-sub">{t('know.short', { n: money(short) })}</div>}
                   {canAct && l.state === 'available' && (
@@ -296,6 +314,7 @@ export function Knowledge({ response, openLocal }: ScreenProps) {
             <StatGrid>
               <StatCard icon="coins" palette="gold" label={t(ask.kind === 'buy' ? 'know.stat.buy' : 'know.stat.research')} value={money(ask.kind === 'buy' ? ask.line.buy_price : ask.line.research_cost)} />
             </StatGrid>
+            {ask.kind === 'research' && <ResearchQuote line={ask.line} />}
             <Note>
               {ask.kind === 'buy'
                 ? t('know.confirm_buy', { name: kname(ask.line.knowledge), price: money(ask.line.buy_price) })
@@ -339,5 +358,17 @@ export function Who({ openLocal }: ScreenProps) {
         })}
       </CardGrid>
     </ScreenScroll>
+  )
+}
+
+/** The quote a project would be recorded on: pace, ahead-of-era surcharge, breakthrough discount and pact bonus, then time. */
+function ResearchQuote({ line }: { line: KnowledgeLineView }) {
+  const notes = quoteNotes(line)
+  return (
+    <div className="rd-quote">
+      {notes.length === 0 ? <Note>{t('rd.q.plain')}</Note> : notes.map((n, i) => <Note key={i}>{n}</Note>)}
+      <Note>{t('rd.q.time', { t: durationText(line.research_time_seconds) })}</Note>
+      {line.slot && <Note>{line.slot === 'free' ? t('rd.q.slot_free') : t('rd.q.slot_building')}</Note>}
+    </div>
   )
 }

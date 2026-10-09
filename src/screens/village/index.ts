@@ -13,13 +13,14 @@ import { registerFlow } from './flow'
 import { FX_FLOWS, FX_SCREENS } from './Fx'
 import { LotManage } from './LotManage'
 import { ReserveScreen } from './Reserve'
+import { ResearchDesk } from './Research'
 
 // The village: a local home screen (the 3D view) and the status screens,
 // which are also the layouts of the server screens the same commands answer
 // with (client-api.md section 4.3). See ../registry.ts.
 const screens: ScreenSet = {
   SERVER: {
-    ...Object.fromEntries([...FLOW_SCREENS, ...SHOP_SCREENS, ...FX_SCREENS, 'lot_manage', 'village_reserve'].map((name) => [name, FlowHost])),
+    ...Object.fromEntries([...FLOW_SCREENS, ...SHOP_SCREENS, ...FX_SCREENS, 'lot_manage', 'village_reserve', 'research'].map((name) => [name, FlowHost])),
     village_overview: Overview,
     settlement_construction_progress: Progress,
     settlement_knowledge_list: Knowledge,
@@ -47,7 +48,7 @@ const screens: ScreenSet = {
 
 registerFlow(SHOP_FLOWS)
 registerFlow(FX_FLOWS)
-registerFlow({ lot_manage: LotManage, village_reserve: ReserveScreen })
+registerFlow({ lot_manage: LotManage, village_reserve: ReserveScreen, research: ResearchDesk })
 
 // a write that answers one of these hands over to its own layout (flow.tsx)
 for (const name of ['village_overview', 'settlement_construction_progress', 'settlement_knowledge_list', 'village_materials', 'labor_board', 'labor_site', 'labor_mine']) {

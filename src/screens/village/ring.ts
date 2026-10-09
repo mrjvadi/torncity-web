@@ -18,7 +18,7 @@ export interface RingHandlers {
   civic?: boolean
   /** «مدیریت»: the owner's, or a holder of public.build on the settlement's own buildings (B1) */
   manage?: () => void
-  run: (command: string) => void
+  run: (command: string, args?: Record<string, string>) => void
 }
 
 const has0 = (ov: BuildingOverlay | null, a: BuildingOverlay['actions'][number]) => !!ov?.actions.includes(a)
@@ -40,6 +40,7 @@ export function ringActions(b: LayoutBuilding, ov: BuildingOverlay | null, h: Ri
     if (has('take_shift')) primary({ id: 'shift', label: t('v6.ring.shift'), icon: 'tool', onClick: () => h.run('settlement.work') })
     if (ov?.role === 'storage') primary({ id: 'storage', label: t('v6.ring.storage'), icon: 'chest', onClick: () => h.open('village_storage') })
     if (ov?.role === 'market') primary({ id: 'market', label: t('v6.ring.market'), icon: 'coin', onClick: () => h.run('market.list') })
+    if (ov?.role === 'research') { primary({ id: 'desk', label: t('rd.ring_desk'), icon: 'book', onClick: () => h.run('settlement.research') }); acts.push({ id: 'post', label: t('rd.take'), icon: 'person', onClick: () => h.run('settlement.research', { action: 'post', code: b.id ?? '' }) }) }
     if (ov?.role === 'education') primary({ id: 'learn', label: t('v6.ring.learn'), icon: 'book', onClick: () => h.run('education.list') })
     if (has('research')) acts.push({ id: 'knowledge', label: t('v6.ring.knowledge'), icon: 'book', onClick: () => h.open('village_knowledge') })
     if (has('elections')) acts.push({ id: 'elections', label: t('v6.ring.elections'), icon: 'ballot', onClick: () => h.run('election.list') })

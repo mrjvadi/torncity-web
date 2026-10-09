@@ -1964,7 +1964,7 @@ bld.desc.code.airport | این بنا وقتی به کار می‌آید که ش
 bld.desc.generic | یکی از ساختمان‌های شهر. | One of the city's buildings.
 # -- refusals of the village area, by code (the core sends a code and data, never a sentence) ----
 refusal.village_insufficient_funds | خزانهٔ شهر برای این کار کافی نیست. | The city treasury cannot pay for this.
-refusal.village_busy | شهر همین حالا سرگرم کار دیگری است؛ صبر کن تمام شود. | The city is busy with something else; wait for it to finish.
+refusal.village_busy | همهٔ جایگاه‌ها پر است؛ صبر کن یکی تمام شود. برای پژوهش بیشتر ساختمان پژوهشی (کتابخانه، آزمایشگاه) بساز. | All slots are busy; wait for one to finish. For more research build a research building.
 refusal.village_already_owned | شهر این را از قبل یاد گرفته. | The city already learned this.
 refusal.village_not_available | این یکی الان نه پژوهش می‌شود نه خریدنی است. | This cannot be researched or bought right now.
 refusal.village_terrain | زمین این شهر برای این کار جور نیست. | The ground of this city does not suit it.
@@ -5691,3 +5691,76 @@ rs.lv_fx | کارمزد بازار | Market fee
 rs.lv_band | بازهٔ مجاز قیمت | Allowed price band
 rs.lv_notice | اعلام برداشت | Withdrawal notice
 rs.hours | {n} ساعت قبل | {n} h ahead
+rd.title | میز پژوهش | Research desk
+rd.lead | پروژه‌های هم‌زمان: {a} از {b} | Projects at once: {a} of {b}
+rd.rules.r1 | هر شهر یک جایگاه رایگان دارد؛ کتابخانه و آزمایشگاه جایگاه‌های بیشتری می‌دهند. | Every city has a free slot; libraries and laboratories add more.
+rd.rules.r2 | ساختمان پژوهشی فقط در روزی کار می‌کند که پژوهشگر کافی دارد، خزانه دستمزد می‌دهد و مواد همان روز در انبار است. | A research building works only on a day with enough scholars, wages paid and the day's materials in stock.
+rd.rules.r3 | هرچه جلوتر از زمانه باشد گران‌تر و کندتر است؛ هرچه دنیا بلد باشد زودتر یاد گرفته می‌شود. | What is ahead of the world costs more and takes longer.
+rd.rules.r4 | پروژه‌ای که شروع شده، هیچ‌وقت وسط کار نمی‌ایستد. | A started project never stops.
+rd.slots | جایگاه‌ها | Slots
+rd.slot_free | جایگاه خالی | Free slot
+rd.slot_ready | آمادهٔ پروژهٔ تازه | Ready for a project
+rd.slot_of_town | جایگاه رایگان شهر | The city's free slot
+rd.slot_locked | جایگاه بسته | Locked slot
+rd.locked_sub | کتابخانه، آزمایشگاه یا مدرسهٔ عالی | A library, laboratory or academy
+rd.not_here | اینجا نیست | Not here
+rd.locked_hint | برای جایگاه بیشتر کتابخانه، آزمایشگاه یا مدرسهٔ عالی بساز و پژوهشگر بگمار. | Build a library, laboratory or academy and staff it for more slots.
+rd.full | همهٔ جایگاه‌ها پر است؛ صبر کن یکی تمام شود یا ساختمان پژوهشی بساز. | All slots are full; wait for one to finish or build a research building.
+rd.left | {w} مانده | {w} left
+rd.buildings | ساختمان‌های پژوهشی | Research buildings
+rd.open | امروز کار می‌کند | Works today
+rd.idle | امروز بیکار است | Idle today
+rd.idle.no_scholars | پژوهشگر کافی نیست. | Not enough scholars.
+rd.idle.no_wage | خزانه دستمزد پژوهشگرها را ندارد. | The treasury cannot pay the scholars.
+rd.idle.no_upkeep | مواد امروز در انبار نیست. | The day's materials are not in the stock.
+rd.scholar | پژوهشگر | Scholar
+rd.s.player | از اهالی | A resident
+rd.s.npc | پژوهشگر شهر | Town scholar
+rd.seats | {a} از {b} پژوهشگر | {a} of {b} scholars
+rd.b_facts | {slots} جایگاه · دستمزد هر روز {wage} · سرعت {bonus} بیشتر | {slots} slots · wage a day {wage} · pace +{bonus}
+rd.upkeep | خرج روز | Day's upkeep
+rd.take | پژوهشگر شو | Become a scholar
+rd.leave | ترک | Leave
+rd.cannot_take | الان جایی برای تو نیست یا پست دیگری داری. | No post for you now, or you hold another.
+rd.exp | تجربهٔ کار | Work experience
+rd.exp_none | هنوز کاری در این زمینه‌ها انجام نشده. | No work done yet.
+rd.exp_pts | {a} امتیاز از {b} | {a} points of {b}
+rd.exp_max | تا {p} ارزان‌تر | up to {p} cheaper
+rd.exp_note | کار واقعی (نوبت‌های تمام‌شده در مزرعه، کارگاه...) پروژهٔ بعدی همان زمینه را ارزان‌تر و زودتر می‌کند. | Real work makes the next project in that field cheaper and faster.
+rd.field.farming | کشاورزی | Farming
+rd.field.craft | صنعت | Craft
+rd.field.building | ساخت‌وساز | Building
+rd.field.trade | بازرگانی | Trade
+rd.pacts | پیمان پژوهش | Research pacts
+rd.pact_note | با هر شهر هم‌پیمانی که آن دانش را دارد، پروژه ۱۰٪ سریع‌تر می‌شود، تا {cap}. | Each partner city that holds the item speeds a project up 10%, up to {cap}.
+rd.pact_none | هنوز پیمانی نیست. | No pacts yet.
+rd.pact.active | فعال | Active
+rd.pact.incoming | پیشنهاد به ما | Offered to us
+rd.pact.outgoing | پیشنهاد ما، منتظر پاسخ | Our offer, waiting
+rd.accept | قبول | Accept
+rd.decline | رد | Decline
+rd.end | پایان پیمان | End the pact
+rd.withdraw | پس‌گرفتن | Withdraw
+rd.offer | پیشنهاد پیمان | Offer a pact
+rd.offer_help | به کدام شهر پیشنهاد می‌دهی؟ | Which city?
+rd.pact_gate | فقط کسی که اجازهٔ «پیمان همکاری پژوهشی» دارد پیمان می‌بندد. | Only a holder of the research-pact permission makes pacts.
+rd.ring_desk | میز پژوهش | Research desk
+rd.slot_building | جایگاه ساختمان | Building slot
+rd.q.speed | سرعت جایگاه: {p} | Slot pace: {p}
+rd.q.ahead | جلوتر از زمانه: +{p} | Ahead of the world: +{p}
+rd.q.discount | تخفیف تجربهٔ کار: {p} | Work-experience discount: {p}
+rd.q.share | پیمان پژوهش: +{p} | Research pact: +{p}
+rd.q.plain | قیمت و زمان معمولی. | Plain price and time.
+rd.q.time | زمان: {t} | Time: {t}
+rd.q.slot_free | در جایگاه رایگان شهر انجام می‌شود. | Runs in the free slot.
+rd.q.slot_building | در جایگاه ساختمان پژوهشی انجام می‌شود. | Runs in a research building's slot.
+know.projects | پروژه‌های هم‌زمان | Projects at once
+know.desk | میز پژوهش | Research desk
+charter.perm.research.share | پیمان همکاری پژوهشی | Research pact
+refusal.village_research_no_post | این ساختمان جای پژوهشگر ندارد. | This building has no scholar post.
+refusal.village_research_post_held | پستی در این ساختمان داری یا جایش پر است. | You already hold a post, or it is full.
+refusal.village_research_no_post_held | پست پژوهشی نداری. | You hold no research post.
+refusal.village_research_pact_open | پیشنهاد پیمان از قبل باز است. | A pact offer is already open.
+refusal.village_research_pact_self | با خودت پیمان نمی‌بندی. | You cannot pact with yourself.
+refusal.village_research_pact_not_found | آن پیمان پیدا نشد. | No such pact.
+refusal.village_research_no_slot | همهٔ جایگاه‌ها پر است؛ صبر کن یکی تمام شود یا ساختمان پژوهشی بساز. | All slots are full; wait or build a research building.
