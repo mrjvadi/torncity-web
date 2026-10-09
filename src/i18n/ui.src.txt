@@ -5856,7 +5856,7 @@ tr.none_on | هنوز چیزی برای فروش نگذاشته‌ای. | Nothin
 tr.stock | موجودی: {n} | In stock: {n}
 tr.on | برای فروش | On sale
 tr.unit | بازرگان واحدی {p} می‌خرد | The trader pays {p} each
-tr.ref | قیمت مرجع {p} · {c} آن | Reference {p} · {c} of it
+tr.ref | مرجع {p} · {c} آن | Reference {p} · {c} of it
 tr.surplus | مازاد {n} واحد | Surplus {n}
 tr.no_surplus | مازادی نیست | No surplus
 tr.keep | نگه‌دار | Keep
@@ -5887,3 +5887,7 @@ ug.consumes | مصرف روزانه | Daily use
 ug.cap.research_slots | جایگاه پژوهش +{n} | Research slots +{n}
 ug.cap.storage | جای انبار +{n} | Storage room +{n}
 ug.cap.housing | جای زندگی +{n} | Housing +{n}
+tr.clerk | جای منشی بازار | Market clerk's seat
+tr.clerk_in | پر است | Filled
+tr.clerk_empty | خالی است؛ بدون منشی بازرگان نمی‌خرد | Empty; the trader does not buy without a clerk
+tr.clerk_wage | دستمزد هر روز: {w} | Wage a day: {w}

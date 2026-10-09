@@ -364,3 +364,4 @@
 .tr-ctl .dk-step { width: 100%; justify-content: space-between; }
 .tr-ctl .dk-step button { width: 40px; height: 44px; flex: none; }
 .tr-ctl .dk-step b { min-width: 0; flex: 1; font-size: 13px; white-space: nowrap; }
+.tr-price { font-size: 14px; } .tr-facts .m-sup { display: block; }

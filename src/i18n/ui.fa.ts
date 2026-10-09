@@ -5756,7 +5756,7 @@ export const uiFa = {
   'tr.stock': 'موجودی: {n}',
   'tr.on': 'برای فروش',
   'tr.unit': 'بازرگان واحدی {p} می‌خرد',
-  'tr.ref': 'قیمت مرجع {p} · {c} آن',
+  'tr.ref': 'مرجع {p} · {c} آن',
   'tr.surplus': 'مازاد {n} واحد',
   'tr.no_surplus': 'مازادی نیست',
   'tr.keep': 'نگه‌دار',
@@ -5787,6 +5787,10 @@ export const uiFa = {
   'ug.cap.research_slots': 'جایگاه پژوهش +{n}',
   'ug.cap.storage': 'جای انبار +{n}',
   'ug.cap.housing': 'جای زندگی +{n}',
+  'tr.clerk': 'جای منشی بازار',
+  'tr.clerk_in': 'پر است',
+  'tr.clerk_empty': 'خالی است؛ بدون منشی بازرگان نمی‌خرد',
+  'tr.clerk_wage': 'دستمزد هر روز: {w}',
 } as const
 
 export type UiKey = keyof typeof uiFa

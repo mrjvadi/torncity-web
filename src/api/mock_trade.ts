@@ -19,7 +19,8 @@ function desk(): TradeDeskView {
   const items = [g('wheat', 'گندم', 120, 9), g('timber', 'چوب', 40, 14), g('stone', 'سنگ', 18, 30), g('wool', 'پشم', 6, 40), g('plank', 'تخته', 0, 28), g('brick', 'آجر', 12, 22), g('cloth', 'پارچه', 3, 70)]
   const sold = { outcome: 'sold', gross: 117 + 540, wage: 120, at: iso(-20), lines: [{ item: N('timber', 'چوب'), qty: 9, unit: 13 }, { item: N('wheat', 'گندم'), qty: 60, unit: 8 }] }
   const last = m === 'none' ? null : m === 'noclerk' ? { outcome: 'no_clerk', gross: 0, wage: 0, at: iso(-20), lines: null } : m === 'wage' ? { outcome: 'no_wage', gross: 0, wage: 0, at: iso(-20), lines: null } : sold
-  return { name: 'آمل', has_post: m !== 'nopost', cap: 80, price_bps: 9000, prospect: [...on].reduce((a, [c, k]) => a + Math.max(0, (items.find((i) => i.item.code === c)?.stock ?? 0) - k), 0), items, last, may_order: head(), keep_presets: [0, 10, 30, 100] }
+  return { name: 'آمل', has_post: m !== 'nopost', cap: 80, price_bps: 9000, prospect: [...on].reduce((a, [c, k]) => a + Math.max(0, (items.find((i) => i.item.code === c)?.stock ?? 0) - k), 0), items, last, may_order: head(), keep_presets: [0, 10, 30, 100],
+    ...(new URLSearchParams(location.search).has('clerkfield') ? { next_at: iso(6), clerk: { seat: 'b-post', filled: m !== 'noclerk', wage: 120 } } : {}) } as TradeDeskView
 }
 
 export function mockTradeCommand(command: string, args: Record<string, unknown>) {

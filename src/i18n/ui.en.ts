@@ -5789,4 +5789,8 @@ export const uiEn: Record<UiKey, string> = {
   'ug.cap.research_slots': 'Research slots +{n}',
   'ug.cap.storage': 'Storage room +{n}',
   'ug.cap.housing': 'Housing +{n}',
+  'tr.clerk': 'Market clerk\'s seat',
+  'tr.clerk_in': 'Filled',
+  'tr.clerk_empty': 'Empty; the trader does not buy without a clerk',
+  'tr.clerk_wage': 'Wage a day: {w}',
 }
