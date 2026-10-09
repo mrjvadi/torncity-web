@@ -655,7 +655,7 @@ export function buildLookModel(look: LookDescriptor, W: number, D: number, found
   g.box(0, (0.16 - f) / 2, 0, W - 0.6, 0.16 + f, D - 0.6, STONE_DARK, G_PLAIN)
   patch(g, 0, 0, W - 1.0, D - 1.0, 0.2, GRAVEL)
   const wobble = (look.wobble ?? 0) * 0.1
-  const w = Math.max(3, (W - 1.6) * (1 + wobble)), d = Math.max(3, (D - 1.6) * (1 - wobble))
+  const w = Math.max(3, W * 0.6 * (1 + wobble)), d = Math.max(3, D * 0.6 * (1 - wobble))
   const base = new Color(look.material === 'stone' ? 0xb9b6ae : PALETTE_WALL[look.palette ?? ''] ?? 0xcdb48c)
   const hsl = { h: 0, s: 0, l: 0 }
   base.getHSL(hsl)
