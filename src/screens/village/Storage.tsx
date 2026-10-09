@@ -110,6 +110,12 @@ export default function Storage({ response, openLocal, run }: ScreenProps) {
           {v.bought && (
             <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: goods(v.bought.item), total: money(v.bought.total) })}</Notice>
           )}
+          {(v.stand_ins ?? []).length > 0 && v.stand_in_until && (
+            <Notice>
+              <b>{t('mt.standin_title')}</b>
+              {(v.stand_ins ?? []).map((s) => <div key={s.item.code}>{t('mt.standin', { at: dateText(v.stand_in_until!), stand: goods(s.stand), item: goods(s.item) })}</div>)}
+            </Notice>
+          )}
           {v.transition?.until && <Notice>{t('sm.st.transition', { date: dateText(v.transition.until) })}</Notice>}
           {(v.classes ?? []).map((c) => (
             <div key={c.class} className="st-class">

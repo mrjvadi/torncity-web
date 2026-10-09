@@ -5891,3 +5891,16 @@ tr.clerk | جای منشی بازار | Market clerk's seat
 tr.clerk_in | پر است | Filled
 tr.clerk_empty | خالی است؛ بدون منشی بازرگان نمی‌خرد | Empty; the trader does not buy without a clerk
 tr.clerk_wage | دستمزد هر روز: {w} | Wage a day: {w}
+tr.next | بازار بعدی: {at} به وقت شهر | Next market: {at} city time
+tr.clerk_npc | منشی شهر پشت میز است | A town clerk sits there
+work.tool_wear | یک ابزار تقریباً هر {n} نوبت فرسوده می‌شود؛ ابزار در انبار: {have} | One tool wears about every {n} shifts; tools in store: {have}
+work.bare | ابزار فرسوده شده و ابزاری در انبار نیست؛ بدون ابزار: {p} تولید. ابزار از کارگاه ابزارسازی یا بازارچه می‌آید. | The tool is worn out and the store has none; without a tool: {p} of the output. Tools come from a tool workshop or the market post.
+work.tool_workshop | ساخت کارگاه ابزارسازی | Build a tool workshop
+work.tool_buy | خرید ابزار | Buy tools
+mt.standin | تا {at} هنوز {stand} جای {item} حساب می‌شود؛ بعد از آن خود {item} لازم است. | Until {at}, {stand} still counts in place of {item}; after that {item} itself is needed.
+mt.standin_title | جایگزین موقت | Temporary stand-in
+rd.standin | یا {stand} (در انبار: {n}) تا {at} | or {stand} (in store: {n}) until {at}
+rd.standin_note | تا {at} هنوز جایگزین‌ها قبول است؛ بعد از آن خود ماده لازم است. | Until {at} stand-ins still count; after that the item itself is needed.
+rd.upkeep_missing | {item} کم است؛ از بازار بخر یا بساز. | {item} is short; buy it or make it.
+rd.fix_buy | بخر | Buy
+rd.fix_build | بساز: {name} | Build: {name}

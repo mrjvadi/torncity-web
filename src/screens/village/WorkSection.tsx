@@ -16,7 +16,7 @@ const FIX: Record<string, Door | undefined> = { no_food: 'village_storage', no_s
 const pct = (bps: number, dec = 0) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: dec }).format(bps / 100)}٪`
 const word = (key: string, fallback: string, args?: Record<string, string | number>) => (hasKey(key) ? t(key as Key, args) : fallback)
 
-export default function WorkSection({ work: w, names, onOpen, onClose, act, manage = false, buildingId = '' }: {
+export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, act, manage = false, buildingId = '' }: {
   /** runs a labour command for this building (post a repair, take a shift, hire a crew); the panel reloads after it */
   act?: (command: string, args: Record<string, string>) => void
   manage?: boolean
@@ -24,6 +24,8 @@ export default function WorkSection({ work: w, names, onOpen, onClose, act, mana
   work: WorkNode
   names: ContentNames
   onOpen?: (screen: Door) => void
+  /** opens the build menu on the tool workshop (the fix when the tools are gone) */
+  onBuild?: () => void
   onClose: () => void
 }) {
   const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
@@ -87,6 +89,20 @@ export default function WorkSection({ work: w, names, onOpen, onClose, act, mana
           <div>{shift.join(' · ')}</div>
           {(w.outputs ?? []).length > 0 && w.storage_class && <small>{t('work.goes_to', { class: className(w.storage_class), free: formatNumber(w.storage_free) })}</small>}
         </div>
+      )}
+      {w.tool_wear_bps > 0 && (
+        <>
+          <div className="gc-note">{t('work.tool_wear', { n: formatNumber(Math.round(10000 / w.tool_wear_bps)), have: formatNumber(w.tools_have) })}</div>
+          {w.bare_hands && (
+            <Note tone="bad">
+              {t('work.bare', { p: pct(w.bare_hands_bps) })}
+              <span className="wk-fixes">
+                {onBuild && <button type="button" className="dk-chip all" onClick={() => { onClose(); onBuild() }}>{t('work.tool_workshop')}</button>}
+                {onOpen && <button type="button" className="dk-chip" onClick={() => { onClose(); onOpen('village_storage') }}>{t('work.tool_buy')}</button>}
+              </span>
+            </Note>
+          )}
+        </>
       )}
       {w.meal_points > 0 && (
         <>

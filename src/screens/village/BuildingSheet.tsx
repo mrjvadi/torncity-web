@@ -155,7 +155,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
       {going ? (
         !b.finish_at && <Note>{t('labor.by_work_hint')}</Note>
       ) : (
-        <TypePanel kind={kind} panel={panel} names={names} onOpen={onOpen} onClose={onClose} manage={canAct} onAct={(c, a) => { void cmd(c, a, { write: true }).then((r) => { if (r.ok) void load(false) }) }} />
+        <TypePanel kind={kind} panel={panel} names={names} onOpen={onOpen} onBuild={onBuild} onClose={onClose} manage={canAct} onAct={(c, a) => { void cmd(c, a, { write: true }).then((r) => { if (r.ok) void load(false) }) }} />
       )}
       {site && b.id && <SiteSheet buildingId={b.id} title={name} onClose={() => setSite(false)} />}
 
@@ -179,7 +179,8 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
   return <Popup open onClose={closeAll} title={name} tone="gold" footer={footer}>{content}</Popup>
 }
 
-function TypePanel({ kind, panel, names, onOpen, onClose, manage, onAct }: {
+function TypePanel({ kind, panel, names, onOpen, onBuild, onClose, manage, onAct }: {
+  onBuild?: Props['onBuild']
   manage: boolean
   onAct: (command: string, args: Record<string, string>) => void
   kind: string
@@ -245,7 +246,7 @@ function TypePanel({ kind, panel, names, onOpen, onClose, manage, onAct }: {
           )}
         </>
       )}
-      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onClose={onClose} manage={manage} act={onAct} buildingId={panel.id} />}
+      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onBuild={onBuild ? () => onBuild('tool_workshop') : undefined} onClose={onClose} manage={manage} act={onAct} buildingId={panel.id} />}
       {effects.length > 0 && (
         <EffectRow>
           {effects.map((e) => (
