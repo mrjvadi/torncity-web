@@ -5587,4 +5587,10 @@ export const uiEn: Record<UiKey, string> = {
   'rs.reason.reserve_not_wind': 'The money is not winding down.',
   'rs.reason.reserve_nothing': 'Nothing to do.',
   'rs.reason.other': 'Not possible now.',
+  'rs.coverage_l': 'Coverage',
+  'rs.lv_mint': 'Mint fee',
+  'rs.lv_fx': 'Market fee',
+  'rs.lv_band': 'Allowed price band',
+  'rs.lv_notice': 'Withdrawal notice',
+  'rs.hours': '{n} h ahead',
 }

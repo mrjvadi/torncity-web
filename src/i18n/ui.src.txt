@@ -5685,3 +5685,9 @@ rs.reason.reserve_wind_down | پول در حال جمع‌شدن است. | The m
 rs.reason.reserve_not_wind | پول در حال جمع‌شدن نیست. | The money is not winding down.
 rs.reason.reserve_nothing | چیزی برای انجام نیست. | Nothing to do.
 rs.reason.other | الان نمی‌شود. | Not possible now.
+rs.coverage_l | پوشش | Coverage
+rs.lv_mint | کارمزد چاپ | Mint fee
+rs.lv_fx | کارمزد بازار | Market fee
+rs.lv_band | بازهٔ مجاز قیمت | Allowed price band
+rs.lv_notice | اعلام برداشت | Withdrawal notice
+rs.hours | {n} ساعت قبل | {n} h ahead

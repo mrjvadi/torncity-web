@@ -5585,6 +5585,12 @@ export const uiFa = {
   'rs.reason.reserve_not_wind': 'پول در حال جمع‌شدن نیست.',
   'rs.reason.reserve_nothing': 'چیزی برای انجام نیست.',
   'rs.reason.other': 'الان نمی‌شود.',
+  'rs.coverage_l': 'پوشش',
+  'rs.lv_mint': 'کارمزد چاپ',
+  'rs.lv_fx': 'کارمزد بازار',
+  'rs.lv_band': 'بازهٔ مجاز قیمت',
+  'rs.lv_notice': 'اعلام برداشت',
+  'rs.hours': '{n} ساعت قبل',
 } as const
 
 export type UiKey = keyof typeof uiFa

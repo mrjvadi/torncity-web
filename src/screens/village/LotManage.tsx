@@ -155,7 +155,8 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
 
   return (
     <>
-      <Popup open={!ask} onClose={close} tone="gold" dismissible={!busy} title={`${t('lm.title')} · ${ctx.bname(v.building.code, v.building.name)}`}>
+      <Popup open={!ask} onClose={close} tone="gold" dismissible={!busy} title={t('lm.title')}>
+        <div className="lm-sub">{ctx.bname(v.building.code, v.building.name)}</div>
         {v.stage === 'done' && <Note tone="good">{t('lm.done')}{v.share_code ? ` ${t('lm.share_code', { code: v.share_code })}` : ''}</Note>}
         {!v.built && <Note>{t('lm.not_built')}</Note>}
         <StatGrid>

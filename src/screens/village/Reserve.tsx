@@ -76,13 +76,19 @@ export const ReserveScreen = flow<ReserveView>(({ view: v0, ctx }) => {
           <StatCard icon="chart" palette="emerald" label={t('rs.excess')} value={sup(v.excess)} />
           <StatCard icon="people" palette="sapphire" label={t('rs.supply')} value={units(v.supply)} />
         </StatGrid>
-        {v.coverage_known ? <ProgressRow frac={Math.min(1, v.coverage_bps / 20000)} label={<span dir="auto">{t('rs.coverage', { p: pct(v.coverage_bps) })}</span>} color="#56d447" /> : <Hint>{t('rs.coverage_none')}</Hint>}
+        {v.coverage_known ? <ProgressRow frac={Math.min(1, v.coverage_bps / 20000)} label={<span dir="rtl" style={{ unicodeBidi: 'isolate' }}>{t('rs.coverage_l')}: <bdi dir="ltr">{pct(v.coverage_bps)}</bdi></span>} color="#56d447" /> : <Hint>{t('rs.coverage_none')}</Hint>}
         <Hint>{t('rs.coverage_note')}</Hint>
         <Facts rows={[
           { label: t('rs.stab'), value: units(v.stabilisation) },
           { label: t('rs.cap'), value: sup(v.market_cap_sup) },
-          { label: t('rs.levers'), value: t('rs.levers_v', { mint: pct(v.mint_fee_bps), fx: pct(v.reserve_fee_bps), band: pct(v.max_move_bps), notice: formatNumber(v.withdraw_notice_hours) }) },
         ]} />
+        <Section>{t('rs.levers')}</Section>
+        <ul className="rs-levers">
+          <li><span>{t('rs.lv_mint')}</span><b>{pct(v.mint_fee_bps)}</b></li>
+          <li><span>{t('rs.lv_fx')}</span><b>{pct(v.reserve_fee_bps)}</b></li>
+          <li><span>{t('rs.lv_band')}</span><b>{pct(v.max_move_bps)}</b></li>
+          <li><span>{t('rs.lv_notice')}</span><b>{t('rs.hours', { n: formatNumber(v.withdraw_notice_hours) })}</b></li>
+        </ul>
       </Panel>
 
       {v.macro && (

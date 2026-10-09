@@ -8,12 +8,21 @@ const N = (code: string, name: string) => ({ code, name })
 export const LOT_LOOK: LotLook = { version: 1, function: 'dwelling', level: 1, w: 2, d: 2, storeys: 1, material: 'timber', roof: 'gable', modules: { bedroom: 1, hearth: 1, storeroom: 1 }, condition: 9400, seed: 4821, palette: 'temperate_grassland', wobble: 1, windows: 3, door: 's', hue: 6, prop: 'woodpile', chimney: true, awning: false }
 let bedrooms = 1
 
-function detail(stage: string, extra: Partial<LotManageView> = {}): LotManageView {
+const LOOKS: Record<string, Partial<LotLook>> = {
+  'b-look-2': { roof: 'hip', storeys: 2, hue: -12, door: 'e', chimney: false, prop: 'barrels', windows: 3, seed: 11 },
+  'b-look-3': { roof: 'flat', storeys: 1, material: 'stone', hue: 0, door: 'n', chimney: false, awning: true, prop: 'crates', seed: 23 },
+  'b-look-4': { roof: 'shed', storeys: 3, hue: 14, door: 'w', chimney: true, prop: 'cart', windows: 4, seed: 37 },
+  'b-look-5': { roof: 'gable', storeys: 2, hue: 8, door: 's', chimney: true, awning: true, prop: 'bench', seed: 41 },
+  'b-look-6': { roof: 'hip', storeys: 1, material: 'stone', hue: -6, door: 's', chimney: false, prop: 'none', seed: 59 },
+  'b-look-7': { roof: 'gable', storeys: 3, hue: -15, door: 'e', chimney: true, prop: 'woodpile', seed: 71 },
+}
+
+function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1'): LotManageView {
   const m = mode()
   const order = m === 'order'
-  const look = { ...LOT_LOOK, modules: { ...LOT_LOOK.modules, bedroom: bedrooms }, storeys: m === 'use' ? 1 : 1 }
+  const look = { ...LOT_LOOK, modules: { ...LOT_LOOK.modules, bedroom: bedrooms }, ...(LOOKS[id] ?? {}) }
   return {
-    village: 'آمل', stage, action: '', buildings: null, id: 'b-lot-1', building: N('private_cottage', 'کلبهٔ شخصی'), x: 2, y: 0, w: 2, d: 2, mine: m !== 'public', public: m === 'public', can_manage: !order, built: true,
+    village: 'آمل', stage, action: '', buildings: null, id, building: N('private_cottage', 'کلبهٔ شخصی'), x: 2, y: 0, w: 2, d: 2, mine: m !== 'public', public: m === 'public', can_manage: !order, built: true,
     function: { code: 'dwelling', name: 'خانه', family: 'home', level: 1, max_level: 3, status: 'standing', permit: 'paid' }, storeys: 1, max_storeys: 2, stability_bps: 10000,
     area_used: 4 + (bedrooms - 1) * 2, area_capacity: 6,
     modules: [{ module: N('bedroom', 'اتاق خواب'), count: bedrooms, included: 1, max: 4, effect: 'housing', area_each: 2, housing_capacity: 2, personal_storage: 0, stall_slots: 0, removable: bedrooms > 1 },
@@ -53,7 +62,7 @@ export function mockLotCommand(command: string, args: Record<string, unknown>) {
   }
   const action = String(args.action ?? '')
   const acts = [back('settlement.mine'), A('refresh', 'settlement.lot.manage', { building: 'b-lot-1' })]
-  if (!action) return mockOk('lot_manage', detail('detail'), acts)
+  if (!action) return mockOk('lot_manage', detail('detail', {}, String(args.building ?? 'b-lot-1')), acts)
   const reason = m === 'reason' && action === 'add' ? 'area' : action === 'add' && String(args.code) === 'cellar' ? 'requires' : ''
   if (!args.confirm) {
     return mockOk('lot_manage', detail('ask', { action, quote: quote(action), reason, needs: reason === 'requires' ? detail('detail').additions![1].needs : null, code: String(args.code ?? ''), n: Number(args.n ?? 0) }), [confirmA('settlement.lot.manage', { building: 'b-lot-1', action, code: String(args.code ?? '') }), back('settlement.lot.manage', { building: 'b-lot-1' })])

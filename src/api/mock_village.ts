@@ -190,6 +190,8 @@ function init() {
     }
     // ?lot=...: a built cottage of mine on lot (2,0), for the lot manager
     if (new URLSearchParams(location.search).has('lot')) st.buildings.push(mk('cottage', 2, 0, 'built', { id: 'b-lot-1', priv: true, owner: 'تو', mine: true }))
+    // ?lot=many: six managed buildings of different looks next to the unmanaged ones
+    if (new URLSearchParams(location.search).get('lot') === 'many') for (const [i, [x, y]] of ([[3, 0], [4, 0], [2, 1], [3, 1], [4, 1], [4, 4]] as [number, number][]).entries()) st.buildings.push(mk('cottage', x, y, 'built', { id: `b-look-${i + 2}`, priv: true, owner: 'تو', mine: true }))
     // ?live=1: the shape of the real Marco Polo: a built road column north out of the grid (x 10, y 16..29), a store and a watch hut
     // on it, and open lots along it
     if (new URLSearchParams(location.search).get('live') === '1') {
