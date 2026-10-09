@@ -294,6 +294,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const looksKey = useRef('')
   useEffect(() => {
     if (!sceneReady || !layout || !own || !member0(layout)) return
+    if (new URLSearchParams(location.search).get('mock') === '1' && new URLSearchParams(location.search).has('nolooks')) return // mock only: the picture without generated looks, for comparison
     const ids = layout.buildings.filter((b) => b.id && b.type !== 'road' && b.state === 'built' && (b.private ? b.mine : false)).map((b) => b.id!).slice(0, 24)
     const key = `${layout.version}|${ids.join(',')}`
     if (key === looksKey.current || !ids.length) return
