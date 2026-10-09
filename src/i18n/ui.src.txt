@@ -5296,6 +5296,40 @@ work.kind.infrastructure | زیرساخت | Infrastructure
 work.kind.other | کار | Work
 work.seats | {filled} از {max} جای کار پُر است | {filled} of {max} posts filled
 work.role.worker | کارگر | Worker
+work.role.teacher | معلم | Teacher
+work.role.trainer | مربی | Trainer
+work.role.health_worker | بهورز | Health worker
+work.role.nurse | پرستار | Nurse
+work.role.watchman | نگهبان | Watchman
+work.role.scholar | پژوهشگر | Scholar
+work.role.labourer | کارگر | Labourer
+work.role.woodcutter | هیزم‌شکن | Woodcutter
+work.role.carpenter | نجار | Carpenter
+work.role.mason | بنّا | Mason
+work.role.smith | آهنگر | Smith
+work.role.weaver | بافنده | Weaver
+work.role.potter | کوزه‌گر | Potter
+work.role.miller | آسیابان | Miller
+work.role.baker | نانوا | Baker
+work.role.storekeeper | انباردار | Storekeeper
+work.role.beacon_keeper | آتشبان | Beacon keeper
+work.role.stall_keeper | دکه‌دار | Stall keeper
+work.role.shopkeeper | دکان‌دار | Shopkeeper
+work.role.miner | معدنچی | Miner
+work.role.mine_hauler | باربر معدن | Mine hauler
+work.role.timberman | چوب‌بند معدن | Timberman
+work.role.banksman | متصدی دهانهٔ چاه | Banksman
+work.role.innkeeper | مسافرخانه‌دار | Innkeeper
+work.role.tea_server | چایچی | Tea server
+work.role.housekeeper | خدمتکار اتاق | Housekeeper
+work.role.hotel_manager | مدیر هتل | Hotel manager
+work.role.registrar | مسئول دفتر ثبت | Registrar
+work.role.surveyor | نقشه‌بردار | Surveyor
+work.role.moneychanger | صراف | Moneychanger
+work.role.teller | صندوقدار بانک | Teller
+work.role.loan_officer | کارشناس وام | Loan officer
+work.role.bank_manager | مدیر شعبهٔ بانک | Bank manager
+work.role.clerk | کارمند | Clerk
 work.empty | خالی | Empty
 work.npc | کارگر روزمزد | Day labourer
 work.player | یک نفر از اهالی | A resident
