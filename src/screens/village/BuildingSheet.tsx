@@ -8,9 +8,11 @@
 // If the server has no panel for the building (an older server, a failed
 // call), the sheet falls back to what the layout itself says.
 
+import { UpgradeCard, fromBuildingUpgrade, type UpgradeX } from './UpgradeDetail'
+import { useUpgradeHandlers, type UpgradeScreen } from './UpgradeConfirm'
 import { endNote } from '../../lib/duration'
 import { buildText, workText } from '../../lib/duration'
-import { CardGrid } from '../../ui/v6/panel'
+import { CardGrid, PCard } from '../../ui/v6/panel'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSide } from '../../state/SideContext'
@@ -156,7 +158,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
       )}
       {site && b.id && <SiteSheet buildingId={b.id} title={name} onClose={() => setSite(false)} />}
 
-      {upgrade && <UpgradeList panel={panel} cat={cat} names={names} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
+      {upgrade && <UpgradeList panel={panel} cat={cat} onOpen={(s) => onOpen?.(s)} onClose={onClose} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
 
       {ask && <Note>{t(ask === 'cancel' ? 'building.confirm_cancel' : 'building.confirm_demolish')}</Note>}
       {going && canAct && ask === null && (
@@ -254,24 +256,26 @@ function TypePanel({ kind, panel, names, onOpen, onClose, manage, onAct }: {
   )
 }
 
-function UpgradeList({ panel, cat, names, onBuild }: { panel: BuildingPanelView | null; cat: Map<string, CatalogueBuilding>; names: ContentNames; onBuild: (code: string) => void }) {
-  const ups = panel?.upgrades ?? null
+function UpgradeList({ panel, cat, onOpen, onClose, onBuild }: { panel: BuildingPanelView | null; cat: Map<string, CatalogueBuilding>; onOpen: (s: UpgradeScreen) => void; onClose: () => void; onBuild: (code: string) => void }) {
+  const [open, setOpen] = useState<string | null>(null)
+  const h = useUpgradeHandlers(cat, onOpen, (c) => c && onBuild(c), onClose, onBuild)
+  const ups = (panel?.upgrades ?? null) as UpgradeX[] | null
   if (!panel || panel.mode !== 'up') return <Note>…</Note>
   if (!ups || ups.length === 0) return <Note>{t('building.upgrade.none')}</Note>
+  const models = ups.map((u) => ({ u, m: fromBuildingUpgrade(u, h, { treasury: panel.treasury || undefined }) }))
+  const sel = models.find((x) => x.u.building.code === open)
   return (
     <>
       <Section>{t('building.upgrade.intro')}</Section>
       <CardGrid>
-      {ups.map((u) => (
-        <div key={u.building.code} className={`vh-upgrade${u.available ? '' : ' locked'}`}>
-          <div className="vh-upgrade-name">{buildingName(cat, u.building.code, u.building.name)}</div>
-          <div className="vh-hint">{money(u.cost_money)} · {buildText(u)}</div>
-          {u.available
-            ? <ActionButton tone="gold" small onClick={() => onBuild(u.building.code)}>{t('building.upgrade.build')}</ActionButton>
-            : <div className="vh-hint bad">{(u.missing ?? []).length > 0 ? t('build.needs', { list: (u.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') }) : t('building.upgrade.locked')}</div>}
-        </div>
-      ))}
+        {models.map(({ u, m }) => (
+          <PCard key={u.building.code} icon={m.available ? 'up' : 'scroll'} title={m.title} tone={m.available ? 'busy' : 'off'} off={!m.available}
+            sub={`${money(u.cost_money)} · ${buildText(u)}`}
+            facts={m.available ? t('v6.up.ready') : <span className="dk-why">{t('ug.blocked', { n: formatNumber(m.reqs.filter((r) => !r.ok).length) })}</span>}
+            onClick={() => setOpen(u.building.code)} />
+        ))}
       </CardGrid>
+      {sel && <UpgradeCard m={sel.m} onClose={() => setOpen(null)} />}
     </>
   )
 }

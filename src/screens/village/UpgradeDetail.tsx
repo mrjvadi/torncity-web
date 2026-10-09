@@ -6,7 +6,7 @@
 // see torncity-lab/handoff/ui-to-backend.md (2026-10-10 upgrade details).
 
 import Popup, { ActionButton, ActionRow, Note, Section, StatCard, StatGrid } from '../../ui/Popup'
-import type { BuildingUpgradeLine, LotUpgradeLine, Named, VillageNeed, WorkItemLine } from '../../api/views.gen'
+import type { BuildingUpgradeLine, LotUpgradeLine, Named, VillageNeed } from '../../api/views.gen'
 import { buildText } from '../../lib/duration'
 import { formatNumber, money } from '../native/kit/format'
 import { t } from '../../i18n'
@@ -106,13 +106,11 @@ export function fromLotUpgrade(u: LotUpgradeLine, h: UpgradeHandlers, cash?: num
   return {
     title: t('lm.upgrade', { n: formatNumber(u.to) }), level: u.to, money: u.cost_money, moneyHave: cash,
     materials: (u.materials ?? []).map((m) => ({ item: m.item, need: m.qty, have: m.qty })), shifts: u.shifts, time: '', gives: (u.adds ?? []).map((a) => t('ug.gives_add', { name: a.name })), extra: [], reqs,
-    available: u.can && reqs.every((r) => r.ok), blockedReason: reqs.some((r) => !r.ok) ? t('ug.blocked', { n: formatNumber(reqs.filter((r) => !r.ok).length) }) : '', go: go ?? (() => undefined),
+    available: u.can && !!go && reqs.every((r) => r.ok), blockedReason: reqs.some((r) => !r.ok) ? t('ug.blocked', { n: formatNumber(reqs.filter((r) => !r.ok).length) }) : !go ? t('ug.not_now') : '', go: go ?? (() => undefined),
   }
 }
 
 export function UpgradeCard({ m, onClose, busy }: { m: UpgradeModel; onClose: () => void; busy?: boolean }) {
-  const matList = (list: WorkItemLine[]) => list
-  void matList
   return (
     <Popup open onClose={onClose} tone="gold" title={t('ug.title', { name: m.title })} dismissible={!busy}
       footer={<ActionRow>

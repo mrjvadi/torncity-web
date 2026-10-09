@@ -5786,3 +5786,5 @@ ug.unknown | شرط این ارتقا هنوز برقرار نیست؛ سرور 
 ug.blocked | هنوز {n} مورد کم است؛ اول آن‌ها را درست کن. | {n} item(s) still missing; fix them first.
 ug.upkeep | هزینهٔ نگهداری | Upkeep
 ug.staff | کارکنان | Staff
+ug.blocked_short | شرطی کم است؛ برای دیدنش بزن | Something is missing; tap to see
+ug.not_now | الان نمی‌توانی سفارش بدهی (سفارشی در جریان است یا ساختمان مال تو نیست). | You cannot order now (an order is running or it is not yours).

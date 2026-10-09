@@ -5688,4 +5688,6 @@ export const uiEn: Record<UiKey, string> = {
   'ug.blocked': '{n} item(s) still missing; fix them first.',
   'ug.upkeep': 'Upkeep',
   'ug.staff': 'Staff',
+  'ug.blocked_short': 'Something is missing; tap to see',
+  'ug.not_now': 'You cannot order now (an order is running or it is not yours).',
 }

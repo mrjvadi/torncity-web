@@ -5686,6 +5686,8 @@ export const uiFa = {
   'ug.blocked': 'هنوز {n} مورد کم است؛ اول آن‌ها را درست کن.',
   'ug.upkeep': 'هزینهٔ نگهداری',
   'ug.staff': 'کارکنان',
+  'ug.blocked_short': 'شرطی کم است؛ برای دیدنش بزن',
+  'ug.not_now': 'الان نمی‌توانی سفارش بدهی (سفارشی در جریان است یا ساختمان مال تو نیست).',
 } as const
 
 export type UiKey = keyof typeof uiFa

@@ -2,6 +2,7 @@
 // board's shifts and draws it from the generated look. A centred popup (never a sheet) with tabs; every act is ask, then confirm.
 // Nothing here changes by itself: the server answers `lot_manage` with the stages menu, detail, ask and done.
 
+import { UpgradeCard, fromLotUpgrade } from './UpgradeDetail'
 import { useEffect, useState } from 'react'
 import type { LotManageView, LotLook, LotQuote, WorkItemLine } from '../../api/views.gen'
 import type { LocalOffer } from '../../api/types'
@@ -93,6 +94,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
   const [ask, setAsk] = useState<{ v: LotManageView; offer: LocalOffer | null; args: Record<string, string> } | null>(() => (init.stage === 'ask' ? { v: init, offer: (ctx.res as { offer?: LocalOffer | null }).offer ?? null, args: { action: init.action, ...(init.code ? { code: init.code } : {}), ...(init.n ? { n: String(init.n) } : {}) } } : null))
   const [tab, setTab] = useState<Tab>('function')
   const [busy, setBusy] = useState(false)
+  const [upCard, setUpCard] = useState(false)
   const [tplName, setTplName] = useState('')
   const [shareCode, setShareCode] = useState('')
   useEffect(() => setV(init), [init])
@@ -182,8 +184,8 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             {v.upgrade && (
               <CardGrid><PCard icon="hammer" title={t('lm.upgrade', { n: formatNumber(v.upgrade.to) })} tone={v.upgrade.can ? 'busy' : 'off'} off={!v.upgrade.can}
                 sub={`${money(v.upgrade.cost_money)} · ${t('lm.q.shifts')}: ${formatNumber(v.upgrade.shifts)}`}
-                facts={!v.upgrade.can ? t(`lm.reason.${v.upgrade.reason}` as Key) : (v.upgrade.adds ?? []).map((a) => a.name).join('، ')}
-                onClick={manage && v.upgrade.can ? () => void quote({ action: 'level' }) : undefined} /></CardGrid>
+                facts={!v.upgrade.can ? <span className="dk-why">{t('ug.blocked_short')}</span> : (v.upgrade.adds ?? []).map((a) => a.name).join('، ')}
+                onClick={() => setUpCard(true)} /></CardGrid>
             )}
             {(v.functions ?? []).length > 0 && <Section>{t('lm.change_use')}</Section>}
             <CardGrid>
@@ -286,6 +288,12 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
         {!manage && v.built && <Note>{v.mine || v.public ? t('lm.busy_now') : t('lm.not_yours')}</Note>}
       </Popup>
 
+      {upCard && v.upgrade && (
+        <UpgradeCard onClose={() => setUpCard(false)} busy={busy} m={fromLotUpgrade(v.upgrade, {
+          names, bname: (c, n) => ctx.bname(c, n), openKnowledge: () => ctx.openLocal('village_knowledge'), openStorage: () => ctx.openLocal('village_storage'), openTreasury: () => ctx.openLocal('village_overview'),
+          openBuild: () => ctx.openLocal('village_home', { build: '1' }), go: () => undefined,
+        }, v.cash, manage ? () => void quote({ action: 'level' }) : undefined)} />
+      )}
       {ask && (
         <Popup open onClose={() => setAsk(null)} tone="gold" dismissible={!busy} title={t(`lm.act.${ask.args.action}` as Key)}
           footer={<ActionRow>

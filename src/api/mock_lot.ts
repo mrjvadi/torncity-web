@@ -32,7 +32,8 @@ function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1
       { module: N('bedroom', 'اتاق خواب'), left: 3, materials: [{ item: N('timber', 'چوب'), qty: 3 }], shifts: 3, area_each: 2, can: m !== 'reason', reason: m === 'reason' ? 'area' : '', needs: null },
       { module: N('cellar', 'زیرزمین'), left: 1, materials: [{ item: N('stone', 'سنگ'), qty: 6 }], shifts: 4, area_each: 2, can: false, reason: 'requires', needs: [{ kind: 'knowledge', item: N('masonry', 'سنگ‌تراشی'), options: [N('masonry', 'سنگ‌تراشی')], have: 0, need: 1, makers: null, price: 0 }] },
     ],
-    upgrade: { to: 2, building: N('private_cottage', 'کلبهٔ شخصی'), cost_money: 600, materials: [{ item: N('timber', 'چوب'), qty: 8 }], shifts: 5, adds: [N('bedroom', 'اتاق خواب')], can: true, reason: '', needs: null },
+    upgrade: { to: 2, building: N('private_cottage', 'کلبهٔ شخصی'), cost_money: 600, materials: [{ item: N('timber', 'چوب'), qty: 8 }], shifts: 5, adds: [N('bedroom', 'اتاق خواب')], can: m !== 'upblock', reason: m === 'upblock' ? 'requires' : '',
+      needs: m === 'upblock' ? [{ kind: 'knowledge', item: N('masonry', 'سنگ‌تراشی'), options: [N('masonry', 'سنگ‌تراشی')], have: 0, need: 1, makers: null, price: 0 }, { kind: 'material', item: N('stone', 'سنگ'), options: null, have: 2, need: 6, makers: [{ building: N('masonry_workshop', 'کارگاه سنگ‌تراشی'), built: false }], price: 30 }] : null },
     storey_up: { to: 2, materials: [{ item: N('timber', 'چوب'), qty: 10 }], shifts: 6, can: true, reason: '' },
     functions: [
       { function: N('dwelling', 'خانه'), family: 'home', current: true, available: true, needs: null, cost_money: 0, materials: null, shifts: 0, fee_sup: 0, permit_fee: 0, effects: [] },
