@@ -9,7 +9,7 @@ import Popup, { ActionButton, ActionRow, Note, Section, StatCard, StatGrid } fro
 import type { BuildingUpgradeLine, LotUpgradeLine, Named, VillageNeed } from '../../api/views.gen'
 import { buildText } from '../../lib/duration'
 import { formatNumber, money } from '../native/kit/format'
-import { t } from '../../i18n'
+import { hasKey, t, type Key } from '../../i18n'
 import type { ContentNames } from '../../village/useVillage'
 
 /** The fields the server may add to BuildingUpgradeLine; all optional until it sends them. */
@@ -77,19 +77,20 @@ export function fromBuildingUpgrade(u: UpgradeX, h: UpgradeHandlers, have: { tre
   const reqs: ReqRow[] = []
   // each missing knowledge is its own line, with the way to research it
   for (const m of u.missing ?? []) reqs.push({ key: `k${m.code}`, ok: false, label: t('ug.know', { name: kn(h, m) }), fix: { label: t('ug.fix.research'), onClick: h.openKnowledge } })
-  for (const m of u.missing_buildings ?? []) reqs.push({ key: `b${m.code}`, ok: false, label: t('ug.build_req', { names: h.bname(m.code, m.name) }), fix: { label: t('ug.fix.build'), onClick: () => h.openBuild(m.code) } })
+  const inNeeds = new Set((u.needs ?? []).flatMap((n) => (n.options ?? []).map((o) => o.code)))
+  for (const m of (u.missing_buildings ?? []).filter((x) => !inNeeds.has(x.code))) reqs.push({ key: `b${m.code}`, ok: false, label: t('ug.build_req', { names: h.bname(m.code, m.name) }), fix: { label: t('ug.fix.build'), onClick: () => h.openBuild(m.code) } })
   reqs.push(...needRows(h, u.needs))
-  const mats = u.materials ?? []
+  const mats = (u.materials ?? []).map((m) => ({ ...m, item: { code: m.item.code, name: item(h, m.item) } }))
   for (const m of mats) if (m.have < m.need) reqs.push({ key: `m${m.item.code}`, ok: false, label: t('ug.mat', { name: item(h, m.item) }), detail: `${formatNumber(m.have)} / ${formatNumber(m.need)}`, fix: { label: t('ug.fix.store'), onClick: h.openStorage } })
-  const treasury = have.treasury ?? u.treasury
+  const treasury = u.treasury ?? have.treasury
   if (treasury !== undefined && treasury < u.cost_money) reqs.push({ key: 'money', ok: false, label: t('ug.money', { n: money(u.cost_money - treasury) }), fix: { label: t('ug.fix.treasury'), onClick: h.openTreasury } })
   const missingCount = reqs.length
   // a locked upgrade the server did not explain: say so, never an empty list
   if (!u.available && missingCount === 0) reqs.push({ key: 'unknown', ok: false, label: t('ug.unknown') })
-  const gives = [...(u.adds ?? []).map((a) => t('ug.gives_add', { name: a.name })), ...(u.gives ?? []).map((g) => (hasEffect(g.target) ? t(`building.effect.${g.target}` as never, { v: formatNumber(g.value) }) : '')).filter(Boolean)]
+  const gives = [...(u.adds ?? []).map((a) => t('ug.gives_add', { name: h.names.name(['component', 'item', 'module'], a.code, a.name) })), ...(u.gives ?? []).map((g) => (hasEffect(g.target) ? t(`building.effect.${g.target}` as never, { v: formatNumber(g.value) }) : '')).filter(Boolean)]
   const extra: UpgradeModel['extra'] = []
   if (u.upkeep !== undefined) extra.push({ label: t('ug.upkeep'), value: money(u.upkeep) })
-  for (const s of u.staff ?? []) extra.push({ label: t('ug.staff'), value: `${s.role} × ${formatNumber(s.slots)}` })
+  for (const s of u.staff ?? []) extra.push({ label: t('ug.staff'), value: `${hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} × ${formatNumber(s.slots)}` })
   return {
     title: h.bname(u.building.code, u.building.name), level: u.tier, money: u.cost_money, moneyHave: treasury, materials: mats, shifts: u.shifts ?? 0, time: buildText(u), gives, extra, reqs,
     available: u.available && reqs.every((r) => r.ok), blockedReason: reqs.some((r) => !r.ok) ? t('ug.blocked', { n: formatNumber(reqs.filter((r) => !r.ok).length) }) : '', go: () => h.go(u.building.code),
@@ -105,7 +106,7 @@ export function fromLotUpgrade(u: LotUpgradeLine, h: UpgradeHandlers, cash?: num
   if (cash !== undefined && cash < u.cost_money) reqs.push({ key: 'money', ok: false, label: t('ug.money', { n: money(u.cost_money - cash) }), fix: { label: t('ug.fix.treasury'), onClick: h.openTreasury } })
   return {
     title: t('lm.upgrade', { n: formatNumber(u.to) }), level: u.to, money: u.cost_money, moneyHave: cash,
-    materials: (u.materials ?? []).map((m) => ({ item: m.item, need: m.qty, have: m.qty })), shifts: u.shifts, time: '', gives: (u.adds ?? []).map((a) => t('ug.gives_add', { name: a.name })), extra: [], reqs,
+    materials: (u.materials ?? []).map((m) => ({ item: { code: m.item.code, name: item(h, m.item) }, need: m.qty, have: m.qty })), shifts: u.shifts, time: '', gives: (u.adds ?? []).map((a) => t('ug.gives_add', { name: h.names.name(['component', 'item', 'module'], a.code, a.name) })), extra: [], reqs,
     available: u.can && !!go && reqs.every((r) => r.ok), blockedReason: reqs.some((r) => !r.ok) ? t('ug.blocked', { n: formatNumber(reqs.filter((r) => !r.ok).length) }) : !go ? t('ug.not_now') : '', go: go ?? (() => undefined),
   }
 }
@@ -146,7 +147,6 @@ export function UpgradeCard({ m, onClose, busy }: { m: UpgradeModel; onClose: ()
           </div>
         ))}
       </div>
-      {!m.available && <Note tone="bad">{m.blockedReason || t('v6.up.blocked')}</Note>}
     </Popup>
   )
 }

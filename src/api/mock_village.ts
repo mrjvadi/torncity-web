@@ -1457,7 +1457,7 @@ function upgradeLine(code: string, tier: number, secs: number) {
   const short = m === 'money' || m === 'all'
   return {
     building: nameOf(code), tier, cost_money: 4800, build_time_seconds: secs, expected_wait: waitOf(secs), available: m === 'ok', missing: missK, needs_tier: '',
-    materials: mats, shifts: 9, adds: [goods('bedroom'), goods('storeroom')], gives: [{ target: 'housing_capacity', value: 4 }, { target: 'happiness_bps', value: 300 }],
+    materials: mats, shifts: 9, adds: [{ code: 'bedroom', name: 'اتاق خواب' }, { code: 'storeroom', name: 'انبارک' }], gives: [{ target: 'housing_capacity', value: 4 }, { target: 'happiness_bps', value: 300 }],
     missing_buildings: missB, needs: missB ? [{ kind: 'building', item: missB[0], options: missB, have: 0, need: 1, makers: null, price: 0 }] : null,
     staff: [{ role: 'clerk', slots: 2 }], upkeep: 90, treasury: short ? 1500 : 12000,
   }
