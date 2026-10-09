@@ -42,11 +42,14 @@ interface Props {
   startSite?: boolean
   /** Opens the resident's own property sheet (rest at home, tax). */
   onMine?: () => void
+  /** «مدیریت قطعهٔ من» for a building of mine (or the settlement's own, with public.build) */
+  onManage?: (buildingId: string) => void
+  canPublicBuild?: boolean
 }
 
 const EFFECT_KEYS = ['local_security_bps', 'food_coverage_bps', 'job_coverage_bps', 'service_coverage_bps', 'happiness_bps', 'housing_capacity']
 
-export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine, startSite }: Props) {
+export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine, onManage, canPublicBuild, startSite }: Props) {
   const now = useNow(1000)
   const names = useContentNames()
   const cmd = useVillageCommand()
@@ -122,7 +125,10 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
     <ActionRow>
       <ActionButton tone="green" small onClick={onMine}>{t('citizen.mine.rest')}</ActionButton>
       <ActionButton tone="steel" small onClick={onMine}>{t('citizen.bar.mine')}</ActionButton>
+      {b.id && onManage && <ActionButton tone="gold" small onClick={() => onManage(b.id!)}>{t('lm.ring')}</ActionButton>}
     </ActionRow>
+  ) : (!going && b.id && onManage && !b.private && canPublicBuild && b.type !== 'road') ? (
+    <ActionButton tone="gold" onClick={() => onManage(b.id!)}>{t('lm.title')}</ActionButton>
   ) : (showUpgrade && !upgrade) ? (
     <ActionButton tone="gold" onClick={() => void reveal()}>{t('building.upgrade')}</ActionButton>
   ) : undefined

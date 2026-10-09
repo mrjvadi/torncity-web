@@ -290,6 +290,22 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     if (useRing && selected && selected.type === 'road') setInfoId(selectedId)
   }, [useRing, selected, selectedId])
   const canPlaceNow = !!layout?.viewer.can_place
+  // the generated looks of the buildings the viewer manages (B1): fetched once per layout version, drawn by the scene
+  const looksKey = useRef('')
+  useEffect(() => {
+    if (!sceneReady || !layout || !own || !member0(layout)) return
+    if (new URLSearchParams(location.search).get('mock') === '1' && new URLSearchParams(location.search).has('nolooks')) return // mock only: the picture without generated looks, for comparison
+    const ids = layout.buildings.filter((b) => b.id && b.type !== 'road' && b.state === 'built' && (b.private ? b.mine : false)).map((b) => b.id!).slice(0, 24)
+    const key = `${layout.version}|${ids.join(',')}`
+    if (key === looksKey.current || !ids.length) return
+    looksKey.current = key
+    void Promise.all(ids.map((bid) => cmd('settlement.lot.manage', { building: bid }, { silent: true }).then((r) => [bid, (r.res?.view as { look?: unknown } | undefined)?.look] as const))).then((list) => {
+      const m = new Map<string, never>()
+      for (const [bid, look] of list) if (look) m.set(bid, look as never)
+      sceneRef.current?.setLooks(m)
+    })
+  }, [sceneReady, layout, own, cmd])
+  const canPublicBuild = !!bootstrap?.settlement?.permissions?.includes('public.build')
   const labelOf = (key: string) => labels.find((l) => l.key === key)
   const verbsFor = (b: NonNullable<typeof selected>, id: string) => ringActions(b, b.id ? overlays.get(b.id) ?? null : null, {
     info: () => setInfoId(id),
@@ -299,6 +315,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     civic: b.type === 'civic_hall' || cat.get(b.type)?.category === 'governance',
     mine: () => { setSelectedId(null); run('settlement.mine') },
     run: (command) => run(command),
+    manage: (b.private ? b.mine : canPublicBuild) ? () => { setSelectedId(null); run('settlement.lot.manage', { building: b.id ?? '' }) } : undefined,
   })
   const ring: RingModel | null = useRing && !inBuildNow(build.state.step) && selected && selected.type !== 'road' && selectedId && labelOf(selectedId)
     ? (() => {
@@ -334,6 +351,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: open })
       acts.push({ id: 'build', label: t('v6.ring.build'), icon: 'hammer', kind: 'primary', onClick: go(() => setHouseLot(lot)), off: noRoad })
       acts.push({ id: 'access', label: t('v6.ring.access'), icon: 'road', onClick: go(() => { setFixView(null); setFixLot(lot) }) })
+      const occ = layout.buildings.find((q) => q.id && q.type !== 'road' && lot.x >= q.x && lot.x < q.x + q.w && lot.y >= q.y && lot.y < q.y + q.h)
+      if (occ?.id) acts.push({ id: 'manage', label: t('lm.ring'), icon: 'tool', onClick: go(() => run('settlement.lot.manage', { building: occ.id! })) })
     } else {
       acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => setTakenLot({ ...lot, owner: lotRing.owner })) })
     }
@@ -499,7 +518,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
         startSite={infoSite}
         onClose={() => { setInfoId(null); setInfoSite(false); if (!useRing) setSelectedId(null) }}
         onOpen={(screen) => openLocal(screen)} onBuild={(code) => { void build.enter().then(() => build.choose(code)) }}
-        onMine={() => { setSelectedId(null); setInfoId(null); run('settlement.mine') }} />
+        onMine={() => { setSelectedId(null); setInfoId(null); run('settlement.mine') }}
+        onManage={(bid) => { setSelectedId(null); setInfoId(null); run('settlement.lot.manage', { building: bid }) }} canPublicBuild={canPublicBuild} />
       {upId && (() => {
         const ub = layout?.buildings.find((b, i) => keyOf(i, b) === upId)
         return ub ? <UpgradeConfirm building={ub} cat={cat} onClose={() => setUpId(null)} onOpen={(screen) => openLocal(screen)} onBuild={(code) => { setSelectedId(null); void build.enter().then(() => build.choose(code)) }} /> : null

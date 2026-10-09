@@ -57,7 +57,7 @@ function needsTitleName(ctx: FlowCtx, v: VillageRefusalView): string {
     : ctx.bname(v.subject.code, v.subject.name)
 }
 
-function NeedLine({ ctx, n }: { ctx: FlowCtx; n: VillageNeed }) {
+export function NeedLine({ ctx, n }: { ctx: FlowCtx; n: VillageNeed }) {
   if (n.kind === 'material') {
     const name = ctx.names.name(['component', 'item'], n.item.code, n.item.name)
     return (

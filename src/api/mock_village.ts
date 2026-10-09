@@ -188,6 +188,10 @@ function init() {
       const dr = landMock.draft(landHost, { x: -9, y: 8 }, 'path')
       if (!dr.error) landMock.store(dr)
     }
+    // ?lot=...: a built cottage of mine on lot (2,0), for the lot manager
+    if (new URLSearchParams(location.search).has('lot')) st.buildings.push({ id: 'b-lot-1', type: 'cottage', x: 2, y: 0, w: 1, h: 1, rotated: false, state: 'built', seed: 55101, priv: true, owner: 'تو', mine: true })
+    // ?lot=many: six managed buildings of different looks next to the unmanaged ones
+    if (new URLSearchParams(location.search).get('lot') === 'many') for (const [i, [x, y]] of ([[3, 0], [4, 0], [2, 1], [3, 1], [4, 1], [4, 4]] as [number, number][]).entries()) st.buildings.push({ id: `b-look-${i + 2}`, type: 'cottage', x, y, w: 1, h: 1, rotated: false, state: 'built', seed: 55100 + i * 13, priv: true, owner: 'تو', mine: true })
     // ?live=1: the shape of the real Marco Polo: a built road column north out of the grid (x 10, y 16..29), a store and a watch hut
     // on it, and open lots along it
     if (new URLSearchParams(location.search).get('live') === '1') {
@@ -1587,11 +1591,11 @@ function shopBuy(args: Record<string, unknown>) {
 function moneyView() {
   const none = (() => { try { return new URLSearchParams(location.search).get('cur') === 'none' } catch { return false } })()
   return mockOk('village_money', {
-    village: 'آمل', chartered: none ? null : { r0: 10, x_ref_ppm: 1_000_000, supply: 49750, pot_sup: 5000, treasury_units: 40000 }, can_charter: none && IS_HEAD,
+    village: 'آمل', chartered: none ? null : { r0: 10, x_ref_ppm: 1_000_000, supply: 49750, pot_sup: 5000, treasury_units: 40000, status: 'chartered', basis_sup: 4800, excess_sup: 200, market_cap_sup: 4975, coverage_bps: 10050, coverage_known: true, stabilisation_units: 0, macro: null, trend: null }, can_charter: none && IS_HEAD,
     currency: { code: none ? 'SUP' : 'MKP', name: none ? 'ساپ' : 'مارک پولو', symbol: '', issued: !none }, market: 'none', reserve: 'none', nil_unit_sup: 1000, nil_per_unit_micro: 2400,
     examples: [{ amount: 100, nil_micro: 240 }, { amount: 1000, nil_micro: 2400 }], treasury: st.treasury, treasury_nil_micro: st.treasury * 2400, output: 1800, output_nil_micro: 4320000, output_days: 7,
     residents: 9, basket: [{ item: goods('rice'), kind: 'item', week_milli: 1400, reference: 12, price: 13, on_shelf: true }, { item: goods('tea'), kind: 'item', week_milli: 200, reference: 8, price: 9, on_shelf: false }], index_bps: 10800, cover_bps: 7500,
-  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : []), ...(none ? [] : [A('currency.desk', 'settlement.currency.desk'), A('fx.book', 'fx.book')])])
+  }, [back('settlement.shop'), refreshA('settlement.money'), ...(none && IS_HEAD ? [A('currency.charter', 'settlement.currency.charter')] : []), ...(none ? [] : [A('currency.desk', 'settlement.currency.desk'), A('fx.book', 'fx.book'), A('currency.reserve', 'settlement.currency.reserve')])])
 }
 // the desk: ?desk=empty for a treasury with no units; the head (default) may set the fee, ?role=resident may not
 let deskFeeBps = 30

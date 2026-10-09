@@ -75,7 +75,7 @@ function door(g: ColorGeom, cx: number, cz: number, d: number, dx: number, color
   g.box(cx + dx, 0.05, cz + d / 2 + 0.6, 2.0, 0.16, 1.0, GRAVEL, G_PLAIN)
 }
 
-interface HouseOpts { floors?: number; roof?: 'gable' | 'hip' | 'flat'; wall?: number; roofColor?: number; floorH?: number; ridge?: 'x' | 'z' }
+interface HouseOpts { noDoor?: boolean; floors?: number; roof?: 'gable' | 'hip' | 'flat'; wall?: number; roofColor?: number; floorH?: number; ridge?: 'x' | 'z' }
 
 /** A small house with walls, roof, door and windows; returns its height. */
 function house(g: ColorGeom, cx: number, cz: number, w: number, d: number, rng: () => number, o: HouseOpts = {}): number {
@@ -98,8 +98,9 @@ function house(g: ColorGeom, cx: number, cz: number, w: number, d: number, rng: 
     g.flatRoof(cx, cz, w, d, H + 0.05, 0x6a6d70, 0xcfc9bc)
   }
   const dx = (rng() < 0.5 ? 1 : -1) * Math.min(w / 2 - 1.6, w * 0.18)
-  door(g, cx, cz, d, dx, pick(rng, [0x5a3a26, 0x2f4a3c, 0x6d2f2a, 0x33445a]))
-  windows(g, cx, cz, w, d, floors, floorH, { door: dx })
+  const doorColor = pick(rng, [0x5a3a26, 0x2f4a3c, 0x6d2f2a, 0x33445a])
+  if (!o.noDoor) door(g, cx, cz, d, dx, doorColor)
+  windows(g, cx, cz, w, d, floors, floorH, { door: o.noDoor ? undefined : dx })
   return H + rise
 }
 
@@ -631,4 +632,60 @@ export function boxPreview(W: number, D: number, H: number): ColorGeom {
   const g = new ColorGeom()
   g.box(0, H / 2, 0, W - 1, H, D - 1, 0xffffff, G_PLAIN)
   return g
+}
+
+
+// -- the generated look of a lot's building (ADR 0045 B1: the server's `look` descriptor) ----------------------------------
+// The descriptor is a pure function of the building and its contents; the same look is the same house. It is drawn with the
+// existing kit (walls, roofs, windows, doors, a chimney, an awning, a few props): no geometry crosses the wire. A later kit v2
+// would add wall materials with their own textures, per-module extensions (a room is only a window row here) and storey setbacks.
+
+export interface LookDescriptor {
+  version?: number; function?: string; level?: number; w: number; d: number; storeys: number; material: string; roof: string
+  modules?: Record<string, number> | null; condition?: number; seed: number; palette?: string; wobble?: number; windows?: number
+  door: string; hue: number; prop: string; chimney: boolean; awning: boolean
+}
+
+const PALETTE_WALL: Record<string, number> = { desert: 0xd9c49a, tundra: 0xb9b4a6, polar_ice: 0xcfd6d8, boreal_forest: 0xa88b64, temperate_forest: 0xc7b08a, temperate_grassland: 0xd6c3a0, tropical_savanna: 0xd9bd8a, tropical_rainforest: 0xb99d6c }
+
+export function buildLookModel(look: LookDescriptor, W: number, D: number, foundation: number): Model {
+  const g = new ColorGeom()
+  const rng = seededRng(look.seed || 1)
+  const f = Math.max(0.6, foundation)
+  g.box(0, (0.16 - f) / 2, 0, W - 0.6, 0.16 + f, D - 0.6, STONE_DARK, G_PLAIN)
+  patch(g, 0, 0, W - 1.0, D - 1.0, 0.2, GRAVEL)
+  const wobble = (look.wobble ?? 0) * 0.1
+  const w = Math.max(3, W * 0.6 * (1 + wobble)), d = Math.max(3, D * 0.6 * (1 - wobble))
+  const base = new Color(look.material === 'stone' ? 0xb9b6ae : PALETTE_WALL[look.palette ?? ''] ?? 0xcdb48c)
+  const hsl = { h: 0, s: 0, l: 0 }
+  base.getHSL(hsl)
+  base.setHSL((hsl.h + (look.hue ?? 0) / 360 + 1) % 1, hsl.s, hsl.l)
+  const floors = Math.max(1, Math.min(6, look.storeys || 1))
+  const roof = look.roof === 'hip' ? 'hip' : look.roof === 'flat' ? 'flat' : 'gable'
+  const roofColor = look.material === 'stone' ? 0x5d5f66 : 0x8a4a35
+  const h = house(g, 0, 0, w, d, rng, { floors, floorH: 3.0, wall: base.getHex(), roof, roofColor, ridge: look.roof === 'shed' ? 'z' : undefined, noDoor: true })
+  const H = floors * 3.0
+  // the door on its side (n e s w: +z is south here), with a doorstep
+  const side = look.door || 's'
+  const dw = side === 'e' || side === 'w' ? d : w
+  const off = (rng() - 0.5) * Math.max(0, dw - 3.5) * 0.6
+  const doorColor = pick(rng, [0x5a3a26, 0x2f4a3c, 0x6d2f2a, 0x33445a])
+  if (side === 's') door(g, 0, 0, d, off, doorColor)
+  else if (side === 'n') { g.box(off, 1.1, -d / 2 - 0.06, 1.4, 2.2, 0.14, TRIM); g.box(off, 1.05, -d / 2 - 0.14, 1.1, 2.05, 0.05, doorColor, G_PLAIN) }
+  else {
+    const sx = side === 'e' ? 1 : -1
+    g.box(sx * (w / 2 + 0.06), 1.1, off, 0.14, 2.2, 1.4, TRIM); g.box(sx * (w / 2 + 0.14), 1.05, off, 0.05, 2.05, 1.1, doorColor, G_PLAIN)
+  }
+  if (look.chimney) g.box(w * 0.25, H + 1.2, -d * 0.2, 0.9, 2.2, 0.9, 0x8a5a48, G_PLAIN)
+  if (look.awning) { g.box(0, 2.7, d / 2 + 0.9, Math.min(w - 1, 7), 0.12, 1.6, 0xb8452f, G_PLAIN); g.box(-Math.min(w - 1, 7) / 2 + 0.2, 1.3, d / 2 + 1.6, 0.12, 2.6, 0.12, WOOD, G_PLAIN); g.box(Math.min(w - 1, 7) / 2 - 0.2, 1.3, d / 2 + 1.6, 0.12, 2.6, 0.12, WOOD, G_PLAIN) }
+  const px = w / 2 + 1.4, pz = d / 2 - 0.4
+  switch (look.prop) {
+    case 'woodpile': g.box(px, 0.45, pz, 1.6, 0.9, 0.9, WOOD, G_PLAIN); g.box(px, 1.1, pz, 1.4, 0.3, 0.8, WOOD_DARK, G_PLAIN); break
+    case 'barrels': g.cylinder(px, pz, 0.45, 0, 1.0, WOOD_DARK, G_PLAIN, 8, 0.45); g.cylinder(px + 1.0, pz, 0.45, 0, 1.0, WOOD, G_PLAIN, 8, 0.45); break
+    case 'cart': g.box(px, 0.7, pz, 1.8, 0.2, 1.1, WOOD, G_PLAIN); g.box(px - 0.7, 0.4, pz + 0.6, 0.12, 0.8, 0.12, WOOD_DARK, G_PLAIN); g.box(px + 0.7, 0.4, pz + 0.6, 0.12, 0.8, 0.12, WOOD_DARK, G_PLAIN); break
+    case 'crates': g.box(px, 0.4, pz, 0.8, 0.8, 0.8, WOOD, G_PLAIN); g.box(px + 0.9, 0.3, pz, 0.6, 0.6, 0.6, WOOD_DARK, G_PLAIN); g.box(px + 0.2, 1.1, pz, 0.6, 0.6, 0.6, WOOD, G_PLAIN); break
+    case 'bench': g.box(px, 0.5, pz, 1.8, 0.12, 0.5, WOOD, G_PLAIN); g.box(px - 0.7, 0.25, pz, 0.12, 0.5, 0.4, WOOD_DARK, G_PLAIN); g.box(px + 0.7, 0.25, pz, 0.12, 0.5, 0.4, WOOD_DARK, G_PLAIN); break
+    default: break
+  }
+  return { geom: g, height: h + (look.chimney ? 1.4 : 0) }
 }

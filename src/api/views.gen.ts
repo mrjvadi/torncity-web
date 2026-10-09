@@ -2621,6 +2621,18 @@ export interface InsureConfirmView {
   payment: PaymentChoice
 }
 
+export interface InterventionLine {
+  id: string
+  side: string
+  units: number
+  price: number
+  status: string
+  sup_used: number
+  refusal: string
+  posted_at: string | null
+  execute_after: string | null
+}
+
 export interface InventoryLine {
   item: Named
   category: string
@@ -3219,6 +3231,17 @@ export interface LotAccessView {
   building: Named
 }
 
+export interface LotAdditionLine {
+  module: Named
+  left: number
+  materials: WorkItemLine[] | null
+  shifts: number
+  area_each: number
+  can: boolean
+  reason: string
+  needs: VillageNeed[] | null
+}
+
 export interface LotBatchConfirmView {
   settlement_name: string
   building: Named
@@ -3232,6 +3255,19 @@ export interface LotBatchConfirmView {
 export interface LotBatchLot {
   x: number
   y: number
+}
+
+export interface LotBuildingLine {
+  id: string
+  building: Named
+  x: number
+  y: number
+  function: string
+  function_name: string
+  level: number
+  storeys: number
+  built: boolean
+  has_order: boolean
 }
 
 export interface LotBuyView {
@@ -3270,6 +3306,30 @@ export interface LotConfirmView {
   auto_roads: number
 }
 
+export interface LotFunctionChoice {
+  function: Named
+  family: string
+  current: boolean
+  available: boolean
+  needs: VillageNeed[] | null
+  cost_money: number
+  materials: WorkItemLine[] | null
+  shifts: number
+  fee_sup: number
+  permit_fee: number
+  effects: string[] | null
+}
+
+export interface LotFunctionLine {
+  code: string
+  name: string
+  family: string
+  level: number
+  max_level: number
+  status: string
+  permit: string
+}
+
 export interface LotGridView {
   outer: LotCell[] | null
   settlement_name: string
@@ -3285,11 +3345,114 @@ export interface LotGridView {
   win_y: number
 }
 
+export interface LotLook {
+  version: number
+  function: string
+  level: number
+  w: number
+  d: number
+  storeys: number
+  material: string
+  roof: string
+  modules: Record<string, number> | null
+  condition: number
+  seed: number
+  palette: string
+  wobble: number
+  windows: number
+  door: string
+  hue: number
+  prop: string
+  chimney: boolean
+  awning: boolean
+}
+
+export interface LotManageView {
+  village: string
+  stage: string
+  action: string
+  buildings: LotBuildingLine[] | null
+  id: string
+  building: Named
+  x: number
+  y: number
+  w: number
+  d: number
+  mine: boolean
+  public: boolean
+  can_manage: boolean
+  built: boolean
+  function: LotFunctionLine
+  storeys: number
+  max_storeys: number
+  stability_bps: number
+  area_used: number
+  area_capacity: number
+  modules: LotModuleLine[] | null
+  additions: LotAdditionLine[] | null
+  upgrade: LotUpgradeLine | null
+  storey_up: LotStoreyLine | null
+  functions: LotFunctionChoice[] | null
+  work: LotWorkLine | null
+  staff: LotStaffLine[] | null
+  housing_capacity: number
+  personal_storage: number
+  stall_slots: number
+  if_unstaffed: string
+  condition_bps: number
+  look: LotLook | null
+  templates: LotTemplateLine[] | null
+  cash: number
+  quote: LotQuote | null
+  reason: string
+  needs: VillageNeed[] | null
+  code: string
+  n: number
+  name: string
+  share_code: string
+}
+
+export interface LotMaterialLine {
+  item: Named
+  need: number
+  have: number
+}
+
+export interface LotModuleLine {
+  module: Named
+  count: number
+  included: number
+  max: number
+  effect: string
+  area_each: number
+  housing_capacity: number
+  personal_storage: number
+  stall_slots: number
+  removable: boolean
+}
+
 export interface LotNearby {
   x: number
   y: number
   distance: number
   access: LotAccess
+}
+
+export interface LotQuote {
+  materials: LotMaterialLine[] | null
+  money: number
+  fee_sup: number
+  permit_fee: number
+  wages: number
+  shifts: number
+  cash: number
+  total: number
+  adds: LotWorkAdd[] | null
+  level_to: number
+  storeys_to: number
+  convert_to: Named
+  salvage: WorkItemLine[] | null
+  skipped: Named[] | null
 }
 
 export interface LotRef {
@@ -3309,6 +3472,64 @@ export interface LotRepairView {
   roads: number
   crossings: number
   carved: number
+}
+
+export interface LotStaffLine {
+  role: string
+  slots: number
+}
+
+export interface LotStoreyLine {
+  to: number
+  materials: WorkItemLine[] | null
+  shifts: number
+  can: boolean
+  reason: string
+}
+
+export interface LotTemplateLine {
+  id: string
+  name: string
+  code: string
+  function: Named
+  level: number
+  storeys: number
+  modules: LotWorkAdd[] | null
+  mine: boolean
+  applicable: boolean
+  reason: string
+}
+
+export interface LotUpgradeLine {
+  to: number
+  building: Named
+  cost_money: number
+  materials: WorkItemLine[] | null
+  shifts: number
+  adds: Named[] | null
+  can: boolean
+  reason: string
+  needs: VillageNeed[] | null
+}
+
+export interface LotWorkAdd {
+  module: Named
+  count: number
+}
+
+export interface LotWorkLine {
+  id: string
+  adds: LotWorkAdd[] | null
+  level_to: number
+  storeys_to: number
+  convert_to: Named
+  shifts_total: number
+  work_done: number
+  work_needed: number
+  progress_bps: number
+  job_open: boolean
+  paused: string
+  status: string
 }
 
 export interface MapCity {
@@ -3616,6 +3837,15 @@ export interface MoneyChartered {
   supply: number
   pot_sup: number
   treasury_units: number
+  status: string
+  basis_sup: number
+  excess_sup: number
+  market_cap_sup: number
+  coverage_bps: number
+  coverage_known: boolean
+  stabilisation_units: number
+  macro: MoneyMacro | null
+  trend: MoneyMacro[] | null
 }
 
 export interface MoneyCurrency {
@@ -3623,6 +3853,22 @@ export interface MoneyCurrency {
   name: string
   symbol: string
   issued: boolean
+}
+
+export interface MoneyMacro {
+  period_no: number
+  x_ref_ppm: number
+  tradable_ppm: number
+  non_tradable_ppm: number
+  price_ppm: number
+  pi_local_bps: number
+  supply_growth_bps: number
+  supply_units: number
+  msup: number
+  ysup: number
+  coverage_bps: number
+  coverage_known: boolean
+  at: string | null
 }
 
 export interface MoneyView {
@@ -4605,6 +4851,61 @@ export interface ResearchLine {
   tech: Named
   finish_at: string | null
   left_seconds: number
+}
+
+export interface ReserveView {
+  village: string
+  name: string
+  symbol: string
+  stage: string
+  action: string
+  status: string
+  r0: number
+  x_ref_ppm: number
+  pot_sup: number
+  basis: number
+  excess: number
+  supply: number
+  stabilisation: number
+  market_cap_sup: number
+  coverage_bps: number
+  coverage_known: boolean
+  minted: number
+  burnt: number
+  deposited: number
+  released: number
+  intervention_out: number
+  intervention_in: number
+  mint_fee_bps: number
+  reserve_fee_bps: number
+  max_move_bps: number
+  withdraw_notice_hours: number
+  cap_bps: number
+  floor_bps: number
+  delay_hours: number
+  buy_budget_sup: number
+  sell_budget_units: number
+  treasury_sup: number
+  treasury_units: number
+  cash_sup: number
+  my_units: number
+  pending_withdrawals: number
+  interventions: InterventionLine[] | null
+  withdrawals: WithdrawalLine[] | null
+  macro: MoneyMacro | null
+  trend: MoneyMacro[] | null
+  wind_down_at: string | null | null
+  wind_down_ends_at: string | null | null
+  my_share: number
+  can_claim: boolean
+  can_issue: boolean
+  can_policy: boolean
+  presets: number[] | null
+  amount: number
+  price: number
+  out: number
+  execute_after: string | null | null
+  reason: string
 }
 
 export interface ResidenceView {
@@ -5876,6 +6177,15 @@ export interface WhoLine {
   place: string
 }
 
+export interface WithdrawalLine {
+  id: string
+  sup: number
+  status: string
+  refusal: string
+  requested_at: string | null
+  execute_after: string | null
+}
+
 export interface WorkCondition {
   bps: number
   decay_bps_per_day: number
@@ -6181,6 +6491,7 @@ export interface ScreenViews {
   loan_confirm: LoanConfirmView
   loan_detail: LoanDetailView
   loan_offer: LoanOfferView
+  lot_manage: LotManageView
   market: MarketView
   market_checkout: MarketCheckoutView
   market_filled_notice: MarketFilledView
@@ -6321,6 +6632,7 @@ export interface ScreenViews {
   village_promoted: PromotionView
   village_promotion: PromotionView
   village_refusal: VillageRefusalView
+  village_reserve: ReserveView
   village_residence_confirm: ResidenceView
   village_residence_done: ResidenceView
   village_shop: VillageShopView

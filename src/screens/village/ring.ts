@@ -16,6 +16,8 @@ export interface RingHandlers {
   mine: () => void
   /** this building is the civic hall (its «اطلاعات» is the city panel) */
   civic?: boolean
+  /** «مدیریت»: the owner's, or a holder of public.build on the settlement's own buildings (B1) */
+  manage?: () => void
   run: (command: string) => void
 }
 
@@ -45,6 +47,7 @@ export function ringActions(b: LayoutBuilding, ov: BuildingOverlay | null, h: Ri
     if (has('road')) acts.push({ id: 'road', label: t('v6.ring.road'), icon: 'road', onClick: h.info })
   }
 
+  if (h.manage && b.id && b.state === 'built') acts.push({ id: 'manage', label: t('lm.ring'), icon: 'tool', onClick: h.manage })
   // the upgrade verb is the server's; the arrow (can_upgrade) decides whether it can be pressed now
   if (has('upgrade')) {
     const up: RingAction = { id: 'up', label: t('v6.ring.up'), icon: 'up', onClick: h.upgrade }
