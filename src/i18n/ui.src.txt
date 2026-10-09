@@ -5521,3 +5521,167 @@ fx.refused.fx_not_found | چنین سفارشی پیدا نشد. | No such order
 fx.market | بازار | Market
 fx.back_book | برگشت به بازار | Back to the market
 wm.cluster | چند شهر نزدیک هم؛ برای دیدنشان بزن | Several cities close together; tap to open
+lm.title | مدیریت قطعهٔ من | Manage my lot
+lm.look | ظاهر ساختمان | The building's look
+lm.menu_lead | کدام ساختمانت را مدیریت می‌کنی؟ | Which of your buildings?
+lm.menu_sub | {fn} · سطح {lvl} · {st} طبقه | {fn} · level {lvl} · {st} storeys
+lm.has_order | سفارش دارد | Has an order
+lm.not_built | این ساختمان هنوز ساخته نشده؛ بعد از ساخت می‌توانی آن را مدیریت کنی. | Not built yet; you can manage it once it stands.
+lm.function | کارکرد | Function
+lm.level | سطح {n} | level {n}
+lm.storeys | طبقه | Storeys
+lm.area | زیربنا | Floor area
+lm.order | سفارش در حال ساخت | Order being built
+lm.order_shifts | {a} از {b} نوبت | {a} of {b} shifts
+lm.work_shift | کار کن | Work a shift
+lm.repost | آگهی دوباره | Post again
+lm.tab.function | کارکرد | Function
+lm.tab.rooms | اتاق‌ها و تجهیزات | Rooms and fittings
+lm.tab.staff | کارکنان | Staff
+lm.tab.store | انبار و جا | Storage and room
+lm.tab.look | ظاهر | Look
+lm.tab.state | وضعیت | State
+lm.upgrade | ارتقا به سطح {n} | Raise to level {n}
+lm.change_use | تغییر کاربری | Change of use
+lm.fn_sub | هزینه {cost} · عوارض تغییر {fee} | Cost {cost} · use-change fee {fee}
+lm.not_here | اینجا نیست | Not here
+lm.rooms | اتاق‌های ساختمان | Rooms of the building
+lm.slots | {a} از {b} | {a} of {b}
+lm.remove | برداشتن | Remove
+lm.add_room | افزودن اتاق یا تجهیزات | Add a room or fitting
+lm.area_each | {n} متر زیربنا | {n} m2 of floor
+lm.storey_up | ساخت طبقهٔ {n} | Build storey {n}
+lm.stability | پایداری سازه: {p}٪ | Stability: {p}%
+lm.staff_none | این ساختمان کارمند نمی‌خواهد. | This building takes no staff.
+lm.posts | {n} جای کار | {n} posts
+lm.housing | جای زندگی | Housing
+lm.personal_storage | انبار شخصی | Own storage
+lm.stall_slots | پیشخوان غرفه | Stall counters
+lm.look_none | ظاهر ساختمان هنوز آماده نیست. | The look is not ready yet.
+lm.look_hint | ظاهر خودش از کارکرد و تجهیزات ساخته می‌شود؛ با هر تغییر عوض می‌شود. | The look follows the function and the fittings and changes with them.
+lm.condition | وضعیت ساختمان: {p}٪ | Condition: {p}%
+lm.templates | قالب‌ها | Templates
+lm.tpl_name | نام قالب (اختیاری) | Template name (optional)
+lm.tpl_save | ذخیرهٔ قالب | Save as template
+lm.tpl_apply | ساختن مثل این | Apply
+lm.tpl_delete | حذف | Delete
+lm.share_ph | کد اشتراک قالب | Template share code
+lm.tpl_apply_code | ساختن با کد | Apply by code
+lm.busy_now | الان سفارشی در حال ساخت است یا نمی‌توانی سفارش بدهی. | An order is being built, or you cannot order now.
+lm.not_yours | این ساختمان مال تو نیست. | This is not your building.
+lm.done | انجام شد. | Done.
+lm.share_code | کد اشتراک: {code} | Share code: {code}
+lm.confirm | تأیید و ثبت سفارش | Confirm and order
+lm.ask_note | کار را کارگرها نوبت‌به‌نوبت انجام می‌دهند؛ تا تمام نشده، همان کارکرد قبلی سرجایش است. | Workers do it shift by shift; until it is done the old function stands.
+lm.use_fee_note | عوارض تغییر کاربری ۲٪ ارزش ساختمان است و به خزانهٔ شهر می‌رود. | The use-change fee is 2% of the value and goes to the treasury.
+lm.q.shifts | نوبت کار | Shifts
+lm.q.wages | دستمزد | Wages
+lm.q.money | هزینه | Cost
+lm.q.fee | عوارض تغییر کاربری | Use-change fee
+lm.q.materials | مصالح | Materials
+lm.q.from_store | اول از انبار خانه برداشته می‌شود، بعد از کیف‌ها. | Taken from the home store first, then the bags.
+lm.q.salvage | برمی‌گردد: {list} | Comes back: {list}
+lm.q.skipped | این‌ها هنوز کاربردی ندارند و ساخته نمی‌شوند: {list} | Not built (no use yet): {list}
+lm.act.add | افزودن | Add
+lm.act.remove | برداشتن | Remove
+lm.act.level | ارتقای سطح | Raise the level
+lm.act.storey | ساخت طبقه | Build a storey
+lm.act.function | تغییر کاربری | Change of use
+lm.act.template_save | ذخیرهٔ قالب | Save the template
+lm.act.template_apply | ساختن از روی قالب | Apply the template
+lm.act.template_delete | حذف قالب | Delete the template
+lm.reason.materials | مصالح کافی نیست. | Not enough materials.
+lm.reason.cash | پول کافی نیست. | Not enough money.
+lm.reason.requires | پیش‌نیازش را هنوز نداری: | A requirement is missing:
+lm.reason.area | زیربنا جا ندارد؛ اول طبقه بساز. | No floor area left; build a storey first.
+lm.reason.slot | جای این تجهیزات پر است. | No free slot for it.
+lm.reason.storeys | بیشتر از این طبقه نمی‌شود ساخت. | No more storeys can be built.
+lm.reason.busy | یک سفارش در حال ساخت است؛ صبر کن تمام شود. | An order is being built; wait for it.
+lm.reason.not_built | ساختمان هنوز ساخته نشده. | Not built yet.
+lm.reason.other | الان نمی‌شود. | Not possible now.
+lm.effect.housing | جای زندگی برای {n} نفر | Houses {n}
+lm.effect.storage | {n} جا در انبار | {n} spaces of storage
+lm.effect.stall | {n} پیشخوان | {n} counters
+lm.ring | مدیریت | Manage
+act.lot.manage | مدیریت قطعهٔ من | Manage my lot
+act.currency.reserve | صندوق ذخیره | Reserve
+rs.title | صندوق ذخیرهٔ {name} | {name} reserve
+rs.status.chartered | در گردش | In circulation
+rs.status.wind_down | در حال جمع‌شدن | Winding down
+rs.status.retired | بازنشسته | Retired
+rs.pot | ذخیرهٔ ساپی | Reserve pot (SUP)
+rs.basis | پشتوانهٔ ثبت‌شده | Basis
+rs.excess | مازاد (قابل برداشت) | Excess (can leave)
+rs.supply | پول در گردش | In circulation
+rs.coverage | پوشش: {p} | Coverage: {p}
+rs.coverage_none | تا پول در گردش نباشد پوششی هم نیست. | No coverage until there is money in circulation.
+rs.coverage_note | پوشش فقط نشانهٔ اطمینان است؛ تعهدی نیست و کسی طلبکار نیست. | Coverage is a measure of confidence; nobody is owed it.
+rs.stab | واحدهای تثبیت‌شده | Stabilisation stock
+rs.cap | ارزش بازاری | Market value
+rs.levers | قاعدهٔ فعلی صندوق مرکزی | Reserve Bank rules now
+rs.levers_v | کارمزد چاپ {mint}، کارمزد بازار {fx}، بازهٔ قیمت {band}، اعلام برداشت {notice} ساعت قبل | mint fee {mint}, market fee {fx}, band {band}, withdrawal notice {notice} h
+rs.macro | آخرین سنجش | Latest reading
+rs.price_idx | شاخص قیمت | Price index
+rs.supply_growth | رشد پول در گردش | Supply growth
+rs.macro_cov | پوشش | Coverage
+rs.trend | روند شاخص قیمت | Price index trend
+rs.wind_lead | این پول دارد جمع می‌شود. | This money is being wound down.
+rs.wind_ends | مهلت دریافت سهم تا {at} است؛ بعد از آن واحدهای باقی‌مانده ارزشی ندارند. | Claim until {at}; after that leftover units are worth nothing.
+rs.claim_hint | با واپس‌دادن همهٔ واحدهایت ({units}) سهمت {share} می‌شود. | Giving back all your units ({units}) pays your share, {share}.
+rs.claim | دریافت سهم | Claim my share
+rs.nothing_to_claim | واحدی نداری که سهمی بدهد. | You hold nothing to claim with.
+rs.claim_warn | همهٔ واحدهایت سوزانده می‌شود و سهمت به ساپ می‌آید. | All your units are burnt and your share is paid in SUP.
+rs.tools | ابزار سرپرست | The head's tools
+rs.tools_note | همهٔ این کارها عمومی‌اند و دیر اجرا می‌شوند؛ درخواست خرید و فروش {h} ساعت بعد در اولین بستن دوره انجام می‌شود. | All of these are public and delayed: buy and sell requests run {h} h later at the first period close.
+rs.act.issue | چاپ بیشتر | Mint more
+rs.act.issue_sub | با سپردهٔ ساپ از خزانه | Against a SUP deposit
+rs.act.issue_help | ساپی از خزانه به ذخیره می‌رود و واحد تازه به خزانه می‌آید. | SUP goes from the treasury to the pot; new units reach the treasury.
+rs.act.burn | سوزاندن | Burn
+rs.act.burn_sub | واحدهای خزانه | Treasury units
+rs.act.burn_help | خزانه واحدهایی را که دارد می‌سوزاند؛ ذخیره سرجایش می‌ماند. | The treasury burns units it holds; the pot stays.
+rs.act.buy | درخواست خرید | Buy request
+rs.act.buy_sub | تثبیت قیمت | Stabilise the price
+rs.act.buy_help | درخواست عمومی است و {h} ساعت بعد، در اولین بستن دوره، در حد مجاز انجام می‌شود. | Public; it runs {h} h later at the first period close within the limits.
+rs.act.sell | درخواست فروش | Sell request
+rs.act.sell_sub | تثبیت قیمت | Stabilise the price
+rs.act.sell_help | درخواست عمومی است و {h} ساعت بعد، در اولین بستن دوره، در حد مجاز انجام می‌شود. | Public; it runs {h} h later within the limits.
+rs.act.withdraw | برداشت مازاد | Withdraw excess
+rs.act.withdraw_sub | با اعلام قبلی | With notice
+rs.act.withdraw_help | فقط مازاد برداشته می‌شود و {n} ساعت بعد از اعلام، اگر مازاد هنوز باشد. | Only the excess, {n} h after the notice if it is still there.
+rs.act.retire | بازنشستگی پول | Retire the money
+rs.act.retire_sub | برگشت ندارد | Cannot be undone
+rs.act.retire_help | شروع جمع‌شدن پول؛ دارندگان سهمشان را می‌گیرند. | Starts the wind-down; holders claim their share.
+rs.act.claim | دریافت سهم | Claim
+rs.act.cancel | لغو | Cancel
+rs.amount_sup | مقدار (ساپ) | Amount (SUP)
+rs.amount_units | مقدار ({name}) | Amount ({name})
+rs.price_opt | قیمت هر واحد (اختیاری) | Price per unit (optional)
+rs.price_ref | نرخ مرجع | Reference price
+rs.review | دیدن و تأیید | Review
+rs.confirm | تأیید | Confirm
+rs.retire_yes | بله، بازنشسته شود | Yes, retire it
+rs.retire_warn | این کار برگشت ندارد: پول شروع به جمع‌شدن می‌کند، سرپرست دیگر چیزی چاپ نمی‌کند و بعد از مهلت واحدهای باقی‌مانده ارزشی ندارند. | This cannot be undone: the money winds down, nothing more is minted and leftover units are worthless after the window.
+rs.you_set | مقدار | Amount
+rs.you_get | می‌رسد | Result
+rs.exec_note | اجرا: {at} (حدود {w} دیگر). همه می‌توانند آن را ببینند. | Runs {at} (in about {w}). Everyone can see it.
+rs.limits | حد مجاز الان: خرید تا {buy}، فروش تا {sell}؛ سقف {cap} و کف {floor} | Allowed now: buy up to {buy}, sell up to {sell}; cap {cap}, floor {floor}
+rs.log | فهرست عمومی | Public log
+rs.log_empty | هنوز درخواستی ثبت نشده. | Nothing logged yet.
+rs.log_buy | خرید {n} | Buy {n}
+rs.log_sell | فروش {n} | Sell {n}
+rs.log_withdraw | برداشت {n} | Withdraw {n}
+rs.st.pending | منتظر اجرا | Pending
+rs.st.done | انجام شد | Done
+rs.st.cancelled | لغو شد | Cancelled
+rs.st.refused | رد شد | Refused
+rs.st.clipped | بخشی انجام شد | Partly done
+rs.exec | اجرا {at} | runs {at}
+rs.cancel | لغو | Cancel
+rs.reason.reserve_funds | موجودی خزانه کافی نیست. | The treasury cannot pay.
+rs.reason.reserve_no_units | واحد کافی نیست. | Not enough units.
+rs.reason.reserve_no_excess | مازادی نیست که برداشته شود. | There is no excess to withdraw.
+rs.reason.reserve_budget | بیشتر از حد مجاز است. | Over the allowed limit.
+rs.reason.reserve_wind_down | پول در حال جمع‌شدن است. | The money is winding down.
+rs.reason.reserve_not_wind | پول در حال جمع‌شدن نیست. | The money is not winding down.
+rs.reason.reserve_nothing | چیزی برای انجام نیست. | Nothing to do.
+rs.reason.other | الان نمی‌شود. | Not possible now.

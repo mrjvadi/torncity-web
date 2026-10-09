@@ -22,7 +22,7 @@ import { GrassTufts } from './grassTufts'
 import { createWaterMaterial } from './waterMaterial'
 import { buildLakeWater, type LakeWaterMesh } from './lakeWater'
 import type { VillageGround } from './terrainModel'
-import { buildModel, buildScaffold } from './buildingModels'
+import { buildLookModel, buildModel, buildScaffold, type LookDescriptor } from './buildingModels'
 import { ColorGeom } from './colorGeom'
 import { makeBuildingMaterials, type BuildingMaterials } from './buildingMaterials'
 import { buildVillageRoads, type RoadsMesh } from './villageRoads'
@@ -434,6 +434,15 @@ export class VillageScene {
     return { cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, W: x1 - x0, D: z1 - z0, base, foundation: base - span.min + 0.6 }
   }
 
+  private looks = new Map<string, LookDescriptor>()
+  /** The generated looks of the lots the viewer manages (building id -> descriptor): those buildings are drawn from it. */
+  setLooks(looks: Map<string, LookDescriptor>) {
+    const same = looks.size === this.looks.size && [...looks].every(([k, v]) => JSON.stringify(this.looks.get(k)) === JSON.stringify(v))
+    if (same) return
+    this.looks = looks
+    if (this.layout) { this.rebuildBuildings(); this.request() }
+  }
+
   private rebuildBuildings() {
     const now = Date.now() + (this.opts.clockSkewMs?.() ?? 0)
     if (this.builtMesh) { this.scene.remove(this.builtMesh); this.builtMesh.geometry.dispose(); this.builtMesh = null }
@@ -447,7 +456,8 @@ export class VillageScene {
       const Wm = b.rotated ? pose.D : pose.W
       const Dm = b.rotated ? pose.W : pose.D
       const finished = b.state === 'built' || b.state === 'damaged'
-      const model = buildModel(b.type, Wm, Dm, b.visual_seed, pose.foundation)
+      const look = b.id ? this.looks.get(b.id) : undefined
+      const model = look && finished ? buildLookModel(look, Wm, Dm, pose.foundation) : buildModel(b.type, Wm, Dm, b.visual_seed, pose.foundation)
       this.poses.set(b.id ?? `i${i}`, { ...pose, height: model.height, building: b })
       if (finished) {
         merged.append(model.geom, pose.cx, pose.base, pose.cz, rot)
