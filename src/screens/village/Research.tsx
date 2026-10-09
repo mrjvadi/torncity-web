@@ -41,6 +41,9 @@ function Seats({ b }: { b: ResearchBuildingLine }) {
   )
 }
 
+/** where a research upkeep good is made, for the «بساز» fix */
+const PRODUCER: Record<string, string> = { paper: 'paper_mill', firewood: 'woodcutter_camp' }
+
 export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
   const cmd = useVillageCommand()
   const names = useContentNames()
@@ -103,6 +106,12 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
                   <span>{t('rd.upkeep')}: {names.name(['component', 'item'], u.item.code, u.item.name)}
                     {u.stand_in?.code && v.stand_in_until && <small className="rd-notes">{t('rd.standin', { stand: names.name(['component', 'item'], u.stand_in.code, u.stand_in.name), n: formatNumber(u.stand_in_have), at: atText(v.stand_in_until) })}</small>}
                     {u.have < u.qty && !(u.stand_in?.code && v.stand_in_until && u.stand_in_have >= u.qty - u.have) && <small className="dk-why">{t('rd.upkeep_missing', { item: names.name(['component', 'item'], u.item.code, u.item.name) })}</small>}
+                    {u.have < u.qty && !(u.stand_in?.code && v.stand_in_until && u.stand_in_have >= u.qty - u.have) && (
+                      <span className="wk-fixes">
+                        <button type="button" className="dk-chip all" onClick={() => ctx.openLocal('village_storage')}>{t('rd.fix_buy')}</button>
+                        {PRODUCER[u.item.code] && <button type="button" className="dk-chip" onClick={() => ctx.openLocal('village_home', { build: '1' })}>{t('rd.fix_build', { name: ctx.bname(PRODUCER[u.item.code], '') })}</button>}
+                      </span>
+                    )}
                   </span>
                   <b className={u.have < u.qty ? 'bad' : ''}>{formatNumber(u.have)} / {formatNumber(u.qty)}</b>
                 </div>

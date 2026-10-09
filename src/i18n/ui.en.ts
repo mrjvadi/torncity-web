@@ -5804,4 +5804,6 @@ export const uiEn: Record<UiKey, string> = {
   'rd.standin': 'or {stand} (in store: {n}) until {at}',
   'rd.standin_note': 'Until {at} stand-ins still count; after that the item itself is needed.',
   'rd.upkeep_missing': '{item} is short; buy it or make it.',
+  'rd.fix_buy': 'Buy',
+  'rd.fix_build': 'Build: {name}',
 }

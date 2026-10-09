@@ -5902,3 +5902,5 @@ mt.standin_title | جایگزین موقت | Temporary stand-in
 rd.standin | یا {stand} (در انبار: {n}) تا {at} | or {stand} (in store: {n}) until {at}
 rd.standin_note | تا {at} هنوز جایگزین‌ها قبول است؛ بعد از آن خود ماده لازم است. | Until {at} stand-ins still count; after that the item itself is needed.
 rd.upkeep_missing | {item} کم است؛ از بازار بخر یا بساز. | {item} is short; buy it or make it.
+rd.fix_buy | بخر | Buy
+rd.fix_build | بساز: {name} | Build: {name}

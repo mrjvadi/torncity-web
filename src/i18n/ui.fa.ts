@@ -5802,6 +5802,8 @@ export const uiFa = {
   'rd.standin': 'یا {stand} (در انبار: {n}) تا {at}',
   'rd.standin_note': 'تا {at} هنوز جایگزین‌ها قبول است؛ بعد از آن خود ماده لازم است.',
   'rd.upkeep_missing': '{item} کم است؛ از بازار بخر یا بساز.',
+  'rd.fix_buy': 'بخر',
+  'rd.fix_build': 'بساز: {name}',
 } as const
 
 export type UiKey = keyof typeof uiFa

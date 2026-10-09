@@ -7,7 +7,7 @@ import type { TradeDeskView, TradeItemLine } from '../../api/views.gen'
 import Popup, { ActionButton, ActionRow, Note, Section } from '../../ui/Popup'
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { formatNumber, money, splitMoney } from '../native/kit/format'
-import { itemIconName } from '../../ui/v6/ItemGrid'
+import { itemPngName } from '../../ui/v6/ItemGrid'
 import { rich } from '../../ui/v6/rich'
 import { atText } from '../../lib/duration'
 import { hasKey, t, type Key } from '../../i18n'
@@ -21,7 +21,7 @@ function ItemCard({ it, v, name, busy, onAct }: { it: TradeItemLine; v: TradeDes
   const [keep, setKeep] = useState(it.on ? it.keep : Math.max(0, Math.min(it.stock, v.keep_presets?.[1] ?? 0)))
   const step = Math.max(1, Math.round(((v.keep_presets ?? [10])[0] || 10) / 2))
   return (
-    <PCard icon={itemIconName(it.item.code)} title={name} tone={it.on ? 'good' : 'busy'}
+    <PCard icon={itemPngName(it.item.code)} title={name} tone={it.on ? 'good' : 'busy'}
       sub={t('tr.stock', { n: formatNumber(it.stock) })}
       badge={it.on ? t('tr.on') : undefined}
       facts={(

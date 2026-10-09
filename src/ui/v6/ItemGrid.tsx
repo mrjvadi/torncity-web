@@ -9,8 +9,11 @@ import Icon from '../Icon'
 import { PBar } from './panel'
 
 /** The icon of a good: its own glyph when it has one, else its shelf's or category's, else a box. */
-// the village goods of ADR 0050 use the closest icon of the kit: firewood = logs, clay = stone, pots = flask, hide = bag, rag = cloth, paper = scroll, tools = tool
-const ITEM_ICON: Record<string, string> = { bread: 'bread', bandage: 'pill', phone: 'phone', lockpick_set: 'keys', firewood: 'logs', clay: 'stone', pots: 'flask', hide: 'bag', rag: 'cloth', paper: 'scroll', tools: 'tool', timber: 'wood', plank: 'plank', stone: 'stone', cloth: 'cloth', wheat: 'wheat' }
+// the village goods of ADR 0050 use the closest icon of the kit (Icon names): firewood = flame, clay = ore, pots = bottle, hide = backpack, rag = tent (cloth), paper = scroll, tools = gears
+const ITEM_ICON: Record<string, string> = { bread: 'bread', bandage: 'pill', phone: 'phone', lockpick_set: 'keys', firewood: 'x_flame', clay: 'ore', pots: 'f_bottle', hide: 'm_backpack', rag: 'tent', paper: 'x_scroll', tools: 'gears' }
+/** the same goods for the flat PNG icons of the v6 panel cards (`PCard icon`): firewood = logs, clay = stone, pots = flask, hide = bag, rag = cloth, paper = scroll, tools = tool */
+const ITEM_PNG: Record<string, string> = { firewood: 'logs', clay: 'stone', pots: 'flask', hide: 'bag', rag: 'cloth', paper: 'scroll', tools: 'tool', timber: 'wood', plank: 'plank', stone: 'stone', cloth: 'cloth', wheat: 'wheat' }
+export const itemPngName = (code: string): string => ITEM_PNG[code] ?? 'crate'
 const GROUP_ICON: Record<string, string> = {
   food: 'bread', medicine: 'pill', gear: 'gears', electronics: 'phone', defence: 'shield',
   mineral: 'ore', metal_ore: 'ore', vehicles: 'x_car', wood: 'x_field', bags: 'm_backpack', clothing: 'box', tools: 'gears',
