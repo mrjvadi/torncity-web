@@ -5822,3 +5822,57 @@ ug.upkeep | هزینهٔ نگهداری | Upkeep
 ug.staff | کارکنان | Staff
 ug.blocked_short | شرطی کم است؛ برای دیدنش بزن | Something is missing; tap to see
 ug.not_now | الان نمی‌توانی سفارش بدهی (سفارشی در جریان است یا ساختمان مال تو نیست). | You cannot order now (an order is running or it is not yours).
+tr.title | بازرگان و روز بازار | The trader and the market day
+tr.door | بازرگان | Trader
+tr.lead | روزی یک بار بازرگانی از راه می‌رسد و مازاد کالاهایی را که شهردار برای فروش گذاشته می‌خرد؛ به شرط این‌که بازارچه با منشی‌اش برپا باشد و خزانه دستمزد منشی را بدهد. | Once a day a trader buys the surplus of the goods the head put on sale, if the barter post stands with its clerk and the treasury can pay.
+tr.when | آمدن بازرگان | The trader comes
+tr.when_v | هر روز، به وقت همین شهر | Every day, city local time
+tr.cap | سقف بار هر بار | Load cap per visit
+tr.cap_v | {n} واحد | {n} units
+tr.prospect | امروز می‌تواند ببرد | Can take today
+tr.prospect_v | {n} واحد | {n} units
+tr.price | قیمت بازرگان | Trader's price
+tr.price_v | {p} قیمت مرجع | {p} of the reference
+tr.read_only | فقط کسی که اجازهٔ «فروش به بازرگان» دارد می‌تواند کالا برای فروش بگذارد. | Only a holder of the sell-to-trader permission can put goods on sale.
+tr.stopped | آخرین روز بازار انجام نشد | The last market day did not run
+tr.out.sold | فروش انجام شد | Sold
+tr.out.no_clerk | منشی بازار نبود | No market clerk
+tr.out.no_wage | خزانه دستمزد منشی را نداشت | The treasury could not pay the clerk
+tr.out.nothing | چیزی برای فروش نبود | Nothing to sell
+tr.out.too_little | فروش آن‌قدر کم بود که به دستمزد منشی نمی‌ارزید | The sale was too small to cover the clerk's wage
+tr.out.no_road | راهی به شهر بازرگان نبود | No road for the trader
+tr.out.other | روز بازار انجام نشد | The market day did not run
+tr.fix.no_clerk | برای منشی بازار باید یک نفر در بازارچه کار کند؛ جایش را در بازار کار آگهی کن. | The market needs someone in the post's clerk seat; post it on the hiring board.
+tr.fix.no_wage | خزانه را پر کن تا دستمزد منشی را بدهد. | Fill the treasury so it can pay the clerk.
+tr.fix.nothing | کالایی برای فروش بگذار و بیشتر از مقدار «نگه‌دار» داشته باش. | Put a good on sale and hold more than the keep amount.
+tr.fix.too_little | مقدار «نگه‌دار» را کمتر کن یا کالای بیشتری برای فروش بگذار. | Lower the keep amount or put more goods on sale.
+tr.fix.no_road | شهر باید به راه اصلی وصل باشد. | The city must be linked to a road.
+tr.fix_board | بازار کار | Hiring board
+tr.no_post | بازرگان بدون بازارچه نمی‌آید. | The trader does not come without a barter post.
+tr.not_here | اینجا نیست | Not here
+tr.no_post_fix | اول بازارچه (جای پایاپای) بساز. | Build the barter post first.
+tr.goods | کالاهای قابل فروش | Goods the trader buys
+tr.none_on | هنوز چیزی برای فروش نگذاشته‌ای. | Nothing is on sale yet.
+tr.stock | موجودی: {n} | In stock: {n}
+tr.on | برای فروش | On sale
+tr.unit | بازرگان واحدی {p} می‌خرد | The trader pays {p} each
+tr.ref | قیمت مرجع {p} · {c} آن | Reference {p} · {c} of it
+tr.surplus | مازاد {n} واحد | Surplus {n}
+tr.no_surplus | مازادی نیست | No surplus
+tr.keep | نگه‌دار | Keep
+tr.kept | نگه‌داشته: {n} | Kept: {n}
+tr.sell | بگذار برای فروش | Put on sale
+tr.update | تغییر | Update
+tr.stop | برداشتن از فروش | Take off sale
+tr.last | آخرین روزهای بازار | The last market day
+tr.last_none | هنوز روز بازاری نبوده. | No market day yet.
+tr.at_unit | {p} واحدی | {p} each
+tr.gross | فروش کل | Gross
+tr.wage | دستمزد منشی | Clerk's wage
+tr.net | خالص به خزانه | Net to the treasury
+tr.confirm_sell | گذاشتن برای فروش | Put on sale
+tr.confirm_sell_body | {name}: بیشتر از {keep} واحد که داری، هر روز به {price} واحدی به بازرگان فروخته می‌شود. | {name}: whatever you hold above {keep} is sold to the trader each day at {price} each.
+tr.confirm_stop | برداشتن از فروش | Take off sale
+tr.confirm_stop_body | {name} دیگر به بازرگان فروخته نمی‌شود. | {name} is no longer sold to the trader.
+tr.confirm_note | از پول فروش، دستمزد منشی کم می‌شود و بقیه به خزانه می‌رود. | The clerk's wage comes off the sale; the rest goes to the treasury.
+charter.perm.trade.export | فروش به بازرگان | Sell to the trader

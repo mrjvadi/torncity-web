@@ -31,7 +31,7 @@ function bpsText(bps: number): string {
   return `${s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d]).replace('.', '٫')}٪`
 }
 
-export default function Storage({ response, openLocal }: ScreenProps) {
+export default function Storage({ response, openLocal, run }: ScreenProps) {
   const names = useContentNames()
   const city = names.name('city', 'support', 'support')
   const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
@@ -106,6 +106,7 @@ export default function Storage({ response, openLocal }: ScreenProps) {
 
       {tab === 'city' && v && (
         <>
+          <div className="tr-door"><ActionButton tone="gold" small onClick={() => run('settlement.trade')}>{t('tr.door')}</ActionButton></div>
           {v.bought && (
             <Notice>{t('storage.bought', { qty: formatNumber(v.bought.qty), name: goods(v.bought.item), total: money(v.bought.total) })}</Notice>
           )}

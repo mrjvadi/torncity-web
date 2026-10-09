@@ -5963,6 +5963,42 @@ export interface VillageMaker {
   built: boolean
 }
 
+export interface TradeDayLine {
+  outcome: string
+  gross: number
+  wage: number
+  at: string | null
+  lines: TradeSoldLine[] | null
+}
+
+export interface TradeDeskView {
+  name: string
+  has_post: boolean
+  cap: number
+  price_bps: number
+  prospect: number
+  items: TradeItemLine[] | null
+  last: TradeDayLine | null
+  may_order: boolean
+  keep_presets: number[] | null
+}
+
+export interface TradeItemLine {
+  item: Named
+  stock: number
+  reference: number
+  unit: number
+  on: boolean
+  keep: number
+  surplus: number
+}
+
+export interface TradeSoldLine {
+  item: Named
+  qty: number
+  unit: number
+}
+
 export interface VillageNeed {
   kind: string
   item: Named
@@ -6629,6 +6665,7 @@ export interface ScreenViews {
   refusal: RefusalView
   report_confirm: ReportConfirmView
   research: ResearchBoardView
+  trade: TradeDeskView
   retrofit: RetrofitView
   reverse_lab: ReverseLabView
   sanction_blocked: SanctionBlockedView
