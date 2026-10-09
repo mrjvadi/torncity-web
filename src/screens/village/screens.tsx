@@ -4,7 +4,7 @@
 // the build menu, grid and confirms, a building's own page. Words are the web's own
 // (src/i18n/ui.src.txt); content names come from the catalogue.
 
-import { UpgradeCard, fromBuildingUpgrade, type UpgradeHandlers, type UpgradeX } from './UpgradeDetail'
+import { UpgradeCard, fromBuildingUpgrade, type UpgradeHandlers } from './UpgradeDetail'
 import { buildText, workText } from '../../lib/duration'
 import { useState, type ReactNode } from 'react'
 import type {
@@ -797,8 +797,9 @@ function FlowUpgrades({ v, ctx }: { v: BuildingPanelView; ctx: FlowCtx }) {
   const h: UpgradeHandlers = {
     names: ctx.names, bname: (c, n) => ctx.bname(c, n), openKnowledge: () => ctx.openLocal('village_knowledge'), openStorage: () => ctx.openLocal('village_storage'),
     openTreasury: () => ctx.openLocal('village_overview'), openBuild: () => ctx.openLocal('village_home', { build: '1' }), go: () => ctx.openLocal('village_home', { build: '1' }),
+    openLearn: () => ctx.run('education.list'), openTravel: () => ctx.run('travel.destinations'),
   }
-  const models = ((v.upgrades ?? []) as UpgradeX[]).map((u) => ({ u, m: fromBuildingUpgrade(u, h, { treasury: v.treasury || undefined }) }))
+  const models = (v.upgrades ?? []).map((u) => ({ u, m: fromBuildingUpgrade(u, h) }))
   const sel = models.find((x) => x.u.building.code === open)
   return (
     <>

@@ -8,7 +8,7 @@
 // If the server has no panel for the building (an older server, a failed
 // call), the sheet falls back to what the layout itself says.
 
-import { UpgradeCard, fromBuildingUpgrade, type UpgradeX } from './UpgradeDetail'
+import { UpgradeCard, fromBuildingUpgrade } from './UpgradeDetail'
 import { useUpgradeHandlers, type UpgradeScreen } from './UpgradeConfirm'
 import { endNote } from '../../lib/duration'
 import { buildText, workText } from '../../lib/duration'
@@ -47,11 +47,12 @@ interface Props {
   /** «مدیریت قطعهٔ من» for a building of mine (or the settlement's own, with public.build) */
   onManage?: (buildingId: string) => void
   canPublicBuild?: boolean
+  onRun?: (command: string) => void
 }
 
 const EFFECT_KEYS = ['local_security_bps', 'food_coverage_bps', 'job_coverage_bps', 'service_coverage_bps', 'happiness_bps', 'housing_capacity']
 
-export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine, onManage, canPublicBuild, startSite }: Props) {
+export default function BuildingSheet({ building: b, canPlace, cat, store, onOpen, onBuild, onClose, onMine, onManage, canPublicBuild, onRun, startSite }: Props) {
   const now = useNow(1000)
   const names = useContentNames()
   const cmd = useVillageCommand()
@@ -158,7 +159,7 @@ export default function BuildingSheet({ building: b, canPlace, cat, store, onOpe
       )}
       {site && b.id && <SiteSheet buildingId={b.id} title={name} onClose={() => setSite(false)} />}
 
-      {upgrade && <UpgradeList panel={panel} cat={cat} onOpen={(s) => onOpen?.(s)} onClose={onClose} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
+      {upgrade && <UpgradeList panel={panel} cat={cat} onRun={onRun} onOpen={(s) => onOpen?.(s)} onClose={onClose} onBuild={(c) => { onClose(); onBuild?.(c) }} />}
 
       {ask && <Note>{t(ask === 'cancel' ? 'building.confirm_cancel' : 'building.confirm_demolish')}</Note>}
       {going && canAct && ask === null && (
@@ -256,13 +257,13 @@ function TypePanel({ kind, panel, names, onOpen, onClose, manage, onAct }: {
   )
 }
 
-function UpgradeList({ panel, cat, onOpen, onClose, onBuild }: { panel: BuildingPanelView | null; cat: Map<string, CatalogueBuilding>; onOpen: (s: UpgradeScreen) => void; onClose: () => void; onBuild: (code: string) => void }) {
+function UpgradeList({ panel, cat, onOpen, onRun, onClose, onBuild }: { onRun?: (command: string) => void; panel: BuildingPanelView | null; cat: Map<string, CatalogueBuilding>; onOpen: (s: UpgradeScreen) => void; onClose: () => void; onBuild: (code: string) => void }) {
   const [open, setOpen] = useState<string | null>(null)
-  const h = useUpgradeHandlers(cat, onOpen, (c) => c && onBuild(c), onClose, onBuild)
-  const ups = (panel?.upgrades ?? null) as UpgradeX[] | null
+  const h = useUpgradeHandlers(cat, onOpen, (c) => c && onBuild(c), onClose, onBuild, onRun)
+  const ups = panel?.upgrades ?? null
   if (!panel || panel.mode !== 'up') return <Note>…</Note>
   if (!ups || ups.length === 0) return <Note>{t('building.upgrade.none')}</Note>
-  const models = ups.map((u) => ({ u, m: fromBuildingUpgrade(u, h, { treasury: panel.treasury || undefined }) }))
+  const models = ups.map((u) => ({ u, m: fromBuildingUpgrade(u, h) }))
   const sel = models.find((x) => x.u.building.code === open)
   return (
     <>

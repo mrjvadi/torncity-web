@@ -5876,3 +5876,14 @@ tr.confirm_stop | برداشتن از فروش | Take off sale
 tr.confirm_stop_body | {name} دیگر به بازرگان فروخته نمی‌شود. | {name} is no longer sold to the trader.
 tr.confirm_note | از پول فروش، دستمزد منشی کم می‌شود و بقیه به خزانه می‌رود. | The clerk's wage comes off the sale; the rest goes to the treasury.
 charter.perm.trade.export | فروش به بازرگان | Sell to the trader
+ug.money_ok | پول خزانه کافی است ({n}) | The treasury has enough ({n})
+ug.literacy | سواد شهر دست‌کم {n} | City literacy of at least {n}
+ug.terrain | زمین مناسب: {name} | Fitting terrain: {name}
+ug.terrain_here | این‌جا نیست؛ باید جای دیگر ساخته شود. | Not here; it must stand elsewhere.
+ug.where | کجا: {where} | Where: {where}
+ug.fix.train | آموزش | Learn
+ug.fix.travel | سفر | Travel
+ug.consumes | مصرف روزانه | Daily use
+ug.cap.research_slots | جایگاه پژوهش +{n} | Research slots +{n}
+ug.cap.storage | جای انبار +{n} | Storage room +{n}
+ug.cap.housing | جای زندگی +{n} | Housing +{n}

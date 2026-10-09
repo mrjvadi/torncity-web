@@ -6,24 +6,14 @@
 // see torncity-lab/handoff/ui-to-backend.md (2026-10-10 upgrade details).
 
 import Popup, { ActionButton, ActionRow, Note, Section, StatCard, StatGrid } from '../../ui/Popup'
-import type { BuildingUpgradeLine, LotUpgradeLine, Named, VillageNeed } from '../../api/views.gen'
+import type { BuildingUpgradeLine, LotUpgradeLine, Named, Prerequisite, VillageNeed } from '../../api/views.gen'
 import { buildText } from '../../lib/duration'
 import { formatNumber, money } from '../native/kit/format'
 import { hasKey, t, type Key } from '../../i18n'
 import type { ContentNames } from '../../village/useVillage'
 
-/** The fields the server may add to BuildingUpgradeLine; all optional until it sends them. */
-export type UpgradeX = BuildingUpgradeLine & {
-  materials?: { item: Named; need: number; have: number }[] | null
-  shifts?: number
-  adds?: Named[] | null
-  gives?: { target: string; value: number }[] | null
-  needs?: VillageNeed[] | null
-  missing_buildings?: Named[] | null
-  staff?: { role: string; slots: number }[] | null
-  upkeep?: number
-  treasury?: number
-}
+/** a requirement as the server sends it: `Prerequisite` (building and knowledge lists) or the older `VillageNeed` (a lot's level-up) */
+export type Need = Omit<Prerequisite, 'how' | 'where' | 'role' | 'tier'> & Partial<Pick<Prerequisite, 'how' | 'where' | 'role' | 'tier'>>
 
 export interface ReqRow { key: string; ok: boolean; label: string; detail?: string; fix?: { label: string; onClick: () => void }; here?: string }
 export interface UpgradeModel {
@@ -49,66 +39,123 @@ export interface UpgradeHandlers {
   openBuild: (code?: string) => void
   openStorage: () => void
   openTreasury: () => void
+  /** a course or a place that teaches (literacy, a skill) */
+  openLearn: () => void
+  /** a trip to the place that has it */
+  openTravel: () => void
   go: (code: string) => void
 }
 
 const kn = (h: UpgradeHandlers, n: Named) => h.names.name('knowledge', n.code, n.name)
 const item = (h: UpgradeHandlers, n: Named) => h.names.name(['component', 'item'], n.code, n.name)
+const pctBps = (b: number) => `\u2066${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(b / 100)}٪\u2069`
 
-function needRows(h: UpgradeHandlers, needs: VillageNeed[] | null | undefined): ReqRow[] {
+/** Each requirement as a line: met or missing, and the button the server's `how` points to (research, build, train, buy, travel, donate). */
+export function needRows(h: UpgradeHandlers, needs: Need[] | null | undefined): ReqRow[] {
   const rows: ReqRow[] = []
   for (const [i, n] of (needs ?? []).entries()) {
-    if (n.kind === 'material') {
-      const ok = n.have >= n.need
-      rows.push({ key: `n${i}`, ok, label: t('ug.mat', { name: item(h, n.item) }), detail: `${formatNumber(n.have)} / ${formatNumber(n.need)}`, fix: ok ? undefined : { label: n.price > 0 ? t('ug.fix.buy', { price: money(n.price) }) : t('ug.fix.store'), onClick: h.openStorage },
-        here: (n.makers ?? []).length ? t('ug.made_in', { list: (n.makers ?? []).map((m) => h.bname(m.building.code, m.building.name) + (m.built ? '' : ` (${t('ug.not_built')})`)).join('، ') }) : undefined })
-    } else if (n.kind === 'knowledge') {
-      const opts = (n.options ?? []).map((o) => kn(h, o))
-      rows.push({ key: `n${i}`, ok: false, label: opts.length > 1 ? t('ug.know_any', { list: opts.join('، ') }) : t('ug.know', { name: opts[0] ?? kn(h, n.item) }), fix: { label: t('ug.fix.research'), onClick: h.openKnowledge } })
-    } else {
-      const opts = (n.options ?? []).map((o) => h.bname(o.code, o.name))
-      rows.push({ key: `n${i}`, ok: false, label: t('ug.build_req', { names: opts.join('، ') }), fix: { label: t('ug.fix.build'), onClick: () => h.openBuild((n.options ?? [])[0]?.code) } })
+    const key = `n${i}`
+    const met = n.have >= n.need
+    const where = n.where ? t('ug.where', { where: n.where }) : undefined
+    switch (n.kind) {
+      case 'knowledge': {
+        const opts = (n.options ?? []).map((o) => kn(h, o))
+        const label = opts.length > 1 ? t('ug.know_any', { list: opts.join('، ') }) : t('ug.know', { name: opts[0] ?? kn(h, n.item) })
+        rows.push({ key, ok: met, label, here: where, fix: met ? undefined : howFix(h, n.how ?? 'research', n) })
+        break
+      }
+      case 'building': {
+        const opts = (n.options ?? []).map((o) => h.bname(o.code, o.name))
+        const label = t('ug.build_req', { names: (opts.length ? opts : [h.bname(n.item.code, n.item.name)]).join('، ') })
+        rows.push({ key, ok: met, label, here: where, fix: met ? undefined : howFix(h, n.how ?? 'build', n) })
+        break
+      }
+      case 'item': {
+        rows.push({ key, ok: met, label: t('ug.mat', { name: item(h, n.item) }), detail: `${formatNumber(n.have)} / ${formatNumber(n.need)}`, fix: met ? undefined : howFix(h, n.how ?? 'buy', n),
+          here: (n.makers ?? []).length ? t('ug.made_in', { list: (n.makers ?? []).map((m) => h.bname(m.building.code, m.building.name) + (m.built ? '' : ` (${t('ug.not_built')})`)).join('، ') }) : where })
+        break
+      }
+      case 'money':
+        rows.push({ key, ok: met, label: met ? t('ug.money_ok', { n: money(n.need) }) : t('ug.money', { n: money(n.need - n.have) }), fix: met ? undefined : howFix(h, n.how ?? 'donate', n) })
+        break
+      case 'literacy':
+        rows.push({ key, ok: met, label: t('ug.literacy', { n: pctBps(n.need) }), detail: pctBps(n.have), fix: met ? undefined : howFix(h, n.how ?? 'train', n), here: where })
+        break
+      case 'terrain':
+        rows.push({ key, ok: met, label: t('ug.terrain', { name: item(h, n.item) }), here: where ?? (met ? undefined : t('ug.terrain_here')), fix: met ? undefined : howFix(h, n.how ?? 'travel', n) })
+        break
+      default:
+        rows.push({ key, ok: met, label: n.item.name || n.kind, here: where })
     }
   }
   return rows
 }
 
-export function fromBuildingUpgrade(u: UpgradeX, h: UpgradeHandlers, have: { treasury?: number } = {}): UpgradeModel {
-  const reqs: ReqRow[] = []
-  // each missing knowledge is its own line, with the way to research it
-  for (const m of u.missing ?? []) reqs.push({ key: `k${m.code}`, ok: false, label: t('ug.know', { name: kn(h, m) }), fix: { label: t('ug.fix.research'), onClick: h.openKnowledge } })
-  const inNeeds = new Set((u.needs ?? []).flatMap((n) => (n.options ?? []).map((o) => o.code)))
-  for (const m of (u.missing_buildings ?? []).filter((x) => !inNeeds.has(x.code))) reqs.push({ key: `b${m.code}`, ok: false, label: t('ug.build_req', { names: h.bname(m.code, m.name) }), fix: { label: t('ug.fix.build'), onClick: () => h.openBuild(m.code) } })
-  reqs.push(...needRows(h, u.needs))
-  const mats = (u.materials ?? []).map((m) => ({ ...m, item: { code: m.item.code, name: item(h, m.item) } }))
-  for (const m of mats) if (m.have < m.need) reqs.push({ key: `m${m.item.code}`, ok: false, label: t('ug.mat', { name: item(h, m.item) }), detail: `${formatNumber(m.have)} / ${formatNumber(m.need)}`, fix: { label: t('ug.fix.store'), onClick: h.openStorage } })
-  const treasury = u.treasury ?? have.treasury
-  if (treasury !== undefined && treasury < u.cost_money) reqs.push({ key: 'money', ok: false, label: t('ug.money', { n: money(u.cost_money - treasury) }), fix: { label: t('ug.fix.treasury'), onClick: h.openTreasury } })
-  const missingCount = reqs.length
-  // a locked upgrade the server did not explain: say so, never an empty list
-  if (!u.available && missingCount === 0) reqs.push({ key: 'unknown', ok: false, label: t('ug.unknown') })
-  const gives = [...(u.adds ?? []).map((a) => t('ug.gives_add', { name: h.names.name(['component', 'item', 'module'], a.code, a.name) })), ...(u.gives ?? []).map((g) => (hasEffect(g.target) ? t(`building.effect.${g.target}` as never, { v: formatNumber(g.value) }) : '')).filter(Boolean)]
-  const extra: UpgradeModel['extra'] = []
-  if (u.upkeep !== undefined) extra.push({ label: t('ug.upkeep'), value: money(u.upkeep) })
-  for (const s of u.staff ?? []) extra.push({ label: t('ug.staff'), value: `${hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} × ${formatNumber(s.slots)}` })
-  return {
-    title: h.bname(u.building.code, u.building.name), level: u.tier, money: u.cost_money, moneyHave: treasury, materials: mats, shifts: u.shifts ?? 0, time: buildText(u), gives, extra, reqs,
-    available: u.available && reqs.every((r) => r.ok), blockedReason: reqs.some((r) => !r.ok) ? t('ug.blocked', { n: formatNumber(reqs.filter((r) => !r.ok).length) }) : '', go: () => h.go(u.building.code),
+function howFix(h: UpgradeHandlers, how: string, n: Need): { label: string; onClick: () => void } | undefined {
+  switch (how) {
+    case 'research': return { label: t('ug.fix.research'), onClick: h.openKnowledge }
+    case 'build': return { label: t('ug.fix.build'), onClick: () => h.openBuild((n.options ?? [])[0]?.code ?? n.item.code) }
+    case 'train': return { label: t('ug.fix.train'), onClick: h.openLearn }
+    case 'buy': return { label: n.price > 0 ? t('ug.fix.buy', { price: money(n.price) }) : t('ug.fix.store'), onClick: h.openStorage }
+    case 'travel': return { label: t('ug.fix.travel'), onClick: h.openTravel }
+    case 'donate': return { label: t('ug.fix.treasury'), onClick: h.openTreasury }
+    default: return undefined
   }
 }
 
-function hasEffect(target: string): boolean { return /_bps$|housing_capacity$/.test(target) }
+const effectText = (target: string, value: number): string => (hasKey(`building.effect.${target}`) ? t(`building.effect.${target}` as Key, { v: formatNumber(/_bps$/.test(target) ? Math.round(value / 100) : value) }) : '')
+const capText = (kind: string, code: string, value: number): string => (hasKey(`ug.cap.${kind}`) ? t(`ug.cap.${kind}` as Key, { code, n: formatNumber(value) }) : `${code} ${formatNumber(value)}`)
+
+export function fromBuildingUpgrade(u: BuildingUpgradeLine, h: UpgradeHandlers): UpgradeModel {
+  const reqs = needRows(h, u.needs)
+  // an older answer without needs[]: the missing knowledge, one line each
+  if (!(u.needs ?? []).length) for (const m of u.missing ?? []) reqs.push({ key: `k${m.code}`, ok: false, label: t('ug.know', { name: kn(h, m) }), fix: { label: t('ug.fix.research'), onClick: h.openKnowledge } })
+  // a locked upgrade the server did not explain: say so, never an empty list
+  if (!u.available && !reqs.some((r) => !r.ok)) reqs.push({ key: 'unknown', ok: false, label: t('ug.unknown') })
+  const have = new Map((u.needs ?? []).filter((n) => n.kind === 'item').map((n) => [n.item.code, n.have]))
+  const mats = (u.materials ?? []).map((m) => ({ item: { code: m.item.code, name: item(h, m.item) }, need: m.qty, have: have.get(m.item.code) ?? m.qty }))
+  const gives = [
+    ...(u.effects ?? []).map((e) => effectText(e.target, e.value)).filter(Boolean),
+    ...(u.capacity ?? []).map((c) => capText(c.kind, c.code, c.value)),
+  ]
+  const extra: UpgradeModel['extra'] = []
+  if (u.upkeep_money > 0) extra.push({ label: t('ug.upkeep'), value: money(u.upkeep_money) })
+  for (const c of u.consumes ?? []) extra.push({ label: t('ug.consumes'), value: `${formatNumber(c.qty)} ${item(h, c.item)}` })
+  for (const s of u.staff ?? []) extra.push({ label: t('ug.staff'), value: `${h.names.name(['staff_role'], s.role.code, s.role.name)} × ${formatNumber(s.slots)}` })
+  const bad = reqs.filter((r) => !r.ok).length
+  return {
+    title: h.bname(u.building.code, u.building.name), level: u.tier, money: u.cost_money, materials: mats, shifts: u.shifts, time: buildText(u), gives, extra, reqs,
+    available: (u.ready ?? u.available) && bad === 0, blockedReason: bad ? t('ug.blocked', { n: formatNumber(bad) }) : '', go: () => h.go(u.building.code),
+  }
+}
 
 export function fromLotUpgrade(u: LotUpgradeLine, h: UpgradeHandlers, cash?: number, go?: () => void): UpgradeModel {
-  const reqs: ReqRow[] = needRows(h, u.needs)
+  const reqs: ReqRow[] = needRows(h, u.needs as VillageNeed[] | null)
   for (const m of u.materials ?? []) reqs.push({ key: `m${m.item.code}`, ok: true, label: t('ug.mat', { name: item(h, m.item) }), detail: formatNumber(m.qty) })
-  if (!u.can && reqs.every((r) => r.ok)) reqs.push({ key: 'reason', ok: false, label: t(`lm.reason.${u.reason}` as never) })
+  if (!u.can && reqs.every((r) => r.ok)) reqs.push({ key: 'reason', ok: false, label: hasKey(`lm.reason.${u.reason}`) ? t(`lm.reason.${u.reason}` as Key) : t('lm.reason.other') })
   if (cash !== undefined && cash < u.cost_money) reqs.push({ key: 'money', ok: false, label: t('ug.money', { n: money(u.cost_money - cash) }), fix: { label: t('ug.fix.treasury'), onClick: h.openTreasury } })
+  const bad = reqs.filter((r) => !r.ok).length
   return {
     title: t('lm.upgrade', { n: formatNumber(u.to) }), level: u.to, money: u.cost_money, moneyHave: cash,
-    materials: (u.materials ?? []).map((m) => ({ item: { code: m.item.code, name: item(h, m.item) }, need: m.qty, have: m.qty })), shifts: u.shifts, time: '', gives: (u.adds ?? []).map((a) => t('ug.gives_add', { name: h.names.name(['component', 'item', 'module'], a.code, a.name) })), extra: [], reqs,
-    available: u.can && !!go && reqs.every((r) => r.ok), blockedReason: reqs.some((r) => !r.ok) ? t('ug.blocked', { n: formatNumber(reqs.filter((r) => !r.ok).length) }) : !go ? t('ug.not_now') : '', go: go ?? (() => undefined),
+    materials: (u.materials ?? []).map((m) => ({ item: { code: m.item.code, name: item(h, m.item) }, need: m.qty, have: m.qty })), shifts: u.shifts, time: '',
+    gives: (u.adds ?? []).map((a) => t('ug.gives_add', { name: h.names.name(['component', 'item', 'module'], a.code, a.name) })), extra: [], reqs,
+    available: u.can && !!go && bad === 0, blockedReason: bad ? t('ug.blocked', { n: formatNumber(bad) }) : !go ? t('ug.not_now') : '', go: go ?? (() => undefined),
   }
+}
+
+/** The requirement lines alone (✓ or ✗, each with its fix): the same rows as the upgrade card, for a knowledge card. */
+export function ReqList({ rows, onFix }: { rows: ReqRow[]; onFix?: () => void }) {
+  return (
+    <div className="ug-reqs">
+      {rows.map((r) => (
+        <div key={r.key} className={`ug-req ${r.ok ? 'ok' : 'bad'}`}>
+          <span className="ug-mark" aria-label={r.ok ? t('v6.have') : t('ug.missing')}>{r.ok ? '✓' : '✗'}</span>
+          <span className="ug-txt"><b>{r.label}</b>{r.detail && <small dir="ltr"> {r.detail}</small>}{r.here && <small>{r.here}</small>}</span>
+          {r.fix && <button type="button" className="dk-chip" onClick={() => { onFix?.(); r.fix!.onClick() }}>{r.fix.label}</button>}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export function UpgradeCard({ m, onClose, busy }: { m: UpgradeModel; onClose: () => void; busy?: boolean }) {

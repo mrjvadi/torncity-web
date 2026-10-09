@@ -519,10 +519,10 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
         onClose={() => { setInfoId(null); setInfoSite(false); if (!useRing) setSelectedId(null) }}
         onOpen={(screen) => openLocal(screen)} onBuild={(code) => { void build.enter().then(() => build.choose(code)) }}
         onMine={() => { setSelectedId(null); setInfoId(null); run('settlement.mine') }}
-        onManage={(bid) => { setSelectedId(null); setInfoId(null); run('settlement.lot.manage', { building: bid }) }} canPublicBuild={canPublicBuild} />
+        onManage={(bid) => { setSelectedId(null); setInfoId(null); run('settlement.lot.manage', { building: bid }) }} canPublicBuild={canPublicBuild} onRun={(c) => run(c)} />
       {upId && (() => {
         const ub = layout?.buildings.find((b, i) => keyOf(i, b) === upId)
-        return ub ? <UpgradeConfirm building={ub} cat={cat} onClose={() => setUpId(null)} onOpen={(screen) => openLocal(screen)} onBuild={(code) => { setSelectedId(null); void build.enter().then(() => build.choose(code)) }} /> : null
+        return ub ? <UpgradeConfirm building={ub} cat={cat} onRun={(c) => run(c)} onClose={() => setUpId(null)} onOpen={(screen) => openLocal(screen)} onBuild={(code) => { setSelectedId(null); void build.enter().then(() => build.choose(code)) }} /> : null
       })()}
       {ctx && <ContextMenu at={ctx} title={(() => { const ub = layout?.buildings.find((b, i) => keyOf(i, b) === ctx.id); return ub ? buildingName(cat, ub.type) : '' })()} items={ctxItems(ctx.id)} onClose={() => setCtx(null)} />}
       <BuyLotSheet lot={buyLot} price={layout?.terms?.lot_price} onClose={() => setBuyLot(null)} store={store} onOther={(l) => setBuyLot(l)} />

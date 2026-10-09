@@ -27,7 +27,7 @@ import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from '
 import type {
   BatchLotFailure, BuildMenuView, BuildingView, WorkNode, WorkSlot, ConstructionProgressView, DonateView, KnowledgeListView, LandCell, LotCell, LandView, LotAccessView, LotRepairView, LotBatchConfirmView,
   LotBuyView, LotConfirmView, LotGridView, MaterialBuyView, MaterialsView, MineView, Named, PrivateConfirmView, PrivateLotsView, PrivateMenuView, PromotionView, DevelopmentView,
-  ResidenceView, SettlementWhoView, TermsView, VillageNeed, VillageOverviewView, WorkView,
+  ResidenceView, SettlementWhoView, TermsView, Prerequisite, VillageNeed, VillageOverviewView, WorkView,
 } from './views.gen'
 const OWN_ID = MOCK_VILLAGE_IDS.own
 const OTHER_ID = MOCK_VILLAGE_IDS.other
@@ -445,7 +445,7 @@ function knowledgeView() {
     lines: st.know.filter((k) => k.terrain || k.state === 'held').map((k) => ({
       knowledge: kn(k.code), state: k.state, research_cost: k.cost, research_time_seconds: k.time, buy_price: k.buy,
       missing: k.missing.length ? k.missing.map(kn) : null, terrain_ok: k.terrain, unlocks: KNOW_UNLOCKS[k.code] ?? null,
-      speed_bps: k.code === 'masonry' ? 11300 : 10000, ahead_bps: k.code === 'masonry' ? 13000 : k.code === 'writing' ? 10000 : 10000, discount_bps: k.code === 'masonry' ? 1200 : 0, share_bps: k.code === 'masonry' && new URLSearchParams(location.search).get('res') === 'pact' ? 2000 : 0, slot: 'free', field: 'craft',
+      needs: k.missing.length ? [...k.missing.map((m) => ({ kind: 'knowledge', item: kn(m), role: '', tier: 0, have: 0, need: 1, how: 'research', where: '', options: [kn(m)], makers: null, price: 0 })), { kind: 'building', item: nameOf('masonry_workshop'), role: 'craft', tier: 0, have: 0, need: 1, how: 'build', where: '', options: [nameOf('masonry_workshop')], makers: null, price: 0 }] : null, speed_bps: k.code === 'masonry' ? 11300 : 10000, ahead_bps: k.code === 'masonry' ? 13000 : k.code === 'writing' ? 10000 : 10000, discount_bps: k.code === 'masonry' ? 1200 : 0, share_bps: k.code === 'masonry' && new URLSearchParams(location.search).get('res') === 'pact' ? 2000 : 0, slot: 'free', field: 'craft',
     })),
     currency: { code: 'AML', name: 'سکهٔ آمل', symbol: '' },
     hidden: 3,
@@ -1448,18 +1448,26 @@ function workNode0(type: string, id: string): Omit<WorkNode, 'meal_points' | 'fo
   return { ...base, status: 'idle', reasons: [{ code: 'no_staff', item: null, class: '', have: 0, need: 3 }], slots: [seat('empty'), seat('empty'), seat('empty')], filled: 0, job: null }
 }
 
-/** ?up=ok | know | bld | mat | money | all: an upgrade line with the richer fields the server is adding (materials, shifts, what it gives, needs with codes) */
+/** ?up=ok | know | bld | mat | money | learn | all: an upgrade line in the server's real shape (materials, shifts, staff, upkeep, effects, capacity, ready, needs[] with how and where) */
 function upgradeLine(code: string, tier: number, secs: number) {
   const m = (() => { try { return new URLSearchParams(location.search).get('up') ?? 'know' } catch { return 'know' } })()
-  const mats = [{ item: goods('timber'), need: 12, have: m === 'mat' || m === 'all' ? 4 : 12 }, { item: goods('stone'), need: 6, have: 6 }]
-  const missK = m === 'know' || m === 'all' ? [kn('irrigation'), kn('masonry')] : null
-  const missB = m === 'bld' || m === 'all' ? [nameOf('carpentry_workshop')] : null
-  const short = m === 'money' || m === 'all'
+  const all = m === 'all', P = (kind: string, item: Named, o: Partial<Prerequisite> = {}): Prerequisite => ({ kind, item, role: '', tier: 0, have: 0, need: 1, how: '', where: '', options: null, makers: null, price: 0, ...o })
+  const needs: Prerequisite[] = []
+  if (m === 'know' || all) needs.push(P('knowledge', kn('irrigation'), { how: 'research', options: [kn('irrigation')] }), P('knowledge', kn('masonry'), { how: 'research', options: [kn('masonry')] }))
+  else needs.push(P('knowledge', kn('irrigation'), { have: 1, how: 'research' }))
+  if (m === 'bld' || all) needs.push(P('building', nameOf('carpentry_workshop'), { how: 'build', role: 'craft', options: [nameOf('carpentry_workshop'), nameOf('masonry_workshop')] }))
+  needs.push(P('item', goods('timber'), { have: m === 'mat' || all ? 4 : 12, need: 12, how: 'buy', price: 22, makers: [{ building: nameOf('woodcutter_camp'), built: true }] }))
+  needs.push(P('item', goods('stone'), { have: 6, need: 6, how: 'buy', price: 30 }))
+  if (m === 'learn' || all) needs.push(P('literacy', { code: 'literacy', name: 'سواد' }, { have: 3400, need: 5000, how: 'train' }))
+  if (all) needs.push(P('terrain', { code: 'river', name: 'کنار رودخانه' }, { how: 'travel', where: 'سرخه' }))
+  const short = m === 'money' || all
+  needs.push(P('money', { code: 'sup', name: 'ساپ' }, { have: short ? 1500 : 12000, need: 4800, how: 'donate' }))
+  const ok = needs.every((n) => n.have >= n.need)
   return {
-    building: nameOf(code), tier, cost_money: 4800, build_time_seconds: secs, expected_wait: waitOf(secs), available: m === 'ok', missing: missK, needs_tier: '',
-    materials: mats, shifts: 9, adds: [{ code: 'bedroom', name: 'اتاق خواب' }, { code: 'storeroom', name: 'انبارک' }], gives: [{ target: 'housing_capacity', value: 4 }, { target: 'happiness_bps', value: 300 }],
-    missing_buildings: missB, needs: missB ? [{ kind: 'building', item: missB[0], options: missB, have: 0, need: 1, makers: null, price: 0 }] : null,
-    staff: [{ role: 'clerk', slots: 2 }], upkeep: 90, treasury: short ? 1500 : 12000,
+    building: nameOf(code), tier, cost_money: 4800, build_time_seconds: secs, expected_wait: waitOf(secs), available: ok, ready: ok, missing: null,
+    materials: [{ item: goods('timber'), qty: 12 }, { item: goods('stone'), qty: 6 }], shifts: 9, needs,
+    staff: [{ role: { code: 'clerk', name: 'منشی' }, slots: 2, wage_bps: 10000, shift_hours: 2 }], upkeep_money: 90, consumes: [{ item: goods('wood_fuel'), qty: 2 }],
+    effects: [{ target: 'housing_capacity', value: 4 }, { target: 'happiness_bps', value: 300 }], capacity: [{ kind: 'research_slots', code: '', value: 1 }, { kind: 'storage', code: 'food', value: 80 }],
   }
 }
 

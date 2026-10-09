@@ -5776,6 +5776,17 @@ export const uiFa = {
   'tr.confirm_stop_body': '{name} دیگر به بازرگان فروخته نمی‌شود.',
   'tr.confirm_note': 'از پول فروش، دستمزد منشی کم می‌شود و بقیه به خزانه می‌رود.',
   'charter.perm.trade.export': 'فروش به بازرگان',
+  'ug.money_ok': 'پول خزانه کافی است ({n})',
+  'ug.literacy': 'سواد شهر دست‌کم {n}',
+  'ug.terrain': 'زمین مناسب: {name}',
+  'ug.terrain_here': 'این‌جا نیست؛ باید جای دیگر ساخته شود.',
+  'ug.where': 'کجا: {where}',
+  'ug.fix.train': 'آموزش',
+  'ug.fix.travel': 'سفر',
+  'ug.consumes': 'مصرف روزانه',
+  'ug.cap.research_slots': 'جایگاه پژوهش +{n}',
+  'ug.cap.storage': 'جای انبار +{n}',
+  'ug.cap.housing': 'جای زندگی +{n}',
 } as const
 
 export type UiKey = keyof typeof uiFa
