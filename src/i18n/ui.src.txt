@@ -6193,3 +6193,26 @@ refusal.craft_too_many | همین حالا دو کار در جریان است؛ 
 refusal.craft_batches | تعداد دسته باید بین یک تا چهار باشد. | The batches must be between one and four.
 refusal.craft_no_inputs | مواد این دسته در انبار خودت کافی نیست. | Your store lacks the materials for this.
 refusal.craft_no_room | انبارت جای محصول را ندارد؛ کمی خالی کن. | Your store has no room for the goods; empty it a little.
+hc.offers | درمان در شهر | Care in the town
+hc.clinic | درمانگاه | Clinic
+hc.uses | با {name} از انبار شهر | with {name} from the town store
+hc.idle.no_staff | امروز کسی آنجا نیست؛ کارمند ندارد. | Nobody is there today; it has no staff.
+hc.idle.no_wage | امروز بسته است؛ مزد کارکنانش داده نشده. | Closed today; its staff are not paid.
+hc.idle.no_supplies | امروز بسته است؛ دارو یا نوار پانسمان در انبار شهر نیست. | Closed today; the town store has no medicine or bandage.
+hc.idle.other | امروز بسته است. | Closed today.
+hc.missing | چه چیزی هنوز نیست | What is not there yet
+hc.none_title | درمان در شهر هنوز نیست | There is no care in the town yet
+hc.none_lead | بیمارستان شهر مرکزی دیگر برای شهر شما کار نمی‌کند؛ درمان را شهر خودتان باید داشته باشد. این‌ها کم است: | The central hospital no longer serves your town; the town must have its own care. These are missing:
+hc.build_house | «{name}» هنوز ساخته نشده؛ شهردار یا کسی که اجازهٔ ساخت دارد می‌تواند بسازد. | The «{name}» is not built yet; the head or a builder can build it.
+hc.build_house_head | «{name}» هنوز ساخته نشده؛ از بخش ساخت (خدمات درمانی) می‌توانی بسازی. | The «{name}» is not built yet; you can build it from the build bar (health).
+hc.build_clinic | «{name}» هنوز ساخته نشده؛ با دارو و پرستار، درمان بهتر و پولی می‌دهد. | The «{name}» is not built yet; with medicine and a nurse it gives better, paid care.
+hc.build_clinic_head | «{name}» هنوز ساخته نشده؛ با دارو و پرستار، درمان بهتر و پولی می‌دهد و از بخش ساخت ساخته می‌شود. | The «{name}» is not built yet; with medicine and a nurse it gives better, paid care, from the build bar.
+hc.no_medicine | در انبار شهر دارو نیست؛ دارو در «{name}» ساخته می‌شود. | The town store holds no medicine; medicine is made at the «{name}».
+hc.apothecary | عطاری | Apothecary
+hc.go_build | برو به ساخت | Open the build bar
+hc.refer | بیمارستان کامل در {name} است. | A full hospital stands in {name}.
+hc.go_travel | سفر به {name} | Travel to {name}
+work.role.herbalist | باغبان گیاهان دارویی | Herb gardener
+work.role.apothecary | عطار | Apothecary
+work.reason.no_wage | مزد امروز کارکنان داده نشده؛ تا پرداخت نشود بسته است. | Today's wages are not paid; it stays closed.
+work.reason.no_supplies | دارو یا نوار پانسمان در انبار شهر نیست؛ تا نرسد بسته است. | The town store has no medicine or bandage; it stays closed.

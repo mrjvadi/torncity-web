@@ -27,7 +27,7 @@ registerWrites(['health.treat'], (a) => !!a.args?.method)
 registerWrites(['mission.abandon'], (a) => !!a.args?.confirm)
 
 /** Who treats: the city's hospital, or a clinic by the name its owner gave it. */
-const providerName = (o: TreatOption, care: Care): string => (o.provider === 'clinic' ? t('ac.health.clinic_name', { name: o.clinic.name }) : t(({ hospital: 'ac.health.city_hospital', house: 'ac.health.health_house', plain: 'ac.health.care_plain' } as const)[careWord(care)]))
+const providerName = (o: TreatOption, care: Care): string => (o.provider === 'health_house' ? t('ac.health.health_house') : o.provider === 'village_clinic' ? t('hc.clinic') : o.provider === 'clinic' ? t('ac.health.clinic_name', { name: o.clinic.name }) : t(({ hospital: 'ac.health.city_hospital', house: 'ac.health.health_house', plain: 'ac.health.care_plain' } as const)[careWord(care)]))
 
 /** The server's refresh of the hospital, worded as the way on («وضع درمان من»), for a screen whose back goes home. */
 const toHospital = (ctx: FlowCtx): Action[] => ctx.acts.filter((a) => a.id === 'health.hospital' || (isRefresh(a) && a.command === 'health.hospital')).slice(0, 1).map((a) => ({ ...a, id: 'health.hospital', kind: 'secondary' }))
