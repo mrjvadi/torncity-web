@@ -394,3 +394,5 @@
 .lm-keeper-pm:disabled { opacity: 0.35; cursor: default; }
 .lm-keeper-range { text-align: center; }
 .lm-keeper-step { direction: ltr; }
+.wp .vf-line b.bad { color: #ff7a6a; }
+.wp .wp-needs { display: block; margin-top: 4px; }

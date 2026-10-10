@@ -5984,3 +5984,53 @@ lm.keeper.more | بیشتر | More
 lm.keeper.range_share | از {a}٪ تا {b}٪ | From {a}% to {b}%
 lm.keeper.range_wage | از {a} تا {b} | From {a} to {b}
 refusal.village_lot_keeper_terms | این مزد در حدّ مجاز نیست؛ عدد را در بازهٔ نشان‌داده‌شده بگذار. | That pay is outside the allowed range; pick a number within it.
+wp.title | کارگاه من | My workshop
+wp.job_open | آگهی استخدام کارگاهت روی تابلوی کار است. | Your hiring notice is on the labour board.
+wp.job_none | آگهی استخدام نداری؛ می‌توانی خودت کار کنی یا آگهی بگذاری. | No hiring notice; work it yourself or post one.
+wp.crew | کارگر | Crew
+wp.crew_of | {crew} از {slots} | {crew} of {slots}
+wp.working | الان سرکارند | Working now
+wp.wage | مزد هر شیفت | Wage per shift
+wp.left | شیفت مانده | Shifts left
+wp.shift_len | هر شیفت {n} دقیقه است. | A shift takes {n} minutes.
+wp.inputs | مواد هر شیفت (از انبار خودت) | Inputs per shift (from your store)
+wp.outputs | محصول هر شیفت (به انبار خودت) | Output per shift (to your store)
+wp.none_needed | این کارگاه ماده‌ای لازم ندارد. | This workshop needs no materials.
+wp.stock | {have} در انبار، {per} برای هر شیفت | {have} in store, {per} per shift
+wp.store_note | مواد و محصول با انبار شخصی خودت حساب می‌شود، نه انبار شهر. | Materials and goods go through your own store, not the city store.
+wp.tools | ابزار | Tools
+wp.room | جای خالی انبار | Free room
+wp.food | غذای کارگرها | Workers' food
+wp.food_of | {have} وعده، هر شیفت {per} | {have} meals, {per} per shift
+wp.tool_wear | هر {n} شیفت، یک ابزار فرسوده می‌شود. | One tool wears out every {n} shifts.
+wp.room_short | برای محصول {need} جا لازم است و فقط {free} جا داری. | The output needs {need} places and you have only {free}.
+wp.of | از | of
+wp.work_self | خودم کار می‌کنم | Work a shift myself
+wp.repair | تعمیر | Repair
+wp.post | آگهی استخدام بگذار | Post a hiring notice
+wp.hire | استخدام کارگر | Hire workers
+wp.wage_set | مزد کارگر بازیکن | Wage for player workers
+wp.close | آگهی را ببند | Close the notice
+wp.today | امروز | Today
+wp.total | از اول تا حالا | Since the start
+wp.t.shifts | شیفت کار شده | Shifts done
+wp.t.value | ارزش محصول | Value of the goods
+wp.t.wages | مزد پرداختی | Wages paid
+wp.t.levy | سهم شهر از مزد | City's cut of wages
+wp.t.made | ساخته شد: {list} | Made: {list}
+wp.t.nothing | هنوز چیزی ساخته نشده. | Nothing made yet.
+wp.value_note | ارزش محصول به قیمت پایهٔ کالاست؛ درآمد واقعی از فروش آن در غرفه یا بازار می‌آید. | The value is the goods' base price; real income comes from selling them.
+wp.paused.no_input | کار ایستاده: مواد کم است؛ از انبارت تکمیل کن. | Stopped: short of materials; restock your store.
+wp.paused.storage_full | کار ایستاده: جا برای محصول نیست؛ انبارت را خالی کن. | Stopped: no room for the goods; empty your store.
+wp.paused.no_food | کار ایستاده: غذای کارگرها نیست؛ غذا به انبارت بیاور. | Stopped: no food for the workers; bring food to your store.
+wp.paused.employer_broke | کار ایستاده: پول مزد نداری. | Stopped: you cannot pay the wage.
+wp.paused.no_staff | کار ایستاده: کارگری سرکار نیست؛ استخدام کن یا خودت کار کن. | Stopped: nobody is at work; hire or work it yourself.
+wp.paused.needs_repair | کار ایستاده: کارگاه فرسوده است؛ تعمیرش کن. | Stopped: the workshop is worn; repair it.
+wp.paused.budget_spent | کار ایستاده: مزد امروز تمام شده. | Stopped: today's wage budget is used up.
+wp.paused.other | کار ایستاده است. | The work has stopped.
+wp.refuse.materials | مواد انبارت برای این شیفت کافی نیست. | Your store lacks the materials for this shift.
+wp.refuse.storage_full | انبارت جای محصول را ندارد؛ {n} جا کم است. | Your store has no room for the goods; {n} places short.
+wp.refuse.labor_no_food | برای این شیفت غذا نداری. | You have no food for this shift.
+wp.refuse.labor_employer_broke | پول مزد این شیفت را نداری. | You cannot pay this shift's wage.
+wp.refuse.labor_needs_repair | کارگاه فرسوده است؛ اول تعمیرش کن. | The workshop is worn; repair it first.
+wp.refuse.labor_no_job | این آگهی دیگر نیست. | This notice is gone.
