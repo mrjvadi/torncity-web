@@ -6212,7 +6212,7 @@ hc.apothecary | عطاری | Apothecary
 hc.go_build | برو به ساخت | Open the build bar
 hc.refer | بیمارستان کامل در {name} است. | A full hospital stands in {name}.
 hc.go_travel | سفر به {name} | Travel to {name}
-work.role.herbalist | باغبان گیاهان دارویی | Herb gardener
+work.role.herbalist | گیاه‌کار | Herb gardener
 work.role.apothecary | عطار | Apothecary
 work.reason.no_wage | مزد امروز کارکنان داده نشده؛ تا پرداخت نشود بسته است. | Today's wages are not paid; it stays closed.
 work.reason.no_supplies | دارو یا نوار پانسمان در انبار شهر نیست؛ تا نرسد بسته است. | The town store has no medicine or bandage; it stays closed.

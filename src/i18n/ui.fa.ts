@@ -6112,12 +6112,10 @@ export const uiFa = {
   'hc.go_build': 'برو به ساخت',
   'hc.refer': 'بیمارستان کامل در {name} است.',
   'hc.go_travel': 'سفر به {name}',
-  'work.role.herbalist': 'باغبان گیاهان دارویی',
+  'work.role.herbalist': 'گیاه‌کار',
   'work.role.apothecary': 'عطار',
   'work.reason.no_wage': 'مزد امروز کارکنان داده نشده؛ تا پرداخت نشود بسته است.',
   'work.reason.no_supplies': 'دارو یا نوار پانسمان در انبار شهر نیست؛ تا نرسد بسته است.',
-  'clinic.open': 'درمانگاه امروز باز است',
-  'clinic.closed': 'درمانگاه امروز بسته است',
 } as const
 
 export type UiKey = keyof typeof uiFa

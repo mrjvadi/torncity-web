@@ -6118,6 +6118,4 @@ export const uiEn: Record<UiKey, string> = {
   'work.role.apothecary': 'Apothecary',
   'work.reason.no_wage': 'Today\'s wages are not paid; it stays closed.',
   'work.reason.no_supplies': 'The town store has no medicine or bandage; it stays closed.',
-  'clinic.open': 'The clinic is open today',
-  'clinic.closed': 'The clinic is closed today',
 }
