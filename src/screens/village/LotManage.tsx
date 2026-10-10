@@ -4,7 +4,7 @@
 
 import { UpgradeCard, fromLotUpgrade } from './UpgradeDetail'
 import { useEffect, useState } from 'react'
-import type { LotManageView, LotLook, LotQuote, WorkItemLine } from '../../api/views.gen'
+import type { LotManageView, LotLook, LotQuote, WorkItemLine, VillageNeed } from '../../api/views.gen'
 import type { LocalOffer } from '../../api/types'
 import Popup, { ActionButton, ActionRow, Note, ProgressRow, Section, StatCard, StatGrid } from '../../ui/Popup'
 import { Segmented } from '../native/kit/Parts'
@@ -13,6 +13,7 @@ import { formatNumber, money } from '../native/kit/format'
 import { t, hasKey, type Key } from '../../i18n'
 import { useVillageCommand, useContentNames } from '../../village/useVillage'
 import { OfferBox } from './Offer'
+import WorkplaceCard, { type WpResult } from './WorkplaceCard'
 import KeeperCard, { payText, payWords } from './KeeperCard'
 import { NeedLine } from './screens'
 import { flow, isBack, Hint, Page, type FlowCtx } from './flow'
@@ -113,6 +114,16 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
     const r = await cmd('settlement.lot.manage', { building: v.id, ...args })
     setBusy(false)
     if (r.ok && r.res?.view) setAsk({ v: r.res.view as unknown as LotManageView, offer: (r.res as { offer?: LocalOffer | null }).offer ?? null, args })
+  }
+  /** A labour command of the private workplace (post, hire, wage, close, repair, work a shift myself): the lot is read again after it; a refusal is handed to the card. */
+  async function wpAct(command: string, args: Record<string, string>): Promise<WpResult | null> {
+    setBusy(true)
+    const r = await cmd(command, args, { write: true, silent: true })
+    if (r.ok) { await open(v.id); return null }
+    setBusy(false)
+    const view = r.res?.view as { needs?: VillageNeed[] | null; missing?: number } | undefined
+    const e = r.res?.error
+    return { code: (r.code ?? '').replace(/^village_/, ''), message: r.message, needs: view?.needs ?? [], missing: Number(e?.args?.missing ?? view?.missing ?? 0) }
   }
   async function confirm(convert?: LocalOffer) {
     if (!ask) return
@@ -234,10 +245,11 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
 
         {tab === 'staff' && (
           <>
-            {(v.staff ?? []).length === 0 ? (v.keeper ? null : <Note>{t('lm.staff_none')}</Note>) : (
+            {(v.staff ?? []).length === 0 ? (v.keeper || v.workplace ? null : <Note>{t('lm.staff_none')}</Note>) : (
               <CardGrid>{(v.staff ?? []).map((s) => <PCard key={s.role} icon="people" title={hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} facts={t('lm.posts', { n: formatNumber(s.slots) })} tone="busy" />)}</CardGrid>
             )}
             {v.if_unstaffed && hasKey(`work.unstaffed.${v.if_unstaffed}`) && <Hint>{t(`work.unstaffed.${v.if_unstaffed}` as Key)}</Hint>}
+            {v.workplace && <WorkplaceCard w={v.workplace} lotId={v.id} manage={manage} busy={busy} condBps={v.condition_bps} names={names} onAct={wpAct} />}
             {v.keeper && <KeeperCard k={v.keeper} manage={manage} busy={busy} onHire={(pay, n) => void quote({ action: 'keeper_hire', code: pay, name: String(n) })} onEnd={() => void quote({ action: 'keeper_end' })} />}
           </>
         )}

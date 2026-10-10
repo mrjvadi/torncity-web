@@ -10,6 +10,19 @@ let bedrooms = 1
 /** ?lot=stall: my stall (a keeper can be hired); ?lot=stall-hired: he already keeps it; ?lot=stall-full: nobody free in the pool */
 const keeper = { hired: (() => { try { return new URLSearchParams(location.search).get('lot') === 'stall-hired' } catch { return false } })(), pay: 'share', n: 1000 }
 
+/** ?lot=workplace: my bakery, a job posted with 2 hands; workplace-none: no job yet; workplace-noinput: the store has no flour; workplace-noroom: the store is full */
+const wp = { job: true, crew: 2, wage: 100, shifts: 40, shiftsToday: 5, shiftsTotal: 61, flour: 9, bread: 4, room: 18 }
+const isWp = (m: string) => m.startsWith('workplace')
+if (typeof location !== 'undefined') { try { const m = new URLSearchParams(location.search).get('lot') ?? ''; if (m === 'workplace-none') wp.job = false; if (m === 'workplace-noinput') wp.flour = 1; if (m === 'workplace-noroom') wp.room = 0 } catch { /* none */ } }
+const workplaceLine = (): NonNullable<LotManageView['workplace']> => {
+  const m = mode()
+  const paused = wp.flour < 3 ? 'no_input' : wp.room < 2 ? 'storage_full' : ''
+  const sold = (n: number) => ({ shifts: n, produced: n ? [{ item: N('bread', 'نان'), qty: n * 2 }] : null, wages: n * 100, levy: n * 5, produced_value: n * 140 })
+  return { job: wp.job ? { id: 'b-lot-1', crew: wp.crew, working: paused ? 0 : Math.min(wp.crew, 1), wage: wp.wage, shifts_left: wp.shifts, paused: m === 'workplace-noinput' || m === 'workplace-noroom' ? paused : '' } : null,
+    slots: 2, shift_minutes: 30, inputs: [{ item: N('flour', 'آرد'), per_shift: 3, have: wp.flour }], outputs: [{ item: N('bread', 'نان'), per_shift: 2, have: wp.bread }],
+    tools_have: 1, tool_wear_bps: 4300, room_free: wp.room, room_needed: m === 'workplace-noroom' ? 2 : 0, food_have: 12, food_per_shift: 2, today: sold(wp.shiftsToday), total: sold(wp.shiftsTotal) }
+}
+
 const LOOKS: Record<string, Partial<LotLook>> = {
   'b-look-2': { roof: 'hip', storeys: 2, hue: -12, door: 'e', chimney: false, prop: 'barrels', windows: 3, seed: 11 },
   'b-look-3': { roof: 'flat', storeys: 1, material: 'stone', hue: 0, door: 'n', chimney: false, awning: true, prop: 'crates', seed: 23 },
@@ -25,7 +38,7 @@ function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1
   const look = { ...LOT_LOOK, modules: { ...LOT_LOOK.modules, bedroom: bedrooms }, ...(LOOKS[id] ?? {}) }
   return {
     village: 'آمل', stage, action: '', buildings: null, id, building: N('private_cottage', 'کلبهٔ شخصی'), x: 2, y: 0, w: 2, d: 2, mine: m !== 'public', public: m === 'public', can_manage: !order, built: true,
-    function: { code: m.startsWith('stall') ? 'stall' : 'dwelling', name: m.startsWith('stall') ? 'دکهٔ بازار' : 'خانه', family: m.startsWith('stall') ? 'trade' : 'home', level: 1, max_level: 3, status: 'standing', permit: 'paid' }, storeys: 1, max_storeys: 2, stability_bps: 10000,
+    function: isWp(m) ? { code: 'bakery_own', name: 'نانوایی (شخصی)', family: 'craft', level: 1, max_level: 3, status: 'standing', permit: 'paid' } : { code: m.startsWith('stall') ? 'stall' : 'dwelling', name: m.startsWith('stall') ? 'دکهٔ بازار' : 'خانه', family: m.startsWith('stall') ? 'trade' : 'home', level: 1, max_level: 3, status: 'standing', permit: 'paid' }, storeys: 1, max_storeys: 2, stability_bps: 10000,
     area_used: 4 + (bedrooms - 1) * 2, area_capacity: 6,
     modules: [{ module: N('bedroom', 'اتاق خواب'), count: bedrooms, included: 1, max: 4, effect: 'housing', area_each: 2, housing_capacity: 2, personal_storage: 0, stall_slots: 0, removable: bedrooms > 1 },
       { module: N('hearth', 'اجاق'), count: 1, included: 1, max: 1, effect: '', area_each: 1, housing_capacity: 0, personal_storage: 0, stall_slots: 0, removable: false },
@@ -41,9 +54,15 @@ function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1
       { function: N('dwelling', 'خانه'), family: 'home', current: true, available: true, needs: null, cost_money: 0, materials: null, shifts: 0, fee_sup: 0, permit_fee: 0, effects: [] },
       { function: N('stall', 'غرفهٔ فروش'), family: 'trade', current: false, available: true, needs: null, cost_money: 400, materials: [{ item: N('timber', 'چوب'), qty: 4 }], shifts: 3, fee_sup: 24, permit_fee: 50, effects: ['پیشخوان فروش'] },
       { function: N('workshop', 'کارگاه'), family: 'craft', current: false, available: false, needs: [{ kind: 'building', item: N('carpentry_workshop', 'کارگاه نجاری'), options: [N('carpentry_workshop', 'کارگاه نجاری')], have: 0, need: 1, makers: null, price: 0 }], cost_money: 900, materials: null, shifts: 5, fee_sup: 40, permit_fee: 0, effects: [] },
+      ...(isWp(m) ? [] : [
+        { function: N('charcoal_clamp_own', 'کورهٔ زغال (شخصی)'), family: 'industry', current: false, available: true, needs: null, cost_money: 700, materials: [{ item: N('timber', 'چوب'), qty: 6 }], shifts: 4, fee_sup: 30, permit_fee: 60, effects: ['انبار شخصی ۴۰'] },
+        { function: N('carpentry_workshop_own', 'کارگاه نجاری (شخصی)'), family: 'craft', current: false, available: true, needs: null, cost_money: 800, materials: [{ item: N('timber', 'چوب'), qty: 8 }], shifts: 4, fee_sup: 30, permit_fee: 60, effects: ['انبار شخصی ۴۰'] },
+        { function: N('smithy_own', 'آهنگری (شخصی)'), family: 'craft', current: false, available: false, needs: null, cost_money: 1100, materials: null, shifts: 5, fee_sup: 40, permit_fee: 80, effects: [] },
+        { function: N('bakery_own', 'نانوایی (شخصی)'), family: 'food', current: false, available: true, needs: null, cost_money: 650, materials: [{ item: N('timber', 'چوب'), qty: 5 }], shifts: 3, fee_sup: 25, permit_fee: 50, effects: ['انبار شخصی ۴۰'] },
+      ]),
     ],
     work: order ? { id: 'w1', adds: [{ module: N('bedroom', 'اتاق خواب'), count: 1 }], level_to: 0, storeys_to: 0, convert_to: N('', ''), shifts_total: 3, work_done: 1, work_needed: 3, progress_bps: 3300, job_open: true, paused: '', status: 'working' } : null,
-    staff: [], housing_capacity: 2 * bedrooms, personal_storage: 40, stall_slots: 0, if_unstaffed: '', condition_bps: 9400, look,
+    staff: isWp(m) ? [{ role: 'baker', slots: 2 }] : [], workplace: isWp(m) ? workplaceLine() : null, housing_capacity: 2 * bedrooms, personal_storage: 40, stall_slots: 0, if_unstaffed: '', condition_bps: 9400, look,
     templates: [{ id: 't1', name: 'قالب ۱', code: 'K7M2Q', function: N('dwelling', 'خانه'), level: 1, storeys: 1, modules: [{ module: N('bedroom', 'اتاق خواب'), count: 2 }], mine: true, applicable: true, reason: '' },
       { id: 't2', name: 'کلبهٔ دوطبقه', code: 'P9X4A', function: N('dwelling', 'خانه'), level: 2, storeys: 2, modules: null, mine: false, applicable: false, reason: 'requires' }],
     keeper: m.startsWith('stall') ? { hired: keeper.hired, pay: keeper.hired ? keeper.pay : '', share_bps: keeper.hired && keeper.pay === 'share' ? keeper.n : 1000, share_min_bps: 500, share_max_bps: 2000, wage: keeper.hired && keeper.pay === 'wage' ? keeper.n : 600, wage_min: 300, wage_max: 1500, left: !keeper.hired && m === 'stall-left' ? 'wage_unpaid' : '', can: !keeper.hired && m !== 'stall-full', reason: !keeper.hired && m === 'stall-full' ? 'no_seat' : '', seats_free: m === 'stall-full' ? 0 : keeper.hired ? 2 : 3, sold_away: keeper.hired ? 18400 : 0, cut_total: keeper.hired ? 1840 : 0, sold_away_today: keeper.hired ? 3200 : 0, cut_today: keeper.hired ? 320 : 0 } : null,
@@ -57,6 +76,18 @@ function quote(action: string): LotQuote {
 }
 
 export function mockLotCommand(command: string, args: Record<string, unknown>) {
+  if (isWp(mode()) && /^settlement\.(labor\.(post|hire|wage|close)|work)$/.test(command) && args.id === 'b-lot-1') {
+    const back = { command: 'settlement.lot.manage', args: null }
+    if (command === 'settlement.work') {
+      if (wp.flour < 3) return mockRefusal('materials', { back, needs: [{ kind: 'material', item: N('flour', 'آرد'), options: null, have: wp.flour, need: 3, makers: null, price: 12 }] })
+      if (wp.room < 2) return mockRefusal('storage_full', { back, args: { missing: 2 - wp.room } })
+      wp.flour -= 3; wp.bread += 2; wp.room -= 2; wp.shiftsToday++; wp.shiftsTotal++
+    } else if (command === 'settlement.labor.post') { if (args.n !== 'repair') wp.job = true }
+    else if (command === 'settlement.labor.hire') wp.crew = Number(args.n) || 0
+    else if (command === 'settlement.labor.wage') wp.wage = Number(args.n) || 100
+    else if (command === 'settlement.labor.close') wp.job = false
+    return mockOk('labor_board', {} as never, [])
+  }
   if (command !== 'settlement.lot.manage') return null
   const m = mode()
   if (!args.building && m === 'menu') {
