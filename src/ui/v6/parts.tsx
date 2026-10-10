@@ -246,9 +246,9 @@ export function NavRail({ sections, active, brand, sub, children }: { sections: 
   )
 }
 
-export function DockedPanel({ crumbs, onClose, children }: { crumbs: { label: string; onClick?: () => void }[]; onClose: () => void; children: ReactNode }) {
+export function DockedPanel({ crumbs, onClose, hidden, children }: { hidden?: boolean; crumbs: { label: string; onClick?: () => void }[]; onClose: () => void; children: ReactNode }) {
   return (
-    <aside className="v6-side" aria-label={t('v6.panel.title')}>
+    <aside className="v6-side" hidden={hidden} aria-label={t('v6.panel.title')}>
       <header>
         <nav className="v6-crumbs">
           {crumbs.map((c, i) => (

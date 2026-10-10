@@ -5962,8 +5962,11 @@ lm.keeper.hire | دکه‌دار بگیر | Hire a keeper
 lm.keeper.end | مرخصش کن | Dismiss him
 lm.keeper.reason.no_seat | در شهر کسی بیکار نیست که دکه‌دار شود. | Nobody in town is free to become a keeper.
 lm.keeper.reason.no_market | برای داشتن دکه‌دار، بازارچه باید باشد. | A keeper needs the market post to stand.
-lm.keeper.away_today | امروز در نبودت فروخت: {a} – سهم دکه‌دار: {b} | Today, while you were away, he sold: {a} – keeper's cut: {b}
-lm.keeper.away_total | از روز استخدام در نبودت فروخت: {a} – سهم دکه‌دار: {b} | Since the hire, while you were away, he sold: {a} – keeper's cut: {b}
+lm.keeper.away | در نبودت | While you were away
+lm.keeper.sold_today | امروز فروخت | Sold today
+lm.keeper.cut_today | امروز سهمش | His cut today
+lm.keeper.sold_total | از استخدام فروخت | Sold since the hire
+lm.keeper.cut_total | از استخدام سهمش | His cut since the hire
 lm.keeper.left_unpaid | دکه‌دار رفت، چون مزدش داده نشد. | The keeper left because he was not paid.
 lm.keeper.ask_hire | دکه‌دار می‌گیری. مزدش: {pay}؛ {how} | You hire a keeper. His pay: {pay}; {how}
 lm.keeper.ask_end | دکه‌دار مرخص می‌شود و جایش در شهر خالی می‌شود. از آن لحظه، وقتی نیستی سفارش‌هایت از بازارچه برداشته می‌شود. | The keeper is dismissed and his place is freed. From then on your orders come off the market when you are away.

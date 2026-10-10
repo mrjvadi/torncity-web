@@ -234,7 +234,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
 
         {tab === 'staff' && (
           <>
-            {(v.staff ?? []).length === 0 ? <Note>{t('lm.staff_none')}</Note> : (
+            {(v.staff ?? []).length === 0 ? (v.keeper ? null : <Note>{t('lm.staff_none')}</Note>) : (
               <CardGrid>{(v.staff ?? []).map((s) => <PCard key={s.role} icon="people" title={hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} facts={t('lm.posts', { n: formatNumber(s.slots) })} tone="busy" />)}</CardGrid>
             )}
             {v.if_unstaffed && hasKey(`work.unstaffed.${v.if_unstaffed}`) && <Hint>{t(`work.unstaffed.${v.if_unstaffed}` as Key)}</Hint>}

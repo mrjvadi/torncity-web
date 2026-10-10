@@ -38,10 +38,15 @@ export default function KeeperCard({ k, manage, busy, onHire, onEnd }: { k: LotK
         <StatCard icon="person" palette="sapphire" label={t('lm.keeper.free')} value={formatNumber(k.seats_free)} />
       </StatGrid>
       {k.hired && (
-        <div className="lm-keeper-away">
-          <div className="gc-note">{t('lm.keeper.away_today', { a: money(k.sold_away_today), b: money(k.cut_today) })}</div>
-          <div className="gc-note">{t('lm.keeper.away_total', { a: money(k.sold_away), b: money(k.cut_total) })}</div>
-        </div>
+        <>
+          <Section>{t('lm.keeper.away')}</Section>
+          <StatGrid>
+            <StatCard icon="coins" palette="gold" label={t('lm.keeper.sold_today')} value={money(k.sold_away_today)} />
+            <StatCard icon="coins" palette="emerald" label={t('lm.keeper.cut_today')} value={money(k.cut_today)} />
+            <StatCard icon="coins" palette="gold" label={t('lm.keeper.sold_total')} value={money(k.sold_away)} />
+            <StatCard icon="coins" palette="emerald" label={t('lm.keeper.cut_total')} value={money(k.cut_total)} />
+          </StatGrid>
+        </>
       )}
       <div className="gc-note">{how}</div>
       {why && <Note tone="bad">{why}</Note>}

@@ -398,3 +398,4 @@
   .v6-money .v6-chip > img, .v6-money .v6-coin-l { transform: scale(.72); transform-origin: right center; }
   .v6-money .v6-chip > b { font-size: 13px; line-height: 26px; }
 }
+.v6-side[hidden] { display: none; }
