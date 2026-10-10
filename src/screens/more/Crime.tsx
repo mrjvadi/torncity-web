@@ -71,7 +71,7 @@ export function CrimeDetail({ response, loading, onAction, run }: ScreenProps) {
       <Header title={v.crime?.name ?? t('crime.title')} tone="ruby" onBack={backTo}
         onRefresh={() => v.crime?.code && run('crime.view', { crime: v.crime.code })} />
 
-      {v.blocked && <Notice alert>{blockedText(v.blocked)}{v.blocked === 'nerve' ? ` · ${formatNumber(v.have ?? 0)}/${formatNumber(v.need ?? 0)}` : ''}</Notice>}
+      {v.blocked && <Notice alert>{blockedText(v.blocked)}{v.blocked === 'nerve' ? ` – ${formatNumber(v.have ?? 0)}/${formatNumber(v.need ?? 0)}` : ''}</Notice>}
 
       <Card tone="ruby">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -141,7 +141,7 @@ export function CrimeResult({ response, loading, onAction, run }: ScreenProps) {
       </Card>
 
       {v.jail && <Notice alert>{t('crime.jailed', { t: hms(v.jail.remaining_seconds) })}</Notice>}
-      {!!v.fine && <Notice alert>{t('crime.fine_line', { a: money(v.fine) })}{v.fine_paid ? ` · ${t('crime.fine_paid', { a: money(v.fine_paid) })}` : ''}</Notice>}
+      {!!v.fine && <Notice alert>{t('crime.fine_line', { a: money(v.fine) })}{v.fine_paid ? ` – ${t('crime.fine_paid', { a: money(v.fine_paid) })}` : ''}</Notice>}
 
       {!!(v.loot && v.loot.length) && (
         <Card>
@@ -156,7 +156,7 @@ export function CrimeResult({ response, loading, onAction, run }: ScreenProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {v.skills!.map((s, i) => (
             <ListRow key={i} icon="chart" palette="violet" title={s.skill ?? '—'}
-              sub={`${t('crime.skill_xp', { n: formatNumber(s.xp ?? 0) })}${s.level ? ` · ${t('crime.skill_level', { n: formatNumber(s.level) })}` : ''}`} />
+              sub={`${t('crime.skill_xp', { n: formatNumber(s.xp ?? 0) })}${s.level ? ` – ${t('crime.skill_level', { n: formatNumber(s.level) })}` : ''}`} />
           ))}
         </div>
       )}

@@ -84,7 +84,7 @@ export default function WorkHome({ response, run, openLocal }: ScreenProps) {
         <>
           <SectionTitle>{t('work.now')}</SectionTitle>
           {v.working
-            ? <Notice>{buildingName(cat, v.working.building.code, v.working.building.name)} · {t('labor.working', { t: hms(left) })}</Notice>
+            ? <Notice>{buildingName(cat, v.working.building.code, v.working.building.name)} – {t('labor.working', { t: hms(left) })}</Notice>
             : <Empty>{t('work.idle')}</Empty>}
 
           {v.empty && (

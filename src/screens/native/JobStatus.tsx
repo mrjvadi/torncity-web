@@ -50,7 +50,7 @@ export default function JobStatus({ response, loading, onAction, run }: ScreenPr
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="display" style={{ fontSize: 18, color: '#fff' }}>{tier(v.job)}</div>
             <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 6 }}>
-              {[career(v.job), v.employer || (v.city_code ? names.name('city', v.city_code, v.city) : v.city)].filter(Boolean).join(' · ')}
+              {[career(v.job), v.employer || (v.city_code ? names.name('city', v.city_code, v.city) : v.city)].filter(Boolean).join(' – ')}
             </div>
             <span className="nx-chip nx-chip-gold">{t('job.per_shift', { pay: money(v.pay) })}</span>{' '}
             <span className="nx-chip">{t('job.shifts', { n: formatNumber(v.shifts_in_tier ?? 0) })}</span>

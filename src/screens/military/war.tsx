@@ -40,7 +40,7 @@ function WarBlock({ ctx, w }: { ctx: FlowCtx; w: WarLine }) {
   return (
     <div className="mil-block">
       <div className="mil-head"><span>{t('mil.war.title', { attacker: place(ctx, w.attacker), defender: place(ctx, w.defender) })}</span><span>{t('mil.war.no', { no: formatNumber(w.no) })}</span></div>
-      <Hint>{status}{w.ground ? ` · ${t('mil.war.ground', { ground: groundName(ctx, w.ground) })}` : ''}</Hint>
+      <Hint>{status}{w.ground ? ` – ${t('mil.war.ground', { ground: groundName(ctx, w.ground) })}` : ''}</Hint>
       {(w.attacker_allies ?? []).length > 0 && <Hint>{t('mil.war.attacker_allies', { list: sides(w.attacker_allies) })}</Hint>}
       {(w.defender_allies ?? []).length > 0 && <Hint>{t('mil.war.defender_allies', { list: sides(w.defender_allies) })}</Hint>}
       {w.broke && <Hint tone="bad">{t('mil.war.broke')}</Hint>}
@@ -60,7 +60,7 @@ function WarBlock({ ctx, w }: { ctx: FlowCtx; w: WarLine }) {
 
 function Occupied({ ctx, o }: { ctx: FlowCtx; o: OccupationLine }) {
   return (
-    <Hint>{t('mil.war.occupied', { city: cityName(ctx, o.city_code, o.city), controller: place(ctx, o.controller), owner: place(ctx, o.de_jure) })} · {durationText(o.since_seconds)}</Hint>
+    <Hint>{t('mil.war.occupied', { city: cityName(ctx, o.city_code, o.city), controller: place(ctx, o.controller), owner: place(ctx, o.de_jure) })} – {durationText(o.since_seconds)}</Hint>
   )
 }
 
@@ -125,7 +125,7 @@ const WarBoard = flow<WarBoardView>(({ view: v, ctx }) => {
           <SectionTitle>{t('mil.war.cities')}</SectionTitle>
           {(v.occupied ?? []).map((o) => <Occupied key={o.city_code} ctx={ctx} o={o} />)}
           {(v.damaged ?? []).map((d) => (
-            <Hint key={d.city_code}>{t('mil.war.damaged', { city: cityName(ctx, d.city_code, d.city), band: damageName(ctx, d.band) })}{d.closed_in_seconds > 0 ? ` · ${t('mil.war.closed_for', { in: durationText(d.closed_in_seconds) })}` : ''}</Hint>
+            <Hint key={d.city_code}>{t('mil.war.damaged', { city: cityName(ctx, d.city_code, d.city), band: damageName(ctx, d.band) })}{d.closed_in_seconds > 0 ? ` – ${t('mil.war.closed_for', { in: durationText(d.closed_in_seconds) })}` : ''}</Hint>
           ))}
         </Panel>
       )}
@@ -219,7 +219,7 @@ const WarRoom = flow<WarRoomView>(({ view: v, ctx }) => {
             const open = ctx.acts.find((a) => a.id === 'war.target' && a.subject === tg.city_code)
             return (
               <ListRow key={tg.city_code} icon="radar" palette="ruby" title={cityName(ctx, tg.city_code, tg.city)}
-                sub={`${place(ctx, tg.country)} · ${t('mil.room.distance', { km: formatNumber(tg.distance_km) })}${tg.damage_band ? ` · ${damageName(ctx, tg.damage_band)}` : ''}`}
+                sub={`${place(ctx, tg.country)} – ${t('mil.room.distance', { km: formatNumber(tg.distance_km) })}${tg.damage_band ? ` – ${damageName(ctx, tg.damage_band)}` : ''}`}
                 onClick={open ? () => ctx.go(open) : undefined} />
             )
           })}
@@ -257,7 +257,7 @@ const WarTarget = flow<WarTargetView>(({ view: v, ctx }) => {
             <div key={`${o.kind}-${o.class.code}`} className="mil-block">
               <div className="mil-head"><span>{operationName(ctx, o.kind)}</span><span>{className(ctx, o.class)}</span></div>
               <Row label={t('mil.target.ready')} value={formatNumber(o.ready)} />
-              <Row label={t('mil.target.from')} value={`${cityName(ctx, o.from_code, o.from)} · ${t('mil.room.distance', { km: formatNumber(o.distance_km) })}`} />
+              <Row label={t('mil.target.from')} value={`${cityName(ctx, o.from_code, o.from)} – ${t('mil.room.distance', { km: formatNumber(o.distance_km) })}`} />
               {o.kind === 'air' && <Row label={t('mil.target.munitions')} value={formatNumber(o.munitions)} />}
               {!o.can_launch && <Hint>{t('mil.target.not_yours', { office: officeText(ctx, o.office) || t('mil.unnamed_office') })}</Hint>}
               {open && <Btns ctx={ctx} list={[open]} />}
@@ -341,7 +341,7 @@ const StrikeReport = flow<StrikeReportView>(({ view: v, ctx }) => {
     ...(v.munitions > 0 ? [{ label: t('mil.target.munitions'), value: formatNumber(v.munitions) }] : []),
     ...(v.fired > 0 || v.hits > 0 ? [{ label: t('mil.report.hits'), value: formatNumber(v.hits) }] : []),
     ...(v.seen_at_km > 0 ? [{ label: t('mil.report.seen_at'), value: t('mil.room.distance', { km: formatNumber(v.seen_at_km) }) }] : []),
-    { label: t('mil.report.damage'), value: `${bpsPct(v.damage_bps)}${v.damage_band ? ` · ${damageName(ctx, v.damage_band)}` : ''}`, gold: true },
+    { label: t('mil.report.damage'), value: `${bpsPct(v.damage_bps)}${v.damage_band ? ` – ${damageName(ctx, v.damage_band)}` : ''}`, gold: true },
   ]
   return (
     <Page title={t(`mil.report.title_${k}` as Key, { no: formatNumber(v.no) })} tone="ruby">

@@ -39,7 +39,7 @@ export function JobOpenings({ response, loading, onAction, run }: ScreenProps) {
             icon={o.eligible ? 'work' : 'm_lock'}
             palette={o.eligible ? 'gold' : 'steel'}
             title={o.job?.title ?? '—'}
-            sub={`${o.job?.career_name ?? ''} · ${money(o.pay)}`}
+            sub={`${o.job?.career_name ?? ''} – ${money(o.pay)}`}
             onClick={() => o.job?.career_code && run('job.view', { role: o.job.career_code })}
           />
         ))}
@@ -49,7 +49,7 @@ export function JobOpenings({ response, loading, onAction, run }: ScreenProps) {
             icon={o.eligible ? 'factory' : 'm_lock'}
             palette={o.eligible ? 'sapphire' : 'steel'}
             title={o.job?.title ?? '—'}
-            sub={`${o.company ?? ''} · ${money(o.pay)}`}
+            sub={`${o.company ?? ''} – ${money(o.pay)}`}
             onClick={() => o.no !== undefined && run('company.opening', { no: String(o.no) })}
           />
         ))}
@@ -106,7 +106,7 @@ export function JobDetail({ response, loading, onAction, run }: ScreenProps) {
       <Header title={v.job?.title ?? t('jobs.detail')} tone="gold" onBack={() => run('job.list')} />
 
       <Card>
-        <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{v.job?.career_name} · {v.city}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>{v.job?.career_name} – {v.city}</div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
           <span className="nx-chip nx-chip-gold">{t('job.per_shift', { pay: money(v.pay) })}</span>
           {!!v.energy_cost && <span className="nx-chip">{t('jobs.energy_per_shift', { n: formatNumber(v.energy_cost) })}</span>}

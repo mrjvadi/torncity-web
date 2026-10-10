@@ -26,7 +26,7 @@ export function PropertyMarket({ response, loading, onAction, run }: ScreenProps
           {v.types!.map((ty, i) => (
             <ListRow key={i} icon={ty.home ? 'house' : 'factory'} palette="emerald"
               title={ty.type?.code ? names.name('property_type', ty.type.code, ty.type.name) : '—'}
-              sub={`${ty.size ? `${t('property.size', { n: formatNumber(ty.size) })} · ` : ''}${ty.left !== undefined ? `${t('property.left', { n: formatNumber(ty.left) })} · ` : ''}${money(ty.price)}`}
+              sub={`${ty.size ? `${t('property.size', { n: formatNumber(ty.size) })} – ` : ''}${ty.left !== undefined ? `${t('property.left', { n: formatNumber(ty.left) })} – ` : ''}${money(ty.price)}`}
               onClick={() => ty.type?.code && run('property.type', { type: ty.type.code })} />
           ))}
         </CardGrid>
@@ -39,7 +39,7 @@ export function PropertyMarket({ response, loading, onAction, run }: ScreenProps
             {v.offers!.map((o, i) => (
               <ListRow key={i} icon={o.kind === 'rent' ? 'keys' : 'house'} palette="steel"
                 title={o.type?.code ? names.name('property_type', o.type.code, o.type.name) : '—'}
-                sub={`${o.kind === 'rent' ? t('property.rent') : t('property.sale')} · ${money(o.price)}${o.seller?.name ? ` · ${o.seller.name}` : ''}`}
+                sub={`${o.kind === 'rent' ? t('property.rent') : t('property.sale')} – ${money(o.price)}${o.seller?.name ? ` – ${o.seller.name}` : ''}`}
                 onClick={() => o.no !== undefined && run('property.offer', { no: String(o.no) })} />
             ))}
           </CardGrid>
@@ -94,7 +94,7 @@ export function PropertyMine({ response, loading, onAction, run }: ScreenProps) 
             <ListRow key={j} icon={b.home ? 'house' : 'factory'} palette={b.home ? 'emerald' : 'gold'}
               title={b.building?.code ? names.name('settlement_building', b.building.code, b.building.name) : '—'}
               sub={[b.home ? t('property.home') : t('property.commercial'), b.state === 'building' ? t('property.going_up') : null,
-                b.home && b.state === 'complete' ? (h.can_rest ? t('property.can_rest_village') : t('property.rest_in', { t: hms(h.rest_in_seconds) })) : null].filter(Boolean).join(' · ')}
+                b.home && b.state === 'complete' ? (h.can_rest ? t('property.can_rest_village') : t('property.rest_in', { t: hms(h.rest_in_seconds) })) : null].filter(Boolean).join(' – ')}
               right={money(b.value)} />
           ))}
           {!!h.lots && <ListRow icon="x_map" palette="teal" title={t('property.lots', { n: formatNumber(h.lots) })} />}
@@ -114,7 +114,7 @@ export function PropertyMine({ response, loading, onAction, run }: ScreenProps) 
               o.home ? t('property.home') : t('property.commercial'),
               o.tenant?.name ? t('property.rented_to', { name: o.tenant.name }) : o.rent ? t('property.rent_amount', { n: money(o.rent) }) : null,
               o.unpaid_periods ? t('property.overdue', { n: formatNumber(o.unpaid_periods) }) : null,
-            ].filter(Boolean).join(' · ')}
+            ].filter(Boolean).join(' – ')}
             right={money(o.value)}
             onClick={() => o.no !== undefined && run('property.view', { no: String(o.no) })}
           />

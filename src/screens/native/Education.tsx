@@ -93,7 +93,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
                 title={course(c.course)}
                 badge={c.eligible ? t('education.open') : t('common.of_level', { n: c.min_level ?? 0 })}
                 tone={c.eligible ? 'good' : 'off'}
-                facts={<Lines lines={[`${c.fee ? money(c.fee) : t('common.free')} · ${roughDuration(c.duration_seconds)}`]} />}
+                facts={<Lines lines={[`${c.fee ? money(c.fee) : t('common.free')} – ${roughDuration(c.duration_seconds)}`]} />}
                 onClick={c.eligible && c.course?.code ? () => run('education.view', { course: c.course!.code! }) : undefined}
               />
             ))}
@@ -110,7 +110,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
               const needs = (g.needs ?? []).map(needText).filter((x): x is string => !!x)
               return (
                 <PCard key={g.course?.code} off icon="book" title={course(g.course)} badge={t('education.here_not')} tone="off"
-                  facts={<><Lines lines={[`${g.fee ? money(g.fee) : t('common.free')} · ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '', tripLine(g.nearest_trip)]} /><Need lines={needs} /></>}
+                  facts={<><Lines lines={[`${g.fee ? money(g.fee) : t('common.free')} – ${roughDuration(g.duration_seconds)}`, near ? t('education.gap.taught_in', { place: near }) : '', tripLine(g.nearest_trip)]} /><Need lines={needs} /></>}
                   foot={near && g.nearest?.code ? <button className="pn-btn sec" onClick={() => run('travel.options', { city: g.nearest!.code! })}>{t('education.gap.go', { place: near })}</button> : undefined} />
               )
             })}

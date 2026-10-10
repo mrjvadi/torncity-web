@@ -123,7 +123,7 @@ export const TradeDesk = flow<TradeDeskView>(({ view: v0, ctx }) => {
       <Section>{t('tr.last')}</Section>
       {!last ? <Hint>{t('tr.last_none')}</Hint> : (
         <Panel tone={last.outcome === 'sold' ? 'emerald' : undefined}>
-          <Lead tone={last.outcome === 'sold' ? 'good' : undefined}>{last.at ? atText(last.at) : ''} · {hasKey(`tr.out.${last.outcome}`) ? t(`tr.out.${last.outcome}` as Key) : last.outcome}</Lead>
+          <Lead tone={last.outcome === 'sold' ? 'good' : undefined}>{last.at ? atText(last.at) : ''} – {hasKey(`tr.out.${last.outcome}`) ? t(`tr.out.${last.outcome}` as Key) : last.outcome}</Lead>
           {(last.lines ?? []).length > 0 && (
             <div className="vf-list">{(last.lines ?? []).map((l) => <div key={l.item.code} className="vf-line"><span>{nameOf(l.item)} × {formatNumber(l.qty)}</span><b>{t('tr.at_unit', { p: money(l.unit) })}</b></div>)}</div>
           )}

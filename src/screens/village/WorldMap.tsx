@@ -456,7 +456,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
             aria-label={p.name}
           >
             <span className="wm-dot">{p.kind === 'home' && <Emboss name="house" palette="gold" size={18} />}</span>
-            <span className="wm-lbl">{p.kind === 'home' ? t('wm.you_here') + ' · ' + p.name : p.name}</span>
+            <span className="wm-lbl">{p.kind === 'home' ? t('wm.you_here') + ' – ' + p.name : p.name}</span>
           </button>
         ))}
       </div>
@@ -575,7 +575,7 @@ export default function WorldMap({ world, home, run, openLocal, onLeft, leaveRef
                     climateBand(spot.lat),
                     spot.tile ? (spot.tile.ocean ? t('wm.depth', { m: String(Math.max(0, Math.round(-spot.tile.elev))) }) : t('wm.height', { m: String(Math.round(spot.tile.elev)) })) : '',
                     spot.tile && !spot.tile.ocean && spot.tile.tileKm <= 20 ? (spot.tile.coast ? t('wm.coast') : t('wm.inland')) : '',
-                  ].filter(Boolean).join(' · ')}
+                  ].filter(Boolean).join(' – ')}
                 </span>
                 <span>{t('wm.from_home', { km: kmText(homeKm(spot.lat, spot.lon)) })}</span>
                 {spot.near && <span>{t('wm.nearest', { name: spot.near.name, km: kmText(spot.near.km) })}</span>}

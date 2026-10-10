@@ -34,7 +34,7 @@ export function PersonalList({ names, list, title, onCourses }: { names: Content
     <div className="pn-lack">
       {title && <div className="pn-lack-t">{title}</div>}
       <ul className="vf-src">
-        {l.map((n, i) => <li key={i}>{personalText(names, n)}{howText(n.how) ? <small className="pn-how"> · {howText(n.how)}</small> : null}</li>)}
+        {l.map((n, i) => <li key={i}>{personalText(names, n)}{howText(n.how) ? <small className="pn-how"> – {howText(n.how)}</small> : null}</li>)}
       </ul>
       {onCourses && learn && <button type="button" className="pn-btn sec" onClick={onCourses}>{t('vx.pn.go')}</button>}
     </div>

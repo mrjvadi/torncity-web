@@ -32,7 +32,7 @@ function LeverLine({ ctx, l }: { ctx: FlowCtx; l: GovLever }) {
   const alloc = l.type === 'allocation'
   return (
     <div className="sc-block">
-      <Line title={leverName(ctx.names, l.code) || t('soc.unnamed_lever')} sub={[origin, alloc ? '' : pendingText(ctx, l)].filter(Boolean).join(' · ')} end={alloc ? undefined : <b className="gold">{leverNow(ctx.names, l)}</b>} />
+      <Line title={leverName(ctx.names, l.code) || t('soc.unnamed_lever')} sub={[origin, alloc ? '' : pendingText(ctx, l)].filter(Boolean).join(' – ')} end={alloc ? undefined : <b className="gold">{leverNow(ctx.names, l)}</b>} />
       {alloc && <Hint>{leverNow(ctx.names, l)}</Hint>}
       {alloc && l.pending && <Hint>{pendingText(ctx, l)}</Hint>}
     </div>
@@ -307,7 +307,7 @@ const GovHistory = screen<GovHistoryView>(({ view: v, ctx }) => (
               <Line title={leverName(ctx.names, e.lever) || t('soc.unnamed_lever')} sub={placeName(ctx.names, e.place)}
                 end={<b className="gold vs-ltr">{leverValue(lever, e.old)} ← {leverValue(lever, e.new)}</b>} />
               <Hint>{t('soc.history.by', { office: officeName(ctx.names, e.office), player: playerText(e.by), ago: span(e.ago_seconds) })}
-                {' · '}{e.effective_in_seconds > 0 ? t('soc.history.in', { when: span(e.effective_in_seconds) }) : t('soc.history.since', { when: span(-e.effective_in_seconds) })}</Hint>
+                {' – '}{e.effective_in_seconds > 0 ? t('soc.history.in', { when: span(e.effective_in_seconds) }) : t('soc.history.since', { when: span(-e.effective_in_seconds) })}</Hint>
             </div>
           )
         })}

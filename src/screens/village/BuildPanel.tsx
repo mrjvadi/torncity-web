@@ -94,7 +94,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
               ? <div className="vh-search"><input type="search" autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('build.search')} aria-label={t('build.search')} /></div>
               : <div className="vh-chips" role="tablist">
                 {present.map((c) => <button key={c.code} role="tab" aria-selected={active === c.code} className={`vh-chip${active === c.code ? ' on' : ''}`} onClick={() => setCat(c.code)}>{t(c.label)}</button>)}
-                {lockedN > 0 && <button className={`vh-chip lock${showLocked ? ' on' : ''}`} aria-pressed={showLocked} onClick={() => setShowLocked((v) => !v)}>{t('build.show_locked')} · {formatNumber(lockedN)}</button>}
+                {lockedN > 0 && <button className={`vh-chip lock${showLocked ? ' on' : ''}`} aria-pressed={showLocked} onClick={() => setShowLocked((v) => !v)}>{t('build.show_locked')} – {formatNumber(lockedN)}</button>}
                 {canDraw && <button className="vh-chip road" disabled={s.busy} onClick={onEnterRoad}>{t('road.chip')}</button>}
               </div>}
             <div className="vh-cards">
@@ -110,7 +110,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
                       ? <span className="vh-card-meta">{t('build.needs', { list: (l.missing ?? []).map((m) => names.name('knowledge', m.code, m.name)).join('، ') })}</span>
                       : <>
                         <span className="vh-card-cost">{money(l.cost_money)}</span>
-                        <span className="vh-card-meta">{buildText(l)}{fpc ? ` · ${fpc[0]}×${fpc[1]}` : ''}</span>
+                        <span className="vh-card-meta">{buildText(l)}{fpc ? ` – ${fpc[0]}×${fpc[1]}` : ''}</span>
                       </>}
                   </button>
                 )
@@ -153,7 +153,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
               <>
                 {s.anchor
                   ? <div className={`vh-hint ${fits ? 'good' : 'bad'}`}>
-                    {t('build.lot', { x: s.anchor.x + 1, y: s.anchor.y + 1 })} · {fits ? t('build.fits') : (blockReason(s.lots, s.anchor, fp.w, fp.h) ?? t('build.no_fit'))}
+                    {t('build.lot', { x: s.anchor.x + 1, y: s.anchor.y + 1 })} – {fits ? t('build.fits') : (blockReason(s.lots, s.anchor, fp.w, fp.h) ?? t('build.no_fit'))}
                   </div>
                   : <div className="vh-hint">{t('build.choose_lot')}</div>}
                 <div className="vh-row">
@@ -170,7 +170,7 @@ export default function BuildPanel({ state: s, fits, footprint: fp, cat, onExit,
             <div className="vh-facts">
               <span>{t('build.multi.count', { n: s.batch.count })}</span>
               <span>{t('build.cost')}: <b>{money(s.batch.cost_money)}</b></span>
-              <span style={{ gridColumn: '1 / -1' }}>{t('build.time')}: <b>{workText(s.batch.build_time_seconds)}</b> · {t('build.batch.together')}</span>
+              <span style={{ gridColumn: '1 / -1' }}>{t('build.time')}: <b>{workText(s.batch.build_time_seconds)}</b> – {t('build.batch.together')}</span>
             </div>
             <div className="vh-row">
               <Slab tone="steel" radius={14} lip={4} className="narrow" onClick={onBack} disabled={s.busy}>{t('build.back')}</Slab>

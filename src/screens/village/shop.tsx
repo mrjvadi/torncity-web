@@ -261,7 +261,7 @@ const Money = flow<MoneyView>(({ view: v, ctx }) => {
       {(v.basket ?? []).length > 0 && (
         <>
           <SectionTitle>{t('sm.money.basket')}</SectionTitle>
-          <Hint>{t('sm.money.index', { p: formatNumber(Math.round(v.index_bps / 100)) })} · {t('sm.money.cover', { p: formatNumber(Math.round(v.cover_bps / 100)) })}</Hint>
+          <Hint>{t('sm.money.index', { p: formatNumber(Math.round(v.index_bps / 100)) })} – {t('sm.money.cover', { p: formatNumber(Math.round(v.cover_bps / 100)) })}</Hint>
           <CardGrid>
             {(v.basket ?? []).map((b) => (
               <PCard key={b.item.code} icon="crate" title={ctx.names.name(['component', 'item'], b.item.code, b.item.name)} facts={money(b.price)}

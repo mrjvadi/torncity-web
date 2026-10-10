@@ -272,7 +272,7 @@ function UpgradeList({ panel, cat, onOpen, onRun, onClose, onBuild }: { onRun?: 
       <CardGrid>
         {models.map(({ u, m }) => (
           <PCard key={u.building.code} icon={m.available ? 'up' : 'scroll'} title={m.title} tone={m.available ? 'busy' : 'off'} off={!m.available}
-            sub={`${money(u.cost_money)} · ${buildText(u)}`}
+            sub={`${money(u.cost_money)} – ${buildText(u)}`}
             facts={m.available ? t('v6.up.ready') : <span className="dk-why">{t('ug.blocked', { n: formatNumber(m.reqs.filter((r) => !r.ok).length) })}</span>}
             onClick={() => setOpen(u.building.code)} />
         ))}

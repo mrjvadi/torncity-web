@@ -213,7 +213,7 @@ const TABLE: Record<string, (ctx: Ctx) => { screen: string; text: string; view?:
   }),
 
   'social.friend.list': () => ({
-    screen: 'friends', text: '<b>دوستان</b>\n۱۲ دوست · ۴ آنلاین',
+    screen: 'friends', text: '<b>دوستان</b>\n۱۲ دوست – ۴ آنلاین',
     actions: [back('society_hub')],
   }),
 

@@ -117,7 +117,7 @@ export const FxBook = flow<FXBookView>(({ view: v, ctx }) => {
           ...(v.last_price > 0 ? [{ label: t('fx.last'), value: priceText(v.last_price, v.name) }] : []),
           { label: t('fx.you_sup'), value: sup(v.cash_sup) },
           { label: t('fx.you_units', { name: v.name }), value: formatNumber(v.units) },
-          ...(v.escrow_sup > 0 || v.escrow_units > 0 ? [{ label: t('fx.held'), value: `${sup(v.escrow_sup)} · ${units(v.escrow_units, v.name)}` }] : []),
+          ...(v.escrow_sup > 0 || v.escrow_units > 0 ? [{ label: t('fx.held'), value: `${sup(v.escrow_sup)} – ${units(v.escrow_units, v.name)}` }] : []),
         ]} />
         <Hint>{t('fx.slow', { n: formatNumber(v.min_trades), d: formatNumber(v.window_periods) })}</Hint>
       </Panel>

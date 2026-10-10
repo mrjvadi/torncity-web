@@ -378,7 +378,7 @@ export const CourseDetail = flow<CourseDetailView>(({ view: v, ctx }) => {
         <RequirementList lines={lines} title={lines.length ? t('ac.work.detail.reqs') : undefined} />
         {elsewhere && (
           <Unavailable
-            reason={t('ac.work.course.not_here')} hint={[t('ac.work.course.taught_in', { place: cityName(ctx, elsewhere.city_code, elsewhere.city) }), tripLine(elsewhere.trip)].filter(Boolean).join(' · ')}
+            reason={t('ac.work.course.not_here')} hint={[t('ac.work.course.taught_in', { place: cityName(ctx, elsewhere.city_code, elsewhere.city) }), tripLine(elsewhere.trip)].filter(Boolean).join(' – ')}
             nearest={{ name: cityName(ctx, elsewhere.city_code, elsewhere.city), onGo: () => ctx.run('travel.options', { city: elsewhere.city_code }), label: t('ac.work.course.go') }}
           />
         )}

@@ -162,7 +162,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
         {v.stage === 'done' && <Note tone="good">{t('lm.done')}{v.share_code ? ` ${t('lm.share_code', { code: v.share_code })}` : ''}</Note>}
         {!v.built && <Note>{t('lm.not_built')}</Note>}
         <StatGrid>
-          <StatCard icon="house" palette="gold" label={t('lm.function')} value={`${f.name} · ${t('lm.level', { n: formatNumber(f.level) })}`} />
+          <StatCard icon="house" palette="gold" label={t('lm.function')} value={`${f.name} – ${t('lm.level', { n: formatNumber(f.level) })}`} />
           <StatCard icon="box" palette="sapphire" label={t('lm.storeys')} value={<span dir="ltr">{formatNumber(v.storeys)} / {formatNumber(v.max_storeys)}</span>} />
           <StatCard icon="chart" palette="emerald" label={t('lm.area')} value={<span dir="ltr">{formatNumber(v.area_used)} / {formatNumber(v.area_capacity)}</span>} />
         </StatGrid>
@@ -183,7 +183,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
           <>
             {v.upgrade && (
               <CardGrid><PCard icon="hammer" title={t('lm.upgrade', { n: formatNumber(v.upgrade.to) })} tone={v.upgrade.can ? 'busy' : 'off'} off={!v.upgrade.can}
-                sub={`${money(v.upgrade.cost_money)} · ${t('lm.q.shifts')}: ${formatNumber(v.upgrade.shifts)}`}
+                sub={`${money(v.upgrade.cost_money)} – ${t('lm.q.shifts')}: ${formatNumber(v.upgrade.shifts)}`}
                 facts={!v.upgrade.can ? <span className="dk-why">{t('ug.blocked_short')}</span> : (v.upgrade.adds ?? []).map((a) => a.name).join('، ')}
                 onClick={() => setUpCard(true)} /></CardGrid>
             )}
@@ -215,7 +215,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             <CardGrid>
               {(v.additions ?? []).map((a) => (
                 <PCard key={a.module.code} icon="plus" title={a.module.name} tone={a.can ? 'busy' : 'off'} off={!a.can}
-                  sub={`${t('lm.q.shifts')}: ${formatNumber(a.shifts)} · ${t('lm.area_each', { n: formatNumber(a.area_each) })}`}
+                  sub={`${t('lm.q.shifts')}: ${formatNumber(a.shifts)} – ${t('lm.area_each', { n: formatNumber(a.area_each) })}`}
                   facts={a.can ? <Items list={a.materials} names={names} /> : <span className="dk-why">{hasKey(`lm.reason.${a.reason}`) ? t(`lm.reason.${a.reason}` as Key) : t('lm.not_here')}</span>}
                   onClick={manage && a.can ? () => void quote({ action: 'add', code: a.module.code, n: '1' }) : undefined} />
               ))}
@@ -267,7 +267,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             )}
             <CardGrid>
               {(v.templates ?? []).map((tp) => (
-                <PCard key={tp.id} icon="scroll" title={tp.name} sub={`${tp.function.name} · ${t('lm.level', { n: formatNumber(tp.level) })} · ${formatNumber(tp.storeys)}`} tone={tp.applicable ? 'busy' : 'off'} off={!tp.applicable}
+                <PCard key={tp.id} icon="scroll" title={tp.name} sub={`${tp.function.name} – ${t('lm.level', { n: formatNumber(tp.level) })} – ${formatNumber(tp.storeys)}`} tone={tp.applicable ? 'busy' : 'off'} off={!tp.applicable}
                   facts={tp.applicable ? (tp.modules ?? []).map((m) => `${m.module.name} × ${formatNumber(m.count)}`).join('، ') : <span className="dk-why">{hasKey(`lm.reason.${tp.reason}`) ? t(`lm.reason.${tp.reason}` as Key) : t('lm.not_here')}</span>}
                   foot={manage ? (
                     <span className="dk-chips">

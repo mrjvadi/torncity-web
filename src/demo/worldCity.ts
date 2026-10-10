@@ -73,7 +73,7 @@ function renderOverlay(root: HTMLElement, labels: Awaited<ReturnType<WorldCitySc
   if (subParts.length > 0) {
     const sub = document.createElement('div')
     sub.className = 'sub'
-    sub.textContent = subParts.join(' · ')
+    sub.textContent = subParts.join(' – ')
     title.appendChild(sub)
   }
   overlay.appendChild(title)
@@ -98,7 +98,7 @@ function renderOverlay(root: HTMLElement, labels: Awaited<ReturnType<WorldCitySc
 
   const hint = document.createElement('div')
   hint.className = 'wc-hint'
-  hint.textContent = `seed ${doc.seed} · ${doc.city.size}×${doc.city.size} قطعه · ${doc.fineGrid.w}×${doc.fineGrid.h} ریزنقشه`
+  hint.textContent = `seed ${doc.seed} – ${doc.city.size}×${doc.city.size} قطعه – ${doc.fineGrid.w}×${doc.fineGrid.h} ریزنقشه`
   overlay.appendChild(hint)
 
   root.appendChild(overlay)

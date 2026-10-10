@@ -26,7 +26,7 @@ export default function Dashboard({ response, loading, onAction, run }: ScreenPr
 
       <Card>
         <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 8 }}>
-          {v.travelling ? t('dashboard.travelling') : [v.city ? names.name('city', v.city_code ?? '', v.city) : '', v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : ''].filter(Boolean).join(' · ')}
+          {v.travelling ? t('dashboard.travelling') : [v.city ? names.name('city', v.city_code ?? '', v.city) : '', v.place?.name ? names.name('place', v.place.code ?? '', v.place.name) : ''].filter(Boolean).join(' – ')}
         </div>
       </Card>
 

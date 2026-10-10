@@ -180,7 +180,7 @@ const Leaderboard = screen<BoardView>(({ view: v, ctx }) => {
     switch (v.board) {
       case 'village':
       case 'richest': return v.ranks?.[l.tag] ? ctx.names.name(['rank'], l.tag, v.ranks[l.tag].name) : ''
-      case 'companies': return `${ctx.names.name(['company_type'], l.tag, l.tag_name)} · ${ctx.names.name(['city'], l.city.code, l.city.name)}`
+      case 'companies': return `${ctx.names.name(['company_type'], l.tag, l.tag_name)} – ${ctx.names.name(['city'], l.city.code, l.city.name)}`
       case 'workers': return l.tag ? ctx.names.name(['career'], l.tag, l.tag_name) : t('soc.board.no_job')
       default: return l.tag_name
     }

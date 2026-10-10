@@ -289,7 +289,7 @@ export const CrimeRecord = flow<CrimeRecordView>(({ view: v, ctx }) => {
               {recent.map((r, i) => (
                 <div key={i} className="vf-line">
                   <span>{nameOf(ctx, 'crime', r.crime)}</span>
-                  <b className={`ac-crime-out ${r.result}`}>{tf(`crime.result.${r.result}`, 'crime.result')}{r.at ? ` · ${dateText(r.at)} ${clockText(r.at)}` : ''}</b>
+                  <b className={`ac-crime-out ${r.result}`}>{tf(`crime.result.${r.result}`, 'crime.result')}{r.at ? ` – ${dateText(r.at)} ${clockText(r.at)}` : ''}</b>
                 </div>
               ))}
             </div>

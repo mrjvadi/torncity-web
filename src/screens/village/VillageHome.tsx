@@ -498,7 +498,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
                 <button className="vh-x" onClick={() => setLandOn(false)} aria-label={t('citizen.land.exit')}>✕</button>
               </div>
               <div className="vh-legend">
-                <span><i className="vh-dot" style={{ background: '#1acc40' }} />{t('citizen.legend.free')}{layout?.terms ? ` · ${money(layout.terms.lot_price)}` : ''}</span>
+                <span><i className="vh-dot" style={{ background: '#1acc40' }} />{t('citizen.legend.free')}{layout?.terms ? ` – ${money(layout.terms.lot_price)}` : ''}</span>
                 <span><i className="vh-dot" style={{ background: '#ffe60d' }} />{t('citizen.legend.needs')}</span>
                 <span><i className="vh-dot" style={{ background: '#1a80ff' }} />{t('citizen.legend.bridge')}</span>
                 <span><i className="vh-dot" style={{ background: '#f21414' }} />{t('citizen.legend.locked')}</span>

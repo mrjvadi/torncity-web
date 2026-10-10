@@ -49,7 +49,7 @@ const Invite: ScreenComponent = () => (
     <SoonBtn kind="blue" icon="x_send">{t('f.press.414')}</SoonBtn>
     <Section title={t('f.press.415')}>
       <ChipRow>
-        {STEPS.map((s) => <Chip key={s.n} text={`${s.n}  ·  ${s.reward}`} color={s.done ? 'var(--lapis)' : 'var(--steel)'} />)}
+        {STEPS.map((s) => <Chip key={s.n} text={`${s.n}  –  ${s.reward}`} color={s.done ? 'var(--lapis)' : 'var(--steel)'} />)}
       </ChipRow>
     </Section>
     <Section title={t('f.press.416')}>

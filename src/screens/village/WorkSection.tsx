@@ -94,10 +94,11 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
       {shift.length > 0 && (
         <div className="wk-shift">
           <small>{t('work.shift')}</small>
-          <div>{shift.join(' · ')}</div>
+          <div>{shift.join(' – ')}</div>
           {(w.outputs ?? []).length > 0 && w.storage_class && <small>{t('work.goes_to', { class: className(w.storage_class), free: formatNumber(w.storage_free) })}</small>}
         </div>
       )}
+      {w.knowledge_bps > 0 && <div className="gc-note wk-know">{t('work.knowledge', { p: pct(w.knowledge_bps) })}</div>}
       {w.tool_wear_bps > 0 && (
         <>
           <div className="gc-note">{t('work.tool_wear', { n: formatNumber(Math.round(10000 / w.tool_wear_bps)), have: formatNumber(w.tools_have) })}</div>
@@ -126,7 +127,7 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
             <u style={{ insetInlineStart: '25%' }} /><u style={{ insetInlineStart: '50%' }} />
           </div>
           <div className="wk-cond-legend"><span>{t('work.band.closed')}</span><span>{t('work.band.worn')}</span><span>{t('work.band.ok')}</span></div>
-          <div className="gc-note">{t('work.output', { p: pct(cond.output_bps) })} · {t('work.decay', { p: pct(cond.decay_bps_per_day, 1) })}</div>
+          <div className="gc-note">{t('work.output', { p: pct(cond.output_bps) })} – {t('work.decay', { p: pct(cond.decay_bps_per_day, 1) })}</div>
           {closed && <Note tone="bad">{t('work.closed')}</Note>}
         </div>
       )}
@@ -160,8 +161,8 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
               <Section>{t('work.hire')}</Section>
               <div className="wk-btns">
                 {HIRE.map((n) => <ActionButton key={n} tone="steel" small onClick={() => act!('settlement.labor.hire', { id: job.id, n: String(n) })}>{t('labor.hire_n', { n: formatNumber(n) })}</ActionButton>)}
-                {job.npc_crew > 0 && <ActionButton tone="steel" small onClick={() => act!('settlement.labor.hire', { id: job.id, n: '0' })}>{t('labor.hire_none')}</ActionButton>}
               </div>
+              {job.npc_crew > 0 && <div className="wk-btns wk-wide"><ActionButton tone="steel" small onClick={() => act!('settlement.labor.hire', { id: job.id, n: '0' })}>{t('labor.hire_none')}</ActionButton></div>}
               <Section>{t('work.wage_set')}</Section>
               <div className="wk-btns">
                 {WAGES.map((p) => <ActionButton key={p} tone="steel" small onClick={() => act!('settlement.labor.wage', { id: job.id, n: String(p) })}>{t('work.wage_pct', { p: formatNumber(p) })}</ActionButton>)}

@@ -71,7 +71,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
   const earned = lines.filter((l) => l.earned).length
   const rankName = v.rank?.name ? names.name('life_rank', v.rank.code ?? '', v.rank.name) : ''
   const stageName = v.stage?.name ? names.name('life_stage', v.stage.code ?? '', v.stage.name) : ''
-  const subline = [rankName, stageName && v.age ? `${stageName} · ${t('common.years_old', { n: v.age })}` : null].filter(Boolean).join(' · ')
+  const subline = [rankName, stageName && v.age ? `${stageName} – ${t('common.years_old', { n: v.age })}` : null].filter(Boolean).join(' – ')
   const city = (code?: string, name?: string) => (name || code ? names.name('city', code ?? '', name) : '')
 
   return (

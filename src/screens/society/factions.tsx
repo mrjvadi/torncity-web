@@ -30,7 +30,7 @@ function Operation({ ctx, o }: { ctx: FlowCtx; o: FactionOperationLine }) {
       <SectionTitle>{t('soc.faction.op.title')}</SectionTitle>
       <Facts rows={[
         { label: t('soc.faction.op.crime'), value: crime, gold: true },
-        { label: t('soc.faction.op.place'), value: `${place} · ${cityOf(ctx, o.city_code, o.city)}` },
+        { label: t('soc.faction.op.place'), value: `${place} – ${cityOf(ctx, o.city_code, o.city)}` },
         { label: t('soc.faction.op.status'), value: word(`soc.faction.op.${o.status}`, o.status) },
         ...(o.left_seconds > 0 ? [{ label: o.status === 'gathering' ? t('soc.faction.op.gather_left') : t('soc.faction.op.end_left'), value: span(o.left_seconds) }] : []),
         { label: t('soc.faction.op.crew'), value: t('soc.faction.op.crew_of', { n: formatNumber((o.crew ?? []).length), min: formatNumber(o.min), max: formatNumber(o.max) }) },
@@ -52,7 +52,7 @@ const FactionList = screen<FactionListView>(({ view: v, ctx }) => {
       <CardGrid>
         {(v.factions ?? []).map((f) => {
           const act = view.find((a) => a.args?.code === f.ref.code)
-          return <ListRow key={f.ref.code} icon="lion" palette="gold" title={f.ref.name} sub={`${f.ref.code} · ${t('soc.faction.member_count', { n: formatNumber(f.members) })}`}
+          return <ListRow key={f.ref.code} icon="lion" palette="gold" title={f.ref.name} sub={`${f.ref.code} – ${t('soc.faction.member_count', { n: formatNumber(f.members) })}`}
             onClick={act ? () => ctx.go(act) : undefined} />
         })}
       </CardGrid>
@@ -286,7 +286,7 @@ const FactionCrime = screen<FactionCrimeBoardView>(({ view: v, ctx }) => {
                       <span className="sc-line-end">{t('soc.faction.crime_crew', { min: formatNumber(l.min), max: formatNumber(l.max) })}</span>
                     </div>
                     <Hint>{t('soc.faction.crime_line', { nerve: formatNumber(l.nerve), level: formatNumber(l.min_level), duration: durationText(l.duration_seconds) })}
-                      {(l.places ?? []).length > 0 ? ` · ${(l.places ?? []).map((p) => ctx.names.name(['place'], p.code, p.name)).join(t('common.sep') + ' ')}` : ''}</Hint>
+                      {(l.places ?? []).length > 0 ? ` – ${(l.places ?? []).map((p) => ctx.names.name(['place'], p.code, p.name)).join(t('common.sep') + ' ')}` : ''}</Hint>
                     {plan && <Btns ctx={ctx} list={[plan]} />}
                   </div>
                 )

@@ -43,7 +43,7 @@ const Family: ScreenComponent = () => (
               <span className="icon" />
             </div>
             <div className="display" style={{ fontSize: 18 }}>{k.name}</div>
-            <div className="ft-tile-sub">{k.age > 0 ? t('f.family.188', { p0: k.age }) : t('f.family.177')}{k.note && `  ·  ${k.note}`}</div>
+            <div className="ft-tile-sub">{k.age > 0 ? t('f.family.188', { p0: k.age }) : t('f.family.177')}{k.note && `  –  ${k.note}`}</div>
             {k.heir && <Chip text={k.heir} color="var(--anar)" />}
           </div>
         ))}

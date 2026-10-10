@@ -136,14 +136,14 @@ export const ReserveScreen = flow<ReserveView>(({ view: v0, ctx }) => {
         {(v.interventions ?? []).map((i) => (
           <div key={i.id} className="rs-row">
             <b>{t(i.side === 'buy' ? 'rs.log_buy' : 'rs.log_sell', { n: units(i.units) })}</b>
-            <span>{t(`rs.st.${i.status}` as Key)}{i.status === 'pending' && i.execute_after ? ` · ${t('rs.exec', { at: when(i.execute_after) })}` : ''}{i.refusal ? ` · ${i.refusal}` : ''}</span>
+            <span>{t(`rs.st.${i.status}` as Key)}{i.status === 'pending' && i.execute_after ? ` – ${t('rs.exec', { at: when(i.execute_after) })}` : ''}{i.refusal ? ` – ${i.refusal}` : ''}</span>
             {i.status === 'pending' && v.can_policy && <button type="button" className="dk-chip" disabled={busy} onClick={() => void simple({ action: 'cancel', id: i.id })}>{t('rs.cancel')}</button>}
           </div>
         ))}
         {(v.withdrawals ?? []).map((w) => (
           <div key={w.id} className="rs-row">
             <b>{t('rs.log_withdraw', { n: sup(w.sup) })}</b>
-            <span>{t(`rs.st.${w.status}` as Key)}{w.status === 'pending' && w.execute_after ? ` · ${t('rs.exec', { at: when(w.execute_after) })}` : ''}</span>
+            <span>{t(`rs.st.${w.status}` as Key)}{w.status === 'pending' && w.execute_after ? ` – ${t('rs.exec', { at: when(w.execute_after) })}` : ''}</span>
             {w.status === 'pending' && v.can_policy && <button type="button" className="dk-chip" disabled={busy} onClick={() => void simple({ action: 'cancel', id: w.id })}>{t('rs.cancel')}</button>}
           </div>
         ))}

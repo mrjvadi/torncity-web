@@ -109,7 +109,7 @@ export function SupportTravel({ openLocal, localArgs }: ScreenProps) {
               <span className="nx-row-text">
                 <span className="nx-row-title">{d.kind === 'city' ? names.name('city', d.code, d.name) : d.name}</span>
                 <span className="nx-row-sub">
-                  {isHere ? t('sc.dest.here') : isHome ? `${t('sc.dest.home')} · ` + `${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}` : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} · ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` · ${roughDuration(d.duration_seconds)}` : ''}`}
+                  {isHere ? t('sc.dest.here') : isHome ? `${t('sc.dest.home')} – ` + `${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}` : `${d.kind === 'city' ? t('sc.dest.city') : t('sc.dest.village')} – ${t('sc.dest.km', { n: formatNumber(Math.round(d.distance_km)) })}${d.duration_seconds ? ` – ${roughDuration(d.duration_seconds)}` : ''}`}
                 </span>
               </span>
               {!isHere && d.fare !== undefined && <span className="nx-row-right">{money(d.fare)}</span>}
@@ -191,7 +191,7 @@ function ConfirmSheet({ dest, hint, service, onClose, onGo }: { dest: TravelDest
             palette={o.mode_code === mode ? 'gold' : 'teal'}
             tone={o.mode_code === mode ? 'gold' : undefined}
             title={modeLabel(o)}
-            sub={`${roughDuration(o.wait_seconds)}${(o.wait_seconds ?? 0) >= 3600 ? ` · ${t('sc.confirm.arrive_at', { at: atText(Date.now() + (o.wait_seconds ?? 0) * 1000) })}` : ''}${o.busy ? ` · ${t('sc.confirm.busy')}` : ''}`}
+            sub={`${roughDuration(o.wait_seconds)}${(o.wait_seconds ?? 0) >= 3600 ? ` – ${t('sc.confirm.arrive_at', { at: atText(Date.now() + (o.wait_seconds ?? 0) * 1000) })}` : ''}${o.busy ? ` – ${t('sc.confirm.busy')}` : ''}`}
             right={money(o.fare)}
             onClick={o.busy ? undefined : () => setMode(o.mode_code)}
           />

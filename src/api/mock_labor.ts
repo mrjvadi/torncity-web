@@ -199,7 +199,7 @@ export function mockLaborCommand(command: string, args: Record<string, unknown> 
     }
     case 'settlement.labor.post': {
       if (!site) return refusal('labor_no_site')
-      site.jobId = `lb-job-${S.seq++}`
+      site.jobId = `lb-job-p${S.seq++}`
       site.left = site.production ? 8 : Math.ceil((site.required - site.done) / 60) * 2
       site.total = site.left
       site.wage = market().npc_wage
