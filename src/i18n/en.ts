@@ -200,6 +200,13 @@ export const en: Partial<Record<Key, string>> = {
   'role.education': 'Education',
   'role.market': 'Market',
   'role.storage': 'Storage',
+  'role.hospitality': 'Hospitality',
+  'role.water': 'Water',
+  'role.commerce': 'Commerce',
+  'role.finance': 'Money and banking',
+  'role.signal': 'Signals',
+  'role.research': 'Research',
+  'role.home': 'Home',
 
   'progress.title': 'Construction',
   'progress.empty': 'Nothing is being built right now.',

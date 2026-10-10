@@ -3,6 +3,7 @@
 import { A, back, mockOk, refreshA } from './mock_neutral'
 import type { ResearchBoardView } from './views.gen'
 
+const PERSONAL_ON = (() => { try { return new URLSearchParams(location.search).get('personal') === '1' } catch { return false } })()
 const mode = () => { try { return new URLSearchParams(location.search).get('res') ?? 'one' } catch { return 'one' } }
 const N = (code: string, name: string) => ({ code, name })
 const iso = (h: number) => new Date(Date.now() + h * 3600_000).toISOString()
@@ -21,6 +22,7 @@ export function researchBoard(): ResearchBoardView {
     pacts: pact ? [{ id: 'p1', partner: N('v-q7m2', 'سرخه'), state: 'active' }, { id: 'p2', partner: N('v-z1p8', 'کوهدشت'), state: 'incoming' }] : [],
     neighbours: [N('v-q7m2', 'سرخه'), N('v-z1p8', 'کوهدشت')], experience: [{ field: 'farming', points: 70, per: 100, max_bps: 3000 }, { field: 'craft', points: 20, per: 100, max_bps: 3000 }, { field: 'building', points: 0, per: 100, max_bps: 3000 }],
     may_share: true, share_cap_bps: 5000, stand_in_until: new URLSearchParams(location.search).get('standin') === '1' ? iso(9 * 24) : null,
+    personal: PERSONAL_ON ? [{ kind: 'literacy', item: { code: 'reading_writing', name: 'reading_writing' }, have: 0, need: 1, how: 'train' }] : null, personal_until: PERSONAL_ON ? iso(5 * 24) : null,
   }
 }
 

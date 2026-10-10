@@ -40,7 +40,7 @@ function PlaceRow({ l, ctx, walking }: { l: NonNullable<CityMapView['places']>[n
     <ListRow
       icon="x_map" palette={l.here ? 'gold' : 'teal'} tone={l.here ? 'gold' : undefined}
       title={nameOf(ctx, 'place', l.place)}
-      sub={[l.here && !walking ? t('lf.map.you_here') : t('lf.map.walk', { t: hms(l.walk_seconds) }), what].filter(Boolean).join(' · ')}
+      sub={[l.here && !walking ? t('lf.map.you_here') : t('lf.map.walk', { t: hms(l.walk_seconds) }), what].filter(Boolean).join(' – ')}
       onClick={go && !walking ? () => ctx.go(go) : undefined}
     />
   )
@@ -106,7 +106,7 @@ export const CityMap = flow<CityMapView>(({ view: v, ctx }) => {
           <Panel tone="teal">
             <Lead>{inVillage ? t('lf.map.village_title') : t('lf.map.city_title', { city: cityName(ctx, v.city_code, v.city) })}</Lead>
             {!inVillage && v.walking && <Hint>{t('lf.map.walking', { place: nameOf(ctx, 'place', v.walking.to), t: hms(v.walking.remaining_seconds), at: clockText(v.walking.arrives_at) })}</Hint>}
-            {!inVillage && !v.walking && v.here.code && <Hint>{t('lf.map.here', { place: nameOf(ctx, 'place', v.here) })}{v.others > 0 ? ` · ${t('lf.map.others', { n: formatNumber(v.others) })}` : ''}</Hint>}
+            {!inVillage && !v.walking && v.here.code && <Hint>{t('lf.map.here', { place: nameOf(ctx, 'place', v.here) })}{v.others > 0 ? ` – ${t('lf.map.others', { n: formatNumber(v.others) })}` : ''}</Hint>}
           </Panel>
           {inVillage
             ? <VillagePlaces ctx={ctx} id={villageId} />
@@ -149,7 +149,7 @@ export const Cities = flow<MapView>(({ view: v, ctx }) => {
                 <ListRow
                   key={d.code} icon={d.village ? 'house' : 'city'} palette={d.village ? 'emerald' : 'gold'}
                   title={cityName(ctx, d.code, d.name)}
-                  sub={[t('sc.dest.km', { n: formatNumber(d.distance_km) }), d.wait_seconds > 0 ? roughDuration(d.wait_seconds) : ''].filter(Boolean).join(' · ')}
+                  sub={[t('sc.dest.km', { n: formatNumber(d.distance_km) }), d.wait_seconds > 0 ? roughDuration(d.wait_seconds) : ''].filter(Boolean).join(' – ')}
                   right={d.wait_seconds > 0 ? (d.fare > 0 ? money(d.fare) : t('common.free')) : undefined}
                   onClick={go ? () => ctx.go(go) : undefined}
                 />
@@ -188,13 +188,23 @@ export const TravelOptions = flow<TravelOptionsView>(({ view: v, ctx }) => {
             <ListRow
               key={o.mode_code} icon={MODE_ICON[o.mode_code] ?? 'plane'} palette="teal"
               title={own || ctx.names.name('mode', o.mode_code, o.mode_name)}
-              sub={[roughDuration(o.wait_seconds), o.wait_seconds >= 3600 ? t('sc.confirm.arrive_at', { at: atText(Date.now() + o.wait_seconds * 1000) }) : '', t('lf.options.energy', { n: formatNumber(o.energy) }), o.busy ? t('travel.busy') : '', o.vehicle ? t('lf.options.condition', { n: bps(o.condition) }) : ''].filter(Boolean).join(' · ')}
+              sub={[roughDuration(o.wait_seconds), o.wait_seconds >= 3600 ? t('sc.confirm.arrive_at', { at: atText(Date.now() + o.wait_seconds * 1000) }) : '', t('lf.options.energy', { n: formatNumber(o.energy) }), o.busy ? t('travel.busy') : '', o.vehicle ? t('lf.options.condition', { n: bps(o.condition) }) : ''].filter(Boolean).join(' – ')}
               right={o.fare > 0 ? (o.vehicle ? t('lf.options.fuel', { n: money(o.fare) }) : money(o.fare)) : t('common.free')}
               onClick={go ? () => ctx.go(go) : undefined}
             />
           )
         })}
       </CardGrid>
+      {(v.licence ?? []).map((l) => {
+        const mode = ctx.names.name('mode', l.mode_code, l.mode_code)
+        const course = ctx.names.name('course', l.course.code, l.course.name)
+        return (
+          <Panel key={l.mode_code} tone="gold">
+            <Hint>{l.until ? t('lf.options.licence_soon', { mode, course, at: atText(l.until) }) : t('lf.options.licence_out', { mode, course })}</Hint>
+            <ActionButton tone="steel" small onClick={() => ctx.run('education.list')}>{t('lf.options.licence_go')}</ActionButton>
+          </Panel>
+        )
+      })}
       <Hint>{t('lf.options.cash', { cash: money(v.cash) })}</Hint>
     </Page>
   )
@@ -233,7 +243,7 @@ export const TravelCheckout = flow<TravelCheckoutView>(({ view: v, ctx }) => {
           {v.wait_seconds > 0 && <StatCard icon="clock" palette="emerald" label={t('sc.confirm.arrive')} value={atText(Date.now() + v.wait_seconds * 1000)} />}
           <StatCard icon="energy" palette="emerald" label={t('lf.energy')} value={formatNumber(v.energy)} />
         </StatGrid>
-        <Note>{t('lf.checkout.route', { from, to })}{v.busy ? ` · ${t('lf.checkout.busy')}` : ''}</Note>
+        <Note>{t('lf.checkout.route', { from, to })}{v.busy ? ` – ${t('lf.checkout.busy')}` : ''}</Note>
         {afford
           ? <Note>{t('lf.pay.balances', { cash: money(v.payment.cash), bank: money(v.payment.bank) })}</Note>
           : <Note tone="bad">{t('lf.pay.cannot', { cash: money(v.payment.cash), bank: money(v.payment.bank) })}</Note>}

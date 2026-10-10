@@ -249,7 +249,7 @@ export const MissionsMine = flow<MissionsMineView>(({ view: v, ctx }) => {
         <Panel>
           <SectionTitle>{t('ac.mission.recent_title')}</SectionTitle>
           <div className="vf-list">
-            {recent.map((m) => <div key={m.no} className="vf-line"><span>{recentLine(ctx, m)}{m.withheld > 0 ? ` · ${t('ac.mission.withheld_short')}` : ''}</span></div>)}
+            {recent.map((m) => <div key={m.no} className="vf-line"><span>{recentLine(ctx, m)}{m.withheld > 0 ? ` – ${t('ac.mission.withheld_short')}` : ''}</span></div>)}
           </div>
         </Panel>
       )}

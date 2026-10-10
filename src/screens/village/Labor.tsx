@@ -105,7 +105,7 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
   return (
     <div className="lb-site">
       {done
-        ? <Notice>{t('labor.done')}</Notice>
+        ? <Notice>{job ? t('labor.done') : t('labor.standing')}</Notice>
         : (
           <Card tone="gold">
             <Bar frac={frac} color="#f5a11f" label={t('labor.progress', { p: Math.floor(v.progress_bps / 100) })} />
@@ -116,19 +116,19 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
       {v.working && (
         <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })}</Notice>
       )}
-      {!done && job && v.can_work && (
+      {job && v.can_work && (
         <Slab tone="gold" radius={16} lip={5} onClick={() => void act('settlement.labor.take', { id: job.id })} disabled={busy}>
           {t('labor.work', { w: money(v.work_wage) })}
         </Slab>
       )}
-      {!done && job && !v.can_work && !v.working && <div className="lb-hint">{t('labor.cannot_work')}</div>}
-      {!done && v.can_work && <div className="lb-hint">{t('labor.points', { m: v.work_points })}</div>}
+      {job && !v.can_work && !v.working && <div className="lb-hint">{t('labor.cannot_work')}</div>}
+      {job && v.can_work && <div className="lb-hint">{t('labor.points', { m: v.work_points })}</div>}
 
-      {!done && (
+      {(!done || !!job) && (
         <>
-          <SectionTitle>{t('labor.workers')}</SectionTitle>
+          <SectionTitle>{t(done ? 'labor.workers_prod' : 'labor.workers')}</SectionTitle>
           {workers.length === 0
-            ? <Empty>{t('labor.workers.none')}</Empty>
+            ? <Empty>{t(done ? 'labor.workers.none_prod' : 'labor.workers.none')}</Empty>
             : <Card><div className="lb-workers">{workers.map((s) => <ShiftRow key={s.id} s={s} now={now} />)}</div></Card>}
         </>
       )}
@@ -142,11 +142,11 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
       )}
       {!done && !job && <Empty>{t('labor.no_job')}</Empty>}
 
-      {v.can_post && !done && (
+      {v.can_post && !job && (
         <Slab tone="steel" radius={14} lip={4} onClick={() => void act('settlement.labor.post', { id: v.id })} disabled={busy}>{t('labor.post')}</Slab>
       )}
 
-      {v.can_employ && job && !done && (
+      {v.can_employ && job && (
         <Card tone="sapphire">
           <SectionTitle>{t('labor.hire')}</SectionTitle>
           <div className="lb-hint">{t('labor.hire_hint', { a: formatNumber(v.npc_available), w: money(v.npc_wage) })}</div>
@@ -154,8 +154,8 @@ export function SitePanel({ view: v, act, busy }: { view: LaborSiteView; act: (c
             {(v.hire_presets ?? []).map((n) => (
               <Slab key={n} tone="blue" radius={12} lip={3} onClick={() => void act('settlement.labor.hire', { id: job.id, n: String(n) })} disabled={busy}>{t('labor.hire_n', { n })}</Slab>
             ))}
-            {job.npc_crew > 0 && <Slab tone="steel" radius={12} lip={3} onClick={() => void act('settlement.labor.hire', { id: job.id, n: '0' })} disabled={busy}>{t('labor.hire_none')}</Slab>}
           </div>
+          {job.npc_crew > 0 && <div className="lb-btns lb-wide"><Slab tone="steel" radius={12} lip={3} onClick={() => void act('settlement.labor.hire', { id: job.id, n: '0' })} disabled={busy}>{t('labor.hire_none')}</Slab></div>}
           <SectionTitle>{t('labor.wage_set')}</SectionTitle>
           <div className="lb-btns">
             {(v.wage_presets ?? []).map((p) => (
@@ -232,7 +232,7 @@ function JobCard({ j, now, onOpen, onTake, busy }: { j: LaborJobView; now: numbe
       tone={ROLE_TONE[role ?? ''] === 'gold' ? undefined : ROLE_TONE[role ?? '']}
       icon={icon} palette={palette}
       title={buildingName(cat, j.building.code, j.building.name)}
-      sub={`${t(construction ? 'labor.job.construction' : 'labor.job.production')} · ${j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village')}`}
+      sub={`${t(construction ? 'labor.job.construction' : 'labor.job.production')} – ${j.employer_kind === 'player' ? t('labor.employer.player', { name: j.employer }) : t('labor.employer.village')}`}
       right={<Chip tone="gold">{t('labor.per_shift', { w: money(j.wage) })}</Chip>}
     >
       {construction && (
@@ -281,7 +281,7 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
       {v && (
         <>
           {v.working && (
-            <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
+            <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} – {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
           )}
           {!v.resident && <div className="lb-hint">{travelling ? t('lf.travelling.here_no_time') : t('labor.not_resident')}</div>}
           {jobs.length === 0 && <Empty>{t('labor.board.empty')}</Empty>}
@@ -300,7 +300,7 @@ export function LaborBoard({ response, openLocal, run }: ScreenProps) {
                   const { icon, palette } = iconForRole(cat.get(s.building.code)?.category)
                   return (
                     <RowCard key={s.id} icon={icon} palette={palette} title={buildingName(cat, s.building.code, s.building.name)}
-                      sub={t('labor.progress', { p: Math.floor(s.progress_bps / 100) })}>
+                      sub={s.standing ? t('labor.standing') : t('labor.progress', { p: Math.floor(s.progress_bps / 100) })}>
                       <div className="lb-btns">
                         <Slab tone="gold" radius={12} lip={3} onClick={() => void post(s.id)}>{t('labor.post')}</Slab>
                       </div>
@@ -346,7 +346,7 @@ export function LaborMine({ response, openLocal, run }: ScreenProps) {
             {v.next_level && <div className="lb-hint">{t('labor.mine.next', { n: v.next_shifts, l: t(`labor.level.${v.next_level}` as Key) })}</div>}
           </Card>
           {v.working
-            ? <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} · {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
+            ? <Notice>{t('labor.working', { t: hms(Math.max(0, (Date.parse(v.working.finish_at ?? "") - now) / 1000)) })} – {buildingName(cat, v.working.building.code, v.working.building.name)}</Notice>
             : <Empty>{t('labor.mine.idle')}</Empty>}
           <MarketCard m={v.market} />
           <div className="lb-btns">

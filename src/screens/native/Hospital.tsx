@@ -47,7 +47,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
         ) : (
           <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>
             {t('hospital.health', { a: formatNumber(v.health ?? 0), b: formatNumber(v.max ?? 0) })}
-            {!!v.full_in_seconds && ` · ${t('hospital.full_in', { t: hms(v.full_in_seconds) })}`}
+            {!!v.full_in_seconds && ` – ${t('hospital.full_in', { t: hms(v.full_in_seconds) })}`}
           </div>
         )}
       </div>
@@ -71,7 +71,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
           {v.clinics!.map((c, i) => (
             <ListRow key={i} icon="stetho" palette={c.can_treat ? 'emerald' : 'steel'}
               title={c.clinic?.name ?? '—'}
-              sub={c.open ? `${t('hospital.doctor', { n: formatNumber(c.doctor ?? 0) })}${c.saves_seconds ? ` · ${t('hospital.saves', { t: roughDuration(c.saves_seconds) })}` : ''}` : t('hospital.closed')}
+              sub={c.open ? `${t('hospital.doctor', { n: formatNumber(c.doctor ?? 0) })}${c.saves_seconds ? ` – ${t('hospital.saves', { t: roughDuration(c.saves_seconds) })}` : ''}` : t('hospital.closed')}
               right={c.price ? money(c.price) : undefined}
               onClick={c.clinic?.code && treat(c.clinic.code) ? () => onAction(treat(c.clinic!.code!)!) : undefined} />
           ))}

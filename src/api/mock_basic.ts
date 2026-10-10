@@ -62,7 +62,7 @@ export function mockBasicCommand(command: string, args?: Ctx): Answer | null {
     case 'map.list':
       return {
         screen: 'city_map',
-        text: '🗺 <b>نقشه‌ی کالدریس</b>\n\nالان اینجایی: مرکز شهر\n\n• بازار · 15 ثانیه پیاده\n• بندر · 3 دقیقه پیاده · بانک\n• منطقه‌ی صنعتی · 1 دقیقه پیاده',
+        text: '🗺 <b>نقشه‌ی کالدریس</b>\n\nالان اینجایی: مرکز شهر\n\n• بازار – 15 ثانیه پیاده\n• بندر – 3 دقیقه پیاده – بانک\n• منطقه‌ی صنعتی – 1 دقیقه پیاده',
         view: { city: 'کالدریس', city_code: 'calderis', here: { code: 'old_town', name: 'مرکز شهر' }, places: [] },
         actions: [
           { label: '🛒 مغازه‌ها', command: 'shop.list', row: 0, kind: 'navigation', icon: 'cart' },
@@ -73,7 +73,7 @@ export function mockBasicCommand(command: string, args?: Ctx): Answer | null {
     case 'device.list':
       return {
         screen: 'devices',
-        text: '📱 <b>دستگاه‌های متصل</b>\n\nمرورگر وب: فعال · همین حالا\nاندروید: آخرین ورود دیروز',
+        text: '📱 <b>دستگاه‌های متصل</b>\n\nمرورگر وب: فعال – همین حالا\nاندروید: آخرین ورود دیروز',
         view: { devices: [] },
         actions: [back('player.settings')],
       }

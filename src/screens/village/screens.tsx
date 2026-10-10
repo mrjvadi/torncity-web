@@ -26,6 +26,7 @@ import {
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
+import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
 
 const Empt = Empty
@@ -107,6 +108,7 @@ const Refusal = flow<VillageRefusalView>(({ view: v, ctx }) => {
             ))}
           </ul>
         )}
+        <PersonalList names={ctx.names} list={v.personal} onCourses={() => ctx.run('education.list')} />
         {needs.length > 0 && (
           <>
             <SectionTitle>{subject ? t(key(`vx.needs.${v.action || 'build'}`), { name: subject }) : t('vx.needs.any')}</SectionTitle>
@@ -265,7 +267,7 @@ const Land = flow<LandView>(({ view: v, ctx }) => {
           }))} />
           {/* the cheapest lots the roads opened: the first grid's map cannot show them */}
           {v.can_buy && (v.outer ?? []).filter((c) => c.state === 'free' && c.access !== 'none').sort((a, b) => a.cost - b.cost || a.y - b.y || a.x - b.x).slice(0, 6).map((c) => (
-            <Do key={`${c.x},${c.y}`} ctx={ctx} tone="steel" label={`${t('citizen.buy.lot', { x: c.x + 1, y: c.y + 1 })} · ${money(v.price + c.cost)}`}
+            <Do key={`${c.x},${c.y}`} ctx={ctx} tone="steel" label={`${t('citizen.buy.lot', { x: c.x + 1, y: c.y + 1 })} – ${money(v.price + c.cost)}`}
               a={{ command: 'settlement.lot.buy', args: { lot: token(c.x, c.y) }, kind: 'primary', id: 'lot.buy' }} />
           ))}
         </Panel>
@@ -310,7 +312,7 @@ function NearbyButtons({ ctx, lots }: { ctx: FlowCtx; lots: { x: number; y: numb
         {list.map((n) => (
           <Slab key={`${n.x}-${n.y}`} tone="steel" radius={14} lip={4} disabled={ctx.busy}
             onClick={() => ctx.go({ command: 'settlement.lot.buy', args: { lot: token(n.x, n.y) }, kind: 'primary', id: 'lot.nearby' })}>
-            {t('citizen.buy.lot', { x: n.x + 1, y: n.y + 1 })}{n.access.cost > 0 ? ` · ${money(n.access.cost)}` : ''}
+            {t('citizen.buy.lot', { x: n.x + 1, y: n.y + 1 })}{n.access.cost > 0 ? ` – ${money(n.access.cost)}` : ''}
           </Slab>
         ))}
       </div>
@@ -442,7 +444,7 @@ const PrivateMenu = flow<PrivateMenuView>(({ view: v, ctx }) => {
           return (
             <Panel key={l.building.code}>
               <ListRow icon="house" palette={l.home ? 'gold' : 'amber'} title={name}
-                sub={`${buildText(l)} · ${l.footprint_w}×${l.footprint_h}`}
+                sub={`${buildText(l)} – ${l.footprint_w}×${l.footprint_h}`}
                 right={<span className="vc-line-price">{rich(money(l.total))}</span>} />
               <Facts rows={[
                 { label: t('citizen.build.cost'), value: money(l.cost_money) },
@@ -513,7 +515,7 @@ const Mine = flow<MineView>(({ view: v, ctx }) => {
         {lots.length === 0 && <Hint>{t('citizen.mine.no_lots')}</Hint>}
         <Facts rows={lots.map((l) => ({
           label: t('citizen.buy.lot', { x: l.x + 1, y: l.y + 1 }),
-          value: l.building ? `${ctx.bname(l.building)}${l.state === 'building' || l.left_seconds > 0 ? ` · ${t('vx.mine.going', { t: durationText(l.left_seconds) })}` : ''}` : l.access && l.access !== 'road' ? t('citizen.mine.lot_no_road') : t('citizen.mine.lot_bare'),
+          value: l.building ? `${ctx.bname(l.building)}${l.state === 'building' || l.left_seconds > 0 ? ` – ${t('vx.mine.going', { t: durationText(l.left_seconds) })}` : ''}` : l.access && l.access !== 'road' ? t('citizen.mine.lot_no_road') : t('citizen.mine.lot_bare'),
         }))} />
         {lots.filter((l) => !l.building && l.access && l.access !== 'road').map((l) => (
           <Do key={`${l.x}-${l.y}`} ctx={ctx} a={{ command: 'settlement.lot.access', args: { lot: token(l.x, l.y) }, kind: 'navigation', id: 'lot.access' }}
@@ -521,7 +523,7 @@ const Mine = flow<MineView>(({ view: v, ctx }) => {
         ))}
         <Facts rows={[
           { label: t('citizen.mine.assessed'), value: money(v.assessed) },
-          { label: t('citizen.mine.tax'), value: `${money(v.tax_per_period)} · ${formatNumber(v.tax_bps / 100)}%` },
+          { label: t('citizen.mine.tax'), value: `${money(v.tax_per_period)} – ${formatNumber(v.tax_bps / 100)}%` },
           ...(v.debt > 0 ? [{ label: t('citizen.mine.debt'), value: t('vx.mine.debt', { amount: money(v.debt), n: v.debt_periods }), gold: true }] : []),
         ]} />
         {v.home && !v.can_rest && <Hint>{t('citizen.mine.rest_wait', { t: durationText(v.rest_wait_seconds) })}</Hint>}
@@ -577,6 +579,7 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
         </Panel>
       )}
       {!v.resident && <Panel><Lead>{t('vx.work.not_resident')}</Lead></Panel>}
+      {v.personal_until && <Panel tone="gold"><Hint>{personalUntilText(v.personal_until, 'work')}</Hint></Panel>}
       {(v.places ?? []).length === 0 && <Empt>{t('vx.work.none')}</Empt>}
       {(v.places ?? []).length === 0 && (v.suggest ?? []).length > 0 && (
         <Hint>{t('vx.work.suggest', { names: (v.suggest ?? []).slice(0, 3).map((n) => ctx.bname(n.code, n.name)).join('، ') })}</Hint>
@@ -592,6 +595,7 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
                 right={<Chip>{t('vx.work.busy', { busy: p.busy, total: p.workers })}</Chip>} />
               {(p.consumes ?? []).length > 0 && <Hint>{t('vx.work.uses', { list: goods(p.consumes) })}</Hint>}
               {(p.produces ?? []).length > 0 && <Hint>{t('vx.work.makes', { list: goods(p.produces) })}</Hint>}
+              <PersonalList names={ctx.names} list={p.personal} title={t('vx.pn.lack')} onCourses={() => ctx.run('education.list')} />
               {act && <Btns ctx={ctx} list={[act]} />}
             </Panel>
           )
@@ -615,7 +619,7 @@ const Who = flow<SettlementWhoView>(({ view: v, ctx }) => (
       {(v.online ?? []).map((p, i) => (
         <ListRow key={i} icon="person" palette="emerald"
           title={<span><i className="vs-dot on" />{p.name}</span>}
-          sub={[hasKey(`activity.${p.activity}`) ? t(key(`activity.${p.activity}`)) : '', p.place ? ctx.names.name(['place'], p.place) : ''].filter(Boolean).join(' · ')} />
+          sub={[hasKey(`activity.${p.activity}`) ? t(key(`activity.${p.activity}`)) : '', p.place ? ctx.names.name(['place'], p.place) : ''].filter(Boolean).join(' – ')} />
       ))}
       </CardGrid>
       {v.offline > 0 && <Hint>{t('vx.who.offline', { n: v.offline })}</Hint>}
@@ -666,7 +670,7 @@ const BuildMenu = flow<BuildMenuView>(({ view: v, ctx }) => {
           return (
             <Panel key={l.building.code}>
               <ListRow icon={locked ? 'm_lock' : icon} palette={locked ? 'steel' : palette} title={ctx.bname(l.building.code, l.building.name)}
-                sub={`${buildText(l)}${l.role ? ` · ${t(key(`role.${l.role}`))}` : ''}`}
+                sub={`${buildText(l)}${l.role ? ` – ${t(key(`role.${l.role}`))}` : ''}`}
                 right={<span className="vc-line-price">{rich(money(l.cost_money))}</span>} />
               {mats(ctx, l.materials)}
               {!locked && (l.short ?? []).length > 0 && <Hint tone="bad">{t('vx.build.short', { list: (l.short ?? []).map((m) => `${formatNumber(m.quantity)} ${ctx.names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ') })}</Hint>}
@@ -805,7 +809,7 @@ function FlowUpgrades({ v, ctx }: { v: BuildingPanelView; ctx: FlowCtx }) {
     <>
       <CardGrid>
         {models.map(({ u, m }) => (
-          <PCard key={u.building.code} icon={m.available ? 'up' : 'scroll'} title={m.title} tone={m.available ? 'busy' : 'off'} off={!m.available} sub={`${money(u.cost_money)} · ${buildText(u)}`}
+          <PCard key={u.building.code} icon={m.available ? 'up' : 'scroll'} title={m.title} tone={m.available ? 'busy' : 'off'} off={!m.available} sub={`${money(u.cost_money)} – ${buildText(u)}`}
             facts={m.available ? t('v6.up.ready') : <span className="dk-why">{t('ug.blocked', { n: formatNumber(m.reqs.filter((r) => !r.ok).length) })}</span>} onClick={() => setOpen(u.building.code)} />
         ))}
       </CardGrid>
@@ -824,7 +828,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
     <Page title={name} tone="gold">
       <Panel tone="gold">
         <ListRow icon={icon} palette={palette} title={t(key(`building.state.${going ? 'under_construction' : 'built'}`))}
-          sub={`${t('building.at', { x: v.x + 1, y: v.y + 1 })} · ${t('build.footprint', { w: v.w, h: v.h })}`} />
+          sub={`${t('building.at', { x: v.x + 1, y: v.y + 1 })} – ${t('build.footprint', { w: v.w, h: v.h })}`} />
         <Lead>{buildingBlurb(v)}</Lead>
         {going && (
           <>
@@ -847,7 +851,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
           <Facts rows={[
             { label: t('building.civic.population'), value: formatNumber(v.population) },
             { label: t('building.civic.treasury'), value: money(v.treasury), gold: true },
-            ...(v.research ? [{ label: t('vx.bld.research'), value: `${ctx.names.name(['knowledge'], v.research.knowledge.code, v.research.knowledge.name)} · ${durationText(v.research.left_seconds)}` }] : []),
+            ...(v.research ? [{ label: t('vx.bld.research'), value: `${ctx.names.name(['knowledge'], v.research.knowledge.code, v.research.knowledge.name)} – ${durationText(v.research.left_seconds)}` }] : []),
           ]} />
         )}
         {effects.length > 0 && (

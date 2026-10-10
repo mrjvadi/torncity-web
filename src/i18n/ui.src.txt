@@ -562,21 +562,21 @@ education.certificates | مدرک‌های تو | Your certificates
 # -- dashboard ---------------------------------------------------------------
 dashboard.title | داشبورد | Dashboard
 dashboard.travelling | در سفر | Travelling
-dashboard.jail | در زندان {city} · {t} مانده | In {city} jail · {t} left
-dashboard.hospital | در بیمارستان {city} · {t} مانده | In {city} hospital · {t} left
+dashboard.jail | در زندان {city} – {t} مانده | In {city} jail · {t} left
+dashboard.hospital | در بیمارستان {city} – {t} مانده | In {city} hospital · {t} left
 # -- life / needs --------------------------------------------------------------
 life.title | زندگی | Life
 need.sleep | خواب | Sleep
 need.hunger | گرسنگی | Hunger
 need.happiness | شادی | Happiness
 need.stress | استرس | Stress
-life.stage_age | {stage} · {age} ساله | {stage} · {age} years old
+life.stage_age | {stage} – {age} ساله | {stage} · {age} years old
 life.net_worth | ارزش خالص | Net worth
 life.cash_bank | نقد + بانک | Cash + bank
 life.property | ملک | Property
 life.sleep_spots | جای خواب | Places to sleep
 life.sleep_spots_other | جاهای دیگر برای خواب | Other places to sleep
-life.spot_sub | {place} · +{rest} انرژی | {place} · +{rest} energy
+life.spot_sub | {place} – +{rest} انرژی | {place} · +{rest} energy
 life.sleep_again | دوباره می‌توانی بخوابی: {t} دیگر | You can sleep again in {t}
 # -- job ----------------------------------------------------------------------
 job.title | کار | Work
@@ -584,7 +584,7 @@ job.none | هنوز شغلی نداری. | You do not have a job yet.
 job.performance | عملکرد | Performance
 job.per_shift | {pay} هر شیفت | {pay} per shift
 job.shifts | {n} شیفت | {n} shifts
-job.shift_running | شیفت در حال انجام · {t} مانده | Shift in progress · {t} left
+job.shift_running | شیفت در حال انجام – {t} مانده | Shift in progress · {t} left
 job.walk_to | {t} پیاده تا {place} | {t} on foot to {place}
 job.current_rank | جایگاه فعلی | Current position
 job.promo_ready | آماده‌ی ترفیع | Ready for promotion
@@ -607,7 +607,7 @@ hospital.closed | تعطیل | Closed
 # -- travel -------------------------------------------------------------------
 travel.title | سفر | Travel
 travel.to | سفر به {city} | Travel to {city}
-travel.energy_busy | {t} · {n} انرژی{busy} | {t} · {n} energy{busy}
+travel.energy_busy | {t} – {n} انرژی{busy} | {t} · {n} energy{busy}
 travel.busy | شلوغ | busy
 travel.on_way | در راه | On the way
 travel.until_arrival | تا رسیدن | until arrival
@@ -672,7 +672,7 @@ market.book_title | دفتر | Order book
 market.book_fallback | دفتر بازار | Market book
 market.walk | {t} پیاده تا {place} | {t} on foot to {place}
 market.walk_place | بازار | the market
-market.bid_ask | خرید {bid} · فروش {ask} | Buy {bid} · Sell {ask}
+market.bid_ask | خرید {bid} – فروش {ask} | Buy {bid} · Sell {ask}
 market.no_book | کالاهای تو بدون دفتر اینجا | Your goods without a book here
 market.last_price | آخرین قیمت | Last price
 market.you_hold | موجودی تو | You hold
@@ -752,8 +752,8 @@ faction.gathering | در حال جمع شدن | Gathering
 faction.you_are_in | عضو {name} هستی. | You are a member of {name}.
 faction.member_count | {n} عضو | {n} members
 crime.title | جرم | Crime
-crime.in_jail | در زندان · {t} مانده | In jail · {t} left
-crime.busy | جرم در حال انجام · {t} مانده | Crime in progress · {t} left
+crime.in_jail | در زندان – {t} مانده | In jail · {t} left
+crime.busy | جرم در حال انجام – {t} مانده | Crime in progress · {t} left
 crime.travelling | در سفر هستی؛ نمی‌توانی جرم انجام بدهی. | You are travelling; you cannot commit crimes.
 crime.heat | داغی {n} | Heat {n}
 crime.wanted | {n} تحت تعقیب | {n} wanted
@@ -813,11 +813,11 @@ finance.credit | اعتبار | Credit
 finance.policy_rate | نرخ سیاستی: {p} | Policy rate: {p}
 finance.missed | {n} قسط عقب‌افتاده | {n} missed instalments
 finance.defaults | {n} نکول | {n} defaults
-finance.product_sub | {p} سالانه · سقف {limit} | {p} a year · limit {limit}
+finance.product_sub | {p} سالانه – سقف {limit} | {p} a year · limit {limit}
 finance.my_loans | وام‌های من | My loans
-finance.loan_active | قسط بعدی {next} · مانده {owed} | Next instalment {next} · owed {owed}
+finance.loan_active | قسط بعدی {next} – مانده {owed} | Next instalment {next} · owed {owed}
 finance.loan_settled | تسویه شده | Settled
-finance.deposit | سپرده: {n} · سود {p} | Deposit: {n} · interest {p}
+finance.deposit | سپرده: {n} – سود {p} | Deposit: {n} · interest {p}
 # -- crime detail / result ------------------------------------------------------------
 req.shifts_have | {n} شیفت{have} | {n} shifts{have}
 req.crime_tier | رتبه‌ی جنایی {name}{have} | Criminal tier {name}{have}
@@ -851,7 +851,7 @@ crime.dry | سهمیه‌ی امروز پر شده بود | Today's quota was al
 crime.xp | {n} تجربه | {n} XP
 crime.criminal_xp | {n} تجربه‌ی جنایی | {n} criminal XP
 crime.level_up | رسیدی به سطح {n} | You reached level {n}
-crime.jailed | دستگیر شدی · {t} حبس | Caught · {t} in jail
+crime.jailed | دستگیر شدی – {t} حبس | Caught · {t} in jail
 crime.fine_line | جریمه {a} | Fine {a}
 crime.fine_paid | {a} پرداخت شد | {a} paid
 crime.loot | غنیمت | Loot
@@ -889,8 +889,8 @@ profile.life | زندگی | Life
 profile.card | کارت من | My card
 profile.devices | دستگاه‌ها | Devices
 profile.certificates | {n} مدرک | {n} certificates
-profile.travelling | در سفر به {city} · {t} | Travelling to {city} · {t}
-profile.walking | در راه {place} · {t} | Walking to {place} · {t}
+profile.travelling | در سفر به {city} – {t} | Travelling to {city} · {t}
+profile.walking | در راه {place} – {t} | Walking to {place} · {t}
 # -- settings -------------------------------------------------------------------------
 settings.title | تنظیمات | Settings
 settings.language | زبان بازی | Game language
@@ -1035,7 +1035,7 @@ city.shift_ready | شیفت آماده | Shift ready
 city.course_ready | مدرک آماده | Certificate ready
 city.gift_soon | جایزه‌ی روز به‌زودی اضافه می‌شود | The daily reward is coming soon
 city.energy_full | انرژی {n} دقیقه دیگه پر می‌شه | Energy full in {n} minutes
-city.shift_pay | یه شیفت برو که هدر نره  ·  +{pay} | Work a shift so it is not wasted  ·  +{pay}
+city.shift_pay | یه شیفت برو که هدر نره  –  +{pay} | Work a shift so it is not wasted  ·  +{pay}
 city.shift_go | یه شیفت برو که هدر نره | Work a shift so it is not wasted
 city.start_shift | شروع شیفت | Start shift
 plate.missions | مأموریت | Missions
@@ -1059,10 +1059,10 @@ f.casino.12 | بیشتر یا کمتر از 7 | Over or under 7
 f.casino.13 | بخت‌آزمایی | Lottery
 f.casino.14 | قرعه‌کشی جمعه | Friday draw
 f.casino.15 | جایزه‌ی بزرگ جمعه | Friday jackpot
-f.casino.16 | بلیت: 100 ساپ  ·  2 روز و 4 ساعت | Ticket: 100 SUP  ·  2 days 4 hours
+f.casino.16 | بلیت: 100 ساپ  –  2 روز و 4 ساعت | Ticket: 100 SUP  ·  2 days 4 hours
 f.casino.17 | بازی مسئولانه: سقف روزانه را خودت تعیین می‌کنی و از آن بیشتر نمی‌شود. | Play responsibly: you set your own daily limit and it can never be exceeded.
 f.casino.18 | گنج پارسی | Persian Treasure
-f.casino.19 | برد! 3 تاج · 5,000 | Win! 3 crowns · 5,000
+f.casino.19 | برد! 3 تاج – 5,000 | Win! 3 crowns · 5,000
 f.casino.20 | شرط هر چرخش | Bet per spin
 f.casino.21 | بچرخان! | Spin!
 f.casino.22 | نگار | Negar
@@ -1077,9 +1077,9 @@ f.casino.30 | بردیا | Bardia
 f.casino.31 | پلنگ S | Palang S
 f.casino.32 | +4.5 ثانیه | +4.5 s
 f.casino.33 | جاده‌ی ساحلی آزور | Azure Coast Road
-f.casino.34 | دور 2 از 3  ·  زنده | Lap 2 of 3  ·  live
+f.casino.34 | دور 2 از 3  –  زنده | Lap 2 of 3  ·  live
 f.casino.35 | رتبه‌بندی | Standings
-f.casino.36 | سرعت 220  ·  شتاب 7.1  ·  کنترل 68 | Speed 220  ·  Acceleration 7.1  ·  Handling 68
+f.casino.36 | سرعت 220  –  شتاب 7.1  –  کنترل 68 | Speed 220  ·  Acceleration 7.1  ·  Handling 68
 f.casino.37 | جایزه‌ی نفر اول: 12,000 ساپ | First place prize: 12,000 SUP
 f.casino.38 | نیترو x2 | Nitro x2
 f.chats.39 | آرش | Arash
@@ -1095,38 +1095,38 @@ f.chats.48 | کانال‌ها | Channels
 f.chats.49 | شهر فنویک | Fenwick city
 f.chats.50 | 1,240 آنلاین | 1,240 online
 f.chats.51 | شیرهای البرز | Alborz Lions
-f.chats.52 | جناح  ·  38 عضو | Faction  ·  38 members
+f.chats.52 | جناح  –  38 عضو | Faction  ·  38 members
 f.chats.53 | کلاس اقتصاد | Economics class
 f.chats.54 | همکلاسی‌ها | Classmates
 f.chats.55 | پیام‌های خصوصی | Private messages
-f.chats.56 | آنلاین  ·  در مرکز شهر | Online  ·  in the city centre
+f.chats.56 | آنلاین  –  در مرکز شهر | Online  ·  in the city centre
 f.chats.57 | صمیمیت | Closeness
 f.chats.58 | صمیمی | Close
 f.chats.59 | سلام! امروز کلاس اقتصاد خیلی خوب بود | Hi! Economics class was great today
 f.chats.60 | آره، مخصوصاً بحث بورس. سهم آراز رو خریدی؟ | Yes, especially the stock market part. Did you buy Araz shares?
 f.chats.61 | هنوز نه، منتظرم عرضه‌ی اولیه تموم بشه | Not yet, waiting for the IPO to finish
-f.chats.62 | آرش یک شاخه گل رز فرستاد  ·  صمیمیت +3 | Arash sent a rose  ·  Closeness +3
+f.chats.62 | آرش یک شاخه گل رز فرستاد  –  صمیمیت +3 | Arash sent a rose  ·  Closeness +3
 f.chats.63 | دعوت به قرار | Date invitation
-f.chats.64 | رستوران · امشب 20:00 · صمیمیت +12 | Restaurant · tonight 20:00 · Closeness +12
+f.chats.64 | رستوران – امشب 20:00 – صمیمیت +12 | Restaurant · tonight 20:00 · Closeness +12
 f.chats.65 | پیام بنویسید… | Write a message…
 f.combat.66 | قدرت | Strength
 f.combat.67 | سرعت | Speed
 f.combat.68 | دفاع | Defence
 f.combat.69 | چالاکی | Agility
 f.combat.70 | باشگاه آهنین | Iron Gym
-f.combat.71 | رده 3 از 8  ·  هر تمرین 20% بیشتر | Tier 3 of 8  ·  each session 20% more
+f.combat.71 | رده 3 از 8  –  هر تمرین 20% بیشتر | Tier 3 of 8  ·  each session 20% more
 f.combat.72 | قدرت نبرد | Combat power
 f.combat.73 | انرژی | Energy
 f.combat.74 | 85 از 100 | 85 of 100
 f.combat.75 | +12 در هر تمرین | +12 per session
-f.combat.76 | تمرین · 5 انرژی | Train · 5 energy
+f.combat.76 | تمرین – 5 انرژی | Train · 5 energy
 f.combat.77 | شادی تو 78 است: هرچه شادتر باشی تمرین اثر بیشتری دارد. خواب و غذا را فراموش نکن. | Your happiness is 78: the happier you are, the more training helps. Do not forget sleep and food.
 f.combat.78 | بردیا  در برابر  سارا | Bardia  vs  Sara
-f.combat.79 | سطح 12  ·  مرکز شهر | Level 12  ·  city centre
+f.combat.79 | سطح 12  –  مرکز شهر | Level 12  ·  city centre
 f.combat.80 | جایزه روی سرش: 5,000 ساپ | Bounty on his head: 5,000 SUP
 f.combat.81 | تجهیزات | Gear
 f.combat.82 | تفنگ شکاری | Hunting rifle
-f.combat.83 | آسیب 62  ·  دقت 70% | Damage 62  ·  Accuracy 70%
+f.combat.83 | آسیب 62  –  دقت 70% | Damage 62  ·  Accuracy 70%
 f.combat.84 | چاقوی ضامن‌دار | Switchblade
 f.combat.85 | آسیب 28 | Damage 28
 f.combat.86 | جلیقه‌ی ضدگلوله | Bulletproof vest
@@ -1170,15 +1170,15 @@ f.combat.123 | در سفر | Travelling
 f.combat.124 | تحت تعقیب | Wanted
 f.combat.125 | هر کس هدف را به بیمارستان بفرستد جایزه را می‌برد | Whoever sends the target to hospital takes the bounty
 f.combat.126 | + گذاشتن جایزه | + Place a bounty
-f.combat.127 | · سطح | · level
+f.combat.127 | – سطح | · level
 f.combat.128 | ساپ | SUP
 f.combat.129 | از طرف: | From:
-f.dating.130 | سطح 9  ·  مهندس ارشد | Level 9  ·  Senior engineer
+f.dating.130 | سطح 9  –  مهندس ارشد | Level 9  ·  Senior engineer
 f.dating.131 | هم‌کلاس اقتصاد | Economics classmate
-f.dating.132 | سطح 6  ·  پرستار | Level 6  ·  Nurse
+f.dating.132 | سطح 6  –  پرستار | Level 6  ·  Nurse
 f.dating.133 | هم‌جناح | Same faction
-f.dating.134 | سطح 12  ·  وکیل | Level 12  ·  Lawyer
-f.dating.135 | سطح 4  ·  دانشجو | Level 4  ·  Student
+f.dating.134 | سطح 12  –  وکیل | Level 12  ·  Lawyer
+f.dating.135 | سطح 4  –  دانشجو | Level 4  ·  Student
 f.dating.136 | تازه‌وارد | Newcomer
 f.dating.137 | آشنایی | Meet
 f.dating.138 | فقط کسانی که این را روشن کرده‌اند دیده می‌شوند | Only people who turned this on are shown
@@ -1188,7 +1188,7 @@ f.dating.141 | سلام امروز: 3 از 5 | Hellos today: 3 of 5
 f.dating.142 | این‌جا | Here
 f.dating.143 | منتظر پاسخ | Waiting for a reply
 f.dating.144 | سلام بده | Say hello
-f.dating.145 | 12 روز آشنایی  ·  از کلاس اقتصاد | 12 days acquainted  ·  from economics class
+f.dating.145 | 12 روز آشنایی  –  از کلاس اقتصاد | 12 days acquainted  ·  from economics class
 f.dating.146 | تا «دلداده»: 64% | To "Sweetheart": 64%
 f.dating.147 | پیام | Messages
 f.dating.148 | هدیه | Gifts
@@ -1203,19 +1203,19 @@ f.dating.156 | هر دو در فنویک هستید | You are both in Fenwick
 f.dating.157 | وضعیت رابطه | Relationship status
 f.dating.158 | کجا؟ | Where?
 f.dating.159 | کافه | Cafe
-f.dating.160 | 200 ساپ  ·  1 انرژی  ·  صمیمیت +6 | 200 SUP  ·  1 energy  ·  Closeness +6
+f.dating.160 | 200 ساپ  –  1 انرژی  –  صمیمیت +6 | 200 SUP  ·  1 energy  ·  Closeness +6
 f.dating.161 | رستوران | Restaurant
-f.dating.162 | 800 ساپ  ·  1 انرژی  ·  صمیمیت +12 | 800 SUP  ·  1 energy  ·  Closeness +12
+f.dating.162 | 800 ساپ  –  1 انرژی  –  صمیمیت +12 | 800 SUP  ·  1 energy  ·  Closeness +12
 f.dating.163 | سینما | Cinema
-f.dating.164 | 400 ساپ  ·  2 انرژی  ·  صمیمیت +9 | 400 SUP  ·  2 energy  ·  Closeness +9
+f.dating.164 | 400 ساپ  –  2 انرژی  –  صمیمیت +9 | 400 SUP  ·  2 energy  ·  Closeness +9
 f.dating.165 | پارک | Park
-f.dating.166 | رایگان  ·  2 انرژی  ·  صمیمیت +4 | Free  ·  2 energy  ·  Closeness +4
+f.dating.166 | رایگان  –  2 انرژی  –  صمیمیت +4 | Free  ·  2 energy  ·  Closeness +4
 f.dating.167 | کی؟ | When?
 f.dating.168 | الان | Now
 f.dating.169 | امشب 20:00 | Tonight 20:00
 f.dating.170 | فردا | Tomorrow
-f.dating.171 | آرش باید دعوت را بپذیرد · هزینه با دعوت‌کننده · روزی یک قرار | Arash must accept · the inviter pays · one date a day
-f.dating.172 | فرستادن دعوت · 800 ساپ | Send invitation · 800 SUP
+f.dating.171 | آرش باید دعوت را بپذیرد – هزینه با دعوت‌کننده – روزی یک قرار | Arash must accept · the inviter pays · one date a day
+f.dating.172 | فرستادن دعوت – 800 ساپ | Send invitation · 800 SUP
 f.family.173 | نیلا | Nila
 f.family.174 | کلاس سوم | Third grade
 f.family.175 | کیان | Kian
@@ -1223,35 +1223,35 @@ f.family.176 | نیازمند مراقبت | Needs care
 f.family.177 | نوزاد | Baby
 f.family.178 | 12 روزه | 12 days old
 f.family.179 | خانواده | Family
-f.family.180 | سارا و آرش  ·  متأهل از 42 روز پیش | Sara and Arash  ·  married for 42 days
+f.family.180 | سارا و آرش  –  متأهل از 42 روز پیش | Sara and Arash  ·  married for 42 days
 f.family.181 | +10% شادی | +10% happiness
 f.family.182 | خانه‌ی مشترک | Shared home
 f.family.183 | حساب مشترک 24,000 | Joint account 24,000
 f.family.184 | قرار عاشقانه | Romantic date
 f.family.185 | حساب مشترک | Joint account
 f.family.186 | خانه | Home
-f.family.187 | فرزندان  ·  ظرفیت خانه: 3 از 4 | Children  ·  home capacity: 3 of 4
+f.family.187 | فرزندان  –  ظرفیت خانه: 3 از 4 | Children  ·  home capacity: 3 of 4
 f.family.188 | {p0} سال | {p0} years
 f.family.189 | بچه‌دار شدن | Have a child
 f.family.190 | طلاق | Divorce
 f.family.191 | خواستگاری از آرش | Propose to Arash
-f.family.192 | سطح 9  ·  مهندس ارشد  ·  فنویک | Level 9  ·  Senior engineer  ·  Fenwick
+f.family.192 | سطح 9  –  مهندس ارشد  –  فنویک | Level 9  ·  Senior engineer  ·  Fenwick
 f.family.193 | وضعیت | Status
 f.family.194 | مجرد | Single
-f.family.195 | آشنایی: 12 روز · 34 پیام · 2 قرار | Acquainted: 12 days · 34 messages · 2 dates
+f.family.195 | آشنایی: 12 روز – 34 پیام – 2 قرار | Acquainted: 12 days · 34 messages · 2 dates
 f.family.196 | انگشتر | Ring
 f.family.197 | نقره | Silver
-f.family.198 | 500 ساپ  ·  +5 صمیمیت | 500 SUP  ·  +5 closeness
+f.family.198 | 500 ساپ  –  +5 صمیمیت | 500 SUP  ·  +5 closeness
 f.family.199 | طلا | Gold
-f.family.200 | 2,500 ساپ  ·  +15 صمیمیت | 2,500 SUP  ·  +15 closeness
+f.family.200 | 2,500 ساپ  –  +15 صمیمیت | 2,500 SUP  ·  +15 closeness
 f.family.201 | الماس | Diamond
-f.family.202 | 12,000 ساپ  ·  +40 صمیمیت | 12,000 SUP  ·  +40 closeness
+f.family.202 | 12,000 ساپ  –  +40 صمیمیت | 12,000 SUP  ·  +40 closeness
 f.family.203 | مهریه | Dowry
 f.family.204 | 1,000 ساپ | 1,000 SUP
 f.family.205 | اگر همسر در طلاق بخواهد، پرداخت می‌شود | Paid if the spouse asks for a divorce
 f.family.206 | «از روزی که در بازار آزور دیدمت، هر روزم بهتر شده. با من ازدواج می‌کنی؟» | "Every day has been better since I met you at the Azure bazaar. Will you marry me?"
-f.family.207 | خواستگاری · 2,500 ساپ | Propose · 2,500 SUP
-f.family.208 | 9 سال  ·  فرزند سارا و آرش | 9 years  ·  child of Sara and Arash
+f.family.207 | خواستگاری – 2,500 ساپ | Propose · 2,500 SUP
+f.family.208 | 9 سال  –  فرزند سارا و آرش | 9 years  ·  child of Sara and Arash
 f.family.209 | تولد بعدی | Next birthday
 f.family.210 | 4 روز | 4 days
 f.family.211 | وارث اول | First heir
@@ -1261,17 +1261,17 @@ f.family.214 | شادی | Happiness
 f.family.215 | آموزش | Education
 f.family.216 | کارها | Activities
 f.family.217 | مدرسه | School
-f.family.218 | هر روز  ·  120 ساپ  ·  آموزش + | Daily  ·  120 SUP  ·  Education +
+f.family.218 | هر روز  –  120 ساپ  –  آموزش + | Daily  ·  120 SUP  ·  Education +
 f.family.219 | ثبت‌نام شده | Enrolled
 f.family.220 | بازی در پارک | Play in the park
-f.family.221 | شادی +15  ·  1 انرژی | Happiness +15  ·  1 energy
+f.family.221 | شادی +15  –  1 انرژی | Happiness +15  ·  1 energy
 f.family.222 | کلاس زبان | Language class
-f.family.223 | آموزش +10  ·  300 ساپ | Education +10  ·  300 SUP
+f.family.223 | آموزش +10  –  300 ساپ | Education +10  ·  300 SUP
 f.family.224 | جدایی از آرش | Separating from Arash
-f.family.225 | 42 روز ازدواج  ·  صمیمیت 18% | 42 days married  ·  closeness 18%
+f.family.225 | 42 روز ازدواج  –  صمیمیت 18% | 42 days married  ·  closeness 18%
 f.family.226 | پس از درخواست، 3 روز مهلت آشتی هست. اگر هیچ‌کدام پس نگیرید، طلاق ثبت می‌شود. | After the request there are 3 days to reconcile. If neither of you withdraws, the divorce is recorded.
 f.family.227 | تقسیم دارایی | Splitting assets
-f.family.228 | 24,000 ساپ  ·  نصف به نصف | 24,000 SUP  ·  half and half
+f.family.228 | 24,000 ساپ  –  نصف به نصف | 24,000 SUP  ·  half and half
 f.family.229 | خانه‌ی خانوادگی | Family home
 f.family.230 | ارزش 180,000 ساپ | Worth 180,000 SUP
 f.family.231 | به سارا | To Sara
@@ -1336,33 +1336,33 @@ f.theme.289 | نامزد | Fiance
 f.theme.290 | همسر | Spouse
 f.misc.291 | زمین‌های شهر هنوز خرید و فروش نمی‌شوند. | City land cannot be bought or sold yet.
 f.misc.292 | محله‌ی باغ‌ها | Gardens district
-f.misc.293 | مسکونی  ·  20 قطعه | Residential  ·  20 plots
+f.misc.293 | مسکونی  –  20 قطعه | Residential  ·  20 plots
 f.misc.294 | مال من | Mine
 f.misc.295 | فروشی | For sale
 f.misc.296 | دیگران | Others
 f.misc.297 | فضای سبز | Green space
 f.misc.298 | قطعه‌ی V-15 | Plot V-15
-f.misc.299 | 600 متر  ·  کاربری مسکونی  ·  نبش | 600 m²  ·  residential  ·  corner
-f.misc.300 | همسایه‌ها: آرش و مهتاب · نزدیک پارک · مالیات سالانه 1% | Neighbours: Arash and Mahtab · near the park · annual tax 1%
+f.misc.299 | 600 متر  –  کاربری مسکونی  –  نبش | 600 m²  ·  residential  ·  corner
+f.misc.300 | همسایه‌ها: آرش و مهتاب – نزدیک پارک – مالیات سالانه 1% | Neighbours: Arash and Mahtab · near the park · annual tax 1%
 f.misc.301 | چه می‌توان ساخت؟ | What can be built?
-f.misc.302 | 60,000  ·  4 روز | 60,000  ·  4 days
-f.misc.303 | 140,000  ·  7 روز | 140,000  ·  7 days
+f.misc.302 | 60,000  –  4 روز | 60,000  ·  4 days
+f.misc.303 | 140,000  –  7 روز | 140,000  ·  7 days
 f.misc.304 | ویلا با استخر | Villa with pool
-f.misc.305 | 320,000  ·  12 روز | 320,000  ·  12 days
+f.misc.305 | 320,000  –  12 روز | 320,000  ·  12 days
 f.misc.306 | خرید زمین | Buy the plot
 f.misc.307 | پیشنهاد قیمت | Offer a price
 f.misc.308 | وصیت‌نامه‌ی سارا | Sara's will
-f.misc.309 | ثبت‌شده در محضر فنویک · آخرین تغییر: 3 روز پیش · وصی: آرش | Registered at the Fenwick notary · last changed 3 days ago · executor: Arash
-f.misc.310 | دارایی‌ها  ·  حدود 412,000 ساپ | Assets  ·  about 412,000 SUP
+f.misc.309 | ثبت‌شده در محضر فنویک – آخرین تغییر: 3 روز پیش – وصی: آرش | Registered at the Fenwick notary · last changed 3 days ago · executor: Arash
+f.misc.310 | دارایی‌ها  –  حدود 412,000 ساپ | Assets  ·  about 412,000 SUP
 f.misc.311 | نقد و بانک | Cash and bank
 f.misc.312 | نیمی از خانه‌ی خانوادگی | Half of the family home
 f.misc.313 | 1,200 سهم صنایع آراز | 1,200 Araz Industries shares
-f.misc.314 | کافه‌ی سارا  ·  100% | Sara's cafe  ·  100%
-f.misc.315 | وارث‌ها  ·  جمع 100% | Heirs  ·  total 100%
-f.misc.316 | 9 سال  ·  تا 18 سالگی نزد قیم | 9 years  ·  with a guardian until 18
-f.misc.317 | 3 سال  ·  تا 18 سالگی نزد قیم | 3 years  ·  with a guardian until 18
-f.misc.318 | 12 روزه  ·  تا 18 سالگی نزد قیم | 12 days old  ·  with a guardian until 18
-f.misc.319 | ثبت در محضر · 500 ساپ | Register at the notary · 500 SUP
+f.misc.314 | کافه‌ی سارا  –  100% | Sara's cafe  ·  100%
+f.misc.315 | وارث‌ها  –  جمع 100% | Heirs  ·  total 100%
+f.misc.316 | 9 سال  –  تا 18 سالگی نزد قیم | 9 years  ·  with a guardian until 18
+f.misc.317 | 3 سال  –  تا 18 سالگی نزد قیم | 3 years  ·  with a guardian until 18
+f.misc.318 | 12 روزه  –  تا 18 سالگی نزد قیم | 12 days old  ·  with a guardian until 18
+f.misc.319 | ثبت در محضر – 500 ساپ | Register at the notary · 500 SUP
 f.misc.320 | ظاهر فقط زیبایی است؛ قدرتی نمی‌دهد. | Looks are cosmetic only; they give no power.
 f.misc.321 | «سلطان بازار» | "Bazaar Sultan"
 f.misc.322 | قاب | Frame
@@ -1383,7 +1383,7 @@ f.misc.336 | بهار آمد! | Spring is here!
 f.misc.337 | 12 روز تا پایان جشن | 12 days until the festival ends
 f.misc.338 | دارایی جشن | Festival wealth
 f.misc.339 | 340 سکه‌ی بهار | 340 spring coins
-f.misc.340 | مسیر جایزه  ·  مرحله 4 | Reward track  ·  step 4
+f.misc.340 | مسیر جایزه  –  مرحله 4 | Reward track  ·  step 4
 f.misc.341 | پاس ویژه ⭐ 150 | Special pass ⭐ 150
 f.misc.342 | مرحله | Step
 f.misc.343 | کارهای جشن | Festival tasks
@@ -1430,9 +1430,9 @@ f.onboarding.383 | روز بعد تا | Next day in
 f.onboarding.384 | روز {p0} | Day {p0}
 f.onboarding.385 | گرفتن جایزه‌ی روز 5 | Claim the day 5 reward
 f.onboarding.386 | کارهای امروز | Today's tasks
-f.onboarding.387 | بگیر  ·  {p0} | Claim  ·  {p0}
+f.onboarding.387 | بگیر  –  {p0} | Claim  ·  {p0}
 f.press.388 | فنویک امروز | Fenwick Today
-f.press.389 | یکشنبه 12 مهر · شماره‌ی 214 · روز 3 جنگ | Sunday 12 Mehr · issue 214 · day 3 of the war
+f.press.389 | یکشنبه 12 مهر – شماره‌ی 214 – روز 3 جنگ | Sunday 12 Mehr · issue 214 · day 3 of the war
 f.press.390 | همه | All
 f.press.391 | سیاست | Politics
 f.press.392 | اقتصاد | Economy
@@ -1458,9 +1458,9 @@ f.press.411 | لقب «سفیر» | "Ambassador" title
 f.press.412 | دوستانت را بیاور | Bring your friends
 f.press.413 | وقتی دوستت به سطح 5 برسد، هر دو جایزه می‌گیرید. | When your friend reaches level 5, you both get a reward.
 f.press.414 | اشتراک در تلگرام | Share on Telegram
-f.press.415 | جایزه‌های دعوت  ·  4 نفر | Invite rewards  ·  4 people
+f.press.415 | جایزه‌های دعوت  –  4 نفر | Invite rewards  ·  4 people
 f.press.416 | دعوت‌شده‌ها | Invited
-f.press.417 | به سطح 5 رسید  ·  جایزه گرفتید | Reached level 5  ·  you got the reward
+f.press.417 | به سطح 5 رسید  –  جایزه گرفتید | Reached level 5  ·  you got the reward
 f.press.418 | سینا | Sina
 f.press.419 | سطح 3 از 5 | Level 3 of 5
 f.press.420 | دنیا | Donya
@@ -1481,7 +1481,7 @@ f.social.434 | بازیکنی با این مشخصات پیدا نشد. | No pla
 f.social.435 | کد: {p0} | Code: {p0}
 f.social.436 | این خودت هستی | This is you
 inventory.all | همه | All
-inventory.total | {n} قلم کالا · {m} عدد | {n} kinds of goods · {m} items
+inventory.total | {n} قلم کالا – {m} عدد | {n} kinds of goods · {m} items
 inventory.cat.food | خوراکی | Food
 inventory.cat.medicine | دارو | Medicine
 inventory.cat.gear | ابزار | Gear
@@ -1494,8 +1494,8 @@ inventory.cat.other | سایر | Other
 bank.deposit_tab | واریز | Deposit
 bank.withdraw_tab | برداشت | Withdraw
 bank.all | همه | All
-bank.after_deposit | نقد تو {cash} · بعد از واریز: {a} نقد، {b} در بانک | Cash {cash} · after depositing: {a} cash, {b} in the bank
-bank.after_withdraw | نقد تو {cash} · بعد از برداشت: {a} نقد، {b} در بانک | Cash {cash} · after withdrawing: {a} cash, {b} in the bank
+bank.after_deposit | نقد تو {cash} – بعد از واریز: {a} نقد، {b} در بانک | Cash {cash} · after depositing: {a} cash, {b} in the bank
+bank.after_withdraw | نقد تو {cash} – بعد از برداشت: {a} نقد، {b} در بانک | Cash {cash} · after withdrawing: {a} cash, {b} in the bank
 bank.no_fee | بدون کارمزد | No fee
 bank.fee_pct | کارمزد {p} | Fee {p}
 bank.submit_deposit | واریز {n} | Deposit {n}
@@ -1703,7 +1703,7 @@ toast.unnamed | یک مورد | An item
 # -- the labour market (hiring board, construction sites) ---------------------
 labor.board.title | تابلوی استخدام | Hiring board
 labor.board.empty | فعلاً آگهی استخدامی نیست. هر ساختمانِ در حال ساخت برای کارگر آگهی می‌دهد. | No jobs are posted right now. Every building going up posts one.
-labor.board.sites | کارگاه‌های بدون آگهی | Sites with no job posted
+labor.board.sites | کارگاه‌های بدون آگهی استخدام | Workplaces with no job posted
 labor.open_board | تابلوی استخدام | Hiring board
 labor.site.title | کارگاه ساخت | Building site
 labor.mine.title | کار من | My work
@@ -1728,14 +1728,14 @@ labor.employer.player | {name} | {name}
 labor.per_shift | {w} / شیفت | {w} / shift
 labor.wage_per_shift | دستمزد هر شیفت: {w} | Wage per shift: {w}
 labor.shifts_left | {n} شیفت باقی | {n} shifts left
-labor.job.site | قطعهٔ {x} و {y} · {p}٪ ساخته شده | Lot {x}, {y} · {p}% built
-labor.left_hours | {left} نفر-ساعت مانده · {n} کارگر مشغول | {left} worker-hours left · {n} working
+labor.job.site | قطعهٔ {x} و {y} – {p}٪ ساخته شده | Lot {x}, {y} · {p}% built
+labor.left_hours | {left} نفر-ساعت مانده – {n} کارگر مشغول | {left} worker-hours left · {n} working
 labor.progress | {p}٪ ساخته شده | {p}% built
-labor.hours | {done} از {total} نفر-ساعت انجام شده · {left} مانده | {done} of {total} worker-hours done · {left} left
+labor.hours | {done} از {total} نفر-ساعت انجام شده – {left} مانده | {done} of {total} worker-hours done · {left} left
 labor.work | کار کن (+{w}) | Work (+{w})
 labor.cannot_work | الان نمی‌توانید روی این کارگاه کار کنید: کارگر کافی مشغول است یا شیفتی دارید. | You cannot work here now: enough workers are on it, or you already have a shift.
 labor.points | این شیفت {m} نفر-دقیقه به ساختمان اضافه می‌کند. | This shift adds {m} worker-minutes to the building.
-labor.working | شیفت شما در جریان است · {t} مانده | Your shift is running · {t} left
+labor.working | شیفت شما در جریان است – {t} مانده | Your shift is running · {t} left
 labor.finishing | در حال پایان | Finishing
 labor.done | این ساختمان ساخته شده است. | This building is built.
 labor.workers | کارگران روی کارگاه | Workers on site
@@ -1748,7 +1748,7 @@ labor.crew | {n} کارگر روزمزد سر کار نگه داشته می‌ش
 labor.no_job | برای این کارگاه آگهی استخدامی نیست. | There is no job posted for this site.
 labor.post | ثبت آگهی استخدام | Post a job
 labor.hire | استخدام کارگر | Hire workers
-labor.hire_hint | کارگر آزاد: {a} · مزد هر شیفت: {w} | Free labourers: {a} · wage per shift: {w}
+labor.hire_hint | کارگر آزاد: {a} – مزد هر شیفت: {w} | Free labourers: {a} · wage per shift: {w}
 labor.hire_n | {n} کارگر | Hire {n}
 labor.hire_none | مرخص کردن کارگرها | Release the crew
 labor.wage_set | دستمزد بازیکن‌ها | Wage for players
@@ -1852,11 +1852,11 @@ vx.terms.note | همهٔ این پول‌ها به خزانهٔ شهر می‌ر
 vx.work.title | کار در «{village}» | Work in {village}
 vx.work.started | شیفتت شروع شد. وقتی تمام شود، دستمزدت را می‌گیری. | Your shift has started. You are paid when it ends.
 vx.work.mine | شیفت تو در «{building}» | Your shift at {building}
-vx.work.mine_sub | {t} مانده · دستمزد {wage} | {t} left · wage {wage}
+vx.work.mine_sub | {t} مانده – دستمزد {wage} | {t} left · wage {wage}
 vx.work.not_resident | فقط ساکنان شهر کار می‌کنند؛ اول ساکن شهر شو. | Only residents work here; live in the city first.
 vx.work.none | هنوز کارگاهی ساخته نشده. | No workshop has been built yet.
 vx.work.suggest | برای شروع یکی از این‌ها را بساز: {names}. | To start, build one of these: {names}.
-vx.work.place_sub | هر شیفت {shift} · دستمزد {wage} | {shift} a shift · wage {wage}
+vx.work.place_sub | هر شیفت {shift} – دستمزد {wage} | {shift} a shift · wage {wage}
 vx.work.busy | {busy} از {total} جا پر است | {busy} of {total} places taken
 vx.work.uses | مصرف: {list} | Uses: {list}
 vx.work.makes | تولید: {list} | Makes: {list}
@@ -1870,7 +1870,7 @@ vx.build.empty | فعلاً ساختمانی برای ساختن باز نشده
 vx.build.short | در انبار شهر کم است: {list} | Short in the city store: {list}
 vx.build.roads | جاده‌ای که خودکار کشیده می‌شود | Road laid along with it
 vx.build.from_stock | مصالح از انبار شهر برداشته می‌شود. | The materials are taken from the city store.
-vx.build.yes | بله، بساز · {p} | Yes, build it · {p}
+vx.build.yes | بله، بساز – {p} | Yes, build it · {p}
 vx.batch.count | {n} قطعه را یک‌جا می‌سازی. | You are building on {n} lots at once.
 vx.lots.pick | روی قطعه‌ای بزن که می‌خواهی آنجا ساخته شود. | Tap the lot where you want it built.
 vx.lots.line_from | اول قطعهٔ شروعِ ردیف را بزن. | First tap the lot where the row starts.
@@ -2232,8 +2232,8 @@ soc.phase.counting | در انتظار شمارش | Awaiting the count
 soc.phase.counted | پایان‌یافته | Finished
 soc.election.winner | برگزیده: {names} | Elected: {names}
 soc.election.unfilled | کسی برگزیده نشد | Nobody was elected
-soc.election.line.candidacy | ثبت‌نام باز است، {remaining} مانده · {count} نامزد | Registration open, {remaining} left · {count} candidates
-soc.election.line.voting | رأی‌گیری، {remaining} مانده · {count} نامزد | Voting, {remaining} left · {count} candidates
+soc.election.line.candidacy | ثبت‌نام باز است، {remaining} مانده – {count} نامزد | Registration open, {remaining} left · {count} candidates
+soc.election.line.voting | رأی‌گیری، {remaining} مانده – {count} نامزد | Voting, {remaining} left · {count} candidates
 soc.election.line.counting | در انتظار شمارش آرا | Waiting for the count
 soc.election.seats | کرسی‌ها | Seats
 soc.election.phase | مرحله | Stage
@@ -2249,7 +2249,7 @@ soc.election.votes | {n} رأی | {n} votes
 soc.election.vote_for | رأی به {player} | Vote for {player}
 soc.election.you_stand | تو نامزد این انتخابات هستی. | You are a candidate in this election.
 soc.election.stand_how | برای نامزد شدن باید ودیعهٔ {deposit} را بپردازی. | To stand you pay a deposit of {deposit}.
-soc.election.balances | نقد: {cash} · کارت: {bank} | Cash: {cash} · Card: {bank}
+soc.election.balances | نقد: {cash} – کارت: {bank} | Cash: {cash} · Card: {bank}
 soc.election.cannot_afford | پولت برای ودیعه کافی نیست. | You cannot afford the deposit.
 soc.election.pay.cash | ثبت‌نام با پول نقد ({amount}) | Register with cash ({amount})
 soc.election.pay.card | ثبت‌نام با کارت ({amount}) | Register with your card ({amount})
@@ -2309,7 +2309,7 @@ soc.faction.fee | هزینهٔ ثبت | Registration fee
 soc.faction.name_rule | نام جناح | Faction name
 soc.faction.name_range | {min} تا {max} حرف | {min} to {max} letters
 soc.faction.found_rules | نام باید با حرف یا عدد شروع شود و نام نهادهای شهر را نداشته باشد. | The name must start with a letter or digit and must not copy the name of a city institution.
-soc.faction.balances | نقد: {cash} · کارت: {bank} | Cash: {cash} · Card: {bank}
+soc.faction.balances | نقد: {cash} – کارت: {bank} | Cash: {cash} · Card: {bank}
 soc.faction.found_how | روش پرداخت را انتخاب کن، بعد نام جناح را بنویس. | Pick how to pay, then type the faction's name.
 soc.faction.cannot_afford | پولت برای ثبت کافی نیست. | You cannot afford the fee.
 soc.faction.pay.cash | پرداخت نقد ({amount}) | Pay in cash ({amount})
@@ -2373,7 +2373,7 @@ soc.faction.bank.rules | واریز با اعضایی است که رتبه‌ش�
 soc.faction.crime_title | کار گروهی {faction} | Group jobs of {faction}
 soc.faction.crime_none | کاری در جریان نیست. کارهای ممکن: | No job is under way. Possible jobs:
 soc.faction.crime_crew | {min} تا {max} نفر | {min} to {max} people
-soc.faction.crime_line | هر نفر {nerve} جسارت · حداقل سطح {level} · {duration} | {nerve} nerve each · level {level}+ · {duration}
+soc.faction.crime_line | هر نفر {nerve} جسارت – حداقل سطح {level} – {duration} | {nerve} nerve each · level {level}+ · {duration}
 soc.faction.crime_rules | کسی که نقشه می‌کشد باید همان‌جایی باشد که کار انجام می‌شود؛ اعضا هم همان‌جا به گروه می‌پیوندند. سهم صندوق جناح {cut} است و باقی به نسبت رتبه تقسیم می‌شود. اگر پلیس برسد، همهٔ گروه زندانی و جریمه می‌شوند. | Whoever plans must be where the job happens, and members join there. The faction bank takes {cut} and the rest is split by rank. If the police arrive, the whole crew is jailed and fined.
 soc.faction.crime_notice.planned | نقشه کشیده شد. اعضا باید همان‌جا جمع شوند و به گروه بپیوندند. | The plan is made. Members must gather there and join.
 soc.faction.crime_notice.joined | به گروه پیوستی؛ تا شروع کار همین‌جا بمان. | You joined the crew; stay here until the job starts.
@@ -2507,9 +2507,9 @@ soc.law.rule.unanimous | همهٔ اعضا موافق باشند | Everyone in f
 soc.law.fraction | {num} از {den} | {num}/{den}
 soc.law.quorum | حد نصاب | Quorum
 soc.law.status | وضع | Status
-soc.law.status.open | در رأی‌گیری؛ {remaining} مانده · {yes} موافق، {no} مخالف | Voting; {remaining} left · {yes} for, {no} against
-soc.law.status.passed | تصویب شد · {yes} موافق، {no} مخالف | Passed · {yes} for, {no} against
-soc.law.status.failed | رد شد · {yes} موافق، {no} مخالف | Rejected · {yes} for, {no} against
+soc.law.status.open | در رأی‌گیری؛ {remaining} مانده – {yes} موافق، {no} مخالف | Voting; {remaining} left · {yes} for, {no} against
+soc.law.status.passed | تصویب شد – {yes} موافق، {no} مخالف | Passed · {yes} for, {no} against
+soc.law.status.failed | رد شد – {yes} موافق، {no} مخالف | Rejected · {yes} for, {no} against
 soc.law.status.lapsed | تصویب شد اما اجرا نشد: {why} | Passed but not applied: {why}
 soc.law.lapse.cooldown | این سیاست در این فاصله تغییر کرده بود | the policy had changed in the meantime
 soc.law.lapse.bounds | مرزهای مجاز این سیاست عوض شده بود | the allowed bounds had changed
@@ -2582,8 +2582,8 @@ lf.arrives_at | ساعت رسیدن | Arrival
 lf.page | صفحهٔ {page} از {pages} | Page {page} of {pages}
 lf.pay.cash | پرداخت نقدی | Pay with cash
 lf.pay.card | پرداخت با کارت | Pay by card
-lf.pay.balances | نقد: {cash} · بانک: {bank} | Cash: {cash} · Bank: {bank}
-lf.pay.cannot | پولت کافی نیست. نقد: {cash} · بانک: {bank} | You cannot afford it. Cash: {cash} · Bank: {bank}
+lf.pay.balances | نقد: {cash} – بانک: {bank} | Cash: {cash} · Bank: {bank}
+lf.pay.cannot | پولت کافی نیست. نقد: {cash} – بانک: {bank} | You cannot afford it. Cash: {cash} · Bank: {bank}
 lf.map.departures | از اینجا با {modes} می‌شود رفت | You can leave from here by {modes}
 lf.map.shops_at | مغازه‌های {place} | Shops at {place}
 lf.map.you_here | اینجا هستی | You are here
@@ -2795,7 +2795,7 @@ lf.property.rent | اجاره هر دوره | Rent per period
 lf.property.value | ارزش | Value
 lf.property.city | شهر | City
 lf.property.where_label | جا | Place
-lf.property.type_title | {type} · {city} | {type} · {city}
+lf.property.type_title | {type} – {city} | {type} · {city}
 lf.property.offer_title | ملک #{no}، {type} | Property #{no}, {type}
 lf.property.mine_title | ملک #{no}، {type} | Property #{no}, {type}
 lf.property.where | در {place} | At {place}
@@ -3205,7 +3205,7 @@ work.next.join | اول باید به این شهر نقل‌مکان کنی. | 
 work.career | شغل من | My career
 work.not_here | برای شروع باید همین‌جا در شهر باشی. | You have to be in the city to start.
 health.of | {a} از {b} | {a} of {b}
-health.admitted | بستری هستی · {t} تا ترخیص | You are admitted · {t} until discharge
+health.admitted | بستری هستی – {t} تا ترخیص | You are admitted · {t} until discharge
 health.rest | استراحت | Rest
 health.rest_home | استراحت در خانه | Rest at home
 health.rest_wait | {t} دیگر می‌توانی دوباره استراحت کنی. | You can rest again in {t}.
@@ -4002,7 +4002,7 @@ mil.procure.title | خرید تسلیحات | Arms procurement
 mil.procure.title_of | خرید تسلیحات {country} | Arms procurement of {country}
 mil.procure.fund | صندوق دفاع | Defence fund
 mil.procure.hint | کالاهای نظامیِ روی بازار که دولت اجازهٔ خریدشان را دارد. | Military goods on the market that the state may buy.
-mil.procure.offer_sub | {company} · {city} · {left} عدد | {company} · {city} · {left} left
+mil.procure.offer_sub | {company} – {city} – {left} عدد | {company} · {city} · {left} left
 mil.procure.none | الان کالای نظامی برای خرید نیست. | No military goods are for sale right now.
 mil.procure.blocked.export | صادراتش آزاد نیست | Export is not allowed
 mil.procure.blocked.embargo | تحریم تسلیحاتی دارد | Under an arms embargo
@@ -4079,7 +4079,7 @@ mil.war.damaged | {city}: خرابی {band} | {city}: {band} damage
 mil.war.closed_for | تا {in} بسته است | closed for {in}
 mil.war.room_sub | شهرهای دشمن و عملیات‌های در جریان | Enemy cities and the operations under way
 mil.war.declare_sub | اعلان جنگ به یک کشور | Declare war on a country
-mil.op.title | {kind} · {objective} · {city} | {kind} · {objective} · {city}
+mil.op.title | {kind} – {objective} – {city} | {kind} · {objective} · {city}
 mil.op.no | عملیات شمارهٔ {no} | Operation no. {no}
 mil.op.sides | {country} علیه {target} | {country} against {target}
 mil.op.called_off | عملیات لغو شد. | The operation was called off.
@@ -4282,7 +4282,7 @@ education.gap.go | سفر به {place} | Travel to {place}
 education.gap.need.knowledge | با پژوهش «{name}» ممکن می‌شود | Possible once “{name}” is researched
 education.gap.need.building | با ساختن «{name}» ممکن می‌شود | Possible once “{name}” is built
 education.gap.need.teacher | برای درس دادن «{name}» لازم است | “{name}” is needed to teach it
-education.gap.fee | {fee} · {time} | {fee} · {time}
+education.gap.fee | {fee} – {time} | {fee} · {time}
 education.literacy.title | خواندن و نوشتن | Reading and writing
 education.literacy.first | اولین درس همه خواندن و نوشتن است. | Everyone’s first lesson is reading and writing.
 education.literacy.share | {p}% مردم {place} باسوادند | {p}% of the people of {place} can read and write
@@ -4399,7 +4399,7 @@ ac.mission.notice.abandoned | مأموریت «{mission}» را رها کردی.
 ac.mission.paid | پولی که گرفتی | Cash received
 ac.mission.withheld | به‌خاطر سقف دریافت پاداش، {n} از آن داده نشد. | Because of the reward cap, {n} of it was not paid.
 ac.mission.withheld_short | بخشی پرداخت نشد | Part not paid
-ac.mission.recent.completed | «{mission}» انجام شد · {cash} | «{mission}» finished · {cash}
+ac.mission.recent.completed | «{mission}» انجام شد – {cash} | «{mission}» finished · {cash}
 ac.mission.recent.abandoned | «{mission}» رها شد | «{mission}» given up
 ac.mission.recent.expired | مهلت «{mission}» تمام شد | «{mission}» ran out of time
 ac.mission.recent.active | «{mission}» در دست است | «{mission}» is running
@@ -4762,7 +4762,7 @@ city.storage | انبار شهر | City storehouse
 city.affairs | کارهای شهر | City affairs
 city.charter | منشور و منصب‌ها | Charter and offices
 city.roles | ساختمان‌های خدماتی | Service buildings
-city.role.level | {role} · سطح {n} | {role} · level {n}
+city.role.level | {role} – سطح {n} | {role} · level {n}
 city.next.title | قدم‌های بعدی | What comes next
 city.next.none | فعلاً قدم تازه‌ای پیش رویتان نیست. | Nothing new is waiting right now.
 city.dim.people | اهالی | Residents
@@ -4970,7 +4970,7 @@ v6.ring.market | بازار | Market
 hub.storehouse | انبار | Storehouse
 # -- teachers and training (docs/research/2026-10-03-activities-audit.md section 7) --------------------
 hub.training | تمرین | Training
-trip.hint | کرایه {fare} · {wait} راه | Fare {fare} · {wait} away
+trip.hint | کرایه {fare} – {wait} راه | Fare {fare} · {wait} away
 education.gap.need.teacher_post | برای این درس باید معلم استخدام شود یا کسی که مدرکش را دارد درس بدهد | A teacher must be hired, or someone holding its certificate must teach it
 lf.req.course_teacher | برای این درس اینجا هنوز معلمی نیست. | Nobody teaches this course here yet.
 lf.req.not_head | فقط کسی که اجازهٔ استخدام دارد می‌تواند معلم مدرسه بگیرد یا کنار بگذارد. | Only someone who may hire can take on or dismiss a school teacher.
@@ -4979,9 +4979,9 @@ lf.req.already_teaching | برای این درس همین حالا معلمی ه
 lf.req.not_teaching | چنین معلمی در این شهر نیست یا جایگاهش از آنِ شما نیست. | No such teacher here, or the post is not yours.
 lf.req.teacher_full | کلاس این معلم پر شده است. | This teacher's class is full.
 ac.work.course.staff | معلم‌ها | Teachers
-ac.work.teacher.npc | معلم مدرسه · {n} از {max} شاگرد | School teacher · {n} of {max} students
-ac.work.teacher.school | {name}، معلم مدرسه · {n} از {max} شاگرد | {name}, school teacher · {n} of {max} students
-ac.work.teacher.home | {name}، معلم خصوصی · {n} از {max} شاگرد | {name}, private teacher · {n} of {max} students
+ac.work.teacher.npc | معلم مدرسه – {n} از {max} شاگرد | School teacher · {n} of {max} students
+ac.work.teacher.school | {name}، معلم مدرسه – {n} از {max} شاگرد | {name}, school teacher · {n} of {max} students
+ac.work.teacher.home | {name}، معلم خصوصی – {n} از {max} شاگرد | {name}, private teacher · {n} of {max} students
 ac.work.teacher.end | کنار گذاشتن | Stop
 ac.work.teacher.wage | مزد معلم مدرسه برای هر شاگرد: {wage}. | A school teacher is paid {wage} for each student.
 ac.work.teacher.btn_hire | استخدام معلم | Hire a teacher
@@ -5558,7 +5558,7 @@ wm.cluster | چند شهر نزدیک هم؛ برای دیدنشان بزن | Se
 lm.title | مدیریت قطعهٔ من | Manage my lot
 lm.look | ظاهر ساختمان | The building's look
 lm.menu_lead | کدام ساختمانت را مدیریت می‌کنی؟ | Which of your buildings?
-lm.menu_sub | {fn} · سطح {lvl} · {st} طبقه | {fn} · level {lvl} · {st} storeys
+lm.menu_sub | {fn} – سطح {lvl} – {st} طبقه | {fn} · level {lvl} · {st} storeys
 lm.has_order | سفارش دارد | Has an order
 lm.not_built | این ساختمان هنوز ساخته نشده؛ بعد از ساخت می‌توانی آن را مدیریت کنی. | Not built yet; you can manage it once it stands.
 lm.function | کارکرد | Function
@@ -5577,7 +5577,7 @@ lm.tab.look | ظاهر | Look
 lm.tab.state | وضعیت | State
 lm.upgrade | ارتقا به سطح {n} | Raise to level {n}
 lm.change_use | تغییر کاربری | Change of use
-lm.fn_sub | هزینه {cost} · عوارض تغییر {fee} | Cost {cost} · use-change fee {fee}
+lm.fn_sub | هزینه {cost} – عوارض تغییر {fee} | Cost {cost} · use-change fee {fee}
 lm.not_here | اینجا نیست | Not here
 lm.rooms | اتاق‌های ساختمان | Rooms of the building
 lm.slots | {a} از {b} | {a} of {b}
@@ -5751,7 +5751,7 @@ rd.scholar | پژوهشگر | Scholar
 rd.s.player | از اهالی | A resident
 rd.s.npc | پژوهشگر شهر | Town scholar
 rd.seats | {a} از {b} پژوهشگر | {a} of {b} scholars
-rd.b_facts | {slots} جایگاه · دستمزد هر روز {wage} · سرعت {bonus} بیشتر | {slots} slots · wage a day {wage} · pace +{bonus}
+rd.b_facts | {slots} جایگاه – دستمزد هر روز {wage} – سرعت {bonus} بیشتر | {slots} slots · wage a day {wage} · pace +{bonus}
 rd.upkeep | خرج روز | Day's upkeep
 rd.take | پژوهشگر شو | Become a scholar
 rd.leave | ترک | Leave
@@ -5856,7 +5856,7 @@ tr.none_on | هنوز چیزی برای فروش نگذاشته‌ای. | Nothin
 tr.stock | موجودی: {n} | In stock: {n}
 tr.on | برای فروش | On sale
 tr.unit | بازرگان واحدی {p} می‌خرد | The trader pays {p} each
-tr.ref | مرجع {p} · {c} آن | Reference {p} · {c} of it
+tr.ref | مرجع {p} – {c} آن | Reference {p} · {c} of it
 tr.surplus | مازاد {n} واحد | Surplus {n}
 tr.no_surplus | مازادی نیست | No surplus
 tr.keep | نگه‌دار | Keep
@@ -5905,3 +5905,46 @@ rd.upkeep_missing | {item} کم است؛ از بازار بخر یا بساز. |
 rd.fix_buy | بخر | Buy
 rd.fix_build | بساز: {name} | Build: {name}
 common.retry | دوباره تلاش کن | Try again
+vx.pn.until_work | تا {at} همین‌طور می‌توانی کار کنی؛ از آن روز آنچه زیر هر کارگاه نوشته شده را لازم داری. | Until {at} you may work as you are; from then on you need what is listed under each workshop.
+vx.pn.until_research | تا {at} همین‌طور می‌توانی پژوهشگر باشی؛ از آن روز آنچه زیر نوشته شده را لازم داری. | Until {at} you may be a scholar as you are; from then on you need what is listed below.
+vx.pn.lack | برای کار اینجا این‌ها را کم داری: | For work here you still lack:
+vx.pn.lack_research | برای پژوهشگری این‌ها را کم داری: | To be a scholar you still lack:
+vx.pn.level | سطح {need} (سطح تو: {have}) | Level {need} (yours: {have})
+vx.pn.skill | مهارت «{skill}» در سطح {need} (سطح تو: {have}) | {skill} at level {need} (yours: {have})
+vx.pn.certificate | مدرک «{course}» | The {course} certificate
+vx.pn.literacy | خواندن و نوشتن (مدرک کلاس سواد) | Reading and writing (the literacy class certificate)
+vx.pn.rank | درجهٔ «{name}» | The rank {name}
+vx.pn.other | یک شرط دیگر هم هست. | There is one more condition.
+vx.pn.how.train | راهش: آموزش | The way: training
+vx.pn.how.course | راهش: یک دورهٔ آموزشی | The way: a course
+vx.pn.go | آموزش‌ها | Courses
+vx.rf.screen.village_personal | حالا که مهلت تمام شده، برای این کار چیزهایی را کم داری. | The grace is over, and you lack some things for this.
+ac.work.req.until | تا {at} هنوز بدون آن هم می‌شود؛ بعد از آن لازم است. | Until {at} you can still do without it; after that it is needed.
+ac.work.req.nearest | کلاسش اینجا نیست؛ نزدیک‌ترین جا: {city}. | Its class is not held here; the nearest place is {city}.
+lf.req.literacy | خواندن و نوشتن (مدرک کلاس سواد) | Reading and writing (the literacy class certificate)
+lf.req.literacy_met | خواندن و نوشتن را بلدی | You can read and write
+vx.svc.title | خدمات روزانهٔ شهر | The city's daily services
+vx.svc.kind.local_security | نگهبانی و امنیت | Watch and safety
+vx.svc.kind.primary_care | کمک‌های اولیه و مراقبت | First aid and care
+vx.svc.kind.lodging_and_tea | جای خواب و چای | A bed and tea
+vx.svc.open | امروز باز بود | Open today
+vx.svc.closed | امروز بسته است | Closed today
+vx.svc.idle.no_staff | کارگر ندارد؛ جایی برای کار در آن خالی است و کسی آن را پر نکرده. | It has no staff; its posts are empty.
+vx.svc.idle.no_wage | دستمزد کارگرش داده نشد؛ خزانهٔ شهر خالی بود. | Its worker was not paid; the treasury was empty.
+vx.svc.idle.no_supplies | مصالح روزانه‌اش تمام شده؛ چیزهایی که هر روز لازم دارد در انبار نیست. | Its daily supplies ran out; what it needs each day is not in the store.
+vx.svc.grace | تا {at} همین‌طور باز می‌ماند؛ از آن روز هر روز این‌ها را می‌خواهد: {needs}. | It stays open as it is until {at}; from then on it needs this each day: {needs}.
+vx.svc.needs | هر روز این‌ها را می‌خواهد: {needs}. | It needs this each day: {needs}.
+refusal.life_closed | مسافرخانه امروز بسته است؛ کارگر ندارد یا نان، آب و هیزمش تمام شده. | The inn is closed today; it has no staff, or it is out of bread, water or firewood.
+labor.standing | ساخته شده، کسی آنجا کار نمی‌کند. | It is built, and nobody works there.
+labor.workers_prod | کارگران این کارگاه | Workers at this workshop
+labor.workers.none_prod | الان کسی اینجا کار نمی‌کند؛ بدون کارگر چیزی تولید نمی‌شود. | Nobody works here now; nothing is made without workers.
+work.fix.no_staff_here | همین‌جا استخدام کن | Hire here
+work.standing | ساخته شده، کسی آنجا کار نمی‌کند. | It is built, and nobody works there.
+work.post | ثبت آگهی استخدام | Post a job
+work.hire | استخدام گروه کارگر | Hire a crew
+work.wage_set | دستمزد هر شیفت | Wage per shift
+work.wage_pct | {p}٪ | {p}%
+lf.options.licence_soon | سوار {mode} شدن تا {at} هنوز آزاد است؛ از آن روز مدرک «{course}» لازم است. | You may still take the {mode} until {at}; from then on you need the {course} licence.
+lf.options.licence_out | {mode} را نمی‌بینی، چون مدرک «{course}» را نداری. | You do not see the {mode} because you lack the {course} licence.
+lf.options.licence_go | آموزش | Training
+work.knowledge | دانش شهر: {p} تولید بیشتر | City knowledge: {p} more output

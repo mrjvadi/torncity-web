@@ -53,7 +53,7 @@ export default function PlayerCard({ response, loading, onAction, run }: ScreenP
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="display" style={{ fontSize: 18, color: '#fff' }}>{v.name ?? '—'}</div>
             <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-              {[stage, v.age ? t('common.years_old', { n: formatNumber(v.age) }) : undefined, v.code ? t('card.code', { code: v.code }) : undefined].filter(Boolean).join(' · ')}
+              {[stage, v.age ? t('common.years_old', { n: formatNumber(v.age) }) : undefined, v.code ? t('card.code', { code: v.code }) : undefined].filter(Boolean).join(' – ')}
             </div>
             {rank && <span className="nx-chip nx-chip-gold" style={{ marginTop: 6, display: 'inline-block' }}>{rank}</span>}
           </div>

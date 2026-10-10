@@ -2,6 +2,7 @@
 // someone works there, the posts as a row of seats, one shift (inputs -> outputs, time, wage), the labourers' crew and
 // every reason it is held back, each with its way out. Codes and numbers come from `BuildingView.work`; the words are ours.
 
+import { useRef } from 'react'
 import type { WorkNode, WorkReason } from '../../api/views.gen'
 import { EffectChip, EffectRow, Note, Section, ActionButton } from '../../ui/Popup'
 import { formatNumber, money } from '../native/kit/format'
@@ -13,6 +14,8 @@ type Door = 'village_labor' | 'village_storage' | 'village_overview'
 const tone = (s: string) => (s === 'working' ? 'good' : s === 'paused' ? 'bad' : 'warn')
 const FIX: Record<string, Door | undefined> = { no_food: 'village_storage', no_staff: 'village_labor', no_input: 'village_storage', storage_full: 'village_storage', employer_broke: 'village_overview', no_keeper: 'village_storage', budget_spent: 'village_labor' }
 
+const HIRE = [1, 2, 4]
+const WAGES = [100, 125, 150, 200]
 const pct = (bps: number, dec = 0) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: dec }).format(bps / 100)}٪`
 const word = (key: string, fallback: string, args?: Record<string, string | number>) => (hasKey(key) ? t(key as Key, args) : fallback)
 
@@ -28,6 +31,7 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
   onBuild?: () => void
   onClose: () => void
 }) {
+  const crewRef = useRef<HTMLDivElement>(null)
   const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
   const className = (c: string) => word(`sm.st.class.${c}`, t('work.class.other'))
   if (w.kind === 'none') {
@@ -52,7 +56,11 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
     const a = { have: formatNumber(r.have), need: formatNumber(r.need), item: r.item ? goods(r.item) : '', class: className(r.class) }
     return word(`work.reason.${r.code}`, t('work.reason.other'), a)
   }
+  // the holder of the permission hires on this very panel: the «no staff» fix lands on the hire buttons
+  const canHire = manage && !!act && !!buildingId
+  const toCrew = () => { crewRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }); crewRef.current?.querySelector('button')?.focus() }
   const fix = (code: string) => {
+    if (code === 'no_staff' && canHire) return <ActionButton tone="steel" small onClick={toCrew}>{t('work.fix.no_staff_here')}</ActionButton>
     const d = FIX[code]
     return d && onOpen ? <ActionButton tone="steel" small onClick={() => go(d)}>{t(`work.fix.${code}` as Key)}</ActionButton> : null
   }
@@ -86,10 +94,11 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
       {shift.length > 0 && (
         <div className="wk-shift">
           <small>{t('work.shift')}</small>
-          <div>{shift.join(' · ')}</div>
+          <div>{shift.join(' – ')}</div>
           {(w.outputs ?? []).length > 0 && w.storage_class && <small>{t('work.goes_to', { class: className(w.storage_class), free: formatNumber(w.storage_free) })}</small>}
         </div>
       )}
+      {w.knowledge_bps > 0 && <div className="gc-note wk-know">{t('work.knowledge', { p: pct(w.knowledge_bps) })}</div>}
       {w.tool_wear_bps > 0 && (
         <>
           <div className="gc-note">{t('work.tool_wear', { n: formatNumber(Math.round(10000 / w.tool_wear_bps)), have: formatNumber(w.tools_have) })}</div>
@@ -118,7 +127,7 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
             <u style={{ insetInlineStart: '25%' }} /><u style={{ insetInlineStart: '50%' }} />
           </div>
           <div className="wk-cond-legend"><span>{t('work.band.closed')}</span><span>{t('work.band.worn')}</span><span>{t('work.band.ok')}</span></div>
-          <div className="gc-note">{t('work.output', { p: pct(cond.output_bps) })} · {t('work.decay', { p: pct(cond.decay_bps_per_day, 1) })}</div>
+          <div className="gc-note">{t('work.output', { p: pct(cond.output_bps) })} – {t('work.decay', { p: pct(cond.decay_bps_per_day, 1) })}</div>
           {closed && <Note tone="bad">{t('work.closed')}</Note>}
         </div>
       )}
@@ -139,6 +148,25 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
                   {manage && rjob.npc_crew > 0 && <ActionButton tone="steel" small onClick={() => act('settlement.labor.hire', { id: rjob.id, n: '0' })}>{t('labor.hire_none')}</ActionButton>}
                 </div>
               )}
+            </>
+          )}
+        </div>
+      )}
+      {canHire && w.kind !== 'none' && (
+        <div className="wk-crew" ref={crewRef}>
+          {!job && w.filled === 0 && <Note>{t('work.standing')}</Note>}
+          {!job && <ActionButton tone="gold" small onClick={() => act!('settlement.labor.post', { id: buildingId })}>{t('work.post')}</ActionButton>}
+          {job && (
+            <>
+              <Section>{t('work.hire')}</Section>
+              <div className="wk-btns">
+                {HIRE.map((n) => <ActionButton key={n} tone="steel" small onClick={() => act!('settlement.labor.hire', { id: job.id, n: String(n) })}>{t('labor.hire_n', { n: formatNumber(n) })}</ActionButton>)}
+              </div>
+              {job.npc_crew > 0 && <div className="wk-btns wk-wide"><ActionButton tone="steel" small onClick={() => act!('settlement.labor.hire', { id: job.id, n: '0' })}>{t('labor.hire_none')}</ActionButton></div>}
+              <Section>{t('work.wage_set')}</Section>
+              <div className="wk-btns">
+                {WAGES.map((p) => <ActionButton key={p} tone="steel" small onClick={() => act!('settlement.labor.wage', { id: job.id, n: String(p) })}>{t('work.wage_pct', { p: formatNumber(p) })}</ActionButton>)}
+              </div>
             </>
           )}
         </div>

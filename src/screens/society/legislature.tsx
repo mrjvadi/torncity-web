@@ -47,7 +47,7 @@ const Bills = screen<BillsView>(({ view: v, ctx }) => {
         {(v.bills ?? []).map((b) => {
           const act = open.find((a) => a.args?.no === String(b.no))
           return (
-            <ListRow key={b.no} icon="vote" palette="violet" title={`${t('soc.law.no', { no: formatNumber(b.no) })} · ${placeName(ctx.names, b.place)}`}
+            <ListRow key={b.no} icon="vote" palette="violet" title={`${t('soc.law.no', { no: formatNumber(b.no) })} – ${placeName(ctx.names, b.place)}`}
               sub={`${subjectText(ctx, b.subject)} — ${statusText(b)}`} right={<Chip tone={tone(b.status)}>{t(key(`soc.law.chip.${b.status}`))}</Chip>}
               onClick={act ? () => ctx.go(act) : undefined} />
           )

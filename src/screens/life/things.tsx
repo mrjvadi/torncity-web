@@ -167,7 +167,7 @@ function Decide({ ctx, price, payment, blocked, max, way }: {
   const walk = ctx.acts.find((a) => a.id === 'walk')
   if (blocked) return <Unavailable reason={tx(`lf.property.refused.${blocked}`, { max: formatNumber(max) })} icon="m_stop" />
   if (way) {
-    return <Unavailable reason={t('lf.property.at_registry', { place: nameOf(ctx, 'place', way.place) })} nearest={walk ? { name: `${nameOf(ctx, 'place', way.place)} · ${hms(way.walk_seconds)}`, onGo: () => ctx.go(walk), label: t('lf.walk.go') } : undefined} />
+    return <Unavailable reason={t('lf.property.at_registry', { place: nameOf(ctx, 'place', way.place) })} nearest={walk ? { name: `${nameOf(ctx, 'place', way.place)} – ${hms(way.walk_seconds)}`, onGo: () => ctx.go(walk), label: t('lf.walk.go') } : undefined} />
   }
   if (!payment) return null
   const afford = (payment.usable ?? []).length > 0
@@ -196,7 +196,7 @@ export const PropertyType = flow<PropertyTypeView>(({ view: v, ctx }) => {
           <StatCard icon="coins" palette="amber" label={t('lf.property.upkeep')} value={money(v.upkeep)} />
           <StatCard icon="chart" palette="steel" label={t('lf.property.tax')} value={bps(v.tax_bps)} />
         </StatGrid>
-        <Note>{t('lf.property.where', { place: nameOf(ctx, 'place', v.place) })} · {t('lf.property.left', { n: formatNumber(v.left) })}</Note>
+        <Note>{t('lf.property.where', { place: nameOf(ctx, 'place', v.place) })} – {t('lf.property.left', { n: formatNumber(v.left) })}</Note>
         {v.home && <Note>{t('lf.property.home_note', { n: formatNumber(v.rest_energy) })}</Note>}
         <Decide ctx={ctx} price={v.price} payment={v.payment} blocked={v.blocked} max={v.max} way={v.way} />
       </Popup>
@@ -218,7 +218,7 @@ export const PropertyOffer = flow<PropertyOfferView>(({ view: v, ctx }) => {
           <StatCard icon="x_star" palette="gold" label={t('lf.property.quality')} value={formatNumber(v.quality)} />
           <StatCard icon={rent ? 'keys' : 'coins'} palette="amber" label={rent ? t('lf.property.rent') : t('lf.property.upkeep')} value={money(rent ? v.offer.price : v.upkeep)} />
         </StatGrid>
-        <Note>{t('lf.property.seller', { name: v.offer.seller.name || v.offer.seller.code })}{v.city.name ? ` · ${cityName(ctx, v.city.code, v.city.name)}` : ''}</Note>
+        <Note>{t('lf.property.seller', { name: v.offer.seller.name || v.offer.seller.code })}{v.city.name ? ` – ${cityName(ctx, v.city.code, v.city.name)}` : ''}</Note>
         {v.home && <Note>{t('lf.property.home_residence')}</Note>}
         <Decide ctx={ctx} price={v.offer.price} payment={v.payment} blocked={v.blocked} max={v.max} way={v.way} />
         <Btns ctx={ctx} list={ctx.by('property.cancel')} />

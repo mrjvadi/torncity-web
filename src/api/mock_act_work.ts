@@ -33,6 +33,7 @@ export const WORK_CONTENT: ContentTables = {
     e('finance.entry', 'Junior clerk', 'کمک‌حسابدار'), e('finance.skilled', 'Accountant', 'حسابدار'),
   ],
   skill: [
+    e('forestry', 'Forestry', 'جنگل‌داری'), e('herding', 'Herding', 'دامداری'), e('weaving', 'Weaving', 'بافندگی'), e('pottery', 'Pottery', 'سفال‌گری'), e('milling', 'Milling', 'آسیابانی'), e('teaching', 'Teaching', 'آموزگاری'),
     e('programming', 'Programming', 'برنامه‌نویسی'), e('engineering', 'Engineering', 'مهندسی'), e('mechanics', 'Mechanics', 'مکانیکی'), e('cooking', 'Cooking', 'آشپزی'),
     e('logistics', 'Logistics', 'انبارداری'), e('driving', 'Driving', 'رانندگی'), e('medicine', 'Medicine', 'پزشکی'), e('management', 'Management', 'مدیریت'),
     e('finance', 'Finance', 'حسابداری'), e('stealth', 'Stealth', 'پنهان‌کاری'), e('lockpicking', 'Lockpicking', 'قفل‌گشایی'), e('deception', 'Deception', 'فریبکاری'),
@@ -64,7 +65,7 @@ const PAY: Record<string, number> = { retail: 120, hospitality: 110, logistics: 
 const LOCKED = new Set(['technology', 'healthcare'])
 
 const iso = (seconds: number) => new Date(Date.now() + seconds * 1000).toISOString()
-const req = (kind: string, met: boolean, o: Partial<Requirement> = {}): Requirement => ({ kind, met, skill: '', need: 0, have: 0, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, trip: null, ...o })
+const req = (kind: string, met: boolean, o: Partial<Requirement> = {}): Requirement => ({ kind, met, skill: '', need: 0, have: 0, course_code: '', course_name: '', city_code: '', city: '', wait_seconds: 0, trip: null, until: null, ...o })
 
 // the player's job in the mock: it changes with applying, promotion and resigning
 let held: JobRef | null = jr('retail')
@@ -274,6 +275,7 @@ function courseDetail(code: string) {
   const poor = c.code === 'nursing'
   const requirements: Requirement[] = [
     req('level', !lowLevel, { need: c.min ?? 1, have: lowLevel ? 2 : 4 }),
+    ...(new URLSearchParams(location.search).get('literacy') === '1' && c.code !== 'reading_writing' ? [req('literacy', false, { course_code: 'reading_writing', course_name: 'reading_writing', city_code: 'support', city: 'شهر مرکزی', until: iso(5 * 86400), trip: { mode: 'bus', mode_name: 'اتوبوس', fare: 60, wait_seconds: 900 } })] : []),
     ...(elsewhere ? [req('course_city', false, { city_code: 'support', city: 'شهر مرکزی' })] : []),
   ]
   const can = !elsewhere && !lowLevel
@@ -312,12 +314,16 @@ function completed(certified = true) {
 // -- skills ------------------------------------------------------------------------------------------------------------------
 
 function skills(none = false) {
-  const all = ['management', 'finance', 'cooking', 'driving', 'medicine', 'programming']
+  const all = ['management', 'finance', 'cooking', 'driving', 'medicine', 'programming', 'forestry', 'herding', 'weaving', 'pottery', 'milling', 'baking', 'teaching']
   const lines: SkillLine[] = all.map((code) => ({ code, level: 0, xp: 0, from: 0, next: 100, percent: 0, max: false }))
   if (!none) {
     Object.assign(lines[0], { level: 3, xp: 340, from: 300, next: 500, percent: 20 })
     Object.assign(lines[1], { level: 2, xp: 309, from: 300, next: 600, percent: 3 })
     Object.assign(lines[3], { level: 5, xp: 1500, next: 0, percent: 100, max: true })
+    Object.assign(lines[6], { level: 1, xp: 120, from: 100, next: 250, percent: 13 })
+    Object.assign(lines[8], { level: 1, xp: 160, from: 100, next: 250, percent: 40 })
+    Object.assign(lines[11], { level: 2, xp: 330, from: 250, next: 500, percent: 32 })
+    Object.assign(lines[12], { level: 1, xp: 110, from: 100, next: 250, percent: 7 })
   }
   return mockOk('skills', { lines } as SkillsView, [back('player.profile.get'), refreshA('skills.list')])
 }

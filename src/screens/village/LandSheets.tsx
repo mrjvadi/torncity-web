@@ -375,7 +375,7 @@ export function HouseSheet({ lot, cat, onClose, store, onNoRoad }: {
                 <Emboss name="house" palette={l.home ? 'gold' : 'amber'} size={34} />
                 <span className="vc-line-text">
                   <span className="vc-line-name">{buildingName(cat, l.building.code, l.building.name)}</span>
-                  <span className="vc-line-sub">{buildText(l)} · {l.footprint_w}×{l.footprint_h}</span>
+                  <span className="vc-line-sub">{buildText(l)} – {l.footprint_w}×{l.footprint_h}</span>
                   {!l.affordable && <span className="vc-line-sub bad">{t('citizen.build.short')}</span>}
                 </span>
                 <span className="vc-line-price">{money(l.total)}</span>

@@ -77,7 +77,7 @@ export default function Life({ response, loading, onAction, run }: ScreenProps) 
               const act = (response?.actions ?? []).find((a) => (a.id === 'life.sleep' || a.id === 'life.sleep_walk') && a.subject === s.spot?.code)
               return (
                 <ListRow key={i} icon="bed" palette="violet" title={s.spot?.name ? names.name('sleep_spot', s.spot.code ?? '', s.spot.name) : '—'}
-                  sub={`${t('life.spot_sub', { place: s.place?.name ? names.name('place', s.place.code ?? '', s.place.name) : '', rest: formatNumber(s.rest ?? 0) })}${s.price ? ` · ${money(s.price)}` : ''}`}
+                  sub={`${t('life.spot_sub', { place: s.place?.name ? names.name('place', s.place.code ?? '', s.place.name) : '', rest: formatNumber(s.rest ?? 0) })}${s.price ? ` – ${money(s.price)}` : ''}`}
                   onClick={act && !v.sleep_in_seconds ? () => onAction(act) : undefined} />
               )
             })}

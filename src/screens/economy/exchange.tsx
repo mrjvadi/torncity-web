@@ -79,7 +79,7 @@ const Exchange = flow<ExchangeView>(({ view: v, ctx }) => {
       <CardGrid>
         {(v.lines ?? []).map((l) => (
           <ListRow key={l.company.code} icon="chart" palette="emerald" title={l.company.name}
-            sub={`${nameOf(ctx, ['company_type'], l.type)} · ${ctx.names.name(['city'], l.city.code, l.city.name)}`}
+            sub={`${nameOf(ctx, ['company_type'], l.type)} – ${ctx.names.name(['city'], l.city.code, l.city.name)}`}
             right={<span dir="ltr">{formatNumber(l.price)} <Move price={l.price} prev={l.prev} /></span>}
             onClick={() => { const a = find(ctx, 'stock.open', { code: l.company.code }); if (a) ctx.go(a) }} />
         ))}

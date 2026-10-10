@@ -33,7 +33,7 @@ const Procure = flow<ProcureView>(({ view: v, ctx }) => {
           const why = o.blocked ? (hasKey(`mil.procure.blocked.${o.blocked}`) ? t(key(`mil.procure.blocked.${o.blocked}`)) : t('mil.procure.blocked.other')) : ''
           return (
             <ListRow key={o.no} icon="box" palette={o.blocked ? 'steel' : 'gold'} title={goodName(ctx, o.good)}
-              sub={why ? `${offerSub(ctx, o)} · ${why}` : offerSub(ctx, o)} right={money(o.price)}
+              sub={why ? `${offerSub(ctx, o)} – ${why}` : offerSub(ctx, o)} right={money(o.price)}
               onClick={open ? () => ctx.go(open) : undefined} />
           )
         })}

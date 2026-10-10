@@ -28,8 +28,8 @@ function EntryBlock({ ctx, e, acts }: { ctx: FlowCtx; e: LicenceEntry; acts: Ret
   return (
     <div className="mil-block">
       <div className="mil-head"><span>{companyName(ctx, e)}</span><span>{t('mil.lic.no', { no: formatNumber(e.no) })}</span></div>
-      <Hint>{[typeName(ctx, e), word(`mil.lic.kind.${e.kind}`), word(`mil.lic.basis.${e.basis}`)].filter(Boolean).join(` · `)}</Hint>
-      <Hint>{word(`mil.lic.status.${e.status}`)}{ends > 0 ? ` · ${t('mil.lic.ends_in', { in: durationText(ends) })}` : ''}</Hint>
+      <Hint>{[typeName(ctx, e), word(`mil.lic.kind.${e.kind}`), word(`mil.lic.basis.${e.basis}`)].filter(Boolean).join(` – `)}</Hint>
+      <Hint>{word(`mil.lic.status.${e.status}`)}{ends > 0 ? ` – ${t('mil.lic.ends_in', { in: durationText(ends) })}` : ''}</Hint>
       <Btns ctx={ctx} list={acts} row />
     </div>
   )

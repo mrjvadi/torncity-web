@@ -23,7 +23,7 @@ export const LIFE_CONTENT: Record<string, { code: string; name: { en: string; fa
     { code: 'university', name: { en: 'University', fa: 'دانشگاه' } }, { code: 'registry', name: { en: 'Land Registry', fa: 'ثبت اسناد' } },
     { code: 'hostel_row', name: { en: 'Hostel Row', fa: 'خیابان مسافرخانه‌ها' } }, { code: 'station', name: { en: 'Station', fa: 'ایستگاه' } },
   ],
-  mode: [{ code: 'bus', name: { en: 'Bus', fa: 'اتوبوس' } }, { code: 'train', name: { en: 'Train', fa: 'قطار' } }, { code: 'flight', name: { en: 'Flight', fa: 'پرواز' } }, { code: 'bicycle', name: { en: 'Bicycle', fa: 'دوچرخه' } }],
+  mode: [{ code: 'bus', name: { en: 'Bus', fa: 'اتوبوس' } }, { code: 'train', name: { en: 'Train', fa: 'قطار' } }, { code: 'flight', name: { en: 'Flight', fa: 'پرواز' } }, { code: 'car', name: { en: 'Car', fa: 'ماشین' } }, { code: 'bicycle', name: { en: 'Bicycle', fa: 'دوچرخه' } }],
   item: [
     { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'phone', name: { en: 'Phone', fa: 'تلفن' } },
     { code: 'lockpick_set', name: { en: 'Lockpick set', fa: 'ست قفل‌باز' } }, { code: 'bicycle', name: { en: 'Bicycle', fa: 'دوچرخه' } },
@@ -123,8 +123,14 @@ const MODES = [
   { mode_code: 'bicycle', mode_name: 'Bicycle', fare: 0, wait_seconds: 90000, energy: 12, busy: false, vehicle: N('bicycle', 'Bicycle'), condition: 8200 },
 ]
 
+/** ?licence=grace (default): the car is still offered, the driving licence is needed from a date; ?licence=out: the car is left out */
+const LICENCE = () => {
+  const q = (() => { try { return new URLSearchParams(location.search).get('licence') ?? 'grace' } catch { return 'grace' } })()
+  return q === 'none' ? null : [{ mode_code: 'car', course: N('driving_licence', 'Driving licence'), until: q === 'out' ? null : iso(5 * 24 * 60) }]
+}
 function travelOptions(to: string) {
-  return mockOk('travel_options', { from_code: 'calderis', from: 'Calderis', to_code: to, to: to === 'support' ? 'Support' : to, options: MODES, cash: 12450, requoted: false }, [
+  const out = LICENCE()?.[0]?.until === null
+  return mockOk('travel_options', { from_code: 'calderis', from: 'Calderis', to_code: to, to: to === 'support' ? 'Support' : to, options: out ? MODES : [...MODES, { mode_code: 'car', mode_name: 'Car', fare: 6200, wait_seconds: 9000, energy: 2, busy: false, vehicle: null, condition: 0 }], cash: 12450, requoted: false, licence: LICENCE() }, [
     ...MODES.map((o) => A('travel.go', 'travel.start', { city: to, mode: o.mode_code, max: String(o.fare) }, { subject: o.mode_code })), back('map.list'), refreshA('travel.options', { city: to }),
   ])
 }
@@ -343,7 +349,8 @@ export function mockLifeCommand(command: string, a: Args): unknown | null {
     case 'mock.not_here': return notHere(false)
     case 'mock.not_here_walking': return notHere(true)
     case 'life.me': return life('')
-    case 'life.sleep': return args.method || args.spot === 'bench' ? life('slept') : sleepPay()
+    case 'life.sleep': if (args.spot === 'hostel' && new URLSearchParams(location.search).get('closed') === '1') return { ok: false, request_id: 'mock', screen: 'life_refusal', view: { kind: 'closed', wait_seconds: 0, min: 0, max: 0 }, error: { code: 'life_closed', args: {} }, actions: [back('life.me')] }
+      return args.method || args.spot === 'bench' ? life('slept') : sleepPay()
     case 'life.card': return card('')
     case 'life.bio': return card(args.clear ? 'bio_gone' : 'bio')
     case 'life.history': return history(Number(args.page ?? 1) || 1)

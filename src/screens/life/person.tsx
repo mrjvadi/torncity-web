@@ -37,7 +37,7 @@ export const History = flow<HistoryView>(({ view: v, ctx }) => {
           const where = l.place.code || l.place.name ? (l.place_kind && l.place_kind !== 'city' ? l.place.name : cityName(ctx, l.place.code, l.place.name)) : ''
           const base = `lf.history.${l.kind}`
           const text = tf(!where && hasKey(`${base}_nowhere`) ? `${base}_nowhere` : base, 'lf.history.other', { what, place: where, amount: money(l.amount), number: formatNumber(l.number) })
-          const sub = [dateText(l.at), l.backfilled ? t('lf.history.old') : '', l.private ? t('lf.history.private') : ''].filter(Boolean).join(' · ')
+          const sub = [dateText(l.at), l.backfilled ? t('lf.history.old') : '', l.private ? t('lf.history.private') : ''].filter(Boolean).join(' – ')
           return <ListRow key={i} icon="book" palette="violet" title={text} sub={sub} />
         })}
       </div>
@@ -131,7 +131,7 @@ export const Devices = flow<DevicesView>(({ view: v, ctx }) => {
           return (
             <ListRow
               key={d.id} icon="phone" palette="sapphire" title={deviceTitle(d.name)}
-              sub={[tx(`lf.devices.via.${d.via}`), t('lf.devices.since', { date: dateText(d.created_at) }), t('lf.devices.seen', { date: dateText(d.last_seen_at) })].join(' · ')}
+              sub={[tx(`lf.devices.via.${d.via}`), t('lf.devices.since', { date: dateText(d.created_at) }), t('lf.devices.seen', { date: dateText(d.last_seen_at) })].join(' – ')}
               right={out ? <button className="vf-cancel" onClick={() => ctx.go(out)} disabled={ctx.busy}>{t('lf.devices.revoke')}</button> : undefined}
             />
           )

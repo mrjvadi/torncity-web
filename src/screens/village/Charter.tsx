@@ -116,7 +116,7 @@ export default function Charter({ response }: ScreenProps) {
 
           <PSec>{t('charter.zone')}</PSec>
           <div className="ch-zone">
-            <p><b>{zoneLabel(v.zone_minutes)}</b> · {t('charter.zone_now', { at: fa(zoneClock(now, v.zone_minutes)) })}</p>
+            <p><b>{zoneLabel(v.zone_minutes)}</b> – {t('charter.zone_now', { at: fa(zoneClock(now, v.zone_minutes)) })}</p>
             {v.zone_minutes !== deviceZone() && <p className="pn-hint">{t('charter.zone_device', { zone: zoneLabel(deviceZone()) })}</p>}
             <p className="pn-hint">{t('charter.zone_what')}</p>
             {holds(mine.map((g) => g.permission), 'settings.timezone') && (
@@ -139,7 +139,7 @@ export default function Charter({ response }: ScreenProps) {
           {(v.audit ?? []).length === 0 && <p className="pn-hint">{t('charter.audit_none')}</p>}
           <div className="ch-audit">
             {(v.audit ?? []).map((a, i) => (
-              <PRow key={i} icon="scroll" title={actionName(a.action, a.title)} sub={`${a.actor} · ${agoText(a.at)}`} />
+              <PRow key={i} icon="scroll" title={actionName(a.action, a.title)} sub={`${a.actor} – ${agoText(a.at)}`} />
             ))}
           </div>
 
@@ -381,7 +381,7 @@ function ZonePopup({ current, busy, onClose, onSave }: { current: number; busy: 
       <label className="ch-field">
         <span>{t('charter.zone')}</span>
         <select className="vd-input ch-select" dir="ltr" value={offset} onChange={(e) => setOffset(Number(e.target.value))} aria-label={t('charter.zone')}>
-          {options.map((o) => <option key={o} value={o}>{zoneLabel(o)} · {zoneClock(now, o)}</option>)}
+          {options.map((o) => <option key={o} value={o}>{zoneLabel(o)} – {zoneClock(now, o)}</option>)}
         </select>
       </label>
     </Popup>

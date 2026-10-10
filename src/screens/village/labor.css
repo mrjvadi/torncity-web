@@ -25,3 +25,5 @@
 .lb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .lb-stat { font-size: 20px; }
 .lb-gold { color: var(--gold); }
+
+.lb-wide .k-slab { flex: 1 1 100%; }

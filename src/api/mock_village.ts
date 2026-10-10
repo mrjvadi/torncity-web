@@ -66,6 +66,14 @@ const CAT: CatEntry[] = [
   { code: 'tool_workshop', fa: 'کارگاه ابزارسازی', en: 'Tool workshop', fp: [2, 2], cost: 1500, time: 5400, role: 'craft' },
   { code: 'pottery_kiln', fa: 'کوره سفالگری', en: 'Pottery kiln', fp: [2, 2], cost: 1200, time: 4800, role: 'craft' },
   { code: 'granary', fa: 'انبار غله', en: 'Granary', fp: [1, 1], cost: 700, time: 3000, role: 'storage' },
+  { code: 'mill', fa: 'آسیاب', en: 'Mill', fp: [2, 2], cost: 1400, time: 5400, role: 'food' },
+  { code: 'bakery', fa: 'نانوایی', en: 'Bakery', fp: [2, 2], cost: 1600, time: 5400, role: 'food' },
+  { code: 'charcoal_clamp', fa: 'کورهٔ زغال', en: 'Charcoal clamp', fp: [2, 2], cost: 900, time: 3600, role: 'craft' },
+  { code: 'iron_pit', fa: 'معدن آهن', en: 'Iron pit', fp: [2, 2], cost: 1500, time: 5400, role: 'extraction' },
+  { code: 'bloomery', fa: 'کورهٔ آهن‌گدازی', en: 'Bloomery', fp: [2, 2], cost: 2000, time: 6600, role: 'craft' },
+  { code: 'tannery', fa: 'دباغی', en: 'Tannery', fp: [2, 2], cost: 1700, time: 5400, role: 'craft' },
+  { code: 'brickworks', fa: 'آجرپزی', en: 'Brickworks', fp: [2, 2], cost: 1500, time: 5400, role: 'craft' },
+  { code: 'teahouse_inn', fa: 'مسافرخانه', en: 'Inn', fp: [2, 2], cost: 2200, time: 7200, role: 'hospitality' },
   { code: 'bank', fa: 'بانک', en: 'Bank', fp: [3, 3], cost: 50000, time: 36000, role: '', needs: ['writing'] },
   { code: 'school', fa: 'مدرسه', en: 'School', fp: [3, 3], cost: 9000, time: 14400, role: 'education', needs: ['writing'] },
 ]
@@ -309,9 +317,10 @@ function roster(): SettlementPlayers {
  * (it resolves names from the catalogue), so the mock sends English on purpose. */
 function nameOf(code: string): Named { const e = CAT.find((c) => c.code === code) ?? citizenEntry(code); return { code, name: e?.en ?? code } }
 function kn(code: string): Named { return { code, name: KNOW_EN[code] ?? code } }
-const GOODS_EN: Record<string, string> = { wool: 'پشم', firewood: 'هیزم', clay: 'گل رس', pots: 'کوزه', hide: 'پوست', rag: 'کهنه', paper: 'کاغذ', tools: 'ابزار', timber: 'Timber', stone: 'Stone', iron_bar: 'Iron bar', wheat: 'Wheat' }
+const GOODS_EN: Record<string, string> = { charcoal: 'زغال', bloom: 'آهن اسفنجی', bricks: 'آجر', leather: 'چرم', bark: 'پوست درخت', flour: 'آرد', water: 'آب', wool: 'پشم', firewood: 'هیزم', clay: 'گل رس', pots: 'کوزه', hide: 'پوست', rag: 'کهنه', paper: 'کاغذ', tools: 'ابزار', timber: 'Timber', stone: 'Stone', iron_bar: 'Iron bar', wheat: 'Wheat' }
 /** The server's estimate of the wait for a build of this much worker effort (a crew of two). */
 const waitOf = (effort: number) => { const shifts = Math.ceil(effort / 60), crew = 2; return { seconds: Math.ceil(shifts / crew) * 60, shifts, crew, shift_seconds: 60 } }
+const N = (code: string, name: string): Named => ({ code, name })
 const goods = (code: string): Named => ({ code, name: GOODS_EN[code] ?? code })
 
 function refusal(kind: string, o: Parameters<typeof mockRefusal>[1] = {}) {
@@ -487,6 +496,11 @@ function developmentView() {
 function overviewView() {
   const stands = st.buildings.filter((b) => b.state === 'built')
   const view: VillageOverviewView = {
+    services: [
+      { building: N('watch_hut', 'نگهبانی محله'), service: 'local_security', held: true, idle: '', grace: false, grace_until: null, needs: null },
+      { building: N('health_house', 'خانهٔ بهداشت'), service: 'primary_care', held: true, idle: '', grace: true, grace_until: new Date(Date.now() + 6 * 86400_000).toISOString(), needs: [{ component: goods('rag'), quantity: 1 }, { component: N('water', 'آب'), quantity: 2 }] },
+      { building: N('teahouse_inn', 'مسافرخانه'), service: 'lodging_and_tea', held: false, idle: 'no_supplies', grace: false, grace_until: null, needs: [{ component: N('bread', 'نان'), quantity: 2 }, { component: N('water', 'آب'), quantity: 3 }, { component: goods('firewood'), quantity: 1 }] },
+    ],
     name: 'آمل', tier: 'city', development: true, population: 2, population_cap: 8,
     food_percent: 72, job_percent: 55, service_percent: 40, happiness_percent: 63, security_percent: 48, literacy_percent: st.literacy, promotion: null, zone_minutes: MOCK_ZONE,
     resident: true, settlement_id: OWN_ID, treasury: st.treasury, is_head: IS_HEAD, support: { code: 'support', name: 'Support', services: SUPPORT_SERVICES.filter((s) => !s.role || !stands.some((b) => CAT.find((c) => c.code === b.type)?.role === s.role)).map((s) => s.service) },
@@ -1272,8 +1286,12 @@ function residence(leaving: boolean, args: Record<string, unknown>) {
 const WORKPLACES = [
   { id: 'wp-1', code: 'woodcutter_camp', produces: [['timber', 3]] as [string, number][], consumes: [] as [string, number][], wage: 30, shift: 3600, workers: 3 },
   { id: 'wp-2', code: 'farm_canal', produces: [['wheat', 12]] as [string, number][], consumes: [] as [string, number][], wage: 24, shift: 5400, workers: 4 },
+  { id: 'wp-4', code: 'smithy', produces: [['tools', 1]] as [string, number][], consumes: [['charcoal', 2], ['bloom', 1]] as [string, number][], wage: 60, shift: 3600, workers: 2 },
+  { id: 'wp-5', code: 'tannery', produces: [['leather', 2]] as [string, number][], consumes: [['hide', 2]] as [string, number][], wage: 44, shift: 2700, workers: 2 },
   { id: 'wp-3', code: 'carpentry_workshop', produces: [['timber', 2]] as [string, number][], consumes: [['wheat', 1]] as [string, number][], wage: 36, shift: 3600, workers: 2 },
 ]
+/** ?personal=1: the grace of ADR 0055 runs and the viewer lacks the smith's level and the reading class */
+const PERSONAL_ON = (() => { try { return new URLSearchParams(location.search).get('personal') === '1' } catch { return false } })()
 const wk = { shift: null as null | { id: string; finish: number } }
 
 function workView(args: Record<string, unknown>) {
@@ -1287,9 +1305,9 @@ function workView(args: Record<string, unknown>) {
   const lines = (l: [string, number][]) => (l.length ? l.map(([c, q]) => ({ component: goods(c), quantity: q })) : null)
   const view: WorkView = {
     village: 'آمل', resident: true,
-    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true })),
+    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true, personal: PERSONAL_ON && p.code === 'smithy' ? [{ kind: 'level', item: { code: '', name: '' }, have: 1, need: 3, how: '' }, { kind: 'skill', item: { code: 'mechanics', name: 'mechanics' }, have: 0, need: 1, how: 'train' }, { kind: 'certificate', item: { code: 'first_aid', name: 'first_aid' }, have: 0, need: 1, how: 'train' }] : PERSONAL_ON && p.code === 'carpentry_workshop' ? [{ kind: 'literacy', item: { code: 'reading_writing', name: 'reading_writing' }, have: 0, need: 1, how: 'train' }] : null })),
     mine: mine ? { building: nameOf(mine.code), finish_at: new Date(wk.shift!.finish).toISOString(), left_seconds: Math.round((wk.shift!.finish - Date.now()) / 1000), wage: mine.wage, produces: lines(mine.produces) } : null,
-    suggest: null, started: !!place, used: Object.values(MAT_STOCK).reduce((a, b) => a + b, 0), capacity: MAT_BASE_CAP,
+    suggest: null, personal_until: PERSONAL_ON ? new Date(Date.now() + 5 * 86400_000).toISOString() : null, started: !!place, used: Object.values(MAT_STOCK).reduce((a, b) => a + b, 0), capacity: MAT_BASE_CAP,
   }
   const acts: MockAct[] = []
   if (!mine) for (const p of WORKPLACES) acts.push(A('work.start', 'settlement.work', { id: p.id }, { subject: p.code }))
@@ -1435,10 +1453,10 @@ function workNode(type: string, id: string): WorkNode {
   // ?tools=bare (worn out: 60 percent output) | ok (tools in store) | none (the building uses no tool)
   const tools = (() => { try { return new URLSearchParams(location.search).get('tools') ?? 'none' } catch { return 'none' } })()
   const wears = tools !== 'none' && n.kind === 'production'
-  return { ...n, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null,
+  return { ...n, knowledge_bps: n.kind === 'production' ? 700 : 0, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null,
     tool_wear_bps: wears ? 1000 : 0, tools_have: tools === 'ok' ? 3 : 0, bare_hands: tools === 'bare' && wears, bare_hands_bps: wears ? 6000 : 0 }
 }
-function workNode0(type: string, id: string): Omit<WorkNode, 'meal_points' | 'food_shifts' | 'condition' | 'tool_wear_bps' | 'tools_have' | 'bare_hands' | 'bare_hands_bps'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
+function workNode0(type: string, id: string): Omit<WorkNode, 'meal_points' | 'food_shifts' | 'condition' | 'tool_wear_bps' | 'tools_have' | 'bare_hands' | 'bare_hands_bps' | 'knowledge_bps'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
   const timber = goods('timber')
   if (type === 'road') return { kind: 'none', status: 'idle', reasons: [{ code: 'no_function', item: null, class: '', have: 0, need: 0 }], slots: null, filled: 0, max: 0, shift_seconds: 0, wage: 0, inputs: null, outputs: null, storage_class: '', storage_free: 0, job: null, if_unstaffed: '' }
   if (type === 'granary' || type === 'storehouse') return { kind: 'storage', status: 'idle', reasons: [{ code: 'no_keeper', item: null, class: 'food', have: 0, need: 0 }], slots: [{ role: 'storekeeper', worker: 'empty', name: '' }], filled: 0, max: 1, shift_seconds: 0, wage: 40, inputs: null, outputs: null, storage_class: 'food', storage_free: 62, job: null, if_unstaffed: 'base_room' }
@@ -1726,7 +1744,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         // the names of everything else the village screens mention, in both languages (the web never shows the view's authored English)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
         place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
-        component: [{ code: 'wool', name: { en: 'Wool', fa: 'پشم' } }, { code: 'firewood', name: { en: 'Firewood', fa: 'هیزم' } }, { code: 'clay', name: { en: 'Clay', fa: 'گل رس' } }, { code: 'pots', name: { en: 'Pots', fa: 'کوزه' } }, { code: 'hide', name: { en: 'Hide', fa: 'پوست' } }, { code: 'rag', name: { en: 'Rags', fa: 'کهنه' } }, { code: 'paper', name: { en: 'Paper', fa: 'کاغذ' } }, { code: 'tools', name: { en: 'Tools', fa: 'ابزار' } }, { code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
+        component: [{ code: 'wool', name: { en: 'Wool', fa: 'پشم' } }, { code: 'firewood', name: { en: 'Firewood', fa: 'هیزم' } }, { code: 'clay', name: { en: 'Clay', fa: 'گِل رس' } }, { code: 'pots', name: { en: 'Pots', fa: 'ظرف سفالی' } }, { code: 'hide', name: { en: 'Hide', fa: 'پوست خام' } }, { code: 'rag', name: { en: 'Rags', fa: 'پارچهٔ کهنه' } }, { code: 'charcoal', name: { en: 'Charcoal', fa: 'زغال' } }, { code: 'bloom', name: { en: 'Bloom iron', fa: 'آهن اسفنجی' } }, { code: 'bricks', name: { en: 'Bricks', fa: 'آجر' } }, { code: 'leather', name: { en: 'Leather', fa: 'چرم' } }, { code: 'bark', name: { en: 'Bark', fa: 'پوست درخت' } }, { code: 'flour', name: { en: 'Flour', fa: 'آرد' } }, { code: 'water', name: { en: 'Water', fa: 'آب' } }, { code: 'paper', name: { en: 'Paper', fa: 'کاغذ' } }, { code: 'tools', name: { en: 'Tools', fa: 'ابزار' } }, { code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
         item: [{ code: 'tea', name: { en: 'Tea', fa: 'چای' } }, { code: 'bag_sack', name: { en: 'Sack', fa: 'کیسه' } }, { code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
         item_shelf_group: [['food', 'خوراک', 'Food'], ['medicine', 'دارو و کمک‌های اولیه', 'Medicine'], ['materials', 'مصالح و مواد', 'Materials'], ['tools', 'ابزار', 'Tools'], ['bags', 'کیف و بار', 'Bags']].map(([code, fa, en]) => ({ code, name: { en, fa } })),
         shop: ECONOMY_CONTENT.shop, budget_line: ECONOMY_CONTENT.budget_line, company_type: ECONOMY_CONTENT.company_type,

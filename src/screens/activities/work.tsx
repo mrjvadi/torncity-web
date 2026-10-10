@@ -11,6 +11,7 @@ import { Bar, Card, ListRow, SectionTitle } from '../native/kit/Parts'
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { Lines, Need } from '../native/kit/cardparts'
 import { needLines, tripLine } from '../native/kit/needs'
+import { atText } from '../../lib/duration'
 import { clamp01, hms, money, roughDuration } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import Popup, {
@@ -44,7 +45,7 @@ registerLabeler((a, names) => {
 // -- requirements, met or not, in words ---------------------------------------------------------------------
 
 const REQ_ICON: Record<string, string> = {
-  level: 'x_star', skill: 'study', certificate: 'study', residence: 'house', performance: 'chart', time: 'clock', shifts: 'work', top: 'x_star',
+  level: 'x_star', literacy: 'book', skill: 'study', certificate: 'study', residence: 'house', performance: 'chart', time: 'clock', shifts: 'work', top: 'x_star',
   course_city: 'x_map', course_teacher: 'study', not_head: 'm_stop', teacher_no_pool: 'm_stop', already_teaching: 'check', not_teaching: 'm_stop', teacher_full: 'm_stop', course_full: 'm_stop', already_certified: 'check', already_enrolled: 'study',
 }
 
@@ -59,9 +60,20 @@ function reqText(ctx: FlowCtx, r: Requirement): string {
   return tx(hasKey(`lf.req.${r.kind}`) ? `lf.req.${r.kind}` : 'ac.work.req.other', p)
 }
 
-const reqLines = (ctx: FlowCtx, list: Requirement[] | null): RequirementLine[] => (list ?? []).map((r, i) => ({
-  key: String(i), icon: REQ_ICON[r.kind] ?? 'check', palette: r.met ? 'emerald' : 'ruby', label: reqText(ctx, r), state: r.met ? 'met' : 'missing',
-}))
+const reqLines = (ctx: FlowCtx, list: Requirement[] | null): RequirementLine[] => (list ?? []).map((r, i) => {
+  // a requirement still in its grace (until) and one that must be learned elsewhere: when it applies, where to get it and the trip
+  const away = !r.met && !!r.city_code
+  const detail = [
+    !r.met && r.until ? t('ac.work.req.until', { at: atText(r.until) }) : '',
+    away && r.kind === 'literacy' ? t('ac.work.req.nearest', { city: cityName(ctx, r.city_code, r.city) }) : '',
+    away && r.kind === 'literacy' ? tripLine(r.trip) : '',
+  ].filter(Boolean).join(' ')
+  return {
+    key: String(i), icon: REQ_ICON[r.kind] ?? 'check', palette: r.met ? 'emerald' : 'ruby', label: reqText(ctx, r), state: r.met ? 'met' : 'missing',
+    detail: detail || undefined,
+    action: away && r.kind === 'literacy' ? { label: t('ac.work.course.go'), onClick: () => ctx.run('travel.options', { city: r.city_code }) } : undefined,
+  }
+})
 
 const backOf = (ctx: FlowCtx) => ctx.acts.filter((a) => isBack(a) && !isRefresh(a))
 
@@ -366,7 +378,7 @@ export const CourseDetail = flow<CourseDetailView>(({ view: v, ctx }) => {
         <RequirementList lines={lines} title={lines.length ? t('ac.work.detail.reqs') : undefined} />
         {elsewhere && (
           <Unavailable
-            reason={t('ac.work.course.not_here')} hint={[t('ac.work.course.taught_in', { place: cityName(ctx, elsewhere.city_code, elsewhere.city) }), tripLine(elsewhere.trip)].filter(Boolean).join(' · ')}
+            reason={t('ac.work.course.not_here')} hint={[t('ac.work.course.taught_in', { place: cityName(ctx, elsewhere.city_code, elsewhere.city) }), tripLine(elsewhere.trip)].filter(Boolean).join(' – ')}
             nearest={{ name: cityName(ctx, elsewhere.city_code, elsewhere.city), onGo: () => ctx.run('travel.options', { city: elsewhere.city_code }), label: t('ac.work.course.go') }}
           />
         )}

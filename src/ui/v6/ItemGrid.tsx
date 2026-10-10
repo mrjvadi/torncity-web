@@ -12,8 +12,10 @@ import { PBar } from './panel'
 // the village goods of ADR 0050 use the closest icon of the kit (Icon names): firewood = flame, clay = ore, pots = bottle, hide = backpack, rag = tent (cloth), paper = scroll, tools = gears
 const ITEM_ICON: Record<string, string> = { bread: 'bread', bandage: 'pill', phone: 'phone', lockpick_set: 'keys', firewood: 'x_flame', clay: 'ore', pots: 'f_bottle', hide: 'm_backpack', rag: 'tent', paper: 'x_scroll', tools: 'gears' }
 /** the same goods for the flat PNG icons of the v6 panel cards (`PCard icon`): firewood = logs, clay = stone, pots = flask, hide = bag, rag = cloth, paper = scroll, tools = tool */
-const ITEM_PNG: Record<string, string> = { firewood: 'logs', clay: 'stone', pots: 'flask', hide: 'bag', rag: 'cloth', paper: 'scroll', tools: 'tool', timber: 'wood', plank: 'plank', stone: 'stone', cloth: 'cloth', wheat: 'wheat' }
-export const itemPngName = (code: string): string => ITEM_PNG[code] ?? 'crate'
+const ITEM_PNG: Record<string, string> = { firewood: 'logs', clay: 'stone', pots: 'flask', hide: 'bag', rag: 'cloth', paper: 'scroll', tools: 'tool', timber: 'wood', plank: 'plank', stone: 'stone', cloth: 'cloth', wheat: 'wheat', flour: 'food', bread: 'bread', charcoal: 'stone', bloom: 'ingot', bar_iron: 'ingot', iron_bar: 'ingot', bricks: 'stone', leather: 'cloth', bark: 'wood', water: 'flask' }
+/** the flat icon of a good: its own, else by the word it is made of, else a crate */
+const PNG_WORD: [RegExp, string][] = [[/bread|bun|cake/, 'bread'], [/flour|rice|grain|oat|barley|bean|fruit|veg|meat|fish|cheese|egg|food|tea/, 'food'], [/wood|log|timber|bark/, 'logs'], [/ore|stone|coal|brick|clay|sand|lime/, 'stone'], [/iron|bloom|ingot|steel|copper/, 'ingot'], [/cloth|yarn|linen|fleece|wool|rag|leather|fibre|rope/, 'cloth'], [/paper|book|scroll/, 'scroll'], [/tool|axe|saw|hammer/, 'tool'], [/bag|sack|pouch/, 'bag'], [/water|bottle|pot|flask/, 'flask']]
+export const itemPngName = (code: string): string => ITEM_PNG[code] ?? PNG_WORD.find(([re]) => re.test(code))?.[1] ?? 'crate'
 const GROUP_ICON: Record<string, string> = {
   food: 'bread', medicine: 'pill', gear: 'gears', electronics: 'phone', defence: 'shield',
   mineral: 'ore', metal_ore: 'ore', vehicles: 'x_car', wood: 'x_field', bags: 'm_backpack', clothing: 'tent', tools: 'gears',
@@ -21,7 +23,7 @@ const GROUP_ICON: Record<string, string> = {
 
 /** a good whose code is not listed gets the icon of the word it is made of (rice_bag, bag_sack, water_bottle...) */
 const WORD_ICON: [RegExp, string][] = [
-  [/bread|bun|cake|biscuit|flour/, 'bread'], [/rice|wheat|grain|oat|barley|seed|bean|lentil|veg|fruit|apple|date/, 'x_sprout'],
+  [/bread|bun|cake|biscuit|flour/, 'bread'], [/charcoal|firewood|fuel|coal/, 'x_flame'], [/brick|clay|pot|kiln/, 'ore'], [/leather|hide|bark|rag|wool|fleece|yarn|linen|fibre|rope|cloth/, 'tent'], [/bloom|iron|ingot|steel/, 'x_goldbar'], [/rice|wheat|grain|oat|barley|seed|bean|lentil|veg|fruit|apple|date/, 'x_sprout'],
   [/water|juice|milk|tea|drink|bottle|soda|cola/, 'soda'], [/ring|jewel|necklace/, 'ring'], [/gem|diamond/, 'x_gem'], [/cash|money|coin/, 'coins'], [/meat|fish|egg|soup|meal|cheese|food/, 'm_meal'],
   [/bandage|pill|medic|drug|syringe|aid|herb/, 'pill'], [/bag|sack|pouch|backpack|satchel|basket/, 'm_backpack'],
   [/wood|log|timber|plank/, 'x_field'], [/ore|stone|coal|iron|bloom|clay|brick|sand/, 'ore'],

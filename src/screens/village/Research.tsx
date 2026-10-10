@@ -8,6 +8,7 @@ import Popup, { ActionButton, ActionRow, Note, ProgressRow, Section } from '../.
 import { CardGrid, PCard } from '../../ui/v6/panel'
 import { formatNumber, money } from '../native/kit/format'
 import { atText, words } from '../../lib/duration'
+import { PersonalList, personalUntilText } from './Personal'
 import { hasKey, t, type Key } from '../../i18n'
 import { useVillageCommand, useContentNames } from '../../village/useVillage'
 import { Btns, Hint, Lead, Page, Panel, flow, isBack } from './flow'
@@ -73,6 +74,8 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
         <ul className="rd-rules">{(['r1', 'r2', 'r3', 'r4'] as const).map((k) => <li key={k}>{t(`rd.rules.${k}` as Key)}</li>)}</ul>
       </Panel>
 
+      {v.personal_until && <Note>{personalUntilText(v.personal_until, 'research')}</Note>}
+      {(v.personal ?? []).length > 0 && <Panel tone="gold"><PersonalList names={names} list={v.personal} title={t('vx.pn.lack_research')} onCourses={() => ctx.run('education.list')} /></Panel>}
       {v.stand_in_until && <Note>{t('rd.standin_note', { at: atText(v.stand_in_until) })}</Note>}
       <Section>{t('rd.slots')}</Section>
       <CardGrid>
@@ -83,8 +86,8 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
             <PCard key={`${s.ref}-${i}`} icon={busyOne ? 'book' : 'plus'} tone={busyOne ? 'busy' : 'good'}
               title={busyOne && prj ? kn(prj.knowledge) : t('rd.slot_free')}
               sub={s.ref === 'free' ? t('rd.slot_of_town') : bn(s.building)}
-              facts={busyOne && prj ? <span>{t('rd.left', { w: words(prj.left_seconds) })}{prj.finish_at ? ` · ${atText(prj.finish_at)}` : ''}</span> : t('rd.slot_ready')}
-              foot={busyOne && prj ? <span className="rd-notes">{quoteNotes(prj).join(' · ') || t('rd.q.plain')}</span> : undefined} />
+              facts={busyOne && prj ? <span>{t('rd.left', { w: words(prj.left_seconds) })}{prj.finish_at ? ` – ${atText(prj.finish_at)}` : ''}</span> : t('rd.slot_ready')}
+              foot={busyOne && prj ? <span className="rd-notes">{quoteNotes(prj).join(' – ') || t('rd.q.plain')}</span> : undefined} />
           )
         }))}
         {locked && <PCard icon="chest" off title={t('rd.slot_locked')} sub={t('rd.locked_sub')} facts={<span className="dk-why">{t('rd.not_here')}</span>} />}
@@ -95,7 +98,7 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
       {(v.buildings ?? []).length > 0 && <Section>{t('rd.buildings')}</Section>}
       {(v.buildings ?? []).map((b) => (
         <Panel key={b.id} tone={b.open ? 'emerald' : undefined}>
-          <Lead>{bn(b.building)} · {b.open ? t('rd.open') : t('rd.idle')}</Lead>
+          <Lead>{bn(b.building)} – {b.open ? t('rd.open') : t('rd.idle')}</Lead>
           {!b.open && idleWhy(b) && <Note tone="bad">{idleWhy(b)}</Note>}
           <Seats b={b} />
           <Hint>{t('rd.b_facts', { slots: formatNumber(b.slots), wage: money(b.wage), bonus: bp(b.bonus_bps) })}</Hint>
@@ -133,7 +136,7 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
           {(v.experience ?? []).map((e) => (
             <PCard key={e.field} icon="scroll" title={hasKey(`rd.field.${e.field}`) ? t(`rd.field.${e.field}` as Key) : e.field} tone="busy"
               sub={t('rd.exp_pts', { a: formatNumber(e.points), b: formatNumber(e.per) })}
-              foot={<span className="rd-notes"><ProgressRow frac={Math.min(1, e.points / Math.max(1, e.per))} label={t('rd.exp_max', { p: bp(e.max_bps) })} color="#8e6cf0" /></span>} />
+              foot={<span className="rd-notes"><ProgressRow frac={Math.min(1, e.points / Math.max(1, e.per))} label="" color="#8e6cf0" /><small className="rd-exp-max">{t('rd.exp_max', { p: bp(e.max_bps) })}</small></span>} />
           ))}
         </CardGrid>
       )}

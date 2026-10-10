@@ -54,7 +54,7 @@ export default function Missions({ response, loading, onAction, run }: ScreenPro
     if (r?.cash) parts.push(money(r.cash))
     if (r?.xp) parts.push(t('missions.xp', { n: r.xp }))
     for (const it of r?.items ?? []) if (it.item) parts.push(t('missions.reward_item', { qty: it.qty ?? 1, item: names.name('item', it.item.code ?? '', it.item.name) }))
-    return parts.join(' · ')
+    return parts.join(' – ')
   }
 
   return (

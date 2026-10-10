@@ -19,14 +19,17 @@ import { words } from '../../lib/duration'
 export const ROLE_ICON: Record<string, string> = {
   '': 'house', security: 'shield', craft: 'gears', extraction: 'ore', water_infra: 'world',
   food: 'bread', health: 'hospital', education: 'study', market: 'market', storage: 'box',
+  water: 'world', hospitality: 'bed', commerce: 'market', finance: 'bank', signal: 'eye', research: 'study', home: 'house',
 }
 export const ROLE_PALETTE: Record<string, IconPalette> = {
   '': 'gold', security: 'ruby', craft: 'amber', extraction: 'steel', water_infra: 'sapphire',
   food: 'emerald', health: 'teal', education: 'violet', market: 'gold', storage: 'steel',
+  water: 'sapphire', hospitality: 'amber', commerce: 'gold', finance: 'gold', signal: 'steel', research: 'violet', home: 'gold',
 }
 export const ROLE_TONE: Record<string, Tone> = {
   '': 'gold', security: 'ruby', craft: 'gold', extraction: 'sapphire', water_infra: 'sapphire',
   food: 'emerald', health: 'teal', education: 'violet', market: 'gold', storage: 'sapphire',
+  water: 'sapphire', hospitality: 'gold', commerce: 'gold', finance: 'gold', signal: 'sapphire', research: 'violet', home: 'gold',
 }
 
 /** Icon/palette of a building type: by the role its catalogue entry carries. */

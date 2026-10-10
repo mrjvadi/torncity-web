@@ -59,7 +59,7 @@ export default function CrimeHub({ response, loading, onAction, run, openLocal }
         {v.venue?.code && <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8 }}>{t('crime.venue', { name: names.name('venue', v.venue.code, v.venue.name) })}</div>}
         {v.tier?.tier?.name && (
           <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>
-            {t('crime.tier', { name: tierName(v.tier.tier) })} {v.tier.next?.name ? `· ${t('crime.tier_next', { name: tierName(v.tier.next), a: formatNumber(v.tier.xp ?? 0), b: formatNumber(v.tier.next_xp ?? 0) })}` : ''}
+            {t('crime.tier', { name: tierName(v.tier.tier) })} {v.tier.next?.name ? `– ${t('crime.tier_next', { name: tierName(v.tier.next), a: formatNumber(v.tier.xp ?? 0), b: formatNumber(v.tier.next_xp ?? 0) })}` : ''}
           </div>
         )}
       </Card>

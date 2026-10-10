@@ -14,12 +14,13 @@ import { Bar, Card, Chip, Empty, Header, ListRow, Notice, ScreenScroll, SectionT
 import { Slab } from '../../kit'
 import { PBtn, CardGrid } from '../../ui/v6/panel'
 import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGrid } from '../../ui/Popup'
-import { hms, money } from '../native/kit/format'
+import { hms, money, splitMoney } from '../native/kit/format'
 import { formatNumber } from '../../lib/persian'
 import { hasKey, t, type Key } from '../../i18n'
 import type {
   ConstructionProgressView, KnowledgeLineView, KnowledgeListView, VillageOverviewView,
 } from '../../api/types'
+import type { ServiceLine } from '../../api/views.gen'
 import { buildingName, useBuildingCatalogue, useContentNames, useNow, useSettlementId, useVillage, useVillageCommand } from '../../village/useVillage'
 import { constructionProgress } from '../../village/progress'
 import { countdown, durationText, iconForRole, RowCard, ROLE_TONE, useVillageView } from './common'
@@ -30,8 +31,40 @@ const back = (openLocal: ScreenProps['openLocal']) => () => openLocal('village_h
 
 // -- overview ----------------------------------------------------------------------------------
 
+/** The treasury: the amount on one line, the SUP equivalent (when the city has its own money) smaller below. */
+function TreasuryFigure({ amount }: { amount: string }) {
+  const sp = splitMoney(amount)
+  return (
+    <>
+      <div className="display vs-treasury">{sp ? sp[0] : amount}</div>
+      {sp && <div className="vs-treasury-sub">{sp[1]}</div>}
+    </>
+  )
+}
+
+/** A daily service post (watch post, health house, inn): held today or closed and why, and the calm note of the grace. */
+const SERVICE_ICON: Record<string, { icon: string; palette: 'ruby' | 'teal' | 'amber' }> = {
+  local_security: { icon: 'shield', palette: 'ruby' }, primary_care: { icon: 'hospital', palette: 'teal' }, lodging_and_tea: { icon: 'bed', palette: 'amber' },
+}
+function ServiceCard({ sv, names, name }: { sv: ServiceLine; names: ReturnType<typeof useContentNames>; name: string }) {
+  const ic = SERVICE_ICON[sv.service] ?? { icon: 'house', palette: 'amber' as const }
+  const needs = (sv.needs ?? []).map((m) => `${formatNumber(m.quantity)} ${names.name(['component', 'item'], m.component.code, m.component.name)}`).join('، ')
+  const why = !sv.held && sv.idle && hasKey(`vx.svc.idle.${sv.idle}`) ? t(`vx.svc.idle.${sv.idle}` as Key) : ''
+  return (
+    <Card className="vs-svc">
+      <ListRow icon={ic.icon} palette={ic.palette} title={name}
+        sub={hasKey(`vx.svc.kind.${sv.service}`) ? t(`vx.svc.kind.${sv.service}` as Key) : undefined}
+        right={<Chip>{sv.held ? t('vx.svc.open') : t('vx.svc.closed')}</Chip>} />
+      {why && <div className="vs-svc-why">{why}</div>}
+      {sv.grace && sv.grace_until && needs && <div className="vs-svc-note">{t('vx.svc.grace', { at: atText(sv.grace_until), needs })}</div>}
+      {!sv.grace && !sv.held && needs && <div className="vs-svc-note">{t('vx.svc.needs', { needs })}</div>}
+    </Card>
+  )
+}
+
 export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
   const cat = useBuildingCatalogue()
+  const names = useContentNames()
   const id = useSettlementId()
   const { players, store, status } = useVillage(id)
   const { res, view: v, loading, failed, refresh } = useVillageView<VillageOverviewView>('settlement.overview', response)
@@ -59,7 +92,7 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
                 <div className="display" style={{ fontSize: 20 }}>{t('vx.ov.people', { n: formatNumber(v.population) })}</div>
                 {v.population_cap > 0 && <div className="nx-bar-sub">{t('vx.ov.cap', { n: formatNumber(v.population_cap) })}</div>}
               </div>
-              <div><div className="nx-stat-label">{t('overview.treasury')}</div><div className="display" style={{ fontSize: 20, color: 'var(--gold)' }}>{money(v.treasury)}</div></div>
+              <div><div className="nx-stat-label">{t('overview.treasury')}</div><TreasuryFigure amount={money(v.treasury)} /></div>
             </div>
             <div className="vs-grid" style={{ marginTop: 10 }}>
               <div><div className="nx-stat-label">{t('village.sheet.role')}</div><div>{role}</div></div>
@@ -77,6 +110,14 @@ export function Overview({ response, run, openLocal, localArgs }: ScreenProps) {
               ))}
             </div>
           </Card>
+          {(v.services ?? []).length > 0 && (
+            <>
+              <SectionTitle>{t('vx.svc.title')}</SectionTitle>
+              <div className="vs-svc-list">
+                {(v.services ?? []).map((sv, i) => <ServiceCard key={i} sv={sv} names={names} name={buildingName(cat, sv.building.code, sv.building.name)} />)}
+              </div>
+            </>
+          )}
           <SectionTitle>{t('overview.buildings')}</SectionTitle>
           {(v.buildings ?? []).length === 0 && <Empty>{t('overview.no_buildings')}</Empty>}
           <CardGrid>
@@ -140,7 +181,7 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
               <RowCard
                 key={`${l.lot_x}-${l.lot_y}-${i}`} icon={icon} palette={palette}
                 title={buildingName(cat, l.building.code, l.building.name)}
-                sub={`${t('building.at', { x: l.lot_x + 1, y: l.lot_y + 1 })} · ${t('vx.prog.by_work')}`}
+                sub={`${t('building.at', { x: l.lot_x + 1, y: l.lot_y + 1 })} – ${t('vx.prog.by_work')}`}
                 right={<span className="vs-timer">{t('progress.percent', { p: Math.floor(l.progress_bps / 100) })}</span>}
               >
                 <Bar frac={l.progress_bps / 10000} color="#f5a11f" label={`${Math.floor(l.progress_bps / 100)}%`} />
@@ -157,7 +198,7 @@ export function Progress({ response, openLocal, run }: ScreenProps) {
               tone={ROLE_TONE[catRole ?? ''] === 'gold' ? undefined : ROLE_TONE[catRole ?? '']}
               icon={icon} palette={palette}
               title={buildingName(cat, l.building.code, l.building.name)}
-              sub={`${t('building.at', { x: l.lot_x + 1, y: l.lot_y + 1 })} · ${l.state === 'queued' ? t('progress.queued') : t('progress.building')}`}
+              sub={`${t('building.at', { x: l.lot_x + 1, y: l.lot_y + 1 })} – ${l.state === 'queued' ? t('progress.queued') : t('progress.building')}`}
               right={<span className="vs-timer">{leftS > 0 ? hms(leftS) : t('progress.done_soon')}</span>}
             >
               {p !== null && <Bar frac={p} color="#f5a11f" label={t('progress.percent', { p: Math.round(p * 100) })} />}
@@ -255,7 +296,7 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
             </div>
             {(v.projects ?? []).map((p) => (
               <div key={p.knowledge.code} style={{ marginTop: 8 }}>
-                <div className="nx-stat-label">{kname(p.knowledge)} · {p.slot === 'free' || !p.slot ? t('rd.slot_of_town') : t('rd.slot_building')} · {bp(p.speed_bps)}</div>
+                <div className="nx-stat-label">{kname(p.knowledge)} – {p.slot === 'free' || !p.slot ? t('rd.slot_of_town') : t('rd.slot_building')} – {bp(p.speed_bps)}</div>
                 <Bar frac={projFrac(v, p, now)} color="#8e6cf0" label={countdown(p.finish_at, now)} />
               </div>
             ))}
@@ -279,7 +320,7 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
               const buyShort = l.buy_price - v.treasury
               const sub = held ? t('know.state.held')
                 : locked ? (missing ? t('know.missing', { list: missing }) : t('know.state.locked'))
-                  : `${t('know.cost', { n: money(l.research_cost) })} · ${t('know.time', { t: durationText(l.research_time_seconds) })}`
+                  : `${t('know.cost', { n: money(l.research_cost) })} – ${t('know.time', { t: durationText(l.research_time_seconds) })}`
               const opens = (l.unlocks ?? []).map((u) => t(`know.unlock.${u.kind}` as Key, {
                 name: u.kind === 'building' ? buildingName(cat, u.item.code, u.item.name) : u.kind === 'course' ? names.name('course', u.item.code, u.item.name) : kname(u.item),
               }))
@@ -294,13 +335,13 @@ export function Knowledge({ response, openLocal, run }: ScreenProps) {
                   {l.state !== 'held' && (l.needs ?? []).length > 0 && (
                     <ReqList rows={needRows({ names, bname: (c, n) => buildingName(cat, c, n), openKnowledge: () => undefined, openBuild: () => openLocal('village_home', { build: '1' }), openStorage: () => openLocal('village_storage'), openTreasury: () => openLocal('village_overview'), openLearn: () => run('education.list'), openTravel: () => run('travel.destinations'), go: () => undefined }, l.needs)} />
                   )}
-                  {l.state === 'available' && quoteNotes(l).length > 0 && <div className="nx-bar-sub rd-notes">{quoteNotes(l).join(' · ')}</div>}
+                  {l.state === 'available' && quoteNotes(l).length > 0 && <div className="nx-bar-sub rd-notes">{quoteNotes(l).join(' – ')}</div>}
                   {!held && opens.length > 0 && <div className="nx-bar-sub">{t('know.unlocks', { list: opens.join('، ') })}</div>}
                   {l.state === 'available' && short > 0 && <div className="nx-bar-sub">{t('know.short', { n: money(short) })}</div>}
                   {canAct && l.state === 'available' && (
                     <div className="vs-btns">
                       <Slab tone="gold" radius={12} lip={3} disabled={short > 0} onClick={() => setAsk({ kind: 'research', line: l })}>{t('know.research')}</Slab>
-                      {l.buy_price > 0 && <Slab tone="blue" radius={12} lip={3} disabled={buyShort > 0} onClick={() => setAsk({ kind: 'buy', line: l })}>{t('know.buy')} · {money(l.buy_price)}</Slab>}
+                      {l.buy_price > 0 && <Slab tone="blue" radius={12} lip={3} disabled={buyShort > 0} onClick={() => setAsk({ kind: 'buy', line: l })}>{t('know.buy')} – {money(l.buy_price)}</Slab>}
                     </div>
                   )}
                 </RowCard>
@@ -362,7 +403,7 @@ export function Who({ openLocal }: ScreenProps) {
               icon={known && p.online ? 'person' : 'person'}
               palette={known && p.online ? 'emerald' : 'steel'}
               title={<span><i className={`vs-dot${known && p.online ? ' on' : ''}`} />{p.name ?? t('who.unknown')}</span>}
-              sub={known ? [label, p.code].filter(Boolean).join(' · ') : t('who.unknown')}
+              sub={known ? [label, p.code].filter(Boolean).join(' – ') : t('who.unknown')}
               right={known ? (p.online ? t('who.online') : t('who.offline')) : undefined}
             />
           )

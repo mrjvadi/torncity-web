@@ -244,7 +244,7 @@ const ShopDetail = flow<ShopView>(({ view: v, ctx }) => {
           const buy = v.here && s.stock > 0 ? find(ctx, 'shop.buy', { item: s.item.code }) : undefined
           return (
             <ListRow key={s.item.code} icon="box" palette={s.stock > 0 ? 'emerald' : 'steel'} title={nameOf(ctx, ['item', 'component'], s.item)}
-              sub={s.stock === 0 ? t('eco.shops.empty') : `${t('eco.shops.stock', { n: formatNumber(s.stock) })}${s.busy ? ` · ${t('eco.shops.busy')}` : ''}${s.buyback > 0 ? ` · ${t('eco.shops.buys', { n: money(s.buyback) })}` : ''}`}
+              sub={s.stock === 0 ? t('eco.shops.empty') : `${t('eco.shops.stock', { n: formatNumber(s.stock) })}${s.busy ? ` – ${t('eco.shops.busy')}` : ''}${s.buyback > 0 ? ` – ${t('eco.shops.buys', { n: money(s.buyback) })}` : ''}`}
               right={money(s.price)} onClick={buy ? () => ctx.go(buy) : undefined} />
           )
         })}

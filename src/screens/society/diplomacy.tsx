@@ -41,9 +41,9 @@ function SanctionBlock({ ctx, s, imposed, lift }: { ctx: FlowCtx; s: SanctionLin
       <div className="sc-line">
         <span className="sc-line-title">{t(imposed ? 'soc.dip.line_on' : 'soc.dip.line_by', { no: formatNumber(s.no), country: placeName(ctx.names, other) })}</span>
       </div>
-      <Hint>{measures(ctx.names, s.measures)} · {t('soc.dip.ground', { ground: groundName(ctx.names, s.ground) })}</Hint>
+      <Hint>{measures(ctx.names, s.measures)} – {t('soc.dip.ground', { ground: groundName(ctx.names, s.ground) })}</Hint>
       <Hint>{s.in_force_in_seconds > 0 ? t('soc.dip.pending', { in: span(s.in_force_in_seconds) }) : t('soc.dip.since', { since: span(s.since_seconds) })}
-        {s.by ? ` · ${t('soc.dip.by', { office: officeName(ctx.names, s.office), player: playerText(s.by) })}` : ''}</Hint>
+        {s.by ? ` – ${t('soc.dip.by', { office: officeName(ctx.names, s.office), player: playerText(s.by) })}` : ''}</Hint>
       {imposed && !s.liftable && s.liftable_in_seconds > 0 && <Hint>{t('soc.dip.liftable_in', { in: span(s.liftable_in_seconds) })}</Hint>}
       {lift && <Btns ctx={ctx} list={[lift]} />}
     </div>

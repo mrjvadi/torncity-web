@@ -12,7 +12,7 @@ const CURVE: [number, number][] = [[0, 7000], [5000, 10000], [10000, 15000], [20
 const BASE_WAGE = 30
 const MIN_WAGE = 10
 
-interface Site { id: string; code: string; fa: string; en: string; x: number; y: number; required: number; done: number; jobId: string; left: number; total: number; crew: number; wage: number; status: 'building' | 'complete'; employer: string }
+interface Site { id: string; code: string; fa: string; en: string; x: number; y: number; required: number; done: number; jobId: string; left: number; total: number; crew: number; wage: number; status: 'building' | 'complete'; employer: string; production?: boolean }
 interface Shift { id: string; siteId: string; npc: boolean; name: string; level: string; finish: number; wage: number; points: number }
 
 const S = {
@@ -37,6 +37,7 @@ function init() {
     { id: 'lb-site-1', code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: 'Woodcutter camp', x: 1, y: 0, required: 120, done: 42, jobId: 'lb-job-1', left: 3, total: 4, crew: 0, wage: 30, status: 'building', employer: '' },
     { id: 'lb-site-2', code: 'cottage', fa: 'خانهٔ کوچک', en: 'Cottage', x: 3, y: 1, required: 240, done: 0, jobId: 'lb-job-2', left: 6, total: 6, crew: 0, wage: 45, status: 'building', employer: 'سارا' },
   ]
+  S.sites.push({ id: 'lb-site-3', code: 'bakery', fa: 'نانوایی', en: 'Bakery', x: 5, y: 1, required: 120, done: 120, jobId: '', left: 0, total: 0, crew: 0, wage: 40, status: 'complete', employer: '', production: true })
   S.shifts = [{ id: 'lb-shift-0', siteId: 'lb-site-1', npc: false, name: 'سارا', level: 'journeyman', finish: Date.now() + 5 * 60_000, wage: 30, points: 60 }]
 }
 
@@ -89,9 +90,9 @@ function jobView(s: Site): LaborJobView {
   const shifts = S.shifts.filter((x) => x.siteId === s.id)
   const pending = shifts.reduce((n, x) => n + x.points, 0)
   return {
-    id: s.jobId, building_id: s.id, building: named(s), kind: 'construction', employer_kind: s.employer ? 'player' : 'settlement', employer: s.employer,
+    id: s.jobId, building_id: s.id, building: named(s), kind: s.production ? 'production' : 'construction', employer_kind: s.employer ? 'player' : 'settlement', employer: s.employer,
     wage: s.wage, left: s.left, total: s.total, progress_bps: Math.floor((s.done * 10000) / s.required), left_minutes: s.required - s.done,
-    workers: shifts.length, npc_crew: s.crew, can_take: s.status === 'building' && s.left > 0 && s.required - s.done - pending > 0 && !mine(), mine: !!s.employer && false, points: 42, lot_x: s.x, lot_y: s.y,
+    workers: shifts.length, npc_crew: s.crew, can_take: (s.status === 'building' || !!s.production) && s.left > 0 && s.required - s.done - pending > 0 && !mine(), mine: !!s.employer && false, points: 42, lot_x: s.x, lot_y: s.y,
   }
 }
 
@@ -99,7 +100,7 @@ const mine = () => S.shifts.find((x) => x.name === 'شما')
 
 function siteView(s: Site, just = ''): LaborSiteView {
   const m = market()
-  const job = s.status === 'building' && s.jobId ? jobView(s) : null
+  const job = (s.status === 'building' || s.production) && s.jobId ? jobView(s) : null
   const shifts = S.shifts.filter((x) => x.siteId === s.id).map(shiftView)
   const head = !s.employer
   const my = mine()
@@ -107,7 +108,7 @@ function siteView(s: Site, just = ''): LaborSiteView {
     village: 'آمل', building: named(s), id: s.id, status: s.status, progress_bps: Math.floor((s.done * 10000) / s.required),
     required_minutes: s.required, done_minutes: s.done, left_minutes: s.required - s.done, job, workers: shifts.length ? shifts : null, market: m,
     can_work: !!job && job.can_take, work_wage: s.wage, work_points: 42, working: my ? shiftView(my) : null,
-    can_employ: !!job && head, can_post: s.status === 'building' && !s.jobId && head,
+    can_employ: !!job && head, can_post: (s.status === 'building' || !!s.production) && !s.jobId && head,
     hire_presets: head && job ? [1, 2, 4] : null,
     wage_presets: head && job ? [100, 125, 150, 200].map((p) => ({ percent: p, wage: Math.floor((m.npc_wage * p) / 100) })) : null,
     npc_available: m.available, npc_wage: m.npc_wage, just,
@@ -156,11 +157,11 @@ export function mockLaborCommand(command: string, args: Record<string, unknown> 
   const site = S.sites.find((s) => s.id === String(args.id ?? '') || s.jobId === String(args.id ?? ''))
   switch (command) {
     case 'settlement.labor.board': {
-      const jobs = S.sites.filter((s) => s.status === 'building' && s.jobId).map(jobView)
+      const jobs = S.sites.filter((s) => (s.status === 'building' || s.production) && s.jobId).map(jobView)
       const my = mine()
       const view: LaborBoardView = {
         village: 'آمل', jobs: jobs.length ? jobs : null, market: market(), working: my ? shiftView(my) : null, resident: true,
-        sites: S.sites.filter((s) => s.status === 'building' && !s.jobId).map((s) => ({ id: s.id, building: named(s), progress_bps: Math.floor((s.done * 10000) / s.required) })),
+        sites: S.sites.filter((s) => (s.status === 'building' || s.production) && !s.jobId).map((s) => ({ id: s.id, building: named(s), progress_bps: Math.floor((s.done * 10000) / s.required), standing: s.status === 'complete' })),
       }
       const acts: MockAct[] = [
         ...jobs.map((j) => A('labor.job', 'settlement.labor.site', { id: j.building_id }, { subject: j.building.code })),
@@ -198,8 +199,8 @@ export function mockLaborCommand(command: string, args: Record<string, unknown> 
     }
     case 'settlement.labor.post': {
       if (!site) return refusal('labor_no_site')
-      site.jobId = `lb-job-${S.seq++}`
-      site.left = Math.ceil((site.required - site.done) / 60) * 2
+      site.jobId = `lb-job-p${S.seq++}`
+      site.left = site.production ? 8 : Math.ceil((site.required - site.done) / 60) * 2
       site.total = site.left
       site.wage = market().npc_wage
       return siteScreen(site, 'posted')

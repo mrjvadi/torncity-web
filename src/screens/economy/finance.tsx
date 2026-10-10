@@ -52,8 +52,8 @@ const Gold = flow<GoldView>(({ view: v, ctx }) => {
         />
         <div className="vh-hint" style={{ textAlign: 'center' }}>
           {t(move > 0 ? 'eco.gold.up' : move < 0 ? 'eco.gold.down' : 'eco.gold.flat', { p: pct(Math.abs(move)) })}
-          {' · '}{t('eco.gold.stock', { n: formatNumber(v.stock) })}
-          {v.next_at && <> · {t('eco.gold.next', { t: clockText(v.next_at) })}</>}
+          {' – '}{t('eco.gold.stock', { n: formatNumber(v.stock) })}
+          {v.next_at && <> – {t('eco.gold.next', { t: clockText(v.next_at) })}</>}
         </div>
       </Card>
       <Panel>
@@ -201,7 +201,7 @@ const LoanOffer = flow<LoanOfferView>(({ view: v, ctx }) => {
           <CardGrid>
           {pledges.map((p) => {
             const a = find(ctx, 'finance.pledge', { pledge: p.code || p.no })
-            return <ListRow key={p.code || p.no} icon="house" palette="sapphire" title={pledgeTitle(ctx, p)} sub={p.code ? t('eco.loan.secures', { n: money(p.limit) }) : `${t('eco.pledge.worth', { n: money(p.value) })} · ${t('eco.loan.secures', { n: money(p.limit) })}`} onClick={() => a && ctx.go(a)} />
+            return <ListRow key={p.code || p.no} icon="house" palette="sapphire" title={pledgeTitle(ctx, p)} sub={p.code ? t('eco.loan.secures', { n: money(p.limit) }) : `${t('eco.pledge.worth', { n: money(p.value) })} – ${t('eco.loan.secures', { n: money(p.limit) })}`} onClick={() => a && ctx.go(a)} />
           })}
           </CardGrid>
         </Panel>
@@ -363,7 +363,7 @@ const Insurance = flow<InsuranceView>(({ view: v, ctx }) => {
                 <span>{t('eco.insurance.policy', { no: formatNumber(p.no), product: nameOf(ctx, ['insurance_product'], p.product) })}</span>
                 <b>{p.status === 'active' ? (p.claimable ? t('eco.insurance.active') : t('eco.insurance.waiting', { t: clockText(p.from) })) : t(key(`eco.insurance.ended.${p.reason || 'cancelled'}`))}</b>
               </div>
-              <Hint>{t('eco.insurance.policy_sub', { premium: money(p.premium), paid: money(p.paid) })}{p.property ? ` · ${pledgeName(ctx, p.property)}` : ''}</Hint>
+              <Hint>{t('eco.insurance.policy_sub', { premium: money(p.premium), paid: money(p.paid) })}{p.property ? ` – ${pledgeName(ctx, p.property)}` : ''}</Hint>
               {p.status === 'active' && !v.cancel && (() => { const a = find(ctx, 'insurance.cancel', { no: p.no }); return a ? <Btns ctx={ctx} list={[a]} tone="red" /> : null })()}
             </div>
           ))}

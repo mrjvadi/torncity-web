@@ -18,7 +18,7 @@ const key = (k: string) => k as Key
 
 function lineSub(ctx: FlowCtx, a: AuctionLine): string {
   const state = a.status === 'open' ? t('eco.auction.remaining', { t: durationText(a.remaining_seconds) }) : t(key(`eco.auction.status.${a.status}`))
-  return `${a.high_bid > 0 ? t('eco.auction.high_bid', { n: money(a.high_bid) }) : t('eco.auction.from', { n: money(a.reserve) })} · ${state}`
+  return `${a.high_bid > 0 ? t('eco.auction.high_bid', { n: money(a.high_bid) }) : t('eco.auction.from', { n: money(a.reserve) })} – ${state}`
 }
 
 function Rows({ list, ctx }: { list: AuctionLine[] | null; ctx: FlowCtx }) {
@@ -73,7 +73,7 @@ const Auction = flow<AuctionDetailView>(({ view: v, ctx }) => {
           { label: t('eco.auction.seller'), value: v.seller || t('eco.someone') },
           { label: t('eco.auction.reserve'), value: money(a.reserve) },
           ...(a.high_bid > 0 ? [{ label: t('eco.auction.high_bid_label'), value: t('eco.auction.high_bid_of', { n: money(a.high_bid), bids: formatNumber(v.bids) }), gold: true }] : []),
-          ...(open ? [{ label: t('eco.auction.ends'), value: `${durationText(a.remaining_seconds)} · ${clockText(a.ends_at)}` }] : []),
+          ...(open ? [{ label: t('eco.auction.ends'), value: `${durationText(a.remaining_seconds)} – ${clockText(a.ends_at)}` }] : []),
         ]} />
         {a.high_bid <= 0 && <Hint>{t('eco.auction.no_bids')}</Hint>}
         {!open && <Hint>{t(key(`eco.auction.status.${a.status}`))}</Hint>}
