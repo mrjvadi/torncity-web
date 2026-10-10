@@ -28,6 +28,7 @@ import { makeBuildingMaterials, type BuildingMaterials } from './buildingMateria
 import { buildVillageRoads, type RoadsMesh } from './villageRoads'
 import { LotOverlay } from './lotOverlay'
 import { LandOverlay, type OuterCell } from './landOverlay'
+import { landSpots, landLotKeys, landSignature, forestKeeps, lotHash, RockField, type LandSpots } from './landObjects'
 import { TreeField, type TreeSpot } from './vegetation'
 import { createSky, type Sky } from './sky'
 import { constructionProgress } from './progress'
@@ -86,6 +87,8 @@ export class VillageScene {
   private grassTime = 0
   private boulders: FieldResult | null = null
   private trees: TreeField | null = null
+  private rocks: RockField | null = null
+  private landSig = ''
   private treeList: TreeSpot[] = []
   private roads: RoadsMesh | null = null
   private mats: BuildingMaterials
@@ -230,14 +233,12 @@ export class VillageScene {
       this.scene.add(...this.grass.objects)
     })
     stage('boulders', () => {
-      this.boulders = buildBoulders(grids)
+      this.boulders = buildBoulders(grids, this.layout.ring ? this.layout.ring.depth + 1 : 2)
       this.scene.add(...this.boulders.objects)
     })
     stage('trees', () => {
-      this.treeList = this.treeSpots()
-      this.trees = new TreeField(this.treeList)
-      for (const o of this.trees.objects) { o.castShadow = true; o.receiveShadow = true }
-      this.scene.add(...this.trees.objects)
+      this.makeCountrySpots()
+      this.rebuildLand()
     })
     this.rebuildBuildings()
     this.frame('aerial')
@@ -334,7 +335,10 @@ export class VillageScene {
     }
   }
 
-  private treeSpots(): TreeSpot[] {
+  /** The countryside's trees, made once from the terrain alone: each cell draws from its own seeded stream, so the spots do not move when the land round the village changes. */
+  private countrySpots: (TreeSpot & { cell: string; kind: 0 | 1 | 2 })[] = []
+
+  private makeCountrySpots(): void {
     const { grids, groundY, originX, originY, n } = this.ground
     const legend = grids.doc.biomeLegend
     const density = (code: string): number => {
@@ -345,47 +349,75 @@ export class VillageScene {
       if (/grassland|steppe|meadow/.test(code)) return 0.03
       return 0
     }
-    const r = seededRng(9137)
-    const spots: TreeSpot[] = []
+    const spots: (TreeSpot & { cell: string; kind: 0 | 1 | 2 })[] = []
     const { w, h } = grids.fine
-    const lot = this.ground.lot
-    const roadCells = new Set(this.roadLots().map((p) => `${p.x},${p.y}`))
     for (let fy = 1; fy < h - 1; fy++) {
       for (let fx = 1; fx < w - 1; fx++) {
         const idx = fy * w + fx
         if (grids.fine.water[idx] !== 0) continue
         const code = legend[grids.fine.biome[idx]]?.code ?? ''
         let p = density(code)
-        const cs = grids.fineScene(fx, fy)
         // forests come in stands: a slow noise thickens some places and thins others
         const nz = valueNoise(fx * 0.12 + 3.1, fy * 0.12 + 7.7) * 0.7 + valueNoise(fx * 0.31, fy * 0.31 + 1.3) * 0.3
         p *= 0.12 + 2.1 * smoothstep(0.42, 0.68, nz)
         // and gather along water
         const wetHere = this.fields.wet[fy * w + fx]
         if (wetHere > 0.02 && wetHere < 0.9 && !/desert|ice|tundra/.test(code)) p = Math.max(p, 0.55 * (1 - Math.abs(wetHere - 0.35)))
-        void cs
         if (p === 0) continue
         if (grids.fineSlopeAt(fx, fy) > 0.5) continue
         const inBlock = fx >= originX && fx < originX + n && fy >= originY && fy < originY + n
         const nearBlock = fx >= originX - 1 && fx <= originX + n && fy >= originY - 1 && fy <= originY + n
-        if (inBlock) {
-          const lx = fx - originX, ly = n - 1 - (fy - originY)
-          const lotInfo = this.layout.lots[ly]?.[lx]
-          if (lotInfo?.buildable || roadCells.has(`${lx},${ly}`) || this.occupied(lx, ly)) continue
-          p *= 0.6
-        } else if (nearBlock) p *= 0.25
+        const lx = fx - originX, ly = n - 1 - (fy - originY)
+        const r = seededRng((Math.imul(fx, 73856093) ^ Math.imul(fy, 19349663) ^ 9137) >>> 0)
         const count = Math.floor(p * 3 + r())
         for (let k = 0; k < count; k++) {
           const c = grids.fineScene(fx + (r() - 0.5) * 0.9, fy + (r() - 0.5) * 0.9)
           if (inBlock && this.ground.lotAt(c.x, c.z) === null) continue
           const lv = this.ground.lakeLevelAt(c.x, c.z)
           if (lv !== null && groundY(c.x, c.z) < lv + 0.9) continue
-          spots.push({ x: c.x, z: c.z, y: groundY(c.x, c.z), s: 0.8 + r() * 0.8, rot: r() * Math.PI * 2, species: /boreal|taiga/.test(code) || r() < 0.22 ? 1 : 0 })
+          spots.push({ x: c.x, z: c.z, y: groundY(c.x, c.z), s: 0.8 + r() * 0.8, rot: r() * Math.PI * 2, species: /boreal|taiga/.test(code) || r() < 0.22 ? 1 : 0, cell: `${lx},${ly}`, kind: inBlock ? 2 : nearBlock ? 1 : 0 })
         }
       }
     }
-    void lot
-    return spots.slice(0, 4200)
+    this.countrySpots = spots
+  }
+
+  /** The trees drawn: the server's own (grid, ring, open land), then the countryside beyond them, thinned by what is left of the forest. A server without the land rule keeps the old scatter. */
+  private treeSpots(land: LandSpots | null): TreeSpot[] {
+    const layout = this.layout
+    const roadCells = new Set(this.roadLots().map((p) => `${p.x},${p.y}`))
+    const keys = land ? landLotKeys(layout) : null
+    const remaining = layout.woods?.forest_remaining_bps ?? 10000
+    const out: TreeSpot[] = land ? [...land.trees] : []
+    for (const t of this.countrySpots) {
+      if (keys) {
+        if (keys.has(t.cell)) continue
+        if (!forestKeeps(t.x, t.z, remaining)) continue
+      } else if (t.kind === 2) {
+        const [lx, ly] = t.cell.split(',').map(Number)
+        if (layout.lots[ly]?.[lx]?.buildable || roadCells.has(t.cell) || this.occupied(lx, ly)) continue
+        if (lotHash(Math.round(t.x), Math.round(t.z), 1, 5) > 0.6) continue
+      } else if (t.kind === 1 && lotHash(Math.round(t.x), Math.round(t.z), 1, 6) > 0.25) continue
+      out.push(t)
+    }
+    return out.slice(0, 4200)
+  }
+
+  /** Draws the trees, rocks and stumps again (the first time, and whenever the land counts change). */
+  private rebuildLand() {
+    if (this.trees) { for (const o of this.trees.objects) this.scene.remove(o); this.trees.dispose() }
+    if (this.rocks) { for (const o of this.rocks.objects) this.scene.remove(o); this.rocks.dispose(); this.rocks = null }
+    const land = this.layout.ring || this.layout.woods ? landSpots(this.layout, this.ground) : null
+    this.landSig = landSignature(this.layout)
+    this.treeList = this.treeSpots(land)
+    this.trees = new TreeField(this.treeList)
+    for (const o of this.trees.objects) { o.castShadow = true; o.receiveShadow = true }
+    this.scene.add(...this.trees.objects)
+    if (land && (land.rocks.length || land.stumps.length)) {
+      this.rocks = new RockField(land.rocks, land.stumps)
+      this.scene.add(...this.rocks.objects)
+    }
+    this.trees.update(this.camera.position, true)
   }
 
   private occupied(lx: number, ly: number): boolean {
@@ -420,6 +452,8 @@ export class VillageScene {
     this.rebuildRoads()
     this.rebuildBuildings()
     this.rebakeControl()
+    // a cut, a planting or a clearing order: the trees and rocks of the lots are drawn again
+    if (this.countrySpots.length && landSignature(layout) !== this.landSig) this.rebuildLand()
     this.request()
   }
 
@@ -953,6 +987,7 @@ export class VillageScene {
     this.grass?.dispose()
     this.boulders?.dispose()
     this.trees?.dispose()
+    this.rocks?.dispose()
     this.roads?.dispose()
     this.overlay.dispose()
     this.land.dispose()

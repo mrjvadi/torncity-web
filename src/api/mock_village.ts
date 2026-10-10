@@ -22,6 +22,7 @@ import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIV
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 import * as landMock from './mock_village_land'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
+import { landOn, withGridLand, ringLots, woods, obstructedAt, clearCommand } from './mock_village_woods'
 import { ALL_PERMISSIONS, MOCK_ZONE, mockCharter } from './mock_charter'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
@@ -61,6 +62,7 @@ const CAT: CatEntry[] = [
   { code: 'teaching_circle', fa: 'کلاس درس', en: 'Village classroom', fp: [1, 1], cost: 200, time: 1500, role: 'education' },
   { code: 'barter_post', fa: 'بازارچه', en: 'Village market', fp: [1, 1], cost: 250, time: 1200, role: 'market' },
   { code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: "Woodcutter's camp", fp: [2, 2], cost: 900, time: 3600, role: 'craft' },
+  { code: 'forester_lodge', fa: 'نهالستان', en: 'Forester lodge', fp: [2, 2], cost: 400, time: 3600, role: 'craft' },
   { code: 'paper_mill', fa: 'کارگاه کاغذسازی', en: 'Paper mill', fp: [2, 2], cost: 1600, time: 5400, role: 'craft' },
   { code: 'clay_pit', fa: 'گودال گل', en: 'Clay pit', fp: [2, 2], cost: 700, time: 2700, role: 'extraction' },
   { code: 'tool_workshop', fa: 'کارگاه ابزارسازی', en: 'Tool workshop', fp: [2, 2], cost: 1500, time: 5400, role: 'craft' },
@@ -282,7 +284,8 @@ function layoutFor(id: string): VillageLayout {
     viewer: { member: own, can_place: own && IS_HEAD, ...(own ? { resident: true } : {}) },
     settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'city', world_cell: own ? 18211 : 18990, centre },
     grid: { lots: own ? size() : GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
-    lots: own ? st.lots : st.otherLots,
+    lots: own ? (landOn() ? withGridLand(st.lots) : st.lots) : st.otherLots,
+    ...(own && landOn() ? { ring: { depth: 3, lots: ringLots(size()) }, woods: woods() } : {}),
     buildings,
     ...(own ? { roads, ...(outerLand ? { land: outerLand } : {}), tenure: cz.tenure.map((l) => ({ x: l.x, y: l.y, tenure: 'freehold' as const, mine: l.mine, owner: l.owner })), terms: { lot_price: LOT_PRICE, permit_fee: PERMIT_FEE, tax_bps: TAX_BPS } } : {}),
   }
@@ -541,6 +544,12 @@ function place(args: Record<string, unknown>) {
   const { x, y, rotated } = at
   const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
   const beyond = x < 0 || y < 0 || x + w > size() || y + h > size()
+  if (landOn() && code !== 'road') {
+    const cells: { x: number; y: number }[] = []
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) cells.push({ x: xx, y: yy })
+    const ob = obstructedAt(cells, size())
+    if (ob) return refusal('obstructed', { obstacles: ob, action: 'build', subject: nameOf(code) })
+  }
   if (beyond) {
     const why = outerFree(x, y, w, h)
     if (why) return refusal(why)
@@ -1696,6 +1705,7 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.currency.fee': { deskFeeBps = Math.max(10, Math.min(300, Number(args.bps ?? 30))); return deskView({}) }
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true, String(args.from ?? ''))
+    case 'settlement.clear.order': case 'settlement.clear.cancel': { const r = clearCommand(command, args); emit({ type: 'land_changed', kind: 'ordered', x: Number(args.x), y: Number(args.y), layout_version: versions() }); return r }
     case 'settlement.build.place': return place(args)
     case 'settlement.build.place_many': return placeMany(args)
     case 'settlement.building.view': return buildingView(args)
@@ -1774,7 +1784,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     const id = decodeURIComponent(m[1])
     if (id !== OWN_ID && id !== OTHER_ID) return json({ ok: false, error: { code: 'not_found', message: 'not found' } }, 404)
     const layout = layoutFor(id)
-    const etag = `"${layout.version}.${layout.detail}"`
+    const etag = `"${layout.version}.${layout.detail}${layout.woods ? '.' + layout.woods.mark : ''}"`
     if (headers.get('If-None-Match') === etag) return new Response(null, { status: 304, headers: { ETag: etag } })
     return json(layout, 200, { ETag: etag, 'Cache-Control': 'private, no-cache' })
   }

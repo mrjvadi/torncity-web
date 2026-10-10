@@ -9,7 +9,7 @@ import type { CharterAuditView, CharterBallotView, CharterGrantView, CharterOffi
 const CATALOGUE: [string, string, boolean, boolean][] = [
   ['treasury.spend', 'treasury', true, true], ['payroll.set', 'treasury', true, false], ['budget.allocate', 'treasury', false, false], ['storage.take', 'treasury', false, true],
   ['fiscal.set:sales_tax', 'fiscal', false, true], ['fiscal.set:shop_price', 'fiscal', false, true], ['fiscal.set:market_fee', 'fiscal', false, false], ['fiscal.set:levy', 'fiscal', false, false],
-  ['road.draw', 'land', false, true], ['zone.open', 'land', false, false], ['zone.close', 'land', false, false], ['lot.sell', 'land', false, true], ['public.build', 'land', false, true], ['public.demolish', 'land', false, true],
+  ['road.draw', 'land', false, true], ['zone.open', 'land', false, false], ['zone.close', 'land', false, false], ['lot.sell', 'land', false, true], ['public.build', 'land', false, true], ['public.demolish', 'land', false, true], ['land.clear', 'land', false, true],
   ['citizen.admit', 'people', false, false], ['citizen.ban', 'people', false, false], ['staff.hire', 'people', false, true], ['staff.fire', 'people', false, true], ['jobs.post', 'people', false, true],
   ['research.start', 'knowledge', false, true], ['research.share', 'knowledge', false, false], ['trade.export', 'treasury', false, true],
   ['police.patrol', 'order', false, false], ['police.fine', 'order', true, false], ['court.judge', 'order', false, false],

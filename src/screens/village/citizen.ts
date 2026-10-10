@@ -2,7 +2,7 @@
 // (free to buy, the viewer's own, someone else's, built on) and the tint of
 // the land map. Pure functions over the layout the server last sent.
 
-import type { LayoutBuilding, VillageLayout } from '../../api/types'
+import type { LandStuff, LayoutBuilding, VillageLayout } from '../../api/types'
 import {
   TONE_BRIDGE, TONE_LOCKED, TONE_NEEDS, TONE_NONE, TONE_OK, TONE_OWN, TONE_OWN_LOCKED, TONE_TAKEN,
 } from '../../village/lotOverlay'
@@ -62,4 +62,19 @@ export function freeOwnLots(layout: VillageLayout): number {
   let n = 0
   for (const t of layout.tenure ?? []) if (t.mine && classifyLot(layout, t.x, t.y).kind === 'mine') n++
   return n
+}
+
+/** The trees and rocks the server counts on a lot of the grid, the woodland ring or the open land (ADR 0065); null when the lot is not in the layout. */
+export function landAt(layout: VillageLayout, x: number, y: number): LandStuff | null {
+  const g = layout.lots[y]?.[x]
+  if (g) return g
+  const r = layout.ring?.lots?.find((l) => l.x === x && l.y === y)
+  if (r) return r
+  return layout.land?.open?.find((l) => l.x === x && l.y === y) ?? null
+}
+
+/** What a clearing order asks for on a lot: both when both stand, else the one that does; null when nothing stands. */
+export function clearWhat(l: LandStuff | null): 'trees' | 'rocks' | 'all' | null {
+  const t = (l?.trees ?? 0) > 0, r = (l?.rocks ?? 0) > 0
+  return t && r ? 'all' : t ? 'trees' : r ? 'rocks' : null
 }

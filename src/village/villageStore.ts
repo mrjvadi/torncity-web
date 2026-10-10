@@ -274,12 +274,16 @@ export class VillageStore {
       }
     }
     if (ev.type === 'head_changed' && ev.layout_stale) refetch = true
+    // a cut, a quarrying, a planting or a clearing order: the trees and rocks of the lots changed (ADR 0065). The fetch is conditional (the ETag carries the woods mark), so the second one costs a 304 when the first already saw it.
+    const land = ev.type === 'land_changed' && !!ev.kind && ev.kind !== 'road_planned' && ev.kind !== 'road_cancelled'
+    if (land) refetch = true
     if (ev.type === 'member_joined' || ev.type === 'member_left' || ev.type === 'head_changed') {
       clearTimeout(this.playersTimer)
       this.playersTimer = window.setTimeout(() => void this.refetchPlayers(), 400)
     }
     this.set({ lastEvent: ev, tick: this.snap.tick + 1 })
     if (refetch) void this.refetchTo(ev.layout_version && layout ? versionFor(layout, ev.layout_version) : null)
+    if (land) window.setTimeout(() => void this.refetchLayout(), 1500)
   }
 
   /** The snapshot's seq of this settlement's channel, when the store has one

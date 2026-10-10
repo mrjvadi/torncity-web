@@ -5102,6 +5102,7 @@ charter.perm.zone.open | باز کردن محدوده | Open zones
 charter.perm.zone.close | بستن محدوده | Close zones
 charter.perm.lot.sell | فروش زمین و تعیین شرط‌هایش | Sell land and set its terms
 charter.perm.public.build | ساخت ساختمان‌های شهر | Build city buildings
+charter.perm.land.clear | پاک کردن درخت و سنگ زمین‌های شهر | Clear trees and rocks from the city's land
 charter.perm.public.demolish | خراب کردن ساختمان‌های شهر | Demolish city buildings
 charter.perm.citizen.admit | پذیرفتن ساکن | Admit residents
 charter.perm.citizen.ban | بیرون کردن از شهر | Ban from the city
@@ -6034,3 +6035,28 @@ wp.refuse.labor_no_food | برای این شیفت غذا نداری. | You have
 wp.refuse.labor_employer_broke | پول مزد این شیفت را نداری. | You cannot pay this shift's wage.
 wp.refuse.labor_needs_repair | کارگاه فرسوده است؛ اول تعمیرش کن. | The workshop is worn; repair it first.
 wp.refuse.labor_no_job | این آگهی دیگر نیست. | This notice is gone.
+act.clear.order | پاک کردن زمین | Clear the land
+act.clear.cancel | لغو پاک‌کردن | Cancel the clearing
+v6.ring.clear | پاک کردن زمین | Clear the land
+v6.ring.clear_cancel | لغو پاک‌کردن | Cancel clearing
+land.n_trees | {n} درخت | {n} trees
+land.n_rocks | {n} سنگ | {n} rocks
+land.both | {a} و {b} | {a} and {b}
+land.obstructed | روی این زمین {list} هست و تا پاک نشود نمی‌شود رویش ساخت. | {list} stand on this land; it cannot be built on until cleared.
+land.obstructed_can | می‌توانی دستور پاک‌کردن بدهی؛ کارگرها درخت و سنگ را برمی‌دارند و چوب و سنگش به انبار می‌رود. | You can order it cleared; workers take the trees and rocks away and the timber and stone go to the store.
+land.obstructed_cannot | پاک‌کردنش با صاحب زمین یا کسی است که اجازهٔ پاک‌کردن زمین دارد. | Clearing it is for the owner or someone allowed to clear land.
+land.clear | پاک کردن زمین | Clear the land
+land.clear_title | پاک کردن زمین | Clearing the land
+land.ordered | دستور پاک‌کردن زمین ({x}، {y}) داده شد: {list}. | The order to clear lot ({x}, {y}) is given: {list}.
+land.ordered_own | دستور پاک‌کردن زمین خودت ({x}، {y}) داده شد: {list}. | The order to clear your lot ({x}, {y}) is given: {list}.
+land.ordered_hint | هر کارگر یا خودت می‌توانی روی کار بروی؛ تا پاک نشود نمی‌شود رویش ساخت. | Anyone can work on it; it cannot be built on until cleared.
+land.cancelled | دستور پاک‌کردن زمین ({x}، {y}) برداشته شد. | The clearing order for lot ({x}, {y}) is withdrawn.
+land.commons | اینجا زمین مشترک شهر است: {trees} درخت و {rocks} سنگ دارد. | This is the town's common land: {trees} trees and {rocks} rocks.
+refusal.village_obstructed | روی این زمین درخت یا سنگ هست و باید اول پاک شود. | Trees or rocks stand on this land; clear it first.
+refusal.village_no_trees_in_reach | دور و بر شهر درختی نمانده که بشود برید. | No trees are left within reach of the town to cut.
+refusal.village_no_plot_in_reach | دور و بر شهر جایی برای کاشتن نهال نیست. | There is no place within reach to plant a sapling.
+refusal.no_trees_in_reach | دور و بر شهر درختی نمانده که بشود برید. | No trees are left within reach of the town to cut.
+refusal.no_plot_in_reach | دور و بر شهر جایی برای کاشتن نهال نیست. | There is no place within reach to plant a sapling.
+refusal.obstructed | روی این زمین درخت یا سنگ هست و باید اول پاک شود. | Trees or rocks stand on this land; clear it first.
+work.role.forester | نهال‌کار | Forester
+work.role.forestry | نهال‌کار | Forester

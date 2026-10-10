@@ -12,7 +12,8 @@ import type {
   MaterialBuyConfirmView, MineView, PrivateConfirmView, PrivateLotsView, PrivateMenuView, ResidenceView,
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
-import type { LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
+import type { Action } from '../../api/types'
+import type { ClearOrderView, LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
 import { Bar, Chip, Empty, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { money } from '../native/kit/format'
@@ -91,9 +92,26 @@ export function NeedLine({ ctx, n }: { ctx: FlowCtx; n: VillageNeed }) {
   return <div className="vf-need">{t('vx.need.building', { names: opts.join('، ') })}</div>
 }
 
+/** «n درخت و m سنگ»: what stands on a lot, in words. */
+const landWords = (trees: number, rocks: number) => trees > 0 && rocks > 0 ? t('land.both', { a: t('land.n_trees', { n: formatNumber(trees) }), b: t('land.n_rocks', { n: formatNumber(rocks) }) }) : trees > 0 ? t('land.n_trees', { n: formatNumber(trees) }) : rocks > 0 ? t('land.n_rocks', { n: formatNumber(rocks) }) : ''
+
 const Refusal = flow<VillageRefusalView>(({ view: v, ctx }) => {
   const code = ctx.res.error?.code ?? `village_${v.kind}`
   const args = { ...(ctx.res.error?.args ?? {}) }
+  const ob = v.obstacles
+  if (ob && (ob.trees > 0 || ob.rocks > 0)) {
+    const what = ob.trees > 0 && ob.rocks > 0 ? 'all' : ob.trees > 0 ? 'trees' : 'rocks'
+    return (
+      <Page title={t('vx.rf.title')} tone="ruby">
+        <Panel tone="ruby">
+          <Lead tone="bad">{t('land.obstructed', { list: landWords(ob.trees, ob.rocks) })}</Lead>
+          <Hint>{ob.can_order ? t('land.obstructed_can') : t('land.obstructed_cannot')}</Hint>
+        </Panel>
+        {ob.can_order && <Btns ctx={ctx} list={[{ id: 'clear.order', label: t('land.clear'), command: 'settlement.clear.order', args: { x: String(ob.x), y: String(ob.y), what }, kind: 'primary', icon: 'action:default' } as Action]} />}
+        <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
+      </Page>
+    )
+  }
   const needs = v.needs ?? []
   const lots = v.lots ?? []
   const subject = needsTitleName(ctx, v)
@@ -773,6 +791,19 @@ const RoadPlannedPage = flow<RoadQuoteView>(({ view: v, ctx }) => (
   </Page>
 ))
 
+/** The clearing order of a lot (ADR 0065): what was ordered cleared, and the way to take it back. */
+const ClearOrderPage = flow<ClearOrderView>(({ view: v, ctx }) => (
+  <Page title={t('land.clear_title')} tone="gold">
+    <Panel tone="gold">
+      {v.cancelled
+        ? <Lead>{t('land.cancelled', { x: formatNumber(v.x + 1), y: formatNumber(v.y + 1) })}</Lead>
+        : <Lead>{t(v.private ? 'land.ordered_own' : 'land.ordered', { x: formatNumber(v.x + 1), y: formatNumber(v.y + 1), list: landWords(v.order_trees ? v.trees : 0, v.order_rocks ? v.rocks : 0) })}</Lead>}
+      {!v.cancelled && <Hint>{t('land.ordered_hint')}</Hint>}
+    </Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
 const RoadCancelledPage = flow<RoadCancelledView>(({ ctx }) => (
   <Page title={t('road.title')} tone="gold">
     <Panel tone="gold"><Lead>{t('road.cancelled')}</Lead></Panel>
@@ -879,7 +910,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
 })
 
 registerFlow({
-  village_refusal: Refusal,
+  village_refusal: Refusal, clear_order: ClearOrderPage,
   village_donate_menu: DonateMenu, village_donate_confirm: DonateConfirm, village_donate_done: DonateDone,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
@@ -895,7 +926,7 @@ registerFlow({
 
 /** The server screens the flow host draws. */
 export const FLOW_SCREENS = [
-  'village_refusal', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
+  'village_refusal', 'clear_order', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
   'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',

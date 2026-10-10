@@ -323,8 +323,10 @@ export async function getChunkBytes(face: number, lod: number, x: number, y: num
  * so a copy in hand can be revalidated without reading a response header
  * the browser might hide from cross-origin scripts. */
 export function layoutEtag(l: Pick<VillageLayout, 'version' | 'detail'>): string {
-  return `"${l.version}.${l.detail}"`
+  return etags.get(l) ?? `"${l.version}.${l.detail}"`
 }
+/** The ETag the server really sent with a layout (it also carries the woods mark, ADR 0065), when the browser lets the page read it. */
+const etags = new WeakMap<object, string>()
 
 /** GET /settlements/{id}/layout. With `have` (the copy already held) sends
  * If-None-Match and answers `null` on 304. */
@@ -345,7 +347,10 @@ export async function getLayout(id: string, have?: VillageLayout | null): Promis
   }
   if (res.status === 304) return null
   if (!res.ok) throw await errorOf(res)
-  return (await res.json()) as VillageLayout
+  const layout = (await res.json()) as VillageLayout
+  const tag = res.headers.get('ETag')
+  if (tag) etags.set(layout, tag)
+  return layout
 }
 
 export async function getSettlementPlayers(id: string): Promise<SettlementPlayers> {
