@@ -15,6 +15,7 @@ import { LotManage } from './LotManage'
 import { ReserveScreen } from './Reserve'
 import { ResearchDesk } from './Research'
 import { TradeDesk } from './Trade'
+import ClearRun from './ClearRun'
 
 // The village: a local home screen (the 3D view) and the status screens,
 // which are also the layouts of the server screens the same commands answer
@@ -44,6 +45,7 @@ const screens: ScreenSet = {
     village_labor: LaborBoard,
     village_storage: Storage,
     village_shop: ShopLocal,
+    clear_run: ClearRun,
   },
 }
 

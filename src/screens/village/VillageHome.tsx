@@ -39,6 +39,9 @@ import './village.css'
 const member0 = (l: { viewer: { member: boolean } } | null | undefined) => !!l?.viewer.member
 const inBuildNow = (step: string) => step !== 'off'
 
+/** The idempotency key of one tap on the clear verb: made at the tap, kept in the screen's arguments, so a reload sends the same key. */
+const clearKey = (k: string, lot: { x: number; y: number }) => `web-clear-${k}-${lot.x}-${lot.y}-${Date.now().toString(36)}`
+
 export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) {
   const id = useSettlementId(localArgs?.id)
   const v = useVillage(id)
@@ -370,8 +373,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     if (what && (lotRing.kind === 'mine' || (canClear && (lotRing.kind === 'free' || lotRing.kind === 'commons')))) {
       const ordered = !!(L?.ordered?.trees || L?.ordered?.rocks)
       acts.push(ordered
-        ? { id: 'clear_cancel', label: t('v6.ring.clear_cancel'), icon: 'close', onClick: go(() => run('settlement.clear.cancel', { x: String(lot.x), y: String(lot.y) })) }
-        : { id: 'clear', label: t('v6.ring.clear'), icon: 'tool', onClick: go(() => run('settlement.clear.order', { x: String(lot.x), y: String(lot.y), what })) })
+        ? { id: 'clear_cancel', label: t('v6.ring.clear_cancel'), icon: 'close', onClick: go(() => openLocal('clear_run', { command: 'settlement.clear.cancel', x: String(lot.x), y: String(lot.y), key: clearKey('c', lot) })) }
+        : { id: 'clear', label: t('v6.ring.clear'), icon: 'tool', onClick: go(() => openLocal('clear_run', { command: 'settlement.clear.order', x: String(lot.x), y: String(lot.y), what, key: clearKey('o', lot) })) })
     }
     return { key: `lot-${lot.x}-${lot.y}`, name: t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 }), anchor: [p.x - r.left, p.y - r.top] as [number, number], actions: acts, onInfo: acts[0].onClick }
   })()
