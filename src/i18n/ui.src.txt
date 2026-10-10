@@ -5948,3 +5948,39 @@ lf.options.licence_soon | سوار {mode} شدن تا {at} هنوز آزاد ا�
 lf.options.licence_out | {mode} را نمی‌بینی، چون مدرک «{course}» را نداری. | You do not see the {mode} because you lack the {course} licence.
 lf.options.licence_go | آموزش | Training
 work.knowledge | دانش شهر: {p} تولید بیشتر | City knowledge: {p} more output
+lm.act.keeper_hire | گرفتن دکه‌دار | Hire a stall keeper
+lm.act.keeper_end | مرخص کردن دکه‌دار | Dismiss the stall keeper
+lm.keeper.title | دکه‌دار | Stall keeper
+lm.keeper.kept | یک نفر از مردم شهر دکه‌ات را نگه می‌دارد. | One of the townspeople keeps your stall.
+lm.keeper.none | دکه‌دار نداری؛ وقتی خودت نیستی، سفارش‌های فروشت از بازارچه برداشته می‌شود. | You have no keeper; when you are away your sell orders come off the market.
+lm.keeper.pay | مزدش | His pay
+lm.keeper.pay_share | {p}٪ از هر فروش | {p}% of each sale
+lm.keeper.pay_wage | روزی {w} | {w} a day
+lm.keeper.pay_none | هنوز ندارد | None yet
+lm.keeper.free | آدم آزاد در شهر | Free people in town
+lm.keeper.hire | دکه‌دار بگیر | Hire a keeper
+lm.keeper.end | مرخصش کن | Dismiss him
+lm.keeper.reason.no_seat | در شهر کسی بیکار نیست که دکه‌دار شود. | Nobody in town is free to become a keeper.
+lm.keeper.reason.no_market | برای داشتن دکه‌دار، بازارچه باید باشد. | A keeper needs the market post to stand.
+lm.keeper.away | در نبودت | While you were away
+lm.keeper.sold_today | امروز فروخت | Sold today
+lm.keeper.cut_today | امروز سهمش | His cut today
+lm.keeper.sold_total | از استخدام فروخت | Sold since the hire
+lm.keeper.cut_total | از استخدام سهمش | His cut since the hire
+lm.keeper.left_unpaid | دکه‌دار رفت، چون مزدش داده نشد. | The keeper left because he was not paid.
+lm.keeper.ask_hire | دکه‌دار می‌گیری. مزدش: {pay}؛ {how} | You hire a keeper. His pay: {pay}; {how}
+lm.keeper.ask_end | دکه‌دار مرخص می‌شود و جایش در شهر خالی می‌شود. از آن لحظه، وقتی نیستی سفارش‌هایت از بازارچه برداشته می‌شود. | The keeper is dismissed and his place is freed. From then on your orders come off the market when you are away.
+refusal.village_lot_keeper_none | دکه‌دار گرفتن الان ممکن نیست: یا از قبل داری، یا کسی آزاد نیست. | You cannot hire a keeper now: you have one, or nobody is free.
+refusal.village_lot_no_keeper | این ساختمان دکه‌دار ندارد. | This building has no keeper.
+lm.keeper.ask_share | این سهم فقط از فروش‌هایی برداشته می‌شود که خودت نیستی. | The share is taken only from sales made while you are away.
+lm.keeper.ask_wage | هر روز از پولت برداشته می‌شود، چه بفروشد چه نه؛ اگر پول نداشته باشی می‌رود. | It is taken from your cash each day, sale or no sale; if you cannot pay, he leaves.
+lm.keeper.how_pick | یک دکه‌دار همهٔ دکه‌های تو را نگه می‌دارد و جای یک نفر از مردم آزاد را می‌گیرد. مزدش را موقع گرفتن انتخاب کن. | One keeper minds all your stalls and takes the place of one free person. Pick his pay when you hire him.
+lm.keeper.how_share | فقط وقتی تو نیستی می‌فروشد و سهمش از هر فروش برداشته می‌شود. | He sells only while you are away, and his share is taken from each sale.
+lm.keeper.how_wage | فقط وقتی تو نیستی می‌فروشد. مزدش هر روز از پولت برداشته می‌شود، چه بفروشد چه نه. | He sells only while you are away. His wage is taken from your cash each day, sale or no sale.
+lm.keeper.form_share | سهم از فروش | Share of sales
+lm.keeper.form_wage | مزد روزانه | Day wage
+lm.keeper.less | کمتر | Less
+lm.keeper.more | بیشتر | More
+lm.keeper.range_share | از {a}٪ تا {b}٪ | From {a}% to {b}%
+lm.keeper.range_wage | از {a} تا {b} | From {a} to {b}
+refusal.village_lot_keeper_terms | این مزد در حدّ مجاز نیست؛ عدد را در بازهٔ نشان‌داده‌شده بگذار. | That pay is outside the allowed range; pick a number within it.

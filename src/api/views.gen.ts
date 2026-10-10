@@ -3366,6 +3366,25 @@ export interface LotGridView {
   win_y: number
 }
 
+export interface LotKeeperLine {
+  hired: boolean
+  pay: string
+  share_bps: number
+  share_min_bps: number
+  share_max_bps: number
+  wage: number
+  wage_min: number
+  wage_max: number
+  sold_away: number
+  cut_total: number
+  sold_away_today: number
+  cut_today: number
+  left: string
+  can: boolean
+  reason: string
+  seats_free: number
+}
+
 export interface LotLook {
   version: number
   function: string
@@ -3416,6 +3435,7 @@ export interface LotManageView {
   functions: LotFunctionChoice[] | null
   work: LotWorkLine | null
   staff: LotStaffLine[] | null
+  keeper: LotKeeperLine | null
   housing_capacity: number
   personal_storage: number
   stall_slots: number

@@ -375,12 +375,16 @@ export default function Shell() {
   // the docked panel's breadcrumb: the section, then the open screen's own title (read from its header)
   const panelBody = useRef<HTMLDivElement | null>(null)
   const [screenTitle, setScreenTitle] = useState('')
+  // a screen that draws only its title and a centred popup leaves the panel body empty: then no empty panel is shown
+  const [panelEmpty, setPanelEmpty] = useState(false)
   const readTitle = useCallback(() => {
+    const sc = panelBody.current?.querySelector('.nx-scroll')
+    setPanelEmpty(!!sc && !sc.querySelector(':scope > :not(.cx-hdr)'))
     const el = panelBody.current?.querySelector('.cx-hdr-title, .k-ribbon-title')
     setScreenTitle((el?.textContent ?? '').trim())
   }, [])
   useEffect(() => {
-    setScreenTitle('')
+    setScreenTitle(''); setPanelEmpty(false)
     const host = panelBody.current
     if (!host || !panelOpen) return
     readTitle()
@@ -410,7 +414,7 @@ export default function Shell() {
     <NavCtx.Provider value={{ back: atRoot ? null : goBack, hideBack: nativeBack || (desktop && hist.length < 2) }}>
       <SideCtx.Provider value={sideApi}>
       <ChromeCtx.Provider value={chrome}>
-        <div className="v6 v6-app" data-panel={panelOpen || sideOpen ? 'open' : 'closed'} data-desk={desktop ? '1' : '0'}>
+        <div className="v6 v6-app" data-panel={(panelOpen && !panelEmpty) || sideOpen ? 'open' : 'closed'} data-desk={desktop ? '1' : '0'}>
           <main className="v6-main" data-kind={kind}>
             {splitWorld ? world : content}
           </main>
@@ -460,7 +464,7 @@ export default function Shell() {
             </NavRail>
           )}
           {panelOpen && (
-            <DockedPanel
+            <DockedPanel hidden={panelEmpty}
               crumbs={[{ label: tabLabel(tab), onClick: () => selectTab(tab) }, ...(screenTitle && !atRoot ? [{ label: screenTitle }] : [])]}
               onClose={() => selectTab('city')}
             >
