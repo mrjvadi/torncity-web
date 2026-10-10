@@ -2,7 +2,8 @@
 // someone works there, the posts as a row of seats, one shift (inputs -> outputs, time, wage), the labourers' crew and
 // every reason it is held back, each with its way out. Codes and numbers come from `BuildingView.work`; the words are ours.
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { RecipePicker, ToolBlock, firstRecipe, recipeArg } from './Recipes'
 import { FarmBlock, GrazingBlock, MillBlock, WaterBlock } from './FarmWork'
 import type { WorkNode, WorkReason } from '../../api/views.gen'
 import { EffectChip, EffectRow, Note, Section, ActionButton } from '../../ui/Popup'
@@ -33,7 +34,10 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
   onClose: () => void
 }) {
   const crewRef = useRef<HTMLDivElement>(null)
+  const [recipe, setRecipe] = useState(firstRecipe(w.recipes))
   const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
+  const goods2 = (code: string, n: string) => names.name(['component', 'item'], code, n)
+  const canHire0 = manage && !!act && !!buildingId
   const className = (c: string) => word(`sm.st.class.${c}`, t('work.class.other'))
   if (w.kind === 'none') {
     return (
@@ -115,6 +119,18 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
                 {onOpen && <button type="button" className="dk-chip" onClick={() => { onClose(); onOpen('village_storage') }}>{t('work.tool_buy')}</button>}
               </span>
             </Note>
+          )}
+        </>
+      )}
+      {w.tool && <ToolBlock tool={w.tool} />}
+      {(w.recipes ?? []).length > 1 && (
+        <>
+          <RecipePicker recipes={w.recipes} value={recipe} onChange={setRecipe} name={goods2} />
+          {act && buildingId && (
+            <div className="wk-btns">
+              <ActionButton tone="green" small disabled={!(w.recipes ?? []).find((r) => r.code === recipe)?.available} onClick={() => act('settlement.work', { id: buildingId, ...recipeArg(recipe) })}>{t('rc.work')}</ActionButton>
+              {canHire0 && <ActionButton tone="steel" small disabled={!(w.recipes ?? []).find((r) => r.code === recipe)?.available} onClick={() => act('settlement.labor.post', { id: buildingId, ...recipeArg(recipe) })}>{job ? t('rc.crew_change') : t('rc.crew_post')}</ActionButton>}
+            </div>
           )}
         </>
       )}

@@ -13,6 +13,7 @@ import { formatNumber, money } from '../native/kit/format'
 import { t, hasKey, type Key } from '../../i18n'
 import { useVillageCommand, useContentNames } from '../../village/useVillage'
 import { OfferBox } from './Offer'
+import LotCraft from './LotCraft'
 import WorkplaceCard, { type WpResult } from './WorkplaceCard'
 import KeeperCard, { payText, payWords } from './KeeperCard'
 import { NeedLine } from './screens'
@@ -245,11 +246,12 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
 
         {tab === 'staff' && (
           <>
-            {(v.staff ?? []).length === 0 ? (v.keeper || v.workplace ? null : <Note>{t('lm.staff_none')}</Note>) : (
+            {(v.staff ?? []).length === 0 ? (v.keeper || v.workplace || v.craft ? null : <Note>{t('lm.staff_none')}</Note>) : (
               <CardGrid>{(v.staff ?? []).map((s) => <PCard key={s.role} icon="people" title={hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} facts={t('lm.posts', { n: formatNumber(s.slots) })} tone="busy" />)}</CardGrid>
             )}
             {v.if_unstaffed && hasKey(`work.unstaffed.${v.if_unstaffed}`) && <Hint>{t(`work.unstaffed.${v.if_unstaffed}` as Key)}</Hint>}
             {v.workplace && <WorkplaceCard w={v.workplace} lotId={v.id} manage={manage} busy={busy} condBps={v.condition_bps} names={names} onAct={wpAct} />}
+            {v.craft && <LotCraft c={v.craft} buildingId={v.id} manage={manage} busy={busy} names={names} onStart={(recipe, batches) => ctx.go({ command: 'settlement.craft', args: { building: v.id, recipe, batches: String(batches) }, kind: 'confirm', id: 'craft.start' } as never)} />}
             {v.keeper && <KeeperCard k={v.keeper} manage={manage} busy={busy} onHire={(pay, n) => void quote({ action: 'keeper_hire', code: pay, name: String(n) })} onEnd={() => void quote({ action: 'keeper_end' })} />}
           </>
         )}

@@ -1329,7 +1329,7 @@ const PERSONAL_ON = (() => { try { return new URLSearchParams(location.search).g
 const wk = { shift: null as null | { id: string; finish: number } }
 
 function workView(args: Record<string, unknown>) {
-  const place = WORKPLACES.find((p) => p.id === String(args.id ?? ''))
+  const place = WORKPLACES.find((p) => p.id === (/^fx-carpentry/.test(String(args.id ?? '')) ? 'wp-3' : String(args.id ?? '')))
   if (args.id && !place) return refusal('not_workplace')
   if (place) {
     if (wk.shift && wk.shift.finish > Date.now()) return refusal('already_working')
@@ -1339,7 +1339,7 @@ function workView(args: Record<string, unknown>) {
   const lines = (l: [string, number][]) => (l.length ? l.map(([c, q]) => ({ component: goods(c), quantity: q })) : null)
   const view: WorkView = {
     village: 'آمل', resident: true,
-    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true, farm: p.code === 'farm_canal' ? b2Work('farm_canal', 'fx-farm-growing').farm : null, mill: p.code === 'mill' ? b2Work('mill', 'fx-mill-toll').mill : null, personal: PERSONAL_ON && p.code === 'smithy' ? [{ kind: 'level', item: { code: '', name: '' }, have: 1, need: 3, how: '' }, { kind: 'skill', item: { code: 'mechanics', name: 'mechanics' }, have: 0, need: 1, how: 'train' }, { kind: 'certificate', item: { code: 'first_aid', name: 'first_aid' }, have: 0, need: 1, how: 'train' }] : PERSONAL_ON && p.code === 'carpentry_workshop' ? [{ kind: 'literacy', item: { code: 'reading_writing', name: 'reading_writing' }, have: 0, need: 1, how: 'train' }] : null })),
+    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true, farm: p.code === 'farm_canal' ? b2Work('farm_canal', 'fx-farm-growing').farm : null, mill: p.code === 'mill' ? b2Work('mill', 'fx-mill-toll').mill : null, recipes: p.code === 'carpentry_workshop' ? MOCK_RECIPES() : null, tool: p.code === 'carpentry_workshop' ? b4Work('carpentry_workshop', 'fx-carpentry-short').tool : null, personal: PERSONAL_ON && p.code === 'smithy' ? [{ kind: 'level', item: { code: '', name: '' }, have: 1, need: 3, how: '' }, { kind: 'skill', item: { code: 'mechanics', name: 'mechanics' }, have: 0, need: 1, how: 'train' }, { kind: 'certificate', item: { code: 'first_aid', name: 'first_aid' }, have: 0, need: 1, how: 'train' }] : PERSONAL_ON && p.code === 'carpentry_workshop' ? [{ kind: 'literacy', item: { code: 'reading_writing', name: 'reading_writing' }, have: 0, need: 1, how: 'train' }] : null })),
     mine: mine ? { building: nameOf(mine.code), finish_at: new Date(wk.shift!.finish).toISOString(), left_seconds: Math.round((wk.shift!.finish - Date.now()) / 1000), wage: mine.wage, produces: lines(mine.produces) } : null,
     suggest: null, personal_until: PERSONAL_ON ? new Date(Date.now() + 5 * 86400_000).toISOString() : null, started: !!place, used: Object.values(MAT_STOCK).reduce((a, b) => a + b, 0), capacity: MAT_BASE_CAP,
   }
@@ -1522,15 +1522,32 @@ function b2Work(type: string, id: string): Pick<WorkNode, 'farm' | 'mill' | 'wat
   return none
 }
 
+// B4 fixtures (ADR 0068): fx-carpentry-<short|ok|locked|notiers>: recipes and the tool line
+const mat = (code: string, name: string, quantity: number) => ({ component: { code, name }, quantity })
+export const MOCK_RECIPES = (locked = false) => [
+  { code: '', name: { code: '', name: 'کار معمولی' }, default: true, selected: true, inputs: [mat('timber', 'چوب', 4)], outputs: [mat('plank', 'تخته', 4)], available: true, missing: null, minutes: 60 },
+  { code: 'stone_tools', name: { code: 'stone_tools', name: 'ابزار سنگی' }, default: false, selected: false, inputs: [mat('stone', 'سنگ', 2), mat('timber', 'چوب', 1)], outputs: [mat('stone_tools', 'ابزار سنگی', 2)], available: true, missing: null, minutes: 45 },
+  { code: 'handle', name: { code: 'handle', name: 'دسته و چوب‌دست' }, default: false, selected: false, inputs: [mat('timber', 'چوب', 2)], outputs: [mat('handle', 'دسته', 6)], available: true, missing: null, minutes: 30 },
+  { code: 'rope', name: { code: 'rope', name: 'طناب' }, default: false, selected: false, inputs: [mat('flax', 'کتان', 3)], outputs: [mat('rope', 'طناب', 2)], available: !locked && false, missing: [{ code: 'rope_making', name: 'طناب‌بافی' }, { code: 'flax_growing', name: 'کتان‌کاری' }], minutes: 40 },
+]
+function b4Work(type: string, id: string): Pick<WorkNode, 'tool' | 'recipes'> {
+  if (type !== 'carpentry_workshop' && !/^fx-carpentry-/.test(id)) return { tool: null, recipes: null }
+  const k = id.match(/^fx-carpentry-([a-z]+)/)?.[1] ?? 'short'
+  return {
+    recipes: MOCK_RECIPES(),
+    tool: k === 'notiers' ? { need: 2, have: 0, has_tool: true, factor_bps: 10000, tiers: false } : k === 'ok' ? { need: 2, have: 2, has_tool: true, factor_bps: 10000, tiers: true } : k === 'none' ? { need: 2, have: 0, has_tool: false, factor_bps: 4000, tiers: true } : { need: 2, have: 1, has_tool: true, factor_bps: 6000, tiers: true },
+  }
+}
+
 function workNode(type: string, id: string): WorkNode {
   const n = workNode0(type, id)
   // ?tools=bare (worn out: 60 percent output) | ok (tools in store) | none (the building uses no tool)
   const tools = (() => { try { return new URLSearchParams(location.search).get('tools') ?? 'none' } catch { return 'none' } })()
   const wears = tools !== 'none' && n.kind === 'production'
-  return { ...n, ...b2Work(type, id), knowledge_bps: n.kind === 'production' ? 700 : 0, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null,
+  return { ...n, ...b2Work(type, id), ...b4Work(type, id), knowledge_bps: n.kind === 'production' ? 700 : 0, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null,
     tool_wear_bps: wears ? 1000 : 0, tools_have: tools === 'ok' ? 3 : 0, bare_hands: tools === 'bare' && wears, bare_hands_bps: wears ? 6000 : 0 }
 }
-function workNode0(type: string, id: string): Omit<WorkNode, 'water' | 'mill' | 'farm' | 'grazing' | 'meal_points' | 'food_shifts' | 'condition' | 'tool_wear_bps' | 'tools_have' | 'bare_hands' | 'bare_hands_bps' | 'knowledge_bps'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
+function workNode0(type: string, id: string): Omit<WorkNode, 'water' | 'mill' | 'farm' | 'grazing' | 'tool' | 'recipes' | 'meal_points' | 'food_shifts' | 'condition' | 'tool_wear_bps' | 'tools_have' | 'bare_hands' | 'bare_hands_bps' | 'knowledge_bps'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
   const timber = goods('timber')
   if (type === 'road') return { kind: 'none', status: 'idle', reasons: [{ code: 'no_function', item: null, class: '', have: 0, need: 0 }], slots: null, filled: 0, max: 0, shift_seconds: 0, wage: 0, inputs: null, outputs: null, storage_class: '', storage_free: 0, job: null, if_unstaffed: '' }
   if (type === 'granary' || type === 'storehouse') return { kind: 'storage', status: 'idle', reasons: [{ code: 'no_keeper', item: null, class: 'food', have: 0, need: 0 }], slots: [{ role: 'storekeeper', worker: 'empty', name: '' }], filled: 0, max: 1, shift_seconds: 0, wage: 40, inputs: null, outputs: null, storage_class: 'food', storage_free: 62, job: null, if_unstaffed: 'base_room' }
@@ -1581,8 +1598,8 @@ function upgradeLine(code: string, tier: number, secs: number) {
 function buildingView(args: Record<string, unknown>) {
   const id = String(args.building_id ?? '')
   const b = st.buildings.find((x) => x.id === id) ?? (() => {
-    const fx = id.match(/^fx-(woodcutter|granary|road|clay|kiln|paper|tools|farm|water|mill|pasture)/)
-    if (fx) return { id, type: ({ woodcutter: 'woodcutter_camp', clay: 'clay_pit', kiln: 'pottery_kiln', paper: 'paper_mill', tools: 'tool_workshop', farm: 'farm_canal', water: 'canal_channel', mill: 'water_mill', pasture: 'pasture_range' } as Record<string, string>)[fx[1]] ?? fx[1], x: 5, y: 5, w: 2, h: 2, rotated: false, state: 'built', seed: 7 } as MBuilding
+    const fx = id.match(/^fx-(woodcutter|granary|road|clay|kiln|paper|tools|farm|water|mill|pasture|carpentry)/)
+    if (fx) return { id, type: ({ woodcutter: 'woodcutter_camp', clay: 'clay_pit', kiln: 'pottery_kiln', paper: 'paper_mill', tools: 'tool_workshop', farm: 'farm_canal', water: 'canal_channel', mill: 'water_mill', pasture: 'pasture_range', carpentry: 'carpentry_workshop' } as Record<string, string>)[fx[1]] ?? fx[1], x: 5, y: 5, w: 2, h: 2, rotated: false, state: 'built', seed: 7 } as MBuilding
     const m = id.match(/^road-(\d+)-(\d+)$/)
     return m ? ({ id, type: 'road', x: +m[1], y: +m[2], w: 1, h: 1, rotated: false, state: 'built', seed: 7 } as MBuilding) : undefined
   })()

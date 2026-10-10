@@ -6139,3 +6139,56 @@ refusal.village_mill_no_grain | در انبار خودت گندمی نداری. 
 refusal.village_mill_not_mill | اینجا آسیاب نیست. | This is not a mill.
 charter.perm.farm.sow | دستور کاشت مزرعه‌های شهر | Order the sowing of the city's farms
 charter.perm.mill.toll | تعیین سهم آسیابان | Set the miller's toll
+rc.title | دستور کار | How to work
+rc.in | مصرف: {list} | Takes: {list}
+rc.out | تولید: {list} | Makes: {list}
+rc.minutes | هر شیفت حدود {n} دقیقه | About {n} minutes a shift
+rc.locked | پژوهش لازم است: {list} | Research needed: {list}
+rc.work | کار کن | Work a shift
+rc.crew_post | آگهی گروه کارگر با این دستور | Post the crew with this recipe
+rc.crew_change | تغییر دستور گروه کارگر | Change the crew's recipe
+tool.need | ابزار رده {need} لازم است | A tool of tier {need} is needed
+tool.have | بهترین ابزار انبار: رده {have} | Best tool in store: tier {have}
+tool.none | ابزاری در انبار نیست | No tool in store
+tool.short | بازده {p}؛ ابزار بهتر لازم است | Yield {p}; a better tool is needed
+tool.not_yet | رده‌بندی ابزار هنوز شروع نشده؛ تا آن روز هر ابزاری کافی است و کار مثل قبل می‌گذرد (کار رده {need} به‌زودی ابزار بهتر می‌خواهد). | Tool tiers have not started yet; until then any tool will do (this work will soon ask for tier {need}).
+craft.title | ساختن در خانه | Making at home
+craft.stations | ایستگاه‌های خانه: {list} | The home's stations: {list}
+craft.station.workbench | میز کار | Workbench
+craft.station.forge | کورهٔ آهنگری | Forge
+craft.station.loom | دار | Loom
+craft.station.kiln | کوره | Kiln
+craft.station.oven | تنور | Oven
+craft.station.millstone | سنگ آسیاب | Millstone
+craft.none | خانه هنوز جایی برای ساختن ندارد؛ از «اتاق‌ها و تجهیزات» میز کار یا چیز دیگری اضافه کن. | The home has no station yet; add a workbench or another from «Rooms and fittings».
+craft.minutes | هر دسته {n} دقیقه | {n} minutes a batch
+craft.job | {name}، {n} دسته | {name}, {n} batches
+craft.left | {t} مانده | {t} left
+craft.done | تمام شد | Done
+craft.full | همین حالا {n} کار در جریان است؛ تا یکی تمام نشود کار تازه شروع نمی‌شود. | {n} jobs already run; a new one waits until one ends.
+craft.confirm_title | ساختن: {name} | Making: {name}
+craft.batches | {n} دسته | {n} batches
+craft.less | کمتر | Fewer
+craft.more | بیشتر | More
+craft.takes | از انبار خودت می‌رود | Leaves your store
+craft.makes | به انبار خودت می‌آید | Comes to your store
+craft.time | زمان | Time
+craft.yield | در خانه {p} بازده دارد؛ آنچه ساخته می‌شود وقتی کار تمام شد به انبارت می‌آید. | At home it yields {p}; what is made comes to your store when the job ends.
+craft.lacking | در انبارت کم است: {list} | Missing from your store: {list}
+craft.start | شروع ساختن | Start making
+craft.page_title | ساختن در خانه | Making at home
+craft.started | ساختن «{name}» شروع شد: {n} دسته. | Making «{name}» has started: {n} batches.
+craft.started_hint | تا {t} دیگر تمام می‌شود و یک خط در صندوق پیام‌هایت می‌آید. | It is done in {t}; a line comes to your inbox.
+work.reason.no_recipe | شهر پژوهشِ این دستور کار را ندارد؛ گروه کارگر تا آن موقع منتظر می‌ماند. | The town lacks the research for this recipe; the crew waits.
+refusal.village_recipe_not_here | این کارگاه یا ایستگاه این را نمی‌سازد. | This workshop or station does not make that.
+refusal.village_craft_no_station | خانهٔ تو ایستگاهی برای ساختن این ندارد؛ میز کار یا ایستگاه مناسب را به خانه اضافه کن. | Your home has no station to make this; add a workbench or the right one.
+refusal.village_craft_too_many | همین حالا دو کار در جریان است؛ بعد از پایان یکی دوباره امتحان کن. | Two jobs already run; try again when one ends.
+refusal.village_craft_batches | تعداد دسته باید بین یک تا چهار باشد. | The batches must be between one and four.
+refusal.village_craft_no_inputs | مواد این دسته در انبار خودت کافی نیست. | Your store lacks the materials for this.
+refusal.village_craft_no_room | انبارت جای محصول را ندارد؛ کمی خالی کن. | Your store has no room for the goods; empty it a little.
+refusal.recipe_not_here | این کارگاه یا ایستگاه این را نمی‌سازد. | This workshop or station does not make that.
+refusal.craft_no_station | خانهٔ تو ایستگاهی برای ساختن این ندارد؛ میز کار یا ایستگاه مناسب را به خانه اضافه کن. | Your home has no station to make this; add a workbench or the right one.
+refusal.craft_too_many | همین حالا دو کار در جریان است؛ بعد از پایان یکی دوباره امتحان کن. | Two jobs already run; try again when one ends.
+refusal.craft_batches | تعداد دسته باید بین یک تا چهار باشد. | The batches must be between one and four.
+refusal.craft_no_inputs | مواد این دسته در انبار خودت کافی نیست. | Your store lacks the materials for this.
+refusal.craft_no_room | انبارت جای محصول را ندارد؛ کمی خالی کن. | Your store has no room for the goods; empty it a little.
