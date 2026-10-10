@@ -37,6 +37,12 @@ export default function KeeperCard({ k, manage, busy, onHire, onEnd }: { k: LotK
         <StatCard icon="people" palette="emerald" label={t('lm.keeper.pay')} value={k.hired ? payText(k) : t('lm.keeper.pay_none')} />
         <StatCard icon="person" palette="sapphire" label={t('lm.keeper.free')} value={formatNumber(k.seats_free)} />
       </StatGrid>
+      {k.hired && (
+        <div className="lm-keeper-away">
+          <div className="gc-note">{t('lm.keeper.away_today', { a: money(k.sold_away_today), b: money(k.cut_today) })}</div>
+          <div className="gc-note">{t('lm.keeper.away_total', { a: money(k.sold_away), b: money(k.cut_total) })}</div>
+        </div>
+      )}
       <div className="gc-note">{how}</div>
       {why && <Note tone="bad">{why}</Note>}
       {manage && !k.hired && k.can && (

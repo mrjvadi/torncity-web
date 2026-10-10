@@ -5864,6 +5864,8 @@ export const uiEn: Record<UiKey, string> = {
   'lm.keeper.end': 'Dismiss him',
   'lm.keeper.reason.no_seat': 'Nobody in town is free to become a keeper.',
   'lm.keeper.reason.no_market': 'A keeper needs the market post to stand.',
+  'lm.keeper.away_today': 'Today, while you were away, he sold: {a} – keeper\'s cut: {b}',
+  'lm.keeper.away_total': 'Since the hire, while you were away, he sold: {a} – keeper\'s cut: {b}',
   'lm.keeper.left_unpaid': 'The keeper left because he was not paid.',
   'lm.keeper.ask_hire': 'You hire a keeper. His pay: {pay}; {how}',
   'lm.keeper.ask_end': 'The keeper is dismissed and his place is freed. From then on your orders come off the market when you are away.',
