@@ -13,7 +13,7 @@ import type {
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
 import type { Action } from '../../api/types'
-import type { ClearOrderView, LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
+import type { FarmSowView, MillTollView, ClearOrderView, LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
 import { Bar, Chip, Empty, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { money } from '../native/kit/format'
@@ -29,6 +29,7 @@ import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
 import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
+import { FarmBlock } from './FarmWork'
 
 const Empt = Empty
 
@@ -613,6 +614,8 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
                 right={<Chip>{t('vx.work.busy', { busy: p.busy, total: p.workers })}</Chip>} />
               {(p.consumes ?? []).length > 0 && <Hint>{t('vx.work.uses', { list: goods(p.consumes) })}</Hint>}
               {(p.produces ?? []).length > 0 && <Hint>{t('vx.work.makes', { list: goods(p.produces) })}</Hint>}
+              {p.mill && <Hint>{t('mill.toll_is', { p: `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(p.mill.toll_bps / 100)}٪` })}</Hint>}
+              {p.farm && !p.farm.legacy && <Hint>{t(`farm.stage.${p.farm.stage}` as Key)}</Hint>}
               <PersonalList names={ctx.names} list={p.personal} title={t('vx.pn.lack')} onCourses={() => ctx.run('education.list')} />
               {act && <Btns ctx={ctx} list={[act]} />}
             </Panel>
@@ -804,6 +807,28 @@ const ClearOrderPage = flow<ClearOrderView>(({ view: v, ctx }) => (
   </Page>
 ))
 
+/** The sowing order of a farm (ADR 0067): what was ordered and the crop as it now stands. */
+const FarmSowPage = flow<FarmSowView>(({ view: v, ctx }) => (
+  <Page title={t('farm.title_page')} tone="emerald">
+    <Panel tone="emerald">
+      <Lead>{t('farm.sown', { name: ctx.bname(v.farm.code, v.farm.name) })}</Lead>
+      <Hint>{t('farm.sown_hint')}</Hint>
+    </Panel>
+    <Panel><FarmBlock f={v.line} id="" act={undefined} manage={false} /></Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
+/** The miller's toll was set (ADR 0067). */
+const MillTollPage = flow<MillTollView>(({ view: v, ctx }) => (
+  <Page title={t('mill.title')} tone="gold">
+    <Panel tone="gold">
+      <Lead>{t('mill.toll_set', { p: `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(v.toll_bps / 100)}٪` })}</Lead>
+    </Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
 const RoadCancelledPage = flow<RoadCancelledView>(({ ctx }) => (
   <Page title={t('road.title')} tone="gold">
     <Panel tone="gold"><Lead>{t('road.cancelled')}</Lead></Panel>
@@ -910,7 +935,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
 })
 
 registerFlow({
-  village_refusal: Refusal, clear_order: ClearOrderPage,
+  village_refusal: Refusal, clear_order: ClearOrderPage, farm_sow: FarmSowPage, mill_toll: MillTollPage,
   village_donate_menu: DonateMenu, village_donate_confirm: DonateConfirm, village_donate_done: DonateDone,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
@@ -926,7 +951,7 @@ registerFlow({
 
 /** The server screens the flow host draws. */
 export const FLOW_SCREENS = [
-  'village_refusal', 'clear_order', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
+  'village_refusal', 'clear_order', 'farm_sow', 'mill_toll', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
   'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',

@@ -243,6 +243,13 @@ export class VillageStore {
         if (t > serverNow() - 60_000) next = Math.min(next, t)
       }
     }
+    // a crop ripens and then spoils by its own times (ADR 0067): the layout is asked again just after each
+    for (const f of layout.farms ?? []) {
+      for (const at of [f.ripe_at, f.spoil_at]) {
+        const t = at ? Date.parse(at) : NaN
+        if (Number.isFinite(t) && t > serverNow()) next = Math.min(next, t)
+      }
+    }
     if (!Number.isFinite(next)) return
     const delay = Math.max(1500, next - serverNow() + 2000)
     this.finishTimer = window.setTimeout(() => void this.refetchLayout(), Math.min(delay, 2_000_000_000))

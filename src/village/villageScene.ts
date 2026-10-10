@@ -29,6 +29,7 @@ import { buildVillageRoads, type RoadsMesh } from './villageRoads'
 import { LotOverlay } from './lotOverlay'
 import { LandOverlay, type OuterCell } from './landOverlay'
 import { landSpots, landLotKeys, landSignature, forestKeeps, lotHash, RockField, type LandSpots } from './landObjects'
+import { fieldOf, fieldsKey } from './farmStage'
 import { TreeField, type TreeSpot } from './vegetation'
 import { createSky, type Sky } from './sky'
 import { constructionProgress } from './progress'
@@ -88,6 +89,7 @@ export class VillageScene {
   private boulders: FieldResult | null = null
   private trees: TreeField | null = null
   private rocks: RockField | null = null
+  private fieldKey = ''
   private landSig = ''
   private treeList: TreeSpot[] = []
   private roads: RoadsMesh | null = null
@@ -483,6 +485,8 @@ export class VillageScene {
     this.poses.clear()
     const merged = new ColorGeom()
     let any = false
+    const farmOf = new Map((this.layout.farms ?? []).map((f) => [f.building, f]))
+    this.fieldKey = fieldsKey(this.layout.farms, now)
     this.layout.buildings.forEach((b, i) => {
       if (b.type === 'road') return
       const pose = this.poseOf(b)
@@ -491,7 +495,7 @@ export class VillageScene {
       const Dm = b.rotated ? pose.W : pose.D
       const finished = b.state === 'built' || b.state === 'damaged'
       const look = b.id ? this.looks.get(b.id) : undefined
-      const model = look && finished ? buildLookModel(look, Wm, Dm, pose.foundation) : buildModel(b.type, Wm, Dm, b.visual_seed, pose.foundation)
+      const model = look && finished ? buildLookModel(look, Wm, Dm, pose.foundation) : buildModel(b.type, Wm, Dm, b.visual_seed, pose.foundation, /^farm_/.test(b.type) ? fieldOf(farmOf.get(b.id ?? ''), now) : undefined)
       this.poses.set(b.id ?? `i${i}`, { ...pose, height: model.height, building: b })
       if (finished) {
         merged.append(model.geom, pose.cx, pose.base, pose.cz, rot)
@@ -838,6 +842,8 @@ export class VillageScene {
       if (this.disposed || this.contextLost || !this.active) return
       const now = Date.now() + (this.opts.clockSkewMs?.() ?? 0)
       let dirty = this.updateScaffolds(now)
+      // a crop ripens or turns dull by its own times: the farms are drawn again when a field's look moves a step
+      if (this.layout.farms?.length && fieldsKey(this.layout.farms, now) !== this.fieldKey) { this.rebuildBuildings(); dirty = true }
       if (this.waterMat && !this.reduced && performance.now() - this.lastMoved < 4000) {
         this.waterClock += WATER_TICK_MS / 1000
         this.waterMat.uniforms.uTime.value = this.waterClock

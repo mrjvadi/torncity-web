@@ -389,6 +389,21 @@ export interface VillageLayout {
   ring?: { depth: number; lots: LayoutRingLot[] | null }
   /** `mark` changes with every cut, planting or maturity; `forest_remaining_bps` thins the countryside trees (10000 = untouched). */
   woods?: { mark: string; forest_remaining_bps: number }
+  /** The crops of the complete farms (ADR 0067); absent without farms. */
+  farms?: LayoutFarm[] | null
+}
+
+/** One complete farm of the layout (ADR 0067): its crop's stage, read at the request time. `legacy` is a farm that still works its flat shift (drawn as a green field). */
+export interface LayoutFarm {
+  building: string
+  stage: 'idle' | 'sowing' | 'growing' | 'ripe' | 'overripe' | 'harvest' | 'harvested' | 'rotted' | string
+  rainfed: boolean
+  legacy: boolean
+  sow_done: number; sow_need: number
+  tended: number; tend_max: number
+  harvest_done: number; harvest_need: number
+  ripe_at?: string | null
+  spoil_at?: string | null
 }
 
 /** A road drawn out of the first grid. */
