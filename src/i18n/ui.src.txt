@@ -5948,3 +5948,23 @@ lf.options.licence_soon | سوار {mode} شدن تا {at} هنوز آزاد ا�
 lf.options.licence_out | {mode} را نمی‌بینی، چون مدرک «{course}» را نداری. | You do not see the {mode} because you lack the {course} licence.
 lf.options.licence_go | آموزش | Training
 work.knowledge | دانش شهر: {p} تولید بیشتر | City knowledge: {p} more output
+lm.act.keeper_hire | گرفتن دکه‌دار | Hire a stall keeper
+lm.act.keeper_end | مرخص کردن دکه‌دار | Dismiss the stall keeper
+lm.keeper.title | دکه‌دار | Stall keeper
+lm.keeper.kept | یک نفر از مردم شهر دکه‌ات را نگه می‌دارد. | One of the townspeople keeps your stall.
+lm.keeper.none | دکه‌دار نداری؛ وقتی خودت نیستی، سفارش‌های فروشت از بازارچه برداشته می‌شود. | You have no keeper; when you are away your sell orders come off the market.
+lm.keeper.pay | مزدش | His pay
+lm.keeper.pay_share | {p}٪ از هر فروش | {p}% of each sale
+lm.keeper.pay_wage | روزی {w} | {w} a day
+lm.keeper.pay_none | هنوز ندارد | None yet
+lm.keeper.free | آدم آزاد در شهر | Free people in town
+lm.keeper.how | دکه‌دار فقط وقتی تو نیستی می‌فروشد. یک دکه‌دار همهٔ دکه‌های تو را نگه می‌دارد و جای یک نفر از مردم آزاد را می‌گیرد. | The keeper sells only while you are away. One keeper minds all your stalls and takes the place of one free person.
+lm.keeper.hire | دکه‌دار بگیر | Hire a keeper
+lm.keeper.end | مرخصش کن | Dismiss him
+lm.keeper.reason.no_seat | در شهر کسی بیکار نیست که دکه‌دار شود. | Nobody in town is free to become a keeper.
+lm.keeper.reason.no_market | برای داشتن دکه‌دار، بازارچه باید باشد. | A keeper needs the market post to stand.
+lm.keeper.left_unpaid | دکه‌دار رفت، چون مزدش داده نشد. | The keeper left because he was not paid.
+lm.keeper.ask_hire | دکه‌دار می‌گیری. مزدش: {pay} (فقط از فروش‌هایی که خودت نیستی). | You hire a keeper. His pay: {pay} (only on sales made while you are away).
+lm.keeper.ask_end | دکه‌دار مرخص می‌شود و جایش در شهر خالی می‌شود. از آن لحظه، وقتی نیستی سفارش‌هایت از بازارچه برداشته می‌شود. | The keeper is dismissed and his place is freed. From then on your orders come off the market when you are away.
+refusal.village_lot_keeper_none | دکه‌دار گرفتن الان ممکن نیست: یا از قبل داری، یا کسی آزاد نیست. | You cannot hire a keeper now: you have one, or nobody is free.
+refusal.village_lot_no_keeper | این ساختمان دکه‌دار ندارد. | This building has no keeper.

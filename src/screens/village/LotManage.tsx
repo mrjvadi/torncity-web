@@ -13,6 +13,7 @@ import { formatNumber, money } from '../native/kit/format'
 import { t, hasKey, type Key } from '../../i18n'
 import { useVillageCommand, useContentNames } from '../../village/useVillage'
 import { OfferBox } from './Offer'
+import KeeperCard, { payText, type KeeperBlock } from './KeeperCard'
 import { NeedLine } from './screens'
 import { flow, isBack, Hint, Page, type FlowCtx } from './flow'
 
@@ -237,6 +238,7 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
               <CardGrid>{(v.staff ?? []).map((s) => <PCard key={s.role} icon="people" title={hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} facts={t('lm.posts', { n: formatNumber(s.slots) })} tone="busy" />)}</CardGrid>
             )}
             {v.if_unstaffed && hasKey(`work.unstaffed.${v.if_unstaffed}`) && <Hint>{t(`work.unstaffed.${v.if_unstaffed}` as Key)}</Hint>}
+            {v.keeper && <KeeperCard k={v.keeper} manage={manage} busy={busy} onHire={() => void quote({ action: 'keeper_hire' })} onEnd={() => void quote({ action: 'keeper_end' })} />}
           </>
         )}
 
@@ -302,8 +304,10 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
             {!ask.v.reason && <ActionButton tone="gold" busy={busy} onClick={() => void confirm()}>{t('lm.confirm')}</ActionButton>}
           </ActionRow>}>
           {ask.v.quote && <QuoteBlock q={ask.v.quote} names={names} ctx={ctx} />}
-          {ask.v.reason ? why(ask.v.reason, ask.v.needs) : <Note>{t('lm.ask_note')}</Note>}
+          {ask.v.reason ? why(ask.v.reason, ask.v.needs) : !ask.args.action.startsWith('keeper_') && <Note>{t('lm.ask_note')}</Note>}
           {!ask.v.reason && ask.args.action === 'function' && <Note>{t('lm.use_fee_note')}</Note>}
+          {!ask.v.reason && ask.args.action === 'keeper_hire' && <Note>{t('lm.keeper.ask_hire', { pay: payText((ask.v.keeper ?? v.keeper) as KeeperBlock) })}</Note>}
+          {!ask.v.reason && ask.args.action === 'keeper_end' && <Note>{t('lm.keeper.ask_end')}</Note>}
           {!ask.v.reason && <OfferBox offer={ask.offer} busy={busy} onConvert={() => ask.offer && void confirm(ask.offer)} />}
         </Popup>
       )}
