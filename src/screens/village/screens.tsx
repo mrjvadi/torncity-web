@@ -13,7 +13,7 @@ import type {
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
 import type { Action } from '../../api/types'
-import type { FarmSowView, MillTollView, ClearOrderView, LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
+import type { CraftStartedView, FarmSowView, MillTollView, ClearOrderView, LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
 import { Bar, Chip, Empty, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { money } from '../native/kit/format'
@@ -30,6 +30,7 @@ import { FlowOffer } from './Offer'
 import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
 import { FarmBlock } from './FarmWork'
+import { RecipePicker, firstRecipe, recipeArg } from './Recipes'
 
 const Empt = Empty
 
@@ -583,6 +584,29 @@ const Terms = flow<TermsView>(({ view: v, ctx }) => {
 
 // -- work ------------------------------------------------------------------------------------
 
+/** One workplace of the work screen: what it takes and makes, the recipe chooser (ADR 0068) and the shift button, which carries the chosen recipe. */
+function WorkPlace({ p, ctx, act, goods }: { p: WorkView['places'] extends (infer P)[] | null ? P : never; ctx: FlowCtx; act: Action | undefined; goods: (l: { component: { code: string; name: string }; quantity: number }[] | null) => string }) {
+  const [recipe, setRecipe] = useState(firstRecipe(p.recipes))
+  const { icon, palette } = iconForRole(ctx.cat.get(p.building.code)?.category)
+  const cur = (p.recipes ?? []).find((r) => r.code === recipe)
+  const picker = (p.recipes ?? []).length > 1
+  void cur
+  return (
+    <Panel>
+      <ListRow icon={icon} palette={palette} tone={ROLE_TONE[ctx.cat.get(p.building.code)?.category ?? '']} title={ctx.bname(p.building.code, p.building.name)}
+        sub={t('vx.work.place_sub', { shift: durationText(p.shift_seconds), wage: money(p.wage) })}
+        right={<Chip>{t('vx.work.busy', { busy: p.busy, total: p.workers })}</Chip>} />
+      {!picker && (p.consumes ?? []).length > 0 && <Hint>{t('vx.work.uses', { list: goods(p.consumes) })}</Hint>}
+      {!picker && (p.produces ?? []).length > 0 && <Hint>{t('vx.work.makes', { list: goods(p.produces) })}</Hint>}
+      {p.mill && <Hint>{t('mill.toll_is', { p: `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(p.mill.toll_bps / 100)}٪` })}</Hint>}
+      {p.farm && !p.farm.legacy && <Hint>{t(`farm.stage.${p.farm.stage}` as Key)}</Hint>}
+      <RecipePicker recipes={p.recipes} value={recipe} onChange={setRecipe} name={(c, n) => ctx.names.name(['component', 'item'], c, n)} />
+      <PersonalList names={ctx.names} list={p.personal} title={t('vx.pn.lack')} onCourses={() => ctx.run('education.list')} />
+      {act && <Btns ctx={ctx} list={[{ ...act, args: { ...(act.args ?? {}), ...recipeArg(recipe) } }]} />}
+    </Panel>
+  )
+}
+
 const Work = flow<WorkView>(({ view: v, ctx }) => {
   const starts = ctx.by('work.start')
   const goods = (l: { component: { code: string; name: string }; quantity: number }[] | null) =>
@@ -604,23 +628,7 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
         <Hint>{t('vx.work.suggest', { names: (v.suggest ?? []).slice(0, 3).map((n) => ctx.bname(n.code, n.name)).join('، ') })}</Hint>
       )}
       <div className="vf-stack">
-        {(v.places ?? []).map((p) => {
-          const { icon, palette } = iconForRole(ctx.cat.get(p.building.code)?.category)
-          const act = starts.find((a) => a.subject === p.building.code)
-          return (
-            <Panel key={p.id}>
-              <ListRow icon={icon} palette={palette} tone={ROLE_TONE[ctx.cat.get(p.building.code)?.category ?? '']} title={ctx.bname(p.building.code, p.building.name)}
-                sub={t('vx.work.place_sub', { shift: durationText(p.shift_seconds), wage: money(p.wage) })}
-                right={<Chip>{t('vx.work.busy', { busy: p.busy, total: p.workers })}</Chip>} />
-              {(p.consumes ?? []).length > 0 && <Hint>{t('vx.work.uses', { list: goods(p.consumes) })}</Hint>}
-              {(p.produces ?? []).length > 0 && <Hint>{t('vx.work.makes', { list: goods(p.produces) })}</Hint>}
-              {p.mill && <Hint>{t('mill.toll_is', { p: `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(p.mill.toll_bps / 100)}٪` })}</Hint>}
-              {p.farm && !p.farm.legacy && <Hint>{t(`farm.stage.${p.farm.stage}` as Key)}</Hint>}
-              <PersonalList names={ctx.names} list={p.personal} title={t('vx.pn.lack')} onCourses={() => ctx.run('education.list')} />
-              {act && <Btns ctx={ctx} list={[act]} />}
-            </Panel>
-          )
-        })}
+        {(v.places ?? []).map((p) => <WorkPlace key={p.id} p={p} ctx={ctx} act={starts.find((a) => a.subject === p.building.code)} goods={goods} />)}
       </div>
       <Hint>{t('vx.work.hint')}</Hint>
       <Hint>{t('vx.work.capacity', { used: formatNumber(v.used), cap: formatNumber(v.capacity) })}</Hint>
@@ -829,6 +837,17 @@ const MillTollPage = flow<MillTollView>(({ view: v, ctx }) => (
   </Page>
 ))
 
+/** A home craft was started (ADR 0068): what, how many batches, when it is done. */
+const CraftStartedPage = flow<CraftStartedView>(({ view: v, ctx }) => (
+  <Page title={t('craft.page_title')} tone="gold">
+    <Panel tone="gold">
+      <Lead>{t('craft.started', { name: v.job.recipe.name, n: formatNumber(v.job.batches) })}</Lead>
+      <Hint>{t('craft.started_hint', { t: durationText(v.job.left_seconds) })}</Hint>
+    </Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
 const RoadCancelledPage = flow<RoadCancelledView>(({ ctx }) => (
   <Page title={t('road.title')} tone="gold">
     <Panel tone="gold"><Lead>{t('road.cancelled')}</Lead></Panel>
@@ -935,7 +954,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
 })
 
 registerFlow({
-  village_refusal: Refusal, clear_order: ClearOrderPage, farm_sow: FarmSowPage, mill_toll: MillTollPage,
+  village_refusal: Refusal, craft_started: CraftStartedPage, clear_order: ClearOrderPage, farm_sow: FarmSowPage, mill_toll: MillTollPage,
   village_donate_menu: DonateMenu, village_donate_confirm: DonateConfirm, village_donate_done: DonateDone,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
@@ -951,7 +970,7 @@ registerFlow({
 
 /** The server screens the flow host draws. */
 export const FLOW_SCREENS = [
-  'village_refusal', 'clear_order', 'farm_sow', 'mill_toll', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
+  'village_refusal', 'craft_started', 'clear_order', 'farm_sow', 'mill_toll', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
   'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',

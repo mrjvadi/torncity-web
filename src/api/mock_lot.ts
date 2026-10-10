@@ -23,6 +23,42 @@ const workplaceLine = (): NonNullable<LotManageView['workplace']> => {
     tools_have: 1, tool_wear_bps: 4300, room_free: wp.room, room_needed: m === 'workplace-noroom' ? 2 : 0, food_have: 12, food_per_shift: 2, today: sold(wp.shiftsToday), total: sold(wp.shiftsTotal) }
 }
 
+/** ?lot=craft: a home with a workbench and a loom (ADR 0068): recipes, the running jobs (two at most) and the start; craft-full: two jobs already run; craft-poor: the store lacks the inputs */
+const mat = (code: string, name: string, quantity: number) => ({ component: N(code, name), quantity })
+const crafts: { id: string; recipe: ReturnType<typeof N>; batches: number; finish: number }[] = []
+function craftLine(): NonNullable<LotManageView['craft']> {
+  const m = mode()
+  if (m === 'craft-full' && crafts.length < 2) { crafts.push({ id: 'cj-1', recipe: N('plank', 'تخته'), batches: 2, finish: Date.now() + 41 * 60000 }, { id: 'cj-2', recipe: N('cloth', 'پارچه'), batches: 1, finish: Date.now() + 18 * 60000 }) }
+  const rec = (station: string, code: string, name: string, inputs: ReturnType<typeof mat>[], outputs: ReturnType<typeof mat>[], minutes: number, available = true, missing: ReturnType<typeof N>[] | null = null) => ({ station, code, name: N(code, name), default: false, selected: false, inputs, outputs, available, missing, minutes })
+  return {
+    stations: ['workbench', 'loom'],
+    recipes: [
+      rec('workbench', 'plank', 'تخته', [mat('timber', 'چوب', 4)], [mat('plank', 'تخته', 4)], 20),
+      rec('workbench', 'handle', 'دسته و چوب‌دست', [mat('timber', 'چوب', 2)], [mat('handle', 'دسته', 6)], 15),
+      rec('loom', 'cloth', 'پارچه', [mat('wool', 'پشم', 3)], [mat('cloth', 'پارچه', 2)], 30),
+      rec('loom', 'rope', 'طناب', [mat('flax', 'کتان', 3)], [mat('rope', 'طناب', 2)], 25, false, [N('rope_making', 'طناب‌بافی')]),
+    ],
+    jobs: crafts.map((c) => ({ id: c.id, building: N('private_cottage', 'کلبهٔ شخصی'), recipe: c.recipe, batches: c.batches, finish_at: new Date(c.finish).toISOString(), left_seconds: Math.max(0, Math.round((c.finish - Date.now()) / 1000)), planned: null })),
+    max_jobs: 2, max_batches: 4, yield_bps: 9000,
+    have: [mat('timber', 'چوب', m === 'craft-poor' ? 3 : 14), mat('wool', 'پشم', 7), mat('flax', 'کتان', 0)],
+  }
+}
+export function mockCraftStart(args: Record<string, unknown>) {
+  const m = mode()
+  const line = craftLine()
+  const rec = (line.recipes ?? []).find((r) => r.code === String(args.recipe ?? ''))
+  const refuse = (kind: string) => mockRefusal(kind, { back: { command: 'settlement.lot.manage', args: null } })
+  if (!rec) return refuse('recipe_not_here')
+  const n = Number(args.batches)
+  if (!(n >= 1 && n <= 4)) return refuse('craft_batches')
+  if (crafts.length >= 2) return refuse('craft_too_many')
+  if (m === 'craft-poor' || (rec.inputs ?? []).some((i) => ((line.have ?? []).find((h) => h.component.code === i.component.code)?.quantity ?? 0) < i.quantity * n)) return refuse('craft_no_inputs')
+  if (m === 'craft-room') return refuse('craft_no_room')
+  const job = { id: `cj-${crafts.length + 1}`, recipe: rec.name, batches: n, finish: Date.now() + rec.minutes * n * 60000 }
+  crafts.push(job)
+  return mockOk('craft_started', { village: 'آمل', job: { id: job.id, building: N('private_cottage', 'کلبهٔ شخصی'), recipe: rec.name, batches: n, finish_at: new Date(job.finish).toISOString(), left_seconds: rec.minutes * n * 60, planned: null } }, [back('settlement.lot.manage', { building: 'b-lot-1' })])
+}
+
 const LOOKS: Record<string, Partial<LotLook>> = {
   'b-look-2': { roof: 'hip', storeys: 2, hue: -12, door: 'e', chimney: false, prop: 'barrels', windows: 3, seed: 11 },
   'b-look-3': { roof: 'flat', storeys: 1, material: 'stone', hue: 0, door: 'n', chimney: false, awning: true, prop: 'crates', seed: 23 },
@@ -46,6 +82,10 @@ function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1
     additions: [
       { module: N('bedroom', 'اتاق خواب'), left: 3, materials: [{ item: N('timber', 'چوب'), qty: 3 }], shifts: 3, area_each: 2, can: m !== 'reason', reason: m === 'reason' ? 'area' : '', needs: null },
       { module: N('cellar', 'زیرزمین'), left: 1, materials: [{ item: N('stone', 'سنگ'), qty: 6 }], shifts: 4, area_each: 2, can: false, reason: 'requires', needs: [{ kind: 'knowledge', item: N('masonry', 'سنگ‌تراشی'), options: [N('masonry', 'سنگ‌تراشی')], have: 0, need: 1, makers: null, price: 0 }] },
+      ...(m.startsWith('craft') ? [
+        ['workbench', 'میز کار', 'timber', 'چوب', 6, 2, 2], ['forge', 'کورهٔ آهنگری', 'stone', 'سنگ', 10, 4, 3], ['loom', 'دار', 'timber', 'چوب', 8, 3, 3],
+        ['kiln', 'کوره', 'clay', 'گل رس', 8, 4, 3], ['oven', 'تنور', 'clay', 'گل رس', 6, 3, 2], ['millstone', 'سنگ آسیاب', 'stone', 'سنگ', 8, 3, 2],
+      ].map(([c, nm, ic, inm, q, sh, ar]) => ({ module: N(String(c), String(nm)), left: 1, materials: [{ item: N(String(ic), String(inm)), qty: Number(q) }], shifts: Number(sh), area_each: Number(ar), can: true, reason: '', needs: null })) : []),
     ],
     upgrade: { to: 2, building: N('private_cottage', 'کلبهٔ شخصی'), cost_money: 600, materials: [{ item: N('timber', 'چوب'), qty: 8 }], shifts: 5, adds: [N('bedroom', 'اتاق خواب')], can: m !== 'upblock', reason: m === 'upblock' ? 'requires' : '',
       needs: m === 'upblock' ? [{ kind: 'knowledge', item: N('masonry', 'سنگ‌تراشی'), options: [N('masonry', 'سنگ‌تراشی')], have: 0, need: 1, makers: null, price: 0 }, { kind: 'material', item: N('stone', 'سنگ'), options: null, have: 2, need: 6, makers: [{ building: N('masonry_workshop', 'کارگاه سنگ‌تراشی'), built: false }], price: 30 }] : null },
@@ -66,6 +106,7 @@ function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1
     templates: [{ id: 't1', name: 'قالب ۱', code: 'K7M2Q', function: N('dwelling', 'خانه'), level: 1, storeys: 1, modules: [{ module: N('bedroom', 'اتاق خواب'), count: 2 }], mine: true, applicable: true, reason: '' },
       { id: 't2', name: 'کلبهٔ دوطبقه', code: 'P9X4A', function: N('dwelling', 'خانه'), level: 2, storeys: 2, modules: null, mine: false, applicable: false, reason: 'requires' }],
     keeper: m.startsWith('stall') ? { hired: keeper.hired, pay: keeper.hired ? keeper.pay : '', share_bps: keeper.hired && keeper.pay === 'share' ? keeper.n : 1000, share_min_bps: 500, share_max_bps: 2000, wage: keeper.hired && keeper.pay === 'wage' ? keeper.n : 600, wage_min: 300, wage_max: 1500, left: !keeper.hired && m === 'stall-left' ? 'wage_unpaid' : '', can: !keeper.hired && m !== 'stall-full', reason: !keeper.hired && m === 'stall-full' ? 'no_seat' : '', seats_free: m === 'stall-full' ? 0 : keeper.hired ? 2 : 3, sold_away: keeper.hired ? 18400 : 0, cut_total: keeper.hired ? 1840 : 0, sold_away_today: keeper.hired ? 3200 : 0, cut_today: keeper.hired ? 320 : 0 } : null,
+    craft: m.startsWith('craft') ? craftLine() : null,
     cash: 12450, quote: null, reason: '', needs: null, code: '', n: 0, name: '', share_code: '', ...extra,
   }
 }
@@ -76,6 +117,7 @@ function quote(action: string): LotQuote {
 }
 
 export function mockLotCommand(command: string, args: Record<string, unknown>) {
+  if (command === 'settlement.craft') return mockCraftStart(args)
   if (isWp(mode()) && /^settlement\.(labor\.(post|hire|wage|close)|work)$/.test(command) && args.id === 'b-lot-1') {
     const back = { command: 'settlement.lot.manage', args: null }
     if (command === 'settlement.work') {
