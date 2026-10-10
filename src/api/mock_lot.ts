@@ -29,14 +29,14 @@ const crafts: { id: string; recipe: ReturnType<typeof N>; batches: number; finis
 function craftLine(): NonNullable<LotManageView['craft']> {
   const m = mode()
   if (m === 'craft-full' && crafts.length < 2) { crafts.push({ id: 'cj-1', recipe: N('plank', 'تخته'), batches: 2, finish: Date.now() + 41 * 60000 }, { id: 'cj-2', recipe: N('cloth', 'پارچه'), batches: 1, finish: Date.now() + 18 * 60000 }) }
-  const rec = (code: string, name: string, inputs: ReturnType<typeof mat>[], outputs: ReturnType<typeof mat>[], minutes: number, available = true, missing: ReturnType<typeof N>[] | null = null) => ({ code, name: N(code, name), default: false, selected: false, inputs, outputs, available, missing, minutes })
+  const rec = (station: string, code: string, name: string, inputs: ReturnType<typeof mat>[], outputs: ReturnType<typeof mat>[], minutes: number, available = true, missing: ReturnType<typeof N>[] | null = null) => ({ station, code, name: N(code, name), default: false, selected: false, inputs, outputs, available, missing, minutes })
   return {
     stations: ['workbench', 'loom'],
     recipes: [
-      rec('plank', 'تخته', [mat('timber', 'چوب', 4)], [mat('plank', 'تخته', 4)], 20),
-      rec('handle', 'دسته و چوب‌دست', [mat('timber', 'چوب', 2)], [mat('handle', 'دسته', 6)], 15),
-      rec('cloth', 'پارچه', [mat('wool', 'پشم', 3)], [mat('cloth', 'پارچه', 2)], 30),
-      rec('rope', 'طناب', [mat('flax', 'کتان', 3)], [mat('rope', 'طناب', 2)], 25, false, [N('rope_making', 'طناب‌بافی')]),
+      rec('workbench', 'plank', 'تخته', [mat('timber', 'چوب', 4)], [mat('plank', 'تخته', 4)], 20),
+      rec('workbench', 'handle', 'دسته و چوب‌دست', [mat('timber', 'چوب', 2)], [mat('handle', 'دسته', 6)], 15),
+      rec('loom', 'cloth', 'پارچه', [mat('wool', 'پشم', 3)], [mat('cloth', 'پارچه', 2)], 30),
+      rec('loom', 'rope', 'طناب', [mat('flax', 'کتان', 3)], [mat('rope', 'طناب', 2)], 25, false, [N('rope_making', 'طناب‌بافی')]),
     ],
     jobs: crafts.map((c) => ({ id: c.id, building: N('private_cottage', 'کلبهٔ شخصی'), recipe: c.recipe, batches: c.batches, finish_at: new Date(c.finish).toISOString(), left_seconds: Math.max(0, Math.round((c.finish - Date.now()) / 1000)), planned: null })),
     max_jobs: 2, max_batches: 4, yield_bps: 9000,

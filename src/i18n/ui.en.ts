@@ -6053,6 +6053,7 @@ export const uiEn: Record<UiKey, string> = {
   'tool.have': 'Best tool in store: tier {have}',
   'tool.none': 'No tool in store',
   'tool.short': 'Yield {p}; a better tool is needed',
+  'tool.starts': 'Tool tiers start {at}; until then any tool will do (this work will then ask for tier {need}).',
   'tool.not_yet': 'Tool tiers have not started yet; until then any tool will do (this work will soon ask for tier {need}).',
   'craft.title': 'Making at home',
   'craft.stations': 'The home\'s stations: {list}',

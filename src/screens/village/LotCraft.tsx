@@ -12,6 +12,15 @@ import { durationText } from './common'
 import { hasKey, t, type Key } from '../../i18n'
 import type { ContentNames } from '../../village/useVillage'
 
+/** The stations the recipes stand at, in the card's own order (stations first, then any recipe with none named). */
+function stationsOf(c: LotCraftLine): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const r of c.recipes ?? []) { const k = r.station || ''; if (!seen.has(k)) { seen.add(k); out.push(k) } }
+  const order = c.stations ?? []
+  return out.sort((a, b) => (order.indexOf(a) < 0 ? 99 : order.indexOf(a)) - (order.indexOf(b) < 0 ? 99 : order.indexOf(b)))
+}
+
 export default function LotCraft({ c, buildingId, manage, busy, names, onStart }: {
   c: LotCraftLine; buildingId: string; manage: boolean; busy: boolean; names: ContentNames
   /** sends settlement.craft through the host (a write; the answer is the craft_started page) */
@@ -42,14 +51,22 @@ export default function LotCraft({ c, buildingId, manage, busy, names, onStart }
       )}
       {full && <Note>{t('craft.full', { n: formatNumber(c.max_jobs) })}</Note>}
       {(c.recipes ?? []).length === 0 && <Note>{t('craft.none')}</Note>}
-      <CardGrid>
-        {(c.recipes ?? []).map((r) => (
-          <PCard key={r.code} icon="tool" title={r.name.name} tone={r.available ? 'busy' : 'off'} off={!r.available}
-            sub={t('craft.minutes', { n: formatNumber(r.minutes) })}
-            facts={r.available ? <><span>{t('rc.in', { list: line(r.inputs) })}</span><br /><span>{t('rc.out', { list: line(r.outputs, 1, c.yield_bps) })}</span></> : <span className="dk-why">{t('rc.locked', { list: (r.missing ?? []).map((m) => m.name).join('، ') || '—' })}</span>}
-            onClick={manage && r.available && !full ? () => { setPick(r.code); setN(1) } : undefined} />
-        ))}
-      </CardGrid>
+      {stationsOf(c).map((st) => {
+        const group = (c.recipes ?? []).filter((r) => (r.station || '') === st)
+        return (
+          <div key={st || 'any'} className="lm-craft-st">
+            {st && <div className="lm-craft-sth">{hasKey(`craft.station.${st}`) ? t(`craft.station.${st}` as Key) : st}</div>}
+            <CardGrid>
+        {group.map((r) => (
+                <PCard key={r.code} icon="tool" title={r.name.name} tone={r.available ? 'busy' : 'off'} off={!r.available}
+                  sub={t('craft.minutes', { n: formatNumber(r.minutes) })}
+                  facts={r.available ? <><span>{t('rc.in', { list: line(r.inputs) })}</span><br /><span>{t('rc.out', { list: line(r.outputs, 1, c.yield_bps) })}</span></> : <span className="dk-why">{t('rc.locked', { list: (r.missing ?? []).map((m) => m.name).join('، ') || '—' })}</span>}
+                  onClick={manage && r.available && !full ? () => { setPick(r.code); setN(1) } : undefined} />
+              ))}
+            </CardGrid>
+          </div>
+        )
+      })}
       {rec && (
         <Popup open onClose={() => setPick(null)} tone="gold" title={t('craft.confirm_title', { name: rec.name.name })}
           footer={<div className="lm-craft-foot">

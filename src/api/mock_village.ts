@@ -1525,17 +1525,17 @@ function b2Work(type: string, id: string): Pick<WorkNode, 'farm' | 'mill' | 'wat
 // B4 fixtures (ADR 0068): fx-carpentry-<short|ok|locked|notiers>: recipes and the tool line
 const mat = (code: string, name: string, quantity: number) => ({ component: { code, name }, quantity })
 export const MOCK_RECIPES = (locked = false) => [
-  { code: '', name: { code: '', name: 'کار معمولی' }, default: true, selected: true, inputs: [mat('timber', 'چوب', 4)], outputs: [mat('plank', 'تخته', 4)], available: true, missing: null, minutes: 60 },
-  { code: 'stone_tools', name: { code: 'stone_tools', name: 'ابزار سنگی' }, default: false, selected: false, inputs: [mat('stone', 'سنگ', 2), mat('timber', 'چوب', 1)], outputs: [mat('stone_tools', 'ابزار سنگی', 2)], available: true, missing: null, minutes: 45 },
-  { code: 'handle', name: { code: 'handle', name: 'دسته و چوب‌دست' }, default: false, selected: false, inputs: [mat('timber', 'چوب', 2)], outputs: [mat('handle', 'دسته', 6)], available: true, missing: null, minutes: 30 },
-  { code: 'rope', name: { code: 'rope', name: 'طناب' }, default: false, selected: false, inputs: [mat('flax', 'کتان', 3)], outputs: [mat('rope', 'طناب', 2)], available: !locked && false, missing: [{ code: 'rope_making', name: 'طناب‌بافی' }, { code: 'flax_growing', name: 'کتان‌کاری' }], minutes: 40 },
+  { station: '', code: '', name: { code: '', name: 'کار معمولی' }, default: true, selected: true, inputs: [mat('timber', 'چوب', 4)], outputs: [mat('plank', 'تخته', 4)], available: true, missing: null, minutes: 60 },
+  { station: 'workbench', code: 'stone_tools', name: { code: 'stone_tools', name: 'ابزار سنگی' }, default: false, selected: false, inputs: [mat('stone', 'سنگ', 2), mat('timber', 'چوب', 1)], outputs: [mat('stone_tools', 'ابزار سنگی', 2)], available: true, missing: null, minutes: 45 },
+  { station: 'workbench', code: 'handle', name: { code: 'handle', name: 'دسته و چوب‌دست' }, default: false, selected: false, inputs: [mat('timber', 'چوب', 2)], outputs: [mat('handle', 'دسته', 6)], available: true, missing: null, minutes: 30 },
+  { station: 'workbench', code: 'rope', name: { code: 'rope', name: 'طناب' }, default: false, selected: false, inputs: [mat('flax', 'کتان', 3)], outputs: [mat('rope', 'طناب', 2)], available: !locked && false, missing: [{ code: 'rope_making', name: 'طناب‌بافی' }, { code: 'flax_growing', name: 'کتان‌کاری' }], minutes: 40 },
 ]
 function b4Work(type: string, id: string): Pick<WorkNode, 'tool' | 'recipes'> {
   if (type !== 'carpentry_workshop' && !/^fx-carpentry-/.test(id)) return { tool: null, recipes: null }
   const k = id.match(/^fx-carpentry-([a-z]+)/)?.[1] ?? 'short'
   return {
     recipes: MOCK_RECIPES(),
-    tool: k === 'notiers' ? { need: 2, have: 0, has_tool: true, factor_bps: 10000, tiers: false } : k === 'ok' ? { need: 2, have: 2, has_tool: true, factor_bps: 10000, tiers: true } : k === 'none' ? { need: 2, have: 0, has_tool: false, factor_bps: 4000, tiers: true } : { need: 2, have: 1, has_tool: true, factor_bps: 6000, tiers: true },
+    tool: k === 'notiers' ? { need: 2, have: 0, has_tool: true, factor_bps: 10000, tiers: false, starts_at: new Date(Date.now() + 6 * 86400_000).toISOString() } : k === 'ok' ? { need: 2, have: 2, has_tool: true, factor_bps: 10000, tiers: true, starts_at: null } : k === 'none' ? { need: 2, have: 0, has_tool: false, factor_bps: 4000, tiers: true, starts_at: null } : { need: 2, have: 1, has_tool: true, factor_bps: 6000, tiers: true, starts_at: null },
   }
 }
 

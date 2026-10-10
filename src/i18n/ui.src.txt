@@ -6151,6 +6151,7 @@ tool.need | ابزار رده {need} لازم است | A tool of tier {need} is 
 tool.have | بهترین ابزار انبار: رده {have} | Best tool in store: tier {have}
 tool.none | ابزاری در انبار نیست | No tool in store
 tool.short | بازده {p}؛ ابزار بهتر لازم است | Yield {p}; a better tool is needed
+tool.starts | رده‌بندی ابزار از {at} شروع می‌شود؛ تا آن موقع هر ابزاری کافی است (کار رده {need} بعد از آن ابزار بهتر می‌خواهد). | Tool tiers start {at}; until then any tool will do (this work will then ask for tier {need}).
 tool.not_yet | رده‌بندی ابزار هنوز شروع نشده؛ تا آن روز هر ابزاری کافی است و کار مثل قبل می‌گذرد (کار رده {need} به‌زودی ابزار بهتر می‌خواهد). | Tool tiers have not started yet; until then any tool will do (this work will soon ask for tier {need}).
 craft.title | ساختن در خانه | Making at home
 craft.stations | ایستگاه‌های خانه: {list} | The home's stations: {list}

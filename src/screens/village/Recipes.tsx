@@ -4,6 +4,7 @@
 import type { MaterialLine, StationRecipeLine, ToolLine } from '../../api/views.gen'
 import { Note } from '../../ui/Popup'
 import { formatNumber } from '../native/kit/format'
+import { atText } from '../../lib/duration'
 import { t } from '../../i18n'
 
 const list = (l: MaterialLine[] | null, name: (code: string, n: string) => string) => (l ?? []).map((m) => `${formatNumber(m.quantity)} ${name(m.component.code, m.component.name)}`).join('، ')
@@ -42,7 +43,7 @@ export function RecipePicker({ recipes, value, onChange, name }: { recipes: Stat
 const pct = (bps: number) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 0 }).format(bps / 100)}٪`
 
 export function ToolBlock({ tool }: { tool: ToolLine }) {
-  if (!tool.tiers) return <div className="gc-note">{t('tool.not_yet', { need: formatNumber(tool.need) })}</div>
+  if (!tool.tiers) return <div className="gc-note">{tool.starts_at ? t('tool.starts', { at: atText(tool.starts_at), need: formatNumber(tool.need) }) : t('tool.not_yet', { need: formatNumber(tool.need) })}</div>
   return (
     <div className="rc-tool">
       <div className="gc-note">{t('tool.need', { need: formatNumber(tool.need) })} – {tool.has_tool ? t('tool.have', { have: formatNumber(tool.have) }) : t('tool.none')}</div>
