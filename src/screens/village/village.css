@@ -382,3 +382,15 @@
 .wk-btns > * { flex: 1 1 auto; min-width: 72px; white-space: nowrap; }
 .wk-wide > * { white-space: normal; }
 .rd-exp-max { display: block; margin-top: 4px; font-size: 12px; color: var(--text-dim); text-align: center; }
+
+/* the stall keeper's pay: two chips, a stepper, the allowed range */
+.lm-keeper { display: flex; flex-direction: column; gap: 8px; }
+.lm-keeper-pick { display: flex; flex-direction: column; gap: 8px; }
+.lm-keeper-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.lm-keeper-chips .dk-chip { flex: 1 1 120px; min-height: 40px; }
+.lm-keeper-step { display: flex; align-items: center; gap: 10px; }
+.lm-keeper-val { flex: 1; text-align: center; font-weight: 800; font-size: 17px; }
+.lm-keeper-pm { width: 48px; height: 48px; border-radius: 14px; border: 0; font-size: 24px; font-weight: 800; color: #fff; background: rgba(255, 255, 255, 0.12); cursor: pointer; }
+.lm-keeper-pm:disabled { opacity: 0.35; cursor: default; }
+.lm-keeper-range { text-align: center; }
+.lm-keeper-step { direction: ltr; }

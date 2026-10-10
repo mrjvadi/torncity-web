@@ -8,7 +8,7 @@ const N = (code: string, name: string) => ({ code, name })
 export const LOT_LOOK: LotLook = { version: 1, function: 'dwelling', level: 1, w: 2, d: 2, storeys: 1, material: 'timber', roof: 'gable', modules: { bedroom: 1, hearth: 1, storeroom: 1 }, condition: 9400, seed: 4821, palette: 'temperate_grassland', wobble: 1, windows: 3, door: 's', hue: 6, prop: 'woodpile', chimney: true, awning: false }
 let bedrooms = 1
 /** ?lot=stall: my stall (a keeper can be hired); ?lot=stall-hired: he already keeps it; ?lot=stall-full: nobody free in the pool */
-let keeperHired = (() => { try { return new URLSearchParams(location.search).get('lot') === 'stall-hired' } catch { return false } })()
+const keeper = { hired: (() => { try { return new URLSearchParams(location.search).get('lot') === 'stall-hired' } catch { return false } })(), pay: 'share', n: 1000 }
 
 const LOOKS: Record<string, Partial<LotLook>> = {
   'b-look-2': { roof: 'hip', storeys: 2, hue: -12, door: 'e', chimney: false, prop: 'barrels', windows: 3, seed: 11 },
@@ -46,7 +46,7 @@ function detail(stage: string, extra: Partial<LotManageView> = {}, id = 'b-lot-1
     staff: [], housing_capacity: 2 * bedrooms, personal_storage: 40, stall_slots: 0, if_unstaffed: '', condition_bps: 9400, look,
     templates: [{ id: 't1', name: 'قالب ۱', code: 'K7M2Q', function: N('dwelling', 'خانه'), level: 1, storeys: 1, modules: [{ module: N('bedroom', 'اتاق خواب'), count: 2 }], mine: true, applicable: true, reason: '' },
       { id: 't2', name: 'کلبهٔ دوطبقه', code: 'P9X4A', function: N('dwelling', 'خانه'), level: 2, storeys: 2, modules: null, mine: false, applicable: false, reason: 'requires' }],
-    keeper: m.startsWith('stall') ? { hired: keeperHired, share_bps: 1000, can: !keeperHired && m !== 'stall-full', reason: !keeperHired && m === 'stall-full' ? 'no_seat' : '', seats_free: m === 'stall-full' ? 0 : keeperHired ? 2 : 3 } : null,
+    keeper: m.startsWith('stall') ? { hired: keeper.hired, pay: keeper.hired ? keeper.pay : '', share_bps: keeper.hired && keeper.pay === 'share' ? keeper.n : 1000, share_min_bps: 500, share_max_bps: 2000, wage: keeper.hired && keeper.pay === 'wage' ? keeper.n : 600, wage_min: 300, wage_max: 1500, left: !keeper.hired && m === 'stall-left' ? 'wage_unpaid' : '', can: !keeper.hired && m !== 'stall-full', reason: !keeper.hired && m === 'stall-full' ? 'no_seat' : '', seats_free: m === 'stall-full' ? 0 : keeper.hired ? 2 : 3 } : null,
     cash: 12450, quote: null, reason: '', needs: null, code: '', n: 0, name: '', share_code: '', ...extra,
   }
 }
@@ -68,9 +68,13 @@ export function mockLotCommand(command: string, args: Record<string, unknown>) {
   const acts = [back('settlement.mine'), A('refresh', 'settlement.lot.manage', { building: 'b-lot-1' })]
   if (!action) return mockOk('lot_manage', detail('detail', {}, String(args.building ?? 'b-lot-1')), acts)
   const reason = m === 'reason' && action === 'add' ? 'area' : action === 'add' && String(args.code) === 'cellar' ? 'requires' : ''
-  if ((action === 'keeper_hire' && keeperHired) || (action === 'keeper_end' && !keeperHired)) return mockRefusal(action === 'keeper_hire' ? 'lot_keeper_none' : 'lot_no_keeper', { back: { command: 'settlement.lot.manage', args: null } })
+  if ((action === 'keeper_hire' && keeper.hired) || (action === 'keeper_end' && !keeper.hired)) return mockRefusal(action === 'keeper_hire' ? 'lot_keeper_none' : 'lot_no_keeper', { back: { command: 'settlement.lot.manage', args: null } })
+  if (action === 'keeper_hire') {
+    const n = Number(args.name) || 0, code = String(args.code)
+    if ((code === 'share' && (n < 500 || n > 2000)) || (code === 'wage' && (n < 300 || n > 1500)) || (code !== 'share' && code !== 'wage')) return mockRefusal('lot_keeper_terms', { back: { command: 'settlement.lot.manage', args: null } })
+  }
   if (action.startsWith('keeper_') && !args.confirm) return mockOk('lot_manage', detail('ask', { action }), [confirmA('settlement.lot.manage', { building: 'b-lot-1', action }), back('settlement.lot.manage', { building: 'b-lot-1' })])
-  if (action.startsWith('keeper_')) { keeperHired = action === 'keeper_hire'; return mockOk('lot_manage', detail('done', { action }), acts) }
+  if (action.startsWith('keeper_')) { keeper.hired = action === 'keeper_hire'; if (keeper.hired) { keeper.pay = String(args.code); keeper.n = Number(args.name) || 0 } return mockOk('lot_manage', detail('done', { action }), acts) }
   if (!args.confirm) {
     return mockOk('lot_manage', detail('ask', { action, quote: quote(action), reason, needs: reason === 'requires' ? detail('detail').additions![1].needs : null, code: String(args.code ?? ''), n: Number(args.n ?? 0) }), [confirmA('settlement.lot.manage', { building: 'b-lot-1', action, code: String(args.code ?? '') }), back('settlement.lot.manage', { building: 'b-lot-1' })])
   }
