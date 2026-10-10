@@ -31,6 +31,8 @@ export default function LotCraft({ c, buildingId, manage, busy, names, onStart }
   const [, tick] = useState(0)
   useEffect(() => { const id = window.setInterval(() => tick((x) => x + 1), 20000); return () => window.clearInterval(id) }, [])
   void buildingId
+  // the station's name is the server catalogue's (the same names as the modules tab); ours only when the catalogue lacks it
+  const stName = (code: string) => names.name(['module_kind', 'module_kinds', 'module'], code, hasKey(`craft.station.${code}`) ? t(`craft.station.${code}` as Key) : code)
   const gname = (m: MaterialLine) => names.name(['component', 'item'], m.component.code, m.component.name)
   const line = (l: MaterialLine[] | null, k = 1, yieldBps = 10000) => (l ?? []).map((m) => `${formatNumber(Math.floor((m.quantity * k * yieldBps) / 10000))} ${gname(m)}`).join('، ')
   const rec = (c.recipes ?? []).find((r) => r.code === pick) ?? null
@@ -40,7 +42,7 @@ export default function LotCraft({ c, buildingId, manage, busy, names, onStart }
   return (
     <div className="lm-keeper lm-craft">
       <Section>{t('craft.title')}</Section>
-      {(c.stations ?? []).length > 0 && <div className="gc-note">{t('craft.stations', { list: (c.stations ?? []).map((s) => (hasKey(`craft.station.${s}`) ? t(`craft.station.${s}` as Key) : s)).join('، ') })}</div>}
+      {(c.stations ?? []).length > 0 && <div className="gc-note">{t('craft.stations', { list: (c.stations ?? []).map(stName).join('، ') })}</div>}
       {(c.jobs ?? []).length > 0 && (
         <div className="vf-list">
           {(c.jobs ?? []).map((j) => {
@@ -55,7 +57,7 @@ export default function LotCraft({ c, buildingId, manage, busy, names, onStart }
         const group = (c.recipes ?? []).filter((r) => (r.station || '') === st)
         return (
           <div key={st || 'any'} className="lm-craft-st">
-            {st && <div className="lm-craft-sth">{hasKey(`craft.station.${st}`) ? t(`craft.station.${st}` as Key) : st}</div>}
+            {st && <div className="lm-craft-sth">{stName(st)}</div>}
             <CardGrid>
         {group.map((r) => (
                 <PCard key={r.code} icon="tool" title={r.name.name} tone={r.available ? 'busy' : 'off'} off={!r.available}

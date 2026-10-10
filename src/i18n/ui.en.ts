@@ -6059,7 +6059,7 @@ export const uiEn: Record<UiKey, string> = {
   'craft.stations': 'The home\'s stations: {list}',
   'craft.station.workbench': 'Workbench',
   'craft.station.forge': 'Forge',
-  'craft.station.loom': 'Loom',
+  'craft.station.loom': 'Weaving loom',
   'craft.station.kiln': 'Kiln',
   'craft.station.oven': 'Oven',
   'craft.station.millstone': 'Millstone',

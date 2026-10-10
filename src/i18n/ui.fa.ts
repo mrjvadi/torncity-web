@@ -6057,7 +6057,7 @@ export const uiFa = {
   'craft.stations': 'ایستگاه‌های خانه: {list}',
   'craft.station.workbench': 'میز کار',
   'craft.station.forge': 'کورهٔ آهنگری',
-  'craft.station.loom': 'دار',
+  'craft.station.loom': 'دار بافندگی',
   'craft.station.kiln': 'کوره',
   'craft.station.oven': 'تنور',
   'craft.station.millstone': 'سنگ آسیاب',

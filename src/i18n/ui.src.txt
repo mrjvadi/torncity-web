@@ -6157,7 +6157,7 @@ craft.title | ساختن در خانه | Making at home
 craft.stations | ایستگاه‌های خانه: {list} | The home's stations: {list}
 craft.station.workbench | میز کار | Workbench
 craft.station.forge | کورهٔ آهنگری | Forge
-craft.station.loom | دار | Loom
+craft.station.loom | دار بافندگی | Weaving loom
 craft.station.kiln | کوره | Kiln
 craft.station.oven | تنور | Oven
 craft.station.millstone | سنگ آسیاب | Millstone
