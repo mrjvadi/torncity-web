@@ -644,10 +644,10 @@ const BOULDER_COLOR_B = new Color(0x716c60)
 
 /** Small boulders scattered thinly across open grass — cheap low-poly
  * instances (one shared icosahedron), never inside the city or on water. */
-export function buildBoulders(grids: CityGrids): FieldResult {
+export function buildBoulders(grids: CityGrids, margin = 2): FieldResult {
   const { w, h } = grids.fine
   const { originX, originY, size } = grids.doc.city
-  const inCity = (x: number, y: number) => x >= originX - 2 && x < originX + size + 2 && y >= originY - 2 && y < originY + size + 2
+  const inCity = (x: number, y: number) => x >= originX - margin && x < originX + size + margin && y >= originY - margin && y < originY + size + margin
 
   const spots: { x: number; y: number; scale: number }[] = []
   for (let y = 1; y < h - 1; y++) {

@@ -317,7 +317,18 @@ export interface WorldInfo {
 
 export type LotWater = 'ocean' | 'lake' | 'river' | 'stream'
 
-export interface LayoutLot {
+/** What stands on a lot as land (ADR 0065): trees and rocks left, stumps (cosmetic, at most 3), saplings (stage 0..1), and what is ordered cleared. */
+export interface LandStuff {
+  trees?: number
+  rocks?: number
+  stumps?: number
+  saplings?: { stage: number; ready_at?: string }[] | null
+  ordered?: { trees: boolean; rocks: boolean } | null
+  /** a lot with trees or rocks cannot be built on until it is cleared */
+  obstructed?: boolean
+}
+
+export interface LayoutLot extends LandStuff {
   height_m: number
   slope_m: number
   buildable: boolean
@@ -325,6 +336,9 @@ export interface LayoutLot {
   water?: LotWater
   tags?: string[]
 }
+
+/** A lot of the woodland ring round the claimed grid (the commons); x and y are signed, in the frame of `lots`. */
+export interface LayoutRingLot extends LandStuff { x: number; y: number; height_m: number; slope_m: number; biome: string; water?: string }
 
 /** Building states a layout reports. */
 export type BuildingState = 'planned' | 'under_construction' | 'built' | 'damaged' | 'ruin'
@@ -371,6 +385,25 @@ export interface VillageLayout {
   terms?: LayoutTerms
   /** The land the roads opened beyond the first grid (ADR 0044 5.5), for a member. */
   land?: LayoutLand
+  /** The woodland ring (ADR 0065): `depth` lots round the grid. Absent on a server without the land rule. */
+  ring?: { depth: number; lots: LayoutRingLot[] | null }
+  /** `mark` changes with every cut, planting or maturity; `forest_remaining_bps` thins the countryside trees (10000 = untouched). */
+  woods?: { mark: string; forest_remaining_bps: number }
+  /** The crops of the complete farms (ADR 0067); absent without farms. */
+  farms?: LayoutFarm[] | null
+}
+
+/** One complete farm of the layout (ADR 0067): its crop's stage, read at the request time. `legacy` is a farm that still works its flat shift (drawn as a green field). */
+export interface LayoutFarm {
+  building: string
+  stage: 'idle' | 'sowing' | 'growing' | 'ripe' | 'overripe' | 'harvest' | 'harvested' | 'rotted' | string
+  rainfed: boolean
+  legacy: boolean
+  sow_done: number; sow_need: number
+  tended: number; tend_max: number
+  harvest_done: number; harvest_need: number
+  ripe_at?: string | null
+  spoil_at?: string | null
 }
 
 /** A road drawn out of the first grid. */
@@ -378,7 +411,7 @@ export interface LayoutRoadPlan { id: string; class: string; lots: number; to_x:
 /** One lot of a drawn road; `built` once a buyer's purchase laid it. Lot coordinates may be negative. */
 export interface LayoutRoadCell { x: number; y: number; plan: string; built: boolean; water?: 'stream' | 'river'; height_m: number }
 /** A lot a road opened; `reason` says why a lot cannot be used ('water' or 'steep'). */
-export interface LayoutOpenLot {
+export interface LayoutOpenLot extends LandStuff {
   x: number; y: number; buildable: boolean; reason?: 'water' | 'steep'
   height_m: number; slope_m: number; biome?: string; water?: string; tags?: string[]
 }
@@ -430,6 +463,10 @@ export interface SettlementEvent {
   /** build_started: the roads the game laid with the building, finished at once. */
   auto_roads?: { building_id: string; lot_x: number; lot_y: number }[]
   layout_version?: LayoutVersions
+  /** land_changed: what changed (trees_cut, rocks_cut, planted, ordered) and where. */
+  kind?: string
+  x?: number
+  y?: number
   research_id?: string
   code?: string
   literacy_share_bps?: number

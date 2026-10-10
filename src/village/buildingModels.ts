@@ -6,6 +6,7 @@
 // Nothing leaves the footprint rectangle.
 
 import { Color, Vector3 } from 'three'
+import type { Field } from './farmStage'
 import { ColorGeom, G_PLAIN, G_ROOF, G_WALL, seededRng } from './colorGeom'
 
 export interface Model { geom: ColorGeom; height: number }
@@ -25,7 +26,7 @@ const GRASS = 0x83a55a
 const WATER = 0x3f88a8
 const CANVAS = 0xe8dcc0
 
-interface Ctx { W: number; D: number; rng: () => number; foundation: number; g: ColorGeom }
+interface Ctx { W: number; D: number; rng: () => number; foundation: number; g: ColorGeom; field?: Field }
 
 const pick = <T,>(r: () => number, a: T[]): T => a[Math.floor(r() * a.length) % a.length]
 
@@ -133,9 +134,24 @@ function patch(g: ColorGeom, cx: number, cz: number, w: number, d: number, y: nu
   g.quad(V(cx - w / 2, y, cz + d / 2), V(cx + w / 2, y, cz + d / 2), V(cx + w / 2, y, cz - d / 2), V(cx - w / 2, y, cz - d / 2), color, 0.2, G_PLAIN)
 }
 
-function furrows(g: ColorGeom, cx: number, cz: number, w: number, d: number, color: number, gap = 1.6): void {
+function furrows(g: ColorGeom, cx: number, cz: number, w: number, d: number, color: number, gap = 1.6, h = 0.3): void {
   const n = Math.max(2, Math.floor(w / gap))
-  for (let i = 0; i < n; i++) g.box(cx - w / 2 + (w * (i + 0.5)) / n, 0.32, cz, gap * 0.45, 0.3, d, color, G_PLAIN)
+  for (let i = 0; i < n; i++) g.box(cx - w / 2 + (w * (i + 0.5)) / n, 0.17 + h / 2, cz, gap * 0.45, h, d, color, G_PLAIN)
+}
+
+const mixHex = (a: number, b: number, t: number): number => new Color(a).lerp(new Color(b), Math.max(0, Math.min(1, t))).getHex()
+
+/** The ground and the rows of a field at its stage (ADR 0067): bare earth, sown rows, green crop growing towards gold, ripe straw going dull, stubble, withered. */
+function cropColours(f: Field | undefined): { soil: number; rows: number; h: number } | null {
+  if (!f) return null
+  switch (f.look) {
+    case 'bare': return { soil: 0x8a7348, rows: 0x6f5a38, h: 0.2 }
+    case 'sown': return { soil: 0x7a6440, rows: 0x8a9a52, h: 0.24 }
+    case 'green': return { soil: 0x6b5a3a, rows: mixHex(0x5f9a3c, 0x9db248, f.blend), h: 0.34 + 0.3 * f.blend }
+    case 'ripe': return { soil: 0x8a7a45, rows: mixHex(0xd4b84a, 0x8a7a50, f.blend), h: 0.72 - 0.15 * f.blend }
+    case 'stubble': return { soil: 0x9a8a5c, rows: 0xb8a56a, h: 0.16 }
+    case 'withered': return { soil: 0x6a5a3c, rows: 0x5a5038, h: 0.22 }
+  }
 }
 
 function chimney(g: ColorGeom, x: number, z: number, y0: number, h: number, r = 0.9): void {
@@ -295,7 +311,8 @@ const wateredField = (g: ColorGeom, cx: number, cz: number, w: number, d: number
 }
 
 function farm(kind: string): Gen {
-  return ({ g, W, D, rng }) => {
+  return ({ g, W, D, rng, field }) => {
+    const crop = cropColours(field)
     patch(g, 0, 0, W - 1.5, D - 1.5, 0.2, 0x8a7a55)
     const fw = (W - 6) / 2, fd = (D - 14) / 2
     const cols = [0xb9a24a, 0x6f8f3e, 0x7a5c38, 0x9bb04a]
@@ -303,8 +320,13 @@ function farm(kind: string): Gen {
     let k = 0
     for (const [sx, sz] of spots) {
       const cx = sx * (fw / 2 + 0.6), cz = -D * 0.18 + sz * (fd / 2 + 0.6) - (sz > 0 ? 0 : 0)
-      if (kind === 'farm_paddy') wateredField(g, cx, cz, fw - 1, fd - 1)
-      else { patch(g, cx, cz, fw - 1, fd - 1, 0.26, cols[(k + Math.floor(rng() * 4)) % 4]); furrows(g, cx, cz, fw - 1.6, fd - 1.6, new Color(cols[k % 4]).multiplyScalar(0.78).getHex()) }
+      if (kind === 'farm_paddy') {
+        wateredField(g, cx, cz, fw - 1, fd - 1)
+        if (crop && crop.h > 0.22) furrows(g, cx, cz, fw - 2, fd - 2, crop.rows, 1.4, crop.h + 0.2)
+      } else if (crop) {
+        patch(g, cx, cz, fw - 1, fd - 1, 0.26, crop.soil)
+        furrows(g, cx, cz, fw - 1.6, fd - 1.6, crop.rows, 1.6, crop.h)
+      } else { patch(g, cx, cz, fw - 1, fd - 1, 0.26, cols[(k + Math.floor(rng() * 4)) % 4]); furrows(g, cx, cz, fw - 1.6, fd - 1.6, new Color(cols[k % 4]).multiplyScalar(0.78).getHex()) }
       k++
     }
     if (kind === 'farm_canal') patch(g, 0, -D * 0.18, 2.2, D - 14, 0.34, WATER)
@@ -535,7 +557,7 @@ const GENS: Record<string, Gen> = {
   weaving_shed: workshop('weaving_shed'), pottery_kiln: workshop('pottery_kiln'), manufactory, factory,
   small_pit: pit, mine,
   canal_channel: waterWorks('canal_channel'), shaft_well: waterWorks('shaft_well'), terrace_works: waterWorks('terrace_works'), paddy_banks: waterWorks('paddy_banks'),
-  farm_canal: farm('farm_canal'), farm_shaft: farm('farm_shaft'), farm_terrace: farm('farm_terrace'), farm_paddy: farm('farm_paddy'),
+  farm_canal: farm('farm_canal'), farm_shaft: farm('farm_shaft'), farm_terrace: farm('farm_terrace'), farm_paddy: farm('farm_paddy'), farm_dry: farm('farm_dry'),
   pasture_range: pasture,
   health_house: healthHouse(false), clinic: healthHouse(true),
   teaching_circle: teachingCircle, school,
@@ -543,14 +565,14 @@ const GENS: Record<string, Gen> = {
 }
 
 /** The finished model of a building type on a W x D metre footprint. */
-export function buildModel(type: string, W: number, D: number, seed: number, foundation: number): Model {
+export function buildModel(type: string, W: number, D: number, seed: number, foundation: number, field?: Field): Model {
   const g = new ColorGeom()
   const rng = seededRng(seed || 1)
   // the platform: sunk into the ground, top a hand's breadth above the base
   const f = Math.max(0.6, foundation)
   g.box(0, (0.16 - f) / 2, 0, W - 0.6, 0.16 + f, D - 0.6, STONE_DARK, G_PLAIN)
   const gen = GENS[type] ?? generic
-  const height = gen({ W, D, rng, foundation: f, g })
+  const height = gen({ W, D, rng, foundation: f, g, field })
   return { geom: g, height }
 }
 

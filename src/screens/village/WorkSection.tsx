@@ -3,6 +3,7 @@
 // every reason it is held back, each with its way out. Codes and numbers come from `BuildingView.work`; the words are ours.
 
 import { useRef } from 'react'
+import { FarmBlock, GrazingBlock, MillBlock, WaterBlock } from './FarmWork'
 import type { WorkNode, WorkReason } from '../../api/views.gen'
 import { EffectChip, EffectRow, Note, Section, ActionButton } from '../../ui/Popup'
 import { formatNumber, money } from '../native/kit/format'
@@ -76,6 +77,10 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
         <EffectChip tone={closed ? 'bad' : tone(w.status)}>{closed ? t('work.status.closed') : word(`work.status.${w.status}`, w.status)}</EffectChip>
         <EffectChip tone="neutral">{word(`work.kind.${w.kind}`, t('work.kind.other'))}</EffectChip>
       </EffectRow>
+      {w.farm && <FarmBlock f={w.farm} id={buildingId} act={act} manage={manage} />}
+      {w.water && <WaterBlock w={w.water} />}
+      {w.mill && <MillBlock m={w.mill} id={buildingId} act={act} />}
+      {w.grazing && <GrazingBlock g={w.grazing} />}
       {w.max > 0 && (
         <div className="wk-seats" role="list" aria-label={t('work.seats', { filled: formatNumber(w.filled), max: formatNumber(w.max) })}>
           {Array.from({ length: w.max }, (_, i) => {

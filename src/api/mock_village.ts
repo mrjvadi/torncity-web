@@ -10,7 +10,7 @@ import { COMPANIES_CONTENT } from './mock_companies'
 import { MILITARY_CONTENT } from './mock_military'
 import { P1_CONTENT } from './mock_p0'
 import type {
-  BuildingState, LayoutBuilding, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
+  BuildingState, LayoutBuilding, LayoutFarm, LayoutLot, SettlementEvent, SettlementPlayers, VillageLayout, BootstrapSettlement,
 } from './types'
 import { LIFE_CONTENT } from './mock_life'
 import { ACTIVITIES_CONTENT } from './mock_act_content'
@@ -22,6 +22,7 @@ import { MOCK_WORLD, mockChunkBytes, mockHeight, mockVillagePlace, RIVER_GY, RIV
 import { MOCK_VILLAGE_IDS } from './mock_village_ids'
 import * as landMock from './mock_village_land'
 import { mockLaborCommand, laborProgressLines } from './mock_labor'
+import { landOn, withGridLand, ringLots, woods, obstructedAt, clearCommand } from './mock_village_woods'
 import { ALL_PERMISSIONS, MOCK_ZONE, mockCharter } from './mock_charter'
 import { A, back, confirmA, mockOk, mockRefusal, refreshA, type MockAct } from './mock_neutral'
 import type {
@@ -57,10 +58,16 @@ const CAT: CatEntry[] = [
   { code: 'smithy', fa: 'آهنگری', en: 'Smithy', fp: [2, 2], cost: 1800, time: 6000, role: 'craft', needs: ['metallurgy'] },
   { code: 'shaft_well', fa: 'چاه قنات', en: 'Qanat well', fp: [1, 1], cost: 300, time: 1200, role: 'water_infra' },
   { code: 'farm_canal', fa: 'مزرعهٔ نهری', en: 'Canal farm', fp: [3, 3], cost: 2200, time: 7200, role: 'food' },
+  { code: 'farm_dry', fa: 'مزرعهٔ دیم', en: 'مزرعهٔ دیم', fp: [3, 3], cost: 1800, time: 6000, role: 'food' },
+  { code: 'canal_channel', fa: 'کانال آبرسانی', en: 'کانال آبرسانی', fp: [1, 1], cost: 500, time: 3600, role: 'water_infra' },
+  { code: 'water_mill', fa: 'آسیاب آبی', en: 'آسیاب آبی', fp: [2, 2], cost: 2600, time: 7200, role: 'craft' },
+  { code: 'mill', fa: 'آسیاب', en: 'آسیاب', fp: [2, 2], cost: 1600, time: 5400, role: 'craft' },
+  { code: 'pasture_range', fa: 'چراگاه', en: 'چراگاه', fp: [3, 3], cost: 1200, time: 4800, role: 'food' },
   { code: 'health_house', fa: 'خانهٔ بهداشت', en: 'Health house', fp: [2, 2], cost: 1200, time: 4800, role: 'health' },
   { code: 'teaching_circle', fa: 'کلاس درس', en: 'Village classroom', fp: [1, 1], cost: 200, time: 1500, role: 'education' },
   { code: 'barter_post', fa: 'بازارچه', en: 'Village market', fp: [1, 1], cost: 250, time: 1200, role: 'market' },
   { code: 'woodcutter_camp', fa: 'کارگاه هیزم‌شکنی', en: "Woodcutter's camp", fp: [2, 2], cost: 900, time: 3600, role: 'craft' },
+  { code: 'forester_lodge', fa: 'نهالستان', en: 'Forester lodge', fp: [2, 2], cost: 400, time: 3600, role: 'craft' },
   { code: 'paper_mill', fa: 'کارگاه کاغذسازی', en: 'Paper mill', fp: [2, 2], cost: 1600, time: 5400, role: 'craft' },
   { code: 'clay_pit', fa: 'گودال گل', en: 'Clay pit', fp: [2, 2], cost: 700, time: 2700, role: 'extraction' },
   { code: 'tool_workshop', fa: 'کارگاه ابزارسازی', en: 'Tool workshop', fp: [2, 2], cost: 1500, time: 5400, role: 'craft' },
@@ -182,6 +189,9 @@ function init() {
     mk('carpentry_workshop', 0, 0, 'under_construction', { started: now - 14 * 60000, finish: now + 21 * 60000 }),
     mk('militia_camp', 2, 3, 'under_construction', { rotated: true, started: now - 32 * 60000, finish: now + 13 * 60000 }),
   ]
+  // ?farm=<stage> stands a farm on the grid (idle, sowing, growing, ripe, overripe, harvested, rotted, legacy, dry): the field is drawn by that stage
+  const farmStage = (() => { try { return new URLSearchParams(location.search).get('farm') } catch { return null } })()
+  if (farmStage) st.buildings.push({ ...mk('farm_canal', 2, 0, 'built'), id: `fx-farm-${farmStage}`, w: 3, h: 2 })
   st.roads = [0, 1, 2, 3, 4].map((x) => ({ x, y: 2 }))
   st.otherBuildings = [mk('civic_hall', 1, 1, 'built'), mk('farm_canal', 2, 2, 'built'), mk('watch_hut', 0, 4, 'built')]
   st.know = [
@@ -261,6 +271,18 @@ function toLayoutBuilding(b: MBuilding, full: boolean): LayoutBuilding {
   return out
 }
 
+/** The crops of the farms of the mock grid, as the layout carries them (ADR 0067). */
+function layoutFarms(): LayoutFarm[] | undefined {
+  const out: LayoutFarm[] = []
+  for (const b of st.buildings) {
+    if (!/^farm_/.test(b.type) || b.state !== 'built') continue
+    const f = b2Work(b.type, b.id).farm
+    if (!f) continue
+    out.push({ building: b.id, stage: f.stage, rainfed: f.rainfed, legacy: f.legacy, sow_done: f.sow_done, sow_need: f.sow_need, tended: f.tended, tend_max: f.tend_max, harvest_done: f.harvest_done, harvest_need: f.harvest_need, ripe_at: f.ripe_at, spoil_at: f.spoil_at })
+  }
+  return out.length ? out : undefined
+}
+
 function layoutFor(id: string): VillageLayout {
   init()
   const own = id === OWN_ID
@@ -282,7 +304,9 @@ function layoutFor(id: string): VillageLayout {
     viewer: { member: own, can_place: own && IS_HEAD, ...(own ? { resident: true } : {}) },
     settlement: { id, code: own ? 'v-k3x9' : 'v-q7m2', name: own ? 'آمل' : 'سرخه', tier: 'city', world_cell: own ? 18211 : 18990, centre },
     grid: { lots: own ? size() : GRID, lot_m: lot, origin, slope_limit: SLOPE_LIMIT },
-    lots: own ? st.lots : st.otherLots,
+    lots: own ? (landOn() ? withGridLand(st.lots) : st.lots) : st.otherLots,
+    ...(own ? { farms: layoutFarms() } : {}),
+    ...(own && landOn() ? { ring: { depth: 3, lots: ringLots(size()) }, woods: woods() } : {}),
     buildings,
     ...(own ? { roads, ...(outerLand ? { land: outerLand } : {}), tenure: cz.tenure.map((l) => ({ x: l.x, y: l.y, tenure: 'freehold' as const, mine: l.mine, owner: l.owner })), terms: { lot_price: LOT_PRICE, permit_fee: PERMIT_FEE, tax_bps: TAX_BPS } } : {}),
   }
@@ -541,6 +565,15 @@ function place(args: Record<string, unknown>) {
   const { x, y, rotated } = at
   const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
   const beyond = x < 0 || y < 0 || x + w > size() || y + h > size()
+  // ADR 0067: a water mill stands beside water or a water work; a pasture needs open land round it
+  if (code === 'water_mill') return refusal('needs_near')
+  if (code === 'pasture_range') return refusal('no_grazing')
+  if (landOn() && code !== 'road') {
+    const cells: { x: number; y: number }[] = []
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) cells.push({ x: xx, y: yy })
+    const ob = obstructedAt(cells, size())
+    if (ob) return refusal('obstructed', { obstacles: ob, action: 'build', subject: nameOf(code) })
+  }
   if (beyond) {
     const why = outerFree(x, y, w, h)
     if (why) return refusal(why)
@@ -1288,6 +1321,7 @@ const WORKPLACES = [
   { id: 'wp-2', code: 'farm_canal', produces: [['wheat', 12]] as [string, number][], consumes: [] as [string, number][], wage: 24, shift: 5400, workers: 4 },
   { id: 'wp-4', code: 'smithy', produces: [['tools', 1]] as [string, number][], consumes: [['charcoal', 2], ['bloom', 1]] as [string, number][], wage: 60, shift: 3600, workers: 2 },
   { id: 'wp-5', code: 'tannery', produces: [['leather', 2]] as [string, number][], consumes: [['hide', 2]] as [string, number][], wage: 44, shift: 2700, workers: 2 },
+  { id: 'wp-4', code: 'mill', produces: [['flour', 16]] as [string, number][], consumes: [['wheat', 20]] as [string, number][], wage: 30, shift: 3600, workers: 2 },
   { id: 'wp-3', code: 'carpentry_workshop', produces: [['timber', 2]] as [string, number][], consumes: [['wheat', 1]] as [string, number][], wage: 36, shift: 3600, workers: 2 },
 ]
 /** ?personal=1: the grace of ADR 0055 runs and the viewer lacks the smith's level and the reading class */
@@ -1305,7 +1339,7 @@ function workView(args: Record<string, unknown>) {
   const lines = (l: [string, number][]) => (l.length ? l.map(([c, q]) => ({ component: goods(c), quantity: q })) : null)
   const view: WorkView = {
     village: 'آمل', resident: true,
-    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true, personal: PERSONAL_ON && p.code === 'smithy' ? [{ kind: 'level', item: { code: '', name: '' }, have: 1, need: 3, how: '' }, { kind: 'skill', item: { code: 'mechanics', name: 'mechanics' }, have: 0, need: 1, how: 'train' }, { kind: 'certificate', item: { code: 'first_aid', name: 'first_aid' }, have: 0, need: 1, how: 'train' }] : PERSONAL_ON && p.code === 'carpentry_workshop' ? [{ kind: 'literacy', item: { code: 'reading_writing', name: 'reading_writing' }, have: 0, need: 1, how: 'train' }] : null })),
+    places: WORKPLACES.map((p) => ({ id: p.id, building: nameOf(p.code), produces: lines(p.produces), consumes: lines(p.consumes), wage: p.wage, shift_seconds: p.shift, workers: p.workers, busy: p.id === mine?.id ? 1 : 0, ready: true, farm: p.code === 'farm_canal' ? b2Work('farm_canal', 'fx-farm-growing').farm : null, mill: p.code === 'mill' ? b2Work('mill', 'fx-mill-toll').mill : null, personal: PERSONAL_ON && p.code === 'smithy' ? [{ kind: 'level', item: { code: '', name: '' }, have: 1, need: 3, how: '' }, { kind: 'skill', item: { code: 'mechanics', name: 'mechanics' }, have: 0, need: 1, how: 'train' }, { kind: 'certificate', item: { code: 'first_aid', name: 'first_aid' }, have: 0, need: 1, how: 'train' }] : PERSONAL_ON && p.code === 'carpentry_workshop' ? [{ kind: 'literacy', item: { code: 'reading_writing', name: 'reading_writing' }, have: 0, need: 1, how: 'train' }] : null })),
     mine: mine ? { building: nameOf(mine.code), finish_at: new Date(wk.shift!.finish).toISOString(), left_seconds: Math.round((wk.shift!.finish - Date.now()) / 1000), wage: mine.wage, produces: lines(mine.produces) } : null,
     suggest: null, personal_until: PERSONAL_ON ? new Date(Date.now() + 5 * 86400_000).toISOString() : null, started: !!place, used: Object.values(MAT_STOCK).reduce((a, b) => a + b, 0), capacity: MAT_BASE_CAP,
   }
@@ -1448,15 +1482,55 @@ function panelKind(type: string, role: string): string {
 }
 
 // W1 fixtures: fx-woodcutter-idle (no crew, nobody), fx-woodcutter-crew (2 labourers + 1 resident), fx-woodcutter-paused (budget spent), a granary, a road
+// B2 fixtures (ADR 0067): fx-farm-<stage> (idle, sowing, growing, ripe, overripe, harvested, rotted, legacy, dry, nowater, noseed), fx-water-<on|off|worn>,
+// fx-mill-<toll|nograin>, fx-pasture-<ok|short>
+const b2 = { sown: new Set<string>(), have: 40, toll: 500 }
+const iso = (ms: number) => new Date(Date.now() + ms).toISOString()
+function b2Work(type: string, id: string): Pick<WorkNode, 'farm' | 'mill' | 'water' | 'grazing'> {
+  const none = { farm: null, mill: null, water: null, grazing: null }
+  const canal = { code: 'canal_channel', name: 'کانال آبرسانی' }
+  if (type.startsWith('farm_') || /^fx-farm-/.test(id)) {
+    let stage = (id.match(/^fx-farm-([a-z]+)/)?.[1]) ?? 'growing'
+    if (b2.sown.has(id)) stage = 'sowing'
+    const legacy = stage === 'legacy', dry = stage === 'dry'
+    const st = ['legacy', 'dry', 'nowater', 'noseed'].includes(stage) ? (legacy ? 'idle' : 'growing') : stage
+    const sowing = st === 'sowing'
+    const farm = {
+      stage: st, rainfed: dry, legacy, legacy_until: legacy ? iso(5 * 86400_000) : null,
+      sow_done: st === 'idle' ? 0 : sowing ? 3 : 8, sow_need: 8, tended: st === 'growing' ? 2 : st === 'idle' || sowing ? 0 : 6, tend_max: 6, harvest_done: st === 'harvested' ? 12 : st === 'ripe' ? 4 : st === 'overripe' ? 4 : 0, harvest_need: 12,
+      ripe_at: st === 'growing' ? iso(3.5 * 3600_000) : st === 'ripe' ? iso(-3600_000) : st === 'overripe' ? iso(-13 * 3600_000) : null,
+      spoil_at: st === 'ripe' ? iso(11 * 3600_000) : st === 'overripe' ? iso(-1 * 3600_000) : st === 'growing' ? iso(15.5 * 3600_000) : null,
+      seed: 25, seed_have: stage === 'noseed' ? 6 : 40, expected: st === 'idle' ? 0 : 168,
+      factors: { soil: 9000, water: stage === 'nowater' ? 6000 : dry ? 8000 : 10000, tending: 10000 - (st === 'growing' ? 400 : 0), loss: st === 'overripe' ? 1000 : st === 'rotted' ? 10000 : 0 },
+      water: dry ? null : { work: stage === 'nowater' ? null : canal, served: stage !== 'nowater', open: stage !== 'nowater', condition_bps: 8200, reason: stage === 'nowater' ? 'not_served' : '' },
+      can_sow: (st === 'idle' || st === 'harvested' || st === 'rotted') && !legacy && stage !== 'noseed',
+    }
+    return { ...none, farm }
+  }
+  if (type === 'canal_channel' || /^fx-water-/.test(id)) {
+    const k = id.match(/^fx-water-([a-z]+)/)?.[1] ?? 'on'
+    return { ...none, water: { open: k !== 'off', condition_bps: k === 'worn' ? 3400 : 8200, serves: k === 'off' ? [{ code: 'f1', name: 'مزرعهٔ نهری' }] : [{ code: 'f1', name: 'مزرعهٔ نهری' }, { code: 'f2', name: 'شالیزار' }] } }
+  }
+  if (type === 'mill' || type === 'water_mill' || /^fx-mill-/.test(id)) {
+    const k = id.match(/^fx-mill-([a-z]+)/)?.[1] ?? 'toll'
+    return { ...none, mill: { toll_bps: b2.toll, min_bps: 333, max_bps: 1000, can_set: k !== 'viewer', batch: 20, have: k === 'nograin' ? 5 : b2.have, toll_units: Math.round(20 * b2.toll / 1000) / 10 } }
+  }
+  if (type === 'pasture_range' || /^fx-pasture-/.test(id)) {
+    const ok = !/^fx-pasture-short/.test(id)
+    return { ...none, grazing: { open: ok ? 11 : 4, need: 6, radius: 4 } }
+  }
+  return none
+}
+
 function workNode(type: string, id: string): WorkNode {
   const n = workNode0(type, id)
   // ?tools=bare (worn out: 60 percent output) | ok (tools in store) | none (the building uses no tool)
   const tools = (() => { try { return new URLSearchParams(location.search).get('tools') ?? 'none' } catch { return 'none' } })()
   const wears = tools !== 'none' && n.kind === 'production'
-  return { ...n, knowledge_bps: n.kind === 'production' ? 700 : 0, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null,
+  return { ...n, ...b2Work(type, id), knowledge_bps: n.kind === 'production' ? 700 : 0, meal_points: n.meal_points ?? 0, food_shifts: n.food_shifts ?? 0, condition: n.condition ?? null,
     tool_wear_bps: wears ? 1000 : 0, tools_have: tools === 'ok' ? 3 : 0, bare_hands: tools === 'bare' && wears, bare_hands_bps: wears ? 6000 : 0 }
 }
-function workNode0(type: string, id: string): Omit<WorkNode, 'meal_points' | 'food_shifts' | 'condition' | 'tool_wear_bps' | 'tools_have' | 'bare_hands' | 'bare_hands_bps' | 'knowledge_bps'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
+function workNode0(type: string, id: string): Omit<WorkNode, 'water' | 'mill' | 'farm' | 'grazing' | 'meal_points' | 'food_shifts' | 'condition' | 'tool_wear_bps' | 'tools_have' | 'bare_hands' | 'bare_hands_bps' | 'knowledge_bps'> & Partial<Pick<WorkNode, 'meal_points' | 'food_shifts' | 'condition'>> {
   const timber = goods('timber')
   if (type === 'road') return { kind: 'none', status: 'idle', reasons: [{ code: 'no_function', item: null, class: '', have: 0, need: 0 }], slots: null, filled: 0, max: 0, shift_seconds: 0, wage: 0, inputs: null, outputs: null, storage_class: '', storage_free: 0, job: null, if_unstaffed: '' }
   if (type === 'granary' || type === 'storehouse') return { kind: 'storage', status: 'idle', reasons: [{ code: 'no_keeper', item: null, class: 'food', have: 0, need: 0 }], slots: [{ role: 'storekeeper', worker: 'empty', name: '' }], filled: 0, max: 1, shift_seconds: 0, wage: 40, inputs: null, outputs: null, storage_class: 'food', storage_free: 62, job: null, if_unstaffed: 'base_room' }
@@ -1507,8 +1581,8 @@ function upgradeLine(code: string, tier: number, secs: number) {
 function buildingView(args: Record<string, unknown>) {
   const id = String(args.building_id ?? '')
   const b = st.buildings.find((x) => x.id === id) ?? (() => {
-    const fx = id.match(/^fx-(woodcutter|granary|road|clay|kiln|paper|tools)/)
-    if (fx) return { id, type: ({ woodcutter: 'woodcutter_camp', clay: 'clay_pit', kiln: 'pottery_kiln', paper: 'paper_mill', tools: 'tool_workshop' } as Record<string, string>)[fx[1]] ?? fx[1], x: 5, y: 5, w: 2, h: 2, rotated: false, state: 'built', seed: 7 } as MBuilding
+    const fx = id.match(/^fx-(woodcutter|granary|road|clay|kiln|paper|tools|farm|water|mill|pasture)/)
+    if (fx) return { id, type: ({ woodcutter: 'woodcutter_camp', clay: 'clay_pit', kiln: 'pottery_kiln', paper: 'paper_mill', tools: 'tool_workshop', farm: 'farm_canal', water: 'canal_channel', mill: 'water_mill', pasture: 'pasture_range' } as Record<string, string>)[fx[1]] ?? fx[1], x: 5, y: 5, w: 2, h: 2, rotated: false, state: 'built', seed: 7 } as MBuilding
     const m = id.match(/^road-(\d+)-(\d+)$/)
     return m ? ({ id, type: 'road', x: +m[1], y: +m[2], w: 1, h: 1, rotated: false, state: 'built', seed: 7 } as MBuilding) : undefined
   })()
@@ -1696,6 +1770,28 @@ export function mockVillageCommand(command: string, args: Record<string, unknown
     case 'settlement.currency.fee': { deskFeeBps = Math.max(10, Math.min(300, Number(args.bps ?? 30))); return deskView({}) }
     case 'settlement.build': return menuView()
     case 'settlement.build.lots': return lotsView(String(args.code ?? ''), args.rotate === '1' || args.rotate === 1 || args.rotate === true, String(args.from ?? ''))
+    case 'settlement.clear.order': case 'settlement.clear.cancel': { const r = clearCommand(command, args); emit({ type: 'land_changed', kind: 'ordered', x: Number(args.x), y: Number(args.y), layout_version: versions() }); return r }
+    case 'settlement.farm.sow': {
+      const fid = String(args.id ?? '')
+      const f = b2Work('farm_canal', fid).farm
+      if (!f) return refusal('farm_not_farm')
+      if (f.legacy) return refusal('farm_legacy')
+      if (!f.can_sow) return refusal('farm_busy')
+      b2.sown.add(fid); st.ver++
+      emit({ type: 'land_changed', kind: 'farm_sown', x: 2, y: 0, layout_version: versions() })
+      return mockOk('farm_sow', { village: 'آمل', farm: nameOf('farm_canal'), line: b2Work('farm_canal', fid).farm! }, [back('settlement.overview')])
+    }
+    case 'settlement.mill.toll': {
+      const bps = Number(args.bps)
+      if (!(bps >= 333 && bps <= 1000)) return refusal('toll_range')
+      b2.toll = bps
+      return mockOk('mill_toll', { village: 'آمل', toll_bps: bps, min_bps: 333, max_bps: 1000 }, [back('settlement.overview')])
+    }
+    case 'settlement.mill.grind': {
+      if (b2.have < 20) return refusal('mill_no_grain')
+      b2.have -= 20
+      return workView({})
+    }
     case 'settlement.build.place': return place(args)
     case 'settlement.build.place_many': return placeMany(args)
     case 'settlement.building.view': return buildingView(args)
@@ -1774,7 +1870,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
     const id = decodeURIComponent(m[1])
     if (id !== OWN_ID && id !== OTHER_ID) return json({ ok: false, error: { code: 'not_found', message: 'not found' } }, 404)
     const layout = layoutFor(id)
-    const etag = `"${layout.version}.${layout.detail}"`
+    const etag = `"${layout.version}.${layout.detail}${layout.woods ? '.' + layout.woods.mark : ''}"`
     if (headers.get('If-None-Match') === etag) return new Response(null, { status: 304, headers: { ETag: etag } })
     return json(layout, 200, { ETag: etag, 'Cache-Control': 'private, no-cache' })
   }

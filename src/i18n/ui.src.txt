@@ -5102,6 +5102,7 @@ charter.perm.zone.open | باز کردن محدوده | Open zones
 charter.perm.zone.close | بستن محدوده | Close zones
 charter.perm.lot.sell | فروش زمین و تعیین شرط‌هایش | Sell land and set its terms
 charter.perm.public.build | ساخت ساختمان‌های شهر | Build city buildings
+charter.perm.land.clear | پاک کردن درخت و سنگ زمین‌های شهر | Clear trees and rocks from the city's land
 charter.perm.public.demolish | خراب کردن ساختمان‌های شهر | Demolish city buildings
 charter.perm.citizen.admit | پذیرفتن ساکن | Admit residents
 charter.perm.citizen.ban | بیرون کردن از شهر | Ban from the city
@@ -6034,3 +6035,107 @@ wp.refuse.labor_no_food | برای این شیفت غذا نداری. | You have
 wp.refuse.labor_employer_broke | پول مزد این شیفت را نداری. | You cannot pay this shift's wage.
 wp.refuse.labor_needs_repair | کارگاه فرسوده است؛ اول تعمیرش کن. | The workshop is worn; repair it first.
 wp.refuse.labor_no_job | این آگهی دیگر نیست. | This notice is gone.
+act.clear.order | پاک کردن زمین | Clear the land
+act.clear.cancel | لغو پاک‌کردن | Cancel the clearing
+v6.ring.clear | پاک کردن زمین | Clear the land
+v6.ring.clear_cancel | لغو پاک‌کردن | Cancel clearing
+land.n_trees | {n} درخت | {n} trees
+land.n_rocks | {n} سنگ | {n} rocks
+land.both | {a} و {b} | {a} and {b}
+land.obstructed | روی این زمین {list} هست و تا پاک نشود نمی‌شود رویش ساخت. | {list} stand on this land; it cannot be built on until cleared.
+land.obstructed_can | می‌توانی دستور پاک‌کردن بدهی؛ کارگرها درخت و سنگ را برمی‌دارند و چوب و سنگش به انبار می‌رود. | You can order it cleared; workers take the trees and rocks away and the timber and stone go to the store.
+land.obstructed_cannot | پاک‌کردنش با صاحب زمین یا کسی است که اجازهٔ پاک‌کردن زمین دارد. | Clearing it is for the owner or someone allowed to clear land.
+land.clear | پاک کردن زمین | Clear the land
+land.clear_title | پاک کردن زمین | Clearing the land
+land.ordered | دستور پاک‌کردن زمین ({x}، {y}) داده شد: {list}. | The order to clear lot ({x}, {y}) is given: {list}.
+land.ordered_own | دستور پاک‌کردن زمین خودت ({x}، {y}) داده شد: {list}. | The order to clear your lot ({x}, {y}) is given: {list}.
+land.ordered_hint | هر کارگر یا خودت می‌توانی روی کار بروی؛ تا پاک نشود نمی‌شود رویش ساخت. | Anyone can work on it; it cannot be built on until cleared.
+land.cancelled | دستور پاک‌کردن زمین ({x}، {y}) برداشته شد. | The clearing order for lot ({x}, {y}) is withdrawn.
+land.commons | اینجا زمین مشترک شهر است: {trees} درخت و {rocks} سنگ دارد. | This is the town's common land: {trees} trees and {rocks} rocks.
+refusal.village_obstructed | روی این زمین درخت یا سنگ هست و باید اول پاک شود. | Trees or rocks stand on this land; clear it first.
+refusal.village_no_trees_in_reach | دور و بر شهر درختی نمانده که بشود برید. | No trees are left within reach of the town to cut.
+refusal.village_no_plot_in_reach | دور و بر شهر جایی برای کاشتن نهال نیست. | There is no place within reach to plant a sapling.
+refusal.no_trees_in_reach | دور و بر شهر درختی نمانده که بشود برید. | No trees are left within reach of the town to cut.
+refusal.no_plot_in_reach | دور و بر شهر جایی برای کاشتن نهال نیست. | There is no place within reach to plant a sapling.
+refusal.obstructed | روی این زمین درخت یا سنگ هست و باید اول پاک شود. | Trees or rocks stand on this land; clear it first.
+work.role.forester | نهال‌کار | Forester
+work.role.forestry | نهال‌کار | Forester
+farm.title | محصول مزرعه | The farm's crop
+farm.stage.idle | چیزی کاشته نشده | Nothing sown
+farm.stage.sowing | در حال کاشت | Being sown
+farm.stage.growing | در حال رشد | Growing
+farm.stage.ripe | رسیده، آمادهٔ برداشت | Ripe, ready to harvest
+farm.stage.overripe | از وقتش گذشته، دارد می‌پوسد | Past its time, spoiling
+farm.stage.harvest | در حال برداشت | Being harvested
+farm.stage.harvested | برداشت شد | Harvested
+farm.stage.rotted | پوسید | Rotted
+farm.rainfed | دیم | Rain-fed
+farm.legacy | این مزرعه تا {until} شیفت ساده کار می‌کند؛ بعد از آن کاشت و برداشت دارد. | This farm works a plain shift until {until}; after that it has sowing and harvest.
+farm.of | {a} از {b} | {a} of {b}
+farm.sow_shifts | شیفت کاشت | Sowing shifts
+farm.tend_shifts | شیفت وجین | Tending shifts
+farm.harvest_shifts | شیفت برداشت | Harvest shifts
+farm.expected | برداشت پیش‌بینی‌شده | Expected harvest
+farm.ripe_at | محصول {at} می‌رسد. | The crop ripens {at}.
+farm.spoil_from | از {at} به بعد محصول می‌پوسد؛ تا آن وقت برداشتش کن. | From {at} the crop spoils; harvest it before.
+farm.spoiling | محصول دارد می‌پوسد؛ از {at} هر چند ساعت یک‌دهمش از دست می‌رود. | The crop is spoiling; since {at} a tenth is lost every few hours.
+farm.rotted | محصول پوسیده و از بین رفته؛ باید دوباره کاشت. | The crop has rotted away; it must be sown again.
+farm.factors | چه چیز بازده را می‌سازد | What makes the yield
+farm.f.soil | خاک | Soil
+farm.f.water | آب | Water
+farm.f.tending | وجین و مراقبت | Tending
+farm.f.loss | پوسیدگی | Spoilage
+farm.water_from | آب از «{name}» می‌رسد. | Water comes from «{name}».
+farm.water.no_work | کانال یا آب‌رسانی ساخته نشده؛ آب مزرعه کم است. | No water work is built; the farm is short of water.
+farm.water.not_served | هیچ آب‌رسانی به این مزرعه آب نمی‌دهد؛ آب مزرعه کم است. | No water work serves this farm; it is short of water.
+farm.water.no_master | امروز میراب سرِ کار نیست؛ آب به مزرعه نمی‌رسد. | The water master is not on duty today; no water reaches the farm.
+farm.water.worn | آب‌رسان فرسوده است؛ باید تعمیر شود. | The water work is worn; it needs repair.
+farm.water.other | آب مزرعه کم است. | The farm is short of water.
+farm.rain_note | مزرعهٔ دیم است: آبش را باران می‌دهد و آب‌رسان نمی‌خواهد. | A rain-fed farm: the rain waters it, no water work needed.
+farm.seed | بذر: {have} در انبار، {need} لازم | Seed: {have} in store, {need} needed
+farm.sow | دستور کاشت | Order the sowing
+farm.sow_head | دستور کاشت را شهردار یا کسی که اجازهٔ کاشت دارد می‌دهد. | The head or someone allowed to sow gives the sowing order.
+farm.sown | دستور کاشت «{name}» داده شد. | The sowing order for «{name}» is given.
+farm.sown_hint | کارگرها اول بذر می‌پاشند، بعد وجین می‌کنند و وقتی رسید برداشت می‌کنند. | Workers sow first, then tend, and harvest when it is ripe.
+farm.title_page | کاشت مزرعه | Sowing the farm
+water.title | آب‌رسان | Water work
+water.on_duty | میراب امروز سرِ کار است | The water master is on duty today
+water.off_duty | میراب امروز نیامده | The water master has not come today
+water.condition | وضعیت: {p} | Condition: {p}
+water.off_note | بی میراب، آب به مزرعه‌ها نمی‌رسد و بازدهشان پایین می‌آید. | Without the master no water reaches the farms and their yield falls.
+water.worn_note | آب‌رسان فرسوده است و کمتر از نصفش کار می‌کند؛ تعمیرش کن. | The water work is worn and works under half; repair it.
+water.serves | مزرعه‌هایی که آب می‌گیرند: {list} | Farms it waters: {list}
+water.serves_none | هنوز مزرعه‌ای از این آب‌رسان آب نمی‌گیرد. | No farm takes water from it yet.
+mill.title | آسیاب | Mill
+mill.toll | سهم آسیابان | Miller's toll
+mill.range | بازهٔ مجاز | Allowed range
+mill.to | تا | to
+mill.less | کمتر | Less
+mill.more | بیشتر | More
+mill.toll_is | سهم آسیابان {p} آرد | Toll: {p} of the flour
+mill.own | آرد کردن گندم خودم | Grind my own wheat
+mill.own_note | هر بار {batch} گندم از انبار خودت آرد می‌شود و آردش به انبارت می‌آید؛ سهم آسیابان {toll} است. تو {have} گندم داری. | Each time {batch} wheat from your store is ground and the flour comes to your store; the toll is {toll}. You hold {have} wheat.
+mill.grind | آسیاب‌کردن گندم خودم | Grind my wheat
+mill.no_grain | گندم انبارت به یک دسته نمی‌رسد. | Your store holds less than one batch.
+mill.toll_set | سهم آسیابان {p} شد. | The toll is now {p}.
+graze.title | چراگاه | Pasture
+graze.ok | دور چراگاه، در {radius} قطعه، {open} قطعهٔ خالی برای چرا هست ({need} لازم است). | Round the pasture, within {radius} lots, {open} open lots for grazing ({need} needed).
+graze.short | دور چراگاه، در {radius} قطعه، فقط {open} قطعهٔ خالی هست و {need} لازم است؛ درخت و سنگ را پاک کن. | Within {radius} lots only {open} open lots; {need} needed. Clear trees and rocks.
+work.reason.farm_idle | چیزی کاشته نشده؛ اول باید دستور کاشت داده شود. | Nothing is sown; the sowing must be ordered first.
+work.reason.farm_waiting | محصول در حال رشد است و وجین تمام شده؛ تا رسیدنش صبر کن. | The crop is growing and tended; wait until it ripens.
+work.reason.no_grazing | دور چراگاه زمین خالی کافی برای چرا نیست. | Not enough open land round the pasture.
+work.reason.no_crop | چیزی در مزرعه نیست؛ گروه کارگر تا کاشت منتظر می‌ماند. | No crop in the field; the crew waits for the sowing.
+work.reason.crop_growing | محصول در حال رشد است؛ گروه کارگر تا رسیدنش منتظر می‌ماند. | The crop is growing; the crew waits until it ripens.
+refusal.village_needs_near | این بنا را باید نزدیک آب یا نزدیک آب‌رسان خودش بسازی؛ تا پنج قطعه دورتر نشود. | This must be built beside water or its own water work, no more than five lots away.
+vx.rf.screen.village_needs_near | این بنا باید کنار آب یا کنار آب‌رسانش باشد، یعنی تا پنج قطعه از آن دور نشود؛ جای دیگری را امتحان کن. | This must stand beside water or its water work, within five lots; try another place.
+refusal.village_farm_idle | چیزی کاشته نشده؛ اول باید دستور کاشت داده شود. | Nothing is sown; the sowing must be ordered first.
+refusal.village_farm_waiting | محصول رشد می‌کند و وجین تمام است؛ تا رسیدن صبر کن. | The crop is growing and tended; wait for it to ripen.
+refusal.village_farm_busy | محصول هنوز در مزرعه است؛ تا برداشت نشود یا نپوسد، کاشت تازه نمی‌شود. | The crop is still in the field; no new sowing until harvested or rotted.
+refusal.village_farm_legacy | این مزرعه هنوز شیفت ساده کار می‌کند؛ بعد از پایان مهلت کاشت و برداشت دارد. | This farm still works a plain shift; sowing and harvest start when the grace ends.
+refusal.village_farm_not_farm | این ساختمان مزرعه نیست. | This building is not a farm.
+refusal.village_no_grazing | دور چراگاه زمین خالی کافی برای چرا نیست؛ درخت و سنگ را پاک کن. | Not enough open land round the pasture; clear trees and rocks.
+refusal.village_toll_range | سهم آسیابان باید از یک‌سی‌ام تا یک‌دهم آرد باشد. | The toll must be between a thirtieth and a tenth of the flour.
+refusal.village_mill_no_grain | در انبار خودت گندمی نداری. | You hold no wheat in your store.
+refusal.village_mill_not_mill | اینجا آسیاب نیست. | This is not a mill.
+charter.perm.farm.sow | دستور کاشت مزرعه‌های شهر | Order the sowing of the city's farms
+charter.perm.mill.toll | تعیین سهم آسیابان | Set the miller's toll

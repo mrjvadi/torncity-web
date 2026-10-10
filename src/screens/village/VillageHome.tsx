@@ -29,7 +29,8 @@ import { useBuildMode } from './useBuildMode'
 import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
 import { BuyLotSheet, HouseSheet, LotAccessSheet, TakenLotSheet } from './LandSheets'
-import { classifyLot, tonesForLand, type LotAccessMap } from './citizen'
+import { classifyLot, tonesForLand, landAt, clearWhat, type LotAccessMap } from './citizen'
+import { formatNumber } from '../native/kit/format'
 import { classifyOuter, inFirstGrid, outerAccess, outerForLand } from './outer'
 import type { LandView, LotAccessView } from '../../api/types'
 import WorldMap, { useWorldMapKeys } from './WorldMap'
@@ -37,6 +38,9 @@ import './village.css'
 
 const member0 = (l: { viewer: { member: boolean } } | null | undefined) => !!l?.viewer.member
 const inBuildNow = (step: string) => step !== 'off'
+
+/** The idempotency key of one tap on the clear verb: made at the tap, kept in the screen's arguments, so a reload sends the same key. */
+const clearKey = (k: string, lot: { x: number; y: number }) => `web-clear-${k}-${lot.x}-${lot.y}-${Date.now().toString(36)}`
 
 export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) {
   const id = useSettlementId(localArgs?.id)
@@ -95,7 +99,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     return () => window.removeEventListener('tc:recentre', on)
   }, [])
   // the lot ring: a tap on bare ground opens the ring of that lot (buy, build, access, info)
-  const [lotRing, setLotRing] = useState<{ x: number; y: number; kind: 'free' | 'mine' | 'taken'; owner?: string } | null>(null)
+  const [lotRing, setLotRing] = useState<{ x: number; y: number; kind: 'free' | 'mine' | 'taken' | 'commons'; owner?: string } | null>(null)
   // Lot access (docs/adr/0043): how each free lot and each of the viewer's bare lots is served by road,
   // read from the land screen's own answer whenever the land map is on or the layout changed.
   const cmd = useVillageCommand()
@@ -261,6 +265,9 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     if (build.state.step === 'lot') { build.tapLot(lot); return }
     if (build.state.step !== 'off' || !resident || !landOn) return
     if (lotRing) { setLotRing(null); return }
+    // the woodland ring round the grid (the commons): the holder of land.clear gets a ring where trees or rocks stand to be cleared
+    const commons = layout.ring?.lots?.find((l) => l.x === lot.x && l.y === lot.y)
+    if (commons && canClear && clearWhat(commons)) { setSelectedId(null); setLotRing({ x: lot.x, y: lot.y, kind: 'commons' }); return }
     // the land tool: a lot a road opened has its ring; a lot it cannot use says why
     const k = classifyOuter(layout, lot.x, lot.y)
     setSelectedId(null)
@@ -306,6 +313,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     })
   }, [sceneReady, layout, own, cmd])
   const canPublicBuild = !!bootstrap?.settlement?.permissions?.includes('public.build')
+  const canClear = !!bootstrap?.settlement?.permissions?.includes('land.clear')
   const labelOf = (key: string) => labels.find((l) => l.key === key)
   const verbsFor = (b: NonNullable<typeof selected>, id: string) => ringActions(b, b.id ? overlays.get(b.id) ?? null : null, {
     info: () => setInfoId(id),
@@ -353,8 +361,20 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       acts.push({ id: 'access', label: t('v6.ring.access'), icon: 'road', onClick: go(() => { setFixView(null); setFixLot(lot) }) })
       const occ = layout.buildings.find((q) => q.id && q.type !== 'road' && lot.x >= q.x && lot.x < q.x + q.w && lot.y >= q.y && lot.y < q.y + q.h)
       if (occ?.id) acts.push({ id: 'manage', label: t('lm.ring'), icon: 'tool', onClick: go(() => run('settlement.lot.manage', { building: occ.id! })) })
+    } else if (lotRing.kind === 'commons') {
+      const L = landAt(layout, lot.x, lot.y)
+      acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => toast.push(t('land.commons', { trees: formatNumber(L?.trees ?? 0), rocks: formatNumber(L?.rocks ?? 0) }), { kind: 'info' })) })
     } else {
       acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => setTakenLot({ ...lot, owner: lotRing.owner })) })
+    }
+    // trees or rocks stand on this lot (ADR 0065): its owner, or the holder of land.clear for the commons and the treasury's lots, orders it cleared or takes the order back
+    const L = landAt(layout, lot.x, lot.y)
+    const what = clearWhat(L)
+    if (what && (lotRing.kind === 'mine' || (canClear && (lotRing.kind === 'free' || lotRing.kind === 'commons')))) {
+      const ordered = !!(L?.ordered?.trees || L?.ordered?.rocks)
+      acts.push(ordered
+        ? { id: 'clear_cancel', label: t('v6.ring.clear_cancel'), icon: 'close', onClick: go(() => openLocal('clear_run', { command: 'settlement.clear.cancel', x: String(lot.x), y: String(lot.y), key: clearKey('c', lot) })) }
+        : { id: 'clear', label: t('v6.ring.clear'), icon: 'tool', onClick: go(() => openLocal('clear_run', { command: 'settlement.clear.order', x: String(lot.x), y: String(lot.y), what, key: clearKey('o', lot) })) })
     }
     return { key: `lot-${lot.x}-${lot.y}`, name: t('citizen.buy.lot', { x: lot.x + 1, y: lot.y + 1 }), anchor: [p.x - r.left, p.y - r.top] as [number, number], actions: acts, onInfo: acts[0].onClick }
   })()

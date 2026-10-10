@@ -12,7 +12,8 @@ import type {
   MaterialBuyConfirmView, MineView, PrivateConfirmView, PrivateLotsView, PrivateMenuView, ResidenceView,
   SettlementWhoView, TermsView, VillageRefusalView, WorkView,
 } from '../../api/types'
-import type { LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
+import type { Action } from '../../api/types'
+import type { FarmSowView, MillTollView, ClearOrderView, LotAccess, LotCell, PrivateMaterial, LandCell, VillageNeed } from '../../api/views.gen'
 import { Bar, Chip, Empty, ListRow, SectionTitle } from '../native/kit/Parts'
 import { Slab } from '../../kit'
 import { money } from '../native/kit/format'
@@ -28,6 +29,7 @@ import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
 import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
+import { FarmBlock } from './FarmWork'
 
 const Empt = Empty
 
@@ -91,9 +93,26 @@ export function NeedLine({ ctx, n }: { ctx: FlowCtx; n: VillageNeed }) {
   return <div className="vf-need">{t('vx.need.building', { names: opts.join('، ') })}</div>
 }
 
+/** «n درخت و m سنگ»: what stands on a lot, in words. */
+const landWords = (trees: number, rocks: number) => trees > 0 && rocks > 0 ? t('land.both', { a: t('land.n_trees', { n: formatNumber(trees) }), b: t('land.n_rocks', { n: formatNumber(rocks) }) }) : trees > 0 ? t('land.n_trees', { n: formatNumber(trees) }) : rocks > 0 ? t('land.n_rocks', { n: formatNumber(rocks) }) : ''
+
 const Refusal = flow<VillageRefusalView>(({ view: v, ctx }) => {
   const code = ctx.res.error?.code ?? `village_${v.kind}`
   const args = { ...(ctx.res.error?.args ?? {}) }
+  const ob = v.obstacles
+  if (ob && (ob.trees > 0 || ob.rocks > 0)) {
+    const what = ob.trees > 0 && ob.rocks > 0 ? 'all' : ob.trees > 0 ? 'trees' : 'rocks'
+    return (
+      <Page title={t('vx.rf.title')} tone="ruby">
+        <Panel tone="ruby">
+          <Lead tone="bad">{t('land.obstructed', { list: landWords(ob.trees, ob.rocks) })}</Lead>
+          <Hint>{ob.can_order ? t('land.obstructed_can') : t('land.obstructed_cannot')}</Hint>
+        </Panel>
+        {ob.can_order && <Btns ctx={ctx} list={[{ id: 'clear.order', label: t('land.clear'), command: 'settlement.clear.order', args: { x: String(ob.x), y: String(ob.y), what }, kind: 'primary', icon: 'action:default' } as Action]} />}
+        <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
+      </Page>
+    )
+  }
   const needs = v.needs ?? []
   const lots = v.lots ?? []
   const subject = needsTitleName(ctx, v)
@@ -595,6 +614,8 @@ const Work = flow<WorkView>(({ view: v, ctx }) => {
                 right={<Chip>{t('vx.work.busy', { busy: p.busy, total: p.workers })}</Chip>} />
               {(p.consumes ?? []).length > 0 && <Hint>{t('vx.work.uses', { list: goods(p.consumes) })}</Hint>}
               {(p.produces ?? []).length > 0 && <Hint>{t('vx.work.makes', { list: goods(p.produces) })}</Hint>}
+              {p.mill && <Hint>{t('mill.toll_is', { p: `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(p.mill.toll_bps / 100)}٪` })}</Hint>}
+              {p.farm && !p.farm.legacy && <Hint>{t(`farm.stage.${p.farm.stage}` as Key)}</Hint>}
               <PersonalList names={ctx.names} list={p.personal} title={t('vx.pn.lack')} onCourses={() => ctx.run('education.list')} />
               {act && <Btns ctx={ctx} list={[act]} />}
             </Panel>
@@ -773,6 +794,41 @@ const RoadPlannedPage = flow<RoadQuoteView>(({ view: v, ctx }) => (
   </Page>
 ))
 
+/** The clearing order of a lot (ADR 0065): what was ordered cleared, and the way to take it back. */
+const ClearOrderPage = flow<ClearOrderView>(({ view: v, ctx }) => (
+  <Page title={t('land.clear_title')} tone="gold">
+    <Panel tone="gold">
+      {v.cancelled
+        ? <Lead>{t('land.cancelled', { x: formatNumber(v.x + 1), y: formatNumber(v.y + 1) })}</Lead>
+        : <Lead>{t(v.private ? 'land.ordered_own' : 'land.ordered', { x: formatNumber(v.x + 1), y: formatNumber(v.y + 1), list: landWords(v.order_trees ? v.trees : 0, v.order_rocks ? v.rocks : 0) })}</Lead>}
+      {!v.cancelled && <Hint>{t('land.ordered_hint')}</Hint>}
+    </Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
+/** The sowing order of a farm (ADR 0067): what was ordered and the crop as it now stands. */
+const FarmSowPage = flow<FarmSowView>(({ view: v, ctx }) => (
+  <Page title={t('farm.title_page')} tone="emerald">
+    <Panel tone="emerald">
+      <Lead>{t('farm.sown', { name: ctx.bname(v.farm.code, v.farm.name) })}</Lead>
+      <Hint>{t('farm.sown_hint')}</Hint>
+    </Panel>
+    <Panel><FarmBlock f={v.line} id="" act={undefined} manage={false} /></Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
+/** The miller's toll was set (ADR 0067). */
+const MillTollPage = flow<MillTollView>(({ view: v, ctx }) => (
+  <Page title={t('mill.title')} tone="gold">
+    <Panel tone="gold">
+      <Lead>{t('mill.toll_set', { p: `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(v.toll_bps / 100)}٪` })}</Lead>
+    </Panel>
+    <Rest ctx={ctx} />
+  </Page>
+))
+
 const RoadCancelledPage = flow<RoadCancelledView>(({ ctx }) => (
   <Page title={t('road.title')} tone="gold">
     <Panel tone="gold"><Lead>{t('road.cancelled')}</Lead></Panel>
@@ -879,7 +935,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
 })
 
 registerFlow({
-  village_refusal: Refusal,
+  village_refusal: Refusal, clear_order: ClearOrderPage, farm_sow: FarmSowPage, mill_toll: MillTollPage,
   village_donate_menu: DonateMenu, village_donate_confirm: DonateConfirm, village_donate_done: DonateDone,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
@@ -895,7 +951,7 @@ registerFlow({
 
 /** The server screens the flow host draws. */
 export const FLOW_SCREENS = [
-  'village_refusal', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
+  'village_refusal', 'clear_order', 'farm_sow', 'mill_toll', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
   'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',
