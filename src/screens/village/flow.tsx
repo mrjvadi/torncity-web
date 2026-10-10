@@ -59,6 +59,8 @@ export function flow<V>(fn: (p: { view: V; ctx: FlowCtx }) => ReactNode): FlowSc
 const WRITES = new Map<string, ((a: Action) => boolean) | undefined>([
   ['settlement.home.rest', undefined], ['settlement.tax.pay', undefined], ['settlement.terms', undefined],
   ['settlement.work', (a) => !!a.args?.id],
+  // the clearing order and its cancel (ADR 0065) change the land: they answer in place, with a key, and add no step to the history
+  ['settlement.clear.order', undefined], ['settlement.clear.cancel', undefined],
 ])
 
 export function registerWrites(commands: string[], when?: (a: Action) => boolean): void {
