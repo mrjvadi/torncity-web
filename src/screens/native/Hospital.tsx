@@ -3,22 +3,28 @@ import { Empty, Header, ListRow, Notice, Ring, ScreenScroll } from './kit/Parts'
 import Actions from './kit/Actions'
 import { clamp01, formatNumber, hms, money, roughDuration } from './kit/format'
 import Icon from '../../ui/Icon'
-import { t, type Key } from '../../i18n'
+import { hasKey, t, type Key } from '../../i18n'
 import { useContentNames } from '../../village/useVillage'
 import { careWord, useCare } from '../../support/care'
+import { useSession } from '../../state/SessionContext'
 
 interface Named { code?: string; name?: string }
-interface Clinic { provider?: string; clinic?: Named; price?: number; doctor?: number; open?: boolean; stock?: number; saves_seconds?: number; can_treat?: boolean }
+interface Clinic { provider?: string; clinic?: Named; price?: number; doctor?: number; open?: boolean; stock?: number; saves_seconds?: number; can_treat?: boolean; medicine?: string; idle?: string }
+interface Site { building?: Named; present?: boolean; open?: boolean; idle?: string }
+interface CareLines { house?: Site; clinic?: Site; apothecary?: Named; no_medicine?: boolean; refer?: Named }
 interface HospitalView {
   health?: number; max?: number; full_in_seconds?: number; city?: string
   city_code?: string; in_hospital?: boolean; cause?: string; remaining_seconds?: number
   treated?: boolean; treated_by?: Clinic | null; city_hospital?: Clinic | null; clinics?: Clinic[] | null
+  village?: Clinic[] | null; care?: CareLines | null; founded?: boolean
 }
 
 const CAUSES = ['crime', 'mugged', 'shift', 'fight']
 const causeText = (c: string) => (CAUSES.includes(c) ? t(`hospital.cause.${c}` as Key) : c)
 
-export default function Hospital({ response, loading, onAction, run }: ScreenProps) {
+export default function Hospital({ response, loading, onAction, run, openLocal }: ScreenProps) {
+  const { bootstrap } = useSession()
+  const canBuild = !!bootstrap?.settlement?.permissions?.includes('public.build')
   const v = (response?.view ?? {}) as HospitalView
   const names = useContentNames()
   // «بیمارستان» is the name only in a city or the central city; a founded village's care place is «خانهٔ بهداشت»
@@ -52,7 +58,7 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
         )}
       </div>
 
-      {!v.in_hospital && !(v.clinics ?? []).length && <Empty>{t('ac.health.out_hint')}</Empty>}
+      {!v.in_hospital && !(v.clinics ?? []).length && !v.founded && <Empty>{t('ac.health.out_hint')}</Empty>}
       {v.treated && <Notice>{t('hospital.treated')}</Notice>}
 
       {v.city_hospital && treat('city') && (
@@ -62,6 +68,44 @@ export default function Hospital({ response, loading, onAction, run }: ScreenPro
             sub={v.city_hospital.saves_seconds ? t('hospital.saves', { t: roughDuration(v.city_hospital.saves_seconds) }) : undefined}
             right={v.city_hospital.price ? money(v.city_hospital.price) : t('common.free')}
             onClick={() => onAction(treat('city')!)} />
+        </div>
+      )}
+
+      {!!(v.village && v.village.length) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div className="nx-sec">{t('hc.offers')}</div>
+          {v.village!.map((o) => {
+            const house = o.provider === 'health_house'
+            const med = o.medicine ? names.name(['component', 'item'], o.medicine, o.medicine) : ''
+            const sub = o.open
+              ? [o.saves_seconds ? t('hospital.saves', { t: roughDuration(o.saves_seconds) }) : '', med ? t('hc.uses', { name: med }) : ''].filter(Boolean).join(' – ')
+              : (o.idle && hasKey(`hc.idle.${o.idle}`) ? t(`hc.idle.${o.idle}` as Key) : t('hc.idle.other'))
+            return (
+              <ListRow key={o.provider} icon={house ? 'health' : 'stetho'} palette={o.can_treat ? 'emerald' : 'steel'}
+                title={house ? t('ac.health.health_house') : t('hc.clinic')} sub={sub}
+                right={o.open ? (o.price ? money(o.price) : t('common.free')) : t('hospital.closed')}
+                onClick={o.can_treat && treat(o.provider!) ? () => onAction(treat(o.provider!)!) : undefined} />
+            )
+          })}
+        </div>
+      )}
+
+      {v.care && (
+        <div className="hc-care">
+          {((v.village ?? []).length === 0 || (v.care.house && !v.care.house.present) || (v.care.clinic && !v.care.clinic.present) || v.care.no_medicine) && <div className="nx-sec">{(v.village ?? []).length ? t('hc.missing') : t('hc.none_title')}</div>}
+          {!(v.village ?? []).length && <div className="gc-note">{t('hc.none_lead')}</div>}
+          {v.care.house && !v.care.house.present && <div className="hc-line">{t(canBuild ? 'hc.build_house_head' : 'hc.build_house', { name: v.care.house.building?.name || t('ac.health.health_house') })}</div>}
+          {v.care.clinic && !v.care.clinic.present && <div className="hc-line">{t(canBuild ? 'hc.build_clinic_head' : 'hc.build_clinic', { name: v.care.clinic.building?.name || t('hc.clinic') })}</div>}
+          {v.care.no_medicine && <div className="hc-line">{t('hc.no_medicine', { name: v.care.apothecary?.name || t('hc.apothecary') })}</div>}
+          {canBuild && ((v.care.house && !v.care.house.present) || (v.care.clinic && !v.care.clinic.present)) && (
+            <button type="button" className="dk-chip all" onClick={() => openLocal('village_home', { build: '1' })}>{t('hc.go_build')}</button>
+          )}
+          {v.care.refer?.name && (
+            <>
+              <div className="gc-note">{t('hc.refer', { name: v.care.refer.name })}</div>
+              <button type="button" className="dk-chip" onClick={() => run('travel.destinations')}>{t('hc.go_travel', { name: v.care.refer.name })}</button>
+            </>
+          )}
         </div>
       )}
 

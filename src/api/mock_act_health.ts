@@ -41,9 +41,9 @@ const CLINIC_SHIFA: CompanyRef = { code: 'C-4F2K', name: 'شفا', type: { code:
 const CLINIC_NILOOFAR: CompanyRef = { code: 'C-9Q7M', name: 'نیلوفر', type: { code: 'clinic', name: 'Clinic' } }
 const CLINIC_AFTAB: CompanyRef = { code: 'C-2B8D', name: 'آفتاب', type: { code: 'clinic', name: 'Clinic' } }
 
-const CITY_OPTION: TreatOption = { provider: 'city', clinic: NO_CLINIC, price: 1800, saves_seconds: 1200, doctor: 0, stock: 0, open: true, can_treat: true }
+const CITY_OPTION: TreatOption = { provider: 'city', clinic: NO_CLINIC, price: 1800, saves_seconds: 1200, doctor: 0, stock: 0, open: true, can_treat: true, medicine: '', idle: '' }
 const clinic = (ref: CompanyRef, price: number, doctor: number, stock: number, open: boolean, saves: number): TreatOption => ({
-  provider: 'clinic', clinic: ref, price, saves_seconds: saves, doctor, stock, open, can_treat: open && stock > 0,
+  provider: 'clinic', clinic: ref, price, saves_seconds: saves, doctor, stock, open, can_treat: open && stock > 0, medicine: '', idle: '',
 })
 const CLINICS: TreatOption[] = [
   clinic(CLINIC_SHIFA, 1200, 12, 18, true, 900),
@@ -51,6 +51,28 @@ const CLINICS: TreatOption[] = [
   clinic(CLINIC_AFTAB, 0, 6, 4, true, 600),
 ]
 
+// B5 (ADR 0069): the care a founded settlement built: the health house (first aid, free) and the clinic (medicine, a fee into the treasury)
+const HOUSE: TreatOption = { provider: 'health_house', clinic: NO_CLINIC, price: 0, saves_seconds: 540, doctor: 0, stock: 3, open: true, can_treat: true, medicine: 'bandage', idle: '' }
+const VCLINIC: TreatOption = { provider: 'village_clinic', clinic: NO_CLINIC, price: 350, saves_seconds: 1500, doctor: 0, stock: 2, open: true, can_treat: true, medicine: 'painkillers', idle: '' }
+const closed = (o: TreatOption, idle: string): TreatOption => ({ ...o, open: false, can_treat: false, idle, medicine: '' })
+const site = (code: string, name: string, present: boolean, open: boolean, idle = '') => ({ building: { code, name }, present, open, idle })
+type VillageMode = 'house' | 'both' | 'closed' | 'empty' | 'nomed'
+const villageHospital = (mode: VillageMode) => {
+  const village = mode === 'house' ? [HOUSE] : mode === 'both' ? [HOUSE, VCLINIC] : mode === 'closed' ? [closed(HOUSE, 'no_staff'), closed(VCLINIC, 'no_wage')] : mode === 'nomed' ? [closed(HOUSE, 'no_supplies')] : []
+  const care = {
+    city_hospital_gone: true,
+    house: site('health_house', 'خانهٔ بهداشت', mode !== 'empty', mode === 'house' || mode === 'both', mode === 'closed' ? 'no_staff' : mode === 'nomed' ? 'no_supplies' : ''),
+    clinic: site('clinic', 'درمانگاه', mode === 'both' || mode === 'closed', mode === 'both', mode === 'closed' ? 'no_wage' : ''),
+    apothecary: { code: 'apothecary', name: 'عطاری' }, no_medicine: mode === 'empty' || mode === 'nomed', refer: { code: 'support', name: 'شهر مرکزی' },
+  }
+  return mockOk('hospital', {
+    health: 34, max: 100, full_in_seconds: 0, city_code: 'v-k3x9', city: 'آمل', in_hospital: true, cause: 'fight', remaining_seconds: 2700, ends_at: inMinutes(45), treated: false, treated_by: HOUSE,
+    city_hospital: null, clinics: null, village, care, founded: true,
+  }, [
+    ...village.filter((o) => o.can_treat).map((o) => A('health.treat', 'health.treat', { provider: o.provider }, { subject: o.provider })),
+    back('player.profile.get'), refreshA('health.hospital'),
+  ])
+}
 const inMinutes = (m: number) => new Date(Date.now() + m * 60000).toISOString()
 const PAY: PaymentChoice = { amount: 1800, accepted: ['cash', 'card'], usable: ['cash', 'card'], cash: 6400, bank: 20500 }
 const PAY_BROKE: PaymentChoice = { amount: 1800, accepted: ['cash', 'card'], usable: [], cash: 300, bank: 120 }
@@ -68,7 +90,7 @@ const hospitalView = (mode: 'in' | 'out' | 'clinics') => {
     city_code: 'support', city: 'شهر مرکزی', in_hospital: inHospital, cause: inHospital ? 'crime' : '', remaining_seconds: inHospital ? (treated ? 1500 : 2700) : 0,
     ends_at: inHospital ? inMinutes(treated ? 25 : 45) : null, treated: inHospital && treated, treated_by: inHospital && treated ? treatedBy! : CITY_OPTION,
     city_hospital: inHospital && !treated ? CITY_OPTION : null,
-    clinics: mode === 'out' ? null : CLINICS,
+    clinics: mode === 'out' ? null : CLINICS, village: null, care: null, founded: false,
   }, [
     ...(inHospital && !treated
       ? [CITY_OPTION, CLINICS[0], CLINICS[2]].map((o) => { const p = o.provider === 'city' ? 'city' : o.clinic.code; return A('health.treat', 'health.treat', { provider: p }, { subject: p }) })
@@ -77,7 +99,7 @@ const hospitalView = (mode: 'in' | 'out' | 'clinics') => {
   ])
 }
 
-const optionOf = (provider: string): TreatOption => (provider === 'city' ? CITY_OPTION : CLINICS.find((c) => c.clinic.code === provider) ?? CLINICS[0])
+const optionOf = (provider: string): TreatOption => (provider === 'city' ? CITY_OPTION : provider === 'health_house' ? HOUSE : provider === 'village_clinic' ? VCLINIC : CLINICS.find((c) => c.clinic.code === provider) ?? CLINICS[0])
 
 function treatConfirm(provider: string, pay: 'ok' | 'broke') {
   const option = optionOf(provider)
@@ -278,6 +300,11 @@ export function mockHealthCommand(command: string, a: Args): unknown | null {
     // screenshot states: ?mock=1&open=mock.<name>
     case 'mock.hospital': treatedBy = null; return hospitalView('in')
     case 'mock.hospital_treated': treatedBy = CITY_OPTION; return hospitalView('in')
+    case 'mock.village_care_house': treatedBy = null; return villageHospital('house')
+    case 'mock.village_care_both': treatedBy = null; return villageHospital('both')
+    case 'mock.village_care_closed': return villageHospital('closed')
+    case 'mock.village_care_empty': return villageHospital('empty')
+    case 'mock.village_care_nomed': return villageHospital('nomed')
     case 'mock.hospital_out': return hospitalView('out')
     case 'mock.hospital_clinics': return hospitalView('clinics')
     case 'mock.treat_confirm': return treatConfirm('city', 'ok')
