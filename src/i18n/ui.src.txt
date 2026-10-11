@@ -6216,3 +6216,87 @@ work.role.herbalist | گیاه‌کار | Herb gardener
 work.role.apothecary | عطار | Apothecary
 work.reason.no_wage | مزد امروز کارکنان داده نشده؛ تا پرداخت نشود بسته است. | Today's wages are not paid; it stays closed.
 work.reason.no_supplies | دارو یا نوار پانسمان در انبار شهر نیست؛ تا نرسد بسته است. | The town store has no medicine or bandage; it stays closed.
+need.thirst | تشنگی | Thirst
+need.warmth | سرما | Cold
+sv.title | تشنگی و سرما | Thirst and cold
+sv.not_founded | اینجا تشنگی و سرما حساب نمی‌شود. در شهری که خودت یا گروهت ساخته‌ای، از چند روز بعد از شروع این قانون حساب می‌شود. | Thirst and cold do not count here. In a town you founded they start counting a few days after the rule begins.
+sv.season.0 | زمستان | Winter
+sv.season.1 | بهار | Spring
+sv.season.2 | تابستان | Summer
+sv.season.3 | پاییز | Autumn
+sv.temp | {n} درجه | {n} degrees
+sv.temp_neg | {n} درجه زیر صفر | {n} degrees below zero
+sv.rain | بارانی | rainy
+sv.wind | باد | windy
+sv.hour | ساعت {h} به وقت شهر | {h}:00 town time
+sv.warmth.chilly | خنکی | Chilly
+sv.warmth.cold | سردت است | Cold
+sv.warmth.freezing | یخ‌زده‌ای | Freezing
+sv.warmth.hot | گرمت است | Hot
+sv.thirst.1 | تشنه‌ای | Thirsty
+sv.thirst.2 | خیلی تشنه‌ای | Very thirsty
+sv.sheltered | زیر سقف گرم | Under a warm roof
+sv.drink_title | آب خوردن | Drinking
+sv.drink.well | از چاه شهر بنوش | Drink from the town well
+sv.drink.bag | از کیسه‌ام بنوشم ({n}) | Drink from my bag ({n})
+sv.drink.boiled | آب رودخانه را بجوشان و بنوش | Boil river water and drink
+sv.drink.river | آب رودخانه را همین‌طور بنوش | Drink the river water as it is
+sv.well_closed | چاه شهر الان آب نمی‌دهد؛ آب شهر تمام شده یا چاه بسته است. | The town well gives no water now; the town's water is spent or the well is closed.
+sv.river_warn | آب رودخانه بی‌جوشاندن می‌تواند مریضت کند. جوشاندنش یک هیزم می‌خواهد. | River water can make you ill unless boiled; boiling takes a piece of firewood.
+sv.warm_btn | گرم شدن | Warm up
+sv.warming_closed | گرمخانه امروز باز نیست. | The warming house is not open today.
+sv.ill.waterborne | از آب ناسالم مریض شده‌ای | You are ill from unsafe water
+sv.ill.chill | سرما خورده‌ای | You caught a chill
+sv.ill_until | تا {at} | until {at}
+sv.ill_hint | در خانهٔ بهداشت یا درمانگاه با دارو درمان می‌شود. | A health house or clinic treats it with medicine.
+sv.cure | درمان بیماری | Treat the illness
+sv.cure_none | الان جایی باز با دارو برای درمانت نیست؛ خانهٔ بهداشت یا درمانگاه شهر را ببین. | No open place with medicine can treat you now; see the town's health house or clinic.
+sv.wardrobe | لباس‌هایی که پوشیده‌ای | What you wear
+sv.spare | لباس‌های دیگر | Other garments
+sv.slot.head | سر | Head
+sv.slot.outer | رو | Outer layer
+sv.slot.mid | میانی | Middle layer
+sv.slot.base | زیر | Under layer
+sv.slot.hands | دست | Hands
+sv.slot.feet | پا | Feet
+sv.empty_slot | چیزی نپوشیده‌ای | Nothing worn
+sv.warm | گرمایش {n} | Warmth {n}
+sv.left | {t} مانده | {t} left
+sv.qty | {n} تا | {n} pieces
+sv.remove | درآوردن | Take off
+sv.wear | پوشیدن | Put on
+sv.no_garments | لباسی نداری؛ خیاطی شهر یا بازار لباس دارد. | You have no garments; the tailor or the market has some.
+sv.notice.drank | آب خوردی. | You drank.
+sv.notice.river_ok | آب جوشیده را خوردی. | You drank the boiled water.
+sv.notice.river_sick | آب رودخانه مریضت کرد. | The river water made you ill.
+sv.notice.dressed | لباس را پوشیدی. | You put it on.
+sv.notice.undressed | لباس را درآوردی. | You took it off.
+sv.notice.warmed | در گرمخانه گرم شدی. | You warmed up at the warming house.
+sv.notice.cured | بیماریت درمان شد. | You are cured.
+sv.notice.collapsed | از پا افتادی و بستری شدی. | You collapsed and were admitted.
+hub.survival | تشنگی و سرما | Thirst and cold
+health.survival_sub | آب خوردن، لباس و آب‌وهوا | Drinking, clothes and the weather
+hospital.cause.exposure | سرمازدگی | Exposure to cold
+hospital.cause.dehydration | کم‌آبی | Dehydration
+ac.health.refused.not_founded | اینجا تشنگی و سرما حساب نمی‌شود. | Thirst and cold do not count here.
+ac.health.refused.no_water | آبی برای نوشیدن نیست. | There is no water to drink.
+ac.health.refused.drink_wait | تازه آب خورده‌ای؛ کمی بعد دوباره بنوش. | You have just drunk; wait a little.
+ac.health.refused.no_river | اینجا رودخانه‌ای نیست. | There is no river here.
+ac.health.refused.no_fuel | برای جوشاندن هیزم نداری. | You have no firewood to boil it.
+ac.health.refused.no_garment | چنین لباسی نداری. | You do not have that garment.
+ac.health.refused.not_open | گرمخانه یا درمانگاه الان باز نیست. | The warming house or clinic is not open now.
+ac.health.refused.not_ill | بیماری نداری که درمان شود. | You have no illness to treat.
+ac.health.refused_hint.drink_wait | بعد از چند دقیقه دوباره امتحان کن. | Try again in a few minutes.
+ac.health.refused_hint.no_fuel | هیزم را از انبار یا بازار بگیر، یا آب را بی‌جوشاندن نخور. | Get firewood from the store or market.
+ac.health.refused_hint.no_water | آب چاه شهر را ببین یا کیسهٔ آب بگیر. | Check the town well or take a water bag.
+refusal.health_not_founded | اینجا تشنگی و سرما حساب نمی‌شود. | Thirst and cold do not count here.
+refusal.health_no_water | آبی برای نوشیدن نیست. | There is no water to drink.
+refusal.health_drink_wait | تازه آب خورده‌ای؛ کمی بعد دوباره بنوش. | You have just drunk; wait a little.
+refusal.health_no_river | اینجا رودخانه‌ای نیست. | There is no river here.
+refusal.health_no_fuel | برای جوشاندن هیزم نداری. | You have no firewood to boil it.
+refusal.health_no_garment | چنین لباسی نداری. | You do not have that garment.
+refusal.health_not_open | گرمخانه یا درمانگاه الان باز نیست. | The warming house or clinic is not open now.
+refusal.health_not_ill | بیماری نداری که درمان شود. | You have no illness to treat.
+refusal.health_no_medicine | دارو برای درمانت در انبار شهر نیست. | The town store has no medicine to treat you.
+work.role.tailor | خیاط | Tailor
+work.role.hearth_keeper | آتش‌بان | Hearth keeper
