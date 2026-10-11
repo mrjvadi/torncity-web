@@ -34,6 +34,6 @@
 .tc-entry.here { background: color-mix(in srgb, #9be88d 10%, transparent); }
 .tc-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .tc-meta { display: flex; flex-direction: column; gap: 2px; font-size: 13px; opacity: .85; }
-.tc-crafts { padding: 4px 0; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: thin; }
+.tc-crafts { flex: none; min-height: 48px; align-items: center; padding: 4px 0; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: thin; }
 .tc-crafts .dk-chip { flex: none; white-space: nowrap; }
 .tc-reason { display: flex; flex-direction: column; gap: 6px; }

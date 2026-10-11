@@ -17,6 +17,12 @@ const word = (key: string, fallback = ''): string => (hasKey(key) ? t(key as Key
 const act = (command: string, args: Record<string, string>) => ({ command, args, kind: 'secondary' as const, id: command, icon: 'action:default' }) as never
 const pct = (bps: number) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 0 }).format(bps / 100)}٪`
 const craftName = (ctx: FlowCtx, code: string) => ctx.names.name(['course', 'skill'], code, code)
+/** The craft by its short name (the skill's: «بافندگی»), not the course's («استادکاری بافندگی»). */
+const shortCraft = (ctx: FlowCtx, code: string) => {
+  const base = code.replace(/_craft$/, '')
+  const sk = ctx.names.name('skill', base, '')
+  return sk || craftName(ctx, code)
+}
 
 function Line({ l, ctx }: { l: ApprenticeLine; ctx: FlowCtx }) {
   const [asking, setAsking] = useState(false)
@@ -110,10 +116,10 @@ export const Teachers = flow<TeachersView>(({ view: v, ctx }) => {
     <Page title={t('tc.dir_title')} tone="violet">
       <div className="rc-chips tc-crafts" role="radiogroup" aria-label={t('tc.craft')}>
         {(v.crafts ?? []).map((c) => (
-          <button key={c} type="button" role="radio" aria-checked={c === v.craft} className={`dk-chip${c === v.craft ? ' all' : ''}`} onClick={() => ctx.run('education.teachers', { craft: c })}>{craftName(ctx, c)}</button>
+          <button key={c} type="button" role="radio" aria-checked={c === v.craft} className={`dk-chip${c === v.craft ? ' all' : ''}`} onClick={() => ctx.run('education.teachers', { craft: c })}>{shortCraft(ctx, c)}</button>
         ))}
       </div>
-      <Panel><Lead>{t('tc.dir_lead', { craft: v.course.name || craftName(ctx, v.craft) })}</Lead><Hint>{t('tc.rule')}</Hint></Panel>
+      <Panel><Lead>{t('tc.dir_lead', { craft: shortCraft(ctx, v.craft) })}</Lead><Hint>{t('tc.rule')}</Hint></Panel>
       {list.length === 0 && <Panel><Lead>{t('tc.dir_none')}</Lead></Panel>}
       {list.length > 0 && <Panel><div className="tc-list">{list.map((e, i) => <Entry key={i} e={e} ctx={ctx} />)}</div></Panel>}
     </Page>

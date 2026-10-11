@@ -39,7 +39,7 @@ const entries = (craft: string): TeacherEntry[] => {
 }
 const CRAFTS = ['weaving_craft', 'pottery_craft', 'milling_craft', 'baking_craft', 'tanning_craft', 'forestry_craft', 'herding_craft', 'farming_craft', 'tailoring_craft', 'carpentry_craft', 'masonry_craft', 'smithing_craft', 'herbal_medicine']
 const CNAME: Record<string, string> = { weaving_craft: 'بافندگی', pottery_craft: 'سفالگری', milling_craft: 'آسیابانی', baking_craft: 'نانوایی', tanning_craft: 'دباغی', forestry_craft: 'جنگل‌داری', herding_craft: 'دامداری', farming_craft: 'کشاورزی', tailoring_craft: 'خیاطی', carpentry_craft: 'نجاری', masonry_craft: 'بنایی', smithing_craft: 'آهنگری', herbal_medicine: 'گیاهان دارویی' }
-export const TEACH_CONTENT = { course: CRAFTS.map((c) => ({ code: c, name: { en: c, fa: `استادکاری ${CNAME[c]}` } })) }
+export const TEACH_CONTENT = { skill: CRAFTS.map((c) => ({ code: c.replace(/_craft$/, ''), name: { en: c, fa: CNAME[c] } })), course: CRAFTS.map((c) => ({ code: c, name: { en: c, fa: `استادکاری ${CNAME[c]}` } })) }
 
 export function mockTeachingCommand(command: string, a: Record<string, unknown>): unknown | null {
   switch (command) {
