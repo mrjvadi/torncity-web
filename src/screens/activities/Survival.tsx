@@ -16,7 +16,8 @@ import { ActionButton, EffectChip, EffectRow, Note } from '../../ui/Popup'
 registerWrites(['health.drink', 'health.wear', 'health.remove', 'health.warm', 'health.cure'])
 
 export const SLOTS = ['head', 'outer', 'mid', 'base', 'hands', 'feet'] as const
-import { word, weatherLine, warmthWord, thirstWord } from './survivalText'
+import { word, weatherLine, warmthWord, thirstWord, Forecast } from './survivalText'
+import { atText } from '../../lib/duration'
 
 const act = (command: string, args: Record<string, string>) => ({ command, args, kind: 'secondary' as const, id: command, icon: 'action:default' })
 const when = (g: GarmentLine) => (g.left_seconds > 0 ? t('sv.left', { t: roughDuration(g.left_seconds) }) : '')
@@ -36,7 +37,7 @@ function Row({ slot, g, ctx }: { slot: string; g: GarmentLine | undefined; ctx: 
 }
 
 export const Survival = flow<SurvivalView>(({ view: v, ctx }) => {
-  if (!v.founded) return <Page title={t('sv.title')} tone="sapphire"><Panel><Lead>{t('sv.not_founded')}</Lead></Panel></Page>
+  if (!v.founded) return <Page title={t('sv.title')} tone="sapphire"><Panel><Lead>{v.starts_at ? t('sv.starts', { at: atText(v.starts_at) }) : t('sv.not_founded')}</Lead></Panel></Page>
   const worn = new Map((v.worn ?? []).map((g) => [g.slot, g]))
   const spare = [...(v.kept ?? []), ...(v.bag ?? [])]
   const ill = v.illness ?? []
@@ -51,10 +52,12 @@ export const Survival = flow<SurvivalView>(({ view: v, ctx }) => {
         </div>
         <EffectRow>
           {thirstWord(v.thirst_level) && <EffectChip tone={v.thirst_level > 1 ? 'bad' : 'warn'}>{thirstWord(v.thirst_level)}</EffectChip>}
-          {warmthWord(v.warmth_level) && v.warmth_level !== 'fine' && <EffectChip tone={v.warmth_level === 'chilly' ? 'warn' : 'bad'}>{warmthWord(v.warmth_level)}</EffectChip>}
+          {warmthWord(v.warmth_level) && v.warmth_level !== 'fine' && <EffectChip tone={v.warmth_level === 'chilly' || v.warmth_level === 'hot' ? 'warn' : 'bad'}>{warmthWord(v.warmth_level)}</EffectChip>}
           {v.sheltered && <EffectChip tone="good">{t('sv.sheltered')}</EffectChip>}
         </EffectRow>
         {v.env && <Hint>{weatherLine(v.env)}</Hint>}
+        {v.env?.cold_snap_until && <Note tone="bad">{t('sv.snap_until', { at: atText(v.env.cold_snap_until) })}</Note>}
+        {v.env && <Forecast days={v.env.forecast} />}
       </Panel>
 
       <SectionTitle>{t('sv.drink_title')}</SectionTitle>

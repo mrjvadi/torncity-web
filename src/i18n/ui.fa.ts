@@ -6200,6 +6200,16 @@ export const uiFa = {
   'refusal.health_no_medicine': 'دارو برای درمانت در انبار شهر نیست.',
   'work.role.tailor': 'خیاط',
   'work.role.hearth_keeper': 'آتش‌بان',
+  'sv.starts': 'تشنگی و سرما از {at} شروع به حساب شدن می‌کند؛ تا آن موقع نگرانش نباش.',
+  'sv.snap_until': 'موج سرما تا {at} ادامه دارد؛ لباس گرم بپوش.',
+  'sv.forecast': 'پیش‌بینی سه روز آینده',
+  'sv.day2': 'پس‌فردا',
+  'sv.day3': 'سه روز دیگر',
+  'sv.f.range': '{a} تا {b}',
+  'sv.f.snap': 'موج سرما',
+  'sv.f.spell': 'موج گرما',
+  'sv.warmth.heatstroke': 'گرمازده‌ای',
+  'sv.neg': 'منفی {n}',
 } as const
 
 export type UiKey = keyof typeof uiFa

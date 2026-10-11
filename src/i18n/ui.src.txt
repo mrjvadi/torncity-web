@@ -6300,3 +6300,13 @@ refusal.health_not_ill | بیماری نداری که درمان شود. | You h
 refusal.health_no_medicine | دارو برای درمانت در انبار شهر نیست. | The town store has no medicine to treat you.
 work.role.tailor | خیاط | Tailor
 work.role.hearth_keeper | آتش‌بان | Hearth keeper
+sv.starts | تشنگی و سرما از {at} شروع به حساب شدن می‌کند؛ تا آن موقع نگرانش نباش. | Thirst and cold start counting {at}; until then do not worry about them.
+sv.snap_until | موج سرما تا {at} ادامه دارد؛ لباس گرم بپوش. | A cold snap lasts until {at}; wear warm clothes.
+sv.forecast | پیش‌بینی سه روز آینده | Forecast for the next three days
+sv.day2 | پس‌فردا | The day after tomorrow
+sv.day3 | سه روز دیگر | In three days
+sv.f.range | {a} تا {b} | {a} to {b}
+sv.f.snap | موج سرما | cold snap
+sv.f.spell | موج گرما | hot spell
+sv.warmth.heatstroke | گرمازده‌ای | Heatstroke
+sv.neg | منفی {n} | minus {n}

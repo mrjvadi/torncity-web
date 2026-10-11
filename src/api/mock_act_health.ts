@@ -90,9 +90,12 @@ function survivalView(notice = '') {
   const lvl = (n: number) => (n >= 70 ? 2 : n >= 50 ? 1 : 0)
   const w = sv.warmth
   const view = {
-    founded: svMode !== 'neutral', thirst: sv.thirst, warmth: sv.warmth, thirst_level: sv.thirst >= 70 ? 2 : sv.thirst >= 50 ? 1 : 0,
-    warmth_level: w >= 80 ? 'freezing' : w >= 60 ? 'cold' : w >= 40 ? 'chilly' : 'fine',
-    env: { temp_c: svMode === 'cold' || svMode === 'ill' ? -4 : 11, rain: svMode === 'cold', wind: true, season: svMode === 'cold' || svMode === 'ill' ? 0 : 3, hour: 23 },
+    founded: svMode !== 'neutral' && svMode !== 'grace', starts_at: svMode === 'grace' ? new Date(Date.now() + 6 * 86400_000).toISOString() : null, thirst: sv.thirst, warmth: sv.warmth, thirst_level: sv.thirst >= 70 ? 2 : sv.thirst >= 50 ? 1 : 0,
+    warmth_level: svMode === 'hot' ? 'hot' : svMode === 'heat' ? 'heatstroke' : w >= 80 ? 'freezing' : w >= 60 ? 'cold' : w >= 40 ? 'chilly' : 'fine',
+    env: { temp_c: svMode === 'cold' || svMode === 'ill' ? -4 : 11, rain: svMode === 'cold', wind: true, season: svMode === 'cold' || svMode === 'ill' ? 0 : svMode === 'hot' || svMode === 'heat' ? 2 : 3, hour: 23,
+      cold_snap_until: svMode === 'cold' ? new Date(Date.now() + 30 * 3600_000).toISOString() : null,
+      forecast: svMode === 'hot' || svMode === 'heat' ? [{ offset: 1, min_c: 24, max_c: 38, rain: false, wind: false, snap: false, spell: true }, { offset: 2, min_c: 25, max_c: 40, rain: false, wind: false, snap: false, spell: true }, { offset: 3, min_c: 22, max_c: 33, rain: false, wind: true, snap: false, spell: false }]
+        : [{ offset: 1, min_c: -9, max_c: -2, rain: false, wind: true, snap: svMode === 'cold', spell: false }, { offset: 2, min_c: -12, max_c: -4, rain: true, wind: true, snap: svMode === 'cold', spell: false }, { offset: 3, min_c: -3, max_c: 3, rain: false, wind: false, snap: false, spell: false }] },
     sheltered: false, worn: sv.worn, kept: sv.kept, bag: sv.bag, illness: sv.ill, well_open: svMode !== 'thirst', river: true, carried: sv.carried,
     warming_open: true, can_cure: sv.ill.length > 0, notice,
   }

@@ -25,3 +25,7 @@
 .sv-what.none { opacity: .55; }
 .sv-btns { display: flex; flex-direction: column; gap: 8px; }
 .sv-risky { background: none; border: 1px dashed #ff9a9e; color: #ff9a9e; border-radius: 12px; padding: 10px 12px; font-size: 13.5px; cursor: pointer; }
+.sv-fc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.sv-fc-d { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, currentColor 7%, transparent); font-size: 13px; }
+.sv-fc-d.warn { background: color-mix(in srgb, #ffb02e 16%, transparent); }
+.sv-fc-d span { opacity: .85; } .sv-fc-d em { font-style: normal; font-size: 12px; opacity: .75; }
