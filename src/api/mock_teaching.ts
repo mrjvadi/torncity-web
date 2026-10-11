@@ -6,6 +6,7 @@ import type { ApprenticeLine, TeacherEntry } from './views.gen'
 const mode = () => { try { return new URLSearchParams(location.search).get('teach') ?? 'apprentice' } catch { return 'apprentice' } }
 const N = (code: string, name: string) => ({ code, name })
 const WS = N('b-weave-1', 'کارگاه بافندگی')
+const BOUNDS = { min_days: 7, max_days: 90, default_days: 28, max_fee: 5000, min_share_bps: 2000, default_share_bps: 5000, max_share_bps: 8000 }
 const st = { phase: '' as '' | 'offered' | 'active' | 'ready' | 'completed' | 'left' | 'dismissed', shifts: 0, notice: '', joined: false, offer: { days: 28, fee: 0, share: 5000 } }
 const init = () => { if (st.phase === '' ) st.phase = mode() === 'none' ? 'left' : mode() === 'master' ? 'active' : 'offered' }
 
@@ -28,9 +29,9 @@ function lines(): ApprenticeLine[] {
 
 const view = (notice = '') => {
   init()
-  return mockOk('apprentices', { lines: lines(), can_join: st.joined || mode() === 'none' && false ? null : [{ workshop: N('b-pool-1', 'کارگاه بافندگی شهر'), craft: 'weaving_craft', up_to: 2 }], notice }, [back('education.list'), A('refresh', 'settlement.apprentice.mine', {})])
+  return mockOk('apprentices', { lines: lines(), bounds: BOUNDS, can_join: st.joined || mode() === 'none' && false ? null : [{ workshop: N('b-pool-1', 'کارگاه بافندگی شهر'), craft: 'weaving_craft', up_to: 2 }], notice }, [back('education.list'), A('refresh', 'settlement.apprentice.mine', {})])
 }
-const refuse = (kind: string) => mockOk('apprentice_refusal', { kind }, [back('settlement.apprentice.mine')])
+const refuse = (kind: string) => mockOk('apprentice_refusal', { kind, bounds: kind === 'range' ? BOUNDS : null }, [back('settlement.apprentice.mine')])
 
 const entries = (craft: string): TeacherEntry[] => {
   const e = (kind: string, place: string, km: number, who: string, cl: number, tl: number, up: number, fee: number, seats: number, here = false): TeacherEntry => ({ kind, settlement: N(place === 'آمل' ? 'v-k3x9' : place, place), km, teacher: N(who ? `P-${who.length}K` : '', who), craft_level: cl, teaching_level: tl, up_to: up, fee, free_seats: seats, here })
@@ -44,7 +45,7 @@ export const TEACH_CONTENT = { skill: CRAFTS.map((c) => ({ code: c.replace(/_cra
 export function mockTeachingCommand(command: string, a: Record<string, unknown>): unknown | null {
   switch (command) {
     case 'settlement.apprentice.mine': return view()
-    case 'education.teachers': { const craft = String(a.craft || 'weaving_craft'); return mockOk('teachers', { craft, course: N(craft, `استادکاری ${CNAME[craft] ?? craft}`), entries: entries(craft), crafts: CRAFTS }, [back('education.list')]) }
+    case 'education.teachers': { const craft = String(a.craft || (mode() === 'pottery' ? 'pottery_craft' : 'weaving_craft')); return mockOk('teachers', { craft, course: N(craft, `استادکاری ${CNAME[craft] ?? craft}`), entries: entries(craft), crafts: CRAFTS, starts_at: mode() === 'rule' ? new Date(Date.now() + 9 * 86400_000).toISOString() : null }, [back('education.list')]) }
     case 'settlement.apprentice.offer': {
       const days = Number(a.days ?? 28), fee = Number(a.fee ?? 0), share = Number(a.share ?? 5000)
       if (!String(a.player ?? '').trim()) return refuse('apprentice_unknown')

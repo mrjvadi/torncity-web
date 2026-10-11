@@ -8,7 +8,7 @@ import type { TripHint } from '../../api/views.gen'
 import Actions from './kit/Actions'
 import { clamp01, hms, money, roughDuration } from './kit/format'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
-import { t, type Key } from '../../i18n'
+import { hasKey, t, type Key } from '../../i18n'
 
 interface Named { code?: string; name?: string }
 interface CurrentCourse { course?: Named; percent?: number; remaining_seconds?: number; paused?: boolean }
@@ -18,7 +18,7 @@ interface Gap { course?: Named; fee?: number; duration_seconds?: number; nearest
 interface Literacy { share_bps?: number }
 interface EducationView {
   current?: CurrentCourse | null
-  certificates?: Named[] | null
+  certificates?: (Named & { issued_by?: Named | null; route?: string })[] | null
   place?: Named | null
   tier?: string
   literacy?: Literacy | null
@@ -126,8 +126,13 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
       {!!(v.certificates && v.certificates.length) && (
         <Card>
           <div className="nx-sec" style={{ marginBottom: 8 }}>{t('education.certificates')}</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {v.certificates!.map((c) => <span key={c.code} className="nx-chip nx-chip-emerald">{course(c)}</span>)}
+          <div className="edu-certs">
+            {v.certificates!.map((c) => (
+              <div key={c.code} className="edu-cert">
+                <b>{course(c)}</b>
+                <span>{[c.issued_by?.name ? t('edu.cert.by', { name: c.issued_by.name }) : '', c.route && hasKey(`edu.cert.route.${c.route}`) ? t(`edu.cert.route.${c.route}` as Key) : ''].filter(Boolean).join(' – ')}</span>
+              </div>
+            ))}
           </div>
         </Card>
       )}

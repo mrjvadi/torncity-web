@@ -6407,3 +6407,10 @@ refusal.apprentice_range | مدت، شهریه یا سهم مزد از حد مج
 refusal.apprentice_slots_full | این کارگاه جای شاگرد ندارد. | This workshop has no room for an apprentice.
 refusal.apprentice_not_master | برای شاگرد گرفتن باید مهارت سطح ۳ این هنر را داشته باشی. | You need craft level 3 to take an apprentice.
 refusal.apprentice_cannot_afford | پول شهریه را نداری. | You cannot pay the fee.
+edu.cert.by | صادرکننده: {name} | Issued by {name}
+edu.cert.route.class | از راه کلاس | Through a class
+edu.cert.route.apprenticeship | از راه شاگردی | Through an apprenticeship
+edu.cert.route.exam | از راه آزمون | Through an exam
+tc.rule_from | برای درس‌دادن یک هنر، استاد باید مهارت سطح ۳ آن هنر را داشته باشد و تا یک سطح پایین‌تر از خودش یاد می‌دهد. این قانون از {at} شروع می‌شود. | A teacher needs craft level 3 and teaches up to one level below his own. This rule starts {at}.
+tc.refused.range_b | مدت باید بین {d1} تا {d2} روز باشد، شهریه حداکثر {fee} و سهم مزد شاگرد از {s1} تا {s2}. | The term must be {d1} to {d2} days, the fee at most {fee} and the apprentice's share {s1} to {s2}.
+tc.range | از {a} تا {b} | from {a} to {b}

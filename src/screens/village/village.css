@@ -409,3 +409,4 @@
 .hc-line { font-size: 14px; line-height: 1.7; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, #ffb02e 12%, transparent); width: 100%; }
 .tc-offer { display: flex; flex-direction: column; gap: 8px; }
 .tc-f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.tc-range { font-style: normal; opacity: .65; font-size: 12px; }

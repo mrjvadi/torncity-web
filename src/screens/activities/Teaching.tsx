@@ -119,7 +119,7 @@ export const Teachers = flow<TeachersView>(({ view: v, ctx }) => {
           <button key={c} type="button" role="radio" aria-checked={c === v.craft} className={`dk-chip${c === v.craft ? ' all' : ''}`} onClick={() => ctx.run('education.teachers', { craft: c })}>{shortCraft(ctx, c)}</button>
         ))}
       </div>
-      <Panel><Lead>{t('tc.dir_lead', { craft: shortCraft(ctx, v.craft) })}</Lead><Hint>{t('tc.rule')}</Hint></Panel>
+      <Panel><Lead>{t('tc.dir_lead', { craft: shortCraft(ctx, v.craft) })}</Lead><Hint>{v.starts_at ? t('tc.rule_from', { at: atText(v.starts_at) }) : t('tc.rule')}</Hint></Panel>
       {list.length === 0 && <Panel><Lead>{t('tc.dir_none')}</Lead></Panel>}
       {list.length > 0 && <Panel><div className="tc-list">{list.map((e, i) => <Entry key={i} e={e} ctx={ctx} />)}</div></Panel>}
     </Page>
@@ -129,7 +129,7 @@ export const Teachers = flow<TeachersView>(({ view: v, ctx }) => {
 export const ApprenticeRefusal = flow<ApprenticeRefusalView>(({ view: v, ctx }) => (
   <Page title={t('msg.refusal')} tone="ruby">
     <Panel tone="ruby">
-      <Lead tone="bad">{word(`tc.refused.${v.kind}`, t('tc.refused.other'))}</Lead>
+      <Lead tone="bad">{v.kind === 'range' && v.bounds ? t('tc.refused.range_b', { d1: formatNumber(v.bounds.min_days), d2: formatNumber(v.bounds.max_days), fee: money(v.bounds.max_fee), s1: pct(v.bounds.min_share_bps), s2: pct(v.bounds.max_share_bps) }) : word(`tc.refused.${v.kind}`, t('tc.refused.other'))}</Lead>
       {hasKey(`tc.refused_hint.${v.kind}`) && <Hint>{word(`tc.refused_hint.${v.kind}`)}</Hint>}
     </Panel>
     <Btns ctx={ctx} list={ctx.acts.filter((a) => a.kind === 'back').slice(0, 0)} />

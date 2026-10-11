@@ -6307,6 +6307,13 @@ export const uiFa = {
   'refusal.apprentice_slots_full': 'این کارگاه جای شاگرد ندارد.',
   'refusal.apprentice_not_master': 'برای شاگرد گرفتن باید مهارت سطح ۳ این هنر را داشته باشی.',
   'refusal.apprentice_cannot_afford': 'پول شهریه را نداری.',
+  'edu.cert.by': 'صادرکننده: {name}',
+  'edu.cert.route.class': 'از راه کلاس',
+  'edu.cert.route.apprenticeship': 'از راه شاگردی',
+  'edu.cert.route.exam': 'از راه آزمون',
+  'tc.rule_from': 'برای درس‌دادن یک هنر، استاد باید مهارت سطح ۳ آن هنر را داشته باشد و تا یک سطح پایین‌تر از خودش یاد می‌دهد. این قانون از {at} شروع می‌شود.',
+  'tc.refused.range_b': 'مدت باید بین {d1} تا {d2} روز باشد، شهریه حداکثر {fee} و سهم مزد شاگرد از {s1} تا {s2}.',
+  'tc.range': 'از {a} تا {b}',
 } as const
 
 export type UiKey = keyof typeof uiFa
