@@ -6416,20 +6416,20 @@ tc.refused.range_b | مدت باید بین {d1} تا {d2} روز باشد، ش�
 tc.range | از {a} تا {b} | from {a} to {b}
 city.registry | ثبت زمین | Land registry
 rg.title | ثبت زمین | Land registry
-rg.parcels | قطعه‌های من | My parcels
-rg.parcels_none | هنوز قطعه‌ای نداری؛ هر زمینی که بخری یک قطعه می‌شود. | You hold no parcel yet; every lot you buy becomes a parcel.
-rg.parcel_fee | یکی‌کردن یا جدا کردن قطعه {fee} هزینهٔ ثبت دارد. قطعه تا {n} خانه می‌شود. | Joining or splitting a parcel costs {fee}. A parcel can hold up to {n} lots.
-rg.mine | قطعهٔ تو | Your parcel
-rg.of | قطعهٔ {who} | {who}'s parcel
+rg.parcels | ملک‌های من | My parcels
+rg.parcels_none | هنوز ملکی نداری؛ هر زمینی که بخری یک ملک می‌شود. | You hold no parcel yet; every lot you buy becomes a parcel.
+rg.parcel_fee | یکی‌کردن یا جدا کردن ملک {fee} هزینهٔ ثبت دارد. ملک تا {n} قطعه می‌شود. | Joining or splitting a parcel costs {fee}. A parcel can hold up to {n} lots.
+rg.mine | ملک تو | Your parcel
+rg.of | ملک {who} | {who}'s parcel
 rg.commons | زمین مشاع شهر | The town's commons
-rg.cells | {n} خانه | {n} lots
+rg.cells | {n} قطعه | {n} lots
 rg.span | از {a} تا {b} | from {a} to {b}
 rg.use.home | خانه | Home
 rg.use.commons | مشاع | Commons
 rg.use.farm | کشاورزی | Farm
 rg.in_zone | در پهنهٔ «{name}» | In the zone «{name}»
-rg.join | یکی کن با قطعهٔ {to} | Join with the parcel {to}
-rg.split | جدا کردن بخشی | Split a part off
+rg.join | یکی کن با ملک {to} | Join with the parcel {to}
+rg.split | جدا کردن چند قطعه | Split a part off
 rg.split_hint | گوشهٔ بالا و پایین بخشی را که می‌خواهی جدا شود بنویس (شمارهٔ ستون و ردیف همان که روی نقشهٔ زمین می‌بینی). | Type two corners of the part to cut out (column and row as the land map shows).
 rg.split_go | جدا کن | Split
 rg.from | از | from
@@ -6446,10 +6446,10 @@ rg.zone_close | بستن پهنه | Close the zone
 rg.zone_open | باز کردن پهنه | Open a zone
 rg.zone_name | نام پهنه | Zone name
 rg.zone_kind | نوع پهنه | Zone kind
-rg.zone_lots | خانه‌های پهنه (تا {n} خانه) | Lots of the zone (up to {n})
-rg.zone_fee | هر خانه {fee} هزینهٔ باز کردن دارد. | Each lot costs {fee} to open.
+rg.zone_lots | قطعه‌های پهنه (تا {n} قطعه) | Lots of the zone (up to {n})
+rg.zone_fee | هر قطعه {fee} هزینهٔ باز کردن دارد. | Each lot costs {fee} to open.
 rg.zone_ask | هزینهٔ باز کردن را ببین | See the cost of opening
-rg.commons_n | زمین مشاع شهر: {n} خانه؛ فروخته نمی‌شود. | The town's commons: {n} lots; not for sale.
+rg.commons_n | زمین مشاع شهر: {n} قطعه؛ فروخته نمی‌شود. | The town's commons: {n} lots; not for sale.
 rg.kind.commons | زمین مشاع | Commons
 rg.kind.core | مرکز | Core
 rg.kind.residential | مسکونی | Residential
@@ -6465,7 +6465,7 @@ rg.tile | بلوک {x}، {y} | Tile {x}, {y}
 rg.paid_to | نگهداری‌اش تا {at} پرداخت شده | Upkeep paid until {at}
 rg.claim_upkeep | هر بلوک روزی {fee} نگهداری می‌خواهد؛ اگر خزانه نتواند بدهد بلوک را از دست می‌دهیم. | Each tile needs {fee} a day; if the treasury cannot pay the tile is lost.
 rg.claim_title | ادعای زمین | Claim land
-rg.claim_hint | بلوکی را که کنار زمین شهر است بگیر؛ {cost} از خزانه می‌رود و شهر تا {n} بلوک نگه می‌دارد. شمارهٔ ستون و ردیف یکی از خانه‌هایش را بنویس. | Claim a tile next to the town's land; it costs {cost} from the treasury and the town can hold up to {n}. Type the column and row of one of its lots.
+rg.claim_hint | بلوکی را که کنار زمین شهر است بگیر؛ {cost} از خزانه می‌رود و شهر تا {n} بلوک نگه می‌دارد. شمارهٔ ستون و ردیف یکی از قطعه‌هایش را بنویس. | Claim a tile next to the town's land; it costs {cost} from the treasury and the town can hold up to {n}. Type the column and row of one of its lots.
 rg.claim_ask | قیمتش را ببین | See the price
 rg.ground | شیب زمین و پی | Slope and foundation
 rg.band.flat | صاف | Flat
@@ -6477,31 +6477,31 @@ rg.band_gentle | {a} تا {b} متر | {a} to {b} m
 rg.band_steep | {a} تا {b} متر | {a} to {b} m
 rg.band_none | بیشتر از {n} متر | more than {n} m
 rg.ground_hint | روی شیب تند بعضی ساختمان‌ها پی می‌خواهند: بنّا با سنگ پی می‌ریزد (پژوهش بنّایی لازم است). روی ملایم و صاف پی نمی‌خواهند. | On a steep slope some buildings need a foundation: the mason lays it with stone (masonry needed). Flat and gentle ground needs none.
-rg.foundations | پی‌ریخته‌شده: {n} خانه | Foundations laid: {n} lots
+rg.foundations | پی‌ریخته‌شده: {n} قطعه | Foundations laid: {n} lots
 rg.found_title | پی‌ریزی | Lay a foundation
-rg.found_hint | پی {stone} سنگ و دستمزد بنّا ({wage}) می‌خواهد. شمارهٔ ستون و ردیف خانه را بنویس. | A foundation takes {stone} stone and the mason's wage ({wage}). Type the lot's column and row.
+rg.found_hint | پی {stone} سنگ و دستمزد بنّا ({wage}) می‌خواهد. شمارهٔ ستون و ردیف قطعه را بنویس. | A foundation takes {stone} stone and the mason's wage ({wage}). Type the lot's column and row.
 rg.found_ask | قیمتش را ببین | See the price
 rg.buy_land | زمین بخر | Buy land
 rg.q.cost | هزینه | Cost
-rg.q.cells | خانه | Lots
+rg.q.cells | قطعه | Lots
 rg.q.stone | سنگ | Stone
 rg.q.stone_v | {need} لازم؛ {have} همراهته، {buy} را می‌خری | {need} needed; you carry {have}, you buy {buy}
-rg.q.cash | پولت | Your cash
-rg.q.poor | پولت به این هزینه نمی‌رسد. | You cannot afford this.
+rg.q.cash | پول تو | Your cash
+rg.q.poor | پول تو به این هزینه نمی‌رسد. | You cannot afford this.
 rg.q.confirm | تأیید ({cost}) | Confirm ({cost})
 rg.q.cancel | انصراف | Cancel
-rg.quote.parcel.join | یکی‌کردن دو قطعه هزینهٔ ثبت دارد. | Joining two parcels costs a registration fee.
+rg.quote.parcel.join | یکی‌کردن دو ملک هزینهٔ ثبت دارد. | Joining two parcels costs a registration fee.
 rg.quote.parcel.split | جدا کردن این بخش هزینهٔ ثبت دارد. | Splitting this part costs a registration fee.
 rg.quote.zone.open | باز کردن این پهنه خرج دارد؛ بعد از مهلت اعلام اجرا می‌شود و فقط ساختمان‌های تازه را محدود می‌کند. | Opening this zone costs; it starts after the notice and binds only new buildings.
 rg.quote.claim | گرفتن این بلوک از خزانه می‌برد. | Claiming this tile takes money from the treasury.
-rg.quote.foundation.lay | پی‌ریزی این خانه سنگ و دستمزد بنّا می‌خواهد. | Laying this foundation takes stone and the mason's wage.
+rg.quote.foundation.lay | پی‌ریزی این قطعه سنگ و دستمزد بنّا می‌خواهد. | Laying this foundation takes stone and the mason's wage.
 rg.quote.other | این کار هزینه دارد. | This costs something.
-rg.notice.parcel_joined | دو قطعه یکی شد. | The two parcels are one.
-rg.notice.parcel_split | قطعه جدا شد. | The part is split off.
+rg.notice.parcel_joined | دو ملک یکی شد. | The two parcels are one.
+rg.notice.parcel_split | ملک جدا شد. | The part is split off.
 rg.notice.zone_opened | پهنه باز شد؛ بعد از مهلت اعلام اجرا می‌شود و ساختمان‌های ایستاده سر جایشان می‌مانند. | The zone is open; it takes effect after the notice and standing buildings stay.
 rg.notice.zone_closed | پهنه بسته شد؛ هیچ ساختمانی برداشته نشد. | The zone is closed; no building was removed.
 rg.notice.claimed | بلوک به قلمرو شهر اضافه شد. | The tile joined the town's territory.
-rg.notice.foundation_laid | پی ریخته شد؛ حالا روی این خانه می‌شود ساخت. | The foundation is laid; you can build on this lot now.
+rg.notice.foundation_laid | پی ریخته شد؛ حالا روی این قطعه می‌شود ساخت. | The foundation is laid; you can build on this lot now.
 rg.rule.zoning_from | پهنه‌بندی از {at} شروع می‌شود؛ تا آن موقع پهنه‌ها اثری ندارند. | Zoning starts {at}; until then zones have no effect.
 rg.rule.zoning_off | پهنه‌بندی هنوز شروع نشده. | Zoning has not started yet.
 rg.rule.slope_from | قاعدهٔ شیب برای ساختمان‌های تازه از {at} شروع می‌شود. | The slope rule for new buildings starts {at}.
@@ -6513,17 +6513,17 @@ rg.layer.zones | پهنه‌ها | Zones
 rg.layer.commons | مشاع | Commons
 rg.legend.zones | پهنه | Zone
 rg.legend.commons | مشاع | Commons
-refusal.village_land_not_yours | این قطعه مال تو نیست. | This parcel is not yours.
-refusal.village_land_not_adjacent | این دو قطعه به هم نچسبیده‌اند. | The two parcels do not touch.
-refusal.village_land_too_big | قطعه از این بزرگ‌تر نمی‌شود. | A parcel cannot grow bigger.
-refusal.village_land_not_one_parcel | همهٔ این خانه‌ها در یک قطعه نیستند. | These lots are not all in one parcel.
-refusal.village_land_whole_parcel | این کل قطعه است؛ فقط بخشی را باید جدا کنی. | That is the whole parcel; cut only a part.
+refusal.village_land_not_yours | این ملک مال تو نیست. | This parcel is not yours.
+refusal.village_land_not_adjacent | این دو ملک به هم نچسبیده‌اند. | The two parcels do not touch.
+refusal.village_land_too_big | ملک از این بزرگ‌تر نمی‌شود. | A parcel cannot grow bigger.
+refusal.village_land_not_one_parcel | همهٔ این قطعه‌ها در یک ملک نیستند. | These lots are not all in one parcel.
+refusal.village_land_whole_parcel | این کل ملک است؛ فقط بخشی را باید جدا کنی. | That is the whole parcel; cut only a part.
 refusal.village_land_not_connected | هر تکه باید یک تکهٔ یکپارچه بماند. | Each piece must stay in one piece.
 refusal.village_land_no_money | پول کافی نیست. | Not enough money.
-refusal.village_land_bad_cells | جای خانه‌ها را درست ننوشته‌ای. | The lots are not written right.
-refusal.village_land_off_land | این خانه‌ها جزو زمین شهر نیستند؛ اول جاده بکش یا بلوک را بگیر. | These lots are not the town's land; draw a road or claim the tile first.
-refusal.village_land_cell_owned | یکی از این خانه‌ها مال کس دیگری است؛ پهنه روی زمین دیگران باز نمی‌شود. | One lot is someone else's; a zone cannot open on others' land.
-refusal.village_land_cell_zoned | یکی از این خانه‌ها همین حالا در پهنه‌ای است. | One of these lots is already in a zone.
+refusal.village_land_bad_cells | جای قطعه‌ها را درست ننوشته‌ای. | The lots are not written right.
+refusal.village_land_off_land | این قطعه‌ها جزو زمین شهر نیستند؛ اول جاده بکش یا بلوک را بگیر. | These lots are not the town's land; draw a road or claim the tile first.
+refusal.village_land_cell_owned | یکی از این قطعه‌ها مال کس دیگری است؛ پهنه روی زمین دیگران باز نمی‌شود. | One lot is someone else's; a zone cannot open on others' land.
+refusal.village_land_cell_zoned | یکی از این قطعه‌ها همین حالا در پهنه‌ای است. | One of these lots is already in a zone.
 refusal.village_land_zone_name | نام پهنه باید بین ۱ تا ۴۰ حرف باشد. | The zone name must be 1 to 40 letters.
 refusal.village_land_zone_kind | این نوع پهنه را نمی‌شناسیم. | We do not know this zone kind.
 refusal.village_land_zone_size | پهنه از این بزرگ‌تر نمی‌شود، یا جای گوشه‌ها درست نیست. | The zone cannot be that big, or the corners are wrong.
@@ -6536,9 +6536,10 @@ refusal.village_land_tile_apart | بلوک باید به زمین خود شهر 
 refusal.village_land_claim_limit | شهر بیشتر از این بلوک نمی‌تواند نگه دارد. | The town cannot hold more tiles.
 refusal.village_land_commons | زمین مشاع فروشی نیست. | Commons are not for sale.
 refusal.village_land_needs_foundation | این زمین برای این بنا زیادی شیب دارد؛ اول پی بریز. | This ground is too steep for this building; lay a foundation first.
-refusal.village_land_no_foundation_needed | این خانه صاف است و پی نمی‌خواهد. | This lot is flat and needs no foundation.
-refusal.village_land_foundation_exists | روی این خانه قبلاً پی ریخته شده. | A foundation is already laid here.
+refusal.village_land_no_foundation_needed | این قطعه صاف است و پی نمی‌خواهد. | This lot is flat and needs no foundation.
+refusal.village_land_foundation_exists | روی این قطعه قبلاً پی ریخته شده. | A foundation is already laid here.
 refusal.village_land_no_masonry | شهر هنوز بنّایی را یاد نگرفته؛ پی را بنّا می‌ریزد. | The town has not learned masonry; the mason lays foundations.
 refusal.village_land_too_steep | این زمین آن‌قدر شیب دارد که هیچ بنایی رویش نمی‌ایستد. | This ground is so steep that nothing can stand on it.
 refusal.village_land_zone_forbids | پهنهٔ این زمین چنین بنایی را قبول نمی‌کند. | The zone of this land does not accept such a building.
 rg.cell | ستون {x}، ردیف {y} | column {x}, row {y}
+rg.and_more | ، با {n} قطعهٔ دیگر | and {n} more

@@ -6444,4 +6444,5 @@ export const uiEn: Record<UiKey, string> = {
   'refusal.village_land_too_steep': 'This ground is so steep that nothing can stand on it.',
   'refusal.village_land_zone_forbids': 'The zone of this land does not accept such a building.',
   'rg.cell': 'column {x}, row {y}',
+  'rg.and_more': 'and {n} more',
 }

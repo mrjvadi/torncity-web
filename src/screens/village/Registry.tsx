@@ -51,7 +51,7 @@ function Parcel({ p, ctx, byId }: { p: ParcelLine; ctx: FlowCtx; byId: (id: stri
       {p.zone && <EffectRow><EffectChip tone="neutral">{t('rg.in_zone', { name: p.zone.name })}</EffectChip></EffectRow>}
       {p.mine && (
         <div className="wk-btns">
-          {(p.can_join ?? []).map((o) => <ActionButton key={o} tone="steel" small disabled={ctx.busy} onClick={() => ask(ctx, 'settlement.parcel.join', { parcel: p.id, with: o })}>{t('rg.join', { to: spanOf(byId(o)) || o })}</ActionButton>)}
+          {(p.can_join ?? []).map((o) => <ActionButton key={o} tone="steel" small disabled={ctx.busy} onClick={() => ask(ctx, 'settlement.parcel.join', { parcel: p.id, with: o })}>{t('rg.join', { to: (byId(o) ?? []).length ? cellText(byId(o)![0]) + ((byId(o) ?? []).length > 1 ? t('rg.and_more', { n: formatNumber((byId(o) ?? []).length - 1) }) : '') : o })}</ActionButton>)}
           {p.can_split && <ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setSplit(!split)}>{t('rg.split')}</ActionButton>}
         </div>
       )}
