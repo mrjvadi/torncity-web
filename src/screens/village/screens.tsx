@@ -29,7 +29,7 @@ import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
 import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
-import { Registry } from './Registry'
+import { Registry, lotToken } from './Registry'
 import { FarmBlock } from './FarmWork'
 import { RecipePicker, firstRecipe, recipeArg } from './Recipes'
 
@@ -102,6 +102,18 @@ const Refusal = flow<VillageRefusalView>(({ view: v, ctx }) => {
   const code = ctx.res.error?.code ?? `village_${v.kind}`
   const args = { ...(ctx.res.error?.args ?? {}) }
   const ob = v.obstacles
+  const fd = v.foundation
+  if (fd) {
+    return (
+      <Page title={t('vx.rf.title')} tone="ruby">
+        <Panel tone="ruby">
+          <Lead tone="bad">{hasKey(`refusal.${code}`) ? t(key(`refusal.${code}`)) : refusalText(code, undefined, args)}</Lead>
+          <Hint>{t('rg.found_offer', { x: formatNumber(fd.x + 1), y: formatNumber(fd.y + 1) })}</Hint>
+        </Panel>
+        <Slab tone="gold" radius={14} lip={4} disabled={ctx.busy} onClick={() => ctx.go({ id: 'found.lay', command: 'settlement.foundation.lay', args: { lot: lotToken(fd.x, fd.y) }, kind: 'primary', icon: 'action:default' } as Action)}>{t('v6.ring.found')}</Slab>
+      </Page>
+    )
+  }
   if (ob && (ob.trees > 0 || ob.rocks > 0)) {
     const what = ob.trees > 0 && ob.rocks > 0 ? 'all' : ob.trees > 0 ? 'trees' : 'rocks'
     return (

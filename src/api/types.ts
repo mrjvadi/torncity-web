@@ -326,6 +326,9 @@ export interface LandStuff {
   ordered?: { trees: boolean; rocks: boolean } | null
   /** a lot with trees or rocks cannot be built on until it is cleared */
   obstructed?: boolean
+  /** ADR 0072: the slope band (flat, gentle, steep, none) and whether a foundation is laid */
+  slope_band?: string
+  foundation?: boolean
 }
 
 export interface LayoutLot extends LandStuff {

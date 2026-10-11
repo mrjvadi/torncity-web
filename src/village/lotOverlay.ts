@@ -23,6 +23,7 @@ export const TONE_OWN_LOCKED = 9
 /** Optional registry layers (ADR 0072): a lot in a zone, and the town's commons. */
 export const TONE_ZONE = 10
 export const TONE_COMMONS = 11
+export const TONE_CLAIM = 12
 
 const SUB = 4
 const LIFT = 0.28
@@ -39,6 +40,7 @@ const TONES: Record<number, [number, number, number, number]> = {
   [TONE_OWN_LOCKED]: [1, 0.3, 0.7, 0.82],
   [TONE_ZONE]: [0.1, 0.75, 0.85, 0.72],
   [TONE_COMMONS]: [0.6, 0.8, 0.25, 0.7],
+  [TONE_CLAIM]: [0.95, 0.55, 0.15, 0.7],
 }
 
 /** The RGBA of a tone, for the overlay of the land beyond the first grid (landOverlay.ts). */

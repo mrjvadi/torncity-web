@@ -93,7 +93,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   const [landOn, setLandOn] = useState(false)
   // the land registry (ADR 0072): read once for a resident and again when the layout moves; the ring verbs and the optional layers use it
   const [reg, setReg] = useState<LandRegistryView | null>(null)
-  const [layers, setLayers] = useState({ zones: false, commons: false })
+  const [layers, setLayers] = useState({ zones: false, commons: false, claims: false })
   const [buyLot, setBuyLot] = useState<{ x: number; y: number } | null>(null)
   const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
   const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
@@ -135,7 +135,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   }, [buyLot, sceneReady])
   useEffect(() => {
     if (!sceneReady) return
-    sceneRef.current?.setOverlayTones((landOn || lotRing) && layout && build.state.step === 'off' ? withRegistryLayers(tonesForLand(layout, access), layout.grid.lots, reg?.parcels ?? [], layers) : null)
+    sceneRef.current?.setOverlayTones((landOn || lotRing) && layout && build.state.step === 'off' ? withRegistryLayers(tonesForLand(layout, access), layout.grid.lots, reg?.parcels ?? [], layers, (reg?.claims ?? []).flatMap((c) => (c.rect ? [c.rect] : []))) : null)
   }, [landOn, lotRing, layout, sceneReady, build.state.step, access, reg, layers])
   // the land the roads opened (ADR 0044 5.5): tinted in the land tool like the first grid
   useEffect(() => {
@@ -381,10 +381,11 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => setTakenLot({ ...lot, owner: lotRing.owner })) })
     }
     // the land registry's verbs (ADR 0072): a foundation where the ground is too steep to build without one, and a claim at the town's edge
-    const slope = slopeAt(layout, lot.x, lot.y)
+    const L0 = landAt(layout, lot.x, lot.y)
+    const band = L0?.slope_band
     const gridN = layout.grid.lots
     const outside = lot.x < 0 || lot.y < 0 || lot.x >= gridN || lot.y >= gridN
-    if (reg?.can_lay_foundation && reg.slope_on && slope !== undefined && slope > reg.slope_flat_m && slope <= reg.slope_unusable_m && (lotRing.kind === 'mine' || lotRing.kind === 'free')) {
+    if (reg?.can_lay_foundation && reg.slope_on && (band === 'gentle' || band === 'steep') && !L0?.foundation && (lotRing.kind === 'mine' || lotRing.kind === 'free')) {
       acts.push({ id: 'found', label: t('v6.ring.found'), icon: 'hammer', onClick: go(() => run('settlement.foundation.lay', { lot: lotToken(lot.x, lot.y) })) })
     }
     if (reg?.can_claim && outside && lotRing.kind !== 'mine') {
@@ -553,6 +554,7 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
               <div className="vh-layers" role="group" aria-label={t('rg.layers')}>
                 <button type="button" className={`vh-chip${layers.zones ? ' on' : ''}`} aria-pressed={layers.zones} onClick={() => setLayers((l) => ({ ...l, zones: !l.zones }))}><i className="vh-dot" style={{ background: '#1abfd9' }} />{t('rg.layer.zones')}</button>
                 <button type="button" className={`vh-chip${layers.commons ? ' on' : ''}`} aria-pressed={layers.commons} onClick={() => setLayers((l) => ({ ...l, commons: !l.commons }))}><i className="vh-dot" style={{ background: '#99cc40' }} />{t('rg.layer.commons')}</button>
+                <button type="button" className={`vh-chip${layers.claims ? ' on' : ''}`} aria-pressed={layers.claims} onClick={() => setLayers((l) => ({ ...l, claims: !l.claims }))}><i className="vh-dot" style={{ background: '#f28c26' }} />{t('rg.layer.claims')}</button>
                 <button type="button" className="vh-chip" onClick={() => { setLandOn(false); run('settlement.land.registry') }}>{t('rg.title')}</button>
               </div>
               {canPlace && (

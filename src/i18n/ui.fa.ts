@@ -6443,6 +6443,8 @@ export const uiFa = {
   'refusal.village_land_zone_forbids': 'پهنهٔ این زمین چنین بنایی را قبول نمی‌کند.',
   'rg.cell': 'ستون {x}، ردیف {y}',
   'rg.and_more': '، با {n} قطعهٔ دیگر',
+  'rg.layer.claims': 'ادعا',
+  'rg.found_offer': 'می‌توانی روی قطعهٔ ستون {x}، ردیف {y} پی بریزی (سنگ و دستمزد بنّا می‌خواهد) و بعد بسازی.',
 } as const
 
 export type UiKey = keyof typeof uiFa
