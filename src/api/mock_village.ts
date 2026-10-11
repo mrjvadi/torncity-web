@@ -65,6 +65,8 @@ const CAT: CatEntry[] = [
   { code: 'pasture_range', fa: 'چراگاه', en: 'چراگاه', fp: [3, 3], cost: 1200, time: 4800, role: 'food' },
   { code: 'herb_garden', fa: 'باغچهٔ گیاهان دارویی', en: 'باغچهٔ گیاهان دارویی', fp: [2, 2], cost: 700, time: 3600, role: 'food', needs: ['herbalism'] },
   { code: 'apothecary', fa: 'عطاری', en: 'عطاری', fp: [2, 2], cost: 1200, time: 4800, role: 'craft', needs: ['herbalism'] },
+  { code: 'tailor_shop', fa: 'خیاطی', en: 'خیاطی', fp: [2, 2], cost: 1100, time: 4800, role: 'craft' },
+  { code: 'warming_house', fa: 'گرمخانه', en: 'گرمخانه', fp: [2, 2], cost: 1500, time: 5400, role: 'health' },
   { code: 'clinic', fa: 'درمانگاه', en: 'درمانگاه', fp: [2, 2], cost: 1800, time: 6000, role: 'health' },
   { code: 'health_house', fa: 'خانهٔ بهداشت', en: 'Health house', fp: [2, 2], cost: 1200, time: 4800, role: 'health' },
   { code: 'teaching_circle', fa: 'کلاس درس', en: 'Village classroom', fp: [1, 1], cost: 200, time: 1500, role: 'education' },
@@ -91,6 +93,7 @@ const CAT: CatEntry[] = [
 const SUPPORT_SERVICES = [{ service: 'bank', role: '' }, { service: 'market', role: 'market' }, { service: 'knowledge', role: 'education' }, { service: 'hospital', role: 'health' }]
 const KNOW_EN: Record<string, string> = {
   herbalism: 'گیاهان دارویی',
+  tailoring: 'خیاطی',
   fire_making: 'Fire making', masonry: 'Masonry', irrigation: 'Irrigation', writing: 'Writing', metallurgy: 'Metallurgy', geometry: 'Geometry', archery: 'Archery', carpentry: 'Carpentry',
 }
 export const KNOW_NAMES: Record<string, string> = {
@@ -1534,6 +1537,12 @@ export const MOCK_RECIPES = (locked = false) => [
   { station: 'workbench', code: 'handle', name: { code: 'handle', name: 'دسته و چوب‌دست' }, default: false, selected: false, inputs: [mat('timber', 'چوب', 2)], outputs: [mat('handle', 'دسته', 6)], available: true, missing: null, minutes: 30 },
   { station: 'workbench', code: 'rope', name: { code: 'rope', name: 'طناب' }, default: false, selected: false, inputs: [mat('flax', 'کتان', 3)], outputs: [mat('rope', 'طناب', 2)], available: !locked && false, missing: [{ code: 'rope_making', name: 'طناب‌بافی' }, { code: 'flax_growing', name: 'کتان‌کاری' }], minutes: 40 },
 ]
+const TAILOR_RECIPES = [
+  { station: '', code: '', name: { code: '', name: 'پیراهن پشمی' }, default: true, selected: true, inputs: [mat('wool', 'پشم', 4)], outputs: [mat('wool_tunic', 'پیراهن پشمی', 1)], available: true, missing: null, minutes: 60 },
+  { station: '', code: 'wool_cloak', name: { code: 'wool_cloak', name: 'شنل پشمی' }, default: false, selected: false, inputs: [mat('wool', 'پشم', 8)], outputs: [mat('wool_cloak', 'شنل پشمی', 1)], available: true, missing: null, minutes: 90 },
+  { station: '', code: 'wool_cap', name: { code: 'wool_cap', name: 'کلاه پشمی' }, default: false, selected: false, inputs: [mat('wool', 'پشم', 2)], outputs: [mat('wool_cap', 'کلاه پشمی', 1)], available: true, missing: null, minutes: 30 },
+  { station: '', code: 'wool_mittens', name: { code: 'wool_mittens', name: 'دستکش پشمی' }, default: false, selected: false, inputs: [mat('wool', 'پشم', 2)], outputs: [mat('wool_mittens', 'دستکش پشمی', 1)], available: false, missing: [{ code: 'tailoring', name: 'خیاطی' }], minutes: 30 },
+]
 const APOTHECARY_RECIPES = [
   { station: '', code: '', name: { code: '', name: 'عصارهٔ گیاهان' }, default: true, selected: true, inputs: [mat('herbs', 'گیاهان دارویی', 4)], outputs: [mat('herb_extract', 'عصاره', 2)], available: true, missing: null, minutes: 60 },
   { station: '', code: 'painkillers', name: { code: 'painkillers', name: 'مسکّن' }, default: false, selected: false, inputs: [mat('herb_extract', 'عصاره', 2)], outputs: [mat('painkillers', 'مسکّن', 3)], available: true, missing: null, minutes: 45 },
@@ -1542,6 +1551,7 @@ const APOTHECARY_RECIPES = [
 ]
 function b4Work(type: string, id: string): Pick<WorkNode, 'tool' | 'recipes'> {
   if (type === 'apothecary' || /^fx-apothecary/.test(id)) return { tool: null, recipes: APOTHECARY_RECIPES }
+  if (type === 'tailor_shop' || /^fx-tailor/.test(id)) return { tool: null, recipes: TAILOR_RECIPES }
   if (type !== 'carpentry_workshop' && !/^fx-carpentry-/.test(id)) return { tool: null, recipes: null }
   const k = id.match(/^fx-carpentry-([a-z]+)/)?.[1] ?? 'short'
   return {
@@ -1559,6 +1569,11 @@ function b5Node(type: string, id: string): Partial<WorkNode> | null {
     return { kind: 'service', status: open ? 'working' : 'paused', slots: open ? [seat('nurse', 'npc'), seat('health_worker', 'npc')] : [seat('nurse', k === 'nostaff' ? 'empty' : 'npc'), seat('health_worker', k === 'nostaff' ? 'empty' : 'npc')], filled: open ? 2 : k === 'nostaff' ? 0 : 2, max: 2,
       reasons: open ? null : [{ code: k === 'nostaff' ? 'no_staff' : k === 'nowage' ? 'no_wage' : 'no_supplies', item: null, class: '', have: 0, need: 1 }], inputs: [{ item: goods('painkillers'), qty: 1 }], outputs: null, storage_class: '', storage_free: 0, shift_seconds: 0, job: null }
   }
+  if (type === 'warming_house' || /^fx-warming/.test(id)) {
+    const closed = /^fx-warming-closed/.test(id)
+    return { kind: 'service', status: closed ? 'paused' : 'working', slots: [seat('hearth_keeper', closed ? 'empty' : 'npc')], filled: closed ? 0 : 1, max: 1, reasons: closed ? [{ code: 'no_staff', item: null, class: '', have: 0, need: 1 }] : null, inputs: [{ item: goods('firewood'), qty: 3 }], outputs: null, storage_class: '', storage_free: 0, shift_seconds: 0, job: null }
+  }
+  if (type === 'tailor_shop' || /^fx-tailor/.test(id)) return { kind: 'production', slots: [seat('tailor', 'npc'), seat('tailor', 'empty')], filled: 1, max: 2, status: 'working', reasons: null, inputs: [{ item: goods('wool'), qty: 4 }], outputs: [{ item: goods('wool_tunic'), qty: 1 }], storage_class: 'goods' }
   if (type === 'herb_garden' || /^fx-herb/.test(id)) return { kind: 'production', slots: [seat('herbalist', 'empty'), seat('herbalist', 'empty')], filled: 0, max: 2, status: 'idle', reasons: [{ code: 'no_staff', item: null, class: '', have: 0, need: 2 }], inputs: null, outputs: [{ item: goods('herbs'), qty: 6 }], storage_class: 'food' }
   if (type === 'apothecary' || /^fx-apothecary/.test(id)) return { kind: 'production', slots: [seat('apothecary', 'npc'), seat('apothecary', 'empty')], filled: 1, max: 2, status: 'working', reasons: null, inputs: [{ item: goods('herbs'), qty: 4 }], outputs: [{ item: goods('herb_extract'), qty: 2 }], storage_class: 'goods' }
   return null
@@ -1623,8 +1638,8 @@ function upgradeLine(code: string, tier: number, secs: number) {
 function buildingView(args: Record<string, unknown>) {
   const id = String(args.building_id ?? '')
   const b = st.buildings.find((x) => x.id === id) ?? (() => {
-    const fx = id.match(/^fx-(woodcutter|granary|road|clay|kiln|paper|tools|farm|water|mill|pasture|carpentry|clinic|apothecary|herb)/)
-    if (fx) return { id, type: ({ woodcutter: 'woodcutter_camp', clay: 'clay_pit', kiln: 'pottery_kiln', paper: 'paper_mill', tools: 'tool_workshop', farm: 'farm_canal', water: 'canal_channel', mill: 'water_mill', pasture: 'pasture_range', carpentry: 'carpentry_workshop', clinic: 'clinic', apothecary: 'apothecary', herb: 'herb_garden' } as Record<string, string>)[fx[1]] ?? fx[1], x: 5, y: 5, w: 2, h: 2, rotated: false, state: 'built', seed: 7 } as MBuilding
+    const fx = id.match(/^fx-(woodcutter|granary|road|clay|kiln|paper|tools|farm|water|mill|pasture|carpentry|clinic|apothecary|herb|tailor|warming)/)
+    if (fx) return { id, type: ({ woodcutter: 'woodcutter_camp', clay: 'clay_pit', kiln: 'pottery_kiln', paper: 'paper_mill', tools: 'tool_workshop', farm: 'farm_canal', water: 'canal_channel', mill: 'water_mill', pasture: 'pasture_range', carpentry: 'carpentry_workshop', clinic: 'clinic', apothecary: 'apothecary', herb: 'herb_garden', tailor: 'tailor_shop', warming: 'warming_house' } as Record<string, string>)[fx[1]] ?? fx[1], x: 5, y: 5, w: 2, h: 2, rotated: false, state: 'built', seed: 7 } as MBuilding
     const m = id.match(/^road-(\d+)-(\d+)$/)
     return m ? ({ id, type: 'road', x: +m[1], y: +m[2], w: 1, h: 1, rotated: false, state: 'built', seed: 7 } as MBuilding) : undefined
   })()
@@ -1883,7 +1898,7 @@ export function mockVillageRoute(path: string, method: string, headers: Headers)
         city: [{ code: 'calderis', name: { en: 'Calderis', fa: 'کالدریس' } }, { code: 'support', name: { en: 'Central City', fa: 'شهر مرکزی' } }],
         place: [{ code: 'old_town', name: { en: 'Old Town', fa: 'مرکز شهر' } }, { code: 'harbour', name: { en: 'Harbour', fa: 'بندر' } }, ...ECONOMY_CONTENT.place],
         component: [{ code: 'wool', name: { en: 'Wool', fa: 'پشم' } }, { code: 'firewood', name: { en: 'Firewood', fa: 'هیزم' } }, { code: 'clay', name: { en: 'Clay', fa: 'گِل رس' } }, { code: 'pots', name: { en: 'Pots', fa: 'ظرف سفالی' } }, { code: 'hide', name: { en: 'Hide', fa: 'پوست خام' } }, { code: 'rag', name: { en: 'Rags', fa: 'پارچهٔ کهنه' } }, { code: 'charcoal', name: { en: 'Charcoal', fa: 'زغال' } }, { code: 'bloom', name: { en: 'Bloom iron', fa: 'آهن اسفنجی' } }, { code: 'bricks', name: { en: 'Bricks', fa: 'آجر' } }, { code: 'leather', name: { en: 'Leather', fa: 'چرم' } }, { code: 'bark', name: { en: 'Bark', fa: 'پوست درخت' } }, { code: 'flour', name: { en: 'Flour', fa: 'آرد' } }, { code: 'water', name: { en: 'Water', fa: 'آب' } }, { code: 'paper', name: { en: 'Paper', fa: 'کاغذ' } }, { code: 'tools', name: { en: 'Tools', fa: 'ابزار' } }, { code: 'timber', name: { en: 'Timber', fa: 'الوار' } }, { code: 'stone', name: { en: 'Stone', fa: 'سنگ' } }, { code: 'iron_bar', name: { en: 'Iron bar', fa: 'شمش آهن' } }],
-        item: [{ code: 'tea', name: { en: 'Tea', fa: 'چای' } }, { code: 'painkillers', name: { en: 'Painkillers', fa: 'مسکّن' } }, { code: 'first_aid_kit', name: { en: 'First aid kit', fa: 'جعبهٔ کمک‌های اولیه' } }, { code: 'herbs', name: { en: 'Medicinal herbs', fa: 'گیاهان دارویی' } }, { code: 'herb_extract', name: { en: 'Herb extract', fa: 'عصارهٔ گیاهان' } }, { code: 'bag_sack', name: { en: 'Sack', fa: 'کیسه' } }, { code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
+        item: [{ code: 'tea', name: { en: 'Tea', fa: 'چای' } }, { code: 'painkillers', name: { en: 'Painkillers', fa: 'مسکّن' } }, { code: 'wool_tunic', name: { en: 'Wool tunic', fa: 'پیراهن پشمی' } }, { code: 'wool_cloak', name: { en: 'Wool cloak', fa: 'شنل پشمی' } }, { code: 'wool_cap', name: { en: 'Wool cap', fa: 'کلاه پشمی' } }, { code: 'wool_mittens', name: { en: 'Wool mittens', fa: 'دستکش پشمی' } }, { code: 'hide_boots', name: { en: 'Hide boots', fa: 'چکمهٔ چرمی' } }, { code: 'first_aid_kit', name: { en: 'First aid kit', fa: 'جعبهٔ کمک‌های اولیه' } }, { code: 'herbs', name: { en: 'Medicinal herbs', fa: 'گیاهان دارویی' } }, { code: 'herb_extract', name: { en: 'Herb extract', fa: 'عصارهٔ گیاهان' } }, { code: 'bag_sack', name: { en: 'Sack', fa: 'کیسه' } }, { code: 'wheat', name: { en: 'Wheat', fa: 'گندم' } }, { code: 'bread', name: { en: 'Bread', fa: 'نان' } }, { code: 'bandage', name: { en: 'Bandage', fa: 'باند' } }, { code: 'soda', name: { en: 'Soda', fa: 'نوشابه' } }, { code: 'pill', name: { en: 'Pill', fa: 'قرص' } }, { code: 'ring', name: { en: 'Ring', fa: 'انگشتر' } }, { code: 'pistol', name: { en: 'Pistol', fa: 'کلت' } }, ...ECONOMY_CONTENT.item.filter((i) => i.code !== 'bread')],
         item_shelf_group: [['food', 'خوراک', 'Food'], ['medicine', 'دارو و کمک‌های اولیه', 'Medicine'], ['materials', 'مصالح و مواد', 'Materials'], ['tools', 'ابزار', 'Tools'], ['bags', 'کیف و بار', 'Bags']].map(([code, fa, en]) => ({ code, name: { en, fa } })),
         shop: ECONOMY_CONTENT.shop, budget_line: ECONOMY_CONTENT.budget_line, company_type: ECONOMY_CONTENT.company_type,
         // what the pushed notices name (api/client-api.md section 4.1)

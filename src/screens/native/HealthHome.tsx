@@ -38,6 +38,12 @@ export default function HealthHome({ response, run, openLocal }: ScreenProps) {
         <PCard icon="heart" title={t('health.sleep')} onClick={() => run('life.me')} facts={<Lines lines={[t('health.sleep_open')]} />} />
       </CardGrid>
 
+      {!isCity && (
+        <CardGrid>
+          <PCard icon="heat" title={t('hub.survival')} onClick={() => run('health.survival')} facts={<Lines lines={[t('health.survival_sub')]} />} />
+        </CardGrid>
+      )}
+
       <PSec>{t('health.care')}</PSec>
       <CardGrid>
         {facilities.map((f, i) => (

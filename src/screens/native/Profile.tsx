@@ -5,6 +5,10 @@
 // Facts come from the `profile` view; the net worth (life.me) and the medals
 // (achievement.list) are read from their own views.
 
+import { useEffect, useState } from 'react'
+import * as api from '../../api/client'
+import type { SurvivalView } from '../../api/views.gen'
+import { thirstWord, warmthWord, weatherLine } from '../activities/survivalText'
 import { useContentNames } from '../../village/useVillage'
 import type { CSSProperties } from 'react'
 import type { ScreenProps } from '../types'
@@ -44,6 +48,30 @@ interface ProfileView {
 interface LifeView { worth?: { total?: number } }
 interface AchievementsView { lines?: { achievement?: Named; earned?: boolean }[] | null }
 
+
+/** Thirst and cold next to hunger (ADR 0070): only where they run (a founded town), with the state word and the weather; a tap opens the survival panel. */
+function SurvivalNeeds({ run }: { run: (command: string, args?: Record<string, string>) => void }) {
+  const [sv, setSv] = useState<SurvivalView | null>(null)
+  useEffect(() => {
+    let on = true
+    api.runCommand('health.survival', {}).then((r) => { if (on && r.ok !== false) setSv(r.view as unknown as SurvivalView) }).catch(() => undefined)
+    return () => { on = false }
+  }, [])
+  if (!sv || !sv.founded) return null
+  const words = [thirstWord(sv.thirst_level), sv.warmth_level !== 'fine' ? warmthWord(sv.warmth_level) : ''].filter(Boolean).join('، ')
+  return (
+    <>
+      <NeedBar {...NEED_SPEC.thirst} label={t('need.thirst')} value={sv.thirst} />
+      <NeedBar {...NEED_SPEC.warmth} label={t('need.warmth')} value={sv.warmth} />
+      {(words || sv.env) && (
+        <button type="button" className="sv-line" onClick={() => run('health.survival')}>
+          {words && <b>{words}</b>}
+          {sv.env && <span>{weatherLine(sv.env)}</span>}
+        </button>
+      )}
+    </>
+  )
+}
 
 export default function Profile({ response, loading, run }: ScreenProps) {
   const own = (response?.view ?? {}) as ProfileView
@@ -115,6 +143,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
       <PSec>{t('profile.needs')}</PSec>
       <div className="pf2-needs">
           {(['sleep', 'hunger', 'happiness', 'stress'] as const).map((k) => <NeedBar key={k} {...NEED_SPEC[k]} label={t(`need.${k}`)} value={needs[k]} />)}
+          <SurvivalNeeds run={run} />
       </div>
       </>}
 
@@ -184,6 +213,8 @@ export const NEED_SPEC = {
   sleep: { icon: 'timer', color: 'blue', bad: true },
   hunger: { icon: 'bread', color: 'green', bad: true },
   happiness: { icon: 'people', color: 'green', bad: false },
+  thirst: { icon: 'flask', color: 'blue', bad: true },
+  warmth: { icon: 'cloth', color: 'orange', bad: true },
   stress: { icon: 'nerve', color: 'orange', bad: true },
 } as const
 

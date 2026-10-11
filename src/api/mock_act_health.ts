@@ -77,6 +77,52 @@ const inMinutes = (m: number) => new Date(Date.now() + m * 60000).toISOString()
 const PAY: PaymentChoice = { amount: 1800, accepted: ['cash', 'card'], usable: ['cash', 'card'], cash: 6400, bank: 20500 }
 const PAY_BROKE: PaymentChoice = { amount: 1800, accepted: ['cash', 'card'], usable: [], cash: 300, bank: 120 }
 
+// B6 (ADR 0070): thirst, warmth, garments, sickness. ?survival=fine|cold|thirst|ill|neutral, ?hurt=exposure for the hospital cause
+const svMode = (() => { try { return new URLSearchParams(location.search).get('survival') ?? 'fine' } catch { return 'fine' } })()
+const G = (id: string, code: string, name: string, slot: string, warmth: number, left: number, qty = 1) => ({ id, item: { code, name }, slot, warmth, left_seconds: left, qty })
+const sv = {
+  thirst: svMode === 'thirst' ? 72 : 22, warmth: svMode === 'cold' || svMode === 'ill' ? 64 : 18, carried: 2, noticeCode: '',
+  worn: [G('w1', 'wool_tunic', 'پیراهن پشمی', 'base', 6, 14 * 86400), G('w2', 'hide_boots', 'چکمهٔ چرمی', 'feet', 3, 5 * 86400)] as ReturnType<typeof G>[],
+  kept: [G('k1', 'wool_cloak', 'شنل پشمی', 'outer', 9, 20 * 86400)], bag: [G('', 'wool_cap', 'کلاه پشمی', 'head', 4, 30 * 86400, 1)],
+  ill: svMode === 'ill' ? [{ kind: 'chill', ends_at: new Date(Date.now() + 3 * 3600_000).toISOString(), treated: false }] : [],
+}
+function survivalView(notice = '') {
+  const lvl = (n: number) => (n >= 70 ? 2 : n >= 50 ? 1 : 0)
+  const w = sv.warmth
+  const view = {
+    founded: svMode !== 'neutral' && svMode !== 'grace', starts_at: svMode === 'grace' ? new Date(Date.now() + 6 * 86400_000).toISOString() : null, thirst: sv.thirst, warmth: sv.warmth, thirst_level: sv.thirst >= 70 ? 2 : sv.thirst >= 50 ? 1 : 0,
+    warmth_level: svMode === 'hot' ? 'hot' : svMode === 'heat' ? 'heatstroke' : w >= 80 ? 'freezing' : w >= 60 ? 'cold' : w >= 40 ? 'chilly' : 'fine',
+    env: { temp_c: svMode === 'cold' || svMode === 'ill' ? -4 : 11, rain: svMode === 'cold', wind: true, season: svMode === 'cold' || svMode === 'ill' ? 0 : svMode === 'hot' || svMode === 'heat' ? 2 : 3, hour: 23,
+      cold_snap_until: svMode === 'cold' ? new Date(Date.now() + 30 * 3600_000).toISOString() : null,
+      forecast: svMode === 'hot' || svMode === 'heat' ? [{ offset: 1, min_c: 24, max_c: 38, rain: false, wind: false, snap: false, spell: true }, { offset: 2, min_c: 25, max_c: 40, rain: false, wind: false, snap: false, spell: true }, { offset: 3, min_c: 22, max_c: 33, rain: false, wind: true, snap: false, spell: false }]
+        : [{ offset: 1, min_c: -9, max_c: -2, rain: false, wind: true, snap: svMode === 'cold', spell: false }, { offset: 2, min_c: -12, max_c: -4, rain: true, wind: true, snap: svMode === 'cold', spell: false }, { offset: 3, min_c: -3, max_c: 3, rain: false, wind: false, snap: false, spell: false }] },
+    sheltered: false, worn: sv.worn, kept: sv.kept, bag: sv.bag, illness: sv.ill, well_open: svMode !== 'thirst', river: true, carried: sv.carried,
+    warming_open: true, can_cure: sv.ill.length > 0, notice,
+  }
+  void lvl
+  return mockOk('survival', view, [back('health.home'), refreshA('health.survival')])
+}
+const svStep = (cmd: string, a: Record<string, unknown>) => {
+  if (cmd === 'health.drink') {
+    const src = String(a.source)
+    if (src === 'bag') { if (sv.carried < 1) return healthRefusalSv('no_water'); sv.carried--; sv.thirst = Math.max(0, sv.thirst - 35); return survivalView('drank') }
+    if (src === 'well') { if (svMode === 'thirst') return healthRefusalSv('no_water'); sv.thirst = Math.max(0, sv.thirst - 40); return survivalView('drank') }
+    if (src === 'boiled') { sv.thirst = Math.max(0, sv.thirst - 35); return survivalView('river_ok') }
+    sv.thirst = Math.max(0, sv.thirst - 35); sv.ill = [{ kind: 'waterborne', ends_at: new Date(Date.now() + 5 * 3600_000).toISOString(), treated: false }]; return survivalView('river_sick')
+  }
+  if (cmd === 'health.wear') {
+    const id = String(a.item); const g = [...sv.kept, ...sv.bag].find((x) => (x.id || x.item.code) === id)
+    if (!g) return healthRefusalSv('no_garment')
+    sv.worn = [...sv.worn.filter((x) => x.slot !== g.slot), { ...g, id: g.id || `w-${g.item.code}` }]; sv.kept = sv.kept.filter((x) => x !== g); sv.bag = sv.bag.filter((x) => x !== g)
+    sv.warmth = Math.max(0, sv.warmth - g.warmth * 2); return survivalView('dressed')
+  }
+  if (cmd === 'health.remove') { const g = sv.worn.find((x) => x.slot === String(a.slot)); if (g) { sv.worn = sv.worn.filter((x) => x !== g); sv.kept = [...sv.kept, g]; sv.warmth = Math.min(100, sv.warmth + g.warmth * 2) } return survivalView('undressed') }
+  if (cmd === 'health.warm') { sv.warmth = Math.max(0, sv.warmth - 40); return survivalView('warmed') }
+  if (sv.ill.length === 0) return healthRefusalSv('not_ill')
+  sv.ill = []; return survivalView('cured')
+}
+const healthRefusalSv = (kind: string) => mockOk('health_refusal', { kind }, [back('health.survival')])
+
 // -- state of the mock: a stay that can be treated, a clinic's desk, the player's missions ----------------------------
 
 let treatedBy: TreatOption | null = null
@@ -285,6 +331,8 @@ export function mockHealthCommand(command: string, a: Args): unknown | null {
   const args = (a ?? {}) as Record<string, unknown>
   const s = (k: string, d = '') => String(args[k] ?? d)
   switch (command) {
+    case 'health.survival': return survivalView()
+    case 'health.drink': case 'health.wear': case 'health.remove': case 'health.warm': case 'health.cure': return svStep(command, a as Record<string, unknown>)
     case 'health.hospital': return hospitalView('in')
     case 'health.treat': return args.method ? treated(s('provider', 'city'), s('method')) : treatConfirm(s('provider', 'city'), 'ok')
     case 'health.clinic': return clinicDesk()
@@ -300,6 +348,7 @@ export function mockHealthCommand(command: string, a: Args): unknown | null {
     // screenshot states: ?mock=1&open=mock.<name>
     case 'mock.hospital': treatedBy = null; return hospitalView('in')
     case 'mock.hospital_treated': treatedBy = CITY_OPTION; return hospitalView('in')
+    case 'mock.hospital_exposure': { const r = villageHospital('both') as { view: { cause: string } }; r.view.cause = 'exposure'; return r }
     case 'mock.village_care_house': treatedBy = null; return villageHospital('house')
     case 'mock.village_care_both': treatedBy = null; return villageHospital('both')
     case 'mock.village_care_closed': return villageHospital('closed')

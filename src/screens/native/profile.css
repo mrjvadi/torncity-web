@@ -50,3 +50,5 @@
 /* the backpack (Inventory.tsx) */
 .inv-banner { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #fff; }
 .inv-badge { left: 6px; top: 6px; }
+.sv-line { display: flex; flex-direction: column; gap: 2px; text-align: start; background: none; border: 0; color: inherit; padding: 4px 0; font-size: 13px; cursor: pointer; grid-column: 1 / -1; }
+.sv-line span { opacity: .75; font-size: 12.5px; }

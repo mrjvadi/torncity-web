@@ -15,6 +15,7 @@ import Popup, { ActionButton, ActionRow, Hero, Medallion, Note, StatCard, StatGr
 import { t } from '../../i18n'
 import { careWord, useCare, type Care } from '../../support/care'
 import { Btns, Facts, Hint, Lead, Page, Panel, Rest, flow, isBack, isRefresh, registerWrites, type FlowCtx } from '../village/flow'
+import { Survival } from './Survival'
 import { objectiveText } from '../native/Missions'
 import { bps, clockText, nameOf, tx } from '../life/common'
 
@@ -270,5 +271,5 @@ export const MissionRefusal = flow<MissionRefusalView>(({ view: v, ctx }) => (
 
 Object.assign(HEALTH_SCREENS, {
   treat_confirm: TreatConfirm, treated: Treated, clinic_desk: ClinicDesk, health_refusal: HealthRefusal,
-  mission: Mission, missions_mine: MissionsMine, mission_refusal: MissionRefusal,
+  survival: Survival, mission: Mission, missions_mine: MissionsMine, mission_refusal: MissionRefusal,
 })

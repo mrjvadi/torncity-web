@@ -1714,6 +1714,16 @@ export interface EnrolledView {
   method: string
 }
 
+export interface EnvLine {
+  temp_c: number
+  rain: boolean
+  wind: boolean
+  season: number
+  hour: number
+  forecast: ForecastDay[] | null
+  cold_snap_until: string | null | null
+}
+
 export interface ErrorView {
   code: string
   args: Record<string, unknown> | null
@@ -2210,6 +2220,16 @@ export interface ForcesView {
   moving: number
 }
 
+export interface ForecastDay {
+  offset: number
+  min_c: number
+  max_c: number
+  rain: boolean
+  wind: boolean
+  snap: boolean
+  spell: boolean
+}
+
 export interface FoundDraftView {
   founder: string
   pending: boolean
@@ -2309,6 +2329,15 @@ export interface FriendsView {
   friends: FriendLine[] | null
   page: number
   pages: number
+}
+
+export interface GarmentLine {
+  id: string
+  item: Named
+  slot: string
+  warmth: number
+  left_seconds: number
+  qty: number
 }
 
 export interface GarrisonLine {
@@ -2598,6 +2627,12 @@ export interface HospitalisedView {
 export interface HubView {
   place: ActivityPlace
   entries: ActivityEntry[] | null
+}
+
+export interface IllnessLine {
+  kind: string
+  ends_at: string | null
+  treated: boolean
 }
 
 export interface ImposeView {
@@ -5894,6 +5929,27 @@ export interface SupplyOffer {
   stock: number
 }
 
+export interface SurvivalView {
+  founded: boolean
+  starts_at: string | null | null
+  thirst: number
+  warmth: number
+  thirst_level: number
+  warmth_level: string
+  env: EnvLine | null
+  sheltered: boolean
+  worn: GarmentLine[] | null
+  kept: GarmentLine[] | null
+  bag: GarmentLine[] | null
+  illness: IllnessLine[] | null
+  well_open: boolean
+  river: boolean
+  carried: number
+  warming_open: boolean
+  can_cure: boolean
+  notice: string
+}
+
 export interface TeacherLine {
   id: string
   kind: string
@@ -7048,6 +7104,7 @@ export interface ScreenViews {
   strike_report: StrikeReportView
   studio: StudioView
   suppliers: SuppliersView
+  survival: SurvivalView
   tech: TechView
   trade: TradeDeskView
   trained: TrainedView

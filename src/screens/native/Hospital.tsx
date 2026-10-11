@@ -19,7 +19,7 @@ interface HospitalView {
   village?: Clinic[] | null; care?: CareLines | null; founded?: boolean
 }
 
-const CAUSES = ['crime', 'mugged', 'shift', 'fight']
+const CAUSES = ['crime', 'mugged', 'shift', 'fight', 'exposure', 'dehydration']
 const causeText = (c: string) => (CAUSES.includes(c) ? t(`hospital.cause.${c}` as Key) : c)
 
 export default function Hospital({ response, loading, onAction, run, openLocal }: ScreenProps) {
