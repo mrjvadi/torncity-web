@@ -6238,7 +6238,7 @@ sv.thirst.2 | خیلی تشنه‌ای | Very thirsty
 sv.sheltered | زیر سقف گرم | Under a warm roof
 sv.drink_title | آب خوردن | Drinking
 sv.drink.well | از چاه شهر بنوش | Drink from the town well
-sv.drink.bag | از کیسه‌ام بنوشم ({n}) | Drink from my bag ({n})
+sv.drink.bag | از کوله‌ات بنوش ({n}) | Drink from your pack ({n})
 sv.drink.boiled | آب رودخانه را بجوشان و بنوش | Boil river water and drink
 sv.drink.river | آب رودخانه را همین‌طور بنوش | Drink the river water as it is
 sv.well_closed | چاه شهر الان آب نمی‌دهد؛ آب شهر تمام شده یا چاه بسته است. | The town well gives no water now; the town's water is spent or the well is closed.
@@ -6288,7 +6288,7 @@ ac.health.refused.not_open | گرمخانه یا درمانگاه الان با�
 ac.health.refused.not_ill | بیماری نداری که درمان شود. | You have no illness to treat.
 ac.health.refused_hint.drink_wait | بعد از چند دقیقه دوباره امتحان کن. | Try again in a few minutes.
 ac.health.refused_hint.no_fuel | هیزم را از انبار یا بازار بگیر، یا آب را بی‌جوشاندن نخور. | Get firewood from the store or market.
-ac.health.refused_hint.no_water | آب چاه شهر را ببین یا کیسهٔ آب بگیر. | Check the town well or take a water bag.
+ac.health.refused_hint.no_water | آب چاه شهر را ببین یا آب توی کوله‌ات بگذار. | Check the town well or take a water bag.
 refusal.health_not_founded | اینجا تشنگی و سرما حساب نمی‌شود. | Thirst and cold do not count here.
 refusal.health_no_water | آبی برای نوشیدن نیست. | There is no water to drink.
 refusal.health_drink_wait | تازه آب خورده‌ای؛ کمی بعد دوباره بنوش. | You have just drunk; wait a little.

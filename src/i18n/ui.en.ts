@@ -6140,7 +6140,7 @@ export const uiEn: Record<UiKey, string> = {
   'sv.sheltered': 'Under a warm roof',
   'sv.drink_title': 'Drinking',
   'sv.drink.well': 'Drink from the town well',
-  'sv.drink.bag': 'Drink from my bag ({n})',
+  'sv.drink.bag': 'Drink from your pack ({n})',
   'sv.drink.boiled': 'Boil river water and drink',
   'sv.drink.river': 'Drink the river water as it is',
   'sv.well_closed': 'The town well gives no water now; the town\'s water is spent or the well is closed.',
