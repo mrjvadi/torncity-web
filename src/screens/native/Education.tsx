@@ -53,6 +53,11 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
     <ScreenScroll>
       <Header title={t('education.title')} tone="violet" onRefresh={() => run('education.list')} />
 
+      <CardGrid>
+        <PCard icon="person" title={t('tc.entry_apprentice')} onClick={() => run('settlement.apprentice.mine')} facts={<Lines lines={[t('tc.entry_apprentice_sub')]} />} />
+        <PCard icon="book" title={t('tc.entry_teachers')} onClick={() => run('education.teachers')} facts={<Lines lines={[t('tc.entry_teachers_sub')]} />} />
+      </CardGrid>
+
       {lit && (
         <Card>
           <div className="nx-sec">{t('education.literacy.title')}</div>
