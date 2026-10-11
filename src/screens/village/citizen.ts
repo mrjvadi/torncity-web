@@ -4,7 +4,7 @@
 
 import type { LandStuff, LayoutBuilding, VillageLayout } from '../../api/types'
 import {
-  TONE_BRIDGE, TONE_LOCKED, TONE_NEEDS, TONE_NONE, TONE_OK, TONE_OWN, TONE_OWN_LOCKED, TONE_TAKEN,
+  TONE_COMMONS, TONE_ZONE, TONE_BRIDGE, TONE_LOCKED, TONE_NEEDS, TONE_NONE, TONE_OK, TONE_OWN, TONE_OWN_LOCKED, TONE_TAKEN,
 } from '../../village/lotOverlay'
 
 export type LotKind =
@@ -77,4 +77,25 @@ export function landAt(layout: VillageLayout, x: number, y: number): LandStuff |
 export function clearWhat(l: LandStuff | null): 'trees' | 'rocks' | 'all' | null {
   const t = (l?.trees ?? 0) > 0, r = (l?.rocks ?? 0) > 0
   return t && r ? 'all' : t ? 'trees' : r ? 'rocks' : null
+}
+
+/** The slope (metres of height difference) the layout reports for a lot of the grid or of the open land; undefined when it does not say. */
+export function slopeAt(layout: VillageLayout, x: number, y: number): number | undefined {
+  const g = layout.lots[y]?.[x]
+  if (g) return g.slope_m
+  const r = layout.ring?.lots?.find((l) => l.x === x && l.y === y)
+  if (r) return r.slope_m
+  return layout.land?.open?.find((l) => l.x === x && l.y === y)?.slope_m
+}
+
+/** The land map's tones with the registry layers painted over them: lots of zones and the town's commons (the first grid only; an overlay tint, nothing else). */
+export function withRegistryLayers(tones: Uint8Array, n: number, parcels: { treasury: boolean; zone: unknown; cells: { x: number; y: number }[] | null }[], layers: { zones: boolean; commons: boolean }): Uint8Array {
+  if (!layers.zones && !layers.commons) return tones
+  const out = Uint8Array.from(tones)
+  for (const p of parcels) {
+    const tone = layers.commons && p.treasury ? TONE_COMMONS : layers.zones && p.zone ? TONE_ZONE : 0
+    if (!tone) continue
+    for (const c of p.cells ?? []) if (c.x >= 0 && c.y >= 0 && c.x < n && c.y < n) out[c.y * n + c.x] = tone
+  }
+  return out
 }

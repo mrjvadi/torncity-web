@@ -22,6 +22,7 @@ import { mockTradeCommand } from './mock_trade'
 import { mockResearchCommand } from './mock_research'
 import { mockLotCommand } from './mock_lot'
 import { mockTeachingCommand } from './mock_teaching'
+import { mockRegistryCommand } from './mock_registry'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 import { mockSocietyCommand } from './mock_society'
 import { mockP0Command } from './mock_p0'
@@ -151,6 +152,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   if (trd) return json(trd)
   const rsd = mockResearchCommand(command, args ?? {})
   if (rsd) return json(rsd)
+  const reg = mockRegistryCommand(command, args ?? {})
+  if (reg) return json(reg)
   const teach = mockTeachingCommand(command, args ?? {})
   if (teach) return json(teach)
   const lot = mockLotCommand(command, args ?? {})
