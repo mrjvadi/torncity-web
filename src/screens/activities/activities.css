@@ -29,3 +29,11 @@
 .sv-fc-d { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, currentColor 7%, transparent); font-size: 13px; }
 .sv-fc-d.warn { background: color-mix(in srgb, #ffb02e 16%, transparent); }
 .sv-fc-d span { opacity: .85; } .sv-fc-d em { font-style: normal; font-size: 12px; opacity: .75; }
+.tc-list { display: flex; flex-direction: column; gap: 10px; }
+.tc-entry { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 6%, transparent); }
+.tc-entry.here { background: color-mix(in srgb, #9be88d 10%, transparent); }
+.tc-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tc-meta { display: flex; flex-direction: column; gap: 2px; font-size: 13px; opacity: .85; }
+.tc-crafts { flex: none; min-height: 48px; align-items: center; padding: 4px 0; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: thin; }
+.tc-crafts .dk-chip { flex: none; white-space: nowrap; }
+.tc-reason { display: flex; flex-direction: column; gap: 6px; }

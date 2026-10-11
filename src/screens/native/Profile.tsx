@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import * as api from '../../api/client'
-import type { SurvivalView } from '../../api/views.gen'
+import type { ApprenticeLine, ApprenticesView, SurvivalView } from '../../api/views.gen'
 import { thirstWord, warmthWord, weatherLine } from '../activities/survivalText'
 import { useContentNames } from '../../village/useVillage'
 import type { CSSProperties } from 'react'
@@ -50,6 +50,19 @@ interface AchievementsView { lines?: { achievement?: Named; earned?: boolean }[]
 
 
 /** Thirst and cold next to hunger (ADR 0070): only where they run (a founded town), with the state word and the weather; a tap opens the survival panel. */
+/** «شاگرد استاد X» (ADR 0071): the player's running apprenticeship, from the apprenticeships view; nothing when there is none. */
+function ApprenticeLineRow({ run }: { run: (command: string, args?: Record<string, string>) => void }) {
+  const [ln, setLn] = useState<ApprenticeLine | null>(null)
+  useEffect(() => {
+    let on = true
+    api.runCommand('settlement.apprentice.mine', {}).then((r) => { const l = ((r.view as unknown as ApprenticesView | undefined)?.lines ?? []).find((x) => x.status === 'active'); if (on && r.ok !== false) setLn(l ?? null) }).catch(() => undefined)
+    return () => { on = false }
+  }, [])
+  if (!ln) return null
+  const mine = ln.role === 'master'
+  return <PRow icon="person" title={mine ? t('tc.profile_master', { who: ln.with.name || t('tc.npc_master') }) : t('tc.profile_apprentice', { who: ln.with.name || t('tc.npc_master') })} sub={t('tc.of', { a: formatNumber(ln.shifts), b: formatNumber(ln.exam_shifts) })} onClick={() => run('settlement.apprentice.mine')} />
+}
+
 function SurvivalNeeds({ run }: { run: (command: string, args?: Record<string, string>) => void }) {
   const [sv, setSv] = useState<SurvivalView | null>(null)
   useEffect(() => {
@@ -146,6 +159,8 @@ export default function Profile({ response, loading, run }: ScreenProps) {
           <SurvivalNeeds run={run} />
       </div>
       </>}
+
+      <ApprenticeLineRow run={run} />
 
       {(v.work?.job || v.work?.course) && (
         <>

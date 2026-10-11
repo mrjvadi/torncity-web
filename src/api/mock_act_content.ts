@@ -4,6 +4,7 @@
 
 import { CRIME_CONTENT } from './mock_act_crime'
 import { WORK_CONTENT } from './mock_act_work'
+import { TEACH_CONTENT } from './mock_teaching'
 import { HEALTH_CONTENT } from './mock_act_health'
 
 export type ContentEntry = { code: string; name: { en: string; fa: string } }
@@ -20,4 +21,4 @@ function join(...parts: ContentTables[]): ContentTables {
   return out
 }
 
-export const ACTIVITIES_CONTENT: ContentTables = join(CRIME_CONTENT, WORK_CONTENT, HEALTH_CONTENT)
+export const ACTIVITIES_CONTENT: ContentTables = join(CRIME_CONTENT, WORK_CONTENT, HEALTH_CONTENT, TEACH_CONTENT as ContentTables)

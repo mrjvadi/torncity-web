@@ -250,7 +250,8 @@ function LotManageBody({ init, ctx }: { init: LotManageView; ctx: FlowCtx }) {
               <CardGrid>{(v.staff ?? []).map((s) => <PCard key={s.role} icon="people" title={hasKey(`work.role.${s.role}`) ? t(`work.role.${s.role}` as Key) : s.role} facts={t('lm.posts', { n: formatNumber(s.slots) })} tone="busy" />)}</CardGrid>
             )}
             {v.if_unstaffed && hasKey(`work.unstaffed.${v.if_unstaffed}`) && <Hint>{t(`work.unstaffed.${v.if_unstaffed}` as Key)}</Hint>}
-            {v.workplace && <WorkplaceCard w={v.workplace} lotId={v.id} manage={manage} busy={busy} condBps={v.condition_bps} names={names} onAct={wpAct} />}
+            {v.workplace && <WorkplaceCard w={v.workplace} lotId={v.id} manage={manage} busy={busy} condBps={v.condition_bps} names={names} onAct={wpAct}
+              onOffer={(o) => ctx.go({ command: 'settlement.apprentice.offer', args: { building: v.id, player: o.player, days: String(o.days), fee: String(o.fee), share: String(o.share) }, kind: 'secondary', id: 'apprentice.offer', icon: 'action:default' } as never)} />}
             {v.craft && <LotCraft c={v.craft} buildingId={v.id} manage={manage} busy={busy} names={names} onStart={(recipe, batches) => ctx.go({ command: 'settlement.craft', args: { building: v.id, recipe, batches: String(batches) }, kind: 'confirm', id: 'craft.start' } as never)} />}
             {v.keeper && <KeeperCard k={v.keeper} manage={manage} busy={busy} onHire={(pay, n) => void quote({ action: 'keeper_hire', code: pay, name: String(n) })} onEnd={() => void quote({ action: 'keeper_end' })} />}
           </>

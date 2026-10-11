@@ -47,7 +47,33 @@ function Takings({ title, x, names }: { title: string; x: LotTakings; names: Con
   )
 }
 
-export default function WorkplaceCard({ w, lotId, manage, busy, condBps, names, onAct }: {
+function ApprenticeForm({ busy, onOffer }: { busy: boolean; onOffer: (a: { player: string; days: number; fee: number; share: number }) => void }) {
+  const [open, setOpen] = useState(false)
+  const [player, setPlayer] = useState('')
+  const [days, setDays] = useState('28')
+  const [fee, setFee] = useState('0')
+  const [share, setShare] = useState('50')
+  const num = (x: string) => Number(x.replace(/[^0-9]/g, '')) || 0
+  return (
+    <div className="tc-offer">
+      <Section>{t('tc.offer_title')}</Section>
+      {!open ? <ActionButton tone="steel" small disabled={busy} onClick={() => setOpen(true)}>{t('tc.offer_open')}</ActionButton> : (
+        <>
+          <div className="gc-note">{t('tc.offer_note')}</div>
+          <label className="tc-f"><span>{t('tc.f.player')}</span><input className="fx-field-input" dir="ltr" value={player} onChange={(e) => setPlayer(e.target.value.trim())} placeholder="P-XXXX" aria-label={t('tc.f.player')} /></label>
+          <label className="tc-f"><span>{t('tc.f.days')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={days} onChange={(e) => setDays(e.target.value)} aria-label={t('tc.f.days')} /></label>
+          <label className="tc-f"><span>{t('tc.f.fee')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={fee} onChange={(e) => setFee(e.target.value)} aria-label={t('tc.f.fee')} /></label>
+          <label className="tc-f"><span>{t('tc.f.share')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={share} onChange={(e) => setShare(e.target.value)} aria-label={t('tc.f.share')} /></label>
+          <ActionButton tone="gold" small disabled={busy || !player} onClick={() => onOffer({ player, days: num(days), fee: num(fee), share: num(share) * 100 })}>{t('tc.offer_send')}</ActionButton>
+        </>
+      )}
+    </div>
+  )
+}
+
+export default function WorkplaceCard({ w, lotId, manage, busy, condBps, names, onAct, onOffer }: {
+  /** a master's offer to an apprentice (settlement.apprentice.offer): a player code, days, fee, share in basis points */
+  onOffer?: (a: { player: string; days: number; fee: number; share: number }) => void
   w: LotWorkplaceLine; lotId: string; manage: boolean; busy: boolean; condBps: number; names: ContentNames
   /** runs a command; null when it went through, else the refusal */
   onAct: (command: string, args: Record<string, string>) => Promise<WpResult | null>
@@ -121,6 +147,7 @@ export default function WorkplaceCard({ w, lotId, manage, busy, condBps, names, 
         </>
       )}
 
+      {manage && onOffer && <ApprenticeForm busy={busy} onOffer={onOffer} />}
       <Takings title={t('wp.today')} x={w.today} names={names} />
       <Takings title={t('wp.total')} x={w.total} names={names} />
       <div className="gc-note">{t('wp.value_note')}</div>

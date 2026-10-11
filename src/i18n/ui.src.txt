@@ -6310,3 +6310,100 @@ sv.f.snap | موج سرما | cold snap
 sv.f.spell | موج گرما | hot spell
 sv.warmth.heatstroke | گرمازده‌ای | Heatstroke
 sv.neg | منفی {n} | minus {n}
+tc.entry_apprentice | شاگردی | Apprenticeship
+tc.entry_apprentice_sub | استاد، شاگرد و آزمون | Master, apprentice and exam
+tc.entry_teachers | استادان | Teachers
+tc.entry_teachers_sub | چه کسی کجا چه یاد می‌دهد | Who teaches what and where
+tc.title | شاگردی | Apprenticeship
+tc.none | الان شاگرد کسی نیستی و شاگردی هم نداری. | You are nobody's apprentice and have none.
+tc.none_hint | استاد پیشنهاد می‌دهد و تو می‌پذیری؛ یا در کارگاه شهر شاگرد شو. استادها را در «استادان» ببین. | A master offers and you accept; or join the town's workshop. See «Teachers» for masters.
+tc.line_apprentice | شاگرد {who} در {craft} | Apprentice of {who} in {craft}
+tc.line_master | {who} شاگرد توست در {craft} | {who} is your apprentice in {craft}
+tc.status.offered | پیشنهاد داده شده | Offered
+tc.status.active | در جریان | Under way
+tc.status.completed | تمام شد | Completed
+tc.status.left | کنار رفت | Left
+tc.status.dismissed | کنار گذاشته شد | Dismissed
+tc.status.declined | رد شد | Declined
+tc.certified | گواهی گرفت | Certified
+tc.workshop | کارگاه | Workshop
+tc.term | مدت | Term
+tc.days | {n} روز | {n} days
+tc.until | تا {at} | until {at}
+tc.fee | شهریه | Fee
+tc.share | سهم مزد شاگرد | Apprentice's share of the wage
+tc.shifts | شیفت‌های کار شده | Shifts worked
+tc.of | {a} از {b} | {a} of {b}
+tc.extra_xp | تجربهٔ بیشتر از شاگردی | Extra experience from the apprenticeship
+tc.wait_shifts | در کارگاه استاد شیفت کار کن؛ بعد از مدت و شیفت‌ها استاد آزمونت را می‌گیرد. | Work shifts at the master's workshop; after the term and the shifts the master examines you.
+tc.wait_shifts_master | تا شاگرد شیفت‌های لازم را کار نکرده آزمون نمی‌شود. | No exam until the apprentice has worked the shifts.
+tc.exam_ready | شاگرد شیفت‌های لازم را کار کرده؛ کارش را ببین و قبول یا رد کن. | The apprentice has worked the shifts; judge the work.
+tc.accept | می‌پذیرم | Accept
+tc.accept_fee | می‌پذیرم ({fee}) | Accept ({fee})
+tc.decline | نمی‌پذیرم | Decline
+tc.leave | کنار می‌روم | Leave
+tc.exam_pass | آزمون: قبول | Exam: pass
+tc.exam_fail | آزمون: رد | Exam: fail
+tc.dismiss | کنار گذاشتن شاگرد | Dismiss the apprentice
+tc.dismiss_why | چرا؟ | Why?
+tc.reason.idle | کار نمی‌کند | He does not work
+tc.reason.abusive | رفتار بد دارد | Bad behaviour
+tc.join_title | شاگردی در کارگاه شهر | Apprentice at the town's workshop
+tc.join_hint | در کارگاه شهر، استادکار شهر شاگرد می‌گیرد؛ نیازی به پیشنهاد نیست. | At the town's workshop the town's craftsman takes apprentices; no offer is needed.
+tc.join | شاگردی {craft} در {place} | Apprentice in {craft} at {place}
+tc.join_up_to | تا سطح {n} هنر یاد می‌دهد. | He teaches up to level {n} of the craft.
+tc.notice.offered | پیشنهاد فرستاده شد. | The offer was sent.
+tc.notice.started | شاگردی شروع شد. | The apprenticeship has begun.
+tc.notice.left | کنار رفتی؛ بدهی‌ای نداری. | You left; you owe nothing.
+tc.notice.dismissed | شاگرد کنار گذاشته شد. | The apprentice was dismissed.
+tc.npc_master | استادکار شهر | The town's craftsman
+tc.offer_title | شاگرد بپذیر | Take an apprentice
+tc.offer_open | شاگرد بپذیر | Take an apprentice
+tc.offer_note | برای شاگرد پیشنهاد می‌فرستی: چند روز، چقدر شهریه، و چند درصد مزد او. فقط با مهارت سطح ۳ در این هنر. | You send an offer: days, fee and his share of the wage. Only with craft level 3.
+tc.f.player | کد بازیکن | Player code
+tc.f.days | چند روز | Days
+tc.f.fee | شهریه | Fee
+tc.f.share | سهم مزد شاگرد (درصد) | Apprentice's share (percent)
+tc.offer_send | پیشنهاد بفرست | Send the offer
+tc.dir_title | استادان | Teachers
+tc.craft | هنر | Craft
+tc.dir_lead | استادان {craft} | Teachers of {craft}
+tc.rule | برای درس‌دادن یک هنر، خودِ استاد باید در آن مهارت سطح ۳ داشته باشد و تا یک سطح پایین‌تر از خودش یاد می‌دهد. | A teacher must have craft level 3 and teaches up to one level below his own.
+tc.dir_none | در این دور و بر کسی این هنر را یاد نمی‌دهد. | Nobody near teaches this craft.
+tc.kind.class | کلاس | Class
+tc.kind.master | استاد | Master
+tc.kind.npc_master | استادکار شهر | Town craftsman
+tc.kind.city | مدرسهٔ شهر مرکزی | Central city school
+tc.city_school | مدرسهٔ شهر | The city school
+tc.here | همین‌جاست | Right here
+tc.away | {place}، {km} کیلومتر | {place}, {km} km
+tc.levels | سطح استاد {have} – تا سطح {up} | Teacher level {have} – up to level {up}
+tc.seats | {n} جای خالی | {n} free seats
+tc.no_seats | جا ندارد | No seats
+tc.go | برو {place} | Go to {place}
+tc.profile_apprentice | شاگرد استاد {who} | Apprentice of {who}
+tc.profile_master | شاگردت {who} | Your apprentice {who}
+tc.refused.other | الان نمی‌شود. | Not now.
+tc.refused.not_craft | این هنر شاگردی ندارد. | This craft has no apprenticeship.
+tc.refused.not_master | برای شاگرد گرفتن باید مهارت سطح ۳ این هنر را داشته باشی. | You need craft level 3 to take an apprentice.
+tc.refused.master_level | سطح استاد برای این هنر کافی نیست. | The master's level is not enough for this craft.
+tc.refused.slots_full | این کارگاه جای شاگرد ندارد. | This workshop has no room for an apprentice.
+tc.refused.apprentice_unknown | چنین بازیکنی پیدا نشد؛ کد بازیکن را دوباره بنویس. | No such player; type the code again.
+tc.refused.self | نمی‌شود شاگرد خودت باشی. | You cannot be your own apprentice.
+tc.refused.busy | او همین حالا شاگرد دیگری است یا کاری در جریان دارد. | He is already an apprentice or busy.
+tc.refused.range | مدت، شهریه یا سهم مزد از حد مجاز بیرون است؛ عددهای کمتر یا بیشتری بنویس. | The term, fee or share is out of bounds; try other numbers.
+tc.refused.not_there | باید در همان شهر و کارگاه باشی. | You must be at that town and workshop.
+tc.refused.not_yours | این مال تو نیست. | This is not yours.
+tc.refused.not_offered | این پیشنهاد دیگر نیست. | That offer is gone.
+tc.refused.not_active | این شاگردی در جریان نیست. | This apprenticeship is not under way.
+tc.refused.cannot_afford | پول شهریه را نداری. | You cannot pay the fee.
+tc.refused.cannot_refund | استاد شهریه را پس ندارد؛ کنار گذاشتن الان نمی‌شود. | The master cannot refund the fee; dismissing is not possible now.
+tc.refused.too_skilled | مهارتت از این شاگردی بیشتر است؛ شاگرد لازم نیست. | You are too skilled for this apprenticeship.
+tc.refused.reason | دلیل کنار گذاشتن را انتخاب کن. | Choose a reason.
+tc.refused.exam_not_ready | هنوز زود است؛ شاگرد شیفت‌های لازم را کار نکرده. | Too early; the apprentice has not worked the shifts.
+tc.refused.exam_done | آزمون پیش‌تر گرفته شده. | The exam is already done.
+tc.refused.exam_needs | برای آزمون چیزی کم است: مدت یا شیفت‌ها. | The exam lacks something: the term or the shifts.
+refusal.apprentice_range | مدت، شهریه یا سهم مزد از حد مجاز بیرون است. | The term, fee or share is out of bounds.
+refusal.apprentice_slots_full | این کارگاه جای شاگرد ندارد. | This workshop has no room for an apprentice.
+refusal.apprentice_not_master | برای شاگرد گرفتن باید مهارت سطح ۳ این هنر را داشته باشی. | You need craft level 3 to take an apprentice.
+refusal.apprentice_cannot_afford | پول شهریه را نداری. | You cannot pay the fee.
