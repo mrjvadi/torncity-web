@@ -161,7 +161,14 @@ export function noticeLine(screen: string, view: unknown, n: Namer): NoticeLine 
     }
     case 'hospitalised_notice': {
       const v = view as V.HospitalisedView
+      if (v.cause === 'raid') return line('pn.hospitalised_fall', { city: n('city', v.city_code, v.city), health: num(v.health), max: num(v.max) }, 'warning')
       return line('pn.hospitalised', { city: n('city', v.city_code, v.city), damage: num(v.damage), health: num(v.health), max: num(v.max) }, 'warning')
+    }
+    case 'settlement_raid_notice': {
+      const v = view as V.RaidNoticeView
+      const kind = ['detected', 'opened', 'resolved', 'settled'].includes(v.kind) ? v.kind : 'opened'
+      const band = ['few', 'group', 'band', 'host'].includes(v.band) ? v.band : 'group'
+      return line(`pn.raid.${kind}`, { other: v.other, band: t(`pn.raid.band.${band}` as Key), lead: Math.max(1, Math.round(v.lead_secs / 3600)), cash: money(v.cash), falls: num(v.falls), amount: money(v.amount) }, kind === 'detected' || kind === 'opened' ? 'warning' : 'info')
     }
     case 'clinic_treated_notice': {
       const v = view as V.ClinicTreatedView
@@ -294,7 +301,7 @@ export function wordsNotice(screen: string): boolean {
 const NOTICE_SCREENS = new Set([
   'payment_notice', 'achievement_notice', 'office_notice', 'auction_notice', 'victim_notice', 'case_solved_notice', 'convicted_notice',
   'treaty_proposed_notice', 'election_result_notice', 'faction_request_notice', 'faction_answer_notice', 'faction_crime_notice',
-  'finance_notice', 'hospitalised_notice', 'clinic_treated_notice', 'bill_decided_notice', 'rank_notice', 'hunger_notice',
+  'finance_notice', 'hospitalised_notice', 'settlement_raid_notice', 'clinic_treated_notice', 'bill_decided_notice', 'rank_notice', 'hunger_notice',
   'market_filled_notice', 'mission_completed_notice', 'property_notice', 'recruit_notice', 'stock_notice', 'village_news',
   'company_application_notice', 'company_employee_notice', 'company_period_notice', 'production_notice',
   'move_arrived_notice', 'licence_notice', 'war_notice', 'strike_report',

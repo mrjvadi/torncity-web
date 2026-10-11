@@ -139,10 +139,32 @@ export interface EventSlot { key: string; icon: string; label: string; time: str
 /** The right column: time-limited events only, each with the end time the server sends in the settlement entity:
  * the village's research, and the open election (the candidacy, then the vote). Market days do not exist in the game
  * yet, so none is shown. */
+/** The detection chip (ADR 0074): one per raid against the town that is filed or open, «خبر رسید» when a watch saw the raiders in time, else «بی‌خبر».
+ * Read from `settlement.raid` once a minute for a resident; nothing when raids are not on. */
+export function useRaidEvents(): EventSlot[] {
+  const [lines, setLines] = useState<{ id: string; warned: boolean; lead: number; other: string; status: string }[]>([])
+  useEffect(() => {
+    let on = true
+    const read = () => api.runCommand('settlement.raid', {}).then((r) => {
+      const v = r.ok === false ? null : (r.view as unknown as { on?: boolean; mine?: { id: string; side: string; status: string; warned: boolean; lead_secs: number; other: { name: string } }[] | null })
+      if (!on) return
+      setLines(v?.on ? (v.mine ?? []).filter((l) => l.side === 'defender' && (l.status === 'filed' || l.status === 'open')).map((l) => ({ id: l.id, warned: l.warned, lead: l.lead_secs, other: l.other.name, status: l.status })) : [])
+    }).catch(() => undefined)
+    void read()
+    const iv = window.setInterval(() => void read(), 60_000)
+    return () => { on = false; window.clearInterval(iv) }
+  }, [])
+  return lines.map((l) => ({
+    key: `raid-${l.id}`, icon: 'warn', label: l.warned ? t('v6.ev.raid_warned') : t('v6.ev.raid_unwarned'), time: l.warned ? waitText(l.lead, t('v6.day')) : '',
+    tip: l.warned ? t('v6.tip.raid_warned', { who: l.other, t: waitText(l.lead, t('v6.day')) }) : t('v6.tip.raid_unwarned', { who: l.other }), open: { command: 'settlement.raid' },
+  }))
+}
+
 export function useEvents(): EventSlot[] {
   const view = useStoreView()
   const now = useTick(1000)
   const out: EventSlot[] = []
+  out.push(...useRaidEvents())
   const mine = entityOf(view, 'residence', 'self')?.settlement
   const st = (mine ? entityOf(view, 'settlement', mine) : undefined) ?? entitiesOf(view, 'settlement').find(([, d]) => d.viewer !== 'public')?.[1]
   const res = st?.research
