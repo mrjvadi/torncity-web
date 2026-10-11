@@ -6524,7 +6524,7 @@ export const uiEn: Record<UiKey, string> = {
   'rz.off': 'Raids have not started yet.',
   'rz.off_from': 'Raids start {at}; until then nobody raids.',
   'rz.off_hint': 'The start day is not set yet.',
-  'rz.intro': 'A raid is not a war: nobody dies and nothing is wiped. Only one who presses join or stand is at risk.',
+  'rz.intro': 'In a raid nobody dies and nothing is wiped for good; only one who presses join or stand is at risk.',
   'rz.mine': 'Your raids',
   'rz.mine_none': 'No raid is under way.',
   'rz.to': 'Raid on {who}',
