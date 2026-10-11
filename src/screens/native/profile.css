@@ -52,3 +52,6 @@
 .inv-badge { left: 6px; top: 6px; }
 .sv-line { display: flex; flex-direction: column; gap: 2px; text-align: start; background: none; border: 0; color: inherit; padding: 4px 0; font-size: 13px; cursor: pointer; grid-column: 1 / -1; }
 .sv-line span { opacity: .75; font-size: 12.5px; }
+.edu-certs { display: flex; flex-direction: column; gap: 6px; }
+.edu-cert { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, #9be88d 10%, transparent); }
+.edu-cert span { font-size: 12.5px; opacity: .8; }

@@ -229,6 +229,7 @@ const COURSES: Record<string, CourseRow> = {
 }
 const nm = (code: string) => (WORK_CONTENT.course.find((c) => c.code === code)?.name.fa ?? code)
 const cref = (code: string) => ({ code, name: nm(code) })
+const cert = (code: string, route = 'class', by = 'کاوه') => ({ ...cref(code), issued_by: by ? { code: 'P-9QXM', name: by } : null, route })
 const line = (code: string, eligible = true): CourseLine => ({ course: cref(code), fee: COURSES[code].fee, duration_seconds: COURSES[code].secs, min_level: COURSES[code].min ?? 1, eligible })
 
 const VILLAGE = { code: 'v-k3x9', name: 'آمل' }
@@ -248,7 +249,7 @@ function education(page: number, mode: string) {
   if (city) {
     const all = ['driving_licence', 'bookkeeping', 'first_aid', 'culinary_arts', 'nursing']
     const p = Math.min(Math.max(1, page), 2)
-    v = { ...base, certificates: [cref('reading_writing')], courses: all.slice((p - 1) * 3, p * 3).map((c) => line(c, !COURSES[c].min)), page: p, pages: 2 }
+    v = { ...base, certificates: [cert('reading_writing', 'class', 'مدرسهٔ شهر مرکزی'), cert('first_aid', 'exam', '')], courses: all.slice((p - 1) * 3, p * 3).map((c) => line(c, !COURSES[c].min)), page: p, pages: 2 }
   } else if (mode === 'empty') {
     v = { ...base, empty: 'nothing_taught', elsewhere: [gap('first_aid', [need('knowledge', 'basic_medicine'), need('building', 'health_house', 'health')])] }
   } else if (mode === 'no_class') {
@@ -256,7 +257,7 @@ function education(page: number, mode: string) {
   } else {
     v = {
       ...base, courses: [line('reading_writing'), line('bookkeeping'), line('culinary_arts', false)], elsewhere: [gap('first_aid', [need('knowledge', 'basic_medicine')]), gap('nursing', [need('teacher', '', 'health')])],
-      ...(mode === 'current' ? { current: { course: cref('bookkeeping'), percent: 42, remaining_seconds: 8300, ends_at: iso(8300), paused: false }, certificates: [cref('reading_writing')] } : {}),
+      ...(mode === 'current' ? { current: { course: cref('bookkeeping'), percent: 42, remaining_seconds: 8300, ends_at: iso(8300), paused: false }, certificates: [cert('reading_writing'), cert('culinary_arts', 'apprenticeship', 'سارا'), cert('first_aid', 'exam', '')] } : {}),
     }
   }
   const a: MockAct[] = (v.courses ?? []).map((c) => A('education.course', 'education.view', { course: c.course.code }, { subject: c.course.code }))

@@ -6309,4 +6309,11 @@ export const uiEn: Record<UiKey, string> = {
   'refusal.apprentice_slots_full': 'This workshop has no room for an apprentice.',
   'refusal.apprentice_not_master': 'You need craft level 3 to take an apprentice.',
   'refusal.apprentice_cannot_afford': 'You cannot pay the fee.',
+  'edu.cert.by': 'Issued by {name}',
+  'edu.cert.route.class': 'Through a class',
+  'edu.cert.route.apprenticeship': 'Through an apprenticeship',
+  'edu.cert.route.exam': 'Through an exam',
+  'tc.rule_from': 'A teacher needs craft level 3 and teaches up to one level below his own. This rule starts {at}.',
+  'tc.refused.range_b': 'The term must be {d1} to {d2} days, the fee at most {fee} and the apprentice\'s share {s1} to {s2}.',
+  'tc.range': 'from {a} to {b}',
 }

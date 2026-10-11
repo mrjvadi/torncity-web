@@ -2,8 +2,9 @@
 // wage, shifts left, why it stopped), what a shift takes from and gives to his own store, tools, room and food, and what it made today and
 // since the start. Every act is an existing command: settlement.labor.post|hire|wage|close, settlement.work (he works it himself) and the repair job.
 
-import { useState } from 'react'
-import type { LotWorkplaceLine, LotStockLine, LotTakings, VillageNeed } from '../../api/views.gen'
+import { useEffect, useState } from 'react'
+import * as api from '../../api/client'
+import type { ApprenticeBounds, ApprenticesView, LotWorkplaceLine, LotStockLine, LotTakings, VillageNeed } from '../../api/views.gen'
 import { ActionButton, Note, Section, StatCard, StatGrid } from '../../ui/Popup'
 import { formatNumber, money } from '../native/kit/format'
 import { hasKey, t, type Key } from '../../i18n'
@@ -47,13 +48,42 @@ function Takings({ title, x, names }: { title: string; x: LotTakings; names: Con
   )
 }
 
+const DEFAULT_BOUNDS: ApprenticeBounds = { min_days: 7, max_days: 90, default_days: 28, max_fee: 5000, min_share_bps: 2000, default_share_bps: 5000, max_share_bps: 8000 }
+const clampTo = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))
+
+/** A number with a minus and a plus inside its bounds (the same stepper as the keeper's pay). */
+function Step({ label, value, min, max, step, show, onChange }: { label: string; value: number; min: number; max: number; step: number; show: (n: number) => string; onChange: (n: number) => void }) {
+  return (
+    <div className="tc-f">
+      <span>{label} <em className="tc-range">{t('tc.range', { a: show(min), b: show(max) })}</em></span>
+      <div className="lm-keeper-step">
+        <button type="button" className="lm-keeper-pm" aria-label={t('craft.less')} disabled={value <= min} onClick={() => onChange(clampTo(value - step, min, max))}>−</button>
+        <div className="lm-keeper-val">{show(value)}</div>
+        <button type="button" className="lm-keeper-pm" aria-label={t('craft.more')} disabled={value >= max} onClick={() => onChange(clampTo(value + step, min, max))}>+</button>
+      </div>
+    </div>
+  )
+}
+
 function ApprenticeForm({ busy, onOffer }: { busy: boolean; onOffer: (a: { player: string; days: number; fee: number; share: number }) => void }) {
   const [open, setOpen] = useState(false)
+  const [bd, setBd] = useState<ApprenticeBounds>(DEFAULT_BOUNDS)
   const [player, setPlayer] = useState('')
-  const [days, setDays] = useState('28')
-  const [fee, setFee] = useState('0')
-  const [share, setShare] = useState('50')
-  const num = (x: string) => Number(x.replace(/[^0-9]/g, '')) || 0
+  const [days, setDays] = useState(DEFAULT_BOUNDS.default_days)
+  const [fee, setFee] = useState(0)
+  const [share, setShare] = useState(DEFAULT_BOUNDS.default_share_bps)
+  // the bounds are the server's: read once when the form opens
+  useEffect(() => {
+    if (!open) return
+    let on = true
+    api.runCommand('settlement.apprentice.mine', {}).then((r) => {
+      const b = (r.view as unknown as ApprenticesView | undefined)?.bounds
+      if (on && b) { setBd(b); setDays(b.default_days); setShare(b.default_share_bps); setFee(0) }
+    }).catch(() => undefined)
+    return () => { on = false }
+  }, [open])
+  const feeStep = Math.max(50, Math.round(bd.max_fee / 50 / 10) * 10)
+  const pctOf = (bps: number) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 0 }).format(bps / 100)}٪`
   return (
     <div className="tc-offer">
       <Section>{t('tc.offer_title')}</Section>
@@ -61,10 +91,10 @@ function ApprenticeForm({ busy, onOffer }: { busy: boolean; onOffer: (a: { playe
         <>
           <div className="gc-note">{t('tc.offer_note')}</div>
           <label className="tc-f"><span>{t('tc.f.player')}</span><input className="fx-field-input" dir="ltr" value={player} onChange={(e) => setPlayer(e.target.value.trim())} placeholder="P-XXXX" aria-label={t('tc.f.player')} /></label>
-          <label className="tc-f"><span>{t('tc.f.days')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={days} onChange={(e) => setDays(e.target.value)} aria-label={t('tc.f.days')} /></label>
-          <label className="tc-f"><span>{t('tc.f.fee')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={fee} onChange={(e) => setFee(e.target.value)} aria-label={t('tc.f.fee')} /></label>
-          <label className="tc-f"><span>{t('tc.f.share')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={share} onChange={(e) => setShare(e.target.value)} aria-label={t('tc.f.share')} /></label>
-          <ActionButton tone="gold" small disabled={busy || !player} onClick={() => onOffer({ player, days: num(days), fee: num(fee), share: num(share) * 100 })}>{t('tc.offer_send')}</ActionButton>
+          <Step label={t('tc.f.days')} value={days} min={bd.min_days} max={bd.max_days} step={1} show={(n) => t('tc.days', { n: formatNumber(n) })} onChange={setDays} />
+          <Step label={t('tc.f.fee')} value={fee} min={0} max={bd.max_fee} step={feeStep} show={(n) => (n > 0 ? money(n) : t('common.free'))} onChange={setFee} />
+          <Step label={t('tc.f.share')} value={share} min={bd.min_share_bps} max={bd.max_share_bps} step={500} show={pctOf} onChange={setShare} />
+          <ActionButton tone="gold" small disabled={busy || !player} onClick={() => onOffer({ player, days, fee, share })}>{t('tc.offer_send')}</ActionButton>
         </>
       )}
     </div>
