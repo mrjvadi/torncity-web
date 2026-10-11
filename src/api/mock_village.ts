@@ -163,6 +163,7 @@ function makeLots(origin: { lat: number; lon: number }, bump: [number, number, n
       if (river) tags.push('river_lot')
       if (slope > SLOPE_LIMIT) tags.push('sloped_lot')
       row.push({
+        slope_band: (x === 4 && y === 3) || (x === 3 && y === 3) ? 'steep' : slope > 4 ? 'gentle' : 'flat', foundation: false,
         height_m: heights[y][x], slope_m: slope, buildable: !river && slope <= SLOPE_LIMIT, biome: 'temperate_grassland',
         ...(river ? { water: 'river' as const } : {}), tags,
       })
@@ -572,6 +573,7 @@ function place(args: Record<string, unknown>) {
   const { x, y, rotated } = at
   const w = rotated ? e.fp[1] : e.fp[0], h = rotated ? e.fp[0] : e.fp[1]
   const beyond = x < 0 || y < 0 || x + w > size() || y + h > size()
+  if (x === 4 && y === 3) return refusal('land_needs_foundation', { foundation: { x: 4, y: 3 } })
   // ADR 0067: a water mill stands beside water or a water work; a pasture needs open land round it
   if (code === 'water_mill') return refusal('needs_near')
   if (code === 'pasture_range') return refusal('no_grazing')

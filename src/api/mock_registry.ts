@@ -34,7 +34,7 @@ const view = (notice = '', quote: LandQuote | null = null): LandRegistryView => 
     can_split: p.mine && p.cells.length > 1,
   }))
   const zones: ZoneLine[] = st.zones.map((z) => ({ id: z.id, name: z.name, kind: z.kind, cells: z.cells, effective: z.effective, effective_at: z.effective ? null : iso(1), opened_by: N('me', 'تو'), can_close: m !== 'viewer' }))
-  const claims: ClaimLine[] = st.claims.map((c) => ({ id: c.id, face: c.face, gx: c.gx, gy: c.gy, claimed_at: iso(-c.ago), paid_through: iso(c.until) }))
+  const claims: ClaimLine[] = st.claims.map((c) => ({ id: c.id, face: c.face, gx: c.gx, gy: c.gy, claimed_at: iso(-c.ago), paid_through: iso(c.until), rect: c.id === 'c1' ? { x: 0, y: 3, w: 2, d: 2 } : c.id === 'c2' ? { x: 3, y: 0, w: 1, d: 2 } : null }))
   return {
     village: 'آمل', notice, parcels, zones, claims, quote, foundations: st.foundations, zoning_on: m !== 'rule', zoning_starts_at: zoningStart, slope_on: m !== 'rule', slope_starts_at: slopeStart,
     can_zone: m !== 'viewer', can_close_zone: m !== 'viewer', can_claim: m !== 'viewer', can_lay_foundation: m !== 'viewer', zone_kinds: ['commons', 'core', 'residential', 'farm', 'industry', 'port', 'site', 'open'],
@@ -42,7 +42,7 @@ const view = (notice = '', quote: LandQuote | null = null): LandRegistryView => 
     slope_flat_m: 5, slope_gentle_m: 15, slope_unusable_m: 30,
   }
 }
-const refuse = (kind: string) => mockOk('village_refusal', { kind, back: { command: 'settlement.land.registry', args: null }, remaining_seconds: 0, min: 0, max: 0, lots: null, missing: 0, action: '', subject: N('', ''), needs: null, personal: null, obstacles: null }, [back('settlement.land.registry')])
+const refuse = (kind: string) => mockOk('village_refusal', { kind, back: { command: 'settlement.land.registry', args: null }, remaining_seconds: 0, min: 0, max: 0, lots: null, missing: 0, action: '', subject: N('', ''), needs: null, personal: null, obstacles: null, foundation: null }, [back('settlement.land.registry')])
 const quote = (act: string, cells: number, money: number, o: Partial<LandQuote> = {}): LandQuote => ({ act, args: [], cells, lot: null, money, stone_need: 0, stone_have: 0, stone_buy: 0, cash: st.cash, ...o })
 const out = (notice = '', q: LandQuote | null = null) => mockOk('settlement_land_registry', view(notice, q), [back('settlement.land'), A('refresh', 'settlement.land.registry', {})])
 

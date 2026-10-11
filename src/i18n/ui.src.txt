@@ -6543,3 +6543,5 @@ refusal.village_land_too_steep | این زمین آن‌قدر شیب دارد �
 refusal.village_land_zone_forbids | پهنهٔ این زمین چنین بنایی را قبول نمی‌کند. | The zone of this land does not accept such a building.
 rg.cell | ستون {x}، ردیف {y} | column {x}, row {y}
 rg.and_more | ، با {n} قطعهٔ دیگر | and {n} more
+rg.layer.claims | ادعا | Claims
+rg.found_offer | می‌توانی روی قطعهٔ ستون {x}، ردیف {y} پی بریزی (سنگ و دستمزد بنّا می‌خواهد) و بعد بسازی. | You can lay a foundation on the lot at column {x}, row {y} (it takes stone and the mason's wage) and then build.

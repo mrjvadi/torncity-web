@@ -4,7 +4,7 @@
 
 import type { LandStuff, LayoutBuilding, VillageLayout } from '../../api/types'
 import {
-  TONE_COMMONS, TONE_ZONE, TONE_BRIDGE, TONE_LOCKED, TONE_NEEDS, TONE_NONE, TONE_OK, TONE_OWN, TONE_OWN_LOCKED, TONE_TAKEN,
+  TONE_CLAIM, TONE_COMMONS, TONE_ZONE, TONE_BRIDGE, TONE_LOCKED, TONE_NEEDS, TONE_NONE, TONE_OK, TONE_OWN, TONE_OWN_LOCKED, TONE_TAKEN,
 } from '../../village/lotOverlay'
 
 export type LotKind =
@@ -89,13 +89,14 @@ export function slopeAt(layout: VillageLayout, x: number, y: number): number | u
 }
 
 /** The land map's tones with the registry layers painted over them: lots of zones and the town's commons (the first grid only; an overlay tint, nothing else). */
-export function withRegistryLayers(tones: Uint8Array, n: number, parcels: { treasury: boolean; zone: unknown; cells: { x: number; y: number }[] | null }[], layers: { zones: boolean; commons: boolean }): Uint8Array {
-  if (!layers.zones && !layers.commons) return tones
+export function withRegistryLayers(tones: Uint8Array, n: number, parcels: { treasury: boolean; zone: unknown; cells: { x: number; y: number }[] | null }[], layers: { zones: boolean; commons: boolean; claims?: boolean }, claims: { x: number; y: number; w: number; d: number }[] = []): Uint8Array {
+  if (!layers.zones && !layers.commons && !layers.claims) return tones
   const out = Uint8Array.from(tones)
   for (const p of parcels) {
     const tone = layers.commons && p.treasury ? TONE_COMMONS : layers.zones && p.zone ? TONE_ZONE : 0
     if (!tone) continue
     for (const c of p.cells ?? []) if (c.x >= 0 && c.y >= 0 && c.x < n && c.y < n) out[c.y * n + c.x] = tone
   }
+  if (layers.claims) for (const r of claims) for (let y = r.y; y < r.y + r.d; y++) for (let x = r.x; x < r.x + r.w; x++) if (x >= 0 && y >= 0 && x < n && y < n) out[y * n + x] = TONE_CLAIM
   return out
 }

@@ -6445,4 +6445,6 @@ export const uiEn: Record<UiKey, string> = {
   'refusal.village_land_zone_forbids': 'The zone of this land does not accept such a building.',
   'rg.cell': 'column {x}, row {y}',
   'rg.and_more': 'and {n} more',
+  'rg.layer.claims': 'Claims',
+  'rg.found_offer': 'You can lay a foundation on the lot at column {x}, row {y} (it takes stone and the mason\'s wage) and then build.',
 }

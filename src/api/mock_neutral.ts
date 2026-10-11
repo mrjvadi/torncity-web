@@ -37,6 +37,7 @@ interface RefusalOptions {
   needs?: VillageNeed[]
   personal?: PersonalNeed[]
   obstacles?: import('./views.gen').ObstacleView | null
+  foundation?: { x: number; y: number } | null
   action?: string
   subject?: Named
   lots?: BatchLotFailure[]
@@ -72,7 +73,7 @@ export function mockRefusal(kind: string, o: RefusalOptions = {}) {
   const needs = o.needs ?? []
   const view: VillageRefusalView = {
     kind, back: o.back ?? { command: 'settlement.overview', args: null }, remaining_seconds: o.remaining ?? 0, min: o.min ?? 0, max: o.max ?? 0,
-    lots: o.lots ?? null, missing: 0, action: o.action ?? '', subject: o.subject ?? { code: '', name: '' }, needs: needs.length ? needs : null, personal: o.personal ?? null, obstacles: o.obstacles ?? null,
+    lots: o.lots ?? null, missing: 0, action: o.action ?? '', subject: o.subject ?? { code: '', name: '' }, needs: needs.length ? needs : null, personal: o.personal ?? null, obstacles: o.obstacles ?? null, foundation: o.foundation ?? null,
   }
   const args: Record<string, unknown> = { ...(o.min || o.max ? { min: o.min ?? 0, max: o.max ?? 0 } : {}), ...(o.remaining ? { remaining_seconds: o.remaining } : {}), ...(o.args ?? {}) }
   return {
