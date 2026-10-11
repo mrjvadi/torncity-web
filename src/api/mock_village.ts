@@ -1364,7 +1364,7 @@ function whoView() {
     name: 'آمل', online: r.players.filter((p) => p.online).map((p) => ({ name: p.name ?? '', activity: String(p.activity ?? 'idle'), place: p.place === 'city_centre' ? '' : p.place ?? '' })),
     offline: r.players.filter((p) => !p.online).length,
   }
-  return mockOk('settlement_who', view, [back('settlement.overview'), refreshA('settlement.who')])
+  return mockOk('settlement_who', view, [A('village.households', 'settlement.households'), back('settlement.overview'), refreshA('settlement.who')])
 }
 
 const homeCall = () => mockOk('village_home_call', {}, [A('village.found', 'settlement.found.draft'), back('player.profile.get')])

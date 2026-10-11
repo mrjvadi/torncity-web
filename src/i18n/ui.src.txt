@@ -6545,3 +6545,60 @@ rg.cell | ستون {x}، ردیف {y} | column {x}, row {y}
 rg.and_more | ، با {n} قطعهٔ دیگر | and {n} more
 rg.layer.claims | ادعا | Claims
 rg.found_offer | می‌توانی روی قطعهٔ ستون {x}، ردیف {y} پی بریزی (سنگ و دستمزد بنّا می‌خواهد) و بعد بسازی. | You can lay a foundation on the lot at column {x}, row {y} (it takes stone and the mason's wage) and then build.
+hh.open_screen | خانوارهای شهر | The town's households
+act.village.households | خانوارهای شهر | The town's households
+hh.title | خانوارهای شهر | Households
+hh.none | اینجا خانوار نیست. | There are no households here.
+hh.none_hint | خانوارها فقط در شهرهایی که خودتان ساخته‌اید می‌آیند؛ این شهر هنوز جزو آن‌ها نیست. | Households come only to towns you founded; this one is not part of it yet.
+hh.dual | خانوارها در حال آمدن‌اند؛ شهر در حال آماده‌سازی است. | Households are arriving; the town is getting ready.
+hh.dual_hint | وقتی خانوارها جای کارگرهای قدیمی را پر کنند یا مهلت تمام شود، کار شهر به دست آن‌ها می‌افتد. تا آن موقع چیز دیگری عوض نمی‌شود. الان {have} از {want} جای کار پر است. | When the households fill the old labour pool, or the grace ends, the town's work passes to them. Nothing else changes until then. {have} of {want} places are filled.
+hh.off | خانوارهای این شهر کنار گذاشته شده‌اند. | The town's households are stopped.
+hh.off_hint | کسی نمی‌آید و کسی نمی‌رود؛ دوباره راه افتادنش دست اداره‌کنندهٔ بازی است. | Nobody arrives or leaves; starting it again is up to the game's operator.
+hh.s.homes | خانوار | Households
+hh.s.persons | نفر | People
+hh.s.earners | کارگر | Earners
+hh.s.wallets | پول همهٔ خانوارها | All wallets
+hh.mood | رضایت {p} | Contentment {p}
+hh.leaving_n | {n} خانوار دارد می‌رود | {n} leaving
+hh.open | شهر خانوار تازه می‌پذیرد | The town takes new households
+hh.closed | شهر خانوار تازه نمی‌پذیرد | The town takes no new households
+hh.worst | بیشتر از همه این کم است: {need} | Most often lacking: {need}
+hh.pool | جای کار پرشده: {have} از {want} | Work places filled: {have} of {want}
+hh.last_day | دیروز: {a} خانوار آمد، {d} خانوار رفت ({at}) | Last day: {a} arrived, {d} left ({at})
+hh.need.food | خوراک | Food
+hh.need.water | آب | Water
+hh.need.warmth | گرما | Warmth
+hh.need.shelter | سرپناه | Shelter
+hh.need.work | کار | Work
+hh.need.care | درمان | Care
+hh.levers | تصمیم‌های شهر | The town's decisions
+hh.admit_on | الان شهر برای خانوارهای تازه باز است. | The town is open to new households now.
+hh.admit_off | الان شهر برای خانوارهای تازه بسته است. | The town is closed to new households now.
+hh.open_btn | شهر را باز کن | Open the town
+hh.close_btn | شهر را ببند | Close the town
+hh.tax_is | مالیات از مزد خانوارها {p} است. | The tax on a household's wage is {p}.
+hh.dwellings | خانهٔ من برای مستأجر | My home for tenants
+hh.dwellings_hint | می‌توانی خانهٔ خودت را به خانوارها اجاره بدهی؛ اجاره را روزانه می‌گیری (تا {max}). بازیکن‌ها همیشه اول‌اند: اگر بازیکنی خانه را بخواهد خانوار اخطار می‌گیرد. | You can rent your home to households and collect rent a day (up to {max}). Players come first: if a player wants the home the household gets notice.
+hh.rent_open | اجاره داده می‌شود | Open to tenants
+hh.rent_closed | اجاره داده نمی‌شود | Not rented
+hh.slots | جای {n} خانوار | Room for {n} households
+hh.rent_is | اجارهٔ روزانه {r} | Rent {r} a day
+hh.tenants | {n} مستأجر | {n} tenants
+hh.rent_stop | دیگر اجاره نده | Stop renting
+hh.list | خانوارها | Households
+hh.list_none | هنوز خانواری نیامده. | No household has arrived yet.
+hh.n | خانوار {n} | Household {n}
+hh.leaving | دارد می‌رود | Leaving
+hh.people | {a} بزرگسال، {d} فرزند، {e} کارگر | {a} adults, {d} children, {e} earners
+hh.wallet | پول: {w} | Wallet: {w}
+hh.lacks | کمبود: {need} | Lacks: {need}
+hh.leaving_why | می‌رود چون {need} نداشت | Leaving: it lacked {need}
+hh.news | تازه‌ها | News
+hh.news.arrived | خانواری آمد ({d} نفر) | A household arrived ({d} people)
+hh.news.left | خانواری رفت؛ {need} کم بود | A household left; it lacked {need}
+hh.news.notice | خانواری اخطار گرفت؛ {need} کم است | A household was warned; {need} is short
+hh.news.notice_home | خانواری اخطار گرفت چون بازیکنی خانه را خواست | A household was warned because a player took the home
+hh.news.born | بچه‌ای به دنیا آمد | A child was born
+hh.news.grown | بچه‌ای بزرگ شد | A child grew up
+hh.news.grant | هدیهٔ شهر به خانوار: {m} | The town's gift to a household: {m}
+hh.note | خانوارها اسم ندارند؛ فقط شمارند. هر چه می‌خورند و می‌سوزانند از انبار شهر می‌رود و مالیاتشان به خزانه می‌آید. | Households have no names; they are numbered. What they eat and burn comes from the town's store and their tax goes to the treasury.

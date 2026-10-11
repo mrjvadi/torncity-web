@@ -422,3 +422,8 @@
 .vh-layers .vh-chip.on { outline: 2px solid #f4c441; }
 /* a phone: the land tool's panel stands above the dock, not behind it */
 @media (max-width: 899px) { .vh-bottom { bottom: calc(var(--v6-dock-h, 76px) + var(--safe-b, 0px) + 8px); } }
+.hh-list { display: flex; flex-direction: column; gap: 8px; }
+.hh-row { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 6%, transparent); }
+.hh-row.leaving { background: color-mix(in srgb, #ff5a47 12%, transparent); }
+.hh-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.hh-sub { font-size: 13px; opacity: .85; }
