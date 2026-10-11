@@ -348,6 +348,7 @@ export function mockHealthCommand(command: string, a: Args): unknown | null {
     // screenshot states: ?mock=1&open=mock.<name>
     case 'mock.hospital': treatedBy = null; return hospitalView('in')
     case 'mock.hospital_treated': treatedBy = CITY_OPTION; return hospitalView('in')
+    case 'mock.hospital_raid': { const r = villageHospital('both') as { view: { cause: string } }; r.view.cause = 'raid'; return r }
     case 'mock.hospital_exposure': { const r = villageHospital('both') as { view: { cause: string } }; r.view.cause = 'exposure'; return r }
     case 'mock.village_care_house': treatedBy = null; return villageHospital('house')
     case 'mock.village_care_both': treatedBy = null; return villageHospital('both')

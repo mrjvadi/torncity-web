@@ -6602,3 +6602,143 @@ hh.news.born | بچه‌ای به دنیا آمد | A child was born
 hh.news.grown | بچه‌ای بزرگ شد | A child grew up
 hh.news.grant | هدیهٔ شهر به خانوار: {m} | The town's gift to a household: {m}
 hh.note | خانوارها اسم ندارند؛ فقط شمارند. هر چه می‌خورند و می‌سوزانند از انبار شهر می‌رود و مالیاتشان به خزانه می‌آید. | Households have no names; they are numbered. What they eat and burn comes from the town's store and their tax goes to the treasury.
+city.raid | یورش و دیده‌بانی | Raids and watch
+city.insurance | بیمهٔ شهر | Town insurance
+hospital.cause.raid | یورش | A raid
+pn.hospitalised_fall | از پا افتادی و به بیمارستان رساندندت. در {city} بستری شدی؛ سلامت: {health} از {max}. | You fell and were taken to hospital in {city}. Health: {health} of {max}.
+pn.raid.detected | خبر رسید: یورشی از {other} در راه است ({band})، حدود {lead} ساعت دیگر. | Word came: a raid from {other} is on its way ({band}), in about {lead} hours.
+pn.raid.opened | یورش {other} شروع شد. | The raid by {other} has begun.
+pn.raid.resolved | یورش {other} تمام شد. {cash} به دست رفته؛ {falls} نفر از پا افتادند. | The raid by {other} is over. {cash} was taken; {falls} fell.
+pn.raid.settled | با {other} سر باج توافق شد ({amount})؛ یورش لغو شد. | A tribute of {amount} was agreed with {other}; the raid is off.
+pn.raid.band.few | چند نفر | a few
+pn.raid.band.group | یک گروه | a group
+pn.raid.band.band | یک دسته | a band
+pn.raid.band.host | لشکر بزرگ | a large host
+v6.ev.raid_warned | خبر رسید | Word came
+v6.ev.raid_unwarned | بی‌خبر | Unwarned
+v6.tip.raid_warned | یورشی از {who} در راه است؛ {t} مانده. | A raid from {who} is coming; {t} left.
+v6.tip.raid_unwarned | یورشی از {who} ثبت شده و دیده‌بان‌های شهر خبری نگرفته‌اند. | A raid from {who} is filed and the town's watch has heard nothing.
+rz.title | یورش و دیده‌بانی | Raids and watch
+rz.off | یورش هنوز شروع نشده. | Raids have not started yet.
+rz.off_from | یورش از {at} شروع می‌شود؛ تا آن موقع کسی به شهری یورش نمی‌برد. | Raids start {at}; until then nobody raids.
+rz.off_hint | هنوز روز شروعش معلوم نیست. | The start day is not set yet.
+rz.intro | یورش جنگ نیست: کسی نمی‌میرد و چیزی برای همیشه پاک نمی‌شود. فقط کسی که خودش «همراه می‌روم» یا «می‌ایستم» را بزند در خطر است. | A raid is not a war: nobody dies and nothing is wiped. Only one who presses join or stand is at risk.
+rz.mine | یورش‌های شما | Your raids
+rz.mine_none | الان یورشی در کار نیست. | No raid is under way.
+rz.to | یورش به {who} | Raid on {who}
+rz.from | یورش {who} به شهر شما | Raid by {who} on your town
+rz.status.filed | ثبت شده | Filed
+rz.status.open | در جریان | Under way
+rz.status.resolved | تمام شد | Finished
+rz.status.settled | با باج تمام شد | Settled by tribute
+rz.starts | شروع: {at} | Starts {at}
+rz.ends | پایان: {at} | Ends {at}
+rz.people | {r} مزدور، {j} همراه، {s} مدافع | {r} hired, {j} riding, {s} standing
+rz.fee_paid | هزینهٔ ثبت {f} | Fee {f}
+rz.warned | خبر رسید ({by}): حدود {t} مانده. | Word came ({by}): about {t} left.
+rz.unwarned | بی‌خبر: دیده‌بانی‌های شهر به‌موقع خبری نگرفتند. | Unwarned: the town's watch heard nothing in time.
+rz.by.lookout | دیده‌بان | lookout
+rz.by.watchtower | برج دیده‌بانی | watchtower
+rz.by.beacon_chain | زنجیرهٔ آتش | beacon chain
+rz.tribute_is | باج پیشنهادی: {m} | Tribute offered: {m}
+rz.me_ride | همراه رفتن را انتخاب کرده‌ای | You chose to ride
+rz.me_stand | ایستادن را انتخاب کرده‌ای | You chose to stand
+rz.join | همراه می‌روم | I ride along
+rz.stand | می‌ایستم | I stand
+rz.accept | باج را می‌پذیرم ({m}) | Accept the tribute ({m})
+rz.risk | اگر این را بزنی ممکن است در جنگ از پا بیفتی؛ آن‌وقت به بیمارستان می‌روی و بخشی از پول و کالای همراهت را از دست می‌دهی (بانک، زمین و مهارتت سالم می‌ماند). | If you press this you may fall in the fight; you go to hospital and lose part of the cash and goods you carry (bank, land and skills are safe).
+rz.offer_hint | می‌توانی پیش از شروع باج بدهی تا یورش لغو شود (دست‌کم {min}). | Before it starts you may offer tribute to call it off (at least {min}).
+rz.tribute | باج | Tribute
+rz.offer | باج پیشنهاد بده | Offer tribute
+rz.out.won | یورش گرفت | The raid took
+rz.out.lost | شهر باخت | The town lost
+rz.out.failed | یورش نگرفت | The raid failed
+rz.out.held | شهر ایستاد | The town held
+rz.out.cash | پول گرفته‌شده: {c} | Cash taken: {c}
+rz.out.buildings | {n} ساختمان آسیب دید ({d}) | {n} buildings damaged ({d})
+rz.out.units | نیروی یورش {a}، نیروی شهر {d} | Raiders {a}, defenders {d}
+rz.out.falls | {n} نفر از پا افتادند | {n} fell
+rz.out.fell_me | تو از پا افتادی و به بیمارستان رساندندت. | You fell and were taken to hospital.
+rz.targets | یورش به شهری | Raid a town
+rz.targets_hint | هزینهٔ ثبت {fee} از خزانه می‌رود. شهرهای نزدیک: | The fee {fee} leaves the treasury. Nearest towns:
+rz.targets_none | شهر دیگری نزدیک نیست. | No other town is near.
+rz.km | {n} کیلومتر | {n} km
+rz.residents | {n} نفر ساکن | {n} residents
+rz.pick | این را انتخاب کن | Choose this one
+rz.pick_off | رها کن | Drop it
+rz.file_hint | یورش {a} تا {b} ساعت بعد از ثبت شروع می‌شود و {w} دقیقه طول می‌کشد؛ در این فاصله شهر می‌تواند آماده شود. | The raid starts {a} to {b} hours after filing and lasts {w} minutes; the town can prepare meanwhile.
+rz.lead | {n} ساعت بعد | In {n} hours
+rz.raiders | {n} مزدور | {n} hired raiders
+rz.transport | وسیلهٔ رفت | Transport
+rz.tr.foot | پیاده | On foot
+rz.tr.cart | گاری | Cart
+rz.tr.horse | اسب | Horse
+rz.tr.rail | راه‌آهن | Rail
+rz.cost | هزینه از خزانه: {m} | From the treasury: {m}
+rz.file_go | یورش به {who} را ثبت کن | File the raid on {who}
+rz.watch_title | دیده‌بانی شهر | The town's watch
+rz.watch_none | شهر هنوز دیده‌بانی ندارد؛ پایگاه دیده‌بانی، برج یا برج آتش خبر یورش را زودتر می‌رساند. | The town has no watch yet; a lookout post, tower or beacon brings word of a raid sooner.
+rz.watch.lookout_post | پایگاه دیده‌بانی | Lookout post
+rz.watch.watchtower | برج دیده‌بانی | Watchtower
+rz.watch.beacon_tower | برج آتش | Beacon tower
+rz.watch_open | امروز باز بود (تا {m} متر) | Open today (to {m} m)
+rz.watch_shut | امروز باز نبود | Not open today
+rz.idle.no_staff | کارمند نداشت | No staff
+rz.idle.no_wage | مزدش داده نشد | Wage unpaid
+rz.idle.no_supplies | هیزم یا مواد نداشت | No fuel or supplies
+rz.idle.other | امروز بسته بود | Closed today
+rz.watch_hint | دیده‌بان فقط روزی که باز باشد چیزی می‌بیند. | A post sees nothing on a day it is not open.
+rz.notice.raid_filed | یورش ثبت شد. | The raid is filed.
+rz.notice.raid_joined | همراه یورش شدی. | You ride with the raid.
+rz.notice.raid_standing | ایستادی. | You stand.
+rz.notice.raid_offered | باج پیشنهاد شد. | Tribute offered.
+rz.notice.raid_settled | یورش با باج تمام شد. | The raid ended by tribute.
+in.title | بیمهٔ شهر | Town insurance
+in.closed | شهر هنوز صندوق بیمه ندارد. | The town has no insurance fund yet.
+in.closed_hint | با صندوق بیمهٔ شهر، مردم برای از دست دادن و آسیب یورش بیمه می‌گیرند. | With a town fund people insure against loss and raid damage.
+in.open_btn | صندوق بیمه را باز کن | Open the fund
+in.fund | پول صندوق | Fund
+in.scale | سطح قیمت | Price level
+in.scale_set | سطح قیمت را {p} کن | Set the price level to {p}
+in.scale_hint | سطح قیمت از ۵۰٪ تا ۲۰۰٪ است؛ قیمت‌ها گران‌تر که شود صندوق پول بیشتری می‌گیرد. | The level runs 50 to 200 percent; dearer prices fill the fund faster.
+in.products | بیمه‌ها | Covers
+in.held | داری | Held
+in.covers.death_loss | از پا افتادن | A fall
+in.covers.raid_damage | آسیب یورش به ساختمان | Raid damage to a building
+in.line | حق بیمه {prem}، پوشش {cover}، سهم خودت {own} | Premium {prem}, cover {cover}, your share {own}
+in.cap | حداکثر خسارت {m}؛ انتظار: {w} | At most {m}; waiting {w}
+in.no_building | ساختمانی برای این بیمه نداری. | You have no building for this cover.
+in.buy_for | بیمهٔ {b} | Insure {b}
+in.buy | بخر ({m}) | Buy ({m})
+in.policies | بیمه‌نامه‌های تو | Your policies
+in.status.active | فعال | Active
+in.status.ended | تمام شده | Ended
+in.notice.opened | صندوق بیمه باز شد. | The fund is open.
+in.notice.scaled | سطح قیمت عوض شد. | The price level is changed.
+in.notice.bought | بیمه خریده شد. | Cover bought.
+refusal.village_raid_off | یورش هنوز شروع نشده. | Raids have not started yet.
+refusal.village_raid_no_target | چنین شهری نیست. | No such town.
+refusal.village_raid_same | به شهر خودت نمی‌شود یورش برد. | You cannot raid your own town.
+refusal.village_raid_lead_short | زمان آماده‌شدن کم است؛ دست‌کم {min} ساعت. | The lead is too short; at least {min} hours.
+refusal.village_raid_lead_long | زمان آماده‌شدن زیاد است؛ حداکثر {max} ساعت. | The lead is too long; at most {max} hours.
+refusal.village_raid_cooldown | تازه یورش برده‌ای؛ کمی صبر کن. | You raided just now; wait a little.
+refusal.village_raid_weekly | این هفته به اندازهٔ کافی یورش برده‌ای. | You have raided enough this week.
+refusal.village_raid_shielded | این شهر الان در پناه است و یورش نمی‌شود. | This town is shielded now.
+refusal.village_raid_founding_grace | این شهر تازه ساخته شده و مهلت دارد. | This town is new and has a grace.
+refusal.village_raid_nothing_to_take | در این شهر چیزی برای گرفتن نیست. | There is nothing to take there.
+refusal.village_raid_no_money | خزانه پول هزینه را ندارد. | The treasury cannot pay.
+refusal.village_raid_not_resident | تو ساکن این شهر نیستی. | You do not live in this town.
+refusal.village_raid_not_open | این یورش الان باز نیست. | This raid is not open now.
+refusal.village_raid_not_found | چنین یورشی نیست. | No such raid.
+refusal.village_raid_tribute_low | باج کم است؛ دست‌کم {min}. | The tribute is too low; at least {min}.
+refusal.village_raid_no_offer | باجی پیشنهاد نشده. | No tribute was offered.
+refusal.village_raid_too_many_raiders | مزدور بیشتر از این نمی‌شود. | Not that many raiders.
+refusal.village_raid_bad_args | عددها درست نیست. | The numbers are not right.
+refusal.village_raid_wrong_side | این کار را از این طرف نمی‌شود. | That is not for your side.
+refusal.village_insurance_not_open | صندوق بیمه هنوز باز نشده. | The fund is not open yet.
+refusal.village_insurance_already_open | صندوق بیمه قبلاً باز شده. | The fund is already open.
+refusal.village_insurance_no_product | چنین بیمه‌ای نیست. | No such cover.
+refusal.village_insurance_no_building | ساختمانی برای این بیمه انتخاب نشده. | No building chosen for this cover.
+refusal.village_insurance_held | این بیمه را داری. | You already hold this cover.
+refusal.village_insurance_no_money | پول بیمه را نداری. | You cannot pay the premium.
+refusal.village_insurance_bad_scale | سطح قیمت باید بین ۵۰٪ تا ۲۰۰٪ باشد. | The level must be 50 to 200 percent.

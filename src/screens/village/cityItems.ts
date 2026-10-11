@@ -29,6 +29,8 @@ export const CITY_ITEMS: CityItem[] = [
   { key: 'treasury', label: 'city.treasury', local: 'village_overview', icon: 'coin' },
   { key: 'storage', label: 'storage.open', local: 'village_storage', icon: 'chest' },
   { key: 'registry', label: 'city.registry', command: 'settlement.land.registry', icon: 'scroll', resident: true },
+  { key: 'raid', label: 'city.raid', command: 'settlement.raid', icon: 'warn', resident: true },
+  { key: 'insurance', label: 'city.insurance', command: 'settlement.insurance', icon: 'cross', resident: true },
   { key: 'terms', label: 'menu.terms', command: 'settlement.terms', icon: 'scroll', perm: 'lot.sell' },
   { key: 'charter', label: 'city.charter', command: 'settlement.charter.view', icon: 'banner', resident: true },
   { key: 'leave', label: 'menu.leave', command: 'settlement.leave', icon: 'cross', resident: true, notHead: true },
