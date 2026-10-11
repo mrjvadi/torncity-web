@@ -29,7 +29,10 @@ import { useBuildMode } from './useBuildMode'
 import BuildPanel from './BuildPanel'
 import BuildingSheet from './BuildingSheet'
 import { BuyLotSheet, HouseSheet, LotAccessSheet, TakenLotSheet } from './LandSheets'
-import { classifyLot, tonesForLand, landAt, clearWhat, type LotAccessMap } from './citizen'
+import { classifyLot, tonesForLand, landAt, clearWhat, slopeAt, withRegistryLayers, type LotAccessMap } from './citizen'
+import { lotToken } from './Registry'
+import * as apiClient from '../../api/client'
+import type { LandRegistryView } from '../../api/views.gen'
 import { formatNumber } from '../native/kit/format'
 import { classifyOuter, inFirstGrid, outerAccess, outerForLand } from './outer'
 import type { LandView, LotAccessView } from '../../api/types'
@@ -88,6 +91,9 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   // builds a house on their own, sees their property. `landOn` is the land map
   // (free lots green, own lots gold); a tap on a lot opens the sheet it needs.
   const [landOn, setLandOn] = useState(false)
+  // the land registry (ADR 0072): read once for a resident and again when the layout moves; the ring verbs and the optional layers use it
+  const [reg, setReg] = useState<LandRegistryView | null>(null)
+  const [layers, setLayers] = useState({ zones: false, commons: false })
   const [buyLot, setBuyLot] = useState<{ x: number; y: number } | null>(null)
   const [houseLot, setHouseLot] = useState<{ x: number; y: number } | null>(null)
   const [takenLot, setTakenLot] = useState<{ x: number; y: number; owner?: string } | null>(null)
@@ -129,8 +135,8 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
   }, [buyLot, sceneReady])
   useEffect(() => {
     if (!sceneReady) return
-    sceneRef.current?.setOverlayTones((landOn || lotRing) && layout && build.state.step === 'off' ? tonesForLand(layout, access) : null)
-  }, [landOn, lotRing, layout, sceneReady, build.state.step, access])
+    sceneRef.current?.setOverlayTones((landOn || lotRing) && layout && build.state.step === 'off' ? withRegistryLayers(tonesForLand(layout, access), layout.grid.lots, reg?.parcels ?? [], layers) : null)
+  }, [landOn, lotRing, layout, sceneReady, build.state.step, access, reg, layers])
   // the land the roads opened (ADR 0044 5.5): tinted in the land tool like the first grid
   useEffect(() => {
     if (!sceneReady || build.state.step !== 'off') return
@@ -257,6 +263,13 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
     setSelectedId(bid)
   }
 
+  useEffect(() => {
+    if (!resident || !layout || layout.detail !== 'full') return
+    let on = true
+    void apiClient.runCommand('settlement.land.registry', {}).then((r) => { if (on && r.ok !== false) setReg(r.view as unknown as LandRegistryView) }).catch(() => undefined)
+    return () => { on = false }
+  }, [resident, layout?.version, layout?.detail])  // eslint-disable-line react-hooks/exhaustive-deps
+
   groundRef.current = (lot) => {
     if (!layout || inFirstGrid(layout, lot.x, lot.y)) return
     // the road tool: the end of the road is any place on the ground
@@ -366,6 +379,16 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
       acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => toast.push(t('land.commons', { trees: formatNumber(L?.trees ?? 0), rocks: formatNumber(L?.rocks ?? 0) }), { kind: 'info' })) })
     } else {
       acts.push({ id: 'info', label: t('v6.ring.info'), icon: 'info', kind: 'info', onClick: go(() => setTakenLot({ ...lot, owner: lotRing.owner })) })
+    }
+    // the land registry's verbs (ADR 0072): a foundation where the ground is too steep to build without one, and a claim at the town's edge
+    const slope = slopeAt(layout, lot.x, lot.y)
+    const gridN = layout.grid.lots
+    const outside = lot.x < 0 || lot.y < 0 || lot.x >= gridN || lot.y >= gridN
+    if (reg?.can_lay_foundation && reg.slope_on && slope !== undefined && slope > reg.slope_flat_m && slope <= reg.slope_unusable_m && (lotRing.kind === 'mine' || lotRing.kind === 'free')) {
+      acts.push({ id: 'found', label: t('v6.ring.found'), icon: 'hammer', onClick: go(() => run('settlement.foundation.lay', { lot: lotToken(lot.x, lot.y) })) })
+    }
+    if (reg?.can_claim && outside && lotRing.kind !== 'mine') {
+      acts.push({ id: 'claim', label: t('v6.ring.claim'), icon: 'road', onClick: go(() => run('settlement.claim', { lot: lotToken(lot.x, lot.y) })) })
     }
     // trees or rocks stand on this lot (ADR 0065): its owner, or the holder of land.clear for the commons and the treasury's lots, orders it cleared or takes the order back
     const L = landAt(layout, lot.x, lot.y)
@@ -527,6 +550,11 @@ export default function VillageHome({ localArgs, openLocal, run }: ScreenProps) 
                 <span><i className="vh-dot" style={{ background: '#9aa0b4' }} />{t('citizen.legend.taken')}</span>
               </div>
               <div className="vh-hint">{t('citizen.land.hint')}</div>
+              <div className="vh-layers" role="group" aria-label={t('rg.layers')}>
+                <button type="button" className={`vh-chip${layers.zones ? ' on' : ''}`} aria-pressed={layers.zones} onClick={() => setLayers((l) => ({ ...l, zones: !l.zones }))}><i className="vh-dot" style={{ background: '#1abfd9' }} />{t('rg.layer.zones')}</button>
+                <button type="button" className={`vh-chip${layers.commons ? ' on' : ''}`} aria-pressed={layers.commons} onClick={() => setLayers((l) => ({ ...l, commons: !l.commons }))}><i className="vh-dot" style={{ background: '#99cc40' }} />{t('rg.layer.commons')}</button>
+                <button type="button" className="vh-chip" onClick={() => { setLandOn(false); run('settlement.land.registry') }}>{t('rg.title')}</button>
+              </div>
               {canPlace && (
                 <button className="vh-chip road" onClick={() => { setLandOn(false); void build.enter().then(() => build.enterRoad()) }}>{t('road.draw_btn')}</button>
               )}

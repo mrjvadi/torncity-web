@@ -29,6 +29,7 @@ import { rich } from '../../ui/v6/rich'
 import { FlowOffer } from './Offer'
 import { PersonalList, personalUntilText } from './Personal'
 import WorkSection from './WorkSection'
+import { Registry } from './Registry'
 import { FarmBlock } from './FarmWork'
 import { RecipePicker, firstRecipe, recipeArg } from './Recipes'
 
@@ -954,7 +955,7 @@ const BuildingPage = flow<BuildingPanelView>(({ view: v, ctx }) => {
 })
 
 registerFlow({
-  village_refusal: Refusal, craft_started: CraftStartedPage, clear_order: ClearOrderPage, farm_sow: FarmSowPage, mill_toll: MillTollPage,
+  village_refusal: Refusal, settlement_land_registry: Registry, craft_started: CraftStartedPage, clear_order: ClearOrderPage, farm_sow: FarmSowPage, mill_toll: MillTollPage,
   village_donate_menu: DonateMenu, village_donate_confirm: DonateConfirm, village_donate_done: DonateDone,
   village_residence_confirm: ResidenceConfirm, village_residence_done: ResidenceDone,
   settlement_land: Land, settlement_lot_buy_confirm: LotBuyConfirm, settlement_lot_buy_done: LotBuyDone,
@@ -970,7 +971,7 @@ registerFlow({
 
 /** The server screens the flow host draws. */
 export const FLOW_SCREENS = [
-  'village_refusal', 'craft_started', 'clear_order', 'farm_sow', 'mill_toll', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
+  'village_refusal', 'settlement_land_registry', 'craft_started', 'clear_order', 'farm_sow', 'mill_toll', 'village_donate_menu', 'village_donate_confirm', 'village_donate_done',
   'village_residence_confirm', 'village_residence_done', 'settlement_land', 'settlement_lot_buy_confirm', 'settlement_lot_buy_done',
   'settlement_lot_access', 'settlement_lot_repair_done',
   'settlement_private_menu', 'settlement_private_lots', 'settlement_private_confirm', 'settlement_mine', 'settlement_terms', 'village_work',

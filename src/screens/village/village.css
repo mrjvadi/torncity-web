@@ -410,3 +410,15 @@
 .tc-offer { display: flex; flex-direction: column; gap: 8px; }
 .tc-f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 .tc-range { font-style: normal; opacity: .65; font-size: 12px; }
+.rg-list { display: flex; flex-direction: column; gap: 8px; }
+.rg-card { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 6%, transparent); }
+.rg-card.mine { background: color-mix(in srgb, #a84dff 10%, transparent); }
+.rg-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; } .rg-head span { font-size: 12.5px; opacity: .75; }
+.rg-sub { font-size: 13px; opacity: .85; }
+.rg-form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.rg-corners { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
+.rg-n { width: 64px; text-align: center; }
+.vh-layers { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.vh-layers .vh-chip.on { outline: 2px solid #f4c441; }
+/* a phone: the land tool's panel stands above the dock, not behind it */
+@media (max-width: 899px) { .vh-bottom { bottom: calc(var(--v6-dock-h, 76px) + var(--safe-b, 0px) + 8px); } }
