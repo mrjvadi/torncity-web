@@ -4,6 +4,7 @@
 
 import { mockStandsIn } from '../support/mock'
 import { mockLaborCommand } from './mock_labor'
+import { polityMode } from './mock_polity'
 
 type Args = Record<string, unknown> | undefined
 
@@ -122,7 +123,7 @@ export function mockP0Command(command: string, args?: Args) {
       place,
       entries: [
         e('inbox', 'inbox.show'), ...(city ? [e('faction', 'faction.mine')] : []), e('friends', 'social.friend.list'), e('elections', 'election.list'),
-        e('government', 'gov.city'), ...(city ? [e('war', 'military.ministry')] : []),
+        e('government', 'gov.city'), ...(city ? [] : [e('unions', 'settlement.union')]), ...(city || polityMode() === 'country' ? [e('war', 'military.ministry')] : []),
       ],
     })
   }

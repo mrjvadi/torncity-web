@@ -5041,7 +5041,7 @@ charter.mine | اجازه‌های من | My permissions
 charter.mine_none | تو در هیچ منصبی نیستی. | You hold no office.
 charter.audit | دفتر ثبت | Register
 charter.audit_none | هنوز چیزی ثبت نشده. | Nothing is recorded yet.
-charter.perm_limit | {name} (تا {limit}) | {name} (up to {limit})
+charter.perm_limit | {name} – تا {limit} | {name} – up to {limit}
 charter.resign | کناره‌گیری | Resign
 charter.close_office | بستن منصب | Close office
 charter.edit | ویرایش | Edit
@@ -7028,3 +7028,543 @@ refusal.village_rail_no_booking | چنین ثبتی نیست. | No such booking.
 refusal.village_rail_no_capacity | قطار جای این بار را ندارد. | The train has no room for this load.
 refusal.village_rail_booking_no_stock | در انبار این‌قدر کالا نیست. | The store does not hold that much.
 refusal.village_chain_not_yet | محاسبهٔ زنجیره هنوز شروع نشده. | The chain calculator has not started yet.
+# -- unions and countries, treaties, tenders and loans between towns (ADR 0076) --------------------------------------------------
+city.unions | اتحادها و کشورها | Unions and countries
+city.treaties | پیمان‌ها | Treaties
+city.tenders | مناقصه‌ها | Tenders
+city.debts | وام‌ها | Loans
+hub.unions | اتحادها و کشورها | Unions and countries
+charter.group.defence | دفاع | Defence
+charter.group.money | وام و پول | Loans and money
+charter.group.works | کارهای ساختمانی | Public works
+charter.group.currency | پول شهر | Town money
+charter.perm.union.ratify | تأیید اتحاد از طرف شهر | Ratify unions for the town
+charter.perm.union.admit | پذیرفتن شهر به اتحاد | Admit towns to the union
+charter.perm.union.expel | بیرون کردن شهر از اتحاد | Expel towns from the union
+charter.perm.treaty.sign | امضای پیمان | Sign treaties
+charter.perm.treaty.end | پایان دادن به پیمان | End treaties
+charter.perm.war.declare | اعلان جنگ | Declare war
+charter.perm.war.peace | صلح | Make peace
+charter.perm.border.close | بستن مرز | Close the border
+charter.perm.customs.set | تعیین گمرک | Set customs
+charter.perm.sanction.impose | تحریم | Impose sanctions
+charter.perm.military.command | فرماندهی نیروها | Command the forces
+charter.perm.military.procure | خرید تجهیزات نظامی | Buy military equipment
+charter.perm.military.licence | جواز دفاعی | Defence licence
+charter.perm.debt.borrow | وام گرفتن | Borrow
+charter.perm.debt.lend | وام دادن | Lend
+charter.perm.debt.restructure | بازبینی وام و بخشودن بدهی | Restructure loans and write off debts
+charter.perm.works.tender | باز کردن مناقصه | Open tenders
+charter.perm.works.accept | تأیید کار پیمانکار | Accept a contractor's work
+charter.perm.insurance.run | اداره صندوق بیمه | Run the insurance fund
+charter.perm.mine.run | اداره معدن | Run the mines
+charter.perm.rail.draw | کشیدن ریل | Draw railways
+charter.perm.haul.order | فرستادن کالا با گاری و قطار | Send goods by cart and train
+charter.perm.currency.charter | ثبت پول شهر | Charter the town money
+charter.perm.currency.issue | چاپ و جمع کردن پول | Issue and retire money
+charter.perm.bank.policy | سیاست بانک | Bank policy
+pu.title | اتحادها و کشورها | Unions and countries
+pu.off | اتحادها هنوز شروع نشده‌اند. | Unions have not started yet.
+pu.off_from | از {at} شروع می‌شود. | They start on {at}.
+pu.off_hint | وقتی شروع شود، شهرها می‌توانند با هم اتحاد ببندند یا کشور بسازند. | When it starts, towns can join in a union or found a country.
+pu.intro | چند شهر با توافق هم اتحاد می‌بندند. هر شهر خودش و با منشور خودش تأیید می‌کند. کشور اتحادی است که جنگ، پیمان و دادگاه را از شهرها می‌گیرد. | Towns join in a union by agreement and each ratifies by its own charter. A country is a union that takes war, treaties and courts from its towns.
+pu.mine | اتحادهای شهر تو | Unions of your town
+pu.mine_none | شهر تو هنوز عضو هیچ اتحادی نیست. | Your town is not in any union yet.
+pu.proposals | پیشنهادهای باز | Open proposals
+pu.not_ratify | تأیید یا نپذیرفتن با کسی است که منشور شهر این حق را به او داده. | Whoever the charter gives the right decides for the town.
+pu.new | اتحاد یا کشور تازه | A new union or country
+pu.not_propose | پیشنهاد اتحاد با کسی است که منشور شهر این حق را به او داده. | Whoever the charter gives the right proposes a union.
+pu.town_treaties | پیمان‌های شهر | Town treaties
+pu.town_debts | وام‌های شهر | Town loans
+pu.kind.league | اتحاد | Union
+pu.kind.country | کشور | Country
+pu.member.active | عضو | Member
+pu.member.notice | در مهلت خروج | Leaving after notice
+pu.member.left | رفته | Left
+pu.member.expelled | اخراج‌شده | Expelled
+pu.decision.pending | منتظر پاسخ | Waiting for an answer
+pu.decision.assembly | در رأی‌گیری مردم | The people are voting
+pu.decision.yes | پذیرفت | Agreed
+pu.decision.no | نپذیرفت | Refused
+pu.class.dues | حق عضویت | Dues
+pu.class.treaty | پیمان‌بستن | Making treaties
+pu.class.defence | دفاع | Defence
+pu.class.courts | دادگاه | Courts
+pu.class.currency | پول | Money
+pu.class.customs | گمرک | Customs
+pu.class.war | جنگ | War
+pu.class.roads | راه‌ها | Roads
+pu.class.claims | زمین‌های ادعاشده | Claimed land
+pu.mode.one_member | هر شهر یک رأی | One vote per town
+pu.mode.weighted | رأی به نسبت مردم | Votes by population
+pu.mode.double_majority | اکثریت دوگانه | Double majority
+pu.mode_hint.one_member | هر شهر عضو یک رأی دارد، کوچک باشد یا بزرگ. | Each town has one vote, small or large.
+pu.mode_hint.weighted | رأی هر شهر به نسبت مردمش است، با سقفی که شهر بزرگ همه‌چیز را نبرد. | A town's vote follows its people, with a cap so one big town cannot decide alone.
+pu.mode_hint.double_majority | هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | Most towns and most people must both agree.
+pu.exit.free | هر شهر با اعلام مهلت می‌رود | A town leaves after giving notice
+pu.exit.consent | رفتن به رضایت اعضا | Leaving needs the members' consent
+pu.deleg_line | کارهایی که شهرها به اتحاد سپرده‌اند: {list} | What the towns handed to the union: {list}
+pu.card | {n} شهر عضو، خزانه {m} | {n} towns, purse {m}
+pu.open | ببین | Open
+pu.until | تا {at} | until {at}
+pu.answer_by | تا {at} فرصت جواب هست | Answer by {at}
+pu.fee_paid | هزینهٔ ثبت را شهر تو پرداخته: {m} | Your town paid the filing fee: {m}
+pu.needs_assembly | این پیشنهاد کارهای سنگین را از شهر می‌گیرد؛ مردم شهر باید رأی بدهند. | This takes weighty powers from the town, so its people vote.
+pu.ratify | شهر ما می‌پذیرد | Our town agrees
+pu.ratify_assembly | رأی‌گیری مردم را باز کن | Open the people's vote
+pu.refuse | نمی‌پذیریم | We refuse
+pu.refuse_title | نپذیرفتن پیشنهاد | Refuse the proposal
+pu.refuse_body | شهر تو «{name}» را نمی‌پذیرد. | Your town refuses «{name}».
+pu.withdraw | پس گرفتن | Withdraw
+pu.withdraw_title | پس گرفتن پیشنهاد | Withdraw the proposal
+pu.withdraw_body | پیشنهاد «{name}» را پس می‌گیری. | You withdraw the proposal «{name}».
+pu.withdraw_hint | هزینهٔ ثبت برنمی‌گردد. | The filing fee does not come back.
+pu.yes | موافقم | Yes
+pu.no | مخالفم | No
+pu.yes_word | موافق | for
+pu.no_word | مخالف | against
+pu.voted | رأی تو ثبت شد | Your vote is in
+pu.my_vote | رأی تو: {v} | Your vote: {v}
+pu.tally | موافق {y}، مخالف {n} | For {y}, against {n}
+pu.need | لازم: {n} | needed: {n}
+pu.ballot.vote | رأی‌گیری دربارهٔ {who} | Vote on {who}
+pu.ballot.petition | درخواست برکناری {who} | Petition to remove {who}
+pu.ballot.signatures | {a} امضا از {b} | {a} signatures of {b}
+pu.ballots | رأی‌گیری‌ها | Votes
+pu.members | شهرهای عضو | Member towns
+pu.purse | خزانهٔ اتحاد | Union purse
+pu.dues | حق عضویت هر دوره | Dues each period
+pu.dues_line | ثابت {f} و {s} از درآمد | fixed {f} and {s} of income
+pu.mode_label | شیوهٔ رأی | How members vote
+pu.exit_label | رفتن از اتحاد | Leaving
+pu.rules | حق عضویت را عوض کن | Change the dues
+pu.rules_title | حق عضویت | Dues
+pu.rules_go | ثبت | Save
+pu.treaties | پیمان‌های اتحاد | Union treaties
+pu.debts | وام‌های اتحاد | Union loans
+pu.tenders | مناقصه‌های اتحاد | Union tenders
+pu.roster | شهرهای عضو و حق عضویتشان | Member towns and their dues
+pu.member_line | {r} ساکن، پرداخته {p} | {r} residents, paid {p}
+pu.arrears | {n} دوره عقب | {n} periods behind
+pu.notice_ends | مهلت تا {at} | notice until {at}
+pu.motions | پیشنهادها به اعضا | Motions to the members
+pu.motions_none | پیشنهاد بازی نیست. | No motion is open.
+pu.motion_new | پیشنهاد تازه | A new motion
+pu.motion_not | پیشنهاد دادن با کسی است که منشور اتحاد این حق را به او داده. | Whoever the union charter gives the right makes a motion.
+pu.motion.admit | پذیرفتن {who} | Admit {who}
+pu.motion.expel | بیرون کردن {who} | Expel {who}
+pu.motion.dissolve | برچیدن اتحاد | Dissolve the union
+pu.motion.exit | رفتن {who} با رضایت اعضا | {who} leaves with the members' consent
+pu.double_note | این اتحاد اکثریت دوگانه می‌خواهد: هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | This union needs a double majority: most towns and most people.
+pu.nm.title | پیشنهاد تازه به اعضا | A new motion to the members
+pu.nm.kind | چه پیشنهادی؟ | What kind?
+pu.nm.k.admit | پذیرفتن شهر | Admit a town
+pu.nm.k.expel | بیرون کردن شهر | Expel a town
+pu.nm.k.dissolve | برچیدن اتحاد | Dissolve the union
+pu.nm.hint.admit | اعضا رأی می‌دهند؛ بعد خود آن شهر باید بپیوندد. | The members vote, then the town itself must accede.
+pu.nm.hint.expel | شهری که حق عضویت نمی‌دهد یا قول‌هایش را شکسته. اعضا رأی می‌دهند. | A town that does not pay its dues or broke its word. The members vote.
+pu.nm.hint.dissolve | اگر تصویب شود، خزانه به نسبت حق عضویتِ پرداخته بین شهرها پخش می‌شود. | If it passes, the purse is shared among the towns by the dues they paid.
+pu.nm.who | کدام شهر؟ | Which town?
+pu.nm.nobody | شهری برای این کار نیست. | There is no town for this.
+pu.nm.need | یک شهر انتخاب کن. | Pick a town.
+pu.nm.go | پیشنهاد را بفرست | Send the motion
+pu.offices | منصب‌های اتحاد | Union offices
+pu.offices_hint | منشور اتحاد جدا از منشور شهرهاست. منصب‌ها را بنیان‌گذاران نام می‌برند و بعد کسانی که اجازه دارند منصوب می‌کنند. | The union charter is separate from the towns'. Founders name the first holders; after that those with the right appoint.
+pu.seats | {a} از {b} جا پر است | {a} of {b} seats filled
+pu.vacant | این منصب الان کسی ندارد. | Nobody holds this office now.
+pu.appoint | منصوب کن | Appoint
+pu.appoint_ph | کد بازیکن | Player code
+pu.dismiss | برکنار کن | Dismiss
+pu.dismiss_title | برکناری | Dismissal
+pu.dismiss_body | {who} را از «{office}» برکنار می‌کنی. | You dismiss {who} from «{office}».
+pu.recall | برکناری با رأی مردم | Recall by vote
+pu.recall_title | درخواست برکناری | Petition to recall
+pu.recall_body | برای برکناری {who} از «{office}» امضا جمع می‌شود. | A petition opens to recall {who} from «{office}».
+pu.recall_hint | امضا که به حد برسد، مردم شهرهای عضو رأی می‌دهند. | Once it has enough signatures, the people of the member towns vote.
+pu.recall_yes | شروع کن | Start
+pu.edit | ویرایش منصب | Edit office
+pu.edit_title | ویرایش منصب | Edit office
+pu.new_office_title | منصب تازه | A new office
+pu.office_new | منصب تازه | A new office
+pu.office_close | منصب را ببند | Close the office
+pu.office_close_title | بستن منصب | Close the office
+pu.office_close_body | منصب «{office}» بسته می‌شود و کسانی که در آن هستند کنار می‌روند. | The office «{office}» closes and its holders step down.
+pu.ceiling_note | هر منصب فقط کارهایی را می‌تواند داشته باشد که شهرها به اتحاد سپرده‌اند و خودت هم داری. | An office can hold only what the towns handed to the union and what you hold yourself.
+pu.office.title | نام منصب | Office name
+pu.office.seats | تعداد جا | Seats
+pu.office.holders | کد کسانی که از اول در آن می‌نشینند | Codes of those who sit in it from the start
+pu.office.holders_hint | کد دوستی بازیکن‌ها، با ویرگول جدا شود. | The players' friend codes, separated by commas.
+pu.leave_section | رفتن از اتحاد | Leaving the union
+pu.leave | اعلام خروج | Give notice to leave
+pu.leave_title | خروج از اتحاد | Leave the union
+pu.leave_body | شهر تو از «{name}» بیرون می‌رود. | Your town leaves «{name}».
+pu.leave_hint_free | پس از مهلت خروج بیرون می‌روی و سهم خزانه‌ات به شهر برمی‌گردد. تا آن موقع می‌شود پشیمان شد. | After the notice you leave and your share of the purse returns. Until then you can change your mind.
+pu.leave_hint_consent | اعضا باید به رفتنت رضایت بدهند؛ پیشنهادش برای رأی باز می‌شود. | The members must consent; a motion opens for them to vote.
+pu.leave_free | با اعلام خروج، مهلتی شروع می‌شود و بعدش شهر بیرون می‌رود. | Giving notice starts a wait, after which the town leaves.
+pu.leave_consent | رفتن از این اتحاد به رضایت اعضا است. | Leaving this union needs the members' consent.
+pu.leave_yes | اعلام می‌کنم | Give notice
+pu.leaving | شهر تو در مهلت خروج است. | Your town is in its notice to leave.
+pu.stay | پشیمان شدم، می‌مانیم | We stay after all
+pu.accede | به اتحاد می‌پیوندیم | Join the union
+pu.audit | سابقه | Record
+pu.audit_show | سابقه را ببین ({n} مورد) | Show the record ({n} entries)
+pu.audit_hide | بستن سابقه | Hide the record
+pu.audit.other | تغییری در منشور | A change to the charter
+pu.p.title | اتحاد یا کشور تازه | A new union or country
+pu.p.name | نام | Name
+pu.p.kind | چه می‌سازید؟ | What do you found?
+pu.p.league_hint | اتحاد پیمانی است میان شهرها؛ هر شهر استقلال خودش را نگه می‌دارد و فقط آنچه سپرده شده با اتحاد است. | A union is an agreement between towns; each keeps its own rule except what it hands over.
+pu.p.country_hint | کشور باید جنگ، پیمان و دادگاه را از شهرها بگیرد و شهرها روی هم دست‌کم {n} ساکن داشته باشند. | A country must take war, treaties and courts from its towns, and the towns together need at least {n} residents.
+pu.p.deleg | شهرها چه کارهایی را به اتحاد می‌سپارند؟ | What do the towns hand to the union?
+pu.p.deleg_hint | هرچه بیشتر بسپارید، اتحاد قوی‌تر و تأیید مردم لازم‌تر می‌شود. | The more you hand over, the stronger the union, and the more the people must approve.
+pu.p.mode | شیوهٔ رأی اعضا | How members vote
+pu.p.exit | رفتن از اتحاد | Leaving
+pu.p.dues_fixed | حق عضویت ثابت هر دوره | Fixed dues each period
+pu.p.dues_share | سهم از درآمد شهر (درصد) | Share of the town's income (percent)
+pu.p.dues_hint | از خزانهٔ هر شهر به خزانهٔ اتحاد می‌رود. | Goes from each town's treasury to the union purse.
+pu.p.share_hint | عدد ۰ یعنی فقط مبلغ ثابت. | 0 means the fixed amount only.
+pu.p.invite | کدام شهرها دعوت شوند؟ | Which towns are invited?
+pu.p.no_targets | شهری برای دعوت نیست. | There is no town to invite.
+pu.p.offices | منشور اتحاد | The union charter
+pu.p.offices_hint | دست‌کم یک منصب بساز که بتواند اتحاد را اداره کند و کسی در آن بنشیند. | Make at least one office that can run the union, with someone in it.
+pu.p.office_n | منصب {n} | Office {n}
+pu.p.office_add | منصب دیگر | Another office
+pu.p.office_drop | این منصب را حذف کن | Remove this office
+pu.p.go | پیشنهاد را ثبت و بفرست | File and send the proposal
+pu.p.need_name | نام باید دو تا سی‌ودو حرف باشد. | The name needs two to thirty-two letters.
+pu.p.need_invite | دست‌کم یک شهر را دعوت کن. | Invite at least one town.
+pu.p.need_country | کشور باید این کارها را از شهرها بگیرد: {list}. | A country must take these from its towns: {list}.
+pu.p.need_office | هر منصب نام و دست‌کم یک اجازه می‌خواهد و یک منصب باید کسی را از اول داشته باشد. | Each office needs a name and at least one power, and one must have someone from the start.
+pu.notice.union_proposed | پیشنهاد اتحاد ثبت شد و برای شهرهای دعوت‌شده رفت. | The proposal is filed and sent to the invited towns.
+pu.notice.union_withdrawn | پیشنهاد پس گرفته شد. | The proposal is withdrawn.
+pu.notice.union_ratified | شهر تو این پیشنهاد را پذیرفت. | Your town agreed to the proposal.
+pu.notice.union_refused | شهر تو این پیشنهاد را نپذیرفت. | Your town refused the proposal.
+pu.notice.union_assembly_opened | رأی‌گیری مردم شهر دربارهٔ این پیشنهاد باز شد. | The people's vote on the proposal is open.
+pu.notice.union_voted | رأی تو ثبت شد. | Your vote is in.
+pu.notice.union_founded | اتحاد برپا شد. | The union is founded.
+pu.notice.union_notice_given | اعلام خروج ثبت شد؛ پس از پایان مهلت بیرون می‌روی. | Your notice is filed; you leave when it runs out.
+pu.notice.union_notice_withdrawn | اعلام خروج پس گرفته شد. | The notice is withdrawn.
+pu.notice.union_motion_opened | پیشنهاد برای رأی اعضا باز شد. | The motion is open for the members to vote.
+pu.notice.union_acceded | شهر تو به اتحاد پیوست. | Your town joined the union.
+pu.notice.union_office_saved | منصب ذخیره شد. | The office is saved.
+pu.notice.union_office_closed | منصب بسته شد. | The office is closed.
+pu.notice.union_appointed | منصب واگذار شد. | The office is filled.
+pu.notice.union_dismissed | از منصب برکنار شد. | Dismissed from the office.
+pu.notice.union_recall_started | رأی‌گیری برای برکناری باز شد. | The vote to remove is open.
+pu.notice.union_recall_signed | امضای تو ثبت شد. | Your signature is in.
+pu.notice.union_rules_saved | حق عضویت تازه ثبت شد. | The new dues are saved.
+pt.title | پیمان‌ها | Treaties
+pt.title_union | پیمان‌های «{name}» | Treaties of «{name}»
+pt.off | پیمان‌ها هنوز شروع نشده‌اند. | Treaties have not started yet.
+pt.intro | شهرها و اتحادها با هم پیمان می‌بندند: هم‌پیمانی، عدم تجاوز، بازرگانی و عبور. | Towns and unions sign treaties: alliance, non-aggression, trade and passage.
+pt.live | پیمان‌های برقرار | Standing treaties
+pt.live_none | پیمانی بسته نشده. | No treaty is signed.
+pt.offers | پیشنهادهای باز | Open offers
+pt.new | پیمان تازه | A new treaty
+pt.not_allowed | بستن پیمان با کسی است که منشور این حق را به او داده. | Whoever the charter gives the right signs treaties.
+pt.record | سابقهٔ پیمان‌ها | Treaty record
+pt.record_hint | پیمانی که تمام شود در سابقه می‌ماند. | A treaty that ends stays in the record.
+pt.record_none | هنوز پیمانی تمام نشده. | No treaty has ended yet.
+pt.record_count | {n} پیمان پایان یافته است. | {n} treaties have ended.
+pt.with | {kind} با {who} | {kind} with {who}
+pt.kind.alliance | هم‌پیمانی دفاعی | Defensive alliance
+pt.kind.non_aggression | عدم تجاوز | Non-aggression
+pt.kind.trade_agreement | پیمان بازرگانی | Trade agreement
+pt.kind.passage | پیمان عبور | Passage
+pt.status.proposed | منتظر پاسخ | Waiting for an answer
+pt.status.active | برقرار | Standing
+pt.status.declined | رد شد | Declined
+pt.status.withdrawn | پس گرفته شد | Withdrawn
+pt.status.expired | مهلتش گذشت | Expired
+pt.status.terminated | پایان یافت | Ended
+pt.alliance | دفاع از هم | defends each other
+pt.nonagg | به هم یورش یا جنگ نمی‌برند | no raids or war between them
+pt.passage | راه و ریل از زمین هم می‌گذرد | roads and rails cross each other's land
+pt.tariff | تخفیف گمرک {p} | customs cut {p}
+pt.plain | پیمانِ ساده | plain agreement
+pt.since | از {at} | since {at}
+pt.ended_at | پایان: {at} | ended: {at}
+pt.answer_by | تا {at} فرصت جواب هست | Answer by {at}
+pt.cooling | تا {at} نمی‌توانی به آن‌ها یورش ببری یا جنگ اعلام کنی. | Until {at} you cannot raid them or declare war on them.
+pt.end | پایان دادن | End it
+pt.end_title | پایان دادن به پیمان | End the treaty
+pt.end_body | پیمان با {who} تمام می‌شود. | The treaty with {who} ends.
+pt.end_cooling | بعد از پایان دادن به هم‌پیمانی یا عدم تجاوز، {n} روز نمی‌توانی به آن‌ها یورش ببری یا جنگ اعلام کنی. این پایان در سابقه می‌ماند. | After ending an alliance or a non-aggression pact you cannot raid them or declare war on them for {n} days. The end stays in the record.
+pt.end_plain | پایان در سابقه می‌ماند. | The end stays in the record.
+pt.end_yes | تمامش کن | End it
+pt.accept | می‌پذیرم و امضا می‌کنم | I accept and sign
+pt.decline | نمی‌پذیرم | Decline
+pt.decline_title | نپذیرفتن پیمان | Decline the treaty
+pt.decline_body | پیشنهاد {who} را رد می‌کنی. | You decline the offer from {who}.
+pt.withdraw | پیشنهاد را پس بگیر | Withdraw the offer
+pt.withdraw_title | پس گرفتن پیشنهاد | Withdraw the offer
+pt.withdraw_body | پیشنهادت به {who} پس گرفته می‌شود. | Your offer to {who} is withdrawn.
+pt.new_title | پیمان تازه | A new treaty
+pt.kind_label | چه پیمانی؟ | What kind?
+pt.to_label | با کدام شهر؟ | With which town?
+pt.no_targets | شهری برای پیمان نیست. | There is no town for a treaty.
+pt.send | بفرست | Send
+pt.send_hint | طرف دیگر باید بپذیرد و امضا کند تا پیمان بسته شود. | The other side must accept and sign for the treaty to stand.
+pt.taken | همین پیمان با همین طرف باز یا برقرار است. | The same treaty with the same side is open or standing.
+pt.notice.treaty_proposed | پیشنهاد پیمان فرستاده شد. | The offer is sent.
+pt.notice.treaty_accepted | پیمان بسته شد. | The treaty is signed.
+pt.notice.treaty_declined | پیشنهاد پیمان رد شد. | The offer is declined.
+pt.notice.treaty_ended | پیمان پایان یافت. | The treaty is ended.
+pt.notice.treaty_withdrawn | پیشنهاد پس گرفته شد. | The offer is withdrawn.
+pd.title | مناقصه‌ها | Tenders
+pd.off | مناقصه‌ها هنوز شروع نشده‌اند. | Tenders have not started yet.
+pd.intro | شهر برای ساختمانی که هنوز تمام نشده مناقصه باز می‌کند. شرکت‌های پیمانکاری با ضمانت پیشنهاد می‌دهند. کار در سه مرحله پرداخت می‌شود و بخشی از پول تا پایان مهلت عیب‌یابی نزد شهر می‌ماند. | The town opens a tender for a building still in the making. Contractor companies bid with a bond. The work is paid in three stages and part of the money stays with the town through the defects period.
+pd.mine | مناقصه‌های شهر | The town's tenders
+pd.me | شرکت تو | your company
+pd.mine_none | مناقصه‌ای باز نیست. | No tender is open.
+pd.sites | ساختمان‌هایی که می‌شود مناقصه‌شان کرد | Buildings that can go to tender
+pd.sites_none | ساختمانِ نیمه‌کارهٔ شهری نیست. | There is no unfinished town building.
+pd.site_work | {a} از {b} کار | {a} of {b} work
+pd.not_tender | باز کردن مناقصه با کسی است که منشور این حق را به او داده. | Whoever the charter gives the right opens tenders.
+pd.post | مناقصه باز کن | Open a tender
+pd.post_title | مناقصهٔ {b} | Tender for {b}
+pd.cap | بالاترین قیمت | Highest price
+pd.cap_hint | پیشنهاد بالاتر از این پذیرفته نمی‌شود. | A bid above this is not accepted.
+pd.due | مهلت ساخت (روز) | Time to build (days)
+pd.due_hint | از روز برنده شدن حساب می‌شود. | Counted from the award.
+pd.window | وقت پیشنهاد دادن (ساعت) | Time to bid (hours)
+pd.window_hint | بعد از این وقت می‌شود برنده را تعیین کرد. | After this the winner can be chosen.
+pd.rule | برنده چطور انتخاب شود؟ | How is the winner chosen?
+pd.rule.lowest_price | ارزان‌ترین | Lowest price
+pd.rule.scored | امتیازی (قیمت، زمان و سابقه) | Scored (price, time and record)
+pd.post_terms | هزینهٔ باز کردن {fee}. ضمانت پیمانکار {bond} قیمتش و نگهداشت {ret} پول کار است. | Opening costs {fee}. The contractor's bond is {bond} of its price and the retention is {ret} of the pay.
+pd.post_need | قیمت، مهلت و وقت را بنویس. | Fill in the price, time and window.
+pd.post_go | مناقصه را باز کن | Open the tender
+pd.board | مناقصه‌های باز برای شرکت تو | Open tenders for your company
+pd.board_hint | فقط شرکت پیمانکاری ساختمان می‌تواند پیشنهاد بدهد. شرکتی که مال مسئول مناقصه یا سهامش دست او باشد پذیرفته نمی‌شود. | Only a building contractor company can bid. A company owned by, managed by or held in shares by the official who awards is refused.
+pd.board_none | مناقصهٔ بازی نیست. | No tender is open.
+pd.no_company | شرکت پیمانکاری ساختمان نداری. | You have no building contractor company.
+pd.companies | شرکت‌های پیمانکاری تو | Your contractor companies
+pd.record | {n} کار تمام‌شده | {n} jobs finished
+pd.barred_short | تا {at} کنار گذاشته شده | kept out until {at}
+pd.rules_hint | ضمانت {bond} قیمت پیشنهادی است. اگر کار را ول کنی ضمانت به شهر می‌رسد و مدتی از مناقصه‌ها کنار گذاشته می‌شوی. نگهداشت {ret} تا پایان مهلت عیب‌یابی می‌ماند. | The bond is {bond} of your price. If you walk away it goes to the town and you are kept out of tenders for a while. The retention of {ret} stays through the defects period.
+pd.status.open | باز | Open
+pd.status.awarded | در کار | In progress
+pd.status.done | تمام | Done
+pd.status.failed | ناموفق | Failed
+pd.status.cancelled | لغو شد | Cancelled
+pd.bid.standing | ایستاده | Standing
+pd.bid.won | برنده | Won
+pd.bid.lost | نبرد | Lost
+pd.bid.withdrawn | پس گرفته | Withdrawn
+pd.by | از طرف {who} | By {who}
+pd.cap_short | سقف {m} | cap {m}
+pd.rule_line | {r}، سقف {m} | {r}, cap {m}
+pd.terms_line | ضمانت {b}، نگهداشت {r} تا {d} روز عیب‌یابی، {n} روز مهلت ساخت | bond {b}, retention {r} for {d} defects days, {n} days to build
+pd.closes | پیشنهادها تا {at} | Bids until {at}
+pd.closed_at | وقت پیشنهاد دادن در {at} تمام شد | Bidding closed at {at}
+pd.no_bids | هنوز پیشنهادی نیامده. | No bid yet.
+pd.bid | پیشنهاد بده | Bid
+pd.bid_title | پیشنهاد برای {b} | Bid for {b}
+pd.company | کدام شرکت؟ | Which company?
+pd.price | قیمت | Price
+pd.price_hint | بیشترین: {m} | at most {m}
+pd.days | چند روزه می‌سازی؟ | Days to build
+pd.days_hint | شهر {n} روز خواسته. | The town asked for {n} days.
+pd.bond_note | ضمانتی که کنار گذاشته می‌شود {b} است، یعنی {p} قیمت. اگر برنده شوی و کار را ول کنی از دست می‌رود. | The bond set aside is {b}, which is {p} of the price. You lose it if you win and walk away.
+pd.bid_go | پیشنهاد را ثبت کن | Place the bid
+pd.bid_line | {m} در {d} روز | {m} in {d} days
+pd.bid_withdraw | پس گرفتن | Withdraw
+pd.barred | این شرکت تا {at} از مناقصه‌های شهر کنار گذاشته شده. | This company is kept out of town tenders until {at}.
+pd.barred_reason | شرکت تا {at} کنار گذاشته شده. | The company is kept out until {at}.
+pd.over_cap | قیمت از سقف بیشتر است؛ سقف {m} است. | The price is above the cap, which is {m}.
+pd.winner | پیمانکار | Contractor
+pd.due_at | تحویل تا | Due by
+pd.work | کار انجام‌شده | Work done
+pd.stages_head | سه مرحلهٔ پرداخت | The three payment stages
+pd.stage | مرحلهٔ {n} | Stage {n}
+pd.stage_paid | {m} در {at} پرداخت شد | {m} paid at {at}
+pd.stage_wait | هنوز نرسیده | not reached yet
+pd.retention | نگهداشت {m} تا {d} روز بعد از تحویل نزد شهر می‌ماند. | {m} stays with the town for {d} days after delivery.
+pd.failed | پیمانکار کار را تمام نکرد؛ ضمانتش به شهر رسید و مدتی از مناقصه‌ها کنار گذاشته شد. | The contractor did not finish; the bond went to the town and it is kept out of tenders for a while.
+pd.cancelled | مناقصه لغو شد و ضمانت‌ها برگشت. | The tender was cancelled and the bonds returned.
+pd.award | برنده را تعیین کن | Choose the winner
+pd.award_title | تعیین برنده | Choose the winner
+pd.award_body | از {n} پیشنهاد، برنده بر پایهٔ قاعدهٔ مناقصه انتخاب می‌شود و پول کار کنار گذاشته می‌شود. | Of {n} bids, the winner is chosen by the tender's rule and the money for the work is set aside.
+pd.award_hint | بعد از این، مناقصه را نمی‌شود لغو کرد. | After this the tender cannot be cancelled.
+pd.award_yes | تعیین کن | Choose
+pd.not_closed | هنوز وقت پیشنهاد دادن تمام نشده. | Bidding time is not over yet.
+pd.settle | مرحله‌های رسیده را بپرداز | Pay the stages reached
+pd.accept | عیب دارد، تأیید می‌کنم | Defect found, I accept the claim
+pd.cancel | لغو مناقصه | Cancel the tender
+pd.cancel_title | لغو مناقصه | Cancel the tender
+pd.cancel_body | مناقصه لغو می‌شود و ضمانت همهٔ شرکت‌ها برمی‌گردد. | The tender is cancelled and every company's bond returns.
+pd.cancel_hint | هزینهٔ باز کردن برنمی‌گردد. | The opening fee does not come back.
+pd.cancel_yes | لغو کن | Cancel it
+pd.notice.tender_posted | مناقصه باز شد. | The tender is open.
+pd.notice.tender_bid | پیشنهاد تو ثبت شد و ضمانتش کنار گذاشته شد. | Your bid is placed and its bond set aside.
+pd.notice.tender_bid_withdrawn | پیشنهاد تو پس گرفته شد و ضمانتش برگشت. | Your bid is withdrawn and the bond returned.
+pd.notice.tender_cancelled | مناقصه لغو شد و ضمانت‌ها برگشت. | The tender is cancelled and bonds returned.
+pd.notice.tender_awarded | برنده تعیین شد و کار شروع می‌شود. | The winner is chosen and the work begins.
+pd.notice.tender_no_bids | پیشنهادی نبود؛ مناقصه بسته شد. | There were no bids; the tender closed.
+pd.notice.tender_stage_paid | مرحله‌های رسیده پرداخت شد. | The stages reached are paid.
+pb.title | وام‌ها | Loans
+pb.title_union | وام‌های «{name}» | Loans of «{name}»
+pb.off | وام‌های میان دولت‌ها هنوز شروع نشده‌اند. | Loans between governments have not started yet.
+pb.intro | شهرها و اتحادها می‌توانند به هم وام بدهند. فقط پول خزانه جابه‌جا می‌شود و پولی ساخته نمی‌شود. | Towns and unions can lend to each other. Only treasury money moves; none is created.
+pb.lendable_label | پولی که می‌شود وام داد | Money that can be lent
+pb.income | درآمد هر دوره | Income each period
+pb.service | قسط‌های هر دوره | Instalments each period
+pb.offers | پیشنهادهای وام | Loan offers
+pb.running | وام‌های جاری | Running loans
+pb.running_none | وامی در کار نیست. | No loan is running.
+pb.closed | وام‌های تمام‌شده | Finished loans
+pb.offer | وام پیشنهاد بده | Offer a loan
+pb.not_lend | وام دادن با کسی است که منشور این حق را به او داده. | Whoever the charter gives the right lends.
+pb.not_borrow | وام گرفتن هم با کسی است که منشور این حق را به او داده. | Whoever the charter gives the right borrows.
+pb.line | {a} به {b} | {a} to {b}
+pb.role.lender | تو وام‌دهنده‌ای | You are the lender
+pb.role.borrower | تو وام‌گیرنده‌ای | You are the borrower
+pb.principal | مبلغ وام | Loan amount
+pb.rate | سود سالانه | Yearly interest
+pb.instalment | قسط | Instalment
+pb.owed | مانده | Owed
+pb.schedule | قسط {a} از {b} پرداخت شده | Instalment {a} of {b} paid
+pb.next | قسط بعدی: {at} | Next instalment: {at}
+pb.answer_by | تا {at} فرصت جواب هست | Answer by {at}
+pb.late | دیرکرد: {m} عقب مانده و جریمه {f} | Late: {m} behind and a fee of {f}
+pb.defaulted | وام نکول شد؛ {m} مانده و قسط‌ها دیگر نمی‌رود. | The loan is in default; {m} is owed and instalments stop.
+pb.status.offered | پیشنهاد شده | Offered
+pb.status.active | جاری | Running
+pb.status.repaid | تسویه شد | Repaid
+pb.status.defaulted | نکول | Default
+pb.status.written_off | بخشوده شد | Written off
+pb.status.restructured | بازبینی شد | Restructured
+pb.status.declined | رد شد | Declined
+pb.status.withdrawn | پس گرفته شد | Withdrawn
+pb.status.expired | مهلتش گذشت | Expired
+pb.accept | وام را می‌پذیرم | Accept the loan
+pb.decline | نمی‌پذیرم | Decline
+pb.decline_title | نپذیرفتن وام | Decline the loan
+pb.decline_body | وام {m} از {who} را رد می‌کنی. | You decline the loan of {m} from {who}.
+pb.withdraw | پیشنهاد را پس بگیر | Withdraw the offer
+pb.withdraw_title | پس گرفتن پیشنهاد وام | Withdraw the loan offer
+pb.withdraw_body | پیشنهاد وامت به {who} پس گرفته می‌شود. | Your loan offer to {who} is withdrawn.
+pb.restructure | بازبینی شرط‌ها | Change the terms
+pb.restructure_title | بازبینی وام | Restructure the loan
+pb.restructure_go | پیشنهاد بازبینی را بفرست | Send the restructure offer
+pb.restructure_hint | شرط تازه باید طرف دیگر را راضی کند. بدهی بیشتر از مانده نمی‌شود. | The other side must agree to the new terms. The debt cannot grow.
+pb.owed_now | الان مانده: {m} | owed now: {m}
+pb.writeoff | ببخش | Write off
+pb.writeoff_title | بخشودن بدهی | Write off the debt
+pb.writeoff_body | بدهی {m} از {who} بخشوده می‌شود. | The debt of {m} from {who} is written off.
+pb.writeoff_hint | فقط وامِ نکول‌شده را می‌شود بخشید و هیچ پولی جابه‌جا نمی‌شود. | Only a defaulted loan can be written off, and no money moves.
+pb.writeoff_yes | ببخش | Write it off
+pb.offer_title | پیشنهاد وام | Loan offer
+pb.offer_go | پیشنهاد را بفرست | Send the offer
+pb.offer_hint | وام‌گیرنده باید بپذیرد تا پول از خزانهٔ تو به خزانهٔ او برود. | The borrower must accept before money leaves your treasury.
+pb.to_label | به کدام شهر؟ | To which town?
+pb.no_targets | شهری برای وام نیست. | There is no town to lend to.
+pb.lendable | بیشترین: {m} | at most {m}
+pb.rate_max | بیشترین سود سالانه {p} | at most {p} a year
+pb.periods | تعداد قسط‌ها | Number of instalments
+pb.periods_max | بیشترین: {n} قسط | at most {n}
+pb.periods_range | تعداد قسط‌ها باید یک تا {n} باشد. | Instalments must be one to {n}.
+pb.more_than_lendable | از پولی که می‌شود وام داد بیشتر است. | More than can be lent.
+pb.more_than_owed | از مانده بیشتر است. | More than is owed.
+pb.rate_high | سود از {p} بیشتر نمی‌شود. | Interest cannot exceed {p}.
+pb.record | سابقهٔ وام‌گرفتن | Borrowing record
+pb.record_hint | هر وام‌دهنده این سابقه را می‌بیند. | Every lender can see this record.
+pb.record_me | سابقهٔ خودمان | Our record
+pb.record_line | {a} وام گرفته، {b} تسویه، {c} با دیرکرد، {d} نکول | {a} taken, {b} repaid, {c} late, {d} defaulted
+pb.notice.debt_offered | پیشنهاد وام فرستاده شد. | The loan offer is sent.
+pb.notice.debt_accepted | وام پذیرفته شد و پول به خزانه رفت. | The loan is accepted and the money is in the treasury.
+pb.notice.debt_declined | پیشنهاد وام رد شد. | The loan offer is declined.
+pb.notice.debt_withdrawn | پیشنهاد وام پس گرفته شد. | The loan offer is withdrawn.
+pb.notice.debt_restructured | پیشنهاد بازبینی وام فرستاده شد. | The restructure offer is sent.
+pb.notice.debt_written_off | بدهی بخشوده شد. | The debt is written off.
+mil.war_refused.cooling | به‌تازگی پیمان دوستی یا عدم تجاوزت با این کشور را تمام کرده‌ای؛ فعلاً نمی‌شود به آن جنگ اعلام کرد. | You ended an alliance or non-aggression pact with this country lately; you cannot declare war on it for now.
+refusal.village_union_not_yet | اتحادها هنوز شروع نشده‌اند. | Unions have not started yet.
+refusal.village_union_bad_args | درخواست درست نوشته نشده است. | The request is not filled in right.
+refusal.village_union_no_union | چنین اتحادی پیدا نشد. | No such union.
+refusal.village_union_no_proposal | چنین پیشنهادی پیدا نشد. | No such proposal.
+refusal.village_union_no_target | چنین شهری پیدا نشد یا برای اتحاد کافی نیست. | No such town, or it does not qualify for a union.
+refusal.village_union_bad_name | نام اتحاد باید دو تا سی‌ودو حرف باشد. | The name needs two to thirty-two letters.
+refusal.village_union_not_country | کشور باید کارهای جنگ، پیمان و دادگاه را از شهرها بگیرد. | A country must take war, treaties and courts from its towns.
+refusal.village_union_too_small | برای کشور، شهرها روی هم ساکنان کافی ندارند. | The towns together do not have enough residents for a country.
+refusal.village_union_ceiling | این منصب کاری می‌خواهد که شهرها به اتحاد نسپرده‌اند. | This office asks for a power the towns did not hand to the union.
+refusal.village_union_no_manager | منشور باید منصبی داشته باشد که بتواند آن را اداره کند و کسی در آن نشسته باشد. | The charter needs an office that can run it, with someone sitting in it.
+refusal.village_union_not_member | شهر تو عضو این اتحاد نیست. | Your town is not in this union.
+refusal.village_union_already_member | این شهر عضو اتحاد است. | This town is already a member.
+refusal.village_union_one_country | یک شهر را همزمان فقط در یک کشور می‌شود نگه داشت. | A town can be in only one country at a time.
+refusal.village_union_open_proposal | پیشنهاد دیگری از شهر تو هنوز باز است. | Another proposal from your town is still open.
+refusal.village_union_no_money | خزانه برای این کار پول کافی ندارد. | The treasury does not have enough money for this.
+refusal.village_union_not_invited | این پیشنهاد شهر تو را دعوت نکرده است. | This proposal did not invite your town.
+refusal.village_union_decided | این کار دیگر باز نیست. | This is no longer open.
+refusal.village_union_not_eligible | تو در این رأی‌گیری حق رأی نداری. | You have no vote in this one.
+refusal.village_union_already_voted | تو پیش‌تر رأی داده‌ای. | You have already voted.
+refusal.village_union_no_ballot | چنین رأی‌گیری پیدا نشد. | No such vote.
+refusal.village_union_no_motion | چنین پیشنهادی پیدا نشد. | No such motion.
+refusal.village_union_not_admitted | اعضای اتحاد هنوز پذیرفتن این شهر را تصویب نکرده‌اند. | The members have not yet voted to admit this town.
+refusal.village_union_motion_open | همین پیشنهاد هم‌اکنون باز است. | This motion is already open.
+refusal.village_union_no_office | چنین منصبی پیدا نشد. | No such office.
+refusal.village_union_no_player | چنین بازیکنی پیدا نشد. | No such player.
+refusal.village_union_seats_full | جای خالی در این منصب نیست. | This office has no free seat.
+refusal.village_union_title | عنوان منصب پذیرفته نیست یا تکراری است. | The office name is not accepted or is taken.
+refusal.village_union_not_held | آن بازیکن در این منصب نیست. | That player does not hold this office.
+refusal.village_union_delegated_away | این کار را شهر به اتحاد سپرده است. | The town has handed this to the union.
+refusal.village_union_at_war | با جنگ باز نمی‌شود. | This cannot be done during a war.
+refusal.village_union_notice_running | مهلت خروج در جریان است. | The notice to leave is running.
+refusal.village_union_too_soon | هنوز زود است. | It is too early.
+refusal.village_union_recall_tenure | این منصب‌دار هنوز به اندازهٔ کافی در منصب نبوده که بشود برکنارش کرد. | The holder has not been in office long enough to be recalled.
+refusal.village_treaty_not_yet | پیمان‌ها هنوز شروع نشده‌اند. | Treaties have not started yet.
+refusal.village_treaty_bad_args | درخواست درست نوشته نشده است. | The request is not filled in right.
+refusal.village_treaty_no_target | طرف دیگر پیدا نشد. | The other side was not found.
+refusal.village_treaty_no_kind | چنین پیمانی نداریم. | There is no such kind of treaty.
+refusal.village_treaty_open | پیمانی از همین نوع میان این دو باز است. | A treaty of this kind is already open between the two.
+refusal.village_treaty_no_treaty | چنین پیمانی پیدا نشد. | No such treaty.
+refusal.village_treaty_state | پیمان در حالتی نیست که بشود این کار را کرد. | The treaty is not in a state where this can be done.
+refusal.village_treaty_self | با خودت نمی‌شود پیمان بست. | You cannot sign a treaty with yourself.
+refusal.village_treaty_delegated | پیمان‌بستن را شهر به اتحاد سپرده است. | The town has handed treaty-making to the union.
+refusal.village_treaty_not_party | این پیمان از آنِ تو نیست. | This treaty is not yours.
+refusal.village_treaty_cooling | به‌تازگی پیمانی را پایان داده‌ای؛ باید صبر کنی. | You ended a treaty lately; you must wait.
+refusal.village_haul_no_passage | راه از زمین شهر دیگری می‌گذرد و پیمان عبور با آن‌ها نداری. | The road crosses another town's land and you have no passage treaty with them.
+refusal.village_raid_treaty | با آن شهر پیمان دفاع یا عدم تجاوز داری؛ به آن یورش نمی‌بری. | You have a defence or non-aggression treaty with that town, so you do not raid it.
+refusal.village_raid_cooling | به‌تازگی پیمانی با آن شهر را پایان داده‌ای؛ هنوز نمی‌توانی به آن یورش ببری. | You ended a treaty with that town lately; you cannot raid it yet.
+refusal.village_raid_same_union | آن شهر با تو عضو یک اتحاد است؛ به هم یورش نمی‌برید. | That town is in the same union as yours; you do not raid each other.
+refusal.village_tender_not_yet | مناقصه‌ها هنوز شروع نشده‌اند. | Tenders have not started yet.
+refusal.village_tender_bad_args | درخواست درست نوشته نشده است. | The request is not filled in right.
+refusal.village_tender_no_building | چنین ساختمانی پیدا نشد. | No such building.
+refusal.village_tender_not_site | این ساختمان در دست ساخت نیست یا کارگاهش مال شهر نیست. | This building is not being built, or the site is not the town's.
+refusal.village_tender_have | برای این ساختمان مناقصه‌ای باز یا در کار است. | A tender for this building is already open or running.
+refusal.village_tender_no_tender | چنین مناقصه‌ای پیدا نشد. | No such tender.
+refusal.village_tender_closed | مناقصه بسته شده است. | The tender is closed.
+refusal.village_tender_not_company | این شرکت مال تو نیست. | This company is not yours.
+refusal.village_tender_no_contractor | فقط شرکت پیمانکاری ساختمان می‌تواند پیشنهاد بدهد. | Only a building contractor company can bid.
+refusal.village_tender_debarred | این شرکت تا مدتی از مناقصه‌های شهر کنار گذاشته شده. | This company is kept out of town tenders for a while.
+refusal.village_tender_bad_bid | پیشنهاد باید قیمت و روز داشته باشد، از سقف بیشتر نباشد و ضمانتش پوشش داده شود. | A bid needs a price and days, must not pass the cap, and its bond must be covered.
+refusal.village_tender_have_bid | این شرکت پیش‌تر پیشنهاد داده است. | This company has already bid.
+refusal.village_tender_no_money | پول برای این کار کافی نیست. | There is not enough money for this.
+refusal.village_tender_conflict | کسی که مناقصه را می‌دهد با این شرکت پیوند مالی دارد؛ پیشنهادش پذیرفته نمی‌شود. | The official who awards the tender has a financial tie to this company, so its bid is refused.
+refusal.village_tender_not_yet_closed | هنوز زمان پیشنهادها تمام نشده است. | Bidding time is not over yet.
+refusal.village_tender_no_bid | پیشنهادی از تو در این مناقصه نیست. | You have no bid in this tender.
+refusal.village_tender_not_payer | پرداخت‌کنندهٔ این مناقصه شهر تو نیست. | Your town is not the payer of this tender.
+refusal.village_tender_union | این ساختمان در شهری از این اتحاد نیست. | This building is not in a town of this union.
+refusal.village_debt_not_yet | وام‌های میان دولت‌ها هنوز شروع نشده‌اند. | Loans between governments have not started yet.
+refusal.village_debt_bad_args | درخواست درست نوشته نشده است. | The request is not filled in right.
+refusal.village_debt_no_target | طرف دیگر پیدا نشد. | The other side was not found.
+refusal.village_debt_no_loan | چنین وامی پیدا نشد. | No such loan.
+refusal.village_debt_self | به خودت نمی‌شود وام داد. | You cannot lend to yourself.
+refusal.village_debt_terms | شرط‌های وام از حد مجاز بیرون است. | The terms are outside what is allowed.
+refusal.village_debt_lender_short | خزانهٔ وام‌دهنده این مقدار را نمی‌تواند وام بدهد. | The lender's treasury cannot lend that much.
+refusal.village_debt_service | قسط‌ها از توان درآمد وام‌گیرنده بیشتر است. | The instalments are more than the borrower's income can bear.
+refusal.village_debt_state | وام در حالتی نیست که بشود این کار را کرد. | The loan is not in a state where this can be done.
+refusal.village_debt_not_party | این وام از آنِ تو نیست. | This loan is not yours.
+refusal.village_debt_expired | مهلت پذیرفتن این پیشنهاد گذشته است. | The time to accept this offer has passed.
+refusal.village_debt_not_default | فقط وامِ نکول‌شده را می‌شود بخشید. | Only a defaulted loan can be written off.
+refusal.village_debt_raise | در بازبینی نمی‌شود بدهی را بیشتر کرد. | A restructure cannot make the debt bigger.
+pu.held | اجازه‌هایی که تو در این اتحاد داری: | What you hold in this union:
+pu.not_handed | شهرها این کار را به اتحاد نسپرده‌اند. | The towns did not hand this power to the union.
+pu.tally_towns | رأی شهرها: {n} شهر، بیش از {need} لازم است | Towns' vote: {n} towns, more than {need} needed
+pu.tally_people | رأی مردم شهرها، به نسبت جمعیت | The people's vote, by population
+pu.motion_mode.one_member | هر شهر یک رأی دارد. | Each town has one vote.
+pu.motion_mode.weighted | رأی هر شهر به نسبت مردمش است، با سقف. | Each town's vote follows its people, with a cap.
+pu.motion_mode.double_majority | هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | Most towns and most people must both agree.
+pu.motion_mode.two_thirds | برچیدن اتحاد دو سوم شهرها را می‌خواهد. | Dissolving needs two thirds of the towns.
+pu.p.fee | هزینهٔ ثبت از خزانهٔ شهر می‌رود: {m} | The filing fee comes from the town's treasury: {m}
+pt.ended_by | این پیمان را {who} تمام کرد. | {who} ended this treaty.

@@ -78,7 +78,7 @@ const holds = (mine: CharterGrantView[], code: string) => mine.some((g) => g.per
 function view(isHead: boolean): CharterView {
   const s = init(isHead)
   const mine = mineOf(s, isHead)
-  const permissions: CharterPermissionView[] = CATALOGUE.map(([code, group, limited, active]) => ({ code, group, limited, active }))
+  const permissions: CharterPermissionView[] = CATALOGUE.map(([code, group, limited, active]) => ({ code, group, limited, active, class: '' }))
   return {
     village: 'آمل', settlement_id: 'mock-own', offices: s.offices, mine, can_create: holds(mine, 'office.create'), can_edit: holds(mine, 'office.edit'),
     can_appoint: holds(mine, 'office.appoint'), can_dismiss: holds(mine, 'office.dismiss'), permissions, audit: s.audit, limits: LIMITS,
