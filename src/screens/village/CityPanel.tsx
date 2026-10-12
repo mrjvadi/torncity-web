@@ -16,6 +16,7 @@ import { useVillageView } from './common'
 import { useCan } from '../../lib/permissions'
 import { useContentNames } from '../../village/useVillage'
 import { cityItemsFor } from './cityItems'
+import { VettingRule } from './Intel'
 import type { DevelopmentDimension, DevelopmentView } from '../../api/views.gen'
 import './village.css'
 
@@ -84,6 +85,8 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
           </CardGrid>
         </div>
       )}
+      <PSec>{t('city.watch')}</PSec>
+      <VettingRule run={run} />
       <PSec>{t('city.affairs')}</PSec>
       <div className="hub-grid">
         {items.map((it) => (

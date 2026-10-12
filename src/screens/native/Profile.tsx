@@ -5,6 +5,7 @@
 // Facts come from the `profile` view; the net worth (life.me) and the medals
 // (achievement.list) are read from their own views.
 
+import { IntelMine } from '../village/Intel'
 import { useEffect, useState } from 'react'
 import * as api from '../../api/client'
 import type { ApprenticeLine, ApprenticesView, SurvivalView } from '../../api/views.gen'
@@ -161,6 +162,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
       </>}
 
       <ApprenticeLineRow run={run} />
+      <IntelMine run={run} />
 
       {(v.work?.job || v.work?.course) && (
         <>

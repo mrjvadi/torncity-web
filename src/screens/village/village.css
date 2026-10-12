@@ -458,3 +458,12 @@
 .pd-bid { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, currentColor 5%, transparent); }
 .pp-panel .rc-chips, .ch-edit .rc-chips { flex-wrap: wrap; overflow: visible; }
 .pp-panel .rc-chips .dk-chip { flex: none; white-space: nowrap; }
+
+/* great works, intelligence, licences (ADR 0077) */
+.pj-marks { display: flex; gap: 6px; flex-wrap: wrap; padding: 2px 0; }
+.pj-mark { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-style: normal; font-weight: 700; border: 2px solid color-mix(in srgb, currentColor 28%, transparent); opacity: .75; }
+.pj-mark.done { background: #56d447; border-color: #56d447; color: #10200c; opacity: 1; }
+.pj-mark.now { border-color: #f5a11f; box-shadow: 0 0 0 3px color-mix(in srgb, #f5a11f 28%, transparent); opacity: 1; }
+.pj-need { display: flex; flex-direction: column; gap: 4px; }
+.pj-need b.good { color: #56d447; }
+.pj-me { margin-block: 6px; }

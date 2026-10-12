@@ -466,6 +466,7 @@ eco.market.refused.too_many | همین حالا {count} سفارش باز دار
 eco.market.refused.not_enough | این‌قدر {item} همراهت نیست. | You do not have that much {item} on you.
 eco.market.refused.no_order | چنین سفارشی از تو وجود ندارد. | You have no such order.
 eco.market.refused.closed | این سفارش دیگر باز نیست. | This order is no longer open.
+eco.market.refused.no_licence | این شهر برای فروش در بازارچه مجوز غرفه می‌خواهد؛ از «مجوزها» بگیر. | This town asks for a stall licence to sell at the market; get one under Licences.
 # the shops
 eco.shops.in_city | مغازه‌های {city} | Shops of {city}
 eco.shops.none_at | در {place} مغازه‌ای نیست. | There are no shops at {place}.
@@ -7568,3 +7569,618 @@ pu.motion_mode.double_majority | هم بیشتر شهرها و هم بیشتر �
 pu.motion_mode.two_thirds | برچیدن اتحاد دو سوم شهرها را می‌خواهد. | Dissolving needs two thirds of the towns.
 pu.p.fee | هزینهٔ ثبت از خزانهٔ شهر می‌رود: {m} | The filing fee comes from the town's treasury: {m}
 pt.ended_by | این پیمان را {who} تمام کرد. | {who} ended this treaty.
+# -- B13: great works, intelligence, licences (ADR 0077) ----------------------------------------------------------
+city.projects | کارهای بزرگ | Great works
+city.intel | دفتر اطلاعات | Intelligence office
+city.licences | مجوزها | Licences
+city.watch | چشم شهر به تازه‌واردان | How the town watches newcomers
+act.market.licences | مجوزها | Licences
+pj.title | کارهای بزرگ | Great works
+pj.off | کارهای بزرگ هنوز شروع نشده. | Great works have not started yet.
+pj.intro | کار بزرگ، مثل دیوار شهر یا کتابخانهٔ بزرگ، چند مرحله دارد و روزها طول می‌کشد. هر مرحله مصالح و ساعت کار می‌خواهد و باید زمانش هم بگذرد. هر کسی می‌تواند به صندوقش هدیه بدهد. | A great work, like a town wall or a great library, has several stages and takes days. Each stage needs materials and working hours, and some time has to pass. Anyone may give to its fund.
+pj.live | کارهای در جریان | Works in hand
+pj.live_none | شهر الان کار بزرگی در دست ندارد. | The town has no great work in hand.
+pj.finished | کارهای تمام‌شده و رهاشده | Finished works
+pj.finished_hint | کار تمام‌شده هیچ‌وقت خراب نمی‌شود. اگر کسی نگهبانی‌اش را نکند یا مزدش نرسد، فقط بی‌اثر می‌ماند و وقتی دوباره نگهبان و مزد داشت باز می‌شود. | A finished work is never destroyed. If nobody keeps it or its wages are not paid, it only stands idle until it has keepers and wages again.
+pj.kinds | کارهایی که می‌شود شروع کرد | Works that can be started
+pj.kinds_none | شهر هنوز چیزی ندارد که کار بزرگی از آن شروع شود. | The town has nothing yet that a great work could start from.
+pj.not_allowed | شروع کار بزرگ با کسی است که منشور شهر این اختیار را به او داده. | Starting a great work is for whoever the charter gives that power to.
+pj.board | مناقصه‌های کار بزرگ | Tenders of great works
+pj.board_hint | شرکت پیمانکاری می‌تواند برای مرحله‌های یک کار بزرگ پیشنهاد بدهد. تضمین پیشنهاد از شرکت گرفته می‌شود و اگر برنده نشود برمی‌گردد. | A contractor company may bid for a great work. The bond is taken from the company and given back if it does not win.
+pj.board_none | الان هیچ مناقصه‌ای باز نیست. | No tender is open now.
+pj.board_line | {name} در {town} | {name} in {town}
+pj.board_link | مناقصه‌های کار بزرگ | Tenders of great works
+pj.kind.great_beacon | فانوس بزرگ | Great beacon
+pj.kind.city_wall | دیوار شهر | City wall
+pj.kind.great_library | کتابخانهٔ بزرگ | Great library
+pj.kind.aqueduct | آبراه | Aqueduct
+pj.kind.great_canal | کانال بزرگ | Great canal
+pj.kind.great_temple | نیایشگاه بزرگ | Great temple
+pj.effect.detector | از دور، نزدیک شدن یورش را می‌بیند و خبرش را می‌رساند؛ نگهبان و سوخت می‌خواهد. | Sees a raid coming from afar and passes the word; it needs a keeper and fuel.
+pj.effect.garrison | روی دیوار جای نگهبان دارد؛ نگهبانش باید نان و مزد داشته باشد. | The wall has seats for guards; the guards need food and wages.
+pj.effect.research | جای پژوهش بیشتر و آموزش می‌دهد؛ نویسنده و کاغذ می‌خواهد. | Gives more room for research and teaching; it needs scribes and paper.
+pj.effect.household_water | آب را به خانه‌های شهر می‌رساند؛ نگهبان و تعمیر می‌خواهد. | Brings water to the town's homes; it needs a keeper and repairs.
+pj.effect.farm_water | مزرعه‌ای را که آبی ندارد آب می‌دهد. | Waters a farm that has no water yet.
+pj.effect.trade_footfall | زائر و رهگذر می‌آورد و بازارچه را پررفت‌وآمد می‌کند؛ نگهبانانش مزد می‌خواهند. | Brings pilgrims and passers-by to the market; its keepers need wages.
+pj.marks | مرحلهٔ {a} از {b} | Stage {a} of {b}
+pj.marks_done | هر {n} مرحله تمام شده | All {n} stages done
+pj.stage_of | مرحلهٔ {a} از {b} | Stage {a} of {b}
+pj.stage_n | مرحلهٔ {n} | Stage {n}
+pj.fund_short | صندوق: {m} | Fund: {m}
+pj.see | ببین | Open
+pj.kind_stages | {n} مرحله | {n} stages
+pj.kind_missing | شهر باید اول این‌ها را پیدا یا بسازد: {list} | The town must first find or build: {list}
+pj.kind_missing_any | چیزهایی که هنوز ندارد | things it does not have yet
+pj.kind_missing_hint | شهردار یا کسی که پژوهش با اوست می‌تواند آن را در «دانش» بگذارد. | The mayor, or whoever holds research, can put it under Knowledge.
+pj.start | شروع کار | Start the work
+pj.start_title | شروع کار بزرگ | Start a great work
+pj.start_body | شهر «{name}» را شروع کند؟ این کار {n} مرحله دارد. | Should the town start the {name}? It has {n} stages.
+pj.start_hint | ثبت کار {fee} از خزانه می‌برد. بعد از مرحلهٔ اول دیگر نمی‌شود لغوش کرد. | Filing costs {fee} from the treasury. After the first stage it can no longer be cancelled.
+pj.start_yes | شروع کن | Start
+pj.back_list | بازگشت به فهرست کارها | Back to the list of works
+pj.state | حال این کار | State of the work
+pj.kept | باز است | Open
+pj.abandoned | رهاشده | Left idle
+pj.open_today | امروز باز است | Open today
+pj.idle | بی‌اثر | Idle
+pj.kept_hint | نگهبانانش مزد می‌گیرند و کارش را می‌کند. | Its keepers are paid and it does its job.
+pj.idle.no_staff | نگهبان ندارد. | It has no keeper.
+pj.idle.no_wage | خزانه مزد نگهبانش را نداده. | The treasury has not paid its keeper.
+pj.idle.no_supplies | مواد یا سوختش تمام شده. | It has run out of supplies or fuel.
+pj.idle.sabotaged | کسی کارش را خراب کرده. | Someone has spoiled it.
+pj.idle.other | امروز بسته است. | It is closed today.
+pj.idle_never | خراب نمی‌شود؛ هر وقت نگهبان و مزد پیدا شد دوباره باز می‌شود. | It does not decay; it opens again once it has keepers and wages.
+pj.library_post | اینجا هم پژوهشگر لازم است. هر ساکنی می‌تواند در میز پژوهش کرسی بگیرد. | Scholars are needed here too. Any resident may take a post at the research desk.
+pj.library_go | میز پژوهش | Research desk
+pj.now | مرحلهٔ در دست | The stage in hand
+pj.waiting | حال مرحله | State of the stage
+pj.wait.ready | همه‌چیز آماده است | All is ready
+pj.wait.materials | منتظر مصالح | Waiting for materials
+pj.wait.crew | منتظر کارگر | Waiting for workers
+pj.wait.time | باید زمان بگذرد | Time must pass
+pj.wait.delay | کار را کند کرده‌اند | The work has been slowed
+pj.wait.research | شهر باید دانش این مرحله را پیدا کند | The town must find the knowledge of this stage
+pj.until | کمترین زمان مرحله تا {at} | Least time of the stage until {at}
+pj.delay_until | کند شدن کار تا {at} | Slowed until {at}
+pj.research_hint | برای این مرحله دانش تازه‌ای لازم است؛ از «دانش» شهر شروعش کنید. | This stage needs new knowledge; start it from the town's Knowledge.
+pj.crew_hours | ساعت کار | Working hours
+pj.have_need | {a} از {b} | {a} of {b}
+pj.no_materials | این مرحله مصالح نمی‌خواهد. | This stage needs no materials.
+pj.give_btn | مصالح بده | Give materials
+pj.deliver_btn | مصالح از انبار شهر | Materials from the town store
+pj.give_note | مصالحی که می‌دهی از همان‌چیزی کم می‌شود که همراهت است و توی کارگاه کار می‌ماند. | What you give comes out of what you carry and stays at the site.
+pj.crew | کارگرها | Crew
+pj.crew_contractor | این کار را پیمانکار با کارگرهای خودش انجام می‌دهد. | The contractor does this work with his own crew.
+pj.crew_none | الان کسی سر کار نیست. | Nobody is working now.
+pj.me | تو | You
+pj.shift_run | تا {at} | until {at}
+pj.shift_done | {n} ساعت کار | {n} hours worked
+pj.shift_mine | شیفت تو تا {at} ادامه دارد. | Your shift goes on until {at}.
+pj.work | شیفت کار ({m} دقیقه) | Take a shift ({m} min)
+pj.hire_btn | کارگر از میان مردم | Hire from the people
+pj.hire_note | امروز {n} ساعت از {m} ساعت گرفته شده. | Today {n} of {m} hours hired.
+pj.fund | صندوق کار | Fund
+pj.fund_now | موجودی صندوق | In the fund
+pj.pledge_btn | هدیه به صندوق | Give to the fund
+pj.alloc_btn | از خزانه به صندوق | From the treasury to the fund
+pj.donors | کسانی که هدیه داده‌اند | Who has given
+pj.donors_none | هنوز کسی هدیه نداده. | Nobody has given yet.
+pj.anonymous | ناشناس | Anonymous
+pj.refunded | پس گرفته شد | taken back
+pj.unpledge | پس گرفتن هدیه | Take the gift back
+pj.unpledge_title | پس گرفتن هدیه | Take the gift back
+pj.unpledge_body | هدیه‌ات از صندوق به خودت برمی‌گردد. | Your gift comes back to you from the fund.
+pj.contract | پیمانکار | Contractor
+pj.contract_none | هنوز مناقصه‌ای برای این کار باز نشده. | No tender has been opened for this work yet.
+pj.tender_btn | مناقصه باز کن | Open a tender
+pj.done | مرحله‌های تمام‌شده | Stages done
+pj.cancelled | این کار لغو شد. | This work was cancelled.
+pj.cancelled_chip | لغو شد | Cancelled
+pj.stages_paid | مرحله‌های پرداخت‌شده | Stages paid
+pj.retention | پول نگه‌داشته‌شده | Money held back
+pj.defect | عیب دارد | It has a fault
+pj.defect_title | ثبت عیب | Record a fault
+pj.defect_body | به پیمانکار می‌گویی کار عیب دارد. | You tell the contractor the work has a fault.
+pj.defect_hint | پولی که نگه داشته شده به صندوق کار می‌رود. این فقط تا پایان مدت عیب‌یابی شدنی است. | The money held back goes to the fund. This is only possible during the defects period.
+pj.defect_yes | عیب را ثبت کن | Record it
+pj.cancel_btn | لغو کار | Cancel the work
+pj.cancel_title | لغو کار | Cancel the work
+pj.cancel_body | این کار لغو شود؟ | Cancel this work?
+pj.cancel_hint | فقط پیش از مرحلهٔ دوم شدنی است. پول صندوق به نسبت به دهنده‌ها برمی‌گردد. | Only possible before stage two. The fund goes back to the givers in proportion.
+pj.cancel_yes | لغو کن | Cancel it
+pj.pledge_title | هدیه به صندوق | Give to the fund
+pj.pledge_go | هدیه بده | Give
+pj.amount | مبلغ | Amount
+pj.pledge_hint | کمترین هدیه {m} است. | The least gift is {m}.
+pj.pledge_low | هدیه باید دست‌کم {m} باشد. | The gift must be at least {m}.
+pj.anon_label | نام تو در فهرست | Your name on the roll
+pj.anon_no | با نام خودم | With my name
+pj.anon_yes | ناشناس | Anonymous
+pj.pledge_refund | تا پیش از شروع مرحلهٔ اول می‌توانی هدیه‌ات را پس بگیری. | You can take your gift back until the first stage starts.
+pj.pledge_spent | هدیه بعد از شروع مرحله‌ها خرج کار می‌شود و پس نمی‌آید. | Once the stages have started the gift is spent on the work and does not come back.
+pj.alloc_title | از خزانه به صندوق | Treasury to fund
+pj.alloc_go | به صندوق بده | Move to the fund
+pj.alloc_hint | این پول از خزانهٔ شهر برمی‌دارد. | This takes money from the town treasury.
+pj.item | کالا | Goods
+pj.count | تعداد | Count
+pj.lacks_n | هنوز {n} کم است. | {n} still missing.
+pj.deliver_title | مصالح از انبار شهر | Materials from the town store
+pj.deliver_go | به کارگاه برسان | Send to the site
+pj.deliver_hint | از انبار شهر برداشته می‌شود و توی کارگاه می‌ماند. | Taken from the town store and left at the site.
+pj.give_title | مصالح به کارگاه | Materials to the site
+pj.give_go | بده | Give
+pj.give_hint | باید همین‌جا باشی و کالا همراهت باشد. | You must be here and carry the goods.
+pj.hire_title | کارگر از میان مردم | Hire from the people
+pj.hire_go | کارگر بگیر | Hire
+pj.hours | ساعت کار | Working hours
+pj.hire_hint | امروز تا {n} ساعت می‌شود گرفت. | Up to {n} hours can be hired today.
+pj.hire_left | امروز فقط {n} ساعت مانده. | Only {n} hours are left today.
+pj.tender_title | مناقصهٔ کار بزرگ | Tender for the great work
+pj.tender_go | مناقصه را باز کن | Open the tender
+pj.tender_need | سقف قیمت، روزها و مهلت را بنویس. | Write the price cap, the days and the window.
+pj.tender_hint | وقتی مناقصه باز است، شهر خودش کارگر نمی‌گیرد. پیمانکار بعد از برنده شدن کار را با کارگر خودش انجام می‌دهد. | While a tender is open the town hires no crew itself. After the award the contractor does the work with his own crew.
+pj.bid_title | پیشنهاد پیمانکار | Contractor bid
+pj.notice.project_started | کار بزرگ شروع شد. | The great work has started.
+pj.notice.project_pledged | هدیه‌ات به صندوق رسید. | Your gift reached the fund.
+pj.notice.project_unpledged | هدیه پس گرفته شد. | The gift was taken back.
+pj.notice.project_allocated | پول از خزانه به صندوق رفت. | Money went from the treasury to the fund.
+pj.notice.project_delivered | مصالح به کارگاه رسید. | The materials reached the site.
+pj.notice.project_working | شیفت کار شروع شد. | The shift has started.
+pj.notice.project_hired | کارگر از میان مردم گرفته شد. | Workers were hired from the people.
+pj.notice.project_cancelled | کار لغو شد و پول صندوق به نسبت برگشت. | The work was cancelled and the fund went back in proportion.
+pj.notice.project_tender | مناقصه باز شد. | The tender is open.
+pj.notice.project_bid | پیشنهاد شرکت ثبت شد. | The company's bid was recorded.
+pj.notice.project_bid_withdrawn | پیشنهاد پس گرفته شد. | The bid was withdrawn.
+pj.notice.project_awarded | پیمانکار انتخاب شد. | The contractor was chosen.
+pj.notice.project_defect | عیب ثبت شد؛ پول نگه‌داشته به صندوق می‌رود. | The fault was recorded; the money held back goes to the fund.
+pj.notice.project_stage_done | یک مرحله تمام شد. | A stage is done.
+# -- intelligence ------------------------------------------------------------------------------------------------
+gi.title | دفتر اطلاعات | Intelligence office
+gi.off | دفتر اطلاعات هنوز شروع نشده. | The intelligence office has not started yet.
+gi.intro | شهر می‌تواند کسی را که در شهر دیگر زندگی می‌کند برای خبر آوردن بگیرد. خبر همیشه تقریبی است و کهنه می‌شود. هیچ‌وقت عدد دقیق نمی‌آید. | A town can engage someone who lives in another town to bring news. News is always rough and gets old. A figure never comes.
+gi.bureau | دفتر | The office
+gi.bureau_open | امروز باز است | Open today
+gi.bureau_closed | امروز بسته است | Closed today
+gi.bureau_none | ساخته نشده | Not built
+gi.bureau_none_hint | شهر تو دفتر اطلاعات ندارد. اول باید ساخته شود و کارمند و حقوق داشته باشد. | Your town has no intelligence office. It must be built and have a clerk and wages.
+gi.bureau_closed_hint | دفتر امروز باز نیست؛ کارمند، حقوق یا کاغذ ندارد. | The office is not open today; it lacks a clerk, wages or paper.
+gi.counter_label | مراقبتِ شهر از غریبه‌ها | How the town watches strangers
+gi.counter.none | کسی را برای دیدن غریبه‌ها ندارد | Nobody to watch strangers
+gi.counter.light | کمی مراقب است | Watches a little
+gi.counter.solid | خوب مراقب است | Watches well
+gi.vet_label | تازه‌واردها را می‌سنجیم | Newcomers are vetted
+gi.vet_days | {n} روز | {n} days
+gi.vet_none | سنجشی نیست | No vetting
+gi.vet_change | عوض کردن | Change
+gi.vet_title | سنجش تازه‌واردها | Vetting newcomers
+gi.vet_field | چند روز زیر نظر بمانند | Days under watch
+gi.vet_field_hint | از صفر تا شصت روز. هرچه بیشتر، غریبه‌ها دیرتر جا باز می‌کنند ولی مهمان‌های واقعی هم معطل می‌شوند. | From zero to sixty. The longer, the harder it is for strangers, but real guests wait too.
+gi.vet_max | بیشتر از شصت روز نمی‌شود. | No more than sixty days.
+gi.vet_go | ثبت کن | Save
+gi.offers | پیشنهادهای کار برای تو | Offers of work for you
+gi.offer | پیشنهاد | Offer
+gi.offer_line | «{sponsor}» می‌خواهد دربارهٔ «{target}» خبر بیاوری | «{sponsor}» wants you to bring news about «{target}»
+gi.offer_cover | تو در همان شهر زندگی می‌کنی و همین پوشش توست. مزدت را شهری می‌دهد که تو را گرفته. | You live in that town and that is your cover. The town that engaged you pays your wage.
+gi.accept | می‌پذیرم | Accept
+gi.refuse | نمی‌پذیرم | Refuse
+gi.mine | کارهای پنهانی تو | Your covert jobs
+gi.agents | کسانی که برای شهر خبر می‌آورند | Who brings news for the town
+gi.agents_none | هنوز کسی را نگرفته‌ای. | You have engaged nobody yet.
+gi.engage | گرفتن مأمور | Engage an agent
+gi.engage_title | گرفتن مأمور | Engage an agent
+gi.engage_go | پیشنهاد بده | Offer
+gi.engage_need | کد بازیکن و شهر را بنویس. | Write the player's code and the town.
+gi.engage_hint | مأمور باید خودش در آن شهر زندگی کند. پیشنهاد تا وقتی که او نپذیرد کاری نمی‌کند. | The agent must really live in that town. The offer does nothing until he accepts.
+gi.player | کد بازیکن | Player code
+gi.player_hint | کدی که او در برگهٔ خودش دارد. | The code on his own card.
+gi.target | کدام شهر | Which town
+gi.no_towns | شهر دیگری پیدا نشد. | No other town found.
+gi.survey | خبر بخواه | Ask for news
+gi.survey_title | خبر خواستن | Ask for news
+gi.survey_go | بفرست | Send
+gi.survey_hint | هر کار روزی یک بار انجام می‌شود. ممکن است خوب پیش برود، نیمه‌کاره بماند یا خراب شود. | Each job can be done once a day. It may go well, half-fail or go wrong.
+gi.op | چه خبری | What news
+gi.op_missing | شهر تو هنوز این را بلد نیست: {list} | Your town does not know this yet: {list}
+gi.agent | کدام مأمور | Which agent
+gi.agent_me | مأمور در «{target}» | Agent in «{target}»
+gi.agent_line | {who} در «{target}» | {who} in «{target}»
+gi.agent_for | برای «{sponsor}» | for «{sponsor}»
+gi.cover | روزهای پوشش: {n} | Days of cover: {n}
+gi.ops_today | امروز {n} کار | {n} jobs today
+gi.recall | فراخواندن | Call back
+gi.recall_title | فراخواندن مأمور | Call the agent back
+gi.recall_body | {who} فراخوانده شود؟ | Call {who} back?
+gi.recall_hint | کارش تمام می‌شود و پوششش هم. | His work ends, and so does his cover.
+gi.wait_agent | اول باید مأموری پیشنهاد را بپذیرد. | An agent must accept the offer first.
+gi.status.offered | پیشنهاد | Offered
+gi.status.active | در کار | At work
+gi.status.declined | رد شد | Declined
+gi.status.expelled | بیرون شد | Put out
+gi.status.recalled | فراخوانده شد | Called back
+gi.reports | خبرها | News
+gi.reports_hint | اندازه‌ها تقریبی است و هر خبر تاریخ و اطمینان دارد. خبر کهنه را زیاد جدی نگیر. | The sizes are rough, and each piece of news has a date and a confidence. Do not take old news too seriously.
+gi.reports_none | هنوز خبری نیامده. | No news has come yet.
+gi.report_of | خبر دربارهٔ «{target}» | News about «{target}»
+gi.confidence | اطمینان {c} | Confidence {c}
+gi.conf.low | کم | low
+gi.conf.medium | متوسط | medium
+gi.conf.high | زیاد | high
+gi.taken | گرفته شد {at} | taken {at}
+gi.old | کهنه | old
+gi.old_hint | این خبر کهنه شده؛ شاید حالا فرق کرده باشد. | This news is old; things may have changed.
+gi.shared | این خبر به شهر دیگری هم داده شده. | This news was passed to another town.
+gi.share | دادن به شهر دیگر | Pass to another town
+gi.share_title | دادن خبر به شهر دیگر | Pass the news to another town
+gi.share_to | به کدام شهر | To which town
+gi.share_go | بده | Pass it
+gi.share_hint | آن شهر خبر را می‌بیند، ولی نمی‌فهمد از کجا آمده. | That town sees the news but not where it came from.
+gi.metric.treasury | خزانه | Treasury
+gi.metric.food | خوراک | Food
+gi.metric.materials | مصالح | Materials
+gi.metric.seats | نگهبان‌ها | Guards
+gi.metric.watch_posts | دیده‌بانی‌ها | Watch posts
+gi.metric.pending | پیمان‌های در راه | Treaties on the way
+gi.metric.progress | پیشرفت کار بزرگ | Progress of the great work
+gi.metric.shortfall | کمبود مصالح | Shortage of materials
+gi.metric.vacant | کرسی‌های خالی | Empty posts
+gi.metric.unknown | چیزی | Something
+gi.band.meagre | اندک | Meagre
+gi.band.modest | کم | Modest
+gi.band.ample | خوب | Ample
+gi.band.vast | بسیار | Vast
+gi.band.scarce | کم | Scarce
+gi.band.enough | کافی | Enough
+gi.band.plenty | فراوان | Plenty
+gi.band.none | هیچ | None
+gi.band.few | چند تا | A few
+gi.band.some | تعدادی | Some
+gi.band.many | بسیار | Many
+gi.band.several | چندین | Several
+gi.band.one_or_two | یکی دو تا | One or two
+gi.band.early | اول کار | Early
+gi.band.midway | میانهٔ کار | Midway
+gi.band.late | نزدیک پایان | Near the end
+gi.band.small | کم | Small
+gi.band.large | زیاد | Large
+gi.band.unknown | نامعلوم | Unknown
+gi.op.survey_stock | انبار و خزانه | Stores and treasury
+gi.op.survey_garrison | نگهبان‌ها و دیده‌بانی | Guards and watch
+gi.op.survey_treaties | پیمان‌های در راه | Treaties on the way
+gi.op.survey_projects | کارهای بزرگ | Great works
+gi.op.survey_posts | کرسی‌های خالی | Empty posts
+gi.op.delay_work | کند کردن یک کار | Slow a work
+gi.op.spoil_stock | تباه کردن بخشی از یک کالا | Spoil part of a good
+gi.op.blind_post | کور کردن یک دیده‌بانی | Blind a watch post
+gi.op.skip_service_day | از کار انداختن یک روز خدمت | Stop a day of service
+gi.op.unknown | خبر | News
+gi.spoil | خرابکاری | Sabotage
+gi.spoil_off | این بخش هنوز باز نشده. | This part has not opened yet.
+gi.spoil_intro | کار سنگین و پنهانی است: ردپا می‌گذارد، شهر هدف می‌تواند مأمور را بشناسد و بیرون کند، و در هفته فقط چند بار شدنی است. به مال شخصی کسی دست نمی‌زنند و هرچه خراب شود را می‌شود تعمیر کرد. | This is heavy and hidden work: it leaves a trace, the target town can find the agent and put him out, and it can only be done a few times a week. Nobody's personal goods are touched, and whatever is spoiled can be repaired.
+gi.spoil_btn | خرابکاری | Sabotage
+gi.spoil_title | خرابکاری در شهر دیگر | Sabotage in another town
+gi.spoil_calm | یک بار دیگر فکر کن. این کار ممکن است رابطهٔ دو شهر را برای همیشه عوض کند و اگر بفهمند، مأمور بیرون می‌شود. | Think once more. This may change the relation of the two towns for good, and if it is found out the agent is put out.
+gi.spoil_kind | چه کاری | What act
+gi.spoil_ref | هدف | Target
+gi.spoil_ref_hint | کار بزرگ، کالا یا ساختمانی که می‌خواهی به آن دست بزنی را بنویس. | The work, the good or the building you mean to touch.
+gi.spoil_ref_need | هدف را بنویس. | Write the target.
+gi.spoil_sure_label | مطمئنی | Are you sure
+gi.spoil_not_yet | هنوز نه | Not yet
+gi.spoil_sure | بله، می‌دانم | Yes, I know
+gi.spoil_tick | اول بگو که مطمئنی. | First say you are sure.
+gi.spoil_go | انجام بده | Do it
+gi.spoil_cap | هفته‌ای فقط چند بار شدنی است و هر ساختمان یا کالا را نباید پشت سر هم زد. | Only a few times a week, and the same building or good cannot be hit twice in a row.
+gi.spoil_what.delay_work | یک مرحله از کار بزرگ آن شهر دیرتر پیش می‌رود. | A stage of that town's great work goes slower.
+gi.spoil_what.spoil_stock | بخشی از یک کالا در انبار آن شهر خراب می‌شود. | Part of one good in that town's store is spoiled.
+gi.spoil_what.blind_post | یک دیده‌بانی برای مدتی نمی‌بیند. | A watch post cannot see for a while.
+gi.spoil_what.skip_service_day | یک ساختمان خدماتی یک روز بسته می‌ماند. | A service building stays shut for a day.
+gi.watch | آنچه به شهر ما رسیده | What reached our town
+gi.act.delay_work | کندکردن کار | slowing a work
+gi.act.spoil_stock | تباه‌کردن کالا | spoiling goods
+gi.act.blind_post | کورکردن دیده‌بانی | blinding a watch post
+gi.act.skip_service_day | از کار انداختن یک روز خدمت | stopping a day of service
+gi.act.other | خرابکاری | sabotage
+gi.act_by_us | {kind} در «{target}» | {kind} in «{target}»
+gi.act_to_us | {kind} در شهر ما از طرف «{sponsor}» | {kind} in our town by «{sponsor}»
+gi.unknown_hand | دستی ناشناخته | an unknown hand
+gi.repaired | تعمیر شد | repaired
+gi.expelled | مأموری را بیرون کردیم | We put an agent out
+gi.expelled_known | مأموری را بیرون کردیم که برای «{sponsor}» کار می‌کرد | We put out an agent who worked for «{sponsor}»
+gi.until | تا {at} | until {at}
+gi.notice.intel_accepted | کار را پذیرفتی؛ از همین حالا پوششت شروع شد. | You accepted; your cover starts now.
+gi.notice.intel_engaged | پیشنهاد کار به او داده شد. | The offer was made to him.
+gi.notice.intel_op_blown | کار خراب شد و خبری نیامد؛ کسی هم نفهمید. | The job went wrong and no news came; nobody noticed.
+gi.notice.intel_op_clean | کار انجام شد و خبر آمد. | The job was done and news came.
+gi.notice.intel_op_exposed | کار خراب شد و مأمور را شناختند؛ از آن شهر بیرونش کردند. | The job went wrong and the agent was found out and put out of that town.
+gi.notice.intel_op_partial | کار نیمه‌کاره ماند؛ خبر مبهمی آمد. | The job was half done; a vague piece of news came.
+gi.notice.intel_recalled | مأمور فراخوانده شد. | The agent was called back.
+gi.notice.intel_refused | پیشنهاد را رد کردی. | You refused the offer.
+gi.notice.intel_sabotage_done | کار انجام شد. | It was done.
+gi.notice.intel_shared | خبر به آن شهر داده شد. | The news was passed to that town.
+gi.notice.intel_vetting_set | قاعدهٔ سنجش تازه‌واردها ثبت شد. | The vetting rule was saved.
+# -- licences ----------------------------------------------------------------------------------------------------
+lc.title | مجوزها | Licences
+lc.off | بازار مجوز هنوز شروع نشده. | The licence market has not started yet.
+lc.intro | بعضی کارها در این شهر مجوز می‌خواهد، مثل غرفه در بازارچه یا کار در یک پیشه. فهرست مجوزها برای همه باز است و هر کس می‌بیند چه کسی چه مجوزی دارد. | Some things in this town need a licence, like a stall at the market or work in a craft. The register is open to all, and anyone can see who holds what.
+lc.mine | مجوزهای تو | Your licences
+lc.mine_none | مجوزی نداری. | You hold no licence.
+lc.kinds | مجوزهایی که شهر می‌خواهد | Licences the town asks for
+lc.kinds_hint | شهر هر مجوز را با مهلت می‌خواهد. تا پایان مهلت، صاحبان کار مجوز اول را با قیمت پایه می‌گیرند. | The town asks for each licence with a grace. Until it ends, those already at the work take their first licence at the base price.
+lc.kinds_none | هیچ مجوزی در شهر نیست. | The town has no licences.
+lc.kind.stall_right | حق غرفه در بازارچه | Stall right at the market
+lc.kind.craft_privilege | پروانهٔ یک پیشه | Licence for a craft
+lc.kind.works_class | رتبهٔ پیمانکاری | Contractor's rank
+lc.kind.concession | امتیاز بهره‌برداری | Concession to work a deposit
+lc.kind.toll_franchise | امتیاز عوارض راه | Toll franchise
+lc.kind.other | مجوز | Licence
+lc.duty.stall_right | غرفه را باز نگه می‌داری و هزینهٔ دوره را می‌دهی. | You keep the stall open and pay the fee of the term.
+lc.duty.craft_privilege | در شهر همان پیشه را کار می‌کنی و شاگرد می‌گیری. | You work that craft in town and take apprentices.
+lc.duty.works_class | کار عمومی را که به تو سپرده‌اند انجام می‌دهی و تضمینش را نگه می‌داری. | You do the public work given to you and keep your bond.
+lc.duty.concession | کان را با احتیاط کار می‌کنی و سهم شهر را می‌دهی. | You work the deposit with care and pay the town's share.
+lc.duty.toll_franchise | راه را تعمیر نگه می‌داری و سهم شهر را از عوارض می‌دهی. | You keep the road in repair and pay the town's share of the toll.
+lc.deferred | هنوز کاری نمی‌کند | Does nothing yet
+lc.deferred_hint | چیزی در بازی هنوز این مجوز را نمی‌خواند؛ پس شهر نمی‌تواند آن را لازم کند. | Nothing in the game reads this licence yet, so the town cannot require it.
+lc.in_grace | در مهلت | In grace
+lc.required | لازم است | Required
+lc.not_required | لازم نیست | Not required
+lc.gate | بدون آن نمی‌شود: {what} | Without it you cannot: {what}
+lc.gate.stall | در بازارچه چیز فروخت | sell at the market
+lc.gate.craft | در کارگاه شخصی آن پیشه را کار کرد | work that craft in a private workshop
+lc.gate.works | روی کارهای عمومی شهر پیشنهاد داد | bid on the town's public works
+lc.mode | چطور داده می‌شود | How it is given
+lc.mode.fixed | با قیمت ثابت | At a fixed price
+lc.mode.auction | با مزایده | By auction
+lc.fee | قیمت | Price
+lc.fee_hint | چیزی که صاحب مجوز می‌دهد و به خزانه می‌رود. | What the holder pays; it goes to the treasury.
+lc.reserve | کف قیمت | Reserve
+lc.reserve_hint | کمتر از این در مزایده نمی‌شود پیشنهاد داد. | No bid below this in the auction.
+lc.term | مدت | Term
+lc.term_hint | چند روز اعتبار دارد. | Days it stays valid.
+lc.days | {n} روز | {n} days
+lc.transfer | دست‌به‌دست شدن | Selling on
+lc.transfer_yes | می‌شود فروخت | Can be sold
+lc.transfer_no | نمی‌شود فروخت | Cannot be sold
+lc.grace_note | تا {at} مهلت است؛ صاحبان کار مجوز اول را با قیمت پایه می‌گیرند. | Grace until {at}; those at the work take their first licence at the base price.
+lc.since | از {at} لازم است. | Required since {at}.
+lc.kind_missing | شهر تو هنوز این را بلد نیست: {list} | Your town does not know this yet: {list}
+lc.claim | مجوز اول را بگیر | Take the first licence
+lc.apply | درخواست مجوز | Apply
+lc.rule_set | شرط بگذار | Set a requirement
+lc.rule_change | شرط را عوض کن | Change the requirement
+lc.rule_unset | شرط را بردار | Drop the requirement
+lc.auction_only | مهلت تمام شده و این مجوز فقط در مزایده داده می‌شود؛ پایین ببین. | The grace is over and this licence goes by auction only; see below.
+lc.have_it | این مجوز را داری. | You hold this licence.
+lc.unset_title | برداشتن شرط | Drop the requirement
+lc.unset_body | شهر دیگر این مجوز را نخواهد. | The town will no longer ask for this licence.
+lc.unset_hint | مجوزهای داده‌شده تا پایان مدتشان می‌مانند. | Licences already given stay until their term ends.
+lc.rule_title | شرط مجوز | Licence requirement
+lc.rule_need | قیمت یا کف قیمت و مدت را بنویس. | Write the price or reserve, and the term.
+lc.rule_go | ثبت شرط | Save the requirement
+lc.rule_grace | شرط بعد از مهلت اجرا می‌شود. تا آن روز هیچ‌کس بی‌مجوز جلویش بسته نمی‌شود. | The requirement runs after the grace. Until then nobody is shut out for having no licence.
+lc.claim_title | مجوز اول | First licence
+lc.apply_title | درخواست مجوز | Apply for a licence
+lc.claim_go | مجوز را بگیر | Take it
+lc.apply_go | درخواست بده | Apply
+lc.target_label | چیزی که مجوز روی آن است | What the licence is for
+lc.target_need | آنچه مجوز برایش است را بنویس. | Write what the licence is for.
+lc.target.craft | پیشه | Craft
+lc.target.deposit | کان | Deposit
+lc.target.link | راه | Road
+lc.claim_price | با قیمت پایه {m}. | At the base price {m}.
+lc.apply_price | پول درخواست {m} است. | The fee is {m}.
+lc.claim_hint | فقط در مهلت شدنی است و مجوز همین حالا مال تو می‌شود. | Only in the grace; the licence is yours at once.
+lc.apply_hint | پول تا تصمیم نزد شهر می‌ماند و اگر رد شود برمی‌گردد. | The money stays with the town until it decides, and comes back if refused.
+lc.for | برای چه کسی | For whom
+lc.for_me | برای خودم | For myself
+lc.auctions | مزایده‌ها | Auctions
+lc.auctions_none | الان هیچ مزایده‌ای باز نیست. | No auction is open.
+lc.auction.open | باز | Open
+lc.auction.awarded | بسته شد | Closed
+lc.auction.void | بی‌برنده | No winner
+lc.auction.cancelled | لغو شد | Cancelled
+lc.reserve_line | کف قیمت {m} | Reserve {m}
+lc.closes | بسته می‌شود {at} | Closes {at}
+lc.closed_at | بسته شد {at} | Closed {at}
+lc.won_for | به قیمت {m} داده شد | Given for {m}
+lc.bids_n | {n} پیشنهاد در پاکت | {n} bids in envelopes
+lc.my_bid | پیشنهاد تو: {m} | Your bid: {m}
+lc.bid.standing | سر جایش | standing
+lc.bid.won | برنده شد | won
+lc.bid.lost | نبرد | lost
+lc.bid.withdrawn | پس گرفته شد | withdrawn
+lc.bid | پیشنهاد بده | Make a bid
+lc.bid_title | پیشنهاد مزایده | Auction bid
+lc.bid_go | پیشنهاد را ببند | Seal the bid
+lc.amount | مبلغ | Amount
+lc.bid_low | پیشنهاد باید دست‌کم برابر کف قیمت باشد: {m} | The bid must be at least the reserve: {m}
+lc.bid_hint | دست‌کم {m} | At least {m}
+lc.bid_sealed | پیشنهاد در پاکت بسته می‌ماند، پولش نزد شهر نگه داشته می‌شود و هر کس فقط یک پیشنهاد دارد. کسی مبلغ دیگران را نمی‌بیند. | The bid stays in a sealed envelope, its money is held by the town, and each person has one bid. Nobody sees the others' amounts.
+lc.auction_open | مزایدهٔ تازه | A new auction
+lc.auction_title | باز کردن مزایده | Open an auction
+lc.auction_need | مجوز، کف قیمت و مدت را بنویس. | Write the licence, the reserve and the hours.
+lc.auction_go | مزایده را باز کن | Open it
+lc.kind_label | کدام مجوز | Which licence
+lc.window | مدت مزایده | Length of the auction
+lc.window_hint | به ساعت | In hours
+lc.apps | درخواست‌ها | Applications
+lc.apps_hint | دادن مجوز به خودت یا شرکتی که پشتش هستی ممکن نیست. | You cannot give a licence to yourself or to a firm you stand behind.
+lc.app_line | {kind} برای {who} | {kind} for {who}
+lc.app_wait | در انتظار | Waiting
+lc.app_fee | پول نگه‌داشته {m} | held {m}
+lc.issue | مجوز بده | Give the licence
+lc.decline | رد کن | Refuse
+lc.app_withdraw | پس گرفتن | Withdraw
+lc.board | دفتر فروش | Exchange board
+lc.board_hint | صاحب مجوز می‌تواند آن را بفروشد. شهر {p} از قیمت برمی‌دارد. | A holder may sell his licence. The town takes {p} of the price.
+lc.board_none | چیزی برای فروش نیست. | Nothing for sale.
+lc.seller | فروشنده {who} | seller {who}
+lc.buy | بخر | Buy
+lc.buy_title | خرید مجوز | Buy the licence
+lc.buy_go | بخر به {m} | Buy for {m}
+lc.buy_body | این مجوز به قیمت {m} به نام تو می‌شود. | The licence becomes yours for {m}.
+lc.buy_fee | سهم شهر {f} است و از قیمت کم نمی‌شود، روی آن می‌آید. | The town's share is {f}, on top of the price.
+lc.delist | برداشتن از دفتر | Take off the board
+lc.register | فهرست مجوزهای شهر | Register of the town
+lc.register_hint | همه می‌توانند ببینند. | Anyone can see it.
+lc.register_none | هنوز مجوزی داده نشده. | No licence has been given yet.
+lc.no | شمارهٔ {n}: {name} | No. {n}: {name}
+lc.on | برای {what} | for {what}
+lc.company | شرکت | company
+lc.until | تا {at} | until {at}
+lc.notice | اخطار داده شده؛ بعد از {at} لغو می‌شود. | A warning was given; it ends after {at}.
+lc.status.active | جاری | Live
+lc.status.notice | اخطار | Warned
+lc.status.revoked | لغو شد | Revoked
+lc.status.expired | تمام شد | Expired
+lc.status.transferred | فروخته شد | Sold
+lc.renew | تمدید | Renew
+lc.list | فروش | Sell
+lc.list_title | فروش مجوز | Sell the licence
+lc.list_go | بگذار در دفتر | Put on the board
+lc.price | قیمت | Price
+lc.list_hint | برای گذاشتن در دفتر {fee} می‌دهی و شهر {p} از قیمت می‌گیرد. | Listing costs {fee}, and the town takes {p} of the price.
+lc.revoke | لغو | Revoke
+lc.revoke_confirm | تأیید لغو | Confirm the revoking
+lc.revoke_title | لغو مجوز | Revoke the licence
+lc.revoke_confirm_title | تأیید لغو مجوز | Confirm revoking
+lc.revoke_body | مجوز {who} لغو شود؟ | Revoke the licence of {who}?
+lc.revoke_proposed | لغو پیشنهاد شده؛ یکی دیگر از صاحبان این اختیار باید تأیید کند. | Revoking is proposed; another holder of this power must confirm.
+lc.cause | دلیل | Reason
+lc.cause.non_use | مجوز را مدتی به کار نبرده | Left unused for a while
+lc.cause.none | بدون دلیل | Without a reason
+lc.cause.unpaid | پولش نرسیده | Unpaid
+lc.cause.breach | شرط را شکسته | Broke the terms
+lc.cause.no_cause | بدون دلیل | Without a reason
+lc.cause.non_use_hint | اول اخطار می‌رود و بعد از مهلت اخطار لغو می‌شود. | A warning goes first; it ends after the warning period.
+lc.cause.none_hint | لغو بی‌دلیل را دو نفر از صاحبان این اختیار باید تأیید کنند و بخش مصرف‌نشدهٔ پول به صاحب مجوز برمی‌گردد. | Two holders of this power must confirm a revoking without a reason, and the unused part of the money goes back to the holder.
+lc.events | دفتر رویدادها | Log
+lc.event_line | {what} ({who}) | {what} ({who})
+lc.event_town | شهر | the town
+lc.event.rule_set | شرط تازه گذاشته شد | A requirement was set
+lc.event.rule_closed | شرط برداشته شد | A requirement was dropped
+lc.event.granted | مجوز داده شد | A licence was given
+lc.event.applied | درخواست ثبت شد | An application was filed
+lc.event.declined | درخواست رد شد | An application was refused
+lc.event.auction_opened | مزایده باز شد | An auction opened
+lc.event.auction_awarded | مزایده بسته شد | An auction closed
+lc.event.renewed | مجوز تمدید شد | A licence was renewed
+lc.event.listed | مجوز برای فروش گذاشته شد | A licence was put up for sale
+lc.event.bought | مجوز فروخته شد | A licence was sold
+lc.event.delisted | مجوز از دفتر برداشته شد | A licence left the board
+lc.event.revoked | مجوز لغو شد | A licence was revoked
+lc.event.expired | مجوز تمام شد | A licence expired
+lc.event.other | رویدادی ثبت شد | Something was logged
+lc.notice.licence_application_withdrawn | درخواست پس گرفته شد و پول برگشت. | The application was withdrawn and the money came back.
+lc.notice.licence_applied | درخواست ثبت شد؛ پول تا تصمیم نزد شهر می‌ماند. | The application is filed; the money stays with the town until it decides.
+lc.notice.licence_auction_opened | مزایدهٔ مجوز باز شد. | The auction is open.
+lc.notice.licence_bid_placed | پیشنهادت در پاکت بسته ثبت شد. | Your bid is sealed.
+lc.notice.licence_bought | مجوز به نام تو شد. | The licence is yours.
+lc.notice.licence_declined | درخواست رد شد و پول برگشت. | The application was refused and the money came back.
+lc.notice.licence_delisted | مجوز از دفتر فروش برداشته شد. | The licence left the board.
+lc.notice.licence_granted | مجوز داده شد. | The licence was given.
+lc.notice.licence_kind_closed | این مجوز دیگر لازم نیست؛ مجوزهای داده‌شده تا پایان مدت می‌مانند. | This licence is no longer required; those given stay until their term ends.
+lc.notice.licence_kind_set | شرط ثبت شد؛ بعد از مهلت، همه باید مجوز داشته باشند. | The requirement is saved; after the grace everyone needs the licence.
+lc.notice.licence_listed | مجوز در دفتر فروش گذاشته شد. | The licence is on the board.
+lc.notice.licence_notice_given | اخطار داده شد؛ بعد از مهلت اخطار لغو می‌شود. | A warning was given; it ends after the warning period.
+lc.notice.licence_renewed | مجوز تمدید شد. | The licence was renewed.
+lc.notice.licence_revocation_proposed | لغو پیشنهاد شد؛ یک نفر دیگر از صاحبان این اختیار باید تأیید کند. | Revoking is proposed; another holder must confirm.
+lc.notice.licence_revoked | مجوز لغو شد و سهم زمان‌مانده برگشت. | The licence was revoked and the unused part came back.
+# refusals of the three parts
+refusal.village_intel_bad_args | درخواست درست نوشته نشده. | The request is not written right.
+refusal.village_intel_bureau_closed | دفتر اطلاعات امروز باز نیست؛ کارمند، حقوق یا کاغذ ندارد. | The bureau is not open today: no clerk, no wage or no paper.
+refusal.village_intel_day_limit | امروز بیشتر از این نمی‌توانی کار کنی. | You cannot do more than this in a day.
+refusal.village_intel_done_today | این کار را امروز کرده‌ای. | You did this one today.
+refusal.village_intel_expelled | از آن شهر بیرونت کرده‌اند؛ تا پایان مدت نمی‌توانی برگردی. | You were put out of that town; you cannot return until the time is over.
+refusal.village_intel_no_agent | چنین مأموری پیدا نشد. | No such agent was found.
+refusal.village_intel_no_bureau | شهر تو دفتر اطلاعات ندارد. | Your town has no intelligence office.
+refusal.village_intel_no_cover | باید در همان شهر زندگی کنی تا پوشش داشته باشی. | You must live in that town to have a cover.
+refusal.village_intel_no_money | خزانهٔ شهر برای هزینه و مزد پول ندارد. | The treasury has no money for the fee and the wage.
+refusal.village_intel_no_offer | چنین پیشنهادی برای تو نیست. | There is no such offer for you.
+refusal.village_intel_no_op | چنین کاری وجود ندارد. | There is no such operation.
+refusal.village_intel_no_party | آن شهر پیدا نشد. | That town was not found.
+refusal.village_intel_no_player | بازیکنی با این کد نیست. | No player has that code.
+refusal.village_intel_no_report | چنین گزارشی پیدا نشد. | No such report was found.
+refusal.village_intel_no_target | آن چیز در شهر هدف نیست یا نمی‌شود به آن دست زد. | That is not in the target town or cannot be touched.
+refusal.village_intel_not_yet | اطلاعات هنوز شروع نشده. | Intelligence has not started yet.
+refusal.village_intel_open_agent | این بازیکن برای آن شهر پیشنهاد یا کار باز دارد. | This player already has an open offer or work for that town.
+refusal.village_intel_research | شهر تو هنوز این دانش را ندارد. | Your town has not researched this yet.
+refusal.village_intel_sabotage_not_yet | این کار هنوز آغاز نشده. | This has not started yet.
+refusal.village_intel_sabotage_refused | این کار اجازه ندارد. | This is not allowed.
+refusal.village_intel_sabotage_refused_forbidden | پیمانی میان دو شهر این کار را ممنوع می‌کند. | A treaty between the two towns forbids it.
+refusal.village_intel_sabotage_refused_no_cover | بدون پوشش نمی‌شود. | It cannot be done without a cover.
+refusal.village_intel_sabotage_refused_nothing_to_do | کاری برای انجام نیست. | There is nothing to do.
+refusal.village_intel_sabotage_refused_personal | به مال شخصی دست نمی‌زنند. | Personal property is not touched.
+refusal.village_intel_sabotage_refused_protected | آن شهر در مهلت تازه‌تأسیسی یا زیر پناه است. | That town is newly founded or under shelter.
+refusal.village_intel_sabotage_refused_too_soon | هنوز زود است؛ این کار را به‌تازگی همان‌جا کرده‌اند. | Too soon: the same was done there lately.
+refusal.village_intel_sabotage_refused_unknown_kind | چنین کاری وجود ندارد. | There is no such act.
+refusal.village_intel_sabotage_refused_weekly_limit | این هفته بیشتر از این مجاز نیست. | No more is allowed this week.
+refusal.village_intel_self | برای شهر خودت نمی‌شود. | Not for your own town.
+refusal.village_licence_auction_closed | مزایده بسته شده. | The auction is closed.
+refusal.village_licence_bad_args | درخواست درست نوشته نشده. | The request is not written right.
+refusal.village_licence_bad_cause | این دلیل ثبت نشده؛ فقط مجوزی که مدتی کار نکرده با اخطار لغو می‌شود. | That cause is not on record; only a licence left unused is ended with notice.
+refusal.village_licence_below_reserve | پیشنهاد از کف قیمت کمتر است. | The bid is under the reserve.
+refusal.village_licence_conflict | کسی که مجوز می‌دهد در این کار سهم دارد؛ نمی‌شود. | Someone who grants licences has a stake in this; refused.
+refusal.village_licence_cooling | این مجوز به‌تازگی دست‌به‌دست شده؛ باید صبر کنی. | This licence changed hands lately; wait.
+refusal.village_licence_grace_over | مهلت اولیه تمام شده؛ حالا درخواست بدهی یا در مزایده شرکت کنی. | The first grant is over; apply or bid now.
+refusal.village_licence_have_bid | برای این مزایده پیشنهاد داده‌ای. | You have bid on this auction already.
+refusal.village_licence_have_one | از این مجوز درخواست یا مزایدهٔ باز هست. | An application or auction for this is open.
+refusal.village_licence_in_grace | هنوز در مهلتیم؛ صاحبان کار همان‌جا مجوز اول را با قیمت پایه می‌گیرند. | Still in the grace: those at work take the first grant at the base price.
+refusal.village_licence_needs_second_holder | لغو بی‌دلیل را دو نفر از صاحبان این اختیار باید تأیید کنند. | Two holders of the power must confirm a revocation without cause.
+refusal.village_licence_no_application | چنین درخواستی پیدا نشد. | No such application was found.
+refusal.village_licence_no_auction | چنین مزایده‌ای پیدا نشد. | No such auction was found.
+refusal.village_licence_no_kind | چنین مجوزی نیست. | There is no such licence.
+refusal.village_licence_no_licence | چنین مجوزی پیدا نشد. | No such licence was found.
+refusal.village_licence_no_listing | چنین فروشی در دفتر نیست. | No such listing.
+refusal.village_licence_no_money | پول کافی نیست. | There is not enough money.
+refusal.village_licence_no_rule | شهر برای این مجوز قاعده‌ای نگذاشته. | The town has set no rule for this licence.
+refusal.village_licence_no_target | باید چیزی را که مجوز روی آن است نام ببری. | Name the thing the licence is over.
+refusal.village_licence_not_auction | این مجوز با مزایده داده نمی‌شود. | This licence is not auctioned.
+refusal.village_licence_not_company | آن شرکت مال تو نیست. | That company is not yours.
+refusal.village_licence_not_fixed | این مجوز با قیمت ثابت داده نمی‌شود؛ مزایده است. | This licence is not at a fixed fee; it is auctioned.
+refusal.village_licence_not_holder | این مجوز مال تو نیست. | This licence is not yours.
+refusal.village_licence_not_live | این مجوز دیگر جاری نیست. | This licence is no longer in force.
+refusal.village_licence_not_transferable | این مجوز را نمی‌شود فروخت. | This licence cannot be sold.
+refusal.village_licence_not_yet | بازار مجوز هنوز شروع نشده. | The licence market has not started yet.
+refusal.village_licence_over_share | یک نفر نمی‌تواند از این مجوز بیش از سهم مجاز داشته باشد. | One holder may not hold more than the allowed share.
+refusal.village_licence_own_listing | مجوز خودت را نمی‌خری. | You cannot buy your own licence.
+refusal.village_licence_required | این شهر برای این کار مجوز می‌خواهد؛ از «مجوزها» بگیر. | This town asks a licence for this; get one from the licences.
+refusal.village_licence_research | شهر تو هنوز این دانش را ندارد. | Your town has not researched this yet.
+refusal.village_licence_reserve_low | کف قیمت باید مثبت و دست‌کم برابر کمینه باشد. | The reserve must be positive and at least the least allowed.
+refusal.village_licence_same_holder | مجوز همین حالا مال توست. | You hold this licence already.
+refusal.village_licence_taken | آن چیز مجوز دارد. | That already has a licence.
+refusal.village_licence_term_bad | مدت مجوز درست نیست. | The term is not right.
+refusal.village_licence_window_short | مدت مزایده کوتاه است. | The auction window is too short.
+refusal.village_project_bad_args | درخواست درست نوشته نشده. | The request is not written right.
+refusal.village_project_bad_bid | پیشنهاد باید قیمت و روز داشته باشد، زیر سقف باشد و تضمینش پرداخت شود. | A bid needs a price and days, within the cap, and its bond covered.
+refusal.village_project_below_min | هدیه از کمترین مقدار کمتر است. | The gift is under the least allowed.
+refusal.village_project_busy | شیفت دیگری در جریان است. | A shift is running.
+refusal.village_project_conflict | کسی که پیمانکار را انتخاب می‌کند در این شرکت سهم دارد؛ پیشنهادش رد شد. | Whoever awards has a stake in this company; its bid is refused.
+refusal.village_project_contract_closed | مناقصه بسته شده. | The tender is closed.
+refusal.village_project_contractor_crew | این کار را پیمانکار با کارگران خودش انجام می‌دهد. | The contractor does this work with its own crew.
+refusal.village_project_crew_full | برای این مرحله به‌اندازهٔ لازم کارگر هست. | This stage has all the crew it needs.
+refusal.village_project_debarred | این شرکت فعلاً از مناقصه‌ها کنار گذاشته شده. | This company is kept from tenders for now.
+refusal.village_project_fund_short | صندوق کار برای مزد پول ندارد. | The fund has no money for the wage.
+refusal.village_project_has_contract | مناقصه یا پیمانکار دارد. | A tender or a contractor is on it.
+refusal.village_project_have_bid | این شرکت پیشنهاد داده است. | This company has bid already.
+refusal.village_project_no_bid | پیشنهادی از تو نیست. | You have no bid here.
+refusal.village_project_no_contract | چنین مناقصه‌ای نیست. | No such tender.
+refusal.village_project_no_contractor | فقط شرکت پیمانکاری می‌تواند پیشنهاد بدهد. | Only a contractor company can bid.
+refusal.village_project_no_defect_now | الان نمی‌شود ایراد ثبت کرد. | A defect cannot be raised now.
+refusal.village_project_no_hours | امروز دیگر کارگر آزاد نیست یا مرحله کارگر لازم ندارد. | No more labour today, or the stage needs none.
+refusal.village_project_no_kind | چنین کاری نیست. | There is no such work.
+refusal.village_project_no_money | پول کافی نیست. | There is not enough money.
+refusal.village_project_no_pledge | چنین هدیه‌ای از تو نیست. | No such gift of yours.
+refusal.village_project_no_project | چنین کاری پیدا نشد. | No such work was found.
+refusal.village_project_no_stock | انبار این مقدار ندارد. | The stock does not hold that much.
+refusal.village_project_not_active | این کار دیگر در جریان نیست. | This work is not under way.
+refusal.village_project_not_company | آن شرکت مال تو نیست. | That company is not yours.
+refusal.village_project_not_here | باید در همین شهر باشی. | You must be in this town.
+refusal.village_project_not_needed | این مرحله بیشتر از این به آن نیاز ندارد. | The stage needs no more of that.
+refusal.village_project_not_poster | آگهی‌دهندهٔ مناقصه تو نیست. | You did not post this tender.
+refusal.village_project_not_yet | کارهای بزرگ هنوز شروع نشده. | Great works have not started yet.
+refusal.village_project_pledge_spent | هدیه خرج کار شده و پس نمی‌آید. | The gift is spent on the work.
+refusal.village_project_research | شهر تو هنوز این دانش را ندارد. | Your town has not researched this yet.
+refusal.village_project_too_late_to_cancel | بعد از مرحلهٔ اول دیگر نمی‌شود لغو کرد. | It can no longer be cancelled.
+refusal.village_project_too_many | شهر کار نیمه‌تمام زیاد دارد. | The town has too many works under way.
+refusal.village_licence_missing | این شهر برای این کار مجوز می‌خواهد؛ از «مجوزها» بگیر. | This town asks a licence for this; get one under Licences.
+refusal.village_licence_kind_deferred | این مجوز هنوز کاری نمی‌کند، پس نمی‌شود لازمش کرد یا برایش درخواست داد. | This licence does nothing yet, so it cannot be required or applied for.
+sp.off_hint | وقتی شروع شود، از همین‌جا می‌شود سراغش رفت. | Once it starts you can reach it from here.
