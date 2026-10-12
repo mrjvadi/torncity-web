@@ -5041,7 +5041,7 @@ charter.mine | اجازه‌های من | My permissions
 charter.mine_none | تو در هیچ منصبی نیستی. | You hold no office.
 charter.audit | دفتر ثبت | Register
 charter.audit_none | هنوز چیزی ثبت نشده. | Nothing is recorded yet.
-charter.perm_limit | {name} (تا {limit}) | {name} (up to {limit})
+charter.perm_limit | {name} – تا {limit} | {name} – up to {limit}
 charter.resign | کناره‌گیری | Resign
 charter.close_office | بستن منصب | Close office
 charter.edit | ویرایش | Edit
@@ -7097,7 +7097,7 @@ pu.class.roads | راه‌ها | Roads
 pu.class.claims | زمین‌های ادعاشده | Claimed land
 pu.mode.one_member | هر شهر یک رأی | One vote per town
 pu.mode.weighted | رأی به نسبت مردم | Votes by population
-pu.mode.double_majority | دو اکثریت | Double majority
+pu.mode.double_majority | اکثریت دوگانه | Double majority
 pu.mode_hint.one_member | هر شهر عضو یک رأی دارد، کوچک باشد یا بزرگ. | Each town has one vote, small or large.
 pu.mode_hint.weighted | رأی هر شهر به نسبت مردمش است، با سقفی که شهر بزرگ همه‌چیز را نبرد. | A town's vote follows its people, with a cap so one big town cannot decide alone.
 pu.mode_hint.double_majority | هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | Most towns and most people must both agree.
@@ -7155,7 +7155,7 @@ pu.motion.admit | پذیرفتن {who} | Admit {who}
 pu.motion.expel | بیرون کردن {who} | Expel {who}
 pu.motion.dissolve | برچیدن اتحاد | Dissolve the union
 pu.motion.exit | رفتن {who} با رضایت اعضا | {who} leaves with the members' consent
-pu.double_note | این اتحاد دو اکثریت می‌خواهد: هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | This union needs a double majority: most towns and most people.
+pu.double_note | این اتحاد اکثریت دوگانه می‌خواهد: هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | This union needs a double majority: most towns and most people.
 pu.nm.title | پیشنهاد تازه به اعضا | A new motion to the members
 pu.nm.kind | چه پیشنهادی؟ | What kind?
 pu.nm.k.admit | پذیرفتن شهر | Admit a town
@@ -7372,7 +7372,7 @@ pd.bid_line | {m} در {d} روز | {m} in {d} days
 pd.bid_withdraw | پس گرفتن | Withdraw
 pd.barred | این شرکت تا {at} از مناقصه‌های شهر کنار گذاشته شده. | This company is kept out of town tenders until {at}.
 pd.barred_reason | شرکت تا {at} کنار گذاشته شده. | The company is kept out until {at}.
-pd.over_cap | قیمت از سقف ({m}) بیشتر است. | The price is above the cap ({m}).
+pd.over_cap | قیمت از سقف بیشتر است؛ سقف {m} است. | The price is above the cap, which is {m}.
 pd.winner | پیمانکار | Contractor
 pd.due_at | تحویل تا | Due by
 pd.work | کار انجام‌شده | Work done
