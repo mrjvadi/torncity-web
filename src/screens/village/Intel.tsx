@@ -11,7 +11,7 @@ import { PRow } from '../../ui/v6/panel'
 import { ActionButton, EffectChip, Note } from '../../ui/Popup'
 import Popup from '../../ui/Popup'
 import { atText } from '../../lib/duration'
-import { formatNumber } from '../native/kit/format'
+import { formatNumber, money } from '../native/kit/format'
 import { sendCmd } from './Mining'
 import { Ask, Choice, Closed, NoticeStrip, NumField, word } from './Polity'
 import { lacks } from './Project'
@@ -23,25 +23,14 @@ registerWrites(['settlement.intel'], (a) => !!a.args?.action)
 const act = (ctx: FlowCtx, action: string, args: Record<string, string>) => sendCmd(ctx, 'settlement.intel', { action, ...args })
 const STATUS_TONE: Record<string, 'good' | 'warn' | 'bad' | 'neutral'> = { offered: 'warn', active: 'good', declined: 'neutral', expelled: 'bad', recalled: 'neutral' }
 
-/** The other towns, for a list to choose from (the view of treaties carries them). */
-export function useTowns(): Named[] {
-  const [towns, setTowns] = useState<Named[]>([])
-  useEffect(() => {
-    let on = true
-    api.runCommand('settlement.treaty', {}).then((r) => { const l = (r.view as unknown as { targets?: Named[] | null } | undefined)?.targets; if (on && r.ok !== false) setTowns(l ?? []) }).catch(() => undefined)
-    return () => { on = false }
-  }, [])
-  return towns
-}
-
 const bandText = (b: string) => word(`gi.band.${b}`) || t('gi.band.unknown')
 const metricText = (m: string) => word(`gi.metric.${m}`) || t('gi.metric.unknown')
 const opText = (code: string, ops: IntelOpLine[], fallback = '') => word(`gi.op.${code}`, ops.find((o) => o.code === code)?.name ?? fallback) || t('gi.op.unknown')
 
 // -- forms ---------------------------------------------------------------------------------------
 
-function Engage({ ctx, onClose }: { ctx: FlowCtx; onClose: () => void }) {
-  const towns = useTowns()
+function Engage({ v, ctx, onClose }: { v: IntelView; ctx: FlowCtx; onClose: () => void }) {
+  const towns = (v.targets ?? []).map((x) => x.target)
   const [player, setPlayer] = useState('')
   const [to, setTo] = useState('')
   const ok = player.trim().length > 0 && !!to
@@ -82,28 +71,27 @@ function Spoil({ v, agents, ctx, onClose }: { v: IntelView; agents: IntelAgentLi
   const [op, setOp] = useState((ops.find((o) => o.available) ?? ops[0])?.code ?? '')
   const [ref, setRef] = useState('')
   const [sure, setSure] = useState(false)
+  const choices = (agents.find((a) => a.id === agent)?.choices ?? []).filter((c) => c.op === op)
   const sel = ops.find((o) => o.code === op)
-  const ok = !!agent && !!sel?.available && ref.trim().length > 0
+  const ok = !!agent && !!sel?.available && !!ref
   return (
     <Popup open onClose={onClose} tone="red" title={t('gi.spoil_title')}
-      footer={<ActionButton tone="red" disabled={ctx.busy || !ok || !sure} reason={!sure ? t('gi.spoil_tick') : !ref.trim() ? t('gi.spoil_ref_need') : undefined} onClick={() => { onClose(); act(ctx, 'sabotage', { id: agent, code: op, ref: ref.trim() }) }}>{t('gi.spoil_go')}</ActionButton>}>
+      footer={<ActionButton tone="red" disabled={ctx.busy || !ok || !sure} reason={!sure ? t('gi.spoil_tick') : !ref ? t('gi.spoil_ref_need') : undefined} onClick={() => { onClose(); act(ctx, 'sabotage', { id: agent, code: op, ref }) }}>{t('gi.spoil_go')}</ActionButton>}>
       <Note>{t('gi.spoil_calm')}</Note>
       {agents.length > 1 && <Choice label={t('gi.agent')} value={agent} onChange={setAgent} options={agents.map((a) => ({ key: a.id, text: `${a.player.name} (${a.target.name})` }))} />}
-      <Choice label={t('gi.spoil_kind')} value={op} onChange={setOp} options={ops.map((o) => ({ key: o.code, text: opText(o.code, ops, o.name) }))} />
+      <Choice label={t('gi.spoil_kind')} value={op} onChange={(k) => { setOp(k); setRef('') }} options={ops.map((o) => ({ key: o.code, text: opText(o.code, ops, o.name) }))} />
       {sel && <Hint>{word(`gi.spoil_what.${sel.code}`)}</Hint>}
       {sel && !sel.available && <Note>{t('gi.op_missing', { list: lacks(ctx, sel.missing) || t('pj.kind_missing_any') })}</Note>}
-      <label className="tc-f"><span>{t('gi.spoil_ref')}</span>
-        <input className="fx-field-input" dir="ltr" value={ref} onChange={(e) => setRef(e.target.value)} aria-label={t('gi.spoil_ref')} />
-        <small className="pu-hint">{t('gi.spoil_ref_hint')}</small>
-      </label>
+      <Choice label={t('gi.spoil_ref')} value={ref} onChange={setRef} options={choices.map((c) => ({ key: c.ref.code, text: c.ref.name }))} />
+      {choices.length === 0 && <Hint>{t('gi.spoil_ref_none')}</Hint>}
       <Choice label={t('gi.spoil_sure_label')} value={sure ? 'yes' : 'no'} onChange={(k) => setSure(k === 'yes')} options={[{ key: 'no', text: t('gi.spoil_not_yet') }, { key: 'yes', text: t('gi.spoil_sure') }]} />
-      <Hint>{t('gi.spoil_cap')}</Hint>
+      <Hint>{t('gi.spoil_cap', { used: formatNumber(v.caps.used_this_week), n: formatNumber(v.caps.weekly_limit) })}</Hint>
     </Popup>
   )
 }
 
-function Share({ r, ctx, onClose }: { r: IntelReportLine; ctx: FlowCtx; onClose: () => void }) {
-  const towns = useTowns()
+function Share({ v, r, ctx, onClose }: { v: IntelView; r: IntelReportLine; ctx: FlowCtx; onClose: () => void }) {
+  const towns = (v.targets ?? []).map((x) => x.target)
   const [to, setTo] = useState('')
   return (
     <Popup open onClose={onClose} tone="gold" title={t('gi.share_title')}
@@ -146,7 +134,7 @@ function Offer({ o, ctx }: { o: IntelAgentLine; ctx: FlowCtx }) {
   )
 }
 
-function Report({ r, ctx, ops }: { r: IntelReportLine; ctx: FlowCtx; ops: IntelOpLine[] }) {
+function Report({ v, r, ctx, ops }: { v: IntelView; r: IntelReportLine; ctx: FlowCtx; ops: IntelOpLine[] }) {
   const [share, setShare] = useState(false)
   return (
     <div className="mn-card">
@@ -158,7 +146,7 @@ function Report({ r, ctx, ops }: { r: IntelReportLine; ctx: FlowCtx; ops: IntelO
       </div>
       {r.shared && <Hint>{t('gi.shared')}</Hint>}
       {r.may_share && <div className="wk-btns"><ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setShare(true)}>{t('gi.share')}</ActionButton></div>}
-      {share && <Share r={r} ctx={ctx} onClose={() => setShare(false)} />}
+      {share && <Share v={v} r={r} ctx={ctx} onClose={() => setShare(false)} />}
     </div>
   )
 }
@@ -234,7 +222,7 @@ export const Intel = flow<IntelView>(({ view: v, ctx }) => {
           <Panel>
             <Hint>{t('gi.reports_hint')}</Hint>
             {(v.reports ?? []).length === 0 && <Lead>{t('gi.reports_none')}</Lead>}
-            <div className="mn-list">{(v.reports ?? []).map((r) => <Report key={r.id} r={r} ctx={ctx} ops={ops} />)}</div>
+            <div className="mn-list">{(v.reports ?? []).map((r) => <Report key={r.id} v={v} r={r} ctx={ctx} ops={ops} />)}</div>
           </Panel>
         </>
       )}
@@ -246,6 +234,15 @@ export const Intel = flow<IntelView>(({ view: v, ctx }) => {
             {!v.sabotage_open ? <Hint>{t('gi.spoil_off')}</Hint> : (
               <>
                 <Hint>{t('gi.spoil_intro')}</Hint>
+                <div className="vf-list">
+                  <div className="vf-line"><span>{t('gi.cap_week')}</span><b>{t('gi.cap_used', { a: formatNumber(v.caps.used_this_week), b: formatNumber(v.caps.weekly_limit) })}</b></div>
+                  <div className="vf-line"><span>{t('gi.cap_delay')}</span><b>{t('gi.cap_hours', { n: formatNumber(v.caps.delay_hours) })}</b></div>
+                  <div className="vf-line"><span>{t('gi.cap_spoil')}</span><b>{formatNumber(v.caps.spoil_percent)}٪</b></div>
+                  <div className="vf-line"><span>{t('gi.cap_blind')}</span><b>{formatNumber(v.caps.blind_percent)}٪</b></div>
+                  <div className="vf-line"><span>{t('gi.cap_skip')}</span><b>{t('gi.cap_days', { n: formatNumber(v.caps.skip_days) })}</b></div>
+                  <div className="vf-line"><span>{t('gi.cap_again')}</span><b>{t('gi.cap_days', { n: formatNumber(v.caps.per_target_days) })}</b></div>
+                  <div className="vf-line"><span>{t('gi.cap_cost')}</span><b>{money(v.caps.cost)}</b></div>
+                </div>
                 <div className="wk-btns"><ActionButton tone="red" small disabled={ctx.busy || active.length === 0 || !v.bureau_open} reason={active.length === 0 ? t('gi.wait_agent') : !v.bureau_open ? t('gi.bureau_closed_hint') : undefined} onClick={() => setForm('spoil')}>{t('gi.spoil_btn')}</ActionButton></div>
               </>
             )}
@@ -275,7 +272,7 @@ export const Intel = flow<IntelView>(({ view: v, ctx }) => {
         </>
       )}
 
-      {form === 'engage' && <Engage ctx={ctx} onClose={() => setForm(null)} />}
+      {form === 'engage' && <Engage v={v} ctx={ctx} onClose={() => setForm(null)} />}
       {form === 'survey' && <Survey v={v} agents={active} ctx={ctx} onClose={() => setForm(null)} />}
       {form === 'spoil' && <Spoil v={v} agents={active} ctx={ctx} onClose={() => setForm(null)} />}
     </Page>

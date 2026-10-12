@@ -57,17 +57,14 @@ function Get({ v, k, how, ctx, onClose }: { v: LicenceView; k: LicenceKindLine; 
   const [co, setCo] = useState('')
   const needTarget = !!k.target
   const price = k.mode === 'auction' ? k.reserve : k.fee
-  const ok = !needTarget || target.trim().length > 0
+  const ok = !needTarget || !!target
   return (
     <Popup open onClose={onClose} tone="gold" title={t(how === 'claim' ? 'lc.claim_title' : 'lc.apply_title', { name: kindText(k.code, k.name) })}
-      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lc.target_need')} onClick={() => { onClose(); act(ctx, how, { code: k.code, ...(needTarget ? { target: target.trim() } : {}), ...(co ? { company: co } : {}) }) }}>{t(how === 'claim' ? 'lc.claim_go' : 'lc.apply_go')}</ActionButton>}>
+      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lc.target_need')} onClick={() => { onClose(); act(ctx, how, { code: k.code, ...(needTarget ? { target } : {}), ...(co ? { company: co } : {}) }) }}>{t(how === 'claim' ? 'lc.claim_go' : 'lc.apply_go')}</ActionButton>}>
       <Lead>{kindText(k.code, k.name)}</Lead>
       <Holder v={v} value={co} onChange={setCo} />
-      {needTarget && (
-        <label className="tc-f"><span>{t(`lc.target.${k.target}` as 'lc.target.craft')}</span>
-          <input className="fx-field-input" value={target} onChange={(e) => setTarget(e.target.value)} aria-label={t('lc.target_label')} />
-        </label>
-      )}
+      {needTarget && <Choice label={k.target_name || t('lc.target_label')} value={target} onChange={setTarget} options={(k.options ?? []).map((o) => ({ key: o.code, text: o.name }))} />}
+      {needTarget && (k.options ?? []).length === 0 && <Hint>{t('lc.target_none')}</Hint>}
       <Lead>{t(how === 'claim' ? 'lc.claim_price' : 'lc.apply_price', { m: money(price) })}</Lead>
       <Hint>{t(how === 'claim' ? 'lc.claim_hint' : 'lc.apply_hint')}</Hint>
     </Popup>
@@ -97,16 +94,12 @@ function OpenAuction({ v, ctx, onClose }: { v: LicenceView; ctx: FlowCtx; onClos
   const [target, setTarget] = useState('')
   const [reserve, setReserve] = useState('')
   const [window, setWindow] = useState('48')
-  const ok = !!code && Number(reserve) > 0 && Number(window) > 0 && (!k?.target || target.trim().length > 0)
+  const ok = !!code && Number(reserve) > 0 && Number(window) > 0 && (!k?.target || !!target)
   return (
     <Popup open onClose={onClose} tone="gold" title={t('lc.auction_title')}
-      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lc.auction_need')} onClick={() => { onClose(); act(ctx, 'auction', { code, reserve, window, ...(k?.target ? { target: target.trim() } : {}) }) }}>{t('lc.auction_go')}</ActionButton>}>
-      <Choice label={t('lc.kind_label')} value={code} onChange={setCode} options={kinds.map((x) => ({ key: x.code, text: kindText(x.code, x.name) }))} />
-      {k?.target && (
-        <label className="tc-f"><span>{t(`lc.target.${k.target}` as 'lc.target.craft')}</span>
-          <input className="fx-field-input" value={target} onChange={(e) => setTarget(e.target.value)} aria-label={t('lc.target_label')} />
-        </label>
-      )}
+      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lc.auction_need')} onClick={() => { onClose(); act(ctx, 'auction', { code, reserve, window, ...(k?.target ? { target } : {}) }) }}>{t('lc.auction_go')}</ActionButton>}>
+      <Choice label={t('lc.kind_label')} value={code} onChange={(c) => { setCode(c); setTarget('') }} options={kinds.map((x) => ({ key: x.code, text: kindText(x.code, x.name) }))} />
+      {k?.target && <Choice label={k.target_name || t('lc.target_label')} value={target} onChange={setTarget} options={(k.options ?? []).map((o) => ({ key: o.code, text: o.name }))} />}
       <NumField label={`${t('lc.reserve')} (${t('unit.money')})`} value={reserve} onChange={setReserve} hint={t('lc.reserve_hint')} />
       <NumField label={t('lc.window')} value={window} onChange={setWindow} hint={t('lc.window_hint')} />
     </Popup>

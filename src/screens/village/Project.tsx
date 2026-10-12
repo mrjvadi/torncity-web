@@ -19,7 +19,7 @@ import { t } from '../../i18n'
 registerWrites(['settlement.project'], (a) => !!a.args?.action && a.args.action !== 'open')
 
 const act = (ctx: FlowCtx, action: string, args: Record<string, string>) => sendCmd(ctx, 'settlement.project', { action, ...args })
-const kindName = (k: { code: string; name: string }) => word(`pj.kind.${k.code}`, k.name)
+const kindName = (k: { code: string; name: string }) => k.name && !/^[a-z0-9_.-]+$/.test(k.name) ? k.name : word(`pj.kind.${k.code}`, k.name)
 const itemName = (ctx: FlowCtx, code: string) => ctx.names.name(['component', 'item'], code, '')
 const passed = (iso: string | null) => !!iso && Date.parse(iso) <= Date.now()
 
@@ -366,7 +366,7 @@ function KindCard({ k, v, ctx, onStart }: { k: ProjectKindLine; v: ProjectView; 
   return (
     <div className="mn-card">
       <div className="mn-head"><b>{kindName(k)}</b><EffectChip tone={k.available ? 'good' : 'neutral'}>{t('pj.kind_stages', { n: formatNumber(k.stages) })}</EffectChip></div>
-      <div className="mn-sub">{word(`pj.effect.${k.effect}`)}</div>
+      <div className="mn-sub">{k.effect_name || word(`pj.effect.${k.effect}`)}</div>
       {!k.available && <Note>{t('pj.kind_missing', { list: miss || t('pj.kind_missing_any') })}</Note>}
       {!k.available && <Hint>{t('pj.kind_missing_hint')}</Hint>}
       {k.available && v.may_start && <div className="wk-btns"><ActionButton tone="gold" small disabled={ctx.busy} onClick={onStart}>{t('pj.start')}</ActionButton></div>}

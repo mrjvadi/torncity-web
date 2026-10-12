@@ -7855,20 +7855,17 @@ gi.op.skip_service_day | از کار انداختن یک روز خدمت | Stop 
 gi.op.unknown | خبر | News
 gi.spoil | خرابکاری | Sabotage
 gi.spoil_off | این بخش هنوز باز نشده. | This part has not opened yet.
-gi.spoil_intro | کار سنگین و پنهانی است: ردپا می‌گذارد، شهر هدف می‌تواند مأمور را بشناسد و بیرون کند، و در هفته فقط چند بار شدنی است. به مال شخصی کسی دست نمی‌زنند و هرچه خراب شود را می‌شود تعمیر کرد. | This is heavy and hidden work: it leaves a trace, the target town can find the agent and put him out, and it can only be done a few times a week. Nobody's personal goods are touched, and whatever is spoiled can be repaired.
 gi.spoil_btn | خرابکاری | Sabotage
 gi.spoil_title | خرابکاری در شهر دیگر | Sabotage in another town
 gi.spoil_calm | یک بار دیگر فکر کن. این کار ممکن است رابطهٔ دو شهر را برای همیشه عوض کند و اگر بفهمند، مأمور بیرون می‌شود. | Think once more. This may change the relation of the two towns for good, and if it is found out the agent is put out.
 gi.spoil_kind | چه کاری | What act
 gi.spoil_ref | هدف | Target
-gi.spoil_ref_hint | کار بزرگ، کالا یا ساختمانی که می‌خواهی به آن دست بزنی را بنویس. | The work, the good or the building you mean to touch.
 gi.spoil_ref_need | هدف را بنویس. | Write the target.
 gi.spoil_sure_label | مطمئنی | Are you sure
 gi.spoil_not_yet | هنوز نه | Not yet
 gi.spoil_sure | بله، می‌دانم | Yes, I know
 gi.spoil_tick | اول بگو که مطمئنی. | First say you are sure.
 gi.spoil_go | انجام بده | Do it
-gi.spoil_cap | هفته‌ای فقط چند بار شدنی است و هر ساختمان یا کالا را نباید پشت سر هم زد. | Only a few times a week, and the same building or good cannot be hit twice in a row.
 gi.spoil_what.delay_work | یک مرحله از کار بزرگ آن شهر دیرتر پیش می‌رود. | A stage of that town's great work goes slower.
 gi.spoil_what.spoil_stock | بخشی از یک کالا در انبار آن شهر خراب می‌شود. | Part of one good in that town's store is spoiled.
 gi.spoil_what.blind_post | یک دیده‌بانی برای مدتی نمی‌بیند. | A watch post cannot see for a while.
@@ -8055,20 +8052,6 @@ lc.cause.none_hint | لغو بی‌دلیل را دو نفر از صاحبان �
 lc.events | دفتر رویدادها | Log
 lc.event_line | {what} ({who}) | {what} ({who})
 lc.event_town | شهر | the town
-lc.event.rule_set | شرط تازه گذاشته شد | A requirement was set
-lc.event.rule_closed | شرط برداشته شد | A requirement was dropped
-lc.event.granted | مجوز داده شد | A licence was given
-lc.event.applied | درخواست ثبت شد | An application was filed
-lc.event.declined | درخواست رد شد | An application was refused
-lc.event.auction_opened | مزایده باز شد | An auction opened
-lc.event.auction_awarded | مزایده بسته شد | An auction closed
-lc.event.renewed | مجوز تمدید شد | A licence was renewed
-lc.event.listed | مجوز برای فروش گذاشته شد | A licence was put up for sale
-lc.event.bought | مجوز فروخته شد | A licence was sold
-lc.event.delisted | مجوز از دفتر برداشته شد | A licence left the board
-lc.event.revoked | مجوز لغو شد | A licence was revoked
-lc.event.expired | مجوز تمام شد | A licence expired
-lc.event.other | رویدادی ثبت شد | Something was logged
 lc.notice.licence_application_withdrawn | درخواست پس گرفته شد و پول برگشت. | The application was withdrawn and the money came back.
 lc.notice.licence_applied | درخواست ثبت شد؛ پول تا تصمیم نزد شهر می‌ماند. | The application is filed; the money stays with the town until it decides.
 lc.notice.licence_auction_opened | مزایدهٔ مجوز باز شد. | The auction is open.
@@ -8184,3 +8167,33 @@ refusal.village_project_too_many | شهر کار نیمه‌تمام زیاد د
 refusal.village_licence_missing | این شهر برای این کار مجوز می‌خواهد؛ از «مجوزها» بگیر. | This town asks a licence for this; get one under Licences.
 refusal.village_licence_kind_deferred | این مجوز هنوز کاری نمی‌کند، پس نمی‌شود لازمش کرد یا برایش درخواست داد. | This licence does nothing yet, so it cannot be required or applied for.
 sp.off_hint | وقتی شروع شود، از همین‌جا می‌شود سراغش رفت. | Once it starts you can reach it from here.
+
+lc.event.kind_set | شرط تازه گذاشته شد | A requirement was set
+lc.event.kind_closed | شرط برداشته شد | A requirement was dropped
+lc.event.granted | مجوز داده شد | A licence was given
+lc.event.applied | درخواست ثبت شد | An application was filed
+lc.event.declined | درخواست رد شد | An application was refused
+lc.event.auction_opened | مزایده باز شد | An auction opened
+lc.event.auction_void | مزایده بی‌برنده ماند | An auction had no winner
+lc.event.renewed | مجوز تمدید شد | A licence was renewed
+lc.event.listed | مجوز برای فروش گذاشته شد | A licence was put up for sale
+lc.event.transferred | مجوز دست‌به‌دست شد | A licence changed hands
+lc.event.notice | به صاحب مجوز اخطار داده شد | A licence holder was warned
+lc.event.revocation_proposed | لغو مجوز پیشنهاد شد | Revoking a licence was proposed
+lc.event.revoked | مجوز لغو شد | A licence was revoked
+lc.event.expired | مجوز تمام شد | A licence expired
+lc.event.other | رویدادی ثبت شد | Something was logged
+lc.target_none | هنوز چیزی برای انتخاب نیست. | Nothing to pick yet.
+gi.spoil_ref_none | برای این کار در آن شهر چیزی پیدا نشد. | Nothing to act on there for this job.
+gi.spoil_cap | این هفته {used} از {n} بار انجام شده؛ همان هدف را پشت سر هم نمی‌شود زد. | {used} of {n} done this week; the same target cannot be hit twice in a row.
+gi.spoil_intro | کار سنگین و پنهانی است: ردپا می‌گذارد و شهر هدف می‌تواند مأمور را بشناسد و بیرون کند. به مال شخصی کسی دست نمی‌زنند و هرچه خراب شود را می‌شود تعمیر کرد. حدها این‌هاست: | This is heavy, hidden work: it leaves a trace and the target town may find the agent and put him out. Nobody's personal goods are touched and whatever is spoiled can be repaired. The limits are:
+gi.cap_week | این هفته | This week
+gi.cap_used | {a} از {b} | {a} of {b}
+gi.cap_delay | کند کردن کار | Slowing a work
+gi.cap_hours | {n} ساعت | {n} hours
+gi.cap_spoil | تباه شدن کالا | Goods spoiled
+gi.cap_blind | کور کردن دیده‌بانی | Blinding a watch post
+gi.cap_skip | از کار افتادن خدمت | A service stopped
+gi.cap_days | {n} روز | {n} days
+gi.cap_again | فاصله برای همان هدف | Gap for the same target
+gi.cap_cost | هزینه از خزانه | Cost from the treasury

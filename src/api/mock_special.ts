@@ -38,12 +38,12 @@ function project(notice = ''): ProjectView {
   const lib: ProjectLine = { id: 'p2', kind: N('great_library', 'کتابخانهٔ بزرگ'), effect: 'research', status: 'finished', stage: 3, stages: 3, hours: 0, need_hour: 0, fund: 0, waiting: '', materials: null, min_until: null, delay: null, held: true, idle: '', donors: [{ id: 'd9', name: 'سیما', kind: 'player', amount: 9000, at: iso(-400), status: 'held', mine: false, refunds: false, anonymous: false }], done: [{ stage: 1, hours: 24, at: iso(-500) }, { stage: 2, hours: 32, at: iso(-450) }, { stage: 3, hours: 24, at: iso(-410) }], shifts: null, contract: null, my_shift: null, may_pledge: false, may_fund: false, may_cancel: false, may_work: false, may_hire: false, may_tender: false, hired_today: 0, hire_per_day: 0, shift_hours: 4 }
   const temple: ProjectLine = { ...lib, id: 'p3', kind: N('great_temple', 'نیایشگاه بزرگ'), effect: 'trade_footfall', stages: 4, stage: 4, held: false, idle: 'no_wage' }
   const kinds = [
-    { code: 'great_library', name: 'کتابخانهٔ بزرگ', stages: 3, effect: 'research', available: true, missing: null },
-    { code: 'city_wall', name: 'حصار شهر', stages: 4, effect: 'garrison', available: true, missing: null },
-    { code: 'aqueduct', name: 'آبراه', stages: 5, effect: 'household_water', available: true, missing: null },
-    { code: 'great_beacon', name: 'فانوس بزرگ', stages: 4, effect: 'detector', available: false, missing: ['writing', 'masonry'] },
-    { code: 'great_canal', name: 'کانال بزرگ', stages: 6, effect: 'farm_water', available: false, missing: ['irrigation'] },
-    { code: 'great_temple', name: 'نیایشگاه بزرگ', stages: 4, effect: 'trade_footfall', available: true, missing: null },
+    { code: 'great_library', name: 'کتابخانهٔ بزرگ', stages: 3, effect: 'research', effect_name: 'پژوهش', available: true, missing: null },
+    { code: 'city_wall', name: 'حصار شهر', stages: 4, effect: 'garrison', effect_name: 'جای نگهبان روی دیوار', available: true, missing: null },
+    { code: 'aqueduct', name: 'آبراه', stages: 5, effect: 'household_water', effect_name: 'آب خانه‌ها', available: true, missing: null },
+    { code: 'great_beacon', name: 'فانوس بزرگ', stages: 4, effect: 'detector', effect_name: 'دیده‌بانی از دور', available: false, missing: ['writing', 'masonry'] },
+    { code: 'great_canal', name: 'کانال بزرگ', stages: 6, effect: 'farm_water', effect_name: 'آب مزرعه', available: false, missing: ['irrigation'] },
+    { code: 'great_temple', name: 'نیایشگاه بزرگ', stages: 4, effect: 'trade_footfall', effect_name: 'رفت‌وآمد بازارچه', available: true, missing: null },
   ]
   return {
     village: 'آمل', open: true, may_start: perm, fee: 1200, pledge_min: 100, shift_minutes: 30, kinds,
@@ -58,7 +58,7 @@ function project(notice = ''): ProjectView {
 
 function intel(notice = ''): IntelView {
   const m = mode(), perm = m !== 'noperm'
-  const base = { village: 'آمل', open: m !== 'off', bureau_built: m !== 'empty', bureau_open: m !== 'empty', may_run: perm, may_read: perm, may_vet: perm, sabotage_open: true, vetting_days: st.vet, counter: 'light', notice }
+  const base = { caps: { weekly_limit: 3, used_this_week: 1, delay_hours: 12, spoil_percent: 10, blind_percent: 50, skip_days: 1, per_target_days: 3, cost: 400 }, targets: [{ target: N('v-b2', 'بابل'), kind: 'settlement' }, { target: N('v-x1', 'گلستان'), kind: 'settlement' }, { target: N('v-r5', 'رامسر'), kind: 'settlement' }], village: 'آمل', open: m !== 'off', bureau_built: m !== 'empty', bureau_open: m !== 'empty', may_run: perm, may_read: perm, may_vet: perm, sabotage_open: true, vetting_days: st.vet, counter: 'light', notice }
   if (m === 'off') return { ...base, agents: null, offers: null, reports: null, ops: null, acts: null, expelled: null }
   const ops = [
     { code: 'survey_stock', name: 'انبار و خزانه', kind: 'survey', available: true, missing: null },
@@ -68,11 +68,12 @@ function intel(notice = ''): IntelView {
     { code: 'spoil_stock', name: 'تباه‌کردن', kind: 'sabotage', available: true, missing: null },
     { code: 'blind_post', name: 'کورکردن دیده‌بانی', kind: 'sabotage', available: false, missing: ['irrigation'] },
   ]
-  const ag = (id: string, status: string, who: string, extra: Record<string, unknown> = {}) => ({ id, player: N(`p-${id}`, who), sponsor: N('v-k3x9', 'آمل'), target: N('v-q7m2', 'سرخه'), status, cover_days: 12, ops_today: 0, mine: false, may_accept: false, may_recall: true, may_operate: status === 'active', created_at: iso(-300), ended_at: null, ...extra })
+  const choices = [{ op: 'delay_work', ref: N('p9', 'دیوار شهر'), kind: 'project' }, { op: 'spoil_stock', ref: N('stone', 'سنگ'), kind: 'item' }, { op: 'spoil_stock', ref: N('timber', 'چوب'), kind: 'item' }, { op: 'blind_post', ref: N('b7', 'دیده‌بانی شمالی'), kind: 'building' }]
+  const ag = (id: string, status: string, who: string, extra: Record<string, unknown> = {}) => ({ choices, id, player: N(`p-${id}`, who), sponsor: N('v-k3x9', 'آمل'), target: N('v-q7m2', 'سرخه'), status, cover_days: 12, ops_today: 0, mine: false, may_accept: false, may_recall: true, may_operate: status === 'active', created_at: iso(-300), ended_at: null, ...extra })
   return {
     ...base,
     agents: m === 'empty' ? null : [ag('a1', 'active', 'سیما'), ag('a2', st.engaged ? 'offered' : 'declined', 'نیما', { may_operate: false, may_recall: st.engaged }), { ...ag('a3', 'active', 'آریا', { mine: true, sponsor: N('v-b2', 'بابل'), target: N('v-k3x9', 'آمل'), may_operate: false }) }],
-    offers: st.accepted || st.refused ? null : [{ id: 'o1', player: N('p-aria', 'آریا'), sponsor: N('v-b2', 'بابل'), target: N('v-k3x9', 'آمل'), status: 'offered', cover_days: 0, ops_today: 0, mine: true, may_accept: true, may_recall: false, may_operate: false, created_at: iso(-3), ended_at: null }],
+    offers: st.accepted || st.refused ? null : [{ choices: null, id: 'o1', player: N('p-aria', 'آریا'), sponsor: N('v-b2', 'بابل'), target: N('v-k3x9', 'آمل'), status: 'offered', cover_days: 0, ops_today: 0, mine: true, may_accept: true, may_recall: false, may_operate: false, created_at: iso(-3), ended_at: null }],
     reports: [
       { id: 'r1', op: 'survey_stock', target: N('v-q7m2', 'سرخه'), confidence: 'high', fields: [{ metric: 'treasury', band: 'ample' }, { metric: 'food', band: 'enough' }, { metric: 'materials', band: 'scarce' }], taken_at: iso(-5), old: false, shared: false, may_share: true },
       { id: 'r2', op: 'survey_garrison', target: N('v-q7m2', 'سرخه'), confidence: 'low', fields: [{ metric: 'seats', band: 'few' }, { metric: 'watch_posts', band: 'several' }], taken_at: iso(-24 * 9), old: true, shared: st.shared, may_share: false },
@@ -89,7 +90,7 @@ function intel(notice = ''): IntelView {
 function licence(notice = ''): LicenceView {
   const m = mode(), official = m === 'official', perm = m !== 'noperm'
   if (m === 'off') return { village: 'آمل', open: false, may_set_kind: false, may_issue: false, may_auction: false, may_revoke: false, kinds: null, mine: null, register: null, auctions: null, applications: null, board: null, events: null, companies: null, transfer_fee_bps: 0, listing_fee: 0, notice }
-  const kind = (code: string, name: string, extra: Record<string, unknown>) => ({ code, name, target: '', gate: '', duty: '', available: true, missing: null, required: false, mode: '', fee: 0, reserve: 0, term_days: 0, transferable: false, effective_at: null, in_grace: false, deferred: false, ...extra })
+  const kind = (code: string, name: string, extra: Record<string, unknown>) => ({ code, name, target: '', target_name: '', options: null, effect_name: '', gate: '', duty: '', available: true, missing: null, required: false, mode: '', fee: 0, reserve: 0, term_days: 0, transferable: false, effective_at: null, in_grace: false, deferred: false, ...extra })
   const lic = (id: string, no: number, k: string, who: string, extra: Record<string, unknown> = {}) => ({ id, no, kind: k, holder: N(`h-${id}`, who), holder_kind: 'player', target: '', via: 'fee', status: 'active', paid: 800, term_end: iso(24 * 20), notice_until: null, cause: '', mine: false, may_renew: false, may_list: false, may_revoke: official, proposed: false, ...extra })
   const mineStall = lic('l1', 7, 'craft_privilege', 'آریا', { mine: true, target: 'نانوایی', transferable: true, may_renew: true, may_list: true, may_revoke: false })
   return {
@@ -97,9 +98,9 @@ function licence(notice = ''): LicenceView {
     kinds: [
       kind('stall_right', 'حق غرفه در بازارچه', { gate: 'stall', required: true, mode: 'fixed', fee: 800, term_days: 30, transferable: true, effective_at: iso(24 * 6), in_grace: true }),
       kind('works_class', 'رتبهٔ پیمانکاری', { gate: 'works', required: true, mode: 'fixed', fee: 2000, term_days: 60, effective_at: iso(-24 * 3), in_grace: false }),
-      kind('craft_privilege', 'امتیاز یک پیشه', { target: 'craft', gate: 'craft', required: true, mode: 'auction', reserve: 1500, term_days: 45, transferable: true, effective_at: iso(-24 * 3) }),
-      kind('concession', 'امتیاز بهره‌برداری', { target: 'deposit', deferred: true }),
-      kind('toll_franchise', 'امتیاز عوارض راه', { target: 'link', deferred: true, available: false, missing: ['writing'] }),
+      kind('craft_privilege', 'امتیاز یک پیشه', { target: 'craft', target_name: 'پیشه', options: [N('baker', 'نانوایی'), N('smith', 'آهنگری'), N('joiner', 'نجاری')], gate: 'craft', required: true, mode: 'auction', reserve: 1500, term_days: 45, transferable: true, effective_at: iso(-24 * 3) }),
+      kind('concession', 'امتیاز بهره‌برداری', { target: 'deposit', target_name: 'کان', options: null, deferred: true }),
+      kind('toll_franchise', 'امتیاز عوارض راه', { target: 'link', target_name: 'راه', options: null, deferred: true, available: false, missing: ['writing'] }),
     ],
     mine: [mineStall, ...(st.claimed ? [lic('l2', 12, 'stall_right', 'آریا', { mine: true, via: 'first_grant' })] : []), lic('l3', 5, 'works_class', 'ساختمان‌سازی البرز', { holder_kind: 'company', mine: true, status: 'notice', notice_until: iso(24 * 5), may_revoke: false })],
     register: [
@@ -114,7 +115,7 @@ function licence(notice = ''): LicenceView {
     ],
     applications: st.applied && !st.issued ? [{ id: 'ap1', kind: 'works_class', target: '', holder: N('p-aria', 'آریا'), holder_kind: 'player', fee: 2000, at: iso(-1), mine: true, may_decide: false }] : official && !st.issued ? [{ id: 'ap2', kind: 'works_class', target: '', holder: N('c-x', 'بنایان شمال'), holder_kind: 'company', fee: 2000, at: iso(-2), mine: false, may_decide: true }] : [],
     board: st.bought ? [] : [{ id: 'ls1', licence: lic('l8', 4, 'craft_privilege', 'سیما', { target: 'نجاری', transferable: true }), price: 1200, fee: 60, mine: false, may_buy: true }, { id: 'ls2', licence: mineStall, price: 1000, fee: 50, mine: true, may_buy: false }],
-    events: [{ kind: 'granted', actor: N('p-x', 'سیما'), licence: 8, at: iso(-30) }, { kind: 'auction_awarded', actor: N('', ''), licence: 9, at: iso(-50) }, { kind: 'revoked', actor: N('p-y', 'کاوه'), licence: 2, at: iso(-120) }, { kind: 'rule_set', actor: N('', ''), licence: 0, at: iso(-24 * 5) }],
+    events: [{ kind: 'granted', actor: N('p-x', 'سیما'), licence: 8, at: iso(-30) }, { kind: 'auction_void', actor: N('', ''), licence: 9, at: iso(-50) }, { kind: 'revoked', actor: N('p-y', 'کاوه'), licence: 2, at: iso(-120) }, { kind: 'kind_set', actor: N('', ''), licence: 0, at: iso(-24 * 5) }],
     companies: [N('c-mine', 'ساختمان‌سازی البرز')],
   }
 }
