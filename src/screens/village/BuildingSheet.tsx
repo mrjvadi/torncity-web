@@ -246,7 +246,7 @@ function TypePanel({ kind, panel, names, onOpen, onBuild, onClose, manage, onAct
           )}
         </>
       )}
-      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onBuild={onBuild ? () => onBuild('tool_workshop') : undefined} onClose={onClose} manage={manage} act={onAct} buildingId={panel.id} />}
+      {panel.work && <WorkSection work={panel.work} names={names} onOpen={onOpen} onBuild={onBuild ? () => onBuild('tool_workshop') : undefined} onClose={onClose} manage={manage} act={onAct} buildingId={panel.id} nodeCode={panel.building.code} />}
       {effects.length > 0 && (
         <EffectRow>
           {effects.map((e) => (

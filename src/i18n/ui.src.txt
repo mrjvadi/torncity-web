@@ -6742,3 +6742,289 @@ refusal.village_insurance_no_building | ساختمانی برای این بیم�
 refusal.village_insurance_held | این بیمه را داری. | You already hold this cover.
 refusal.village_insurance_no_money | پول بیمه را نداری. | You cannot pay the premium.
 refusal.village_insurance_bad_scale | سطح قیمت باید بین ۵۰٪ تا ۲۰۰٪ باشد. | The level must be 50 to 200 percent.
+city.mining | معدن | Mine
+city.haul | گاری و جاده | Carts and roads
+city.rail | ریل | Rail
+city.chain | زنجیرهٔ ساخت | Production chain
+mn.title | معدن | Mine
+mn.off | معدن‌کاری هنوز شروع نشده. | Mining has not started yet.
+mn.off_from | معدن‌کاری از {at} شروع می‌شود؛ تا آن موقع گودال‌های آهن مثل همیشه کار می‌کنند. | Mining starts {at}; until then the iron pits dig as before.
+mn.off_hint | هنوز روز شروعش معلوم نیست. | The start day is not set yet.
+mn.pits_from | گودال‌های آهن تا {at} مثل همیشه کار می‌کنند؛ بعد از آن از کانهٔ واقعی زیر زمین برمی‌دارند و کم‌کم تمام می‌شوند. | The iron pits dig as before until {at}; after that they draw on the real ore and thin out.
+mn.deposits | کانه‌ها | Deposits
+mn.deposits_none | زیر زمین این شهر کانه‌ای شناخته نیست. | No deposit is known under this town.
+mn.maybe | احتمالاً کانی هست | Maybe ore
+mn.maybe_hint | تا کانه‌یابی نشود نمی‌دانیم چقدر و چه عیاری دارد. | We do not know how much or how rich until it is surveyed.
+mn.band.lean | کم‌عیار | Lean
+mn.band.medium | میان‌عیار | Medium
+mn.band.rich | پرعیار | Rich
+mn.grade | عیار: حدود {g} درصد | Grade: about {g} percent
+mn.left_surface | مانده در سطح | Left at the surface
+mn.left_l1 | مانده در طبقهٔ اول | Left on the first level
+mn.left_l2 | مانده در طبقهٔ دوم | Left on the second level
+mn.survey | کانه‌یابی کن | Survey
+mn.survey_hint | کانه‌یابی از خزانه هزینه دارد و کسی که انجامش می‌دهد باید کانه‌یاب باشد. | A survey costs the treasury and the one doing it must be a prospector.
+mn.mines | معدن‌ها | Mines
+mn.mines_none | هنوز معدنی ساخته نشده. | No mine is built yet.
+mn.idle | ایستاده | Idle
+mn.working | کار می‌کند | Working
+mn.shift_moves | هر نوبت حدود {kg} کیلو کانه جابه‌جا می‌شود. | A shift moves about {kg} kg.
+mn.cap.face | کندن در جبهه | Digging at the face
+mn.cap.hoist | بالا کشیدن | Hoisting
+mn.cap.haul | حمل تا انبار | Hauling to the store
+mn.limits | این کمتر از همه است | the lowest
+mn.kg | {n} کیلو | {n} kg
+mn.level | طبقهٔ {n} ({m} متر) | Level {n} ({m} m)
+mn.status.ok | سالم | Sound
+mn.status.needs_repair | چوب‌بست خراب است | Props need repair
+mn.status.flooded | آب گرفته | Flooded
+mn.props | چوب‌بست | Props
+mn.water | آب | Water
+mn.drained | آب از راه تونل بیرون می‌رود | Drained by the adit
+mn.flooded_note | آب گرفته؛ تلمبه یا تونل لازم است و بعد باید چوب‌بند طبقه را باز کند. | Flooded; a pump or adit is needed, then the timberman reopens the level.
+mn.repair_note | طبقه بسته است تا چوب‌بند چوب‌بستش را درست کند. | The level is closed until the timberman mends the props.
+mn.crew | کارگرها | Crew
+mn.adit | تونل: {a} متر از {b} متر که طبقهٔ پایین می‌خواهد | Adit: {a} m of the {b} m the deep level asks
+mn.reason.no_deposit | زیر این معدن کانه‌ای نیست. | No deposit under this mine.
+mn.reason.no_ore | کانه تمام شده. | The ore is gone.
+mn.reason.closed | معدن بسته است. | The mine is closed.
+mn.reason.no_hoist | بالابر ندارد. | It has no hoist.
+mn.reason.no_haul | راه یا گاری برای بردن کانه نیست. | No way to carry the ore out.
+mn.reason.no_staff | کارگر ندارد. | No crew.
+mn.post | کار در معدن به عنوان | Work at the mine as
+mn.post_auto | هرچه معدن بیشتر لازم دارد | What the mine needs most
+mn.post.miner | کانه‌کن | Miner
+mn.post.mine_hauler | باربر معدن | Mine hauler
+mn.post.timberman | چوب‌بند | Timberman
+mn.post.banksman | بالابر‌چی | Banksman
+mn.post.pumper | تلمبه‌چی | Pumper
+mn.work | کار کن | Work a shift
+mn.order_below | ماژول‌ها را پایین‌تر سفارش بده. | Order the modules below.
+mn.works | کار در جریان | Works in hand
+mn.metres | {n} متر | {n} m
+mn.left | {t} مانده | {t} left
+mn.modules | ماژول‌های معدن | Mine modules
+mn.modules_hint | برای معدن «{name}»؛ مصالح از انبار می‌رود و دستمزد بنّاها از خزانه. | For the mine «{name}»; materials leave the store and the builders' wage the treasury.
+mn.have | {a} از {b} | {a} of {b}
+mn.cost | مصالح: {list}؛ دستمزد: {w} | Materials: {list}; wage: {w}
+mn.per | (برای هر {n} متر) | (for each {n} m)
+mn.missing | پژوهش یا ماژول لازم: {list} | Research or module needed: {list}
+mn.order | سفارش بده | Order
+mn.not_head | سفارش ماژول با کسی است که اجازهٔ معدن دارد. | Ordering modules is for the holder of the mine permission.
+mn.notice.mine_surveyed | کانه‌یابی تمام شد. | The survey is done.
+mn.notice.mine_works_ordered | کار سفارش داده شد. | The works are ordered.
+hl.title | گاری و جاده | Carts and roads
+hl.off | گاری و جاده هنوز شروع نشده. | Carts and roads have not started yet.
+hl.loads | بار روی جاده | Goods on the road
+hl.loads_none | الان باری روی جاده نیست. | No goods on the road now.
+hl.load | {n} {item} به {to} | {n} {item} to {to}
+hl.arrives | {t} دیگر می‌رسد | Arrives in {t}
+hl.links | جاده‌های بین شهرها | Roads between towns
+hl.links_none | هنوز جاده‌ای به شهر دیگر نیست. | No road to another town yet.
+hl.road_to | جاده به {who} | Road to {who}
+hl.status.building | در حال ساخت | Being built
+hl.status.open | باز | Open
+hl.status.closed | بسته | Closed
+hl.class.path | راه مالرو | Path
+hl.class.track | جادهٔ خاکی | Dirt road
+hl.km | {n} کیلومتر | {n} km
+hl.condition | وضعیت {p} | Condition {p}
+hl.toll | عوارض {m} | Toll {m}
+hl.mine | جادهٔ خودمان | our road
+hl.new_road | جادهٔ تازه به شهرهایی که هنوز راه ندارند: | A new road to towns with none yet:
+hl.link_go | بساز: {c} | Build: {c}
+hl.not_draw | کشیدن جاده با کسی است که اجازهٔ جاده دارد. | Drawing roads is for the holder of the road permission.
+hl.carts | گاری‌ها | Carts
+hl.carts_none | هنوز گاری نداری. | No cart yet.
+hl.cap | ظرفیت {n} کیلو | Capacity {n} kg
+hl.cstatus.building | در حال ساخت | Being built
+hl.cstatus.idle | آماده | Ready
+hl.cstatus.moving | در راه | On the road
+hl.mode_cost | مصالح: {list}؛ دستمزد: {w}؛ {h} ساعت کار | Materials: {list}; wage: {w}; {h} hours
+hl.build_cart | گاری بساز | Build a cart
+hl.send_section | فرستادن کالا | Send goods
+hl.send_none | برای فرستادن کالا اول باید جاده‌ای به شهر دیگر باز باشد. | A road to another town must be open first.
+hl.send_title | فرستادن به شهر دیگر | Send to another town
+hl.item | کالا | Goods
+gp.search | اسم کالا را بنویس | Type the goods name
+gp.chosen | انتخاب‌شده: {item} | Chosen: {item}
+gp.none | کالایی با این اسم نیست. | No goods by that name.
+hl.qty | چند تا | How many
+hl.to | به | To
+hl.send | فرستادن | Send
+hl.confirm_title | فرستادن کالا | Send goods
+hl.confirm | {n} {item} از انبار شهر به {to} فرستاده می‌شود. | {n} {item} go from the town store to {to}.
+hl.confirm_hint | گاری‌ها دستمزد می‌گیرند و صاحب جاده عوارض؛ هزینه‌اش بعد از ثبت از خزانه می‌رود. | Carters are paid and the road's owner takes a toll; the cost leaves the treasury when it is placed.
+hl.send_go | بفرست | Send
+hl.orders | فرستاده‌ها | Sent
+hl.ostatus.open | منتظر گاری | Waiting for a cart
+hl.ostatus.moving | در راه | On the road
+hl.ostatus.delivered | رسید | Delivered
+hl.ostatus.cancelled | لغو شد | Cancelled
+hl.notice.haul_link_ordered | ساخت جاده سفارش داده شد. | The road is ordered.
+hl.notice.haul_carrier_ordered | ساخت گاری سفارش داده شد. | The cart is ordered.
+hl.notice.haul_sent | کالا فرستاده شد. | The goods are on their way.
+rl.title | ریل | Rail
+rl.off | ریل هنوز شروع نشده. | Rail has not started yet.
+rl.lines | خط‌ها | Lines
+rl.lines_none | هنوز خطی کشیده نشده. | No line is drawn yet.
+rl.status.planned | کشیده‌شده، هنوز ساخته نشده | Drawn, not built
+rl.status.building | در حال ساخت | Being laid
+rl.status.open | باز | Open
+rl.status.closed | بسته | Closed
+rl.sections | {a} تکه از {b} ساخته شده | {a} of {b} sections laid
+rl.condition | بدترین تکه: {p} | Worst section: {p}
+rl.rate | کرایه {m} برای هر تن و کیلومتر | Rate {m} a tonne-kilometre
+rl.laying | تا {at} | until {at}
+rl.open_today | امروز باز است | Open today
+rl.shut_today | امروز بسته است | Shut today
+rl.build_ten | ده تکهٔ بعدی را بساز | Lay the next ten sections
+rl.laying_now | در حال ساخت | Being laid
+rl.add_train | قطار تازه (۳ واگن) | A new train (3 wagons)
+rl.train_name | قطار {n} | Train {n}
+rl.set_rate | کرایهٔ هر تن و کیلومتر | Rate per tonne-kilometre
+rl.rate_go | کرایه را بگذار | Set the rate
+rl.not_draw | کشیدن خط و قطار با کسی است که اجازهٔ ریل دارد. | Lines and trains are for the holder of the rail permission.
+rl.need_stations | برای کشیدن خط دو ایستگاه ساخته‌شده لازم است. | A line needs two finished stations.
+rl.draw_title | خط تازه | A new line
+rl.class | نوع ریل | Rail class
+rl.class_line | سرعت {s} کیلومتر در ساعت، بار {k} کیلو، شیب تا {g} | Speed {s} km/h, load {k} kg, grade up to {g}
+rl.from | از ایستگاه | From station
+rl.to | تا ایستگاه | To station
+rl.plan | هزینه‌اش را ببین | See the cost
+rl.quote_title | خط تازه | A new line
+rl.quote_lead | خط از {a} تا {b} | A line from {a} to {b}
+rl.q.sections | تکه‌ها | Sections
+rl.q.length | طول | Length
+rl.q.grade | بیشترین شیب | Steepest grade
+rl.q.materials | مصالح | Materials
+rl.q.wage | دستمزد | Wage
+rl.q.minutes | زمان ساخت | Time to lay
+rl.q.min_v | {n} دقیقه | {n} minutes
+rl.quote_hint | کشیدن خط فقط آن را ثبت می‌کند؛ ساختنش بعد، ده تکه ده تکه، انجام می‌شود. | Drawing only records the line; laying is done later, ten sections at a time.
+rl.draw_go | خط را بکش | Draw the line
+rl.trains | قطارها | Trains
+rl.trains_none | هنوز قطاری نیست. | No train yet.
+rl.tstatus.idle | ایستاده | Idle
+rl.tstatus.running | در حرکت | Running
+rl.tstatus.waiting | منتظر | Waiting
+rl.train_line | {w} واگن، {k} کیلو | {w} wagons, {k} kg
+rl.at | در {p} | at {p}
+rl.next | حرکت بعدی: {at} | Next: {at}
+rl.reason.blocked | راه بسته است. | The track is blocked.
+rl.reason.no_feed | کالایی برای بار زدن نیست. | Nothing to load.
+rl.reason.station_closed | ایستگاه امروز باز نیست. | The station is not open today.
+rl.reason.track_broken | ریل خراب است. | The track is broken.
+rl.cargo | بار | Cargo
+rl.op.load | بار بزن | Load
+rl.op.unload | خالی کن | Unload
+rl.op.pass | رد شو | Pass
+rl.wait | {n} دقیقه صبر | wait {n} min
+rl.add_step | یک ایستگاه به برنامه اضافه کن | Add a stop to the schedule
+rl.add_step_go | اضافه کن | Add
+rl.clear | برنامه را پاک کن | Clear the schedule
+rl.halt | نگه دار | Halt
+rl.start | راه بینداز | Start
+rl.bookings | بار فرستادن با قطار | Freight bookings
+rl.bookings_none | هنوز باری ثبت نشده. | No freight is booked.
+rl.bstatus.booked | ثبت شد | Booked
+rl.bstatus.open | منتظر قطار | Waiting for a train
+rl.bstatus.moving | در راه | On its way
+rl.bstatus.delivered | رسید | Delivered
+rl.bstatus.cancelled | لغو شد | Cancelled
+rl.cancel_booking | لغو ثبت (پولش برمی‌گردد اگر بار نخورده باشد) | Cancel (the fee comes back if nothing was loaded)
+rl.book_title | بار فرستادن | Book freight
+rl.book_none | برای فرستادن بار، خطی باز لازم است. | An open line is needed to book freight.
+rl.book_to | به ایستگاه | To station
+rl.book | ثبت کن | Book
+rl.book_confirm_title | ثبت بار | Book freight
+rl.book_confirm | {n} {item} با کرایهٔ {rate} برای هر تن و کیلومتر | {n} {item} at {rate} a tonne-kilometre
+rl.book_fee | کرایهٔ حدودی {fee}؛ همین حالا به صاحب خط داده می‌شود. | About {fee}; paid to the line's owner now.
+rl.book_go | ثبت و پرداخت | Book and pay
+rl.notice.rail_quoted | هزینه دیده شد. | The cost is shown.
+rl.notice.rail_drawn | خط کشیده شد. | The line is drawn.
+rl.notice.rail_build_ordered | ساخت تکه‌ها سفارش داده شد. | The sections are ordered.
+rl.notice.rail_train_made | قطار ساخته شد. | The train is made.
+rl.notice.rail_step_added | ایستگاه به برنامه اضافه شد. | The stop is added.
+rl.notice.rail_schedule_cleared | برنامه پاک شد. | The schedule is cleared.
+rl.notice.rail_train_started | قطار راه افتاد. | The train started.
+rl.notice.rail_train_halted | قطار نگه داشته شد. | The train is halted.
+rl.notice.rail_rate_set | کرایه گذاشته شد. | The rate is set.
+rl.notice.rail_booked | بار ثبت شد. | The freight is booked.
+rl.notice.rail_booking_cancelled | ثبت بار لغو شد. | The booking is cancelled.
+ch.title | زنجیرهٔ ساخت | Production chain
+ch.off | محاسبهٔ زنجیره هنوز شروع نشده. | The chain calculator has not started yet.
+ch.intro | یک کالا و چند تا در ساعت بخواه؛ نشان می‌دهیم برای رسیدن به آن از ته زنجیره چند ساختمان از هر نوع لازم است و کجا گلوگاه است. | Ask for a good and a rate; we show how many buildings of each kind it takes and where the bottleneck is.
+ch.target | کالای هدف | Target good
+ch.rate | چند تا در ساعت | Per hour
+ch.calc | حساب کن | Calculate
+ch.first | اولین گلوگاه: {n} ساختمان «{node}» دیگر برای {item} لازم است. | First bottleneck: {n} more «{node}» for {item}.
+ch.lines | زنجیره از هدف تا ته | The chain from the target up
+ch.add | {n}+ | +{n}
+ch.enough | کافی | Enough
+ch.line | «{node}»: لازم {a} و موجود {b} در ساعت؛ {c} ساخته، {r} در کار | «{node}»: need {a}, have {b} an hour; {c} built, {r} running
+ch.raw | مواد خام | Raw goods
+ch.raw_line | {a} در ساعت؛ در انبار {s} | {a} an hour; {s} in store
+ch.raw_hint | این‌ها را هیچ ساختمانی در شهر نمی‌سازد؛ باید از بیرون یا با خرید برسد. | Nothing in the town makes these; they must come from outside or be bought.
+ch.ratios | نسبت‌ها | Ratios
+ch.built | {b} ساخته، {r} در کار | {b} built, {r} running
+ch.makes | هر ساختمان می‌سازد | One makes
+ch.uses | هر ساختمان مصرف می‌کند | One uses
+ch.per_hour | در ساعت | an hour
+ch.need_have | لازم {a}، موجود {b} | need {a}, have {b}
+ch.makers | می‌سازنش: {list} | Made by: {list}
+ch.stock | در انبار {n} | {n} in store
+refusal.village_mine_not_yet | معدن‌کاری هنوز شروع نشده. | Mining has not started yet.
+refusal.village_mine_no_deposit | زیر این معدن کانه‌ای نیست. | No deposit under this mine.
+refusal.village_mine_no_ore | کانهٔ سطح تمام شده. | The surface ore is gone.
+refusal.village_mine_closed | طبقه بسته است؛ چوب‌بند باید دوباره بازش کند. | The level is closed; the timberman must reopen it.
+refusal.village_mine_no_hoist | بالابر نیست؛ کانه را بالا نمی‌شود کشید. | No hoist; the ore cannot be raised.
+refusal.village_mine_limited | کار این نوبت را چیز دیگری نگه می‌دارد؛ بخش کمترین ظرفیت را ببین. | Something else holds this shift back; see the lowest capacity.
+refusal.village_mine_role_full | جای این کار در معدن پر است؛ کار دیگری را انتخاب کن. | That post is full; pick another.
+refusal.village_mine_bad_role | این کار در معدن نیست. | There is no such post at the mine.
+refusal.village_mine_nothing_to_do | الان کاری در معدن برایت نیست. | There is nothing for you to do at the mine now.
+refusal.village_mine_bad_args | عددها درست نیست. | The numbers are not right.
+refusal.village_mine_no_mine | معدنی نیست. | There is no mine.
+refusal.village_mine_already_surveyed | این کانه قبلاً کانه‌یابی شده. | This deposit is already surveyed.
+refusal.village_mine_module_have | این ماژول را داری. | You already have this module.
+refusal.village_mine_module_order | این ماژول الان سفارش داده شده. | This module is already ordered.
+refusal.village_mine_no_outlet | آب بیرون نمی‌رود؛ اول تونل یا تلمبه لازم است. | The water has no way out; an adit or a pump is needed first.
+refusal.village_mine_no_money | خزانه پول این کار را ندارد. | The treasury cannot pay for this.
+refusal.village_haul_not_yet | گاری و جاده هنوز شروع نشده. | Carts and roads have not started yet.
+refusal.village_haul_bad_args | عددها درست نیست. | The numbers are not right.
+refusal.village_haul_no_target | چنین شهری نیست. | No such town.
+refusal.village_haul_same | به شهر خودت نمی‌شود. | Not to your own town.
+refusal.village_haul_no_route | راهی به آن شهر پیدا نشد. | No way to that town was found.
+refusal.village_haul_no_bridge | سر راه آب است و پل لازم است. | Water is in the way; a bridge is needed.
+refusal.village_haul_link_have | به این شهر جاده داری. | You already have a road there.
+refusal.village_haul_no_link | به آن شهر جادهٔ باز نیست. | No open road to that town.
+refusal.village_haul_no_carrier | گاری آماده نیست. | No cart is ready.
+refusal.village_haul_too_heavy | بار از ظرفیت گاری‌های آماده سنگین‌تر است؛ حداکثر {max} کیلو. | The load is heavier than the ready carts take; at most {max} kg.
+refusal.village_haul_no_stock | در انبار این‌قدر کالا نیست. | The store does not hold that much.
+refusal.village_haul_no_mode | چنین گاری‌ای نیست. | No such cart.
+refusal.village_haul_no_money | خزانه پول این کار را ندارد. | The treasury cannot pay for this.
+refusal.village_rail_not_yet | ریل هنوز شروع نشده. | Rail has not started yet.
+refusal.village_rail_bad_args | عددها درست نیست. | The numbers are not right.
+refusal.village_rail_no_station | ایستگاه ساخته‌شده نیست. | No finished station.
+refusal.village_rail_same_station | دو ایستگاه باید فرق کنند. | The two stations must differ.
+refusal.village_rail_no_class | این نوع ریل نیست. | No such rail class.
+refusal.village_rail_no_route | راهی برای ریل پیدا نشد. | No way for a line was found.
+refusal.village_rail_no_bridge | سر راه آب است و پل لازم است. | Water is in the way; a bridge is needed.
+refusal.village_rail_no_line | چنین خطی نیست. | No such line.
+refusal.village_rail_not_owner | این خط مال تو نیست. | This line is not yours.
+refusal.village_rail_works_in_hand | ساخت این خط در جریان است؛ صبر کن. | The line is being laid; wait.
+refusal.village_rail_nothing_to_lay | چیزی برای ساختن نمانده. | Nothing is left to lay.
+refusal.village_rail_no_money | پول این کار را نداری. | You cannot pay for this.
+refusal.village_rail_too_many_trains | قطار بیشتر از این روی یک خط نمی‌شود. | No more trains on one line.
+refusal.village_rail_too_many_wagons | واگن بیشتر از این نمی‌شود. | No more wagons.
+refusal.village_rail_no_train | چنین قطاری نیست. | No such train.
+refusal.village_rail_train_running | قطار در حرکت است؛ اول نگهش دار. | The train is running; halt it first.
+refusal.village_rail_line_not_open | خط هنوز باز نیست. | The line is not open yet.
+refusal.village_rail_bad_schedule | برنامه درست نیست. | The schedule is not right.
+refusal.village_rail_schedule_too_long | برنامه از این بلندتر نمی‌شود. | The schedule cannot be longer.
+refusal.village_rail_no_stop | این ایستگاه روی خط نیست. | That station is not on the line.
+refusal.village_rail_no_rate | اول کرایه را بگذار. | Set the rate first.
+refusal.village_rail_no_booking | چنین ثبتی نیست. | No such booking.
+refusal.village_rail_no_capacity | قطار جای این بار را ندارد. | The train has no room for this load.
+refusal.village_rail_booking_no_stock | در انبار این‌قدر کالا نیست. | The store does not hold that much.
+refusal.village_chain_not_yet | محاسبهٔ زنجیره هنوز شروع نشده. | The chain calculator has not started yet.

@@ -435,3 +435,14 @@
 .rd-form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
 .rd-out { display: flex; flex-direction: column; gap: 2px; font-size: 13px; padding-top: 6px; border-top: 1px solid color-mix(in srgb, currentColor 15%, transparent); }
 .rd-fell { color: #ff9a9e; }
+.mn-list { display: flex; flex-direction: column; gap: 8px; }
+.mn-card { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, currentColor 6%, transparent); }
+.mn-card.starved { background: color-mix(in srgb, #ff5a47 12%, transparent); }
+.mn-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.mn-sub { font-size: 13px; opacity: .85; }
+.mn-level { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, currentColor 5%, transparent); }
+.mn-bar { height: 8px; border-radius: 6px; background: color-mix(in srgb, currentColor 14%, transparent); overflow: hidden; }
+.mn-bar i { display: block; height: 100%; background: #56d447; } .mn-bar i.bad { background: #ff5a47; }
+.mn-ratio { display: flex; flex-direction: column; gap: 6px; }
+.mn-feed { display: flex; flex-direction: column; gap: 3px; }
+.mn-reasons { display: flex; flex-direction: column; gap: 4px; }
