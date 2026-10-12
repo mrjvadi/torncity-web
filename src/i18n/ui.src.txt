@@ -6748,9 +6748,9 @@ city.rail | ریل | Rail
 city.chain | زنجیرهٔ ساخت | Production chain
 mn.title | معدن | Mine
 mn.off | معدن‌کاری هنوز شروع نشده. | Mining has not started yet.
-mn.off_from | معدن‌کاری از {at} شروع می‌شود؛ تا آن موقع چاله‌های آهن مثل همیشه کار می‌کنند. | Mining starts {at}; until then the iron pits dig as before.
+mn.off_from | معدن‌کاری از {at} شروع می‌شود؛ تا آن موقع گودال‌های آهن مثل همیشه کار می‌کنند. | Mining starts {at}; until then the iron pits dig as before.
 mn.off_hint | هنوز روز شروعش معلوم نیست. | The start day is not set yet.
-mn.pits_from | چاله‌های آهن تا {at} مثل همیشه کار می‌کنند؛ بعد از آن از کانهٔ واقعی زیر زمین برمی‌دارند و کم‌کم تمام می‌شوند. | The iron pits dig as before until {at}; after that they draw on the real ore and thin out.
+mn.pits_from | گودال‌های آهن تا {at} مثل همیشه کار می‌کنند؛ بعد از آن از کانهٔ واقعی زیر زمین برمی‌دارند و کم‌کم تمام می‌شوند. | The iron pits dig as before until {at}; after that they draw on the real ore and thin out.
 mn.deposits | کانه‌ها | Deposits
 mn.deposits_none | زیر زمین این شهر کانه‌ای شناخته نیست. | No deposit is known under this town.
 mn.maybe | احتمالاً کانی هست | Maybe ore
@@ -6845,7 +6845,10 @@ hl.build_cart | گاری بساز | Build a cart
 hl.send_section | فرستادن کالا | Send goods
 hl.send_none | برای فرستادن کالا اول باید جاده‌ای به شهر دیگر باز باشد. | A road to another town must be open first.
 hl.send_title | فرستادن به شهر دیگر | Send to another town
-hl.item | کالا (کد) | Goods (code)
+hl.item | کالا | Goods
+gp.search | اسم کالا را بنویس | Type the goods name
+gp.chosen | انتخاب‌شده: {item} | Chosen: {item}
+gp.none | کالایی با این اسم نیست. | No goods by that name.
 hl.qty | چند تا | How many
 hl.to | به | To
 hl.send | فرستادن | Send

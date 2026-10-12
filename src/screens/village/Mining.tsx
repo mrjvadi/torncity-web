@@ -13,7 +13,8 @@ import { hasKey, t, type Key } from '../../i18n'
 
 registerWrites(['settlement.mining'], (a) => !!a.args?.action)
 
-export const word = (key: string, fallback = ''): string => (hasKey(key) ? t(key as Key) : fallback)
+// a code the texts have no word for is never shown (a content gap), only an authored name is
+export const word = (key: string, fallback = ''): string => (hasKey(key) ? t(key as Key) : /^[a-z0-9_.-]+$/.test(fallback) ? '' : fallback)
 export const pct = (bps: number) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 0 }).format(bps / 100)}٪`
 export const sendCmd = (ctx: FlowCtx, command: string, args: Record<string, string>) => ctx.go({ command, args, kind: 'secondary', id: command, icon: 'action:default' } as never)
 /** Materials in a line: «۴ چوب، ۲ سنگ». */

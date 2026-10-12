@@ -12,6 +12,9 @@ import { formatNumber, money } from '../native/kit/format'
 import { atText } from '../../lib/duration'
 import { hasKey, t } from '../../i18n'
 import { matLine, pct, sendCmd, word } from './Mining'
+import { GoodsPick } from './GoodsPick'
+
+const seen = (v: RailView) => [...(v.trains ?? []).flatMap((x) => [...(x.cargo ?? []).map((c) => c.item), ...(x.steps ?? []).map((st) => st.item)]), ...(v.bookings ?? []).map((b) => b.item)].filter((i) => i.code)
 
 registerWrites(['settlement.rail'], (a) => !!a.args?.action && a.args.action !== 'plan')
 
@@ -80,7 +83,7 @@ function Train({ tr, v, ctx }: { tr: RailTrainLine; v: RailView; ctx: FlowCtx })
           <div className="tc-f"><span>{t('rl.add_step')}</span>
             <div className="rc-chips" role="radiogroup">{(line?.stops ?? []).map((s) => <button key={s.id} type="button" role="radio" aria-checked={stop === s.id} className={`dk-chip${stop === s.id ? ' all' : ''}`} onClick={() => setStop(s.id)}>{s.settlement.name}</button>)}</div>
             <div className="rc-chips" role="radiogroup">{['load', 'unload', 'pass'].map((o) => <button key={o} type="button" role="radio" aria-checked={op === o} className={`dk-chip${op === o ? ' all' : ''}`} onClick={() => setOp(o)}>{word(`rl.op.${o}`, o)}</button>)}</div>
-            {op !== 'pass' && <input className="fx-field-input" dir="ltr" value={item} placeholder="iron_ore_rich" onChange={(e) => setItem(e.target.value.trim())} aria-label={t('hl.item')} />}
+            {op !== 'pass' && <GoodsPick value={item} onChange={setItem} suggest={seen(v)} ctx={ctx} />}
           </div>
           <div className="wk-btns">
             <ActionButton tone="steel" small disabled={ctx.busy || !stop || (op !== 'pass' && !item)} onClick={() => sendCmd(ctx, 'settlement.rail', { action: 'step', code: tr.id, n: stop, m: op, ...(item ? { k: item } : {}) })}>{t('rl.add_step_go')}</ActionButton>
@@ -110,12 +113,12 @@ function Book({ v, ctx }: { v: RailView; ctx: FlowCtx }) {
       <div className="mn-head"><b>{t('rl.book_title')}</b></div>
       <div className="rc-chips" role="radiogroup">{lines.map((l) => <button key={l.id} type="button" role="radio" aria-checked={lid === l.id} className={`dk-chip${lid === l.id ? ' all' : ''}`} onClick={() => { setLid(l.id); setStop('') }}>{l.name}</button>)}</div>
       <div className="tc-f"><span>{t('rl.book_to')}</span><div className="rc-chips" role="radiogroup">{(line?.stops ?? []).map((s) => <button key={s.id} type="button" role="radio" aria-checked={stop === s.id} className={`dk-chip${stop === s.id ? ' all' : ''}`} onClick={() => setStop(s.id)}>{s.settlement.name}</button>)}</div></div>
-      <label className="tc-f"><span>{t('hl.item')}</span><input className="fx-field-input" dir="ltr" value={item} placeholder="iron_ore_rich" onChange={(e) => setItem(e.target.value.trim())} aria-label={t('hl.item')} /></label>
+      <div className="tc-f"><span>{t('hl.item')}</span><GoodsPick value={item} onChange={setItem} suggest={seen(v)} ctx={ctx} /></div>
       <label className="tc-f"><span>{t('hl.qty')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)} aria-label={t('hl.qty')} /></label>
       <ActionButton tone="gold" small disabled={ctx.busy || !stop || !item || n < 1} onClick={() => setAsk(true)}>{t('rl.book')}</ActionButton>
       {ask && (
         <Popup open onClose={() => setAsk(false)} tone="gold" title={t('rl.book_confirm_title')} footer={<div className="lm-craft-foot"><ActionButton tone="steel" small onClick={() => setAsk(false)}>{t('common.cancel')}</ActionButton><ActionButton tone="gold" onClick={() => { setAsk(false); sendCmd(ctx, 'settlement.rail', { action: 'book', code: lid, n: String(n), m: item, k: stop }) }}>{t('rl.book_go')}</ActionButton></div>}>
-          <Lead>{t('rl.book_confirm', { n: formatNumber(n), item, rate: money(line?.rate_per_tonne_km ?? 0) })}</Lead>
+          <Lead>{t('rl.book_confirm', { n: formatNumber(n), item: ctx.names.name(['item', 'component'], item), rate: money(line?.rate_per_tonne_km ?? 0) })}</Lead>
           <Hint>{t('rl.book_fee', { fee: money(Math.round(fee)) })}</Hint>
         </Popup>
       )}

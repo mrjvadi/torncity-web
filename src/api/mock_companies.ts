@@ -23,7 +23,7 @@ const e = (code: string, en: string, fa: string): Entry => ({ code, name: { en, 
 export const COMPANIES_CONTENT: Record<string, Entry[]> = {
   company_type: [e('studio', 'Design studio', 'استودیو'), e('bakery', 'Bakery', 'نانوایی'), e('foundry', 'Foundry', 'ریخته‌گری'), e('pharma', 'Pharmacy lab', 'دارویی'), e('aerospace', 'Aerospace works', 'هوافضا')],
   component: [e('flour', 'Flour', 'آرد'), e('yeast', 'Yeast', 'مخمر'), e('dough', 'Dough', 'خمیر'), e('salt', 'Salt', 'نمک'), e('iron_bar', 'Iron bar', 'شمش آهن'), e('timber', 'Timber', 'الوار')],
-  item: [e('bread', 'Bread', 'نان'), e('cake', 'Cake', 'کیک'), e('sword', 'Sword', 'شمشیر')],
+  item: [e('bread', 'Bread', 'نان'), e('cake', 'Cake', 'کیک'), e('sword', 'Sword', 'شمشیر'), e('iron_ore_rich', 'Rich iron ore', 'کانهٔ آهن پرعیار'), e('iron_ore_lean', 'Lean iron ore', 'کانهٔ آهن کم‌عیار'), e('coal', 'Coal', 'زغال‌سنگ'), e('plank', 'Plank', 'تخته')],
   technology: [e('fermentation', 'Fermentation', 'تخمیر'), e('oven_craft', 'Oven craft', 'کوره‌کاری'), e('pastry', 'Pastry', 'شیرینی‌پزی'), e('steel', 'Steel making', 'فولادسازی')],
   supplier: [e('mill', 'The mill', 'آسیاب'), e('saltworks', 'The saltworks', 'نمکزار')],
   design_slot: [e('base', 'Base', 'پایه'), e('filling', 'Filling', 'مایه'), e('topping', 'Topping', 'روکش')],

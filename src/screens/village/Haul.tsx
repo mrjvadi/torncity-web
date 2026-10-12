@@ -12,6 +12,7 @@ import { atText } from '../../lib/duration'
 import { durationText } from './common'
 import { hasKey, t, type Key } from '../../i18n'
 import { matLine, pct, sendCmd, word } from './Mining'
+import { GoodsPick } from './GoodsPick'
 
 registerWrites(['settlement.haul'], (a) => !!a.args?.action)
 
@@ -27,13 +28,13 @@ function Send({ v, ctx }: { v: HaulView; ctx: FlowCtx }) {
   return (
     <div className="mn-card">
       <div className="mn-head"><b>{t('hl.send_title')}</b></div>
-      <label className="tc-f"><span>{t('hl.item')}</span><input className="fx-field-input" dir="ltr" value={item} placeholder="timber" onChange={(e) => setItem(e.target.value.trim())} aria-label={t('hl.item')} /></label>
+      <div className="tc-f"><span>{t('hl.item')}</span><GoodsPick value={item} onChange={setItem} suggest={[...(v.orders ?? []).map((o) => o.item), ...(v.loads ?? []).map((o) => o.item)]} ctx={ctx} /></div>
       <label className="tc-f"><span>{t('hl.qty')}</span><input className="fx-field-input" dir="ltr" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)} aria-label={t('hl.qty')} /></label>
       <div className="rc-chips" role="radiogroup" aria-label={t('hl.to')}>{open.map((l) => <button key={l.id} type="button" role="radio" aria-checked={l.other.code === to} className={`dk-chip${l.other.code === to ? ' all' : ''}`} onClick={() => setTo(l.other.code)}>{l.other.name}</button>)}</div>
       <ActionButton tone="gold" small disabled={ctx.busy || !item || n < 1 || !to} onClick={() => setAsk(true)}>{t('hl.send')}</ActionButton>
       {ask && (
         <Popup open onClose={() => setAsk(false)} tone="gold" title={t('hl.confirm_title')} footer={<div className="lm-craft-foot"><ActionButton tone="steel" small onClick={() => setAsk(false)}>{t('common.cancel')}</ActionButton><ActionButton tone="gold" onClick={() => { setAsk(false); sendCmd(ctx, 'settlement.haul', { action: 'send', code: item, n: String(n), m: to }) }}>{t('hl.send_go')}</ActionButton></div>}>
-          <Lead>{t('hl.confirm', { n: formatNumber(n), item, to: other })}</Lead>
+          <Lead>{t('hl.confirm', { n: formatNumber(n), item: ctx.names.name(['item', 'component'], item), to: other })}</Lead>
           <Hint>{t('hl.confirm_hint')}</Hint>
         </Popup>
       )}
