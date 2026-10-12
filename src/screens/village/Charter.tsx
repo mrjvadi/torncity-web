@@ -27,8 +27,8 @@ import './village.css'
 
 const permKey = (code: string) => `charter.perm.${code.replace(':', '.')}`
 /** A permission or group the client has no word for is never shown as its code. */
-const permName = (code: string) => (hasKey(permKey(code)) ? t(permKey(code) as Key) : t('charter.perm.other'))
-const groupName = (g: string) => (hasKey(`charter.group.${g}`) ? t(`charter.group.${g}` as Key) : t('charter.group.other'))
+export const permName = (code: string) => (hasKey(permKey(code)) ? t(permKey(code) as Key) : t('charter.perm.other'))
+export const groupName = (g: string) => (hasKey(`charter.group.${g}`) ? t(`charter.group.${g}` as Key) : t('charter.group.other'))
 const howName = (a: string) => (hasKey(`charter.how.${a}`) ? t(`charter.how.${a}` as Key) : t('charter.how.appointment'))
 const actionName = (a: string, title: string) => (hasKey(`charter.action.${a}`) ? t(`charter.action.${a}` as Key, { title }) : t('charter.action.other', { title }))
 const grantText = (g: CharterGrantView) => (g.limit > 0 ? t('charter.perm_limit', { name: permName(g.permission), limit: money(g.limit) }) : permName(g.permission))

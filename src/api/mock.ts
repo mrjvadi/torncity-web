@@ -26,6 +26,7 @@ import { mockRegistryCommand } from './mock_registry'
 import { mockHouseholdsCommand } from './mock_households'
 import { mockRaidCommand } from './mock_raids'
 import { mockMinesCommand } from './mock_mines'
+import { mockPolityCommand } from './mock_polity'
 import { installVillageMockHandles, mockBootstrapSettlement, mockVillageCommand, mockVillageRoute } from './mock_village'
 import { mockSocietyCommand } from './mock_society'
 import { mockP0Command } from './mock_p0'
@@ -155,6 +156,8 @@ function mockCommand(command: string, args?: Record<string, unknown>) {
   if (trd) return json(trd)
   const rsd = mockResearchCommand(command, args ?? {})
   if (rsd) return json(rsd)
+  const polity = mockPolityCommand(command, args ?? {})
+  if (polity) return json(polity)
   const mines = mockMinesCommand(command, args ?? {})
   if (mines) return json(mines)
   const raid = mockRaidCommand(command, args ?? {})
