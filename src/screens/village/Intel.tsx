@@ -335,10 +335,9 @@ export function VettingRule({ run }: { run: (command: string, args?: Record<stri
   }, [])
   if (!v || !v.open) return null
   return (
-    <button type="button" className="sv-line" onClick={() => run('settlement.intel')}>
-      <b>{t('gi.vet_label')}</b>
-      <span>{v.vetting_days > 0 ? t('gi.vet_days', { n: formatNumber(v.vetting_days) }) : t('gi.vet_none')}</span>
-      <span>{word(`gi.counter.${v.counter}`) || t('gi.counter.none')}</span>
+    <button type="button" className="mn-card pj-vet" onClick={() => run('settlement.intel')}>
+      <div className="mn-head"><b>{t('gi.vet_label')}</b><EffectChip tone="neutral">{v.vetting_days > 0 ? t('gi.vet_days', { n: formatNumber(v.vetting_days) }) : t('gi.vet_none')}</EffectChip></div>
+      <div className="mn-sub">{word(`gi.counter.${v.counter}`) || t('gi.counter.none')}</div>
     </button>
   )
 }

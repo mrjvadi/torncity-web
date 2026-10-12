@@ -467,3 +467,4 @@
 .pj-need { display: flex; flex-direction: column; gap: 4px; }
 .pj-need b.good { color: #56d447; }
 .pj-me { margin-block: 6px; }
+.pj-vet { width: 100%; text-align: start; border: 0; color: inherit; font: inherit; cursor: pointer; }
