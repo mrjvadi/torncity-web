@@ -20,19 +20,9 @@ export interface OfficeDraft {
 
 export const emptyOffice = (): OfficeDraft => ({ title: '', seats: 1, grants: {}, holders: [] })
 
-/** The powers only a union may hold; a settlement's charter does not list them, so the union's editor adds them (inactive ones are marked). */
-const UNION_ONLY: CharterPermissionView[] = [
-  { code: 'union.admit', group: 'foreign', limited: false, active: true }, { code: 'union.expel', group: 'foreign', limited: false, active: true },
-  { code: 'war.declare', group: 'foreign', limited: false, active: true }, { code: 'war.peace', group: 'foreign', limited: false, active: true },
-  { code: 'border.close', group: 'foreign', limited: false, active: false }, { code: 'customs.set', group: 'foreign', limited: false, active: false },
-  { code: 'sanction.impose', group: 'foreign', limited: false, active: true },
-  { code: 'military.command', group: 'defence', limited: false, active: true }, { code: 'military.procure', group: 'defence', limited: true, active: true },
-  { code: 'military.licence', group: 'defence', limited: false, active: true },
-]
-
 let cache: CharterPermissionView[] | null = null
 
-/** Every permission a union's charter may hold: the settlement catalogue plus the union-only powers. */
+/** The settlement catalogue, for a founding charter (a standing union brings its own list, `UnionDetail.permissions`). */
 export function useCatalogue(): CharterPermissionView[] | null {
   const [list, setList] = useState<CharterPermissionView[] | null>(cache)
   useEffect(() => {
@@ -40,17 +30,17 @@ export function useCatalogue(): CharterPermissionView[] | null {
     let live = true
     api.runCommand('settlement.charter.view', {}).then((r) => {
       const have = ((r.view as unknown as CharterView | undefined)?.permissions ?? [])
-      const codes = new Set(have.map((p) => p.code))
-      cache = [...have, ...UNION_ONLY.filter((p) => !codes.has(p.code))]
+      cache = have
       if (live) setList(cache)
-    }).catch(() => { if (live) setList(UNION_ONLY) })
+    }).catch(() => { if (live) setList([]) })
     return () => { live = false }
   }, [])
   return list
 }
 
-export function OfficeForm({ draft, onChange, held, withHolders, lockSeats }: { draft: OfficeDraft; onChange: (d: OfficeDraft) => void; held?: string[]; withHolders?: boolean; lockSeats?: number }) {
-  const cat = useCatalogue()
+export function OfficeForm({ draft, onChange, held, withHolders, lockSeats, catalogue, delegations }: { draft: OfficeDraft; onChange: (d: OfficeDraft) => void; held?: string[]; withHolders?: boolean; lockSeats?: number; catalogue?: CharterPermissionView[] | null; delegations?: string[] | null }) {
+  const own = useCatalogue()
+  const cat = catalogue ?? own
   const [open, setOpen] = useState<string | null>(null)
   const groups = useMemo(() => {
     const m = new Map<string, CharterPermissionView[]>()
@@ -96,7 +86,8 @@ export function OfficeForm({ draft, onChange, held, withHolders, lockSeats }: { 
                 <span>{groupName(g)}</span><em>{t('charter.group_count', { on: formatNumber(on), total: formatNumber(list.length) })}</em>
               </button>
               {isOpen && list.map((p) => {
-                const can = !held || held.includes(p.code)
+                const handed = !p.class || !delegations || delegations.includes(p.class)
+                const can = handed && (!held || held.includes(p.code))
                 const checked = p.code in draft.grants
                 return (
                   <div key={p.code} className={`ch-perm${can || checked ? '' : ' off'}`}>
@@ -108,7 +99,7 @@ export function OfficeForm({ draft, onChange, held, withHolders, lockSeats }: { 
                       <input className="vd-input ch-limit" inputMode="numeric" dir="ltr" value={draft.grants[p.code] ? String(draft.grants[p.code]) : ''} placeholder={t('charter.no_ceiling')} aria-label={t('charter.ceiling')}
                         onChange={(e) => { const n = Number(e.target.value.replace(/[^0-9]/g, '')) || 0; set({ grants: { ...draft.grants, [p.code]: n } }) }} />
                     )}
-                    {!can && !checked && <small className="ch-lock">{t('charter.not_held')}</small>}
+                    {!can && !checked && <small className="ch-lock">{handed ? t('charter.not_held') : t('pu.not_handed')}</small>}
                   </div>
                 )
               })}

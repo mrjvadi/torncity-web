@@ -56,6 +56,7 @@ function Propose({ v, ctx, onClose }: { v: UnionView; ctx: FlowCtx; onClose: () 
           <label className="ch-field"><span>{t('pu.p.name')}</span><input className="vd-input" value={name} maxLength={32} onChange={(e) => setName(e.target.value)} aria-label={t('pu.p.name')} /></label>
           <Choice label={t('pu.p.kind')} value={kind} onChange={setKind} options={[{ key: 'league', text: t('pu.kind.league') }, { key: 'country', text: t('pu.kind.country') }]} />
           <Hint>{country ? t('pu.p.country_hint', { n: formatNumber(v.country_min_residents) }) : t('pu.p.league_hint')}</Hint>
+          <Hint>{t('pu.p.fee', { m: money(country ? v.fee_country : v.fee_league) })}</Hint>
           <Multi label={t('pu.p.deleg')} values={deleg} onChange={setDeleg} options={classes.map((c) => ({ key: c, text: word(`pu.class.${c}`) })).filter((o) => o.text)} />
           <Hint>{t('pu.p.deleg_hint')}</Hint>
           <Choice label={t('pu.p.mode')} value={mode} onChange={setMode} options={(['one_member', 'weighted', 'double_majority'] as const).map((k) => ({ key: k, text: t(`pu.mode.${k}`) }))} />
@@ -148,8 +149,10 @@ function Motion({ m, d, ctx }: { m: UnionMotionLine; d: UnionDetail; ctx: FlowCt
   return (
     <div className="mn-card">
       <div className="mn-head"><b>{t(`pu.motion.${m.kind}` as never, { who: m.subject.name })}</b>{m.closes_at && <span>{t('pu.until', { at: atText(m.closes_at) })}</span>}</div>
-      <Tally yes={m.yes} no={m.no} need={d.members} />
-      {d.vote_mode === 'double_majority' && <Hint>{t('pu.double_note')}</Hint>}
+      {m.members_bps > 0 && <><div className="mn-sub">{t('pu.tally_towns', { n: formatNumber(m.members), need: pct(m.members_bps) })}</div><Tally yes={m.yes_members} no={m.no_members} need={m.members} /></>}
+      {m.population_bps > 0 && <><div className="mn-sub">{t('pu.tally_people')}</div><Tally yes={m.yes_weight} no={m.no_weight} need={m.weight} /></>}
+      {m.members_bps === 0 && m.population_bps === 0 && <Tally yes={m.yes} no={m.no} need={d.members} />}
+      <Hint>{word(`pu.motion_mode.${m.mode}`)}</Hint>
       {m.my_vote && <EffectChip tone="good">{t('pu.my_vote', { v: m.my_vote === 'yes' ? t('pu.yes_word') : t('pu.no_word') })}</EffectChip>}
       {m.may_vote && !m.my_vote && (
         <div className="wk-btns">
@@ -220,7 +223,7 @@ function EditOffice({ o, d, ctx, onClose }: { o: UnionOfficeLine | null; d: Unio
     <Popup open onClose={onClose} tone="navy" title={o ? t('pu.edit_title') : t('pu.new_office_title')}
       footer={<ActionButton tone="green" disabled={ctx.busy || !ok} reason={ok ? undefined : t('pu.p.need_office')} onClick={() => { onClose(); sendU(ctx, { action: 'office', id: d.id, ...(o ? { office: o.id } : {}), title: draft.title.trim(), seats: draft.seats, grants: grantsOf(draft) }) }}>{t('charter.save')}</ActionButton>}>
       <Hint>{t('pu.ceiling_note')}</Hint>
-      <OfficeForm draft={draft} onChange={setDraft} held={d.held ?? []} lockSeats={o ? (o.holders ?? []).length : 1} />
+      <OfficeForm draft={draft} onChange={setDraft} held={d.held ?? []} lockSeats={o ? (o.holders ?? []).length : 1} catalogue={d.permissions ?? []} delegations={d.delegations} />
     </Popup>
   )
 }

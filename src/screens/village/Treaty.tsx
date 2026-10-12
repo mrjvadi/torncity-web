@@ -30,6 +30,7 @@ function Line({ l, v, ctx, union }: { l: SettlementTreatyLine; v: SettlementTrea
       {l.status === 'proposed' && l.expires_at && <div className="mn-sub">{t('pt.answer_by', { at: atText(l.expires_at) })}</div>}
       {l.status === 'active' && l.proposed_at && <div className="mn-sub">{t('pt.since', { at: atText(l.proposed_at) })}</div>}
       {l.ended_at && <div className="mn-sub">{t('pt.ended_at', { at: atText(l.ended_at) })}</div>}
+      {l.status === 'terminated' && l.ended_party && <Note tone="bad">{t('pt.ended_by', { who: l.ended_party.name })}</Note>}
       {cooling && <Note tone="bad">{t('pt.cooling', { at: atText(l.cooling_until) })}</Note>}
       <div className="wk-btns">
         {LIVE.includes(l.status) && v.may_end && <ActionButton tone="red" small disabled={ctx.busy} onClick={() => setAsk('end')}>{t('pt.end')}</ActionButton>}
@@ -38,7 +39,7 @@ function Line({ l, v, ctx, union }: { l: SettlementTreatyLine; v: SettlementTrea
         {OFFER.includes(l.status) && l.mine && v.may_propose && <ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setAsk('withdraw')}>{t('pt.withdraw')}</ActionButton>}
       </div>
       {ask === 'end' && (
-        <Ask tone="red" title={t('pt.end_title')} body={t('pt.end_body', { who: l.other.name })} hint={l.alliance || l.kind.code === 'non_aggression' ? t('pt.end_cooling') : t('pt.end_plain')} yes={t('pt.end_yes')}
+        <Ask tone="red" title={t('pt.end_title')} body={t('pt.end_body', { who: l.other.name })} hint={l.alliance || l.kind.code === 'non_aggression' ? t('pt.end_cooling', { n: formatNumber(v.cooling_days) }) : t('pt.end_plain')} yes={t('pt.end_yes')}
           onYes={() => sendCmd(ctx, 'settlement.treaty', { ...base, action: 'end', no: String(l.no) })} onClose={() => setAsk(null)} />
       )}
       {ask === 'decline' && <Ask title={t('pt.decline_title')} body={t('pt.decline_body', { who: l.other.name })} yes={t('pt.decline')} onYes={() => sendCmd(ctx, 'settlement.treaty', { ...base, action: 'decline', no: String(l.no) })} onClose={() => setAsk(null)} />}
@@ -52,18 +53,20 @@ function Propose({ v, ctx, union, onClose }: { v: SettlementTreatyView; ctx: Flo
   const [kind, setKind] = useState(kinds[0]?.kind.code ?? '')
   const [to, setTo] = useState('')
   const k = kinds.find((x) => x.kind.code === kind)
+  const parties = (v.parties ?? []).length > 0 ? (v.parties ?? []) : (v.targets ?? []).map((x) => ({ party: x, kind: 'settlement' }))
+  const picked = parties.find((x) => x.party.code === to)
   const taken = (v.treaties ?? []).some((l) => l.kind.code === kind && l.other.code === to && (l.status === 'active' || l.status === 'proposed'))
   return (
     <Popup open onClose={onClose} tone="gold" title={t('pt.new_title')}
-      footer={<ActionButton tone="gold" disabled={ctx.busy || !kind || !to || taken} reason={taken ? t('pt.taken') : undefined} onClick={() => { onClose(); sendCmd(ctx, 'settlement.treaty', { ...(union ? { union } : {}), action: 'propose', kind, code: to }) }}>{t('pt.send')}</ActionButton>}>
+      footer={<ActionButton tone="gold" disabled={ctx.busy || !kind || !to || taken} reason={taken ? t('pt.taken') : undefined} onClick={() => { onClose(); sendCmd(ctx, 'settlement.treaty', { ...(union ? { union } : {}), action: 'propose', kind, ...(picked && picked.kind !== 'settlement' ? { to_union: to } : { code: to }) }) }}>{t('pt.send')}</ActionButton>}>
       <Choice label={t('pt.kind_label')} value={kind} onChange={setKind} options={kinds.map((x) => ({ key: x.kind.code, text: word(`pt.kind.${x.kind.code}`, x.kind.name) }))} />
       {k && (
         <div className="mn-sub">
           {[k.alliance ? t('pt.alliance') : '', k.non_aggression ? t('pt.nonagg') : '', k.passage ? t('pt.passage') : '', k.tariff_discount_bps > 0 ? t('pt.tariff', { p: pct(k.tariff_discount_bps) }) : ''].filter(Boolean).join('، ') || t('pt.plain')}
         </div>
       )}
-      <Choice label={t('pt.to_label')} value={to} onChange={setTo} options={(v.targets ?? []).map((x) => ({ key: x.code, text: x.name }))} />
-      {(v.targets ?? []).length === 0 && <Hint>{t('pt.no_targets')}</Hint>}
+      <Choice label={t('pt.to_label')} value={to} onChange={setTo} options={parties.map((x) => ({ key: x.party.code, text: x.kind === 'settlement' ? x.party.name : `${x.party.name} (${word(`pu.kind.${x.kind}`)})` }))} />
+      {parties.length === 0 && <Hint>{t('pt.no_targets')}</Hint>}
       <Hint>{t('pt.send_hint')}</Hint>
     </Popup>
   )

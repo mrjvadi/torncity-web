@@ -22,20 +22,21 @@ const detail = (): UnionDetail => ({
     { id: 'o1', title: 'دبیر اتحاد', seats: 1, acquisition: 'appointment', grants: [{ permission: 'union.admit', limit: 0 }, { permission: 'treaty.sign', limit: 0 }, { permission: 'treasury.spend', limit: 5000 }], holders: [N('p-aria', 'آریا')] },
     { id: 'o2', title: 'خزانه‌دار', seats: 2, acquisition: 'appointment', grants: [{ permission: 'treasury.spend', limit: 0 }, { permission: 'debt.lend', limit: 20000 }], holders: st.appointed ? [N('p-sima', 'سیما')] : [] },
   ],
-  motions: st.motionVoted ? [] : [{ id: 'm1', kind: 'admit', subject: N('v-x1', 'گلستان'), closes_at: iso(30), yes: 2, no: 0, my_vote: '', may_vote: true }],
+  motions: st.motionVoted ? [] : [{ id: 'm1', kind: 'admit', subject: N('v-x1', 'گلستان'), closes_at: iso(30), yes: 2, no: 0, my_vote: '', may_vote: true, mode: 'double_majority', members: 3, yes_members: 2, no_members: 0, weight: 67, yes_weight: 55, no_weight: 0, members_bps: 5000, population_bps: 5000 }],
   ballots: [{ id: 'b1', kind: 'recall', subject: N('p-aria', 'آریا'), target: 'o1', closes_at: iso(40), yes: 5, no: 2, signatures: 0, need: 12, petition: false, may_vote: !st.voted, voted: st.voted }],
   audit: [{ action: 'founded', at: iso(-300), office: '' }, { action: 'admit', at: iso(-120), office: 'دبیر اتحاد' }],
-  held: ['union.admit', 'treaty.sign', 'treasury.spend', 'charter.amend', 'office.create', 'office.edit'],
+  permissions: [{ code: 'union.admit', group: 'foreign', limited: false, active: true, class: '' }, { code: 'treaty.sign', group: 'foreign', limited: false, active: true, class: 'treaty' }, { code: 'treasury.spend', group: 'treasury', limited: true, active: true, class: '' }, { code: 'war.declare', group: 'foreign', limited: false, active: true, class: 'war' }, { code: 'military.command', group: 'defence', limited: false, active: true, class: 'defence' }, { code: 'debt.lend', group: 'money', limited: true, active: true, class: '' }, { code: 'office.create', group: 'politics', limited: false, active: true, class: '' }],
+  held: ['union.admit', 'war.declare', 'treaty.sign', 'treasury.spend', 'charter.amend', 'office.create', 'office.edit'],
   may_office: true, may_appoint: true, may_dismiss: true, may_admit: true, may_expel: true, may_vote_member: true, may_leave: true, may_accede: false,
 })
 
 function union(notice = '', id = ''): UnionView {
   const m = polityMode()
-  if (m === 'off') return { village: 'آمل', open: false, open_at: iso(24 * 9), may_propose: false, may_ratify: false, country_min_residents: 60, unions: null, proposals: null, detail: null, targets: null, classes: null, notice }
+  if (m === 'off') return { village: 'آمل', open: false, open_at: iso(24 * 9), may_propose: false, may_ratify: false, country_min_residents: 60, fee_league: 3000, fee_country: 8000, unions: null, proposals: null, detail: null, targets: null, classes: null, notice }
   const empty = m === 'empty'
   const perm = m !== 'noperm'
   return {
-    village: 'آمل', open: true, open_at: null, may_propose: perm, may_ratify: perm, country_min_residents: 60, notice,
+    village: 'آمل', open: true, open_at: null, may_propose: perm, may_ratify: perm, country_min_residents: 60, fee_league: 3000, fee_country: 8000, notice,
     unions: empty ? null : [
       { id: 'u-alborz', name: 'اتحاد البرز', kind: 'league', members: 3, delegations: ['dues', 'treaty', 'roads'], purse: 18400, vote_mode: 'double_majority', exit_rule: 'free', dues_fixed: 200, dues_share: 150, my_status: st.left ? 'notice' : 'active' },
       ...(m === 'country' ? [{ id: 'u-iran', name: 'کشور سرزمین سبز', kind: 'country', members: 5, delegations: ['dues', 'treaty', 'defence', 'courts', 'war', 'customs'], purse: 96000, vote_mode: 'weighted', exit_rule: 'consent', dues_fixed: 500, dues_share: 300, my_status: 'active' }] : []),
@@ -49,7 +50,7 @@ function union(notice = '', id = ''): UnionView {
 
 function treaty(notice = '', unionId = ''): SettlementTreatyView {
   const m = polityMode(), perm = m !== 'noperm'
-  const line = (no: number, kind: string, other: string, status: string, o: Partial<SettlementTreatyLine> = {}) => ({ no, kind: N(kind, kind), other: N(other, other), status, mine: false, proposed_at: iso(-200), expires_at: null, ended_at: null, passage: kind === 'passage', alliance: kind === 'alliance', cooling_until: null, ...o })
+  const line = (no: number, kind: string, other: string, status: string, o: Partial<SettlementTreatyLine> = {}): SettlementTreatyLine => ({ ended_party: null, no, kind: N(kind, kind), other: N(other, other), status, mine: false, proposed_at: iso(-200), expires_at: null, ended_at: null, passage: kind === 'passage', alliance: kind === 'alliance', cooling_until: null, ...o })
   return {
     village: 'آمل', open: m !== 'off', party: unionId ? N(unionId, 'اتحاد البرز') : N('v-k3x9', 'آمل'), party_kind: unionId ? 'union' : 'settlement', may_propose: perm, may_sign: perm, may_end: perm, notice,
     treaties: [
@@ -57,7 +58,7 @@ function treaty(notice = '', unionId = ''): SettlementTreatyView {
       line(2, 'passage', 'نمین', 'active'),
       line(3, 'non_aggression', 'بابل', st.accepted ? 'active' : 'proposed', { expires_at: iso(48) }),
       line(4, 'trade_agreement', 'نوشهر', 'proposed', { mine: true, expires_at: iso(72) }),
-      line(5, 'alliance', 'رامسر', 'terminated', { ended_at: iso(-24 * 20) }),
+      line(5, 'alliance', 'رامسر', 'terminated', { ended_at: iso(-24 * 20), ended_party: N('v-r5', 'رامسر') }),
       line(6, 'passage', 'گلستان', 'declined'),
       ...st.treaties.map((k, i) => line(10 + i, k, 'گلستان', 'proposed', { mine: true, expires_at: iso(72) })),
     ],
@@ -68,6 +69,8 @@ function treaty(notice = '', unionId = ''): SettlementTreatyView {
       { kind: N('passage', 'passage'), alliance: false, non_aggression: false, passage: true, tariff_discount_bps: 0 },
     ],
     targets: [N('v-b2', 'بابل'), N('v-x1', 'گلستان'), N('v-r5', 'رامسر')],
+    parties: [{ party: N('v-b2', 'بابل'), kind: 'settlement' }, { party: N('v-x1', 'گلستان'), kind: 'settlement' }, { party: N('v-r5', 'رامسر'), kind: 'settlement' }, { party: N('u-iran', 'کشور سرزمین سبز'), kind: 'country' }],
+    cooling_days: 7,
   }
 }
 
@@ -82,7 +85,7 @@ function tender(notice = ''): TenderView {
       { id: 't2', building: N('well', 'چاه همگانی'), settlement: N('v-k3x9', 'آمل'), payer: N('v-k3x9', 'آمل'), payer_kind: 'settlement', status: 'failed', rule: 'scored', budget_cap: 4000, bond_bps: 1000, retention_bps: 1000, defects_days: 14, due_days: 10, closes_at: iso(-300), company: N('c-z', 'کارگاه بی‌نام'), price: 3500, due_at: iso(-200), stages_paid: 1, retention_held: 0, work_done: 40, work_required: 100, bids: null, stages: null, may_bid: false, may_cancel: false, may_award: false },
     ],
     board: [{ id: 't9', building: N('market', 'بازارچه'), settlement: N('v-q7m2', 'سرخه'), payer: N('v-q7m2', 'سرخه'), payer_kind: 'settlement', status: 'open', rule: 'scored', budget_cap: 12000, bond_bps: 1000, retention_bps: 1000, defects_days: 14, due_days: 16, closes_at: iso(30), company: null, price: 0, due_at: null, stages_paid: 0, retention_held: 0, work_done: 0, work_required: 100, bids: bids.length ? bids : null, stages: null, may_bid: true, may_cancel: false, may_award: false }],
-    sites: [{ building: N('b-school-1', 'مدرسه'), work_required: 100, work_done: 10 }, { building: N('b-clinic-1', 'خانهٔ بهداشت'), work_required: 100, work_done: 0 }],
+    sites: [{ id: 'bi-school-1', building: N('school', 'مدرسه'), work_required: 100, work_done: 10 }, { id: 'bi-clinic-1', building: N('health_post', 'خانهٔ بهداشت'), work_required: 100, work_done: 0 }],
     companies: [{ company: N('c-mine', 'ساختمان‌سازی البرز'), record: 4, debarred_until: null }, { company: N('c-bad', 'سازه‌های شتاب'), record: 1, debarred_until: iso(24 * 20) }],
   }
 }

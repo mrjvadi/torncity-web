@@ -27,7 +27,7 @@ function Post({ v, site, ctx, onClose }: { v: TenderView; site: TenderSiteLine; 
   const name = ctx.bname(site.building.code, site.building.name)
   return (
     <Popup open onClose={onClose} tone="gold" title={t('pd.post_title', { b: name })}
-      footer={<ActionButton tone="gold" cost={money(v.fee)} costIcon="coin" disabled={ctx.busy || !ok} reason={ok ? undefined : t('pd.post_need')} onClick={() => { onClose(); sendCmd(ctx, 'settlement.tender', { action: 'post', building: site.building.code, cap, due, window, rule }) }}>{t('pd.post_go')}</ActionButton>}>
+      footer={<ActionButton tone="gold" cost={money(v.fee)} costIcon="coin" disabled={ctx.busy || !ok} reason={ok ? undefined : t('pd.post_need')} onClick={() => { onClose(); sendCmd(ctx, 'settlement.tender', { action: 'post', building: site.id, cap, due, window, rule }) }}>{t('pd.post_go')}</ActionButton>}>
       <NumField label={t('pd.cap')} value={cap} onChange={setCap} hint={t('pd.cap_hint')} />
       <NumField label={t('pd.due')} value={due} onChange={setDue} hint={t('pd.due_hint')} />
       <NumField label={t('pd.window')} value={window} onChange={setWindow} hint={t('pd.window_hint')} />
@@ -138,7 +138,7 @@ export const Tender = flow<TenderView>(({ view: v, ctx }) => {
       <Panel>
         {sites.length === 0 && <Hint>{t('pd.sites_none')}</Hint>}
         <div className="mn-list">{sites.map((s, i) => (
-          <div key={`${s.building.code}-${i}`} className="mn-card">
+          <div key={s.id || String(i)} className="mn-card">
             <div className="mn-head"><b>{ctx.bname(s.building.code, s.building.name)}</b><span>{t('pd.site_work', { a: formatNumber(s.work_done), b: formatNumber(s.work_required) })}</span></div>
             {v.may_tender && <ActionButton tone="gold" small disabled={ctx.busy} onClick={() => setSite(s)}>{t('pd.post')}</ActionButton>}
           </div>

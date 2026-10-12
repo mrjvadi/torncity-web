@@ -7289,7 +7289,7 @@ pt.cooling | تا {at} نمی‌توانی به آن‌ها یورش ببری ی
 pt.end | پایان دادن | End it
 pt.end_title | پایان دادن به پیمان | End the treaty
 pt.end_body | پیمان با {who} تمام می‌شود. | The treaty with {who} ends.
-pt.end_cooling | بعد از پایان دادن به هم‌پیمانی یا عدم تجاوز، هفت روز نمی‌توانی به آن‌ها یورش ببری یا جنگ اعلام کنی. این پایان در سابقه می‌ماند. | After ending an alliance or a non-aggression pact you cannot raid them or declare war on them for seven days. The end stays in the record.
+pt.end_cooling | بعد از پایان دادن به هم‌پیمانی یا عدم تجاوز، {n} روز نمی‌توانی به آن‌ها یورش ببری یا جنگ اعلام کنی. این پایان در سابقه می‌ماند. | After ending an alliance or a non-aggression pact you cannot raid them or declare war on them for {n} days. The end stays in the record.
 pt.end_plain | پایان در سابقه می‌ماند. | The end stays in the record.
 pt.end_yes | تمامش کن | End it
 pt.accept | می‌پذیرم و امضا می‌کنم | I accept and sign
@@ -7559,3 +7559,12 @@ refusal.village_debt_expired | مهلت پذیرفتن این پیشنهاد گ�
 refusal.village_debt_not_default | فقط وامِ نکول‌شده را می‌شود بخشید. | Only a defaulted loan can be written off.
 refusal.village_debt_raise | در بازبینی نمی‌شود بدهی را بیشتر کرد. | A restructure cannot make the debt bigger.
 pu.held | اجازه‌هایی که تو در این اتحاد داری: | What you hold in this union:
+pu.not_handed | شهرها این کار را به اتحاد نسپرده‌اند. | The towns did not hand this power to the union.
+pu.tally_towns | رأی شهرها: {n} شهر، بیش از {need} لازم است | Towns' vote: {n} towns, more than {need} needed
+pu.tally_people | رأی مردم شهرها، به نسبت جمعیت | The people's vote, by population
+pu.motion_mode.one_member | هر شهر یک رأی دارد. | Each town has one vote.
+pu.motion_mode.weighted | رأی هر شهر به نسبت مردمش است، با سقف. | Each town's vote follows its people, with a cap.
+pu.motion_mode.double_majority | هم بیشتر شهرها و هم بیشتر مردم باید موافق باشند. | Most towns and most people must both agree.
+pu.motion_mode.two_thirds | برچیدن اتحاد دو سوم شهرها را می‌خواهد. | Dissolving needs two thirds of the towns.
+pu.p.fee | هزینهٔ ثبت از خزانهٔ شهر می‌رود: {m} | The filing fee comes from the town's treasury: {m}
+pt.ended_by | این پیمان را {who} تمام کرد. | {who} ended this treaty.
