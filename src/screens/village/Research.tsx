@@ -53,7 +53,7 @@ export const ResearchDesk = flow<ResearchBoardView>(({ view: v0, ctx }) => {
   const [pact, setPact] = useState<string | null>(null)
   const back = ctx.acts.find(isBack)
   const kn = (n: { code: string; name: string }) => names.name('knowledge', n.code, n.name)
-  const bn = (n: { code: string; name: string }) => ctx.bname(n.code, n.name)
+  const bn = (n: { code: string; name: string }) => (hasKey(`pj.kind.${n.code}`) ? t(`pj.kind.${n.code}` as Key) : ctx.bname(n.code, n.name))
 
   async function act(action: string, code: string) {
     setBusy(true)

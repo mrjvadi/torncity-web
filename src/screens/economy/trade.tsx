@@ -98,6 +98,7 @@ const Market = flow<MarketView>(({ view: v, ctx }) => v.unavailable ? (
     {(v.books ?? []).length === 0 && (v.yours ?? []).length === 0 && <Notice>{t('eco.market.empty')}</Notice>}
     <MarketBody v={v} ctx={ctx} />
     <Btns ctx={ctx} list={byId(ctx, 'market.mine', 'market.auctions', 'market.goods')} />
+    {v.village && <Btns ctx={ctx} list={[{ id: 'market.licences', command: 'settlement.licence', kind: 'secondary', icon: 'action:default' } as never]} />}
     <Btns ctx={ctx} list={ctx.acts.filter(isBack)} />
   </Page>
 ))

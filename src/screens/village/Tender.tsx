@@ -151,6 +151,7 @@ export const Tender = flow<TenderView>(({ view: v, ctx }) => {
         {(v.companies ?? []).length === 0 && <Note>{t('pd.no_company')}</Note>}
         {board.length === 0 && (v.companies ?? []).length > 0 && <Lead>{t('pd.board_none')}</Lead>}
         <div className="mn-list">{board.map((l) => <Card key={l.id} l={l} v={v} ctx={ctx} board />)}</div>
+        {(v.companies ?? []).length > 0 && <div className="wk-btns"><ActionButton tone="steel" small disabled={ctx.busy} onClick={() => ctx.run('settlement.project')}>{t('pj.board_link')}</ActionButton></div>}
       </Panel>
       {(v.companies ?? []).length > 0 && (
         <>
