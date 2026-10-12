@@ -3,6 +3,7 @@
 // every reason it is held back, each with its way out. Codes and numbers come from `BuildingView.work`; the words are ours.
 
 import { useRef, useState } from 'react'
+import { RatioBlock, useNode } from './Chain'
 import { RecipePicker, ToolBlock, firstRecipe, recipeArg } from './Recipes'
 import { FarmBlock, GrazingBlock, MillBlock, WaterBlock } from './FarmWork'
 import type { WorkNode, WorkReason } from '../../api/views.gen'
@@ -21,7 +22,9 @@ const WAGES = [100, 125, 150, 200]
 const pct = (bps: number, dec = 0) => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: dec }).format(bps / 100)}٪`
 const word = (key: string, fallback: string, args?: Record<string, string | number>) => (hasKey(key) ? t(key as Key, args) : fallback)
 
-export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, act, manage = false, buildingId = '' }: {
+export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, act, manage = false, buildingId = '', nodeCode }: {
+  /** the building's kind, for the ratio block (ADR 0075) */
+  nodeCode?: string
   /** runs a labour command for this building (post a repair, take a shift, hire a crew); the panel reloads after it */
   act?: (command: string, args: Record<string, string>) => void
   manage?: boolean
@@ -34,6 +37,7 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
   onClose: () => void
 }) {
   const crewRef = useRef<HTMLDivElement>(null)
+  const ratio = useNode(w.kind === 'none' ? undefined : nodeCode)
   const [recipe, setRecipe] = useState(firstRecipe(w.recipes))
   const goods = (i: { code: string; name: string }) => names.name(['component', 'item'], i.code, i.name)
   const goods2 = (code: string, n: string) => names.name(['component', 'item'], code, n)
@@ -122,6 +126,7 @@ export default function WorkSection({ work: w, names, onOpen, onBuild, onClose, 
           )}
         </>
       )}
+      {ratio && <RatioBlock node={ratio} names={names} />}
       {w.tool && <ToolBlock tool={w.tool} />}
       {(w.recipes ?? []).length > 1 && (
         <>
