@@ -192,6 +192,8 @@
 @media (min-width: 900px) {
   .v6 .hub-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
   .v6 .hub-tile:hover { border-color: #ff8a3d99; }
+  /* the docked panel is about 440 px wide: two tiles a row there */
+  .v6-side .hub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .v6 .nx-hub-body { display: flex; flex-direction: column; gap: 12px; }
 
