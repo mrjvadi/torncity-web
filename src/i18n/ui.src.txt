@@ -3192,6 +3192,24 @@ act.founding.open_form | تکمیل اطلاعات شهر | Fill in the city for
 
 # -- P0: activities, work, health, crime empty, travel, friends -------------------
 common.loading | در حال بارگذاری… | Loading…
+common.soon_title | به‌زودی | Coming soon
+common.soon | این بخش در طراحی تازه به‌زودی ساخته می‌شود. | This part of the new design is coming soon.
+common.more | بیشتر | More
+next.facts | جزئیات | Details
+next.list | فهرست | List
+next.actions | کارها | Actions
+next.world | نمای سه‌بعدی {name} | 3D view of {name}
+next.no_city | هنوز شهری نداری. از نوار پایین به «من» یا «جامعه» برو. | You have no town yet. Use «Me» or «Society» below.
+next.world_failed | نمای سه‌بعدی باز نشد. صفحه را دوباره باز کن. | The 3D view did not open. Reopen the page.
+next.buildings_n | {n} ساختمان | {n} buildings
+next.city_work | کارهای شهر | Town work
+next.recentre | کل شهر را نشان بده | Show the whole town
+next.now | در جریان | In progress
+next.choose | چه کار کنم؟ | What to do
+next.sections | بخش‌ها | Sections
+next.wallet.cash | نقد همراه | Cash on hand
+next.wallet.pay | پرداخت به کسی | Pay someone
+next.wallet.bank | بانک | Bank
 crime.empty.level_too_low | از سطح {n} به بالا می‌توانی سراغ این کار بروی. با کار کردن تجربه بگیر. | Crime opens at level {n}. Earn experience by working.
 crime.empty.no_venue | اینجا جایی برای این کار نیست. | There is no place for this here.
 crime.empty.no_targets | فعلاً کاری نیست که از دستت بربیاید. | There is nothing you can attempt right now.

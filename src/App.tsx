@@ -3,6 +3,7 @@ import { SessionProvider, useSession } from './state/SessionContext'
 import { ToastProvider } from './state/ToastContext'
 import Login from './ui/Login'
 import Shell from './ui/Shell'
+import NextShell from './next/Shell'
 import { screensReady } from './screens/registry'
 import { useLang } from './i18n'
 
@@ -21,10 +22,26 @@ function useScreensReady(): boolean {
   return ready
 }
 
+/** The new UI (src/next) is opened with ?ui=next and stays on for this device; ?ui=old goes back to the old one. */
+function useNextUi(): boolean {
+  const [on] = useState(() => {
+    const q = new URLSearchParams(location.search).get('ui')
+    try {
+      if (q === 'next') localStorage.setItem('tc.ui', 'next')
+      if (q === 'old') localStorage.removeItem('tc.ui')
+      return localStorage.getItem('tc.ui') === 'next'
+    } catch {
+      return q === 'next'
+    }
+  })
+  return on
+}
+
 function Root() {
   const { status } = useSession()
   const screens = useScreensReady()
-  if (status === 'signed_in') return screens ? <Shell /> : <div className="boot-blank" />
+  const next = useNextUi()
+  if (status === 'signed_in') return screens ? (next ? <NextShell /> : <Shell />) : <div className="boot-blank" />
   if (status === 'checking') return <div className="boot-blank" />
   return <Login />
 }
