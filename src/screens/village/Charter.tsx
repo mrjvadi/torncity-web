@@ -254,6 +254,9 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
   }, [v.permissions])
   const heldLimit = (code: string) => mine.find((g) => g.permission === code)?.limit ?? 0
   const selected = Object.keys(grants)
+  // an office that charges and judges, or audits and arrests: the server refuses it (law_separation); the editor says so before the save
+  const has = (...c: string[]) => c.some((x) => x in grants)
+  const clash = (has('prosecute.charge', 'prosecute.drop') && has('court.judge', 'court.appeal_hear')) || (has('audit.integrity') && has('police.arrest'))
   const titleOk = title.trim().length >= lim.title_min && title.trim().length <= lim.title_max
   // a ceiling you hold caps what you may give; an unlimited holder may give any ceiling or none
   const limitOk = (p: CharterPermissionView) => {
@@ -361,6 +364,7 @@ function EditPopup({ v, office, busy, onClose, onSave }: {
             {selected.map((c) => <span key={c} className="nx-chip nx-chip-gold">{grants[c] > 0 ? t('charter.perm_limit', { name: permName(c), limit: money(grants[c]) }) : permName(c)}</span>)}
           </div>
           {selected.length === 0 && <p className="pn-hint">{t('charter.sum_none')}</p>}
+          {clash && <p className="pn-hint pn-bad">{t('charter.sep_note')}</p>}
         </div>
       </div>
     </Popup>

@@ -673,6 +673,10 @@ market.book_title | دفتر | Order book
 market.book_fallback | دفتر بازار | Market book
 market.walk | {t} پیاده تا {place} | {t} on foot to {place}
 market.walk_place | بازار | the market
+market.buy_at | خرید {n} | Buy {n}
+market.sell_at | فروش {n} | Sell {n}
+market.no_buyer | خریدار نیست | No buyer
+market.no_seller | فروشنده نیست | No seller
 market.bid_ask | خرید {bid} – فروش {ask} | Buy {bid} · Sell {ask}
 market.no_book | کالاهای تو بدون دفتر اینجا | Your goods without a book here
 market.last_price | آخرین قیمت | Last price
@@ -4764,6 +4768,32 @@ city.affairs | کارهای شهر | City affairs
 city.charter | منشور و منصب‌ها | Charter and offices
 city.roles | ساختمان‌های خدماتی | Service buildings
 city.role.level | {role} – سطح {n} | {role} · level {n}
+role.housing | خانه‌سازی | Housing
+role.home | خانه | Homes
+role.health | بهداشت و درمان | Health
+role.education | آموزش | Education
+role.market | بازار | Market
+role.commerce | بازرگانی | Trade
+role.security | امنیت | Security
+role.food | خوراک | Food
+role.craft | کارگاه | Workshops
+role.extraction | برداشت از زمین | Digging and mining
+role.water_infra | آب | Water
+role.water | آب | Water
+role.storage | انبار | Storage
+role.forestry | جنگل | Forestry
+role.finance | پول و بانک | Money and banking
+role.governance | اداره | Administration
+role.infrastructure | راه | Roads
+role.military | دفاع | Defence
+role.recreation | تفریح | Leisure
+role.transport | رفت‌وآمد | Travel
+role.research | پژوهش | Research
+role.training | تمرین | Training
+role.signal | خبر و پیام | News and signals
+role.hospitality | مهمان‌داری | Hospitality
+role.justice | دادگستری | Justice
+role.other | خدمات دیگر | Other services
 city.next.title | قدم‌های بعدی | What comes next
 city.next.none | فعلاً قدم تازه‌ای پیش رویتان نیست. | Nothing new is waiting right now.
 city.dim.people | اهالی | Residents
@@ -8197,3 +8227,606 @@ gi.cap_skip | از کار افتادن خدمت | A service stopped
 gi.cap_days | {n} روز | {n} days
 gi.cap_again | فاصله برای همان هدف | Gap for the same target
 gi.cap_cost | هزینه از خزانه | Cost from the treasury
+# -- law and courts (ADR 0078, B14) ----------------------------------------------
+city.law | قانون و دادگاه | Law and courts
+city.group.town | شهر ما | Our town
+city.group.land | زمین و ساخت | Land and building
+city.group.economy | اقتصاد شهر | Town economy
+city.group.order | سیاست و امنیت | Politics and safety
+lw.title | قانون و دادگاه | Law and courts
+lw.off | قانون و دادگاه هنوز شروع نشده. | Law and courts have not started yet.
+lw.off_hint | وقتی شروع شود، از همین‌جا می‌شود سراغش رفت. | Once it starts you can reach it from here.
+lw.other | دیگر | Other
+lw.yes | بله | Yes
+lw.no | نه | No
+lw.nothing | هیچ | Nothing
+lw.unknown_person | کسی که شناخته نشد | Someone unknown
+lw.tab.law | قانون شهر | Town law
+lw.tab.posts | پاسگاه | Police post
+lw.tab.cases | پرونده‌ها | Cases
+lw.tab.jail | بازداشتگاه | Lock-up
+lw.tab.customs | گمرک | Customs
+lw.tab.shadow | پشت پرده | Out of sight
+lw.intro | هر عملی در این شهر فقط وقتی جرم است که منشور شهر آن را در فهرست جرم‌ها گذاشته باشد. پلیس پرونده باز می‌کند، دادگاه رأی می‌دهد و بازداشتگاه مجازات را نگه می‌دارد. | An act is a crime in this town only when its charter lists it. The police open cases, the court decides and the lock-up keeps the sentence.
+lw.part.police | کار پلیس | Police work
+lw.part.courts | دادگاه | Court
+lw.part.customs | گمرک | Customs
+lw.part_on | شروع شده | Started
+lw.part_off | هنوز شروع نشده | Not started yet
+lw.captured | چند صاحب‌منصب شهر زیر نفوذ پول‌اند. بازرسی لازم است. | Several office-holders of this town are under the sway of money. An audit is needed.
+lw.model_label | شیوهٔ دادرسی | Way of trying cases
+lw.model.adversarial | دادرسی دوطرفه | Two-sided trial
+lw.model.inquisitorial | دادرسی با بازپرس | Judge-led trial
+lw.model_hint.adversarial | یک نفر اتهام می‌زند، یک نفر از متهم دفاع می‌کند و قاضی تصمیم می‌گیرد. کسی که اتهام زده قاضی همان پرونده نمی‌شود. | One person charges, another defends and the judge decides. Whoever charged cannot judge the same case.
+lw.model_hint.inquisitorial | قاضی خودش مدرک را بررسی می‌کند و تصمیم می‌گیرد. | The judge looks at the evidence himself and decides.
+lw.model_change | عوض کردن | Change
+lw.model_title | شیوهٔ دادرسی شهر | The town's way of trying cases
+lw.model_go | ثبت کن | Save
+lw.model_same | همین شیوه الان برقرار است. | This is already the way.
+lw.model_note | پرونده‌هایی که باز شده‌اند با شیوهٔ همان روز ادامه پیدا می‌کنند. | Cases already open go on in the way of their day.
+lw.offences | جرم‌هایی که شهر فهرست کرده | Offences the town lists
+lw.offences_hint | هر جرم سقف جریمه، حبس و منع دارد. جرمی که در فهرست نباشد در این شهر جرم حساب نمی‌شود. | Each offence has a ceiling for the fine, the jail time and the ban. An offence that is not listed is no crime here.
+lw.offences_hint_holder | تو می‌توانی جرم را در فهرست بگذاری یا از آن برداری. جرمِ تازه بعد از مهلت اجرا می‌شود تا مردم خبردار شوند. | You may list or withdraw an offence. A new one applies after a grace so people can learn of it.
+lw.offences_none | هنوز جرمی در دسترس این شهر نیست. شهر باید اول قانون‌نویسی را پژوهش کند. | No offence is open to this town yet. The town must first research written law.
+lw.listed | در فهرست شهر | Listed
+lw.listed_wait | در مهلت | In grace
+lw.not_listed | در فهرست نیست | Not listed
+lw.grace | از {at} اجرا می‌شود. | It applies from {at}.
+lw.max_fine | سقف جریمه | Fine ceiling
+lw.max_jail | سقف بازداشت | Jail ceiling
+lw.max_ban | سقف منع | Ban ceiling
+lw.not_here | هنوز در این شهر چیزی نیست که برای این جرم مدرک بسازد. | Nothing in this town makes evidence for this offence yet.
+lw.set | در فهرست بگذار | List it
+lw.unset | از فهرست بردار | Withdraw it
+lw.complain | شکایت | Complain
+lw.set_title | «{name}» را در فهرست بگذار | List «{name}»
+lw.set_intro | اگر چیزی ننویسی سقف خود جرم می‌ماند. عددها فقط می‌توانند سقف را پایین‌تر بیاورند. | If you write nothing the offence's own ceiling stays. Numbers can only lower the ceiling.
+lw.set_fine | سقف جریمه | Fine ceiling
+lw.set_jail | سقف بازداشت (ساعت) | Jail ceiling (hours)
+lw.set_ban | سقف منع (روز) | Ban ceiling (days)
+lw.set_max | تا {n} | Up to {n}
+lw.set_over | عدد از سقف جرم بیشتر است. | The number is over the offence's ceiling.
+lw.set_grace | جرم بعد از مهلتِ شهر اجرا می‌شود؛ تا آن روز کسی به‌خاطرش پرونده نمی‌شود. | The offence applies after the town's grace; until then nobody is charged for it.
+lw.set_go | در فهرست بگذار | List it
+lw.unset_title | «{name}» را از فهرست برداریم؟ | Withdraw «{name}»?
+lw.unset_body | از این به بعد این کار در شهر جرم نیست. پرونده‌های باز می‌مانند تا تمام شوند. | From now on this is no crime here. Open cases stay until they end.
+lw.complain_title | شکایت | A complaint
+lw.offence | جرم | Offence
+lw.player | نامِ بازیکن | Player
+lw.player_hint | از فهرست یکی را انتخاب کن. | Pick one from the list.
+lw.player_need | یک نفر را انتخاب کن. | Pick a person.
+lw.complain_hint | شکایت هزینه‌ای دارد که اگر او مجرم شناخته شود برمی‌گردد. شکایت دربارهٔ طرف مقابل چیزی به تو نشان نمی‌دهد. | A complaint has a fee that comes back if he is found guilty. It shows you nothing about the other person.
+lw.complain_go | شکایت را ثبت کن | File the complaint
+lw.complain_need | جرم و یک نفر را انتخاب کن. | Choose an offence and a person.
+lw.complain_none | شهر هنوز جرمی را در فهرست نگذاشته. | The town has listed no offence yet.
+lw.posts_intro | پاسگاه، دادگاه، بازداشتگاه و گمرک ساختمان‌اند. هر کدام وقتی باز است که کارمند، حقوق و غذا داشته باشد. | The post, the court, the lock-up and customs are buildings. Each is open only when it has staff, wages and food.
+lw.post_none | ساخته نشده | Not built
+lw.post_open | امروز باز است | Open today
+lw.post_idle | امروز بسته است | Closed today
+lw.post_idle_hint | امروز باز نیست؛ کارمند، حقوق یا غذا ندارد. | It is not open today: no staff, wages or food.
+lw.post_build.constabulary | شهر باید یک پاسگاه یا کلانتری بسازد و کارمندش را بگیرد. | The town must build a post and hire its staff.
+lw.post_build.court | شهر باید دادگاه بسازد و منشی و مأمور برایش بگیرد. | The town must build a courthouse and hire a clerk and a bailiff.
+lw.post_build.custody | شهر باید بازداشتگاه بسازد و نگهبان و آشپز برایش بگیرد. | The town must build a lock-up and hire a warder and a cook.
+lw.post_build.customs | شهر باید گمرک بسازد و بازرس برایش بگیرد. | The town must build a customs house and hire an inspector.
+lw.service.constabulary | پاسگاه | Police post
+lw.service.court | دادگاه | Court
+lw.service.custody | بازداشتگاه | Lock-up
+lw.service.customs | گمرک | Customs
+lw.cells | سلول‌ها | Cells
+lw.cells_n | {held} پر از {n} | {held} full of {n}
+lw.day | کار امروز پلیس | The police's day
+lw.points | امتیاز امروز | Points today
+lw.points_n | {spent} خرج شده از {n} | {spent} spent of {n}
+lw.patrols | گشت‌های امروز | Patrols today
+lw.patrol_hint | هر گشت امتیاز خرج می‌کند. هرچه گشت ببیند به پرونده تبدیل می‌شود؛ نبیند، چیزی ثبت نمی‌شود. | Each patrol spends points. What it sees becomes a case; if it sees nothing, nothing is recorded.
+lw.patrol | یک شیفت گشت | A patrol shift
+lw.no_points | امروز امتیاز کار پلیس تمام شده. | Today's police points are used up.
+lw.informants | خبرچین‌ها | Informants
+lw.informants_hint | خبرچین از اطرافیان خبر می‌آورد. گزارشش به‌تنهایی برای حکم بس نیست و هر چند وقت باید به نگهبان دیگری سپرده شود. نامش فقط پیش نگهدارنده‌اش می‌ماند. | An informant brings news from those around. His report alone is not enough for a warrant and he must be handed to another handler now and then. His name stays with his handler.
+lw.informants_none | خبرچینی نداری. | You have no informants.
+lw.informant_anon | خبرچین | Informant
+lw.informant_other | نام و اطلاعاتش پیش نگهدارنده می‌ماند؛ تو فقط درستیِ گزارش‌هایش را می‌بینی. | His name stays with his handler; you only see how reliable he is.
+lw.istate.recruited | تازه گرفته شده | Just recruited
+lw.istate.active | در کار | Active
+lw.istate.burned | لو رفته | Burned
+lw.istate.retired | کنار رفته | Retired
+lw.reliability | درستیِ گزارش‌ها | Reliability
+lw.since | از {at} | Since {at}
+lw.rotate_due | وقت سپردنِ او به دست دیگری است. | It is time to hand him to another handler.
+lw.recruit | خبرچین بگیر | Recruit an informant
+lw.recruit_title | خبرچین بگیر | Recruit an informant
+lw.recruit_hint | هر خبرچین هزینه‌ای دارد و حدی دارد. اگر لو برود تلافی می‌شود: جریمهٔ پولی یا منع از یک ساختمان؛ جانش در خطر نیست. | Each informant costs money and there is a limit. If he is burned he suffers a setback: a money penalty or a ban from a building; his life is not at stake.
+lw.recruit_go | بگیر | Recruit
+lw.tip | گزارش بخواه | Ask for a report
+lw.tip_title | گزارش خبرچین | The informant's report
+lw.tip_hint | گزارش درباره کسی که اینجا می‌نویسی می‌گیرد. اگر پشتوانه‌ای نباشد، چیزی به پرونده نمی‌آید. | The report is about the person you write here. If there is nothing behind it, nothing reaches the case.
+lw.tip_go | گزارش بخواه | Ask
+lw.take | به من بسپار | Hand him to me
+lw.retire | کنار بگذار | Let go
+lw.retire_title | خبرچین را کنار بگذاری؟ | Let this informant go?
+lw.retire_body | دیگر برایت گزارش نمی‌آورد. | He will bring no more reports.
+lw.audits | بازرسی | Audits
+lw.audits_hint | بازرسی خرج دارد و نتیجه‌اش یکی از این‌هاست: چیزی پیدا نشد، چیز بی‌تناسبی پیدا شد یا کار خلاف پیدا شد؛ در دو حالت آخر پرونده باز می‌شود. | An audit costs money and ends in one of three ways: nothing found, something out of proportion, or wrongdoing; in the last two a case opens.
+lw.audit_people | بازبینیِ یک صاحب‌منصب | Review an office-holder
+lw.audit_books | بازبینیِ دفتر یک کسب‌وکار | Review a business's books
+lw.audit_title | بازبینیِ یک صاحب‌منصب | Review an office-holder
+lw.audit_hint | دفترها و شکایت‌ها و پول بی‌توضیح او را می‌بیند. هر صاحب‌منصب را روزی یک‌بار می‌شود بازبینی کرد. | It looks at his books, the complaints and money he cannot explain. An office-holder can be reviewed once a day.
+lw.audit_go | بازبینی کن | Review
+lw.books_title | بازبینیِ دفتر کسب‌وکار | Review a business's books
+lw.books_hint | ثبت‌ها و پول‌های کسب‌وکار با هم مقایسه می‌شود. | The business's records and money are compared.
+lw.books_none | کسب‌وکاری برای انتخاب نیست. | There is no business to choose.
+lw.books_go | بازبینی کن | Review
+lw.company | کسب‌وکار | Business
+lw.cases_intro | پرونده از شکایت، گشت، گزارش خبرچین، بازرسی یا گمرک باز می‌شود. هر پرونده مدرک جمع می‌کند، اگر به حد برسد اتهام می‌خورد، جلسه دارد و رأی می‌گیرد. | A case opens from a complaint, a patrol, an informant's report, an audit or customs. It gathers evidence, is charged once it is strong enough, has a hearing and gets a verdict.
+lw.cases_none | پرونده‌ای نیست. | There are no cases.
+lw.case_no | پروندهٔ {n} | Case {n}
+lw.case_source | از کجا باز شد | How it opened
+lw.case_strength | قدرت مدرک‌ها | Strength of the evidence
+lw.case_open | ببین | Open
+lw.case_back | بازگشت به فهرست پرونده‌ها | Back to the list of cases
+lw.custody | متهم در بازداشت است و ساعتِ بازداشت می‌رود. | The accused is held and the custody clock is running.
+lw.custody_until | متهم تا {at} در بازداشت می‌ماند. | The accused is held until {at}.
+lw.accused | متهم | Accused
+lw.opened | باز شد | Opened
+lw.state.open | باز | Open
+lw.state.charged | اتهام خورده | Charged
+lw.state.hearing | در جلسه | In hearing
+lw.state.decided | رأی داده شد | Decided
+lw.state.appealed | در تجدیدنظر | On appeal
+lw.state.final | قطعی شد | Final
+lw.state.dropped | بسته شد | Dropped
+lw.state.lapsed | از اعتبار افتاد | Lapsed
+lw.state_hint.open | مدرک جمع می‌شود. حکم بازداشت را قاضی با مدرکِ قانونی و کافی امضا می‌کند؛ بدون حکم فقط روی دیدنِ خودِ کار در گشت یا گمرک می‌شود بازداشت کرد. | Evidence is gathered. A judge signs an arrest warrant on proper and sufficient evidence; without one the accused can be held only when the act was seen on patrol or at customs.
+lw.state_hint.charged | اتهام ثبت شده و جلسه تعیین شده. متهم می‌تواند وکیل بگیرد و مدرکِ ناقانونی را کنار بگذارد. | The charge is filed and the hearing is set. The accused may have a defender and ask to leave out improper evidence.
+lw.state_hint.hearing | پرونده در جلسه است و منتظر رأی. | The case is in hearing and waits for a verdict.
+lw.state_hint.decided | رأی صادر شده. هر طرف یک‌بار و در مهلت می‌تواند تجدیدنظر بخواهد. | A verdict is given. Each side may appeal once, within the time.
+lw.state_hint.appealed | تجدیدنظر ثبت شده و قاضیِ دیگری رأی را می‌بیند. | An appeal is filed and another judge reviews the verdict.
+lw.state_hint.final | رأی قطعی است و مجازات اجرا می‌شود. | The verdict is final and the sentence is carried out.
+lw.state_hint.dropped | پرونده بسته شد. | The case was dropped.
+lw.state_hint.lapsed | پرونده بدون پیگیری ماند و از اعتبار افتاد. | The case was left alone and lapsed.
+lw.source.complaint | شکایت | A complaint
+lw.source.patrol | گشت | A patrol
+lw.source.tip | گزارش خبرچین | An informant's report
+lw.source.audit | بازرسی | An audit
+lw.source.trace | ردپا در دفترها | A trace in the books
+lw.source.customs | گمرک | Customs
+lw.source.crew | کار گروهی | A crew's job
+lw.evidence | مدرک‌ها | Evidence
+lw.ev_total | قدرت همهٔ مدرک‌های قانونی | Strength of all proper evidence
+lw.ev_quality | درستیِ روندِ پرونده | How soundly the case was built
+lw.ev_quality_hint | مدرکِ ناقانونی درستیِ پرونده را پایین می‌آورد و رأی را سست می‌کند. | Improper evidence lowers it and weakens the verdict.
+lw.ev_none | هنوز مدرکی نیست. | No evidence yet.
+lw.ev_strength | قدرت | Strength
+lw.ev_proper | قانونی | Proper
+lw.ev_improper | ناقانونی | Improper
+lw.ev_excluded | کنار گذاشته شد | Left out
+lw.ev_improper_hint | این مدرک بی‌حکم یا ناقانونی گرفته شده. دادگاه ممکن است آن را کنار بگذارد. | This evidence was taken without a warrant or improperly. The court may leave it out.
+lw.ev_exclude | درخواست کنار گذاشتن | Ask to leave it out
+lw.ev.witness | شاهد | A witness
+lw.ev.record | سندِ ثبت‌شده | A record
+lw.ev.ledger_trace | ردپا در دفتر پول | A trace in the money books
+lw.ev.seized_item | کالای ضبط‌شده | A seized item
+lw.ev.informant_report | گزارش خبرچین | An informant's report
+lw.ev.confession | اعتراف | A confession
+lw.ev.inspection | بازرسی گمرک | A customs inspection
+lw.ev.intel_trace | ردپای کارِ اطلاعاتی | A trace of intelligence work
+lw.warrants | حکم‌ها | Warrants
+lw.warrant_n | حکم {n} | Warrant {n}
+lw.warrant_sign | امضا کن | Sign
+lw.warrant_refuse | رد کن | Refuse
+lw.warrant_hint | قاضی فقط وقتی امضا می‌کند که مدرکِ قانونی به حد برسد و تنها گزارشِ خبرچین نباشد. | A judge signs only when the proper evidence is strong enough and is not an informant's report alone.
+lw.next | قدم بعد | Next step
+lw.investigate | مدرک بیاور | Look for evidence
+lw.warrant_ask | حکم از قاضی بخواه | Ask a judge for a warrant
+lw.arrest | بازداشت | Hold
+lw.arrest_title | متهم را بازداشت کنیم؟ | Hold the accused?
+lw.arrest_body | «{name}» تا پایانِ ساعتِ بازداشت در بازداشتگاه می‌ماند. | «{name}» stays in the lock-up until the custody clock ends.
+lw.arrest_hint | با حکم یا روی دیدنِ کار در گشت و گمرک. بی‌حکم و بی‌دیدن، بازداشت ناقانونی ثبت می‌شود. | With a warrant, or when the act was seen on patrol or at customs. Without either it is recorded as improper.
+lw.charge | اتهام بزن | Charge
+lw.charge_title | اتهام ثبت شود؟ | File the charge?
+lw.charge_body | جلسه تعیین می‌شود و متهم خبردار می‌شود. | A hearing is set and the accused is told.
+lw.charge_hint | مدرکِ قانونی باید به حدِ لازم رسیده باشد. | The proper evidence must reach the needed level.
+lw.drop | پرونده را ببند | Drop the case
+lw.drop_title | پرونده بسته شود؟ | Drop the case?
+lw.drop_body | دیگر پیگیری نمی‌شود. | It will not be pursued any more.
+lw.defend | وکیل | Defender
+lw.defend_title | وکیل متهم | The accused's defender
+lw.defend_who | کی دفاع کند | Who defends
+lw.defend_self | خودم | Myself
+lw.defend_npc | وکیلِ شهری | A town defender
+lw.defend_self_hint | با دفاع، رأی سخت‌تر می‌شود برای کسی که اتهام زده. | A defence makes the verdict harder for the one who charged.
+lw.defend_npc_hint | شهر یک وکیل می‌گذارد و مزدش را از خزانه می‌دهد. | The town provides a defender and pays his fee from the treasury.
+lw.defend_go | ثبت کن | Save
+lw.verdict | رأی بده | Give the verdict
+lw.verdict_title | رأی دادگاه | The court's verdict
+lw.verdict_intro | قدرتِ مدرک‌ها {total} و درستیِ پرونده {q} است. | The evidence weighs {total} and the case's soundness is {q}.
+lw.verdict_label | رأی | Verdict
+lw.guilty | مجرم | Guilty
+lw.acquit | بی‌گناه | Not guilty
+lw.acquit_hint | پرونده بدون مجازات بسته می‌شود. | The case ends with no sentence.
+lw.verdict_need | برای رأیِ مجرم دست‌کم یک مجازات بنویس. | For a guilty verdict write at least one sentence.
+lw.verdict_limit | مجازات از سقفِ جرم و از اختیارِ قاضی بیشتر نمی‌شود. | A sentence cannot go over the offence's ceiling or the judge's own limit.
+lw.verdict_go | رأی را ثبت کن | Record the verdict
+lw.ban_scope | از کجا منع شود | Kept out of
+lw.ban.market | بازارچه | The market
+lw.ban.office | منصب‌ها | Offices
+lw.ban.settlement | شهر | The town
+lw.s_rest | جبرانِ خسارت | Restitution
+lw.rest_hint | به شاکی می‌رسد. | It goes to the complainant.
+lw.s_forf | مصادره | Forfeiture
+lw.forf_hint | از پولی که از کار خلاف آمده برداشته می‌شود و به خزانه می‌رود. | Taken from money that came from the wrong and sent to the treasury.
+lw.s_caution | تذکر | A caution
+lw.verdicts | رأی‌ها | Verdicts
+lw.v_first | دادگاه نخست | First court
+lw.v_appeal | تجدیدنظر | Appeal
+lw.v_npc | قاضیِ شهری | A town judge
+lw.v_player | قاضیِ بازیکن | A player judge
+lw.v_defence | با وکیل | With a defender
+lw.v_no_defence | بی‌وکیل | No defender
+lw.v_weight | وزنِ مدرک | Weight of the evidence
+lw.v_weight_n | {eff} از {total} | {eff} of {total}
+lw.v_quality | درستیِ پرونده | Soundness
+lw.appeal | تجدیدنظر بخواه | Appeal
+lw.appeal_title | تجدیدنظر بخواهی؟ | Appeal?
+lw.appeal_body | قاضیِ دیگری رأی را دوباره می‌بیند. هر طرف فقط یک‌بار می‌تواند. | Another judge reviews the verdict. Each side may do it only once.
+lw.appeal_hint | تجدیدنظر هزینه دارد و مهلتی دارد. | An appeal costs a fee and has a time limit.
+lw.appeal_by | تجدیدنظر خواسته | Appeal filed by
+lw.party.accused | متهم | The accused
+lw.party.prosecution | طرف اتهام | The prosecution
+lw.decide | تجدیدنظر را تصمیم بده | Decide the appeal
+lw.decide_title | تصمیم تجدیدنظر | Decide the appeal
+lw.decide_hint | قاضی تجدیدنظر نباید همان قاضیِ دادگاه نخست یا کسی باشد که اتهام زده. | The appeal judge must not be the first judge or the one who charged.
+lw.decide_confirm | رأی تأیید شود | Confirm the verdict
+lw.decide_quash | رأی باطل شود | Quash the verdict
+lw.sentences | مجازات‌ها | Sentences
+lw.pardon | عفو | Pardon
+lw.sent.fine | جریمه | Fine
+lw.sent.jail | بازداشت در بازداشتگاه | Time in the lock-up
+lw.sent.ban | منع | Ban
+lw.sent.restitution | جبران خسارت | Restitution
+lw.sent.forfeiture | مصادره | Forfeiture
+lw.sent.caution | تذکر | Caution
+lw.sstatus.active | در جریان | Running
+lw.sstatus.served | تمام شد | Served
+lw.sstatus.paid | پرداخت شد | Paid
+lw.sstatus.bailed | با وثیقه آزاد شد | Bailed
+lw.sstatus.quashed | باطل شد | Quashed
+lw.sstatus.pardoned | عفو شد | Pardoned
+lw.sstatus.released | آزاد شد | Released
+lw.class.petty | کوچک | Minor
+lw.class.serious | سنگین | Serious
+lw.class.grave | بسیار سنگین | Grave
+lw.class.mature | ویژهٔ بزرگ‌سالان | Adults only
+lw.jail_intro | محکومِ به بازداشت در یکی از سلول‌ها می‌ماند. بازداشتگاه نگهبان می‌خواهد و غذای زندانی‌ها را شهر از خزانه می‌دهد. | A person sentenced to the lock-up stays in a cell. The lock-up needs a warder and the town pays the prisoners' food from the treasury.
+lw.jail_missing | بدون بازداشتگاهِ باز، دادگاه فقط جریمه، منع و تذکر می‌دهد. | With no open lock-up the court can give only fines, bans and cautions.
+lw.mine | حکم‌های تو | Your sentences
+lw.mine_none | حکمی علیه تو نیست. | There is no sentence against you.
+lw.jail_end | وقتی مدت تمام شود آزاد می‌شوی. اگر بازداشتگاه بسته شود هم زندانی‌ها آزاد می‌شوند و گرسنه نمی‌مانند. | You go free when the time is over. If the lock-up closes the prisoners are freed and never left hungry.
+lw.s_fine | جریمه | Fine
+lw.s_fine_paid | {paid} از {all} پرداخت شده | {paid} of {all} paid
+lw.s_jail | مدت بازداشت | Time held
+lw.s_cell | سلول | Cell
+lw.s_ban | مدت منع | Ban time
+lw.s_ends | تمام می‌شود | Ends
+lw.s_bail | وثیقه برای ساعت‌های مانده | Bail for the hours left
+lw.bail | وثیقه بده | Pay bail
+lw.bail_title | وثیقه بدهی؟ | Pay bail?
+lw.bail_body | با {price} وثیقه آزاد می‌شوی. | You go free by paying {price} as bail.
+lw.bail_hint | پول به خزانهٔ شهر می‌رود. | The money goes to the town treasury.
+lw.bail_go | وثیقه را بده | Pay it
+lw.customs_intro | کسی که بار می‌برد آن را اعلام می‌کند و راه می‌افتد. بازرس ممکن است بار را ببیند: اگر همه‌چیز اعلام شده باشد حقِ گمرک را می‌دهی و رد می‌شوی؛ کالای اعلام‌نشده ضبط و جریمه می‌شود. | Someone who carries a load declares it and sets off. The inspector may look at it: if everything was declared you pay the duty and cross; goods not declared are seized and fined.
+lw.loads | بارهای تو | Your loads
+lw.loads_none | باری اعلام نکرده‌ای. | You have declared no load.
+lw.declare | اعلام بار | Declare a load
+lw.load_to | بار به «{town}» | A load to «{town}»
+lw.load.declared | اعلام شد | Declared
+lw.load.crossed | رد شد | Crossed
+lw.load.seized | ضبط شد | Seized
+lw.load_declared | اعلام‌شده | Declared
+lw.load_carried | آنچه همراه بود | What was carried
+lw.load_duty | حقِ گمرک | Duty
+lw.load_penalty | جریمه | Penalty
+lw.load_clean | بار بازرسی شد و همه‌چیزش اعلام‌شده بود. | The load was inspected and all of it was declared.
+lw.load_seized | کالای اعلام‌نشده ضبط شد و جریمه گرفته شد. | Goods not declared were seized and a penalty was taken.
+lw.cross | رد شو | Cross
+lw.decl_title | اعلامِ بار | Declare a load
+lw.decl_to | مقصد | Destination
+lw.decl_no_towns | شهری برای مقصد نیست. | No town is open as a destination.
+lw.decl_no_goods | کالایی همراه نداری. | You carry no goods.
+lw.decl_have | داری: {n} | You have {n}
+lw.decl_carry | همراه دارم | I carry
+lw.decl_say | اعلام می‌کنم | I declare
+lw.decl_hint | حقِ گمرک را مقصد می‌گیرد و به خزانهٔ خودش می‌رود. | The destination takes the duty and it goes to its own treasury.
+lw.decl_need_town | مقصد را انتخاب کن. | Choose a destination.
+lw.decl_need_goods | دست‌کم یک کالا همراه ببر. | Carry at least one good.
+lw.decl_over | بیشتر از آنچه داری نوشته‌ای. | You wrote more than you have.
+lw.decl_go | اعلام کن | Declare
+lw.bribes | پیشنهادِ پول به صاحب‌منصب | Money offered to an office-holder
+lw.bribes_hint | این کار در شهر جرم است. هر پیشنهاد را فقط دو طرفش می‌بینند. اگر بازرسی پیدایش کند، پول مصادره می‌شود و برای هر دو پرونده باز می‌شود. | This is a crime in the town. Only the two sides see an offer. If an audit finds it the money is forfeited and a case opens for both.
+lw.bribes_none | پیشنهادی نیست. | There are no offers.
+lw.bribe_new | پیشنهاد بده | Make an offer
+lw.bribe_title | پیشنهاد به صاحب‌منصب | An offer to an office-holder
+lw.bribe_calm | اثرش سقف دارد و هیچ‌وقت کامل نیست؛ خطر و هزینه‌اش هم با تو می‌ماند. | Its effect has a ceiling and is never complete; the risk and the cost stay with you.
+lw.bribe_holder | صاحب‌منصب | The office-holder
+lw.bribe_rung | چه چیزی سبک‌تر شود | What should weigh less
+lw.rung.warrant | سخت‌گیری در حکم | Strictness over warrants
+lw.rung.detection | دقت گشت | The patrol's care
+lw.rung.verdict | سنگینیِ رأی | The weight of a verdict
+lw.rung_hint.warrant | قاضی با مدرک کمتر هم حکم می‌دهد یا نمی‌دهد. | A judge may give or refuse a warrant on less evidence.
+lw.rung_hint.detection | گشت کمتر چیزی می‌بیند. | A patrol sees less.
+lw.rung_hint.verdict | رأی سبک‌تر می‌شود. | The verdict is lighter.
+lw.bribe_amount | مبلغ | Amount
+lw.bribe_pct | چقدر سبک‌تر | How much lighter
+lw.bribe_pct_hint | اگر ننویسی همان حدِ معمول می‌ماند. | If you leave it empty the usual level stays.
+lw.pay_from | از کجا بدهم | Pay from
+lw.pay_clean | از پولِ خودم | My own money
+lw.pay_dirty | از پول سیاه، {n} | From black money, {n}
+lw.bribe_risk | اگر این پیشنهاد لو برود، پولش مصادره می‌شود و تو پرونده می‌شوی. | If this offer is found out, its money is forfeited and a case opens against you.
+lw.bribe_need | صاحب‌منصب را انتخاب کن و مبلغ را بنویس. | Pick an office-holder and write an amount.
+lw.bribe_go | پیشنهاد را بفرست | Send the offer
+lw.bribe_mine | پیشنهادِ تو | Your offer
+lw.bribe_to_me | پیشنهاد به تو | An offer to you
+lw.bstatus.offered | منتظر جواب | Waiting
+lw.bstatus.accepted | پذیرفته شد | Accepted
+lw.bstatus.refused | رد شد | Refused
+lw.bstatus.found | لو رفت | Found out
+lw.bstatus.expired | تمام شد | Expired
+lw.bribe_effect | اثر | Effect
+lw.bribe_term | مدت | Term
+lw.dirty_money | پول سیاه | Black money
+lw.bribe_answer_hint | اگر بپذیری، پول سیاه به حسابت می‌آید و بازرسی می‌تواند پیدایش کند. | If you accept, black money reaches you and an audit can find it.
+lw.bribe_accept | می‌پذیرم | Accept
+lw.bribe_refuse | رد می‌کنم | Refuse
+lw.board | بازار زیرزمینی | The underground market
+lw.board_intro | اینجا جایی است که با آشنا و اعتبار کار می‌کند. هر معامله خطر لو رفتن دارد. | This place runs on acquaintance and standing. Every trade risks being found out.
+lw.standing | اعتبارِ تو اینجا | Your standing here
+lw.dirty_hint | پول سیاه جدا از پولِ خودت نگه داشته می‌شود و فقط با کارِ روکش‌دار به پول پاک می‌رسد. | Black money is kept apart from your own and becomes clean only through a front.
+lw.broker_rep | آبروی واسطه | Broker's name
+lw.broker_cap | سقفِ امانت | Escrow ceiling
+lw.list | آگهی بگذار | List a good
+lw.introduce | یک نفر را معرفی کن | Vouch for someone
+lw.broker_be | واسطه شو | Become a broker
+lw.listings | آگهی‌ها | Listings
+lw.listings_none | آگهی‌ای نیست. | No listings.
+lw.fence | دلالِ ثابت | A fence
+lw.listing_mine | آگهیِ تو | Your listing
+lw.listing_other | آگهی | A listing
+lw.qty | تعداد | Quantity
+lw.price_each | قیمت هر عدد | Price each
+lw.min_standing | کمترین اعتبار | Least standing
+lw.standing_low | اعتبارت برای این آگهی کم است. | Your standing is too low for this listing.
+lw.delist | آگهی را بردار | Take it down
+lw.buy | بخر | Buy
+lw.buy_title | خرید «{item}» | Buy «{item}»
+lw.buy_left | موجود: {n} | Left: {n}
+lw.buy_go | بخر، {price} | Buy, {price}
+lw.buy_need | تعداد را بنویس و واسطه را انتخاب کن. | Write a quantity and pick a broker.
+lw.broker | واسطه | Broker
+lw.broker_hint | کدِ واسطه‌ای که پولت نزدش می‌ماند. | The code of the broker who holds your money.
+lw.fence_hint | دلال کالا را خودش می‌فروشد؛ پولت مستقیم داده می‌شود. | The fence sells the good himself; your money is paid straight.
+lw.escrow_hint | پولت نزد واسطه می‌ماند تا کالا برسد و تو تأیید کنی. | Your money stays with the broker until the goods arrive and you confirm.
+lw.scam_risk | واسطه ممکن است با پول برود؛ خطر هر معامله با خودت است. | A broker may run off with the money; the risk of each trade is yours.
+lw.list_title | آگهی در بازار زیرزمینی | A listing on the underground market
+lw.good | کالا | Good
+lw.list_hint | برای آگهی کارمزد گرفته می‌شود و کالا تا فروش یا برداشتن آگهی کنار می‌ماند. | A listing fee is taken and the good is set aside until it sells or you take the listing down.
+lw.list_need | کالا، تعداد و قیمت را درست بنویس. | Write the good, quantity and price rightly.
+lw.list_go | آگهی بگذار | List it
+lw.escrows | پول‌های نزد واسطه | Money held by brokers
+lw.escrow_line | {qty} عدد «{item}» | {qty} of «{item}»
+lw.estatus.held | نزد واسطه | Held
+lw.estatus.released | آزاد شد | Released
+lw.estatus.refunded | برگشت | Refunded
+lw.estatus.scammed | واسطه رفت | Run off with
+lw.role_broker | تو واسطه‌ای | You are the broker
+lw.role_buyer | تو خریداری | You are the buyer
+lw.role_seller | تو فروشنده‌ای | You are the seller
+lw.escrow_pot | پولِ نگه‌داشته | Money held
+lw.escrow_fee | مزدِ واسطه | Broker's fee
+lw.escrow_due | مهلت | Deadline
+lw.escrow_buyer_hint | وقتی کالا رسید تأیید کن تا پول آزاد شود. | Confirm when the goods arrive so the money is freed.
+lw.confirm | کالا رسید | Goods arrived
+lw.refund | برگشت پول | Refund
+lw.refund_title | پول برگردد؟ | Send the money back?
+lw.refund_body | پول به خریدار برمی‌گردد و معامله تمام می‌شود. | The money goes back to the buyer and the trade ends.
+lw.scam | با پول بروم | Run off with it
+lw.scam_title | با پول بروی؟ | Run off with the money?
+lw.scam_body | پول به پول سیاهِ تو می‌آید. | The money joins your black money.
+lw.scam_hint | ممکن است ردت را بگیرند و پرونده شوی. | You may be traced and charged.
+lw.introduce_title | معرفی | Vouching
+lw.introduce_hint | کسی را که معرفی می‌کنی با آبروی خودت در بازار شناخته می‌شود. | The one you vouch for becomes known in the market on your word.
+lw.introduce_go | معرفی کن | Vouch
+lw.broker_title | واسطه شوی؟ | Become a broker?
+lw.broker_body | پولِ دیگران نزد تو می‌ماند تا کالایشان برسد و مزد می‌گیری. | Other people's money stays with you until their goods arrive and you take a fee.
+lw.broker_risk | بیشتر از سقفت امانت نمی‌گیری و آبرویت با هر معامله بالا یا پایین می‌رود. | You cannot hold more than your ceiling and your name rises or falls with each trade.
+lw.ask_title | آشنایی | Acquaintances
+lw.ask_hint | شاید کسی راه را نشانت بدهد. هر بار جواب نمی‌گیری. | Someone may show you the way. You do not always get an answer.
+lw.ask_go | بپرس | Ask
+lw.ask_form | از یک آشنا بپرس | Ask an acquaintance
+lw.ask_form_hint | از کسی بپرس که فکر می‌کنی می‌شناسد. | Ask someone you think knows.
+lw.fronts | روکش و شستن پول سیاه | Fronts and cleaning black money
+lw.fronts_hint | پول سیاه از راه یک کسب‌وکارِ روکش‌دار، در چند مرحله به پول پاک می‌رسد. کارمزد دارد و اگر بازرسی پیدایش کند مصادره می‌شود. | Black money reaches clean money through a front business in several stages. It has a fee and is forfeited if an audit finds it.
+lw.fronts_none | کسب‌وکارِ روکش‌داری نداری. | You have no front business.
+lw.front | روکش | Front
+lw.front_add | کسب‌وکاری را روکش کن | Make a business a front
+lw.front_no_company | کسب‌وکارِ دیگری برای روکش نمانده. | No other business is left to make a front.
+lw.front_title | روکش کردنِ یک کسب‌وکار | Make a business a front
+lw.front_hint | حسابِ کسب‌وکار از این پس زیرِ دید می‌ماند. | The business's books stay under watch from now on.
+lw.front_go | روکش کن | Make it a front
+lw.batches_none | هنوز پولی به راه نیفتاده. | No money has been sent yet.
+lw.batch.placed | گذاشته شد | Placed
+lw.batch.layered | در میانهٔ راه | Midway
+lw.batch.integrated | پاک شد | Cleaned
+lw.batch.frozen | بسته شد | Frozen
+lw.batch_next | مرحلهٔ بعد {at} | next stage {at}
+lw.launder | پول سیاه بده | Send black money
+lw.launder_none | پول سیاهی نداری. | You have no black money.
+lw.launder_title | پول سیاه از راهِ «{name}» | Black money through «{name}»
+lw.launder_amount | چقدر | How much
+lw.launder_over | بیشتر از {n} نمی‌شود. | Not more than {n}.
+lw.launder_hint | چند مرحله طول می‌کشد؛ در آخر مبلغ، منهای کارمزد، به خزانهٔ کسب‌وکار می‌رسد. | It takes several stages; in the end the sum, less the fee, reaches the business's treasury.
+lw.launder_risk | هر مرحله ممکن است بازرسی ببیند و پول بسته شود. | An audit may see any stage and the money is frozen.
+lw.launder_go | به راه بینداز | Set it going
+lw.gang | گروه | The group
+lw.gang_state | وضعِ گروه | The group's state
+lw.gang_none | گروهِ پنهانی نیست | Not a hidden group
+lw.gang_hidden | پنهان | Hidden
+lw.gang_open | اعلام‌شده | Declared
+lw.heat | داغی | Heat
+lw.heat_n | {a} از {b} | {a} of {b}
+lw.heat_hint | هرچه داغی بالاتر باشد، پلیس راحت‌تر گروه را پیدا می‌کند. | The higher the heat, the easier it is for the police to find the group.
+lw.gang_not_leader | ثبت و اعلام فقط با سرپرست گروه است. | Only the group's leader can register or declare it.
+lw.gang_mark | گروه را ثبت کن | Register the group
+lw.gang_mark_title | گروه ثبت شود؟ | Register the group?
+lw.gang_mark_body | گروه پنهان ثبت می‌شود و تا کسی پیدایش نکند، پنهان می‌ماند. | The group is registered as hidden and stays hidden until someone finds it.
+lw.gang_mark_hint | سه محکومیتِ به‌هم‌پیوسته برای اعضایش، اتهامِ اخاذیِ سازمان‌یافته می‌شود. | Three linked convictions of its members become a charge of organised racketeering.
+lw.gang_declare | آشکار اعلام کن | Declare openly
+lw.gang_declare_title | گروه آشکار اعلام شود؟ | Declare the group openly?
+lw.gang_declare_body | همه می‌دانند گروه هست و دیگر پنهان نمی‌شود. | Everyone knows the group exists and it is no longer hidden.
+lw.gang_declare_hint | این کار برگشت ندارد. | This cannot be undone.
+refusal.village_not_office_holder | این کار اختیارِ منصبی می‌خواهد که تو نداری. | This needs the power of an office you do not hold.
+refusal.village_insufficient | پولت یا خزانه برای این کار کافی نیست. | There is not enough money for this.
+refusal.village_law_separation | یک منصب نباید هم اتهام بزند هم قضاوت کند؛ و بازرسِ درستکاری نباید بازداشت هم بکند. | One office must not both charge and judge, and the integrity auditor must not also arrest.
+refusal.law_separation | یک منصب نباید هم اتهام بزند هم قضاوت کند؛ و بازرسِ درستکاری نباید بازداشت هم بکند. | One office must not both charge and judge, and the integrity auditor must not also arrest.
+lw.notice.law_already_known | تو از قبل در بازار زیرزمینی شناخته‌شده‌ای. | You are already known in the underground market.
+lw.notice.law_appeal_decided | رأیِ تجدیدنظر داده شد. | The appeal was decided.
+lw.notice.law_appealed | تجدیدنظرخواهی ثبت شد. | The appeal was filed.
+lw.notice.law_arrested | متهم در بازداشتگاه نگه داشته شد. | The accused is held in the lock-up.
+lw.notice.law_audit_anomaly | در دفترها چیزِ بی‌تناسبی پیدا شد؛ پرونده باز شد. | Something out of proportion was found in the books; a case opened.
+lw.notice.law_audit_clean | بازرسی چیزی پیدا نکرد. | The audit found nothing.
+lw.notice.law_audit_found | بازرسی رشوه یا کارِ خلاف پیدا کرد؛ پرونده باز شد. | The audit found a bribe or wrongdoing; a case opened.
+lw.notice.law_bailed | وثیقه پرداخت شد و آزاد شدی. | Bail was paid and you are free.
+lw.notice.law_bought | خرید انجام شد. | The purchase is done.
+lw.notice.law_bribe_offered | پیشنهاد به او رسید. | The offer reached him.
+lw.notice.law_bribe_refused | پیشنهاد را رد کردی. | You refused the offer.
+lw.notice.law_bribe_taken | پیشنهاد را پذیرفتی؛ پول سیاه به تو رسید. | You accepted the offer; black money reached you.
+lw.notice.law_broker | از این پس واسطهٔ امانت‌داری هستی. | From now on you are an escrow broker.
+lw.notice.law_busted | معامله لو رفت و متوقف شد. | The trade was found out and stopped.
+lw.notice.law_charged | اتهام ثبت شد و جلسه تعیین شد. | The charge was filed and a hearing set.
+lw.notice.law_complaint | شکایت ثبت شد. | The complaint was filed.
+lw.notice.law_confirmed | رسیدنِ کالا را تأیید کردی و پول آزاد شد. | You confirmed the goods and the money was freed.
+lw.notice.law_contact | کسی راه را نشانت داد؛ حالا در بازار زیرزمینی شناخته می‌شوی. | Someone showed you the way; you are now known in the underground market.
+lw.notice.law_crossed | بار رد شد. | The load crossed.
+lw.notice.law_declared | بار اعلام شد. | The load was declared.
+lw.notice.law_defended | برای متهم وکیل گذاشته شد. | A defender was set for the accused.
+lw.notice.law_delisted | آگهی برداشته شد و کالا برگشت. | The listing was taken down and the good came back.
+lw.notice.law_dropped | پرونده بسته شد. | The case was dropped.
+lw.notice.law_escrowed | پول نزد واسطه ماند تا کالا برسد. | The money stays with the broker until the goods arrive.
+lw.notice.law_excluded | مدرکِ ناقانونی از پرونده کنار گذاشته شد. | The improper evidence was left out of the case.
+lw.notice.law_front | کسب‌وکار به‌عنوان روکش ثبت شد. | The business was registered as a front.
+lw.notice.law_gang_declared | گروه آشکارا اعلام شد. | The group was declared openly.
+lw.notice.law_gang_marked | گروه ثبت شد؛ پنهان می‌ماند. | The group was registered; it stays hidden.
+lw.notice.law_inspected_clean | بار بازرسی شد و همه‌چیزش اعلام‌شده بود. | The load was inspected and all of it was declared.
+lw.notice.law_investigated | مدرکِ تازه به پرونده آمد. | New evidence came to the case.
+lw.notice.law_laundered | پول سیاه به راه افتاد و چند مرحله طول می‌کشد. | The black money is on its way and takes several stages.
+lw.notice.law_listed | آگهی در بازار زیرزمینی گذاشته شد. | The listing was put on the underground market.
+lw.notice.law_model | شیوهٔ دادرسی شهر ثبت شد. | The town's way of trying cases was saved.
+lw.notice.law_not_excluded | دادگاه مدرک را کنار نگذاشت. | The court did not leave the evidence out.
+lw.notice.law_nothing_new | چیزِ تازه‌ای پیدا نشد. | Nothing new was found.
+lw.notice.law_offence | جرم در فهرستِ شهر آمد و پس از مهلت اجرا می‌شود. | The offence is on the town's list and applies after the grace.
+lw.notice.law_offence_gone | جرم از فهرستِ شهر برداشته شد. | The offence was taken off the town's list.
+lw.notice.law_pardoned | عفو شد. | Pardoned.
+lw.notice.law_patrol_quiet | گشت تمام شد؛ چیزی دیده نشد. | The patrol ended; nothing was seen.
+lw.notice.law_patrol_saw | گشت چیزی دید و پرونده باز شد. | The patrol saw something and a case opened.
+lw.notice.law_recruited | خبرچین گرفته شد. | An informant was recruited.
+lw.notice.law_refunded | پول به خریدار برگشت. | The money went back to the buyer.
+lw.notice.law_retired | خبرچین کنار گذاشته شد. | The informant was let go.
+lw.notice.law_rotated | خبرچین به تو سپرده شد. | The informant was handed to you.
+lw.notice.law_scam | با پول رفتی. | You ran off with the money.
+lw.notice.law_scam_traced | با پول رفتی، ولی ردت را گرفتند. | You ran off with the money, but you were traced.
+lw.notice.law_seized | کالای اعلام‌نشده ضبط شد و جریمه گرفته شد. | Goods not declared were seized and a penalty was taken.
+lw.notice.law_tip | گزارشِ خبرچین ثبت شد. | The informant's report was recorded.
+lw.notice.law_tip_empty | گزارشِ خبرچین پشتوانه‌ای نداشت. | The informant's report had nothing behind it.
+lw.notice.law_verdict | رأی صادر شد. | The verdict was given.
+lw.notice.law_warrant_asked | درخواستِ حکم رفت. | The request for a warrant went out.
+lw.notice.law_warrant_refused | حکم داده نشد. | The warrant was not given.
+lw.notice.law_warrant_signed | حکم صادر شد. | The warrant was issued.
+refusal.village_law_already_front | این کسب‌وکار پیش‌تر روکش شده. | This business is already a front.
+refusal.village_law_already_informant | این نفر از قبل خبرچین است. | This person is already an informant.
+refusal.village_law_appeal_late | مهلتِ تجدیدنظر گذشته. | The time to appeal is over.
+refusal.village_law_appeal_used | این طرف یک‌بار تجدیدنظر خواسته. | This side has already appealed once.
+refusal.village_law_audited_today | امروز این مورد بازبینی شده. | This one was already reviewed today.
+refusal.village_law_bad_args | درخواست درست نوشته نشده. | The request is not written right.
+refusal.village_law_banned | از بازار منع شده‌ای. | You are banned from the market.
+refusal.village_law_briber_short | پولِ پیشنهاددهنده نمی‌رسد. | The one making the offer does not have the money.
+refusal.village_law_bribe_small | این مبلغ برای پیشنهاد کم است. | This sum is too small for an offer.
+refusal.village_law_case_closed | کارِ این پرونده تمام شده یا هنوز نرسیده. | This case's turn is over or has not come yet.
+refusal.village_law_case_open | برای همین جرم پرونده‌ای باز است. | A case is already open for this offence.
+refusal.village_law_conflict | کسی که اتهام زده نمی‌تواند قاضیِ همان پرونده باشد، و بازرس هم قاضی نیست. | Whoever charged cannot judge the same case, and the auditor is no judge.
+refusal.village_law_has_defence | برای این پرونده وکیل هست. | This case already has a defender.
+refusal.village_law_in_custody | متهم همین حالا در بازداشتگاه است. | The accused is in the lock-up right now.
+refusal.village_law_judge_limit | این جریمه از اختیارِ این قاضی بیشتر است. | This fine is more than this judge may give.
+refusal.village_law_kind_not_allowed | این جرم چنین مجازاتی ندارد. | This offence has no such sentence.
+refusal.village_law_nobody_talks | امروز کسی با تو حرف نزد. | Nobody talked to you today.
+refusal.village_law_no_bribe | چنین پیشنهادی پیدا نشد. | No such offer was found.
+refusal.village_law_no_broker | این واسطه شناخته‌شده نیست. | This broker is not known.
+refusal.village_law_no_case | چنین پرونده‌ای پیدا نشد. | No such case was found.
+refusal.village_law_no_company | چنین کسب‌وکاری در این شهر نداری. | You have no such business in this town.
+refusal.village_law_no_escrow | چنین امانتی نزد واسطه نیست. | No such money is held by a broker.
+refusal.village_law_no_evidence | چنین مدرکی پیدا نشد. | No such evidence was found.
+refusal.village_law_no_faction | عضو هیچ گروهی نیستی. | You are in no group.
+refusal.village_law_no_front | این کسب‌وکار روکش نیست. | This business is not a front.
+refusal.village_law_no_goods | این کالا را به اندازهٔ کافی همراه نداری. | You do not carry enough of this good.
+refusal.village_law_no_informant | چنین خبرچینی پیدا نشد. | No such informant was found.
+refusal.village_law_no_jail | این شهر بازداشتگاهِ باز و جای خالی ندارد. | This town has no open lock-up with a free cell.
+refusal.village_law_no_listing | این آگهی دیگر نیست. | This listing is gone.
+refusal.village_law_no_load | چنین باری پیدا نشد. | No such load was found.
+refusal.village_law_no_money | پولت نمی‌رسد. | You do not have enough money.
+refusal.village_law_no_offence | چنین جرمی در فهرست نیست. | No such offence is on the list.
+refusal.village_law_no_player | بازیکنی با این کد پیدا نشد. | No player has this code.
+refusal.village_law_no_points | امروز امتیازِ کارِ پلیس تمام شده. | Today's police points are used up.
+refusal.village_law_no_sentence | چنین مجازاتی پیدا نشد. | No such sentence was found.
+refusal.village_law_no_settlement | اول باید شهری داشته باشی. | You must have a town first.
+refusal.village_law_no_standing | در بازار زیرزمینی آن‌قدر شناخته نیستی. | You are not known well enough in the underground market.
+refusal.village_law_not_accused | این کار فقط با متهم است. | Only the accused can do this.
+refusal.village_law_not_appealed | این پرونده تجدیدنظر ندارد. | This case has no appeal.
+refusal.village_law_no_target | چنین شهری پیدا نشد. | No such town was found.
+refusal.village_law_not_holder | او این اختیار را ندارد. | He does not hold this power.
+refusal.village_law_not_improper | این مدرک قانونی است یا کنار گذاشته شده. | This evidence is proper or already left out.
+refusal.village_law_not_in_hearing | این پرونده در جلسه نیست. | This case is not in hearing.
+refusal.village_law_not_leader | این کار فقط با سرپرستِ گروه است. | Only the group's leader can do this.
+refusal.village_law_not_outlawed | این کار در این شهر جرم نیست. | This is no crime in this town.
+refusal.village_law_not_resident | او ساکنِ این شهر نیست. | He is not a resident of this town.
+refusal.village_law_not_yet | این بخش هنوز شروع نشده. | This part has not started yet.
+refusal.village_law_not_your_informant | این خبرچین دستِ تو نیست. | This informant is not in your hands.
+refusal.village_law_no_warrant | چنین حکمی پیدا نشد. | No such warrant was found.
+refusal.village_law_over_bound | مجازات از سقفِ این جرم بیشتر است. | The sentence is over this offence's ceiling.
+refusal.village_law_over_broker_cap | این واسطه بیشتر از این امانت نمی‌گیرد. | This broker holds no more than this.
+refusal.village_law_post_closed | پاسگاه یا کلانتری امروز باز نیست؛ کارمند، حقوق یا غذا ندارد. | The post is not open today: no staff, wages or food.
+refusal.village_law_research | شهر باید اول دانشش را پژوهش کند. | The town must first research the knowledge for it.
+refusal.village_law_rotate_due | وقتِ سپردنِ این خبرچین به دیگری است. | It is time to hand this informant to another handler.
+refusal.village_law_rotate_not_due | هنوز وقتِ سپردنِ این خبرچین نیست. | It is not yet time to hand this informant over.
+refusal.village_law_self | این کار دربارهٔ خودِ تو ممکن نیست. | This cannot be done about yourself.
+refusal.village_law_tips_alone | حکم را نمی‌شود فقط روی گزارشِ خبرچین داد. | A warrant cannot rest on an informant's report alone.
+refusal.village_law_too_many_informants | بیش از این خبرچین نمی‌شود نگه داشت. | No more informants can be kept.
+refusal.village_law_treasury_short | خزانهٔ شهر نمی‌رسد. | The town treasury does not have enough.
+refusal.village_law_weak_evidence | مدرک کافی نیست. | The evidence is not enough.
+charter.perm.police.investigate | پیگیریِ پرونده و مدرک | Investigate cases and evidence
+charter.perm.police.arrest | بازداشتِ متهم | Hold an accused
+charter.perm.police.warrant_ask | خواستنِ حکم از قاضی | Ask a judge for a warrant
+charter.perm.police.informant_run | نگه‌داشتنِ خبرچین | Handle informants
+charter.perm.prosecute.charge | اتهام زدن | Bring a charge
+charter.perm.prosecute.drop | بستنِ پرونده | Drop a case
+charter.perm.defence.appear | وکیلِ متهم شدن | Defend an accused
+charter.perm.court.warrant | امضای حکم | Sign warrants
+charter.perm.court.appeal_hear | رسیدگی به تجدیدنظر | Hear appeals
+charter.perm.jail.run | اداره‌ی بازداشتگاه | Run the lock-up
+charter.perm.pardon | عفو | Pardon
+charter.perm.audit.integrity | بازرسیِ درستکاریِ صاحب‌منصب‌ها | Audit office-holders' integrity
+charter.perm.audit.books | بازرسیِ دفترِ کسب‌وکارها | Audit businesses' books
+charter.perm.customs.inspect | بازرسیِ بار در گمرک | Inspect loads at customs
+charter.perm.law.set | نوشتنِ فهرستِ جرم‌ها و شیوهٔ دادرسی | Set the offences and the way of trying cases
+charter.sep_note | یک منصب که هم اتهام بزند هم قضاوت کند ثبت نمی‌شود؛ بازرسِ درستکاری هم نباید بازداشت کند. | An office that both charges and judges is refused; the integrity auditor must not arrest either.
+lw.pick_search | جست‌وجوی نام | Search by name
+lw.pick_none | کسی برای انتخاب نیست. | There is nobody to choose.
+lw.pick_nomatch | نامی با این حروف پیدا نشد. | No name matches.
+lw.pick_people | از ساکنان شهر | From the residents
+lw.pick_holders | از صاحب‌منصب‌ها | From the office-holders
+lw.pick_brokers | واسطه‌هایی که می‌شناسی | Brokers you know
+lw.pick_towns_none | شهری برای مقصد نیست. | No town is open as a destination.
+lw.broker_line | {name}، آبرو {rep}، سقف {cap} | {name}, name {rep}, ceiling {cap}
+lw.bribe_no_holder | صاحب‌منصبی که این کار دستش باشد نیست. | No office-holder has this in his hands.
+lw.audit_no_holder | صاحب‌منصبی برای بازبینی نیست. | There is no office-holder to review.
+lw.companies_none | کسب‌وکاری برای انتخاب نیست. | There is no business to choose.
+lw.ask_none | این‌جا کسی نیست که بپرسی. | Nobody here to ask.
+lw.broker_sub | آبرو {rep}، سقف {cap} | name {rep}, ceiling {cap}
+lw.broker_none | واسطه‌ای که بشناسی نیست؛ بدون واسطه نمی‌شود خرید. | You know no broker; a buy needs one.

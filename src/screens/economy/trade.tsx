@@ -77,7 +77,7 @@ function MarketBody({ v, ctx }: { v: MarketView; ctx: FlowCtx }) {
         {shown.map((r) => (
           <GoodsCard key={`${r.item.from}:${r.item.code}`} code={r.item.code} name={r.name} group={r.shelf?.group ?? r.category}
             price={r.item.from === 'shop' ? money(r.item.ask) : r.item.last > 0 ? money(r.item.last) : undefined}
-            price2={r.item.from === 'shop' ? t('sm.mk.shop_left', { n: formatNumber(r.item.stock ?? 0) }) : r.item.book ? t('market.bid_ask', { bid: r.item.bid > 0 ? formatNumber(r.item.bid) : '—', ask: r.item.ask > 0 ? formatNumber(r.item.ask) : '—' }) : t('market.no_book')}
+            price2={r.item.from === 'shop' ? t('sm.mk.shop_left', { n: formatNumber(r.item.stock ?? 0) }) : r.item.book ? [r.item.bid > 0 ? t('market.buy_at', { n: formatNumber(r.item.bid) }) : t('market.no_buyer'), r.item.ask > 0 ? t('market.sell_at', { n: formatNumber(r.item.ask) }) : t('market.no_seller')].join(' – ') : t('market.no_book')}
             source={village ? (r.item.from === 'shop' ? t('sm.mk.source.shop') : t('sm.mk.source.people')) : undefined}
             onClick={() => {
               if (r.item.from === 'shop') { ctx.run('settlement.shop'); return }

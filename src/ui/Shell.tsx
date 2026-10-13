@@ -4,7 +4,7 @@ import { getDisplayMoney } from '../lib/money'
 import { takeResume, saveResume } from '../i18n/resume'
 import { Screen } from '../kit'
 import GenericScreen from './GenericScreen'
-import { cityItemsFor } from '../screens/village/cityItems'
+import { cityItemsFor, CITY_GROUPS } from '../screens/village/cityItems'
 import { pushNativeBack, hasNativeBack } from '../lib/nativeBack'
 import { SideCtx, type Side } from '../state/SideContext'
 import { useSession } from '../state/SessionContext'
@@ -339,7 +339,7 @@ export default function Shell() {
       for (const it of cityItemsFor(s)) {
         const isCmd = !!it.command
         items.push({
-          key: it.key, label: t(it.label),
+          key: it.key, label: t(it.label), group: t(CITY_GROUPS.find((g) => g.key === it.group)!.label),
           on: isCmd ? contentKey?.command === it.command : contentKey?.local === it.local && JSON.stringify(contentKey?.args ?? {}) === JSON.stringify(it.args ?? {}),
           onClick: () => (isCmd ? run(it.command!) : openLocal(it.local!, it.args)),
         })

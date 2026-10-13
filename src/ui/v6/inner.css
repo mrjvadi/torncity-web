@@ -26,7 +26,7 @@
 
 /* ---------- header: a quiet bar, back chevron at the start, bold title ---------- */
 .v6 .cx-hdr { position: sticky; top: 0; z-index: 4; flex: none; min-height: 52px; margin: 0 -14px 4px; padding: 0 10px 0 14px; gap: 6px;
-  background: #0b111cf2; border-bottom: 1px solid var(--v6-line); backdrop-filter: blur(6px); }
+  background: #0b111c; border-bottom: 1px solid var(--v6-line); box-shadow: 0 -16px 0 0 #0b111c; }
 [dir="rtl"] .v6 .cx-hdr { padding: 0 14px 0 10px; }
 .v6 .cx-hdr-title { font-size: 20px; line-height: 52px; color: #fff; opacity: 1; font-weight: 800; }
 .v6 .cx-hdr-btn { width: 44px; height: 44px; margin-inline-start: -8px; border-radius: 50%; font-size: 26px; background: none; border: 0; color: #fff; }

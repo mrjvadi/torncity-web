@@ -15,7 +15,7 @@ import { useSession } from '../../state/SessionContext'
 import { useVillageView } from './common'
 import { useCan } from '../../lib/permissions'
 import { useContentNames } from '../../village/useVillage'
-import { cityItemsFor } from './cityItems'
+import { cityItemsFor, CITY_GROUPS } from './cityItems'
 import { VettingRule } from './Intel'
 import type { DevelopmentDimension, DevelopmentView } from '../../api/views.gen'
 import './village.css'
@@ -62,7 +62,7 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
               <PSec>{t('city.roles')}</PSec>
               <div className="cp-chips">
                 {(v.roles ?? []).map((r) => (
-                  <span key={r.role} className="nx-chip nx-chip-gold">{t('city.role.level', { role: hasKey(`role.${r.role}`) ? t(`role.${r.role}` as Key) : '', n: r.level })}</span>
+                  <span key={r.role} className="nx-chip nx-chip-gold">{t('city.role.level', { role: hasKey(`role.${r.role}`) ? t(`role.${r.role}` as Key) : t('role.other'), n: r.level })}</span>
                 ))}
               </div>
             </>
@@ -88,14 +88,23 @@ export default function CityPanel({ run, openLocal }: ScreenProps) {
       <PSec>{t('city.watch')}</PSec>
       <VettingRule run={run} />
       <PSec>{t('city.affairs')}</PSec>
-      <div className="hub-grid">
-        {items.map((it) => (
-          <PTile
-            key={it.key} icon={it.icon} title={t(it.label)} tone={it.key === 'leave' ? 'danger' : undefined}
-            onClick={() => (it.command ? run(it.command) : openLocal(it.local!, it.args))}
-          />
-        ))}
-      </div>
+      {CITY_GROUPS.map((g) => {
+        const mine = items.filter((it) => it.group === g.key)
+        if (mine.length === 0) return null
+        return (
+          <div key={g.key} className="cp-group">
+            <div className="cp-group-h">{t(g.label)}</div>
+            <div className="hub-grid">
+              {mine.map((it) => (
+                <PTile
+                  key={it.key} icon={it.icon} title={t(it.label)} tone={it.key === 'leave' ? 'danger' : undefined}
+                  onClick={() => (it.command ? run(it.command) : openLocal(it.local!, it.args))}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      })}
     </ScreenScroll>
   )
 }

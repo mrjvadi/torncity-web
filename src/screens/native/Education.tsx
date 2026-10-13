@@ -6,7 +6,7 @@ import { Lines, Need } from './kit/cardparts'
 import { tripLine } from './kit/needs'
 import type { TripHint } from '../../api/views.gen'
 import Actions from './kit/Actions'
-import { clamp01, hms, money, roughDuration } from './kit/format'
+import { clamp01, formatNumber, hms, money, roughDuration } from './kit/format'
 import { buildingName, useBuildingCatalogue, useContentNames } from '../../village/useVillage'
 import { hasKey, t, type Key } from '../../i18n'
 
@@ -64,7 +64,7 @@ export default function Education({ response, loading, onAction, run }: ScreenPr
           <div className="nx-bar-sub" style={{ margin: '4px 0 8px' }}>{t('education.literacy.first')}</div>
           <Bar
             frac={clamp01((lit.share_bps ?? 0) / 10000)} color="var(--violet)"
-            label={t('education.literacy.share', { p: pct(lit.share_bps), place })}
+            label={t('education.literacy.share', { p: formatNumber(pct(lit.share_bps)), place })}
           />
         </Card>
       )}

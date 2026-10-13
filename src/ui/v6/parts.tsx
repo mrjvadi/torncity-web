@@ -220,8 +220,35 @@ export function PhoneDock({ tabs, active, onSelect, onLong, ownRef }: { tabs: Do
 
 // -- desktop rail + docked panel ---------------------------------------------------------------------------
 
-export interface RailItem { key: string; label: string; on?: boolean; wait?: boolean; onClick: () => void }
+/** `group` is the label of a sub-group the item sits in (a second level under a section; items of one group follow each other). */
+export interface RailItem { key: string; label: string; on?: boolean; wait?: boolean; group?: string; onClick: () => void }
 export interface RailSection { key: string; icon: string; label: string; kbd: string; items: RailItem[]; onSelect: () => void }
+
+/** The items of a section: loose ones, and sub-groups (a header you can fold, opened by default when it holds the open entry or is the first). */
+function RailItems({ sectionKey, items }: { sectionKey: string; items: RailItem[] }) {
+  const [folded, setFolded] = useState<Record<string, boolean>>({})
+  const btn = (it: RailItem) => <button key={it.key} className={`v6-rit${it.on ? ' on' : ''}${it.wait ? ' wait' : ''}`} onClick={it.onClick} aria-current={it.on ? 'true' : undefined}>{it.label}</button>
+  const labels = [...new Set(items.map((i) => i.group).filter((g): g is string => !!g))]
+  if (labels.length === 0) return <>{items.map(btn)}</>
+  const first = labels[0]
+  return (
+    <>
+      {items.filter((i) => !i.group).map(btn)}
+      {labels.map((g) => {
+        const mine = items.filter((i) => i.group === g)
+        const hasOn = mine.some((i) => i.on)
+        // folded state is the player's own choice; an untouched group is open if it is the first or holds the open entry
+        const open = g in folded ? !folded[g] || hasOn : g === first || hasOn
+        return (
+          <div key={`${sectionKey}:${g}`} className={`v6-rg${open ? ' open' : ''}`}>
+            <button type="button" className="v6-rgh" aria-expanded={open} onClick={() => setFolded({ ...folded, [g]: open })}><b>{g}</b><i className="v6-chev" /></button>
+            {open && mine.map(btn)}
+          </div>
+        )
+      })}
+    </>
+  )
+}
 
 export function NavRail({ sections, active, brand, sub, children }: { sections: RailSection[]; active: string; brand: string; sub?: string; children?: ReactNode }) {
   const [open, setOpen] = useState<string | null>(active)
@@ -236,7 +263,7 @@ export function NavRail({ sections, active, brand, sub, children }: { sections: 
               <Ic name={s.icon} /><b>{s.label}</b><kbd>{fa(s.kbd)}</kbd><i className="v6-chev" />
             </button>
             <div className="v6-ri">
-              {s.items.map((it) => <button key={it.key} className={`v6-rit${it.on ? ' on' : ''}${it.wait ? ' wait' : ''}`} onClick={it.onClick} aria-current={it.on ? 'true' : undefined}>{it.label}</button>)}
+              <RailItems sectionKey={s.key} items={s.items} />
             </div>
           </div>
         ))}
