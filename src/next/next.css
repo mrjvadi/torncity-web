@@ -44,7 +44,7 @@
 
 /* ---------- the page: header, scroll body ---------- */
 .n-page { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
-  padding: calc(var(--safe-top) + var(--hud-h) + 18px) 16px calc(var(--safe-bottom) + var(--dock-h) + 28px);
+  padding: calc(var(--safe-top) + var(--hud-h) + 30px) 16px calc(var(--safe-bottom) + var(--dock-h) + 28px);
   background: radial-gradient(120% 45% at 50% 0%, #222a35 0%, var(--bg-2) 55%, var(--bg) 100%); }
 .n-page::-webkit-scrollbar { display: none; }
 .n-page-in { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
