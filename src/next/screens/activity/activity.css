@@ -1,0 +1,98 @@
+/* The «فعالیت» area's own layouts (work, learning, health, crime, missions, rankings). Every class `n-act-`; the
+   tokens are next.css's (scoped under .n-app). */
+
+/* ---------- a result: a glowing card with the 3D icon on top, the figure large ---------- */
+.n-act-result { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;
+  padding: 22px 16px 18px; border-radius: 24px; background: var(--g-hero); border: 1px solid #ffffff14; box-shadow: 0 14px 34px #00000059, inset 0 1px 0 #ffffff12; }
+.n-act-result > * { position: relative; }
+.n-act-result-glow { position: absolute; inset: -40% -20% auto; height: 260px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, #ff8a3d3d, transparent 65%); }
+.n-act-result.win { border-color: #4cd07d55; box-shadow: 0 14px 34px #00000059, 0 0 28px #4cd07d26, inset 0 1px 0 #ffffff12; }
+.n-act-result.win .n-act-result-glow { background: radial-gradient(circle at 50% 50%, #4cd07d40, transparent 62%), radial-gradient(circle at 20% 30%, #ffb06633, transparent 40%); }
+.n-act-result.loss { border-color: #ff5f5655; }
+.n-act-result.loss .n-act-result-glow { background: radial-gradient(circle at 50% 50%, #ff5f5638, transparent 62%); }
+.n-act-result.plain .n-act-result-glow { background: radial-gradient(circle at 50% 50%, #3ec5f02e, transparent 62%); }
+.n-act-result-art { width: 96px; height: 96px; margin-bottom: 4px; filter: drop-shadow(0 10px 18px #00000080); animation: n-act-pop .45s cubic-bezier(.2, 1.4, .4, 1); }
+.n-act-result.win .n-act-result-art { filter: drop-shadow(0 10px 22px #4cd07d55); }
+.n-act-result.loss .n-act-result-art { filter: drop-shadow(0 10px 22px #ff5f5655); }
+.n-act-result-kicker { font: 800 13px/1.5 var(--font); color: var(--mut); }
+.n-act-result.win .n-act-result-kicker { color: var(--ok-hi); }
+.n-act-result.loss .n-act-result-kicker { color: var(--bad-hi); }
+.n-act-result-big { font: 900 30px/1.25 var(--font); color: #fff; letter-spacing: -.3px; overflow-wrap: anywhere; }
+.n-act-result.win .n-act-result-big { color: #fff; text-shadow: 0 0 18px #4cd07d66; }
+.n-act-result-sub { max-width: 34em; font: 500 13.5px/1.8 var(--font); color: #d5dce6; }
+.n-act-result-chips { justify-content: center; margin-top: 10px; }
+.n-act-result-meter { align-self: stretch; margin-top: 12px; text-align: start; }
+@keyframes n-act-pop { from { transform: scale(.6) translateY(10px); opacity: 0; } }
+
+/* ---------- small layout pieces ---------- */
+.n-act-name { font-size: 25px; }
+.n-act-next { display: flex; align-items: center; gap: 12px; }
+.n-act-next > div { flex: 1; min-width: 0; }
+.n-act-next .n-chip { flex: none; }
+.n-act-next-title { font: 900 16px/1.35 var(--font); color: #fff; overflow-wrap: anywhere; }
+.n-act-gap { margin-top: 12px; }
+.n-act-small { margin: 10px 0; font: 500 12.5px/1.7 var(--font); color: var(--mut); }
+.n-act-cards { display: flex; flex-direction: column; gap: 10px; }
+.n-act-off { opacity: .62; }
+.n-act-start { margin-top: 10px; text-align: start; }
+.n-act-gauges .n-meter-head > span, .n-act-objs-m .n-meter-head > span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.n-act-gauges .n-meter-head > b, .n-act-objs-m .n-meter-head > b { flex: none; text-align: end; }
+
+/* ---------- pay box ---------- */
+.n-act-pay { display: flex; flex-direction: column; gap: 12px; }
+.n-act-pay-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.n-act-pay-head span { font: 700 14px/1.4 var(--font); color: var(--mut); }
+.n-act-pay-head b { font: 900 24px/1.2 var(--font); color: var(--accent-hi); }
+
+/* ---------- pager ---------- */
+.n-act-pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.n-act-pager > span { font: 700 13px/1 var(--font); color: var(--mut); }
+
+/* ---------- crime: tier, gauges, the chance, the heavy red start ---------- */
+.n-act-tier { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px;
+  background: linear-gradient(160deg, #2e2328, #1d1f27 70%); border: 1px solid #ff5f5640; box-shadow: var(--sh-card); }
+.n-act-tier > div { flex: 1; min-width: 0; }
+.n-act-tier-name { font: 900 20px/1.3 var(--font); color: #fff; }
+.n-act-stars { display: flex; gap: 2px; filter: drop-shadow(0 0 6px #ffb54766); }
+.n-act-gauges { display: flex; flex-direction: column; gap: 12px; }
+.n-act-crime-hero { background: linear-gradient(160deg, #33262b, #1c222b 72%); border-color: #ff5f5633; }
+.n-act-crime-hero::before { background: radial-gradient(circle, #ff5f5633, transparent 70%); }
+.n-act-chance { margin-top: 16px; padding: 12px; border-radius: 16px; background: #0d1015b3; border: 1px solid #ffffff0f; }
+.n-act-chance .n-meter-head { font-size: 13px; color: #fff; }
+.n-act-chance-v { font: 900 22px/1 var(--font); color: #fff; }
+.n-btn.n-act-heist { position: relative; min-height: 58px; font-size: 17px; color: #fff;
+  background: linear-gradient(180deg, #ff6a5f, #c9271f); box-shadow: inset 0 1px 0 #ffffff55, 0 8px 22px #ff3b3055; }
+.n-act-heist .n-ic { width: 30px; height: 30px; }
+.n-act-heist-cost { display: inline-flex; align-items: center; gap: 2px; margin-inline-start: 6px; padding: 2px 8px; border-radius: 9px; background: #0000004d; font: 900 13px/1.5 var(--font); }
+.n-act-heist-cost .n-ic { width: 18px; height: 18px; }
+
+/* ---------- missions ---------- */
+.n-act-mission-head { display: flex; align-items: center; gap: 12px; }
+.n-act-mission-head > div { flex: 1; min-width: 0; }
+.n-act-objs { list-style: none; margin: 10px 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.n-act-objs li { display: flex; align-items: center; gap: 8px; font: 600 13.5px/1.5 var(--font); color: #dfe6ef; }
+.n-act-objs-m { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+
+/* ---------- rankings: the podium and the rows ---------- */
+.n-act-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 8px; padding-top: 18px; }
+.n-act-podium-col { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; text-align: center; }
+.n-act-podium-av { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font: 900 20px/1 var(--font); color: #fff; border: 2px solid #ffffff33; box-shadow: 0 6px 14px #0008; }
+.n-act-podium-col.p1 .n-act-podium-av { width: 64px; height: 64px; border-color: var(--accent); box-shadow: 0 0 18px #ff8a3d66; }
+.n-act-crown { position: absolute; top: -26px; width: 40px; height: 40px; filter: drop-shadow(0 4px 8px #ffb04766); }
+.n-act-podium-name { max-width: 100%; font: 900 13.5px/1.35 var(--font); color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.n-act-podium-val { font: 700 12px/1.3 var(--font); color: var(--accent-hi); }
+.n-act-podium-step { align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2px; margin-top: 4px; padding-top: 10px;
+  border-radius: 16px 16px 6px 6px; background: linear-gradient(180deg, #2b3340, #1b2029); border: 1px solid var(--line); font: 900 18px/1 var(--font); color: #fff; }
+.n-act-podium-col.p1 .n-act-podium-step { height: 96px; background: linear-gradient(180deg, #ff9a4d, #a8430c); border-color: transparent; color: var(--on-accent); }
+.n-act-podium-col.p2 .n-act-podium-step { height: 74px; }
+.n-act-podium-col.p3 .n-act-podium-step { height: 58px; }
+.n-act-podium-col.mine .n-act-podium-name { color: var(--accent-hi); }
+.n-act-lb { display: flex; flex-direction: column; gap: 8px; }
+.n-act-lb > div > .n-row { border-radius: 18px; background: var(--card); border: 1px solid var(--line); min-height: 64px; }
+.n-act-lb > div.mine > .n-row { border: 1.5px solid var(--accent); box-shadow: 0 0 16px #ff6b1a33; }
+.n-act-sup { display: block; margin-top: 2px; font: 700 14px/1.4 var(--font); color: var(--mut); letter-spacing: 0; text-shadow: none; }
+/* a card on a real button: the reset of `.n-app button` must not strip its look */
+.n-card.n-act-tap { display: block; width: 100%; padding: 14px; text-align: start; background: var(--g-card); border: 1px solid var(--line); border-radius: 18px; transition: transform .1s; }
+.n-card.n-act-tap.lit { border: 1.5px solid var(--accent); }
+.n-card.n-act-tap:active { transform: scale(.98); }

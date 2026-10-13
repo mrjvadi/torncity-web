@@ -30,7 +30,7 @@
 /* ---------- reset inside the app ---------- */
 .n-app { position: fixed; inset: 0; overflow: hidden; background: var(--bg); font-weight: 500; }
 .n-app *, .n-layer * { box-sizing: border-box; }
-.n-app button, .n-layer button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+:where(.n-app, .n-layer) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .n-app a, .n-layer a { color: var(--accent-hi); }
 .n-app img, .n-layer img { -webkit-user-drag: none; user-select: none; }
 .n-app :focus-visible, .n-layer :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
