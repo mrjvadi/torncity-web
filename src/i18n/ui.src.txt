@@ -641,6 +641,13 @@ inbox.cat.property | ملک | Property
 inbox.cat.trade | بازار | Market
 # -- hubs ---------------------------------------------------------------------
 hub.activity | فعالیت | Activity
+hub.now | در جریان | In progress
+hub.choose | چه کار کنم؟ | What to do
+hub.sections | بخش‌ها | Sections
+hub.wallet.cash | نقد همراه | Cash on hand
+hub.wallet.pay | پرداخت به کسی | Pay someone
+profile.copy | کپی | Copy
+profile.copied | کد بازیکن کپی شد | Player code copied
 hub.economy | اقتصاد | Economy
 hub.society | جامعه | Society
 hub.crime | جرم | Crime
@@ -3185,6 +3192,24 @@ act.founding.open_form | تکمیل اطلاعات شهر | Fill in the city for
 
 # -- P0: activities, work, health, crime empty, travel, friends -------------------
 common.loading | در حال بارگذاری… | Loading…
+common.soon_title | به‌زودی | Coming soon
+common.soon | این بخش در طراحی تازه به‌زودی ساخته می‌شود. | This part of the new design is coming soon.
+common.more | بیشتر | More
+next.facts | جزئیات | Details
+next.list | فهرست | List
+next.actions | کارها | Actions
+next.world | نمای سه‌بعدی {name} | 3D view of {name}
+next.no_city | هنوز شهری نداری. از نوار پایین به «من» یا «جامعه» برو. | You have no town yet. Use «Me» or «Society» below.
+next.world_failed | نمای سه‌بعدی باز نشد. صفحه را دوباره باز کن. | The 3D view did not open. Reopen the page.
+next.buildings_n | {n} ساختمان | {n} buildings
+next.city_work | کارهای شهر | Town work
+next.recentre | کل شهر را نشان بده | Show the whole town
+next.now | در جریان | In progress
+next.choose | چه کار کنم؟ | What to do
+next.sections | بخش‌ها | Sections
+next.wallet.cash | نقد همراه | Cash on hand
+next.wallet.pay | پرداخت به کسی | Pay someone
+next.wallet.bank | بانک | Bank
 crime.empty.level_too_low | از سطح {n} به بالا می‌توانی سراغ این کار بروی. با کار کردن تجربه بگیر. | Crime opens at level {n}. Earn experience by working.
 crime.empty.no_venue | اینجا جایی برای این کار نیست. | There is no place for this here.
 crime.empty.no_targets | فعلاً کاری نیست که از دستت بربیاید. | There is nothing you can attempt right now.
@@ -4720,6 +4745,8 @@ v6.tip.build | ساخت من: {t} مانده | My building: {t} left
 v6.tip.build_idle | چیزی در حال ساخت نیست. بزن تا بسازی. | Nothing is being built. Tap to build.
 v6.tip.research | پژوهش: {t} دیگر | Research: {t} left
 v6.tip.quest | برو و انجامش بده | Go and do it
+v6.quest.go | برو | Go
+v6.quest.claim | دریافت | Claim
 v6.tip.ticker | آخرین پیام | Latest message
 v6.ring.info | اطلاعات | Info
 v6.ring.up | ارتقا | Upgrade
@@ -8830,3 +8857,143 @@ lw.companies_none | کسب‌وکاری برای انتخاب نیست. | There 
 lw.ask_none | این‌جا کسی نیست که بپرسی. | Nobody here to ask.
 lw.broker_sub | آبرو {rep}، سقف {cap} | name {rep}, ceiling {cap}
 lw.broker_none | واسطه‌ای که بشناسی نیست؛ بدون واسطه نمی‌شود خرید. | You know no broker; a buy needs one.
+# -- the new UI: «من» (src/next/screens/me) ------------------------------------------------------------------------
+n.me.of | {a} از {b} | {a} of {b}
+n.me.xp | تجربه | Experience
+n.me.all | همه | All
+n.me.settings_sub | زبان، حضور و حساب | Language, presence and account
+n.me.skills.best | بهترین مهارتت | Your best skill
+n.me.skills.trained | آموخته | Learned
+n.me.skills.levels | مجموع سطح‌ها | Total levels
+n.me.skills.mastered | در اوج | Mastered
+n.me.skills.learned | مهارت‌های آموخته | Skills you have
+n.me.skills.untrained | هنوز شروع نشده | Not started yet
+n.me.skills.untrained_hint | با کار، دوره‌های آموزشی و جرم، این مهارت‌ها هم باز می‌شوند. | Work, courses and crime open these skills too.
+n.me.skills.to_next | {n} امتیاز تا سطح بعد | {n} XP to the next level
+n.me.ach.earned | به دست آمده | Earned
+n.me.ach.open | در راه | On the way
+n.me.ach.rewards | پاداش گرفته: {n} | Rewards received: {n}
+n.me.ach.reward | پاداش {n} | Reward {n}
+n.me.card.bio | زندگی‌نامه | Bio
+n.me.settings.sign_out_q | از حساب خارج می‌شوی؟ | Sign out?
+n.me.settings.sign_out_hint | برای برگشتن، دوباره با کد بازیکن یا از تلگرام وارد شو. | To come back, sign in again with your player code or from Telegram.
+n.me.life.next | رتبهٔ بعد: {name} | Next rank: {name}
+n.me.life.intel | هوش | Intelligence
+n.me.life.worth | دارایی‌ها | What you own
+n.me.worth.cash | نقد | Cash
+n.me.worth.bank | بانک | Bank
+n.me.worth.savings | پس‌انداز | Savings
+n.me.worth.property | ملک | Property
+n.me.worth.goods | کالا | Goods
+n.me.worth.gold | طلا | Gold
+n.me.worth.equity | سهام | Shares
+n.me.worth.escrow | در امانت | In escrow
+n.me.worth.loans | وام‌ها | Loans
+n.me.worth.debts | بدهی | Debts
+n.city.now_none | الان چیزی در شهر در دست ساخت یا پژوهش نیست. | Nothing is being built or researched in town right now.
+n.city.roles_none | شهر هنوز ساختمان خدماتی ندارد. | The town has no service building yet.
+n.city.b.title | ساختمان | Building
+n.city.b.does | کارش در شهر | What it does
+n.city.b.makes | تولید | Makes
+n.city.b.uses | مصرف | Uses
+n.city.b.shift | هر شیفت | Each shift
+n.city.b.stock | موجودی انبار | In store
+n.city.b.room | جای انبار | Store room
+n.city.b.short | {n} پیش‌نیاز کم است | {n} requirement(s) missing
+n.city.b.town | بخش‌های شهر | Town sections
+n.city.law.services | خدمات قانون در شهر | The town's law services
+# new UI: society (src/next/screens/society)
+n.soc.inbox.unread | پیام‌های خوانده‌نشده | Unread messages
+n.soc.inbox.cats | دسته‌ها | Categories
+n.soc.inbox.new_n | {n} پیام تازه | {n} new
+n.soc.inbox.all_read | همهٔ پیام‌ها را خوانده‌ای. | You have read every message.
+n.soc.friends.count | {n} دوست | {n} friends
+n.soc.friends.requests | درخواست‌های دوستی | Friend requests
+n.soc.friends.mine | دوستان من | My friends
+n.soc.friends.waiting | در انتظار | Waiting
+n.soc.friends.open | دیدن {name} | Open {name}
+n.soc.election.vote_now | رأی بده | Vote
+n.soc.election.see | دیدن انتخابات | See the election
+n.soc.election.all | همهٔ انتخابات | All elections
+n.soc.election.seats | {n} کرسی | {n} seats
+n.soc.election.candidates_n | {n} نامزد | {n} candidates
+n.soc.faction.yours | جناح تو | Your faction
+n.soc.faction.manage | کارهای مربوط به {name} | Manage {name}
+n.soc.faction.op.min | کمترین گروه | Smallest crew
+n.soc.gov.seat_of | مقر حکومت | Seat of government
+n.soc.gov.holders | {n} صاحب‌منصب | {n} office-holders
+n.soc.gov.country | کشور | Country
+n.soc.gov.announced | تغییر اعلام‌شده | Change announced
+n.soc.office.you_are | منصب تو | Your office
+n.soc.office.levers | سیاست‌هایی که تعیین می‌کنی | Policies you set
+n.soc.office.propose | پیشنهاد تغییر | Propose a change
+n.soc.page | صفحهٔ {a} از {b} | Page {a} of {b}
+# -- next UI: the activity area (src/next/screens/activity) ------------------
+n.act.conds_met | {a} از {b} | {a} of {b}
+n.act.go | برو | Go
+n.act.prev | قبلی | Previous
+n.act.next | بعدی | Next
+n.act.wait | مانده | Left
+n.act.learned | چه یاد گرفتی | What you learned
+n.act.energy_cost | {n} انرژی | {n} energy
+n.act.pay_note | مزد هر شیفت | pay per shift
+n.act.pay.total | مبلغ | Amount
+n.act.pay.short | پولت به اندازه نیست؛ اول نقد یا حساب بانکی‌ات را پر کن. | You cannot afford it; top up your cash or bank first.
+n.act.job.none_sub | یکی از آگهی‌های استخدام را بردار و از همان روز اول مزد بگیر. | Take one of the job openings and earn from day one.
+n.act.job.on_shift | سر شیفت هستی | On shift
+n.act.job.earned | کل درآمد این کار | Earned in this job
+n.act.job.shifts_here | شیفت در این جایگاه | Shifts in this position
+n.act.job.next | ارتقای بعدی | Next promotion
+n.act.job.must_quit | شغل فعلی‌ات؛ برای کار تازه اول باید استعفا بدهی. | Your current job; resign first to take a new one.
+n.act.health.admitted | بستری هستی | You are admitted
+n.act.health.until_out | تا مرخصی | Until discharge
+n.act.health.full | سلامتی‌ات کامل است. | You are in full health.
+n.act.crime.tier | رتبهٔ جنایی | Criminal tier
+n.act.crime.nerve | جسارت | Nerve
+n.act.crime.heat | داغی | Heat
+n.act.crime.choose | چه کاری؟ | What job?
+n.act.crime.under_way | در جریان است | Under way
+n.act.crime.chance | شانس موفقیت | Chance of success
+n.act.crime.stakes | چه به دست می‌آوری، چه از دست می‌دهی | What you can win, what you can lose
+n.act.crime.where | جای کار | Where
+# -- the new UI: economy (src/next/screens/economy) ------------------------------------------------------------
+n.eco.all_n | همه ({n}) | All ({n})
+n.eco.ask_at | فروش به {price} | Sell at {price}
+n.eco.bid_at | پیشنهاد خرید به {price} | Bid {price}
+n.eco.bid_escrow | مبلغ پیشنهاد کنار گذاشته می‌شود و اگر کسی بالاتر بدهد برمی‌گردد. | The bid is set aside and comes back if someone bids higher.
+n.eco.bid_n | پیشنهاد {n} | Bid {n}
+n.eco.buy_at | خرید فوری به {price} | Buy now at {price}
+n.eco.buy_n | خرید {n} عدد | Buy {n}
+n.eco.dropped | {item} را دور انداختی. | You threw away {item}.
+n.eco.dropped_title | دور انداخته شد | Thrown away
+n.eco.given | {item} را به {name} دادی. | You gave {item} to {name}.
+n.eco.given_title | داده شد | Given
+n.eco.go | برو | Go
+n.eco.goods | کالاها | Goods
+n.eco.here | همین‌جا | Here
+n.eco.holdings | سهم‌های من | My shares
+n.eco.less | یکی کمتر | One less
+n.eco.load | بار {w} از {h} کیلو | Load {w} of {h} kg
+n.eco.market_day | روز بازار | Market day
+n.eco.mine | مال من | Mine
+n.eco.more | یکی بیشتر | One more
+n.eco.more_ways | کارهای دیگر | More
+n.eco.owned | ملک‌های من | What I own
+n.eco.past | گذشته | Past
+n.eco.pay_card | پرداخت با کارت | Pay by card
+n.eco.pay_cash | پرداخت نقد | Pay in cash
+n.eco.pay_n | پرداخت {n} | Pay {n}
+n.eco.quality | کیفیت | Quality
+n.eco.reserved | {n} جا کنار گذاشته | {n} space set aside
+n.eco.rest | استراحت | Rest
+n.eco.see_book | دیدن دفتر سفارش‌ها | See the order book
+n.eco.sell_at | فروش فوری به {price} | Sell now at {price}
+n.eco.shelves | قفسه‌ها | Shelves
+n.eco.stalls | غرفه‌ها: {used} از {n} پر | Stalls: {used} of {n} taken
+n.eco.total | جمع | Total
+n.eco.used | {item} را مصرف کردی. | You used {item}.
+n.eco.used_title | مصرف شد | Used
+n.eco.uses | دوام | Uses left
+n.eco.worth | ارزش تقریبی | Worth about
+n.soc.election.count_left | تا شمارش آرا | Until the count
+n.soc.election.voting_left | تا شروع رأی‌گیری | Until voting opens

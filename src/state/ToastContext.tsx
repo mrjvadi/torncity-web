@@ -11,6 +11,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Ic } from '../ui/v6/parts'
 import { t } from '../i18n'
+import { haptic } from '../lib/telegram'
 
 export type ToastKind = 'success' | 'info' | 'warning' | 'error'
 
@@ -87,6 +88,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       lastUser.current = { text, at: now }
     } else if (seenBefore(opts.key ?? `${kind}|${text}`)) return
     const id = ++counter.current
+    if (kind !== 'info') haptic(kind)
     setItems((cur) => [...cur.slice(-2), { id, text, kind, command: opts.command, args: opts.args }])
     setTimeout(() => drop(id), kind === 'error' ? 5200 : 3800)
   }, [drop])

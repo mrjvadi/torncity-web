@@ -61,6 +61,28 @@ export function PTile({ icon, title, badge, tone, onClick }: {
   )
 }
 
+/** Something running for the player right now (a shift, a course): a wide card with its 3D icon in a glowing well, the
+ * name, an optional line under it, and the time left large at the end. The first one is lit in the accent. */
+export function PNow({ icon, title, sub, time, tone = 'accent', onClick }: {
+  icon: string
+  title: ReactNode
+  sub?: ReactNode
+  time?: string
+  tone?: 'accent' | 'cyan'
+  onClick: () => void
+}) {
+  return (
+    <button className={`hub-now ${tone}`} onClick={onClick}>
+      <span className="hub-now-ico"><Ic name={icon} /></span>
+      <span className="hub-now-body">
+        <span className="hub-now-title">{title}</span>
+        {sub && <span className="hub-now-sub">{sub}</span>}
+      </span>
+      {time && <b className="hub-now-time">{time}</b>}
+    </button>
+  )
+}
+
 /** The grid of a list of CHOICES (owner 2026-10-03): 2 cards per row on a phone, 3 to 4 on desktop. Children are
  * `PCard`s, or the older rows (`ListRow`, `PRow`, `RowCard`, `Line`) which this grid redraws as cards, so one look
  * serves every screen. Pure data (messages, ledger, history) stays a column of rows and does not use this. */

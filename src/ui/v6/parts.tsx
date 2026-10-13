@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom'
 import { t, type Key } from '../../i18n'
 import { IC, cashCompact, faNum, fa } from './format'
 import type { HudData, EventSlot, WipSlot } from './hooks'
+import { haptic } from '../../lib/telegram'
 
 export function Ic({ name, className, alt = '' }: { name: string; className?: string; alt?: string }) {
   return <img className={className} src={IC(name)} alt={alt} draggable={false} />
@@ -99,7 +100,7 @@ export function HudBar({ hud, name, portrait, onAvatar, onBank, onPurse, childre
 
 export function Slot({ icon, label, time, idle, ev, dot, tip, onClick }: { icon: string; label: string; time?: string; idle?: boolean; ev?: boolean; dot?: boolean; tip?: string; onClick: () => void }) {
   return (
-    <button className={`v6-slot${idle ? ' idle' : ''}${ev ? ' ev' : ''}`} onClick={onClick} data-tip={tip} aria-label={`${label}${time ? ' ' + time : ''}`}>
+    <button className={`v6-slot${idle ? ' idle' : ''}${ev ? ' ev' : ''}`} onClick={() => { haptic('tap'); onClick() }} data-tip={tip} aria-label={`${label}${time ? ' ' + time : ''}`}>
       <span className="v6-round">
         <Ic name={icon} />
         {dot && <i className="v6-dot" />}
@@ -129,12 +130,12 @@ export function EventsColumn({ events, onOpen, desktop, ownRef }: { events: Even
       <div className="v6-evs">
         {events.slice(0, 3).map((e) => <Slot key={e.key} ev icon={e.icon} label={e.label} time={e.time} tip={e.tip} onClick={() => onOpen(e)} />)}
       </div>
-      <button className="v6-fold" aria-expanded={!folded} aria-label={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} data-tip={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} onClick={() => setFolded((f) => !f)}><i /></button>
+      <button className="v6-fold" aria-expanded={!folded} aria-label={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} data-tip={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} onClick={() => { haptic('select'); setFolded((f) => !f) }}><i /><b className="v6-dot">{fa(Math.min(events.length, 3))}</b></button>
     </nav>
   )
 }
 
-// -- quest strip + ticker ------------------------------------------------------------------------------
+// -- quest card + news line ----------------------------------------------------------------------------
 
 export function QuestStrip({ quest, ticker, onQuest, onTicker, ownRef }: { quest: { text: string; prog: string; done: boolean } | null; ticker: string | null; onQuest: () => void; onTicker: () => void; ownRef?: (el: HTMLElement | null) => void }) {
   if (!quest && !ticker) return null
@@ -145,7 +146,7 @@ export function QuestStrip({ quest, ticker, onQuest, onTicker, ownRef }: { quest
           <i className="v6-glow" />
           <span className="v6-medal"><Ic name={quest.done ? 'check' : 'scroll'} /></span>
           <span className="v6-qtext"><b>{quest.text}</b>{quest.prog && <i className="v6-prog">{quest.prog}</i>}</span>
-          <span className="v6-go"><Ic name={quest.done ? 'gift' : 'chev'} /></span>
+          <span className="v6-go">{t(quest.done ? 'v6.quest.claim' : 'v6.quest.go')}</span>
         </button>
       )}
       {ticker && (
@@ -205,7 +206,7 @@ export function PhoneDock({ tabs, active, onSelect, onLong, ownRef }: { tabs: Do
       {tabs.map((tab, i) => {
         const on = tab.key === active
         return (
-          <button key={tab.key} className={`v6-tab dock-tab${i === 2 ? ' mid' : ''}${on ? ' on' : ''}`} onClick={() => { if (press.current?.fired) { press.current = null; return } onSelect(tab.key) }} onPointerDown={i === 2 ? () => down(tab.key) : undefined} onPointerUp={i === 2 ? up : undefined} onPointerLeave={i === 2 ? up : undefined} onPointerCancel={i === 2 ? up : undefined} onContextMenu={i === 2 ? (e) => e.preventDefault() : undefined} aria-current={on ? 'page' : undefined}>
+          <button key={tab.key} className={`v6-tab dock-tab${i === 2 ? ' mid' : ''}${on ? ' on' : ''}`} onClick={() => { if (press.current?.fired) { press.current = null; return } if (!on) haptic('select'); onSelect(tab.key) }} onPointerDown={i === 2 ? () => down(tab.key) : undefined} onPointerUp={i === 2 ? up : undefined} onPointerLeave={i === 2 ? up : undefined} onPointerCancel={i === 2 ? up : undefined} onContextMenu={i === 2 ? (e) => e.preventDefault() : undefined} aria-current={on ? 'page' : undefined}>
             <span className="v6-ico">
               <Ic name={tab.icon} />
               {tab.dot ? (tab.dot > 1 ? <i className="v6-dot n">{tab.dot > 9 ? fa('9+') : fa(tab.dot)}</i> : <i className="v6-dot" />) : null}
@@ -339,7 +340,7 @@ export function ConfirmPopup({ title, rows, note, primary, disabledReason, onPri
         <div className="v6-btns">
           {disabled
             ? <button ref={btn} className="v6-btn dis" aria-disabled="true"><Ic name="lock" /><span>{primary}</span></button>
-            : <button ref={btn} className="v6-btn" onClick={onPrimary}><span>{primary}</span></button>}
+            : <button ref={btn} className="v6-btn" onClick={() => { haptic('tap'); onPrimary() }}><span>{primary}</span></button>}
           <button className="v6-btn sec" onClick={onClose}><span>{secondary ?? t('common.close')}</span></button>
         </div>
         {disabled && <span className="v6-why">{disabledReason}</span>}

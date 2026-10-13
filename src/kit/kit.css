@@ -74,7 +74,7 @@
 .k-slab-red { --k-top: #ff8a8e; --k-bottom: #d8343b; --k-lip-c: #6e1216; --k-text: #fff; }
 .k-slab-blue { --k-top: #6f8cf0; --k-bottom: #2a45b0; --k-lip-c: #101e60; --k-text: #fff; }
 .k-slab-steel { --k-top: #a7afc8; --k-bottom: #4a536e; --k-lip-c: #1e2436; --k-text: #fff; }
-.k-slab-ghost { --k-top: transparent; --k-bottom: transparent; --k-lip-c: transparent; --k-text: var(--gold); box-shadow: none; border: 1px solid var(--gold-soft); background: linear-gradient(180deg, rgba(242,194,85,0.16), rgba(242,194,85,0.05)); }
+.k-slab-ghost { --k-top: transparent; --k-bottom: transparent; --k-lip-c: transparent; --k-text: var(--gold); box-shadow: none; border: 1px solid var(--gold-soft); background: linear-gradient(180deg, rgba(255, 157, 77,0.16), rgba(255, 157, 77,0.05)); }
 .k-slab-ghost:active { box-shadow: none; }
 
 /* -- Plate: a round (or rounded-square) rimmed plate an icon sits on

@@ -7,10 +7,10 @@
 .bk-amount { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 16px; background: rgba(2,3,8,0.7); border: 1.5px solid var(--gold-soft); }
 .bk-amount:focus-within { border-color: var(--gold); }
 .bk-input { flex: 1; min-width: 0; width: 100%; background: none; border: 0; outline: 0; font-size: 26px; color: var(--gold); text-align: end; }
-.bk-input::placeholder { color: rgba(242,194,85,0.35); }
+.bk-input::placeholder { color: rgba(255, 157, 77,0.35); }
 .bk-amount.over { border-color: var(--anar); }
 .bk-amount.over .bk-input { color: #ff9a9e; }
-.bk-amount-unit { flex: none; font-size: 14px; color: var(--text-dim); padding-inline-start: 12px; border-inline-start: 2px solid rgba(242,194,85,0.55); }
+.bk-amount-unit { flex: none; font-size: 14px; color: var(--text-dim); padding-inline-start: 12px; border-inline-start: 2px solid rgba(255, 157, 77,0.55); }
 .bk-hint { text-align: center; font-size: 12px; color: var(--text-dim); margin-top: -4px; }
 .bk-quick { display: flex; gap: 8px; }
 /* quick amounts: small and quiet */

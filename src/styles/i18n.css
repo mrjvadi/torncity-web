@@ -26,5 +26,5 @@ html[lang='en'] body { font-family: 'Vazirmatn', system-ui, -apple-system, 'Sego
   padding: 10px 12px; border-radius: 14px; font-size: 15px;
   background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.12); color: var(--text-dim);
 }
-.lang-opt.active { border-color: var(--gold); color: #fff; background: linear-gradient(180deg, rgba(242,194,85,0.22), rgba(242,194,85,0.06)); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.18); }
+.lang-opt.active { border-color: var(--gold); color: #fff; background: linear-gradient(180deg, rgba(255, 157, 77,0.22), rgba(255, 157, 77,0.06)); box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.18); }
 .lang-opt .lang-name { font-family: 'Vazirmatn', sans-serif; font-weight: 700; }

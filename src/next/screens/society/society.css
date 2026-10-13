@@ -1,0 +1,102 @@
+/* جامعه (society) screens of the new UI: messages, friends, elections, factions, the city's government.
+   Only what the shared parts (next.css) do not draw; every class `n-soc-`. */
+
+/* ---------- hero text ---------- */
+.n-soc-hero-title { margin-top: 6px; font: 900 20px/1.35 var(--font); color: #fff; overflow-wrap: anywhere; }
+.n-soc-time { margin-top: 2px; font: 900 26px/1.25 var(--font); color: var(--accent-hi); font-variant-numeric: tabular-nums; }
+.n-soc-lead { font: 800 16px/1.75 var(--font); color: #fff; }
+.n-soc-lead.ok { color: var(--ok-hi); }
+.n-soc-lead.bad { color: var(--bad-hi); }
+.n-soc-line { margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.n-soc-meter { margin-top: 14px; }
+.n-soc-steps { margin-top: 16px; }
+.n-soc-val { color: var(--accent-hi); font-weight: 900; }
+.n-soc-center { text-align: center; }
+.n-soc-stack { display: flex; flex-direction: column; gap: 10px; }
+.n-soc-block { display: flex; flex-direction: column; gap: 10px; }
+.n-soc-sub { margin-top: 4px; font: 800 13px/1.4 var(--font); color: var(--mut); }
+
+/* an answer's hero: tall enough for its 3D art */
+.n-soc-out { min-height: 84px; display: flex; flex-direction: column; justify-content: center; }
+
+/* ---------- a person or a faction, big ---------- */
+.n-soc-who { display: flex; align-items: center; gap: 14px; }
+.n-soc-who > div { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.n-soc-who .n-big, .n-soc-who .n-soc-hero-title { margin-top: 0; overflow-wrap: anywhere; }
+.n-soc-bigav { flex: none; width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; font: 900 28px/1 var(--font); color: #fff;
+  box-shadow: 0 0 0 3px #ffffff1f, 0 10px 22px #0008; }
+.n-soc-av { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 900 15px/1 var(--font); color: #fff; }
+.n-soc-crest { flex: none; width: 46px; height: 52px; display: grid; place-items: center; font: 900 20px/1 var(--font); color: #fff;
+  clip-path: polygon(50% 0, 100% 14%, 100% 58%, 50% 100%, 0 58%, 0 14%);
+  background: linear-gradient(160deg, hsl(var(--h) 60% 52%), hsl(var(--h) 55% 30%)); text-shadow: 0 2px 4px #0007; }
+.n-soc-crest.big { width: 68px; height: 78px; font-size: 30px; filter: drop-shadow(0 8px 14px #0009); }
+
+/* a row of small faces (a crew, the office holders) */
+.n-soc-faces { margin-top: 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
+.n-soc-face { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 900 13px/1 var(--font); color: #fff; box-shadow: 0 0 0 2px var(--card); }
+.n-soc-face + .n-soc-face { margin-inline-start: -8px; }
+.n-soc-faces .n-label { margin-inline-start: 10px; }
+
+/* ---------- search ---------- */
+.n-soc-search { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 8px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+.n-soc-search .n-input { flex: 1; min-width: 0; min-height: 44px; border: 0; background: transparent; padding: 0 4px; }
+.n-soc-search .n-input:focus { box-shadow: none; }
+.n-soc-search:focus-within { border-color: var(--accent); }
+.n-soc-search-ic { width: 30px; height: 30px; margin-inline-start: 4px; }
+
+/* a round icon button at a row's end */
+.n-app .n-soc-round, .n-layer .n-soc-round { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--card-hi); border: 1px solid #ffffff1f;
+  font: 900 20px/1 var(--font); color: #fff; }
+.n-soc-round .n-ic { width: 26px; height: 26px; }
+.n-soc-round:active { transform: scale(.95); }
+.n-soc-round:disabled { opacity: .35; cursor: default; }
+
+/* a row with its answer buttons under it (a friend request, a faction request, an appointee) */
+.n-soc-ask { display: flex; flex-direction: column; gap: 8px; padding: 4px 4px 10px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+.n-soc-ask > .n-row { padding-inline: 10px; }
+.n-soc-ask > .n-btn, .n-soc-ask > .n-btns { margin: 0 10px; }
+.n-soc-ask > .n-btn { align-self: stretch; }
+
+/* ---------- messages ---------- */
+.n-soc-msg { align-items: flex-start; padding-block: 12px; }
+.n-soc-msg .n-row-body .n-row-title { font-weight: 600; color: var(--mut); }
+.n-soc-msg.fresh .n-row-body .n-row-title { font-weight: 800; color: #fff; }
+.n-app .n-soc-msg.fresh { background: linear-gradient(90deg, #ff8a3d0f, transparent 60%); }
+[dir="rtl"] .n-app .n-soc-msg.fresh { background: linear-gradient(270deg, #ff8a3d0f, transparent 60%); }
+.n-row-title.n-soc-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.n-soc-dot { flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: transparent; }
+.n-soc-dot[data-on] { background: var(--accent); box-shadow: 0 0 8px #ff8a3d; }
+.n-soc-letter { display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 18px; background: var(--well); border: 1px solid #ffffff0f; }
+.n-soc-letter-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.n-soc-letter-head .n-label { flex: 1; min-width: 0; }
+
+/* ---------- elections ---------- */
+.n-soc-cand { min-height: 68px; }
+.n-soc-cand .n-meter-head { margin: 6px 0 4px; }
+.n-soc-cand.on { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent), 0 0 18px #ff6b1a33; }
+.n-soc-cand.won { border-color: #ff8a3d66 !important; }
+.n-soc-radio { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ffffff40; display: grid; place-items: center; }
+.n-soc-radio[data-on] { border-color: var(--accent); }
+.n-soc-radio[data-on]::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px #ff8a3d; }
+
+/* ---------- government ---------- */
+.n-soc-steppers { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; }
+.n-app .n-soc-step { min-height: 46px; border-radius: 14px; background: #4cd07d1f; box-shadow: inset 0 0 0 1px #4cd07d59; color: var(--ok-hi); font: 900 14px/1 var(--font); }
+.n-app .n-soc-step.down { background: #ff5f561a; box-shadow: inset 0 0 0 1px #ff5f5659; color: var(--bad-hi); }
+.n-soc-step:active { transform: scale(.97); }
+.n-soc-choices { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.n-soc-change { margin-top: 14px; display: flex; align-items: stretch; gap: 10px; }
+.n-soc-change > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 14px; background: var(--well); border: 1px solid #ffffff0f; }
+.n-soc-change small { font: 500 12px/1.4 var(--font); color: var(--mut); }
+.n-soc-change b { font: 900 16px/1.4 var(--font); color: #fff; overflow-wrap: anywhere; }
+.n-soc-change > span.new { border-color: #ff8a3d66; background: #ff8a3d14; }
+.n-soc-change > span.new b { color: var(--accent-hi); }
+.n-soc-arrow { width: 28px; height: 28px; align-self: center; }
+[dir="ltr"] .n-soc-arrow { transform: scaleX(-1); }
+.n-soc-diff { display: block; margin-bottom: 2px; font: 800 13.5px/1.5 var(--font); color: #fff; }
+.n-soc-diff s { color: var(--faint); font-weight: 600; }
+.n-soc-alloc { display: flex; align-items: center; gap: 10px; padding: 10px; }
+.n-soc-alloc-mid { flex: 1; min-width: 0; }
+
+/* ---------- factions ---------- */
+.n-soc-plan-head { display: flex; align-items: center; gap: 12px; }
