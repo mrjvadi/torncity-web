@@ -641,6 +641,13 @@ inbox.cat.property | ملک | Property
 inbox.cat.trade | بازار | Market
 # -- hubs ---------------------------------------------------------------------
 hub.activity | فعالیت | Activity
+hub.now | در جریان | In progress
+hub.choose | چه کار کنم؟ | What to do
+hub.sections | بخش‌ها | Sections
+hub.wallet.cash | نقد همراه | Cash on hand
+hub.wallet.pay | پرداخت به کسی | Pay someone
+profile.copy | کپی | Copy
+profile.copied | کد بازیکن کپی شد | Player code copied
 hub.economy | اقتصاد | Economy
 hub.society | جامعه | Society
 hub.crime | جرم | Crime
@@ -4720,6 +4727,8 @@ v6.tip.build | ساخت من: {t} مانده | My building: {t} left
 v6.tip.build_idle | چیزی در حال ساخت نیست. بزن تا بسازی. | Nothing is being built. Tap to build.
 v6.tip.research | پژوهش: {t} دیگر | Research: {t} left
 v6.tip.quest | برو و انجامش بده | Go and do it
+v6.quest.go | برو | Go
+v6.quest.claim | دریافت | Claim
 v6.tip.ticker | آخرین پیام | Latest message
 v6.ring.info | اطلاعات | Info
 v6.ring.up | ارتقا | Upgrade

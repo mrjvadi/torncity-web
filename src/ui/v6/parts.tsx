@@ -130,12 +130,12 @@ export function EventsColumn({ events, onOpen, desktop, ownRef }: { events: Even
       <div className="v6-evs">
         {events.slice(0, 3).map((e) => <Slot key={e.key} ev icon={e.icon} label={e.label} time={e.time} tip={e.tip} onClick={() => onOpen(e)} />)}
       </div>
-      <button className="v6-fold" aria-expanded={!folded} aria-label={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} data-tip={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} onClick={() => setFolded((f) => !f)}><i /></button>
+      <button className="v6-fold" aria-expanded={!folded} aria-label={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} data-tip={t(folded ? 'v6.events.unfold' : 'v6.events.fold')} onClick={() => { haptic('select'); setFolded((f) => !f) }}><i /><b className="v6-dot">{fa(Math.min(events.length, 3))}</b></button>
     </nav>
   )
 }
 
-// -- quest strip + ticker ------------------------------------------------------------------------------
+// -- quest card + news line ----------------------------------------------------------------------------
 
 export function QuestStrip({ quest, ticker, onQuest, onTicker, ownRef }: { quest: { text: string; prog: string; done: boolean } | null; ticker: string | null; onQuest: () => void; onTicker: () => void; ownRef?: (el: HTMLElement | null) => void }) {
   if (!quest && !ticker) return null
@@ -146,7 +146,7 @@ export function QuestStrip({ quest, ticker, onQuest, onTicker, ownRef }: { quest
           <i className="v6-glow" />
           <span className="v6-medal"><Ic name={quest.done ? 'check' : 'scroll'} /></span>
           <span className="v6-qtext"><b>{quest.text}</b>{quest.prog && <i className="v6-prog">{quest.prog}</i>}</span>
-          <span className="v6-go"><Ic name={quest.done ? 'gift' : 'chev'} /></span>
+          <span className="v6-go">{t(quest.done ? 'v6.quest.claim' : 'v6.quest.go')}</span>
         </button>
       )}
       {ticker && (

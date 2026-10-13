@@ -52,6 +52,9 @@ const AMBER: Record<string, string> = {
   heart: 'health', health: 'health', bolt: 'energy', nerve: 'nerve', coin: 'coins', gem: 'diamond',
   scroll: 'missions', book: 'study', school: 'study', hammer: 'factory', ballot: 'vote', bank: 'bank', chest: 'x_chest',
   trophy: 'trophy', crime: 'crime', chat: 'm_chat', gift: 'x_present', globe: 'world', lock: 'm_lock', check: 'm_check',
+  // names that exist only in the 3D set (the hub entries)
+  muscle: 'x_muscle', backpack: 'm_backpack', market: 'market', box: 'box', crate: 'box', factory: 'factory', chart: 'chart',
+  inbox: 'inbox', flag: 'x_flag', gavel: 'gavel', swords: 'swords', ingot: 'x_goldbar', road: 'x_map',
 }
 
 export const IC = (name: string): string => AMBER[name]

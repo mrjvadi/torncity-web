@@ -22,6 +22,7 @@ import { CardGrid, PBar, PBtn, PRow, PSec, PTile, PWhy } from '../../ui/v6/panel
 import { t } from '../../i18n'
 import { locationOf } from '../../support/location'
 import { useSession } from '../../state/SessionContext'
+import { useToast } from '../../state/ToastContext'
 import { useEntity } from '../../state/useSync'
 import './profile.css'
 
@@ -92,6 +93,7 @@ export default function Profile({ response, loading, run }: ScreenProps) {
   // state sync: the money, the vitals, the level and where the player is are
   // the store's (live, no refresh); the rest is the command's view
   const { profile: live, synced, bootstrap } = useSession()
+  const toast = useToast()
   const loc = useEntity('location', synced ? 'self' : undefined)
   const v: ProfileView = synced && live ? {
     ...own, name: live.name || own.name, level: live.level, xp: live.xp, next_level_xp: live.next_level_xp,
@@ -135,7 +137,12 @@ export default function Profile({ response, loading, run }: ScreenProps) {
             <span>{formatNumber(v.xp ?? 0)} / {formatNumber(v.next_level_xp ?? 0)}</span>
           </div>
         </div>
-        {v.code && <div className="pf2-code"><span>{t('profile.code')}</span><b dir="ltr" data-latin>{v.code}</b></div>}
+        {v.code && (
+          <div className="pf2-code">
+            <span>{t('profile.code')}</span><b dir="ltr" data-latin>{v.code}</b>
+            <button className="pf2-copy" onClick={() => { void navigator.clipboard?.writeText(v.code ?? '').then(() => toast.push(t('profile.copied'), { kind: 'success', user: true })).catch(() => undefined) }}>{t('profile.copy')}</button>
+          </div>
+        )}
       </section>
 
       {v.jail && <PWhy title={t('dashboard.jail', { city: city(v.jail.city_code, v.jail.city), t: hms(v.jail.remaining_seconds) })} />}
