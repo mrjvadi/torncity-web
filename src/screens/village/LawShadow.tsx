@@ -51,7 +51,8 @@ function Bribe({ b, ctx }: { b: LawBribeLine; ctx: FlowCtx }) {
       <div className="mn-head"><b>{b.mine ? t('lw.bribe_mine') : t('lw.bribe_to_me')}</b><EffectChip tone={tone}>{word(`lw.bstatus.${b.status}`) || t('lw.other')}</EffectChip></div>
       <div className="vf-list">
         <div className="vf-line"><span>{t('lw.bribe_rung')}</span><b>{rungWord(b.rung)}</b></div>
-        <div className="vf-line"><span>{t('lw.bribe_amount')}</span><b>{money(b.amount)}{b.dirty ? ` (${t('lw.dirty_money')})` : ''}</b></div>
+        <div className="vf-line"><span>{t('lw.bribe_amount')}</span><b>{money(b.amount)}</b></div>
+        {b.dirty && <div className="vf-line"><span>{t('lw.pay_from')}</span><b>{t('lw.dirty_money')}</b></div>}
         <div className="vf-line"><span>{t('lw.bribe_effect')}</span><b>{formatNumber(Math.round(b.effect_bps / 100))}٪</b></div>
         {b.term_end && <div className="vf-line"><span>{t('lw.bribe_term')}</span><b>{atText(b.term_end)}</b></div>}
       </div>
@@ -282,7 +283,7 @@ function Gang({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
         <div className="mn-head"><b>{t('lw.gang_state')}</b><EffectChip tone={g.declared ? 'warn' : g.marked ? 'info' : 'neutral'}>{g.declared ? t('lw.gang_open') : g.marked ? t('lw.gang_hidden') : t('lw.gang_none')}</EffectChip></div>
         {g.marked && (
           <>
-            <div className="vf-line"><span>{t('lw.heat')}</span><b>{formatNumber(g.heat)} / {formatNumber(g.max)}</b></div>
+            <div className="vf-line"><span>{t('lw.heat')}</span><b>{t('lw.heat_n', { a: formatNumber(g.heat), b: formatNumber(g.max) })}</b></div>
             <Meter value={g.heat} max={Math.max(1, g.max)} bad={g.heat >= g.max * 0.7} />
             <Hint>{t('lw.heat_hint')}</Hint>
           </>

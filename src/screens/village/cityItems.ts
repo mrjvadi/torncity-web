@@ -47,7 +47,7 @@ export const CITY_ITEMS: CityItem[] = [
   { key: 'mining', group: 'land', label: 'city.mining', command: 'settlement.mining', icon: 'tool', resident: true },
   { key: 'haul', group: 'land', label: 'city.haul', command: 'settlement.haul', icon: 'road', resident: true },
   { key: 'rail', group: 'land', label: 'city.rail', command: 'settlement.rail', icon: 'road', resident: true },
-  { key: 'chain', group: 'land', label: 'city.chain', command: 'settlement.chain', icon: 'gears', resident: true },
+  { key: 'chain', group: 'land', label: 'city.chain', command: 'settlement.chain', icon: 'tool', resident: true },
   { key: 'projects', group: 'land', label: 'city.projects', command: 'settlement.project', icon: 'hammer', resident: true },
   // the town's money and goods: the purse, the store, rights, tenders, loans, insurance
   { key: 'treasury', group: 'economy', label: 'city.treasury', local: 'village_overview', icon: 'coin' },

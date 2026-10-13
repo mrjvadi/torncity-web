@@ -8560,7 +8560,7 @@ lw.bribe_pct | چقدر سبک‌تر | How much lighter
 lw.bribe_pct_hint | اگر ننویسی همان حدِ معمول می‌ماند. | If you leave it empty the usual level stays.
 lw.pay_from | از کجا بدهم | Pay from
 lw.pay_clean | از پولِ خودم | My own money
-lw.pay_dirty | از پول سیاه ({n}) | From black money ({n})
+lw.pay_dirty | از پول سیاه، {n} | From black money, {n}
 lw.bribe_risk | اگر این پیشنهاد لو برود، پولش مصادره می‌شود و تو پرونده می‌شوی. | If this offer is found out, its money is forfeited and a case opens against you.
 lw.bribe_need | کد و مبلغ را بنویس. | Write a code and an amount.
 lw.bribe_go | پیشنهاد را بفرست | Send the offer
@@ -8672,6 +8672,7 @@ lw.gang_none | گروهِ پنهانی نیست | Not a hidden group
 lw.gang_hidden | پنهان | Hidden
 lw.gang_open | اعلام‌شده | Declared
 lw.heat | داغی | Heat
+lw.heat_n | {a} از {b} | {a} of {b}
 lw.heat_hint | هرچه داغی بالاتر باشد، پلیس راحت‌تر گروه را پیدا می‌کند. | The higher the heat, the easier it is for the police to find the group.
 lw.gang_not_leader | ثبت و اعلام فقط با سرپرست گروه است. | Only the group's leader can register or declare it.
 lw.gang_mark | گروه را ثبت کن | Register the group

@@ -119,7 +119,7 @@ function PostCard({ p, ctx }: { p: LawPostLine; ctx: FlowCtx }) {
   return (
     <div className="mn-card">
       <div className="mn-head"><b>{name}</b><EffectChip tone={!p.stands ? 'neutral' : p.open ? 'good' : 'warn'}>{!p.stands ? t('lw.post_none') : p.open ? t('lw.post_open') : t('lw.post_idle')}</EffectChip></div>
-      <div className="mn-sub">{serviceWord(p.service)}</div>
+      {name !== serviceWord(p.service) && <div className="mn-sub">{serviceWord(p.service)}</div>}
       {!p.stands && <Hint>{word(`lw.post_build.${p.service}`)}</Hint>}
       {p.stands && !p.open && <Hint>{t('lw.post_idle_hint')}</Hint>}
       {p.stands && p.service === 'custody' && <div className="vf-line"><span>{t('lw.cells')}</span><b>{t('lw.cells_n', { held: formatNumber(p.held), n: formatNumber(p.cells) })}</b></div>}
