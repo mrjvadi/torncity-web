@@ -21,7 +21,7 @@
   background: linear-gradient(180deg, #4a3d8f, #1c1650); border: 2px solid var(--gold);
 }
 .pf-xp { display: flex; align-items: center; gap: 8px; }
-.pf-xp-bar { position: relative; flex: 1; height: 24px; border-radius: 12px; background: rgba(2,3,8,0.85); border: 2px solid var(--firouzeh); box-shadow: 0 0 0 1.5px rgba(242,194,85,0.5); overflow: hidden; }
+.pf-xp-bar { position: relative; flex: 1; height: 24px; border-radius: 12px; background: rgba(2,3,8,0.85); border: 2px solid var(--firouzeh); box-shadow: 0 0 0 1.5px rgba(255, 157, 77,0.5); overflow: hidden; }
 .pf-xp-fill { position: absolute; inset-block: 0; inset-inline-start: 0; background: linear-gradient(180deg, #7ff0e2, var(--firouzeh)); transition: width 0.4s; }
 .pf-xp-label { position: relative; z-index: 1; display: block; text-align: center; line-height: 20px; font-size: 13px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.7); }
 .pf-code { margin-top: 12px; display: flex; justify-content: center; gap: 8px; align-items: baseline; padding: 7px 12px; border-radius: 14px; background: rgba(0,0,0,0.3); border: 1.5px solid rgba(53,82,200,0.6); font-size: 12.5px; color: var(--text-dim); }
@@ -33,7 +33,7 @@
 .pf-card .lang-switch { margin-top: 10px; }
 .pf-card .lang-opt { padding: 7px 10px; font-size: 13px; }
 
-.pf-sec { font-size: 18px; color: #fff; margin: 10px 2px 0; padding-bottom: 5px; border-bottom: 1.5px solid rgba(242,194,85,0.35); text-align: start; }
+.pf-sec { font-size: 18px; color: #fff; margin: 10px 2px 0; padding-bottom: 5px; border-bottom: 1.5px solid rgba(255, 157, 77,0.35); text-align: start; }
 .pf-sec-link { width: 100%; display: block; }
 .pf-needs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
 .pf-need { display: flex; align-items: center; gap: 8px; min-width: 0; }

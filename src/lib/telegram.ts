@@ -19,6 +19,11 @@ interface TelegramWebApp {
   lockOrientation?(): void
   isFullscreen?: boolean
   BackButton?: { show(): void; hide(): void; onClick(cb: () => void): void; offClick(cb: () => void): void }
+  HapticFeedback?: {
+    impactOccurred(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'): void
+    notificationOccurred(type: 'error' | 'success' | 'warning'): void
+    selectionChanged(): void
+  }
 }
 
 declare global {
@@ -29,6 +34,20 @@ declare global {
 
 export function getTelegramWebApp(): TelegramWebApp | null {
   return window.Telegram?.WebApp ?? null
+}
+
+/** A short vibration through Telegram (Bot API 6.1+): `select` for a tab or a choice, `tap` for a button, `success` /
+ * `warning` / `error` for the outcome of an action. Outside Telegram, or with touch feedback off, nothing happens. */
+export function haptic(kind: 'select' | 'tap' | 'success' | 'warning' | 'error'): void {
+  const hf = getTelegramWebApp()?.HapticFeedback
+  if (!hf) return
+  try {
+    if (kind === 'select') hf.selectionChanged()
+    else if (kind === 'tap') hf.impactOccurred('light')
+    else hf.notificationOccurred(kind)
+  } catch {
+    // best effort
+  }
 }
 
 export function initTelegram(): void {
@@ -45,8 +64,8 @@ export function initTelegram(): void {
       wa.lockOrientation?.()
     }
     wa.disableVerticalSwipes?.()
-    wa.setHeaderColor?.('#080b16')
-    wa.setBackgroundColor?.('#080b16')
+    wa.setHeaderColor?.('#13171d')
+    wa.setBackgroundColor?.('#13171d')
   } catch {
     // best effort — the app works without it
   }

@@ -45,4 +45,15 @@ export function waitText(totalSeconds: number, dayWord: string): string {
   return clock(s)
 }
 
-export const IC = (name: string): string => `${import.meta.env.BASE_URL}ui-v6/icons/${name}.png`
+/** The shell's icons that have a twin in the game's amber 3D set (public/icons3d/amber) are drawn from it; the plain
+ * glyphs (chevron, close, plus, info, warn...) and the raw materials keep their flat v6 picture. */
+const AMBER: Record<string, string> = {
+  user: 'person', person: 'person', tool: 'work', house: 'house', bag: 'market', banner: 'society', people: 'society', group: 'society',
+  heart: 'health', health: 'health', bolt: 'energy', nerve: 'nerve', coin: 'coins', gem: 'diamond',
+  scroll: 'missions', book: 'study', school: 'study', hammer: 'factory', ballot: 'vote', bank: 'bank', chest: 'x_chest',
+  trophy: 'trophy', crime: 'crime', chat: 'm_chat', gift: 'x_present', globe: 'world', lock: 'm_lock', check: 'm_check',
+}
+
+export const IC = (name: string): string => AMBER[name]
+  ? `${import.meta.env.BASE_URL}icons3d/amber/${AMBER[name]}.webp`
+  : `${import.meta.env.BASE_URL}ui-v6/icons/${name}.png`
