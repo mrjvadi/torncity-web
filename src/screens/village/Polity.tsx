@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import Popup, { ActionButton } from '../../ui/Popup'
 import { Hint, Lead, Panel } from './flow'
 import { formatNumber } from '../native/kit/format'
-import { toWesternDigits } from '../../lib/persian'
+import { inputDigits, toWesternDigits } from '../../lib/persian'
 import { hasKey, t, type Key } from '../../i18n'
 
 /** A word for a code, or the fallback when the code is an authored name; a bare code is never shown. */
@@ -26,7 +26,7 @@ export function NumField({ label, value, onChange, hint, suffix }: { label: stri
   return (
     <label className="tc-f">
       <span>{label}</span>
-      <input className="fx-field-input" dir="ltr" inputMode="numeric" value={value} onChange={(e) => onChange(digits(e.target.value))} aria-label={label} />
+      <input className="fx-field-input" dir="ltr" inputMode="numeric" value={inputDigits(value)} onChange={(e) => onChange(digits(e.target.value))} aria-label={label} />
       {(hint || suffix) && <small className="pu-hint">{hint}{suffix ? ` ${suffix}` : ''}</small>}
     </label>
   )

@@ -32,6 +32,11 @@ export function formatNumber(n: number): string {
   return isRtl() ? s.replace(/,/g, '٬').replace(/\d/g, (d) => FA_DIGITS[+d]) : s
 }
 
+/** Plain digits for display in a number field: Persian digits in the Persian UI, no separators. */
+export function inputDigits(raw: string): string {
+  return isRtl() ? raw.replace(/\d/g, (d) => FA_DIGITS[+d]) : raw
+}
+
 /**
  * Pull an 8-character link code out of arbitrary pasted text: strip bidi
  * control marks, normalise Persian digits, uppercase, and take the first

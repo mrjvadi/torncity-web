@@ -12,20 +12,7 @@ import { word } from './Polity'
 import { t } from '../../i18n'
 import { formatNumber } from '../native/kit/format'
 
-/** Server fields that the contract may still grow (see the server asks of the B14 web report); read when present, never required. */
-export interface LawExt {
-  /** the gang of the viewer's group, only for a member who may know (hidden otherwise) */
-  gang?: { leader: boolean; marked: boolean; declared: boolean; heat: number; max: number } | null
-  /** what the viewer carries, for a declared load and a listing */
-  goods?: { item: Named; have: number }[] | null
-  /** towns a load may be declared to */
-  towns?: Named[] | null
-  /** the viewer's companies (a front, a batch) */
-  companies?: Named[] | null
-  /** brokers of the hidden board the viewer may use */
-  brokers?: Named[] | null
-}
-export type LawV = LawView & LawExt
+export type LawV = LawView
 
 export const act = (ctx: FlowCtx, action: string, args: Record<string, string> = {}) => sendCmd(ctx, 'settlement.law', { action, ...args })
 
@@ -70,46 +57,58 @@ export function NotYet({ text, hint }: { text: string; hint?: ReactNode }) {
 /** A manifest «bread:2,coffee:1» from the typed rows (only the ones above zero). */
 export const manifest = (rows: Record<string, string>) => Object.entries(rows).filter(([, n]) => Number(n) > 0).map(([k, n]) => `${k}:${Number(n)}`).join(',')
 
-/** A manifest of the server (a map of good to count) as «۲ نان، ۱ قهوه»; a name comes from the server's own list of goods, else the catalogue. */
+/** A manifest of the server (a map of good to count) as «۲ نان، ۱ قهوه»; names by code through our own wording. */
 export const manifestText = (ctx: FlowCtx, m: Record<string, number> | null | undefined, known: Named[] = []) =>
-  Object.entries(m ?? {}).map(([k, n]) => {
-    const own = known.find((x) => x.code === k)?.name
-    const cat = ctx.names.name(['component', 'item'], k, '')
-    return `${formatNumber(n)} ${own || (cat && cat !== k ? cat : t('lw.other'))}`
-  }).join('، ')
+  Object.entries(m ?? {}).map(([k, n]) => `${formatNumber(n)} ${goodName(ctx, known.find((x) => x.code === k) ?? { code: k, name: '' })}`).join('، ')
 
-/** The complaint popup: an offence the town lists and the other person's code. */
+/** The name of a good: our own wording by its code, else the server's name; never the bare code. */
+export const goodName = (ctx: FlowCtx, n: Named) => {
+  const cat = ctx.names.name(['component', 'item'], n.code, '')
+  return (cat && cat !== n.code ? cat : '') || (n.name && n.name !== n.code ? n.name : '') || t('lw.other')
+}
+
+/** A pick list of people (or any named things): chips when there are few, a search box and a scrolling list when many. */
+export function PickName({ label, items, value, onChange, sub, empty }: { label: string; items: Named[]; value: string; onChange: (code: string) => void; sub?: (n: Named) => string | undefined; empty: string }) {
+  const [q, setQ] = useState('')
+  if (items.length === 0) return <Hint>{empty}</Hint>
+  const many = items.length > 8
+  const shown = many && q.trim() ? items.filter((x) => x.name.includes(q.trim())) : items
+  return (
+    <div className="tc-f"><span>{label}</span>
+      {many && <input className="fx-field-input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('lw.pick_search')} aria-label={t('lw.pick_search')} />}
+      <div className={many ? 'lw-pick' : 'rc-chips'} role="radiogroup" aria-label={label}>
+        {shown.map((x) => <button key={x.code} type="button" role="radio" aria-checked={value === x.code} className={`dk-chip${value === x.code ? ' all' : ''}`} onClick={() => onChange(x.code)}>{x.name || t('lw.unknown_person')}{sub?.(x) ? ` – ${sub(x)}` : ''}</button>)}
+        {shown.length === 0 && <small className="pu-hint">{t('lw.pick_nomatch')}</small>}
+      </div>
+    </div>
+  )
+}
+
+/** The complaint popup: an offence the town lists and a resident picked by name. */
 export function Complain({ v, ctx, offence, onClose }: { v: LawV; ctx: FlowCtx; offence?: string; onClose: () => void }) {
   const listed = (v.offences ?? []).filter((o) => o.listed)
+  const people = v.people ?? []
   const [code, setCode] = useState(offence ?? listed[0]?.code ?? '')
   const [player, setPlayer] = useState('')
-  const ok = !!code && player.trim().length > 0
+  const ok = !!code && !!player
   return (
     <Popup open onClose={onClose} tone="gold" title={t('lw.complain_title')}
-      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lw.complain_need')} onClick={() => { onClose(); act(ctx, 'complain', { code, player: player.trim() }) }}>{t('lw.complain_go')}</ActionButton>}>
+      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lw.complain_need')} onClick={() => { onClose(); act(ctx, 'complain', { code, player }) }}>{t('lw.complain_go')}</ActionButton>}>
       <Choice label={t('lw.offence')} value={code} onChange={setCode} options={listed.map((o) => ({ key: o.code, text: o.name }))} />
-      <label className="tc-f"><span>{t('lw.player')}</span>
-        <input className="fx-field-input" dir="ltr" value={player} onChange={(e) => setPlayer(e.target.value)} aria-label={t('lw.player')} />
-        <small className="pu-hint">{t('lw.player_hint')}</small>
-      </label>
+      <PickName label={t('lw.player')} items={people} value={player} onChange={setPlayer} empty={t('lw.pick_none')} />
       <Hint>{t('lw.complain_hint')}</Hint>
     </Popup>
   )
 }
 
-
-/** A popup that asks for one player's code. */
-export function PlayerForm({ title, hint, go, ctx, onClose, onGo, tone = 'gold' }: { title: string; hint: string; go: string; ctx: FlowCtx; onClose: () => void; onGo: (player: string) => void; tone?: 'gold' | 'red' }) {
+/** A popup that asks for one person, picked from a list of names. */
+export function PlayerForm({ title, hint, go, ctx, onClose, onGo, items, empty, tone = 'gold' }: { title: string; hint: string; go: string; ctx: FlowCtx; onClose: () => void; onGo: (player: string) => void; items: Named[]; empty?: string; tone?: 'gold' | 'red' }) {
   const [player, setPlayer] = useState('')
   return (
     <Popup open onClose={onClose} tone={tone} title={title}
-      footer={<ActionButton tone={tone} disabled={ctx.busy || !player.trim()} reason={player.trim() ? undefined : t('lw.player_need')} onClick={() => { onClose(); onGo(player.trim()) }}>{go}</ActionButton>}>
-      <label className="tc-f"><span>{t('lw.player')}</span>
-        <input className="fx-field-input" dir="ltr" value={player} onChange={(e) => setPlayer(e.target.value)} aria-label={t('lw.player')} />
-        <small className="pu-hint">{t('lw.player_hint')}</small>
-      </label>
+      footer={<ActionButton tone={tone} disabled={ctx.busy || !player} reason={player ? undefined : (items.length === 0 ? (empty ?? t('lw.pick_none')) : t('lw.player_need'))} onClick={() => { onClose(); onGo(player) }}>{go}</ActionButton>}>
+      <PickName label={t('lw.player')} items={items} value={player} onChange={setPlayer} empty={empty ?? t('lw.pick_none')} />
       <Hint>{hint}</Hint>
     </Popup>
   )
 }
-

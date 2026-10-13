@@ -4,7 +4,7 @@
 // server, words ours. Calm game wording: names, limits, risks and consequences; nothing here tells anyone how to do anything.
 
 import { useEffect, useState } from 'react'
-import type { LawBribeLine, LawLoadLine, LawOffenceLine, LawPostLine, LawSentenceLine } from '../../api/views.gen'
+import type { Named, LawBribeLine, LawLoadLine, LawOffenceLine, LawPostLine, LawSentenceLine } from '../../api/views.gen'
 import { Hint, Lead, Page, Panel, flow, registerWrites, type FlowCtx } from './flow'
 import { SectionTitle } from '../native/kit/Parts'
 import { ActionButton, EffectChip, Note } from '../../ui/Popup'
@@ -14,7 +14,7 @@ import { formatNumber, money } from '../native/kit/format'
 import { Ask, Choice, Closed, NoticeStrip, NumField, word } from './Polity'
 import { Cases } from './LawCases'
 import { Shadow } from './LawShadow'
-import { Complain, Meter, NotYet, PlayerForm, Tabs, act, banWord, classWord, daysText, hoursText, manifest, manifestText, sentenceStatusWord, sentenceWord, serviceWord, type LawV } from './lawShared'
+import { Complain, Meter, NotYet, PickName, PlayerForm, Tabs, goodName, act, banWord, classWord, daysText, hoursText, manifest, manifestText, sentenceStatusWord, sentenceWord, serviceWord, type LawV } from './lawShared'
 import { t } from '../../i18n'
 
 registerWrites(['settlement.law'], () => true)
@@ -152,7 +152,7 @@ function Posts({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
           <Panel>
             <Hint>{t('lw.informants_hint')}</Hint>
             {informants.length === 0 && <Lead>{t('lw.informants_none')}</Lead>}
-            <div className="mn-list">{informants.map((i) => <Informant key={i.id} i={i} ctx={ctx} may={v.mays.informants} />)}</div>
+            <div className="mn-list">{informants.map((i) => <Informant key={i.id} i={i} ctx={ctx} may={v.mays.informants} people={v.people ?? []} />)}</div>
             {v.mays.informants && <div className="wk-btns"><ActionButton tone="gold" small disabled={ctx.busy} onClick={() => setForm('recruit')}>{t('lw.recruit')}</ActionButton></div>}
           </Panel>
         </>
@@ -169,8 +169,8 @@ function Posts({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
           </Panel>
         </>
       )}
-      {form === 'recruit' && <PlayerForm title={t('lw.recruit_title')} hint={t('lw.recruit_hint')} go={t('lw.recruit_go')} ctx={ctx} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'recruit', { player })} />}
-      {form === 'audit' && <PlayerForm title={t('lw.audit_title')} hint={t('lw.audit_hint')} go={t('lw.audit_go')} ctx={ctx} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'audit', { player })} />}
+      {form === 'recruit' && <PlayerForm title={t('lw.recruit_title')} hint={t('lw.recruit_hint')} go={t('lw.recruit_go')} ctx={ctx} items={v.people ?? []} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'recruit', { player })} />}
+      {form === 'audit' && <PlayerForm title={t('lw.audit_title')} hint={t('lw.audit_hint')} go={t('lw.audit_go')} ctx={ctx} items={(v.holders ?? []).map((h) => h.player)} empty={t('lw.audit_no_holder')} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'audit', { player })} />}
       {form === 'books' && <CompanyForm ctx={ctx} v={v} onClose={() => setForm(null)} />}
     </>
   )
@@ -182,13 +182,13 @@ function CompanyForm({ ctx, v, onClose }: { ctx: FlowCtx; v: LawV; onClose: () =
   return (
     <Popup open onClose={onClose} tone="gold" title={t('lw.books_title')}
       footer={<ActionButton tone="gold" disabled={ctx.busy || !code} reason={code ? undefined : t('lw.books_none')} onClick={() => { onClose(); act(ctx, 'audit_books', { code }) }}>{t('lw.books_go')}</ActionButton>}>
-      {list.length > 0 ? <Choice label={t('lw.company')} value={code} onChange={setCode} options={list.map((c) => ({ key: c.code, text: c.name }))} /> : <Hint>{t('lw.books_none')}</Hint>}
+      {list.length > 0 ? <Choice label={t('lw.company')} value={code} onChange={setCode} options={list.map((c) => ({ key: c.code, text: c.name }))} /> : <Hint>{t('lw.companies_none')}</Hint>}
       <Hint>{t('lw.books_hint')}</Hint>
     </Popup>
   )
 }
 
-function Informant({ i, ctx, may }: { i: import('../../api/views.gen').LawInformantLine; ctx: FlowCtx; may: boolean }) {
+function Informant({ i, ctx, may, people }: { i: import('../../api/views.gen').LawInformantLine; ctx: FlowCtx; may: boolean; people: Named[] }) {
   const [form, setForm] = useState<'tip' | 'retire' | null>(null)
   const live = i.state === 'recruited' || i.state === 'active'
   return (
@@ -206,7 +206,7 @@ function Informant({ i, ctx, may }: { i: import('../../api/views.gen').LawInform
           {i.mine && <ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setForm('retire')}>{t('lw.retire')}</ActionButton>}
         </div>
       )}
-      {form === 'tip' && <PlayerForm title={t('lw.tip_title')} hint={t('lw.tip_hint')} go={t('lw.tip_go')} ctx={ctx} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'tip', { id: i.id, player, kind: 'press' })} />}
+      {form === 'tip' && <PlayerForm title={t('lw.tip_title')} hint={t('lw.tip_hint')} go={t('lw.tip_go')} ctx={ctx} items={people} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'tip', { id: i.id, player, kind: 'press' })} />}
       {form === 'retire' && <Ask title={t('lw.retire_title')} body={t('lw.retire_body')} yes={t('lw.retire')} onYes={() => act(ctx, 'retire', { id: i.id })} onClose={() => setForm(null)} />}
     </div>
   )
@@ -256,24 +256,23 @@ function Jail({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
 // -- customs -----------------------------------------------------------------------------------------
 
 function Declare({ v, ctx, onClose }: { v: LawV; ctx: FlowCtx; onClose: () => void }) {
-  const towns = v.towns ?? []
-  const goods = v.goods ?? []
+  const towns = v.destinations ?? []
+  const goods = (v.goods ?? []).filter((g) => g.qty > 0)
   const [to, setTo] = useState(towns[0]?.code ?? '')
   const [carry, setCarry] = useState<Record<string, string>>({})
   const [decl, setDecl] = useState<Record<string, string>>({})
-  const have = Object.entries(carry).some(([, n]) => Number(n) > 0)
-  const over = goods.some((g) => Number(carry[g.item.code] ?? 0) > g.have)
+  const have = Object.values(carry).some((n) => Number(n) > 0)
+  const over = goods.some((g) => Number(carry[g.item.code] ?? 0) > g.qty)
   const ok = !!to && have && !over
   return (
     <Popup open onClose={onClose} tone="gold" title={t('lw.decl_title')}
       footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={!to ? t('lw.decl_need_town') : !have ? t('lw.decl_need_goods') : over ? t('lw.decl_over') : undefined}
         onClick={() => { onClose(); act(ctx, 'declare', { code: to, items: manifest(decl), carry: manifest(carry) }) }}>{t('lw.decl_go')}</ActionButton>}>
-      <Choice label={t('lw.decl_to')} value={to} onChange={setTo} options={towns.map((x) => ({ key: x.code, text: x.name }))} />
-      {towns.length === 0 && <Hint>{t('lw.decl_no_towns')}</Hint>}
+      {towns.length > 0 ? <Choice label={t('lw.decl_to')} value={to} onChange={setTo} options={towns.map((x) => ({ key: x.code, text: x.name }))} /> : <Hint>{t('lw.decl_no_towns')}</Hint>}
       {goods.length === 0 && <Hint>{t('lw.decl_no_goods')}</Hint>}
       {goods.map((g) => (
         <div key={g.item.code} className="lw-good">
-          <b>{g.item.name}</b><small>{t('lw.decl_have', { n: formatNumber(g.have) })}</small>
+          <b>{goodName(ctx, g.item)}</b><small>{t('lw.decl_have', { n: formatNumber(g.qty) })}</small>
           <NumField label={t('lw.decl_carry')} value={carry[g.item.code] ?? ''} onChange={(x) => { setCarry({ ...carry, [g.item.code]: x }); if (decl[g.item.code] === undefined || decl[g.item.code] === (carry[g.item.code] ?? '')) setDecl({ ...decl, [g.item.code]: x }) }} />
           <NumField label={t('lw.decl_say')} value={decl[g.item.code] ?? ''} onChange={(x) => setDecl({ ...decl, [g.item.code]: x })} />
         </div>

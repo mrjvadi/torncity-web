@@ -482,3 +482,5 @@
 .lw-gone { opacity: .55; }
 .lw-good { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, currentColor 5%, transparent); }
 .lw-good small { opacity: .75; }
+.lw-pick { display: flex; flex-wrap: wrap; gap: 6px; max-height: 190px; overflow-y: auto; padding: 4px 2px; }
+.lw-pick .dk-chip { flex: none; white-space: nowrap; }

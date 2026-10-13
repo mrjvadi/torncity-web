@@ -4,7 +4,6 @@
 // (not started), `gang` (as `on`, with a gang the viewer leads). Writes change the state a little so a flow can be followed; a few refuse in plain words.
 import { back, mockOk, refreshA } from './mock_neutral'
 import type { LawCaseDetail, LawCaseLine, LawMays, LawOffenceLine, LawPostLine, LawSentenceLine, LawView } from './views.gen'
-import type { LawExt } from '../screens/village/lawShared'
 
 const mode = () => { try { return new URLSearchParams(location.search).get('law') ?? 'on' } catch { return 'on' } }
 const N = (code: string, name: string) => ({ code, name })
@@ -15,7 +14,7 @@ const st = {
   arrested: false, charged: false, dropped: false, defended: false, excluded: false, warrantAsked: false, warrantSigned: false, verdict: false, appealed: false, appealDecided: false, investigated: 0,
   bailed: false, pardoned: false,
   bribeAnswered: '', bribeSent: false, audited: false,
-  known: false, listedMine: false, delisted: false, bought: false, confirmed: false, broker: false, scammed: false, refunded: false,
+  asked: false, known: false, listedMine: false, delisted: false, bought: false, confirmed: false, broker: false, scammed: false, refunded: false,
   front: false, laundered: false,
   declared: false, crossed: false, gang: 'none' as 'none' | 'marked' | 'declared',
 }
@@ -32,7 +31,8 @@ const OFFENCES: [string, string, string, string[], number, number, number, boole
   ['racketeering', 'اخاذی سازمان‌یافته', 'grave', ['fine', 'ban', 'jail', 'forfeiture'], 25000, 240, 365, true],
   ['contempt', 'بی‌احترامی به دادگاه', 'petty', ['caution', 'fine'], 1000, 0, 0, true],
 ]
-const GOODS = [{ item: N('bread', 'نان'), have: 6 }, { item: N('coffee', 'قهوه'), have: 3 }, { item: N('fake_documents', 'برگهٔ ساختگی'), have: 0 }]
+const GOODS = [{ item: N('bread', 'Bread'), qty: 6 }, { item: N('coffee', 'Coffee'), qty: 3 }]
+const PEOPLE = Array.from({ length: 24 }, (_, i) => N(`P${i}XYZ`, ['سیما', 'نیما', 'کاوه', 'رضا', 'هادی', 'مهسا', 'آریا', 'نازنین'][i % 8] + (i >= 8 ? ` ${['اول', 'دوم'][i >= 16 ? 1 : 0]}` : '')))
 
 function offences(): LawOffenceLine[] {
   return OFFENCES.map(([code, name, cls, sentences, mf, mj, mb, avail]) => ({
@@ -43,9 +43,9 @@ function offences(): LawOffenceLine[] {
 }
 
 const cases = (): LawCaseLine[] => [
-  { id: 'c1', no: 14, offence: N('fraud', 'کلاهبرداری'), accused: N('p-kaveh', 'کاوه'), state: st.dropped ? 'dropped' : st.charged ? 'charged' : 'open', source: 'patrol', strength: st.investigated ? 74 : 52, custody: st.arrested, at: iso(-30) },
-  { id: 'c2', no: 13, offence: N('bribery', 'رشوه'), accused: N('p-nima', 'نیما'), state: st.verdict ? 'decided' : 'hearing', source: 'audit', strength: 88, custody: false, at: iso(-70) },
-  { id: 'c3', no: 11, offence: N('smuggling', 'قاچاق'), accused: N('p-sima', 'سیما'), state: st.appealDecided ? 'final' : 'appealed', source: 'customs', strength: 95, custody: false, at: iso(-190) },
+  { id: 'c1', no: 14, offence: N('fraud', 'کلاهبرداری'), accused: N('p-kaveh', 'کاوه'), state: st.dropped ? 'dropped' : st.charged ? 'charged' : 'open', source: 'patrol', strength: st.investigated ? 74 : 52, custody: st.arrested, custody_until: st.arrested ? iso(20) : null, at: iso(-30) },
+  { id: 'c2', no: 13, offence: N('bribery', 'رشوه'), accused: N('p-nima', 'نیما'), state: st.verdict ? 'decided' : 'hearing', source: 'audit', strength: 88, custody: false, custody_until: null, at: iso(-70) },
+  { id: 'c3', no: 11, offence: N('smuggling', 'قاچاق'), accused: N('p-sima', 'سیما'), state: st.appealDecided ? 'final' : 'appealed', source: 'customs', strength: 95, custody: false, custody_until: null, at: iso(-190) },
 ]
 
 function mays(m: string): LawMays {
@@ -103,7 +103,7 @@ function posts(m: string): LawPostLine[] {
   ]
 }
 
-function law(notice = ''): LawView & LawExt {
+function law(notice = ''): LawView {
   const m = mode(), off = m === 'off', plain = m === 'citizen' || m === 'noperm' || m === 'empty'
   const mm = mays(m)
   const open = { police: !off, courts: !off, black: !off && m !== 'noperm' && m !== 'empty', customs: !off, launder: !off }
@@ -113,7 +113,7 @@ function law(notice = ''): LawView & LawExt {
     { id: 's9', kind: 'jail', status: st.bailed ? 'bailed' : 'active', ban: '', fine: 0, fine_paid: 0, jail_hours: 36, ban_days: 0, cell: 3, ends_at: iso(20), bail: 1500, may_bail: !st.bailed, may_pardon: false },
     { id: 's10', kind: 'fine', status: 'active', ban: '', fine: 800, fine_paid: 300, jail_hours: 0, ban_days: 0, cell: 0, ends_at: null, bail: 0, may_bail: false, may_pardon: false },
   ] : []
-  const v: LawView & LawExt = {
+  const v: LawView = {
     village: 'آمل', open, mature: true, model: st.model, mays: mm,
     posts: posts(m), points: 10, spent: 3 + st.patrolled * 2, patrol: 1 + st.patrolled,
     offences: m === 'empty' ? OFFENCES.slice(0, 2).map(([code, name, cls, sentences, mf, mj, mb]) => ({ code, name, class: cls, sentences, max_fine: mf, max_jail_hours: mj, max_ban_days: mb, available: false, listed: false, effective_at: null })) : offences(),
@@ -132,15 +132,16 @@ function law(notice = ''): LawView & LawExt {
     ],
     captured: m === 'judge',
     board: {
+      brokers: known ? [{ player: N('p-broker', 'ماهان'), reputation: 8, cap: 20000 }, { player: N('p-b2', 'آرمان'), reputation: 3, cap: 5000 }] : null,
       known, standing: known ? 14 : 0, broker: known && (m === 'judge' || st.broker), rep: 6, broker_cap: 20000, dirty,
       listings: known ? (st.bought ? [] : [
-        { id: 'l1', item: N('fake_documents', 'برگهٔ ساختگی'), qty: 5, price: 1200, fence: true, mine: false, min_standing: 5 },
-        { id: 'l2', item: N('coffee', 'قهوه'), qty: 8, price: 90, fence: false, mine: false, min_standing: 0 },
-        ...(st.delisted ? [] : [{ id: 'l3', item: N('bread', 'نان'), qty: 4, price: 40, fence: false, mine: true, min_standing: 0 }]),
+        { id: 'l1', item: N('fake_documents', 'Fake documents'), qty: 5, price: 1200, fence: true, mine: false, min_standing: 5 },
+        { id: 'l2', item: N('coffee', 'Coffee'), qty: 8, price: 90, fence: false, mine: false, min_standing: 0 },
+        ...(st.delisted ? [] : [{ id: 'l3', item: N('bread', 'Bread'), qty: 4, price: 40, fence: false, mine: true, min_standing: 0 }]),
       ]) : null,
       escrows: known ? [
-        { id: 'x1', status: st.confirmed ? 'released' : st.refunded ? 'refunded' : st.scammed ? 'scammed' : 'held', amount: 360, fee: 20, qty: 4, item: N('coffee', 'قهوه'), buyer: true, broker: false, mine: true, due_at: iso(24) },
-        { id: 'x2', status: 'held', amount: 4800, fee: 240, qty: 4, item: N('fake_documents', 'برگهٔ ساختگی'), buyer: false, broker: m === 'judge' || st.broker, mine: false, due_at: iso(-3) },
+        { id: 'x1', status: st.confirmed ? 'released' : st.refunded ? 'refunded' : st.scammed ? 'scammed' : 'held', amount: 360, fee: 20, qty: 4, item: N('coffee', 'Coffee'), buyer: true, broker: false, mine: true, due_at: iso(24) },
+        { id: 'x2', status: 'held', amount: 4800, fee: 240, qty: 4, item: N('fake_documents', 'Fake documents'), buyer: false, broker: m === 'judge' || st.broker, mine: false, due_at: iso(-3) },
       ] : null,
     },
     fronts: known ? [{ company: N('c-mine', 'نانوایی البرز'), batches: [{ id: 'bt1', state: 'layered', amount: 3000, stage_due: iso(18) }, { id: 'bt2', state: 'integrated', amount: 2000, stage_due: null }, ...(st.laundered ? [{ id: 'bt3', state: 'placed', amount: 1500, stage_due: iso(8) }] : [])] }, ...(st.front ? [{ company: N('c-two', 'کارگاه سرخه'), batches: null }] : [])] : null,
@@ -151,9 +152,10 @@ function law(notice = ''): LawView & LawExt {
       ...(st.declared && st.crossed ? [{ id: 'ld3', status: 'crossed', to: N('v-r5', 'رامسر'), declared: { bread: 2 }, carried: { bread: 2 }, inspected: false, duty: 40, penalty: 0, may_cross: false }] : []),
     ],
     notice,
-    goods: GOODS, towns: [N('v-b2', 'بابل'), N('v-x1', 'گلستان'), N('v-r5', 'رامسر')], companies: [N('c-mine', 'نانوایی البرز'), N('c-two', 'کارگاه سرخه')],
-    brokers: [N('p-broker', 'ماهان')],
-    gang: m === 'gang' ? { leader: true, marked: st.gang !== 'none', declared: st.gang === 'declared', heat: st.gang === 'none' ? 0 : 38, max: 100 } : null,
+    goods: [...GOODS, { item: N('fake_documents', 'Fake documents'), qty: 0 }], destinations: [N('v-b2', 'بابل'), N('v-x1', 'گلستان'), N('v-r5', 'رامسر')], companies: [N('c-mine', 'نانوایی البرز'), N('c-two', 'کارگاه سرخه')],
+    people: m === 'noperm' ? null : PEOPLE,
+    holders: plain ? null : [{ player: N('p-sima', 'سیما'), office: 'sheriff', rungs: ['detection', 'warrant'] }, { player: N('p-nima', 'نیما'), office: 'judge', rungs: ['verdict', 'warrant'] }, { player: N('p-kaveh', 'کاوه'), office: 'clerk', rungs: [] }],
+    gang: m === 'gang' ? { faction: N('f-1', 'برادران شمال'), hidden: st.gang !== 'declared', leader: true, heat: st.gang === 'none' ? 0 : 38 } : null,
   }
   return v
 }
@@ -198,7 +200,7 @@ export function mockLawCommand(command: string, a: Record<string, unknown>): unk
     case 'bribe_refuse': st.bribeAnswered = 'refused'; return ok('law_bribe_refused')
     case 'audit': st.audited = true; return ok('law_audit_clean')
     case 'audit_books': return ok('law_audit_anomaly')
-    case 'ask': if (String(a.player).toUpperCase() === 'XXXX') return refuse('law_nobody_talks'); st.known = true; return ok('law_contact')
+    case 'ask': if (!st.asked) { st.asked = true; return refuse('law_nobody_talks') } st.known = true; return ok('law_contact')
     case 'introduce': return ok('law_complaint')
     case 'broker': st.broker = true; return ok('law_broker')
     case 'list': return ok('law_listed')

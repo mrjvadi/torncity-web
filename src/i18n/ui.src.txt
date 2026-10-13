@@ -8292,12 +8292,12 @@ lw.unset_title | «{name}» را از فهرست برداریم؟ | Withdraw «{
 lw.unset_body | از این به بعد این کار در شهر جرم نیست. پرونده‌های باز می‌مانند تا تمام شوند. | From now on this is no crime here. Open cases stay until they end.
 lw.complain_title | شکایت | A complaint
 lw.offence | جرم | Offence
-lw.player | کد بازیکن | Player code
-lw.player_hint | کد را از کارت بازیکن بگیر. | Take the code from the player's card.
-lw.player_need | کد بازیکن را بنویس. | Write the player's code.
+lw.player | نامِ بازیکن | Player
+lw.player_hint | از فهرست یکی را انتخاب کن. | Pick one from the list.
+lw.player_need | یک نفر را انتخاب کن. | Pick a person.
 lw.complain_hint | شکایت هزینه‌ای دارد که اگر او مجرم شناخته شود برمی‌گردد. شکایت دربارهٔ طرف مقابل چیزی به تو نشان نمی‌دهد. | A complaint has a fee that comes back if he is found guilty. It shows you nothing about the other person.
 lw.complain_go | شکایت را ثبت کن | File the complaint
-lw.complain_need | جرم و کد بازیکن را بنویس. | Choose an offence and write a code.
+lw.complain_need | جرم و یک نفر را انتخاب کن. | Choose an offence and a person.
 lw.complain_none | شهر هنوز جرمی را در فهرست نگذاشته. | The town has listed no offence yet.
 lw.posts_intro | پاسگاه، دادگاه، بازداشتگاه و گمرک ساختمان‌اند. هر کدام وقتی باز است که کارمند، حقوق و غذا داشته باشد. | The post, the court, the lock-up and customs are buildings. Each is open only when it has staff, wages and food.
 lw.post_none | ساخته نشده | Not built
@@ -8547,7 +8547,7 @@ lw.bribes_none | پیشنهادی نیست. | There are no offers.
 lw.bribe_new | پیشنهاد بده | Make an offer
 lw.bribe_title | پیشنهاد به صاحب‌منصب | An offer to an office-holder
 lw.bribe_calm | اثرش سقف دارد و هیچ‌وقت کامل نیست؛ خطر و هزینه‌اش هم با تو می‌ماند. | Its effect has a ceiling and is never complete; the risk and the cost stay with you.
-lw.bribe_holder | کد صاحب‌منصب | The office-holder's code
+lw.bribe_holder | صاحب‌منصب | The office-holder
 lw.bribe_rung | چه چیزی سبک‌تر شود | What should weigh less
 lw.rung.warrant | سخت‌گیری در حکم | Strictness over warrants
 lw.rung.detection | دقت گشت | The patrol's care
@@ -8562,7 +8562,7 @@ lw.pay_from | از کجا بدهم | Pay from
 lw.pay_clean | از پولِ خودم | My own money
 lw.pay_dirty | از پول سیاه، {n} | From black money, {n}
 lw.bribe_risk | اگر این پیشنهاد لو برود، پولش مصادره می‌شود و تو پرونده می‌شوی. | If this offer is found out, its money is forfeited and a case opens against you.
-lw.bribe_need | کد و مبلغ را بنویس. | Write a code and an amount.
+lw.bribe_need | صاحب‌منصب را انتخاب کن و مبلغ را بنویس. | Pick an office-holder and write an amount.
 lw.bribe_go | پیشنهاد را بفرست | Send the offer
 lw.bribe_mine | پیشنهادِ تو | Your offer
 lw.bribe_to_me | پیشنهاد به تو | An offer to you
@@ -8599,8 +8599,8 @@ lw.delist | آگهی را بردار | Take it down
 lw.buy | بخر | Buy
 lw.buy_title | خرید «{item}» | Buy «{item}»
 lw.buy_left | موجود: {n} | Left: {n}
-lw.buy_go | بخر ({price}) | Buy ({price})
-lw.buy_need | تعداد و واسطه را بنویس. | Write a quantity and a broker.
+lw.buy_go | بخر، {price} | Buy, {price}
+lw.buy_need | تعداد را بنویس و واسطه را انتخاب کن. | Write a quantity and pick a broker.
 lw.broker | واسطه | Broker
 lw.broker_hint | کدِ واسطه‌ای که پولت نزدش می‌ماند. | The code of the broker who holds your money.
 lw.fence_hint | دلال کالا را خودش می‌فروشد؛ پولت مستقیم داده می‌شود. | The fence sells the good himself; your money is paid straight.
@@ -8816,3 +8816,17 @@ charter.perm.audit.books | بازرسیِ دفترِ کسب‌وکارها | Aud
 charter.perm.customs.inspect | بازرسیِ بار در گمرک | Inspect loads at customs
 charter.perm.law.set | نوشتنِ فهرستِ جرم‌ها و شیوهٔ دادرسی | Set the offences and the way of trying cases
 charter.sep_note | یک منصب که هم اتهام بزند هم قضاوت کند ثبت نمی‌شود؛ بازرسِ درستکاری هم نباید بازداشت کند. | An office that both charges and judges is refused; the integrity auditor must not arrest either.
+lw.pick_search | جست‌وجوی نام | Search by name
+lw.pick_none | کسی برای انتخاب نیست. | There is nobody to choose.
+lw.pick_nomatch | نامی با این حروف پیدا نشد. | No name matches.
+lw.pick_people | از ساکنان شهر | From the residents
+lw.pick_holders | از صاحب‌منصب‌ها | From the office-holders
+lw.pick_brokers | واسطه‌هایی که می‌شناسی | Brokers you know
+lw.pick_towns_none | شهری برای مقصد نیست. | No town is open as a destination.
+lw.broker_line | {name}، آبرو {rep}، سقف {cap} | {name}, name {rep}, ceiling {cap}
+lw.bribe_no_holder | صاحب‌منصبی که این کار دستش باشد نیست. | No office-holder has this in his hands.
+lw.audit_no_holder | صاحب‌منصبی برای بازبینی نیست. | There is no office-holder to review.
+lw.companies_none | کسب‌وکاری برای انتخاب نیست. | There is no business to choose.
+lw.ask_none | این‌جا کسی نیست که بپرسی. | Nobody here to ask.
+lw.broker_sub | آبرو {rep}، سقف {cap} | name {rep}, ceiling {cap}
+lw.broker_none | واسطه‌ای که بشناسی نیست؛ بدون واسطه نمی‌شود خرید. | You know no broker; a buy needs one.

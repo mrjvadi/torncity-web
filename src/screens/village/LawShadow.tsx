@@ -12,7 +12,7 @@ import Popup from '../../ui/Popup'
 import { atText } from '../../lib/duration'
 import { formatNumber, money } from '../native/kit/format'
 import { Ask, Choice, NumField, word } from './Polity'
-import { Meter, NotYet, PlayerForm, act, rungWord, type LawV } from './lawShared'
+import { Meter, NotYet, PickName, PlayerForm, act, goodName, rungWord, type LawV } from './lawShared'
 import { t } from '../../i18n'
 
 const bpsOf = (percent: string) => String(Math.round(Number(percent || 0) * 100))
@@ -25,17 +25,16 @@ function BribeOffer({ v, ctx, onClose }: { v: LawV; ctx: FlowCtx; onClose: () =>
   const [amount, setAmount] = useState('')
   const [pct, setPct] = useState('')
   const [dirty, setDirty] = useState('no')
-  const ok = player.trim().length > 0 && Number(amount) > 0
+  const holders = (v.holders ?? []).filter((h) => (h.rungs ?? []).includes(rung)).map((h) => h.player)
+  const picked = holders.some((h) => h.code === player) ? player : ''
+  const ok = !!picked && Number(amount) > 0
   return (
     <Popup open onClose={onClose} tone="red" title={t('lw.bribe_title')}
-      footer={<ActionButton tone="red" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lw.bribe_need')} onClick={() => { onClose(); act(ctx, 'bribe', { player: player.trim(), kind: rung, amount, ...(pct ? { bps: bpsOf(pct) } : {}), ...(dirty === 'yes' ? { dirty: '1' } : {}) }) }}>{t('lw.bribe_go')}</ActionButton>}>
+      footer={<ActionButton tone="red" disabled={ctx.busy || !ok} reason={ok ? undefined : holders.length === 0 ? t('lw.bribe_no_holder') : t('lw.bribe_need')} onClick={() => { onClose(); act(ctx, 'bribe', { player: picked, kind: rung, amount, ...(pct ? { bps: bpsOf(pct) } : {}), ...(dirty === 'yes' ? { dirty: '1' } : {}) }) }}>{t('lw.bribe_go')}</ActionButton>}>
       <Note>{t('lw.bribe_calm')}</Note>
-      <label className="tc-f"><span>{t('lw.bribe_holder')}</span>
-        <input className="fx-field-input" dir="ltr" value={player} onChange={(e) => setPlayer(e.target.value)} aria-label={t('lw.bribe_holder')} />
-        <small className="pu-hint">{t('lw.player_hint')}</small>
-      </label>
       <Choice label={t('lw.bribe_rung')} value={rung} onChange={setRung} options={['warrant', 'detection', 'verdict'].map((k) => ({ key: k, text: rungWord(k) }))} />
       <Hint>{word(`lw.rung_hint.${rung}`)}</Hint>
+      <PickName label={t('lw.bribe_holder')} items={holders} value={picked} onChange={setPlayer} empty={t('lw.bribe_no_holder')} />
       <NumField label={t('lw.bribe_amount')} value={amount} onChange={setAmount} />
       <NumField label={t('lw.bribe_pct')} value={pct} onChange={setPct} suffix="٪" hint={t('lw.bribe_pct_hint')} />
       {v.board.dirty > 0 && <Choice label={t('lw.pay_from')} value={dirty} onChange={setDirty} options={[{ key: 'no', text: t('lw.pay_clean') }, { key: 'yes', text: t('lw.pay_dirty', { n: money(v.board.dirty) }) }]} />}
@@ -72,19 +71,17 @@ function Bribe({ b, ctx }: { b: LawBribeLine; ctx: FlowCtx }) {
 // -- the board ---------------------------------------------------------------------------------------
 
 function Buy({ l, v, ctx, onClose }: { l: LawListingLine; v: LawV; ctx: FlowCtx; onClose: () => void }) {
-  const brokers = v.brokers ?? []
+  const brokers = v.board.brokers ?? []
   const [qty, setQty] = useState('1')
-  const [broker, setBroker] = useState(brokers[0]?.code ?? '')
+  const [broker, setBroker] = useState(brokers[0]?.player.code ?? '')
   const [dirty, setDirty] = useState('no')
   const needBroker = !l.fence
-  const ok = Number(qty) > 0 && Number(qty) <= l.qty && (!needBroker || broker.trim().length > 0)
+  const ok = Number(qty) > 0 && Number(qty) <= l.qty && (!needBroker || !!broker)
   return (
-    <Popup open onClose={onClose} tone="gold" title={t('lw.buy_title', { item: l.item.name })}
-      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lw.buy_need')} onClick={() => { onClose(); act(ctx, 'buy', { id: l.id, qty, ...(needBroker ? { code: broker.trim() } : {}), ...(dirty === 'yes' ? { dirty: '1' } : {}) }) }}>{t('lw.buy_go', { price: money(l.price * Math.max(1, Number(qty) || 1)) })}</ActionButton>}>
+    <Popup open onClose={onClose} tone="gold" title={t('lw.buy_title', { item: goodName(ctx, l.item) })}
+      footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={ok ? undefined : t('lw.buy_need')} onClick={() => { onClose(); act(ctx, 'buy', { id: l.id, qty, ...(needBroker ? { code: broker } : {}), ...(dirty === 'yes' ? { dirty: '1' } : {}) }) }}>{t('lw.buy_go', { price: money(l.price * Math.max(1, Number(qty) || 1)) })}</ActionButton>}>
       <NumField label={t('lw.qty')} value={qty} onChange={setQty} hint={t('lw.buy_left', { n: formatNumber(l.qty) })} />
-      {needBroker && (brokers.length > 0
-        ? <Choice label={t('lw.broker')} value={broker} onChange={setBroker} options={brokers.map((b) => ({ key: b.code, text: b.name }))} />
-        : <label className="tc-f"><span>{t('lw.broker')}</span><input className="fx-field-input" dir="ltr" value={broker} onChange={(e) => setBroker(e.target.value)} aria-label={t('lw.broker')} /><small className="pu-hint">{t('lw.broker_hint')}</small></label>)}
+      {needBroker && <PickName label={t('lw.broker')} items={brokers.map((b) => b.player)} value={broker} onChange={setBroker} sub={(n) => { const b = brokers.find((x) => x.player.code === n.code); return b ? t('lw.broker_sub', { rep: formatNumber(b.reputation), cap: money(b.cap) }) : undefined }} empty={t('lw.broker_none')} />}
       {v.board.dirty > 0 && <Choice label={t('lw.pay_from')} value={dirty} onChange={setDirty} options={[{ key: 'no', text: t('lw.pay_clean') }, { key: 'yes', text: t('lw.pay_dirty', { n: money(v.board.dirty) }) }]} />}
       <Hint>{l.fence ? t('lw.fence_hint') : t('lw.escrow_hint')}</Hint>
       <Hint>{t('lw.scam_risk')}</Hint>
@@ -93,16 +90,16 @@ function Buy({ l, v, ctx, onClose }: { l: LawListingLine; v: LawV; ctx: FlowCtx;
 }
 
 function ListForm({ v, ctx, onClose }: { v: LawV; ctx: FlowCtx; onClose: () => void }) {
-  const goods = v.goods ?? []
+  const goods = (v.goods ?? []).filter((g) => g.qty > 0)
   const [code, setCode] = useState(goods[0]?.item.code ?? '')
   const [qty, setQty] = useState('1')
   const [price, setPrice] = useState('')
-  const have = goods.find((g) => g.item.code === code)?.have ?? 0
+  const have = goods.find((g) => g.item.code === code)?.qty ?? 0
   const ok = !!code && Number(qty) > 0 && Number(qty) <= have && Number(price) > 0
   return (
     <Popup open onClose={onClose} tone="gold" title={t('lw.list_title')}
       footer={<ActionButton tone="gold" disabled={ctx.busy || !ok} reason={goods.length === 0 ? t('lw.decl_no_goods') : ok ? undefined : t('lw.list_need')} onClick={() => { onClose(); act(ctx, 'list', { code, qty, amount: price }) }}>{t('lw.list_go')}</ActionButton>}>
-      {goods.length > 0 ? <Choice label={t('lw.good')} value={code} onChange={setCode} options={goods.map((g) => ({ key: g.item.code, text: g.item.name }))} /> : <Hint>{t('lw.decl_no_goods')}</Hint>}
+      {goods.length > 0 ? <Choice label={t('lw.good')} value={code} onChange={setCode} options={goods.map((g) => ({ key: g.item.code, text: goodName(ctx, g.item) }))} /> : <Hint>{t('lw.decl_no_goods')}</Hint>}
       <NumField label={t('lw.qty')} value={qty} onChange={setQty} hint={have > 0 ? t('lw.decl_have', { n: formatNumber(have) }) : undefined} />
       <NumField label={t('lw.price_each')} value={price} onChange={setPrice} />
       <Hint>{t('lw.list_hint')}</Hint>
@@ -114,7 +111,7 @@ function Listing({ l, v, ctx }: { l: LawListingLine; v: LawV; ctx: FlowCtx }) {
   const [form, setForm] = useState(false)
   return (
     <div className="mn-card">
-      <div className="mn-head"><b>{l.item.name}</b><EffectChip tone={l.fence ? 'info' : l.mine ? 'neutral' : 'warn'}>{l.fence ? t('lw.fence') : l.mine ? t('lw.listing_mine') : t('lw.listing_other')}</EffectChip></div>
+      <div className="mn-head"><b>{goodName(ctx, l.item)}</b><EffectChip tone={l.fence ? 'info' : l.mine ? 'neutral' : 'warn'}>{l.fence ? t('lw.fence') : l.mine ? t('lw.listing_mine') : t('lw.listing_other')}</EffectChip></div>
       <div className="vf-list">
         <div className="vf-line"><span>{t('lw.qty')}</span><b>{formatNumber(l.qty)}</b></div>
         <div className="vf-line"><span>{t('lw.price_each')}</span><b>{money(l.price)}</b></div>
@@ -137,7 +134,7 @@ function Escrow({ e, ctx }: { e: LawEscrowLine; ctx: FlowCtx }) {
   const role = e.broker ? t('lw.role_broker') : e.buyer ? t('lw.role_buyer') : t('lw.role_seller')
   return (
     <div className="mn-card">
-      <div className="mn-head"><b>{t('lw.escrow_line', { qty: formatNumber(e.qty), item: e.item.name })}</b><EffectChip tone={held ? 'warn' : e.status === 'scammed' ? 'bad' : 'neutral'}>{word(`lw.estatus.${e.status}`) || t('lw.other')}</EffectChip></div>
+      <div className="mn-head"><b>{t('lw.escrow_line', { qty: formatNumber(e.qty), item: goodName(ctx, e.item) })}</b><EffectChip tone={held ? 'warn' : e.status === 'scammed' ? 'bad' : 'neutral'}>{word(`lw.estatus.${e.status}`) || t('lw.other')}</EffectChip></div>
       <div className="mn-sub">{role}</div>
       <div className="vf-list">
         <div className="vf-line"><span>{t('lw.escrow_pot')}</span><b>{money(e.amount)}</b></div>
@@ -193,7 +190,7 @@ function Board({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
         </>
       )}
       {form === 'list' && <ListForm v={v} ctx={ctx} onClose={() => setForm(null)} />}
-      {form === 'introduce' && <PlayerForm title={t('lw.introduce_title')} hint={t('lw.introduce_hint')} go={t('lw.introduce_go')} ctx={ctx} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'introduce', { player })} />}
+      {form === 'introduce' && <PlayerForm title={t('lw.introduce_title')} hint={t('lw.introduce_hint')} go={t('lw.introduce_go')} ctx={ctx} items={v.people ?? []} onClose={() => setForm(null)} onGo={(player) => act(ctx, 'introduce', { player })} />}
       {form === 'broker' && <Ask title={t('lw.broker_title')} body={t('lw.broker_body')} hint={t('lw.broker_risk')} yes={t('lw.broker_be')} onYes={() => act(ctx, 'broker')} onClose={() => setForm(null)} />}
     </>
   )
@@ -201,15 +198,13 @@ function Board({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
 
 /** Without standing: one quiet card, nothing said of what there is. */
 function AskAround({ ctx }: { ctx: FlowCtx }) {
-  const [open, setOpen] = useState(false)
   return (
     <>
       <SectionTitle>{t('lw.ask_title')}</SectionTitle>
       <Panel>
         <Hint>{t('lw.ask_hint')}</Hint>
-        <div className="wk-btns"><ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setOpen(true)}>{t('lw.ask_go')}</ActionButton></div>
+        <div className="wk-btns"><ActionButton tone="steel" small disabled={ctx.busy} onClick={() => act(ctx, 'ask')}>{t('lw.ask_go')}</ActionButton></div>
       </Panel>
-      {open && <PlayerForm title={t('lw.ask_form')} hint={t('lw.ask_form_hint')} go={t('lw.ask_go')} ctx={ctx} onClose={() => setOpen(false)} onGo={(player) => act(ctx, 'ask', { player })} />}
     </>
   )
 }
@@ -280,19 +275,19 @@ function Gang({ v, ctx }: { v: LawV; ctx: FlowCtx }) {
     <>
       <SectionTitle>{t('lw.gang')}</SectionTitle>
       <Panel>
-        <div className="mn-head"><b>{t('lw.gang_state')}</b><EffectChip tone={g.declared ? 'warn' : g.marked ? 'info' : 'neutral'}>{g.declared ? t('lw.gang_open') : g.marked ? t('lw.gang_hidden') : t('lw.gang_none')}</EffectChip></div>
-        {g.marked && (
+        <div className="mn-head"><b>{g.faction.name || t('lw.gang_state')}</b><EffectChip tone={g.hidden ? 'info' : 'warn'}>{g.hidden ? t('lw.gang_hidden') : t('lw.gang_open')}</EffectChip></div>
+        {g.hidden && g.leader && (
           <>
-            <div className="vf-line"><span>{t('lw.heat')}</span><b>{t('lw.heat_n', { a: formatNumber(g.heat), b: formatNumber(g.max) })}</b></div>
-            <Meter value={g.heat} max={Math.max(1, g.max)} bad={g.heat >= g.max * 0.7} />
+            <div className="vf-line"><span>{t('lw.heat')}</span><b>{formatNumber(g.heat)}</b></div>
+            <Meter value={g.heat} bad={g.heat >= 70} />
             <Hint>{t('lw.heat_hint')}</Hint>
           </>
         )}
         {!g.leader && <Hint>{t('lw.gang_not_leader')}</Hint>}
         {g.leader && (
           <div className="wk-btns">
-            {!g.marked && <ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setAsk('mark')}>{t('lw.gang_mark')}</ActionButton>}
-            {g.marked && !g.declared && <ActionButton tone="red" small disabled={ctx.busy} onClick={() => setAsk('declare')}>{t('lw.gang_declare')}</ActionButton>}
+            {g.hidden && <ActionButton tone="steel" small disabled={ctx.busy} onClick={() => setAsk('mark')}>{t('lw.gang_mark')}</ActionButton>}
+            {g.hidden && <ActionButton tone="red" small disabled={ctx.busy} onClick={() => setAsk('declare')}>{t('lw.gang_declare')}</ActionButton>}
           </div>
         )}
       </Panel>

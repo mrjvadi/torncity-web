@@ -14,7 +14,7 @@ import { Ask, Choice, NumField, word } from './Polity'
 import { Complain, Meter, STATE_TONE, act, banWord, daysText, evidenceWord, hoursText, offenceName, sentenceStatusWord, sentenceWord, sourceWord, stateWord, type LawV } from './lawShared'
 import { t } from '../../i18n'
 
-const custodyUntil = (c: LawCaseLine) => (c as LawCaseLine & { custody_until?: string | null }).custody_until ?? null
+const custodyUntil = (c: LawCaseLine) => c.custody_until ?? null
 
 // -- the list ----------------------------------------------------------------------------------------
 
