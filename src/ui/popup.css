@@ -126,14 +126,17 @@ html.pp-lock, html.pp-lock body { overflow: hidden; overscroll-behavior: none; }
 .pp-act-steel:active:not(:disabled) { background: #ffffff22; box-shadow: inset 0 0 0 1px #ffffff1f; }
 .pp-act-red { background: #ff5a4726; color: #ffb4a8; box-shadow: inset 0 0 0 1px #ff5a4799; }
 .pp-act-steel:disabled, .pp-act-red:disabled { background: #232b3d; color: #8793aa; box-shadow: inset 0 0 0 1.5px #4a5670; }
-.pp-act-label { font: 900 16px/1.3 Vazirmatn; text-align: center; }
+.pp-act-label { font: 900 16px/1.3 Vazirmatn; text-align: center; text-wrap: balance; }
 .pp-act-cost {
   position: absolute; inset-inline-start: 8px; top: 50%; transform: translateY(-50%);
   height: 32px; padding: 0 8px 0 12px; border-radius: 16px; display: flex; align-items: center; gap: 4px;
   font: 800 15px/1 Vazirmatn; color: #fff; background: #0b111ccc; box-shadow: inset 0 0 0 1px #f4c44199;
 }
 .pp-act-wrap:has(.pp-act-cost) .pp-act-label { padding-inline: 74px; }
-.pp-act-reason { text-align: center; font: 500 13.5px/1.5 Vazirmatn; color: #ff9a8c; }
+.pp-act-reason { text-align: center; font: 500 13.5px/1.5 Vazirmatn; color: #ff9a8c; white-space: normal; overflow-wrap: anywhere; min-width: 0; }
+.pp-act-wrap { min-width: 0; max-width: 100%; }
+.wk-btns > .pp-act-wrap:has(.pp-act-reason) { flex-basis: 100%; white-space: normal; }
+.wk-btns > .pp-act-wrap:has(.pp-act-reason) .pp-act-label { white-space: nowrap; }
 .pp-act-small .pp-act { min-height: 44px; border-radius: 14px; }
 .pp-act-small .pp-act-label { font-size: 15px; }
 .pp-acts { display: flex; gap: 8px; align-items: flex-start; }

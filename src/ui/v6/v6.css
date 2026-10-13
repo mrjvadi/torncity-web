@@ -340,6 +340,14 @@
   .v6-rit:hover { background: #ffffff14; }
   .v6-rit.on { background: #f4c4412e; color: var(--v6-gold-hi); font-weight: 700; }
   .v6-rit.wait { color: #7f8aa1; }
+  /* a second level under «شهر»: the group header folds its entries (web map 6.2a) */
+  .v6-rg { margin: 4px 0 2px; }
+  .v6-rgh { display: flex; align-items: center; gap: 8px; width: calc(100% - 8px); margin: 2px 0 2px 8px; height: 32px; padding: 0 10px; border-radius: 8px; text-align: start; color: var(--v6-mut); }
+  .v6-rgh:hover { background: #ffffff0f; }
+  .v6-rgh b { flex: 1; font: 700 12.5px/1 Vazirmatn; letter-spacing: 0; }
+  .v6-rgh .v6-chev { width: 7px; height: 7px; margin: 0 2px 3px; }
+  .v6-rg.open .v6-rgh .v6-chev { transform: rotate(-135deg); margin-bottom: -2px; }
+  .v6-rg.open .v6-rgh { color: var(--v6-gold); }
   /* the active section: a lit plate with a gold edge; its sub-item is lit too */
   .v6-rs { position: relative; }
   .v6-rs.on .v6-rh { background: linear-gradient(270deg, #f4c4412e, #f4c44114); box-shadow: inset 0 0 0 1px #f4c44173; }
