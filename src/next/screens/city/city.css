@@ -1,0 +1,69 @@
+/* «شهر»: the town's one-off layouts (the city panel, a building, the law). Every class `n-city-`; the parts and tokens
+   are next.css's. (`.n-city-tag` is the shell's: the game view's tag, not this area's.) */
+
+.n-city-quiet { font: 500 12.5px/1.75 var(--font); color: var(--mut); }
+.n-app .n-city-gap, .n-layer .n-city-gap { margin-top: 10px; }
+.n-city-facts { display: flex; flex-direction: column; gap: 10px; }
+.n-city-name { overflow-wrap: anywhere; }
+.n-city-acts { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.n-city-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.n-city-card-foot b { font: 900 14px/1.3 var(--font); color: #fff; }
+.n-city-card-foot .n-btns { flex: none; }
+.n-city-up-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.n-city-up-head b { font: 900 15px/1.35 var(--font); color: #fff; }
+
+/* the law's four services, two a row */
+.n-city-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.n-city-post { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 120px; padding: 12px; border-radius: 18px; background: var(--g-card); border: 1px solid var(--line); box-shadow: var(--sh-card); }
+.n-city-post-ic { width: 44px; height: 44px; filter: drop-shadow(0 6px 10px #ff6b1a40); }
+.n-city-post b { font: 900 14.5px/1.3 var(--font); color: #fff; }
+.n-city-post small { font: 500 11.5px/1.4 var(--font); color: var(--mut); }
+.n-city-post.off { background: var(--bg-2); border: 1.5px dashed #ffffff26; box-shadow: none; }
+.n-city-post.off .n-city-post-ic { filter: grayscale(1); opacity: .4; }
+.n-city-post.off b { color: var(--mut); }
+.n-page-in > .n-city-post { min-height: 0; flex-direction: row; align-items: center; flex-wrap: wrap; }
+
+/* the offences: rows that open to their limits */
+.n-city-offs { display: flex; flex-direction: column; gap: 8px; }
+.n-city-off { border-radius: 18px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+.n-city-off.open { border-color: var(--line-hi); }
+.n-app .n-city-off-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 60px; padding: 8px 14px; text-align: start; }
+.n-city-off-name { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.n-city-off-name b { font: 800 15px/1.35 var(--font); color: #fff; }
+.n-city-off-name small { display: flex; align-items: center; gap: 6px; font: 500 12px/1.4 var(--font); color: var(--mut); }
+.n-city-caret { flex: none; width: 18px; height: 18px; opacity: .55; transition: transform .15s; }
+.n-city-off.open .n-city-caret { transform: rotate(180deg); }
+.n-city-off-body { display: flex; flex-direction: column; gap: 8px; padding: 2px 14px 14px; }
+.n-city-dots { display: inline-flex; gap: 3px; }
+.n-city-dots i { width: 7px; height: 7px; border-radius: 50%; background: #ffffff24; }
+.n-city-dots i.on { background: var(--accent); box-shadow: 0 0 6px #ff8a3d99; }
+
+/* the cases */
+.n-app .n-city-case { display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 100%; padding: 14px; text-align: start; color: var(--text); }
+.n-city-case:active { transform: scale(.99); }
+.n-city-case-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.n-city-case-head b { font: 900 15px/1.35 var(--font); color: #fff; }
+.n-city-case-sub { font: 500 12.5px/1.5 var(--font); color: var(--mut); }
+.n-city-case-note { font: 700 12px/1.5 var(--font); color: var(--bad-hi); }
+.n-city-ev { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.n-city-ev.gone { opacity: .55; }
+.n-city-ev .n-btn { align-self: flex-start; }
+
+/* the verbs of a case, two a row */
+.n-city-verbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.n-city-verbs .n-btn { padding: 0 10px; font-size: 14px; }
+
+/* a pick list (an offence, a person) */
+.n-city-pick { display: flex; flex-wrap: wrap; gap: 6px; }
+.n-city-pick.many { max-height: 200px; overflow-y: auto; padding: 2px; }
+.n-app .n-city-pick button, .n-layer .n-city-pick button { min-height: 40px; padding: 0 14px; border-radius: 12px; border: 1px solid #ffffff1a; background: var(--well); color: #c9d2de; font: 700 13px/1 var(--font); }
+.n-app .n-city-pick button[aria-checked="true"], .n-layer .n-city-pick button[aria-checked="true"] { background: var(--text); border-color: transparent; color: var(--bg); font-weight: 900; }
+
+/* a knowledge row */
+.n-city-know { display: flex; align-items: center; gap: 12px; }
+.n-city-know-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.n-city-know-body b { font: 800 15px/1.35 var(--font); color: #fff; }
+.n-city-know-body small { font: 500 12px/1.5 var(--font); color: var(--mut); }
+
+/* the four groups of the town's affairs: all four fit the width, a long name on two lines */
+.n-city-seg .n-seg button { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 4px 6px; font-size: 12.5px; line-height: 1.3; white-space: normal; text-align: center; }
