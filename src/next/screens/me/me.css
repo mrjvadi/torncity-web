@@ -1,0 +1,118 @@
+/* «من» (the Me tab): the area's own layouts. Every class is `n-me-`; tokens and parts come from next.css. */
+
+/* ---------- the face in its XP ring ---------- */
+.n-me-av { position: relative; flex: none; width: 92px; height: 92px; border-radius: 50%; padding: 6px;
+  background: conic-gradient(from 0deg, var(--accent-hi), var(--accent) calc(var(--p) * 360deg), #ffffff14 calc(var(--p) * 360deg));
+  box-shadow: 0 0 22px #ff6b1a40; }
+.n-me-av.plain { background: linear-gradient(160deg, #ffb066, #ff6b1a); }
+.n-me-av.big { width: 112px; height: 112px; padding: 5px; }
+.n-me-av-face { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #3a4352, #1a1f27 75%); border: 2px solid #13171d; }
+.n-me-av-face .n-ic { width: 60%; height: 60%; }
+.n-me-av-emoji { font-size: 44px; line-height: 1; }
+.n-me-av.big .n-me-av-emoji { font-size: 56px; }
+.n-me-av-lvl { position: absolute; bottom: -4px; inset-inline-end: -4px; min-width: 34px; height: 34px; padding: 0 7px; display: grid; place-items: center;
+  border-radius: 17px; background: var(--g-cyan); color: var(--on-cyan); border: 3px solid #1f262f; font: 900 15px/1 var(--font); box-shadow: 0 4px 12px #3ec5f059; }
+
+/* ---------- the identity card ---------- */
+.n-me-id { display: flex; align-items: center; gap: 16px; }
+.n-me-who { flex: 1; min-width: 0; }
+.n-me-who h2 { font: 900 22px/1.3 var(--font); color: #fff; overflow-wrap: anywhere; }
+.n-me-who p { margin-top: 2px; font: 500 13px/1.5 var(--font); color: var(--mut); }
+.n-me-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.n-me-chips.center { justify-content: center; }
+.n-me-xp { margin-top: 16px; }
+.n-me-code { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 8px 8px 8px 12px; border-radius: 16px; background: #0b0e12a6; border: 1px solid #ffffff12; }
+[dir="rtl"] .n-me-code { padding: 8px 12px 8px 8px; }
+.n-me-code-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.n-me-code-text small { font: 500 11.5px/1.4 var(--font); color: var(--mut); }
+.n-me-code-text b { align-self: flex-start; font: 900 18px/1.3 ui-monospace, "SFMono-Regular", Menlo, monospace; letter-spacing: 2px; color: #fff; }
+.n-me-code .n-btn { min-height: 44px; flex: none; }
+.n-me-code .n-btn .n-ic { width: 20px; height: 20px; }
+.n-me-time { font: 900 15px/1 var(--font); color: var(--cyan-hi); }
+.n-me-tile-emoji { font-size: 18px; }
+.n-me-gap { margin-top: 12px; }
+.n-me-hint { margin-top: 10px; font: 500 12.5px/1.7 var(--font); color: var(--mut); }
+.n-me-bad { color: var(--bad-hi); }
+
+/* ---------- needs ---------- */
+.n-me-needs { display: flex; flex-direction: column; gap: 12px; }
+.n-me-need { display: flex; align-items: center; gap: 12px; }
+.n-me-need-ic { width: 34px; height: 34px; }
+.n-me-need-bar { flex: 1; min-width: 0; }
+.n-me-need .n-meter-head span { color: #dfe6ef; font-weight: 700; }
+.n-me-need.bad .n-meter-head b { color: var(--bad-hi); }
+.n-me-weather { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 12px; border-radius: 14px; text-align: start; background: var(--well); border: 1px solid #ffffff0d; }
+.n-me-weather > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.n-me-weather b { font: 800 13.5px/1.4 var(--font); color: var(--warn-hi); }
+.n-me-weather small { font: 500 12px/1.5 var(--font); color: var(--mut); }
+.n-me-mind { display: flex; align-items: center; gap: 12px; }
+
+/* ---------- medals on the profile ---------- */
+.n-me-medals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 6px; padding: 14px 8px; }
+.n-me-medal { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 44px; min-width: 0; }
+.n-me-medal-well { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #2a313c, #12161c 75%); border: 1.5px solid #ffffff14; }
+.n-me-medal-well .n-ic { width: 38px; height: 38px; }
+.n-me-medal.on .n-me-medal-well { border-color: #ff8a3d99; background: radial-gradient(circle at 50% 40%, #ff8a3d47, #1a1f27 72%); box-shadow: 0 0 16px #ff6b1a40; }
+.n-me-medal:not(.on) .n-me-medal-well .n-ic { opacity: .4; filter: grayscale(1); width: 28px; height: 28px; }
+.n-me-medal-name { width: 100%; font: 700 11.5px/1.35 var(--font); color: var(--mut); text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.n-me-medal.on .n-me-medal-name { color: #fff; }
+
+/* ---------- skills ---------- */
+.n-me-skills { display: flex; flex-direction: column; gap: 8px; }
+.n-me-skill { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
+.n-me-skill.max { border-color: #4cd07d4d; }
+.n-me-skill-well { flex: none; width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: radial-gradient(circle at 50% 60%, #3ec5f02e, var(--well) 70%); }
+.n-me-skill-well .n-ic { width: 38px; height: 38px; }
+.n-me-skill-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.n-me-skill-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.n-me-skill-head b { font: 800 15px/1.35 var(--font); color: #fff; min-width: 0; overflow-wrap: anywhere; }
+.n-me-skill-head small { font: 500 11.5px/1.35 var(--font); color: var(--mut); white-space: nowrap; }
+.n-me-skill-fig { font: 700 11.5px/1.2 var(--font); color: var(--faint); }
+.n-me-skill-lvl { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 16px; background: #3ec5f01c; border: 1px solid #3ec5f04d; }
+.n-me-skill-lvl small { font: 600 10.5px/1.2 var(--font); color: var(--cyan-hi); }
+.n-me-skill-lvl b { font: 900 20px/1.1 var(--font); color: #fff; }
+.n-me-skill.max .n-me-skill-lvl { background: #4cd07d1f; border-color: #4cd07d59; }
+.n-me-skill.max .n-me-skill-lvl small { color: var(--ok-hi); }
+.n-me-fresh-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 11px; background: var(--well); border: 1px dashed #ffffff1f; font: 700 12.5px/1.5 var(--font); color: var(--mut); }
+.n-me-fresh-chip .n-ic { opacity: .45; filter: grayscale(.8); }
+
+/* ---------- achievements ---------- */
+.n-me-ach-meter { margin-top: 12px; }
+.n-me-awards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.n-me-award { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 10px 14px; text-align: center; border-radius: 20px;
+  background: linear-gradient(180deg, #2e2a28, #1d222a); border: 1.5px solid #ff8a3d59; box-shadow: var(--sh-card), 0 0 18px #ff6b1a26; }
+.n-me-award .n-me-medal-well { width: 72px; height: 72px; border-color: #ff8a3d99; background: radial-gradient(circle at 50% 40%, #ff8a3d4d, #1a1f27 72%); box-shadow: 0 0 18px #ff6b1a4d; }
+.n-me-award .n-me-medal-well .n-ic { width: 50px; height: 50px; }
+.n-me-award b { font: 900 14px/1.4 var(--font); color: #fff; }
+.n-me-goal { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+.n-me-goal + .n-me-goal { border-top: 1px solid #ffffff0d; }
+.n-me-goal-well { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--well); border: 1.5px dashed #ffffff26; }
+.n-me-goal-well .n-ic { width: 32px; height: 32px; opacity: .5; filter: grayscale(.7); }
+.n-me-goal-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.n-me-goal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.n-me-goal-head b { font: 800 14.5px/1.35 var(--font); color: #fff; }
+.n-me-goal-fig { font: 700 11.5px/1.2 var(--font); color: var(--faint); }
+
+/* ---------- the player card ---------- */
+.n-me-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 4px; }
+.n-me-card h2 { margin-top: 14px; font: 900 23px/1.3 var(--font); color: #fff; overflow-wrap: anywhere; }
+.n-me-card p { margin-top: 2px; font: 500 13px/1.5 var(--font); color: var(--mut); }
+.n-me-bio { display: flex; align-items: flex-start; gap: 12px; }
+.n-me-bio > .n-ic { width: 36px; height: 36px; }
+.n-me-bio > div { flex: 1; min-width: 0; }
+.n-me-bio small { font: 700 12px/1.4 var(--font); color: var(--mut); }
+.n-me-bio p { margin-top: 2px; font: 600 14.5px/1.8 var(--font); color: #fff; white-space: pre-line; overflow-wrap: anywhere; }
+.n-me-bio p.none { color: var(--faint); font-weight: 500; }
+
+/* ---------- settings ---------- */
+.n-me-langs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.n-me-langs button { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 60px; border-radius: 16px; background: var(--well); border: 1.5px solid #ffffff14; font: 800 15px/1.3 var(--font); color: #c9d2de; }
+.n-me-langs button .n-ic { opacity: .5; filter: grayscale(.7); }
+.n-me-langs button[aria-pressed="true"] { border-color: var(--accent); color: #fff; background: radial-gradient(circle at 50% 120%, #ff8a3d33, var(--well) 70%); box-shadow: 0 0 16px #ff6b1a33; }
+.n-me-langs button[aria-pressed="true"] .n-ic { opacity: 1; filter: none; }
+.n-me-foot { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 14px; font: 500 11.5px/1.6 var(--font); color: var(--faint); text-align: center; }
+
+/* ---------- life ---------- */
+.n-me-life-chips { margin-top: 0; align-items: center; }
+.n-me-life-ic { width: 40px; height: 40px; margin-inline-end: 4px; filter: drop-shadow(0 6px 10px #ff6b1a55); }
